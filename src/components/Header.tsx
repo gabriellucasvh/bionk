@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 import NeoButton from './neo-button'
+import Image from 'next/image'
 
 const HeaderProps = [
     { label: "Menu", href: "/" },
@@ -12,8 +13,8 @@ const HeaderProps = [
 const Header = () => {
     return (
         <nav className='fixed inset-0 z-50 flex h-20 m-3 max-w-full items-center gap-4 p-4 rounded-lg bg-white shadow-black/30 shadow-md'>
-            <div>
-                <h1 className='font-bold italic text-xl'>Bionk</h1>
+            <div className='mx-10'>
+                <Link href={"/"}><Image src={"/bionk-logo.svg"} alt='logo' width={160} height={90}/></Link>
             </div>
             {HeaderProps.map((menu) => (
                 <ul className='' key={menu.label}>
