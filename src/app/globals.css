@@ -4,6 +4,7 @@
 @theme {
     --font-sans: var(--font-geist);
     --font-baithe: var(--font-baithe);
+    --color-rose: #ff527a
 }   
 
     @keyframes float {

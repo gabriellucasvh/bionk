@@ -17,14 +17,14 @@ export default function CtaSection() {
                     <div className="inline-flex flex-wrap justify-center gap-4">
                         <div className="relative group">
                             <NeoButton
-                                className="bg-white px-8 py-4 text-black font-semibold"
+                                className="bg-white flex px-8 py-4 text-black font-semibold"
                             >
                                 Criar Conta Grátis <ArrowRight className="ml-2 h-5 w-5" />
                             </NeoButton>
                         </div>
 
                         <NeoButton
-                            className="px-8 py-4 bg-green-400"
+                            className="bg-green-400 flex px-8 py-4 "
                         >
                             Ver Planos Premium <Users className="ml-2 h-5 w-5" />
                         </NeoButton>

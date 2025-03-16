@@ -19,7 +19,7 @@ const Header = () => {
             {HeaderProps.map((menu) => (
                 <ul className='' key={menu.label}>
                     <li>
-                        <Link className='text-gray-600 hover:text-black transition-colors duration-200 px-3 py-2 rounded-xl hover:bg-gray-200' href={menu.href}>{menu.label}</Link>
+                        <Link className='text-gray-600 hover:text-black transition-colors duration-200 px-3 py-2 rounded-md hover:bg-gray-200' href={menu.href}>{menu.label}</Link>
                     </li>
                 </ul>
             )

@@ -27,7 +27,7 @@ const Hero = () => {
       <div className="container relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-4 py-20 sm:px-6 lg:px-8 mt-20">
         {/* Tag */}
         <div 
-          className={`mb-6 transform rounded-full bg-green-400 px-4 py-1.5 text-xs font-medium tracking-wide text-white backdrop-blur-xl transition-all duration-700 ${
+          className={`mb-6 transform bg-rose  block -translate-x-1 -translate-y-1 rounded-lg border-2 border-[#222222]  px-4 py-1 text-sm font-medium tracking-tight transition-all group-hover/button:-translate-y-2 group-active/button:translate-x-0 group-active/button:translate-y-0 text-black backdrop-blur-xl duration-700 ${
             isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
           }`}
         >
@@ -44,7 +44,7 @@ const Hero = () => {
           Link para<br className="sm:hidden" />{" "}
           <span className="relative inline-block">
             Sua Bio
-            <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-blue-500"></span>
+            <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-rose"></span>
           </span>
         </h1>
 
@@ -67,12 +67,12 @@ const Hero = () => {
           style={{ transitionDelay: "300ms" }}
         >
           <NeoButton 
-            className="group relative bg-green-500 overflow-hidden px-6 py-3 text-black"
+            className="group relative bg-rose overflow-hidden px-6 py-3 text-black"
           >
             <span className="relative z-10 flex items-center font-medium">
               Comece Grátis <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </span>
-            <span className="absolute inset-0 z-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 transition-opacity group-hover:opacity-100"></span>
+            <span className="absolute inset-0 z-0 bg-white opacity-0 transition-opacity group-hover:opacity-100"></span>
           </NeoButton>
           <NeoButton 
             className="flex items-center  px-6 py-3 font-medium text-black bg-gray-50"
