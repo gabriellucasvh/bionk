@@ -19,15 +19,15 @@ const Hero = () => {
     <div className="relative min-h-screen w-full overflow-hidden text-white">
       {/* Elementos de background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-blue-50 opacity-60 blur-3xl"></div>
-        <div className="absolute top-1/2 -left-24 h-96 w-96 rounded-full bg-purple-50 opacity-60 blur-3xl"></div>
+        <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-green-300 opacity-60 blur-3xl"></div>
+        <div className="absolute top-1/2 -left-24 h-96 w-96 rounded-full bg-green-300 opacity-60 blur-3xl"></div>
       </div>
 
       {/* Container */}
       <div className="container relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-4 py-20 sm:px-6 lg:px-8 mt-20">
         {/* Tag */}
         <div 
-          className={`mb-6 transform rounded-full bg-black/5 px-4 py-1.5 text-xs font-medium tracking-wide text-gray-700 backdrop-blur-xl transition-all duration-700 ${
+          className={`mb-6 transform rounded-full bg-green-400 px-4 py-1.5 text-xs font-medium tracking-wide text-white backdrop-blur-xl transition-all duration-700 ${
             isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
           }`}
         >
@@ -36,7 +36,7 @@ const Hero = () => {
 
         {/* Texto principal */}
         <h1 
-          className={`mb-6 text-center tracking-wide font-baithe text-4xl font-bold text-gray-900 transition-all duration-700 sm:text-5xl md:text-6xl lg:text-7xl ${
+          className={`mb-6 text-center tracking-wider font-baithe text-4xl font-bold text-white transition-all duration-700 sm:text-5xl md:text-6xl lg:text-7xl ${
             isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
           }`}
           style={{ transitionDelay: "100ms" }}
@@ -50,7 +50,7 @@ const Hero = () => {
 
         {/* Descrição */}
         <p 
-          className={`mb-8 max-w-2xl text-center text-lg text-gray-600 transition-all duration-700 sm:text-xl ${
+          className={`mb-8 max-w-2xl text-center text-lg text-gray-200 transition-all duration-700 sm:text-xl ${
             isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
           }`}
           style={{ transitionDelay: "200ms" }}

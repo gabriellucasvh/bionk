@@ -12,14 +12,14 @@ const HeaderProps = [
 ]
 const Header = () => {
     return (
-        <nav className='fixed inset-0 z-50 flex h-20 m-3 max-w-full items-center gap-4 p-4 rounded-lg bg-white shadow-black/30 shadow-md'>
+        <nav className='fixed inset-0 z-50 flex h-20 m-3 max-w-full items-center  p-4 rounded-xl bg-white'>
             <div className='mx-10'>
-                <Link href={"/"}><Image src={"/bionk-logo.svg"} alt='logo' width={160} height={90}/></Link>
+                <Link href={"/"}><Image src={"/bionk-logo.svg"} alt='logo' width={160} height={90} /></Link>
             </div>
             {HeaderProps.map((menu) => (
                 <ul className='' key={menu.label}>
                     <li>
-                        <Link href={menu.href}>{menu.label}</Link>
+                        <Link className='text-gray-600 hover:text-black transition-colors duration-200 px-3 py-2 rounded-xl hover:bg-gray-200' href={menu.href}>{menu.label}</Link>
                     </li>
                 </ul>
             )
