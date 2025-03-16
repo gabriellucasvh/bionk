@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import { Geist } from "next/font/google"
+import Footer from "@/components/Footer";
 
 const geist = Geist({
   weight: ["100", "200", "300","400","500","600","700","800","900"],
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body>
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );

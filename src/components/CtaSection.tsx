@@ -24,7 +24,7 @@ export default function CtaSection() {
                         </div>
 
                         <NeoButton
-                            className="px-8 py-4"
+                            className="px-8 py-4 bg-green-400"
                         >
                             Ver Planos Premium <Users className="ml-2 h-5 w-5" />
                         </NeoButton>
