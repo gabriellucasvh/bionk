@@ -18,7 +18,7 @@ const HeaderMobile = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <nav className='flex md:hidden fixed inset-x-0 z-50 m-3 max-w-full items-center justify-between p-4 rounded-xl bg-white'>
+        <nav className='flex md:hidden fixed inset-x-0 z-50 m-3 max-w-full items-center justify-between p-4 rounded-xl bg-white border'>
             <div>
                 <Link href={'/'}>
                     <Image src={'/bionk-logo.svg'} alt='logo' width={100} height={50} />
@@ -34,7 +34,7 @@ const HeaderMobile = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.3 }}
-                        className='absolute top-full mt-1 rounded-xl left-0 w-full flex flex-col p-4 space-y-2 bg-white shadow-md'>
+                        className='absolute top-full mt-1 rounded-xl left-0 w-full flex flex-col p-4 space-y-2 bg-white shadow-md border'>
                         {HeaderProps.map((menu) => (
                             <motion.div 
                                 key={menu.label} 
