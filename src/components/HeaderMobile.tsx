@@ -21,7 +21,7 @@ const HeaderMobile = () => {
         <nav className='flex md:hidden fixed inset-x-0 z-50 m-3 max-w-full items-center justify-between p-4 rounded-xl bg-white'>
             <div>
                 <Link href={'/'}>
-                    <Image src={'/bionk-logo-quadrado.svg'} alt='logo' width={50} height={50} />
+                    <Image src={'/bionk-logo.svg'} alt='logo' width={100} height={50} />
                 </Link>
             </div>
             <button onClick={() => setIsOpen(!isOpen)} className='focus:outline-none'>
