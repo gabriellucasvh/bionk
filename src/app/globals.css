@@ -3,7 +3,8 @@
 
 @theme {
     --font-sans: var(--font-geist);
-}
+    --font-baithe: var(--font-baithe);
+}   
 
     @keyframes float {
       0% { transform: translateY(0px); }

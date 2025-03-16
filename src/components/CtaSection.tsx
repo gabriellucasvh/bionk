@@ -7,7 +7,7 @@ export default function CtaSection() {
         <section className="py-20 bg-white text-black">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl text-center">
                 <div className="max-w-3xl mx-auto">
-                    <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+                    <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-baithe tracking-wide">
                         Pronto para unificar sua presença online?
                     </h2>
                     <p className="text-lg mb-8 text-black">
