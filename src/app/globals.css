@@ -2,6 +2,21 @@
 
 
 @theme {
-
     --font-sans: var(--font-geist);
 }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+  
+    .float-animation {
+      animation: float 6s ease-in-out infinite;
+    }
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }

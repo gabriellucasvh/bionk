@@ -11,7 +11,7 @@ const HeaderProps = [
 ]
 const Header = () => {
     return (
-        <nav className='fixed inset-0 z-50 flex h-20 m-3 max-w-full items-center gap-4 p-4 rounded-lg bg-gray-200 shadow-black/30 shadow-md'>
+        <nav className='fixed inset-0 z-50 flex h-20 m-3 max-w-full items-center gap-4 p-4 rounded-lg bg-white shadow-black/30 shadow-md'>
             <div>
                 <h1 className='font-bold italic text-xl'>Bionk</h1>
             </div>

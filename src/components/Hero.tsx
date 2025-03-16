@@ -27,7 +27,7 @@ const Hero = () => {
       <div className="container relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-4 py-20 sm:px-6 lg:px-8">
         {/* Tag */}
         <div 
-          className={`mb-6 transform rounded-full bg-black/5 px-4 py-1.5 text-xs font-medium tracking-wide text-gray-700 backdrop-blur transition-all duration-700 ${
+          className={`mb-6 transform rounded-full bg-black/5 px-4 py-1.5 text-xs font-medium tracking-wide text-gray-700 backdrop-blur-xl transition-all duration-700 ${
             isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
           }`}
         >
@@ -113,8 +113,8 @@ const Hero = () => {
           </div>
 
           {/* Elementos flutuantes */}
-          <div className="absolute -right-4 -top-4 h-20 w-20 rounded-xl bg-blue-500/10 backdrop-blur float-animation" style={{ animationDelay: "0.2s" }}></div>
-          <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-purple-500/10 backdrop-blur float-animation" style={{ animationDelay: "0.5s" }}></div>
+          <div className="absolute -right-4 -top-4 h-20 w-20 rounded-xl bg-blue-500/10 backdrop-blur-xl float-animation" style={{ animationDelay: "0.2s" }}></div>
+          <div className="absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-purple-500/10 backdrop-blur-xl float-animation" style={{ animationDelay: "0.5s" }}></div>
         </div>
       </div>
     </div>
