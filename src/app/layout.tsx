@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/Header";
 import { Geist } from "next/font/google"
-import Footer from "@/components/Footer";
 import localFont from "next/font/local"
 
 const baithe = localFont({
@@ -29,9 +27,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${geist.variable} ${baithe.variable} antialiased bg-green-500`}>
       <body>
-        <Header />
         {children}
-        <Footer />
       </body>
     </html>
   );

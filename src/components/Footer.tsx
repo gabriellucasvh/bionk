@@ -29,7 +29,7 @@ const Footer = () => {
   return (
     <footer
       aria-labelledby="footer-heading"
-      className="font-inter w-full  bg-gray-100 py-10 text-black"
+      className="font-inter w-full mt-auto bg-gray-100 py-10 text-black"
     >
       <h2 id="footer-heading" className="sr-only">
         Footer
