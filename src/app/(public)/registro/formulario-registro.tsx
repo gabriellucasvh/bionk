@@ -41,7 +41,7 @@ function Register() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/");
+      router.replace("/dashboard");
     }
   }, [status, router]);
 
