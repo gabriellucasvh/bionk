@@ -1,7 +1,10 @@
+"use client"
+
 import Link from 'next/link'
 import React from 'react'
 import NeoButton from './neo-button'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 const HeaderProps = [
     { label: "Menu", href: "/" },
@@ -11,6 +14,7 @@ const HeaderProps = [
     { label: "Ajuda", href: "/ajuda" },
 ]
 const Header = () => {
+    const route = useRouter()
     return (
         <nav className='hidden md:flex fixed inset-0 z-50 h-20 m-3 max-w-full items-center p-4 rounded-xl bg-white border'>
             <div className='mx-10'>
@@ -25,8 +29,8 @@ const Header = () => {
             )
             )}
             <div className='flex w-full justify-end gap-4'>
-                <NeoButton className='bg-white'>Login</NeoButton>
-                <NeoButton className='bg-green-400'>Cadastre-se</NeoButton>
+                <NeoButton onClick={() => route.push("/login")} className='bg-white'>Login</NeoButton>
+                <NeoButton onClick={() => route.push("/registro")} className='bg-green-400'>Cadastre-se</NeoButton>
             </div>
         </nav>
     )

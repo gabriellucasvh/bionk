@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Geist } from "next/font/google"
 import localFont from "next/font/local"
+import NextAuthSessionProvider from "@/providers/sessionProvider";
 
 const baithe = localFont({
   src: "/fonts/baithe.otf",
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${geist.variable} ${baithe.variable} antialiased bg-green-500`}>
       <body>
-        {children}
+        <NextAuthSessionProvider>
+          {children}
+        </NextAuthSessionProvider>
       </body>
     </html>
   );
