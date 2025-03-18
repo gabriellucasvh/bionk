@@ -19,7 +19,7 @@ const Sidebar = ({ setActiveTab, activeTab }: SidebarProps) => {
         </Link>
       </div>
       <nav className="grid gap-1 p-2">
-        <Button variant="ghost" className="justify-start gap-2" onClick={() => setActiveTab("profile")}>
+        <Button variant={activeTab === "profile" ? "secondary" : "ghost"} className="justify-start gap-2" onClick={() => setActiveTab("profile")}>
           <User className="h-4 w-4" />
           Perfil
         </Button>
@@ -27,11 +27,11 @@ const Sidebar = ({ setActiveTab, activeTab }: SidebarProps) => {
           <Link2 className="h-4 w-4" />
           Links
         </Button>
-        <Button variant="ghost" className="justify-start gap-2" onClick={() => setActiveTab("analytics")}>
+        <Button variant={activeTab === "analytics" ? "secondary" : "ghost"} className="justify-start gap-2" onClick={() => setActiveTab("analytics")}>
           <BarChart3 className="h-4 w-4" />
           Análises
         </Button>
-        <Button variant="ghost" className="justify-start gap-2" onClick={() => setActiveTab("settings")}>
+        <Button variant={activeTab === "settings" ? "secondary" : "ghost"} className="justify-start gap-2" onClick={() => setActiveTab("settings")}>
           <Settings className="h-4 w-4" />
           Configurações
         </Button>

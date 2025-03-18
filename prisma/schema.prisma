@@ -10,7 +10,7 @@ datasource db {
 model User {
   id             String    @id @default(uuid())
   name           String?
-  username       String?    
+  username       String?
   email          String    @unique
   bio            String?
   provider       String?
@@ -18,4 +18,17 @@ model User {
   image          String?
   hashedPassword String?
   createdAt      DateTime  @default(now())
+  Link           Link[]
+}
+
+model Link {
+  id        Int     @id @default(autoincrement())
+  title     String
+  url       String
+  active    Boolean @default(true)
+  sensitive Boolean @default(false)
+  clicks    Int     @default(0)
+  order     Int     @default(0)
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
 }
