@@ -80,7 +80,7 @@ type LinkItem = {
   isEditing?: boolean;
 };
 
-const LinksTab = () => {
+const LinksClient = () => {
   const { data: session } = useSession();
   const [links, setLinks] = useState<LinkItem[]>([]);
   const [isAdding, setIsAdding] = useState<boolean>(false);
@@ -224,7 +224,7 @@ const LinksTab = () => {
   };
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-4 w-full p-4">
       <header className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Gerenciar links</h2>
         <Button onClick={() => setIsAdding(true)}>
@@ -410,4 +410,4 @@ const LinksTab = () => {
   );
 };
 
-export default LinksTab;
+export default LinksClient;

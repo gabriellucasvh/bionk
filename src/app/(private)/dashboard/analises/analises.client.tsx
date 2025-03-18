@@ -6,9 +6,9 @@ import { ChevronDown, ChevronUp, LayoutDashboard } from "lucide-react"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
-const AbaDeAnalytics = () => {
+const AnalisesClient = () => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full p-4">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Análises</h2>
@@ -178,4 +178,4 @@ const AbaDeAnalytics = () => {
   )
 }
 
-export default AbaDeAnalytics
+export default AnalisesClient

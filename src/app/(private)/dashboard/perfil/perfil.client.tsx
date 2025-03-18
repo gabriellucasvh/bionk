@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Edit } from "lucide-react"
 import Image from "next/image"
 
-const ProfileTab = () => {
+const PerfilClient = () => {
   const { data: session } = useSession()
   const [name, setName] = useState("")
   const [username, setUsername] = useState("")
@@ -84,7 +84,7 @@ const ProfileTab = () => {
   }
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-4 w-full p-4">
       <header className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Perfil</h2>
         <Button onClick={handleSaveProfile} disabled={loading || !hasChanges}>
@@ -183,4 +183,4 @@ const ProfileTab = () => {
   )
 }
 
-export default ProfileTab
+export default PerfilClient
