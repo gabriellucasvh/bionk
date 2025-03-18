@@ -16,7 +16,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden text-white">
+    <div className="relative min-h-screen w-full overflow-hidden text-white bg-green-500">
       {/* Elementos de background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-green-300 opacity-60 blur-3xl"></div>

@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
+import ClientDashboard from "./client-dashboard"
 export default async function dashboard() {
 
     const session = await getServerSession()
@@ -8,6 +9,8 @@ export default async function dashboard() {
         return redirect('/')
     }
     return(
-        <div>oi</div>
+        <div className="bg-white">
+            <ClientDashboard />
+        </div>
     )
 }
