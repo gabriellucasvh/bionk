@@ -37,7 +37,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-full border-r bg-muted/40 md:w-64">
+    <aside className="fixed inset-y-0 left-0 w-full border-r bg-muted/40 md:w-64">
       <header className="flex h-14 items-center border-b px-6">
         <Link href="/" className="flex items-center justify-center gap-2 font-semibold">
           <Image src="/bionk-logo.svg" alt="logo" width={90} height={90} />
