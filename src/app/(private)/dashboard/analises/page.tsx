@@ -3,9 +3,11 @@ import AnalisesClient from "./analises.client";
 
 export default function analises() {
     return (
-        <div className="flex h-screen">
+        <>
             <Sidebar />
-            <AnalisesClient />
-        </div>
+            <main className="ml-0 md:ml-64 h-screen overflow-y-auto">
+                <AnalisesClient />
+            </main>
+        </>
     )
 }

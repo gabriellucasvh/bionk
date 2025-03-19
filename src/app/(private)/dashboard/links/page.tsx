@@ -3,9 +3,11 @@ import LinksClient from "./links.client";
 
 export default function links() {
     return (
-        <div className="flex h-screen">
+        <>
             <Sidebar />
-            <LinksClient />
-        </div>
+            <main className="ml-0 md:ml-64 h-screen overflow-y-auto">
+                <LinksClient />
+            </main>
+        </>
     );
 }
