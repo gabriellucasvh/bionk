@@ -1,4 +1,4 @@
-// Arquivo: /app/api/profile/[id]/route.ts
+// app/api/profile/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -16,7 +16,13 @@ export async function GET(request: NextRequest, { params }: Params) {
   try {
     const profile = await prisma.user.findUnique({
       where: { id },
-      select: { name: true, username: true, bio: true },
+      select: {
+        name: true,
+        username: true,
+        bio: true,
+        bannerUrl: true,   // Adicionado para retornar o banner do usuário
+        profileUrl: true,  // Adicionado para retornar a foto de perfil do usuário
+      },
     });
 
     if (!profile) {
@@ -48,7 +54,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     if (username) {
       const existingUsers = await prisma.user.findMany({
-        where: { username: username, NOT: { id: id } },
+        where: { username: username, NOT: { id } },
       });
 
       if (existingUsers.length > 0) {
@@ -63,7 +69,13 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     return NextResponse.json({
       message: "Perfil atualizado com sucesso",
-      user: { name: updatedUser.name, username: updatedUser.username, bio: updatedUser.bio },
+      user: {
+        name: updatedUser.name,
+        username: updatedUser.username,
+        bio: updatedUser.bio,
+        bannerUrl: updatedUser.bannerUrl,
+        profileUrl: updatedUser.profileUrl,
+      },
     });
   } catch (error) {
     console.error("Erro ao atualizar perfil:", error);

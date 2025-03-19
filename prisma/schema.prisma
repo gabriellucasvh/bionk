@@ -16,6 +16,8 @@ model User {
   provider       String?
   emailVefied    DateTime?
   image          String?
+  bannerUrl      String?
+  profileUrl     String?
   hashedPassword String?
   createdAt      DateTime  @default(now())
   Link           Link[]

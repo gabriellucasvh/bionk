@@ -1,87 +1,158 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useSession } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Edit } from "lucide-react"
-import Image from "next/image"
+import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Edit } from "lucide-react";
+import Image from "next/image";
 
 const PerfilClient = () => {
-  const { data: session } = useSession()
-  const [name, setName] = useState("")
-  const [username, setUsername] = useState("")
-  const [bio, setBio] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState("")
-  const [originalProfile, setOriginalProfile] = useState({ name: "", username: "", bio: "" })
+  const { data: session } = useSession();
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [bio, setBio] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [originalProfile, setOriginalProfile] = useState({ name: "", username: "", bio: "" });
+
+  // Estados para as imagens
+  const [bannerPreview, setBannerPreview] = useState<string>("/banner.png");
+  const [profilePreview, setProfilePreview] = useState<string>("/person.png");
+
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const profileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (session?.user?.id) {
       const fetchProfile = async () => {
-        const res = await fetch(`/api/profile/${session.user.id}`)
-        const data = await res.json()
-        const fetchedName = data.name || ""
-        const fetchedUsername = data.username || ""
-        const fetchedBio = data.bio || ""
-        setName(fetchedName)
-        setUsername(fetchedUsername)
-        setBio(fetchedBio)
-        setOriginalProfile({ name: fetchedName, username: fetchedUsername, bio: fetchedBio })
-      }
-      fetchProfile()
+        const res = await fetch(`/api/profile/${session.user.id}`);
+        const data = await res.json();
+        const fetchedName = data.name || "";
+        const fetchedUsername = data.username || "";
+        const fetchedBio = data.bio || "";
+        setName(fetchedName);
+        setUsername(fetchedUsername);
+        setBio(fetchedBio);
+        setOriginalProfile({ name: fetchedName, username: fetchedUsername, bio: fetchedBio });
+        // Atualiza os previews se os links já estiverem salvos
+        if (data.bannerUrl) setBannerPreview(data.bannerUrl);
+        if (data.profileUrl) setProfilePreview(data.profileUrl);
+      };
+      fetchProfile();
     }
-  }, [session])
+  }, [session]);
 
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
-        setMessage("")
-      }, 5000)
-      return () => clearTimeout(timer)
+        setMessage("");
+      }, 5000);
+      return () => clearTimeout(timer);
     }
-  }, [message])
+  }, [message]);
 
   const hasChanges =
     name !== originalProfile.name ||
     username !== originalProfile.username ||
-    bio !== originalProfile.bio
+    bio !== originalProfile.bio;
 
   const handleSaveProfile = async () => {
-    if (!session?.user?.id) return
+    if (!session?.user?.id) return;
 
-    setLoading(true)
-    setMessage("")
+    setLoading(true);
+    setMessage("");
 
     try {
       const response = await fetch(`/api/profile/${session.user.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, username, bio }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Falha ao atualizar o perfil")
+        throw new Error(data.error || "Falha ao atualizar o perfil");
       }
 
-      setMessage("Perfil atualizado com sucesso!")
-      setOriginalProfile({ name, username, bio })
+      setMessage("Perfil atualizado com sucesso!");
+      setOriginalProfile({ name, username, bio });
     } catch (error) {
-      console.error("Erro ao atualizar o perfil:", error)
+      console.error("Erro ao atualizar o perfil:", error);
       if (error instanceof Error) {
-        setMessage(`Erro: ${error.message}`)
+        setMessage(`Erro: ${error.message}`);
       } else {
-        setMessage("Erro: Ocorreu um problema ao atualizar o perfil")
+        setMessage("Erro: Ocorreu um problema ao atualizar o perfil");
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
+  const uploadImage = async (file: File, type: "banner" | "profile") => {
+    if (!session?.user?.id) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", type);
+    try {
+      const response = await fetch(`/api/profile/${session.user.id}/upload?type=${type}`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Falha no upload da imagem");
+      }
+      setMessage(
+        `${type === "banner" ? "Banner" : "Foto de perfil"} atualizado com sucesso!`
+      );
+      // Atualiza o preview com a URL retornada, se houver
+      if (data.url) {
+        type === "banner" ? setBannerPreview(data.url) : setProfilePreview(data.url);
+      }
+    } catch (error) {
+      console.error(`Erro ao fazer upload do ${type}:`, error);
+      if (error instanceof Error) {
+        setMessage(`Erro: ${error.message}`);
+      } else {
+        setMessage(`Erro: Ocorreu um problema ao fazer upload do ${type}`);
+      }
+    }
+  };
+
+  const handleBannerChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Limite de 5MB para o banner
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage("Erro: O banner deve ter no máximo 5MB.");
+      return;
+    }
+    // Atualiza o preview do banner
+    const previewUrl = URL.createObjectURL(file);
+    setBannerPreview(previewUrl);
+    // Realiza o upload do banner
+    uploadImage(file, "banner");
+  };
+
+  const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Limite de 2MB para a foto de perfil
+    if (file.size > 2 * 1024 * 1024) {
+      setMessage("Erro: A foto de perfil deve ter no máximo 2MB.");
+      return;
+    }
+    // Atualiza o preview da foto de perfil
+    const previewUrl = URL.createObjectURL(file);
+    setProfilePreview(previewUrl);
+    // Realiza o upload da foto de perfil
+    uploadImage(file, "profile");
+  };
 
   return (
     <section className="space-y-4 w-full p-4">
@@ -110,37 +181,59 @@ const PerfilClient = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <div className="relative mx-auto h-[500px] w-full border overflow-hidden rounded-lg bg-muted">
+          <article className="space-y-4">
+            <div className="relative mx-auto h-[300px] w-full border overflow-hidden rounded-lg bg-muted">
               <Image
-                src="/banner.png"
+                src={bannerPreview}
                 alt="Banner"
                 width={1500}
                 height={500}
                 className="h-full w-full object-cover"
               />
-              <Button size="sm" className="absolute bottom-2 right-2">
+              <Button
+                size="sm"
+                className="absolute bottom-2 right-2"
+                onClick={() => bannerInputRef.current?.click()}
+              >
                 <Edit className="mr-2 h-4 w-4" />
                 Alterar banner
               </Button>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={bannerInputRef}
+                onChange={handleBannerChange}
+              />
             </div>
 
             <div className="flex flex-col items-center gap-4 sm:flex-row">
-              <div className="relative">
+              <article className="relative">
                 <div className="h-24 w-24 overflow-hidden rounded-full bg-muted">
                   <Image
-                    src="/person.png"
-                    alt="Profile"
+                    src={profilePreview}
+                    alt="Foto de perfil"
                     width={96}
                     height={96}
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <Button size="icon" className="absolute bottom-0 right-0 h-8 w-8 rounded-full">
+                <Button
+                  size="icon"
+                  className="absolute bottom-0 right-0 h-8 w-8 rounded-full"
+                  onClick={() => profileInputRef.current?.click()}
+                >
                   <Edit className="h-4 w-4" />
                 </Button>
-              </div>
-              <div className="flex-1 space-y-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={profileInputRef}
+                  onChange={handleProfileChange}
+                />
+              </article>
+              <article className="flex-1 space-y-4">
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nome</Label>
                   <Input
@@ -150,20 +243,19 @@ const PerfilClient = () => {
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
-
                 <div className="grid gap-2">
                   <Label htmlFor="username">Nome de usuário</Label>
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">bionk.me/</span>
                     <Input
-                      id="user"
+                      id="username"
                       placeholder="username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
                   </div>
                 </div>
-              </div>
+              </article>
             </div>
 
             <div className="grid gap-2">
@@ -176,11 +268,11 @@ const PerfilClient = () => {
                 onChange={(e) => setBio(e.target.value)}
               />
             </div>
-          </div>
+          </article>
         </CardContent>
       </Card>
     </section>
-  )
-}
+  );
+};
 
-export default PerfilClient
+export default PerfilClient;
