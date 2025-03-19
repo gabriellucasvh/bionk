@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 
-// Importações do dnd-kit para reordenação
 import {
   DndContext,
   closestCenter,
@@ -47,28 +46,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-// Importa o modificador para restringir os itens ao elemento pai
 import { restrictToParentElement } from "@dnd-kit/modifiers";
-
-interface SortableItemProps {
-  id: number;
-  children: React.ReactNode;
-}
-
-const SortableItem = ({ id, children }: SortableItemProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {children}
-    </div>
-  );
-};
 
 type LinkItem = {
   id: number;
@@ -80,33 +58,50 @@ type LinkItem = {
   isEditing?: boolean;
 };
 
+interface SortableItemProps {
+  id: number;
+  children: (props: { listeners: any; attributes: any }) => React.ReactNode;
+}
+
+const SortableItem = ({ id, children }: SortableItemProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    touchAction: "none",
+  };
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      {children({ listeners, attributes })}
+    </div>
+  );
+};
+
 const LinksClient = () => {
   const { data: session } = useSession();
   const [links, setLinks] = useState<LinkItem[]>([]);
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [newTitle, setNewTitle] = useState<string>("");
   const [newUrl, setNewUrl] = useState<string>("");
-  const [activeId, setActiveId] = useState<number | null>(null);
 
-  // Carrega os links do usuário
   useEffect(() => {
     const fetchLinks = async () => {
       if (session?.user?.id) {
         const res = await fetch(`/api/links?userId=${session.user.id}`);
         const data = await res.json();
-        setLinks(data.links); // Supondo resposta { links: LinkItem[] }
+        setLinks(data.links);
       }
     };
     fetchLinks();
   }, [session]);
 
-  // Função simples de validação para URL (verifica se contém extensão de domínio)
   const isValidUrl = (url: string) => {
     const regex = /\.(com|br|me|net|org|info|io|co)$/i;
     return regex.test(url);
   };
 
-  // Adiciona novo link e salva no banco
   const handleAddNewLink = async () => {
     let formattedUrl = newUrl.trim();
     if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
@@ -137,7 +132,6 @@ const LinksClient = () => {
     }
   };
 
-  // Excluir link
   const handleDeleteLink = async (id: number) => {
     const res = await fetch(`/api/links/${id}`, { method: "DELETE" });
     if (res.ok) {
@@ -145,7 +139,6 @@ const LinksClient = () => {
     }
   };
 
-  // Alterna o status "active"
   const toggleActive = async (id: number) => {
     const updated = links.map((link) =>
       link.id === id ? { ...link, active: !link.active } : link
@@ -160,7 +153,6 @@ const LinksClient = () => {
     });
   };
 
-  // Alterna o status "sensitive"
   const toggleSensitive = async (id: number) => {
     const updated = links.map((link) =>
       link.id === id ? { ...link, sensitive: !link.sensitive } : link
@@ -175,7 +167,6 @@ const LinksClient = () => {
     });
   };
 
-  // Edição inline
   const startEditing = (id: number) => {
     setLinks((prev) =>
       prev.map((link) => (link.id === id ? { ...link, isEditing: true } : link))
@@ -200,10 +191,10 @@ const LinksClient = () => {
     );
   };
 
-  // Configuração dos sensores para drag & drop
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
 
-  // Reordenação dos links via dnd-kit
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
@@ -211,7 +202,6 @@ const LinksClient = () => {
       const newIndex = links.findIndex((link) => link.id === over?.id);
       const newLinks = arrayMove(links, oldIndex, newIndex);
       setLinks(newLinks);
-      // Atualiza a ordem no banco
       await fetch(`/api/links/reorder`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -224,7 +214,7 @@ const LinksClient = () => {
   };
 
   return (
-    <section className="space-y-4 w-full p-4">
+    <section className="w-full p-4 space-y-4">
       <header className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Gerenciar links</h2>
         <Button onClick={() => setIsAdding(true)}>
@@ -276,7 +266,7 @@ const LinksClient = () => {
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
-            modifiers={[restrictToParentElement]} 
+            modifiers={[restrictToParentElement]}
           >
             <SortableContext
               items={links.map((link) => link.id)}
@@ -284,122 +274,148 @@ const LinksClient = () => {
             >
               {links.map((link) => (
                 <SortableItem key={link.id} id={link.id}>
-                  <div className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center">
-                    <div className="flex items-center gap-3 sm:w-7/12">
-                      <Grip className="h-5 w-5 cursor-move text-muted-foreground" />
-                      <div className="flex-1 space-y-1">
-                        {link.isEditing ? (
-                          <div className="space-y-2">
-                            <input
-                              type="text"
-                              className="w-full border rounded px-2 py-1"
-                              value={link.title}
-                              onChange={(e) =>
-                                setLinks((prev) =>
-                                  prev.map((l) =>
-                                    l.id === link.id ? { ...l, title: e.target.value } : l
-                                  )
-                                )
-                              }
-                            />
-                            <input
-                              type="url"
-                              className="w-full border rounded px-2 py-1"
-                              value={link.url}
-                              onChange={(e) =>
-                                setLinks((prev) =>
-                                  prev.map((l) =>
-                                    l.id === link.id ? { ...l, url: e.target.value } : l
-                                  )
-                                )
-                              }
-                            />
-                            <div className="flex gap-2">
-                              <Button onClick={() => saveEditing(link.id, link.title, link.url)}>
-                                Salvar
-                              </Button>
-                              <Button variant="outline" onClick={() => cancelEditing(link.id)}>
-                                Cancelar
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">{link.title}</span>
-                              {link.sensitive && (
-                                <Badge variant="outline" className="text-xs border-red-300">
-                                  Sensível
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-1 text-sm text-blue-500">
-                              <ExternalLink className="h-3 w-3" />
-                              <Link
-                                className="truncate"
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {link.url}
-                              </Link>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 sm:w-5/12 sm:justify-end">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="flex items-center gap-1">
-                          <Eye className="h-3 w-3" />
-                          {link.clicks}
-                        </Badge>
-                        <Switch
-                          checked={link.active}
-                          aria-label={link.active ? "Desabilitar link" : "Habilitar link"}
-                          onChange={() => toggleActive(link.id)}
+                  {({ listeners }) => (
+                    <article className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center">
+                      <div className="flex items-center gap-3 sm:w-7/12">
+                        {/* O arraste ocorrerá somente ao interagir com o ícone */}
+                        <Grip
+                          {...listeners}
+                          className="h-5 w-5 cursor-move text-muted-foreground"
                         />
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => startEditing(link.id)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
-                              Ver informações
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => toggleSensitive(link.id)}>
-                              {link.sensitive ? (
-                                <>
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  Conteúdo não Sensível
-                                </>
-                              ) : (
-                                <>
-                                  <EyeOff className="mr-2 h-4 w-4" />
-                                  Conteúdo Sensível
-                                </>
-                              )}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="flex items-center text-destructive focus:text-destructive"
-                              onClick={() => handleDeleteLink(link.id)}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4 text-destructive" />
-                              Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex-1 space-y-1">
+                          {link.isEditing ? (
+                            <div className="space-y-2">
+                              <input
+                                type="text"
+                                className="w-full border rounded px-2 py-1"
+                                value={link.title}
+                                onChange={(e) =>
+                                  setLinks((prev) =>
+                                    prev.map((l) =>
+                                      l.id === link.id ? { ...l, title: e.target.value } : l
+                                    )
+                                  )
+                                }
+                              />
+                              <input
+                                type="url"
+                                className="w-full border rounded px-2 py-1"
+                                value={link.url}
+                                onChange={(e) =>
+                                  setLinks((prev) =>
+                                    prev.map((l) =>
+                                      l.id === link.id ? { ...l, url: e.target.value } : l
+                                    )
+                                  )
+                                }
+                              />
+                              <div className="flex gap-2">
+                                <Button
+                                  onClick={() =>
+                                    saveEditing(link.id, link.title, link.url)
+                                  }
+                                >
+                                  Salvar
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => cancelEditing(link.id)}
+                                >
+                                  Cancelar
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{link.title}</span>
+                                {link.sensitive && (
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs border-red-300"
+                                  >
+                                    Sensível
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1 text-sm text-blue-500">
+                                <ExternalLink className="h-3 w-3" />
+                                <Link
+                                  className="truncate"
+                                  href={link.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {link.url}
+                                </Link>
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                      <div className="flex items-center gap-2 sm:w-5/12 sm:justify-end">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="flex items-center gap-1">
+                            <Eye className="h-3 w-3" />
+                            {link.clicks}
+                          </Badge>
+                          <Switch
+                            checked={link.active}
+                            aria-label={
+                              link.active ? "Desabilitar link" : "Habilitar link"
+                            }
+                            onChange={() => toggleActive(link.id)}
+                          />
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => startEditing(link.id)}
+                              >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Eye className="mr-2 h-4 w-4" />
+                                Ver informações
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => toggleSensitive(link.id)}
+                              >
+                                {link.sensitive ? (
+                                  <>
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    Conteúdo não Sensível
+                                  </>
+                                ) : (
+                                  <>
+                                    <EyeOff className="mr-2 h-4 w-4" />
+                                    Conteúdo Sensível
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="flex items-center text-destructive focus:text-destructive"
+                                onClick={() => handleDeleteLink(link.id)}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4 text-destructive" />
+                                Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    </article>
+                  )}
                 </SortableItem>
               ))}
             </SortableContext>
