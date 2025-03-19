@@ -85,6 +85,7 @@ const LinksClient = () => {
   const [isAdding, setIsAdding] = useState<boolean>(false);
   const [newTitle, setNewTitle] = useState<string>("");
   const [newUrl, setNewUrl] = useState<string>("");
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
 
   useEffect(() => {
     const fetchLinks = async () => {
@@ -92,6 +93,7 @@ const LinksClient = () => {
         const res = await fetch(`/api/links?userId=${session.user.id}`);
         const data = await res.json();
         setLinks(data.links);
+        setIsProfileLoading(false); // Finaliza o carregamento após a busca dos dados
       }
     };
     fetchLinks();
@@ -212,6 +214,13 @@ const LinksClient = () => {
       });
     }
   };
+  if (isProfileLoading) {
+    return (
+      <section className="flex items-center justify-center h-screen">
+        <span className="loader"></span>
+      </section>
+    );
+  }
 
   return (
     <section className="w-full p-4 space-y-4">

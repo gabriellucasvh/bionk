@@ -3,7 +3,13 @@
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +24,7 @@ const PerfilClient = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [originalProfile, setOriginalProfile] = useState({ name: "", username: "", bio: "" });
+  const [isProfileLoading, setIsProfileLoading] = useState(true); // Estado para controle de carregamento
 
   // Estados para as imagens
   const [bannerPreview, setBannerPreview] = useState<string>("/banner.png");
@@ -38,9 +45,9 @@ const PerfilClient = () => {
         setUsername(fetchedUsername);
         setBio(fetchedBio);
         setOriginalProfile({ name: fetchedName, username: fetchedUsername, bio: fetchedBio });
-        // Atualiza os previews se os links já estiverem salvos
         if (data.bannerUrl) setBannerPreview(data.bannerUrl);
         if (data.profileUrl) setProfilePreview(data.profileUrl);
+        setIsProfileLoading(false); // Finaliza o carregamento após a busca dos dados
       };
       fetchProfile();
     }
@@ -107,10 +114,7 @@ const PerfilClient = () => {
       if (!response.ok) {
         throw new Error(data.error || "Falha no upload da imagem");
       }
-      setMessage(
-        `${type === "banner" ? "Banner" : "Foto de perfil"} atualizado com sucesso!`
-      );
-      // Atualiza o preview com a URL retornada, se houver
+      setMessage(`${type === "banner" ? "Banner" : "Foto de perfil"} atualizado com sucesso!`);
       if (data.url) {
         type === "banner" ? setBannerPreview(data.url) : setProfilePreview(data.url);
       }
@@ -127,32 +131,35 @@ const PerfilClient = () => {
   const handleBannerChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Limite de 5MB para o banner
     if (file.size > 5 * 1024 * 1024) {
       setMessage("Erro: O banner deve ter no máximo 5MB.");
       return;
     }
-    // Atualiza o preview do banner
     const previewUrl = URL.createObjectURL(file);
     setBannerPreview(previewUrl);
-    // Realiza o upload do banner
     uploadImage(file, "banner");
   };
 
   const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Limite de 2MB para a foto de perfil
     if (file.size > 2 * 1024 * 1024) {
       setMessage("Erro: A foto de perfil deve ter no máximo 2MB.");
       return;
     }
-    // Atualiza o preview da foto de perfil
     const previewUrl = URL.createObjectURL(file);
     setProfilePreview(previewUrl);
-    // Realiza o upload da foto de perfil
     uploadImage(file, "profile");
   };
+
+  // Renderiza um placeholder enquanto os dados do usuário são carregados
+  if (isProfileLoading) {
+    return (
+      <section className="flex items-center justify-center h-screen">
+        <span className="loader"></span>
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-4 w-full p-4">
