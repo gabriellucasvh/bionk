@@ -1,12 +1,15 @@
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
-export default async function dashboard() {
 
+export default async function Dashboard() {
     const session = await getServerSession()
 
-    if(!session) {
-        return redirect('/')
-    } else {
-        return redirect('/dashboard/perfil')
+    // Simula um pequeno delay para garantir que a sessão foi carregada
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    if (!session) {
+        redirect('/')
     }
+
+    redirect('/dashboard/perfil')
 }
