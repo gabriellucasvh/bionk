@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NeoButton from './neo-button';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
@@ -20,6 +20,9 @@ const HeaderMobile = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { data: session } = useSession()
     const router = useRouter()
+    const handleLogout = () => {
+        signOut()
+    }
 
     return (
         <nav className='flex md:hidden fixed inset-x-0 z-50 m-3 max-w-full items-center justify-between p-4 rounded-xl bg-white border'>
@@ -59,12 +62,20 @@ const HeaderMobile = () => {
                         >
                             <div className="flex w-full justify-end gap-4 border-t pt-4">
                                 {session ? (
-                                    <NeoButton
-                                        onClick={() => router.push("/dashboard")}
-                                        className="bg-green-500"
-                                    >
-                                        Dashboard
-                                    </NeoButton>
+                                    <div className='flex items-center w-full justify-center gap-3'>
+                                        <NeoButton
+                                            onClick={() => router.push("/dashboard")}
+                                            className="p-2 bg-gradient-to-r from-green-500 to-green-400"
+                                        >
+                                            Dashboard
+                                        </NeoButton>
+                                        <NeoButton
+                                            onClick={handleLogout}
+                                            className="py-2 bg-white"
+                                        >
+                                            Sair da conta
+                                        </NeoButton>
+                                    </div>
                                 ) : (
                                     <div className='flex items-center w-full justify-center gap-3'>
                                         <NeoButton

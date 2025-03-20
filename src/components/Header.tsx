@@ -4,7 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import NeoButton from './neo-button'
 
 const HeaderProps = [
@@ -18,6 +18,9 @@ const HeaderProps = [
 const Header: React.FC = () => {
   const { data: session } = useSession()
   const router = useRouter()
+  const handleLogout = () => {
+    signOut()
+  }
 
   return (
     <nav className="hidden md:flex fixed inset-0 z-50 h-20 m-3 max-w-full items-center p-4 rounded-xl bg-white border">
@@ -40,12 +43,20 @@ const Header: React.FC = () => {
       ))}
       <div className="flex w-full justify-end gap-4">
         {session ? (
-          <NeoButton
-            onClick={() => router.push("/dashboard")}
-            className="bg-green-500"
-          >
-            Dashboard
-          </NeoButton>
+          <div className='flex items-center gap-3'>
+            <NeoButton
+              onClick={() => router.push("/dashboard")}
+              className="py-2 bg-gradient-to-r from-green-500 to-green-400"
+            >
+              Dashboard
+            </NeoButton>
+            <NeoButton
+              onClick={handleLogout}
+              className="py-2 bg-white"
+            >
+              Sair da conta
+            </NeoButton>
+          </div>
         ) : (
           <div className='flex items-center gap-3'>
             <NeoButton
