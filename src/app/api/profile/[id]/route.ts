@@ -20,8 +20,8 @@ export async function GET(request: NextRequest, { params }: Params) {
         name: true,
         username: true,
         bio: true,
-        bannerUrl: true,   // Adicionado para retornar o banner do usuário
-        profileUrl: true,  // Adicionado para retornar a foto de perfil do usuário
+        bannerUrl: true,   // Banner do usuário
+        profileUrl: true,  // Foto de perfil do usuário
       },
     });
 
@@ -80,6 +80,31 @@ export async function PUT(request: NextRequest, { params }: Params) {
   } catch (error) {
     console.error("Erro ao atualizar perfil:", error);
     return NextResponse.json({ error: "Erro ao atualizar perfil" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function DELETE(request: NextRequest, { params }: Params) {
+  const session = await getServerSession(authOptions);
+  const { id } = await params;
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+  }
+
+  if (session.user.id !== id) {
+    return NextResponse.json({ error: "Você só pode excluir sua própria conta" }, { status: 403 });
+  }
+
+  try {
+    await prisma.user.delete({
+      where: { id },
+    });
+    return NextResponse.json({ message: "Conta excluída com sucesso" }, { status: 200 });
+  } catch (error) {
+    console.error("Erro ao excluir a conta:", error);
+    return NextResponse.json({ error: "Erro ao excluir a conta" }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
