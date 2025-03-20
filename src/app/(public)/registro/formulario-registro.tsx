@@ -81,7 +81,7 @@ function Register() {
         className="bg-white p-8 rounded-lg w-full max-w-md border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <h2 className="text-2xl font-bold mb-8 text-center text-black" style={{ fontFamily: "system-ui" }}>
+        <h2 className="text-2xl font-bold mb-8 text-center text-black">
           Registro
         </h2>
 

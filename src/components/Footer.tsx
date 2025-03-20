@@ -50,13 +50,13 @@ const Footer = () => {
                 O melhor gerenciador de links para o seu negócio.
             </p>
             <div className="flex space-x-6 text-sm ">
-              <div>Made with ❤️ by <Link className='underline decoration-2 decoration-blue-500 hover:text-blue-500 transition-colors duration-200' href={"https://prysmus.com"}>Prysmus</Link>.</div>
+              <div>Made with ❤️ from Brasil.</div>
             </div>
           </div>
           {/* Navigations */}
           <div className="mt-16 grid grid-cols-2 gap-14 md:grid-cols-2 lg:mt-0 xl:col-span-2">
             <div className="md:mt-0">
-              <h3 className="text-sm font-semibold leading-6 font-baithe tracking-widerr">
+              <h3 className="text-sm font-semibold leading-6 font-baithe tracking-widest">
                 Conexões
               </h3>
               <div className="mt-6 space-y-4">
@@ -76,7 +76,7 @@ const Footer = () => {
             </div>
             <div>
               <div>
-                <h3 className="text-sm font-semibold leading-6 font-baithe tracking-wider">
+                <h3 className="text-sm font-semibold leading-6 font-baithe tracking-widest">
                   Companhia
                 </h3>
                 <div className="mt-6 space-y-4">

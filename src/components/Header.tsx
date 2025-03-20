@@ -42,23 +42,23 @@ const Header: React.FC = () => {
         {session ? (
           <NeoButton
             onClick={() => router.push("/dashboard")}
-            className="bg-green-400"
+            className="bg-green-500"
           >
             Dashboard
           </NeoButton>
         ) : (
-          <div>
+          <div className='flex items-center gap-3'>
             <NeoButton
               onClick={() => router.push("/login")}
-              className="bg-white"
+              className="py-2 bg-white"
             >
               Entrar
             </NeoButton>
             <NeoButton
               onClick={() => router.push("/registro")}
-              className="bg-green-400"
+              className="py-2 bg-gradient-to-r from-green-500 to-green-400"
             >
-              Cadastre-se
+              Cadastre-se gratuitamente
             </NeoButton>
           </div>
         )}

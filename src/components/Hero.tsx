@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, ExternalLink, Link as LinkIcon } from "lucide-react";
 import NeoButton from "./neo-button";
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     // Simulação de carregamento suave
@@ -68,6 +70,7 @@ const Hero = () => {
         >
           <NeoButton 
             className="group relative bg-rose overflow-hidden px-6 py-3 text-black"
+            onClick={() => router.push("/registro")}
           >
             <span className="relative z-10 flex items-center font-medium">
               Comece Grátis <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -76,6 +79,7 @@ const Hero = () => {
           </NeoButton>
           <NeoButton 
             className="flex items-center  px-6 py-3 font-medium text-black bg-gray-50"
+            onClick={() => router.push("/demo")}
           >
             Ver Demonstração <ExternalLink className="ml-2 h-4 w-4" />
           </NeoButton>

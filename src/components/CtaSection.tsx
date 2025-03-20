@@ -1,7 +1,11 @@
+"use client"
+
 import { ArrowRight, Users } from "lucide-react";
 import NeoButton from "./neo-button";
+import { useRouter } from "next/navigation";
 
 export default function CtaSection() {
+    const router = useRouter()
     return (
 
         <section className="py-20 bg-white text-black">
@@ -18,21 +22,19 @@ export default function CtaSection() {
                         <div className="relative group">
                             <NeoButton
                                 className="bg-white flex px-8 py-4 text-black font-semibold"
+                                onClick={() => {router.push("/registro")}}
                             >
                                 Criar Conta Grátis <ArrowRight className="ml-2 h-5 w-5" />
                             </NeoButton>
                         </div>
 
                         <NeoButton
-                            className="bg-green-400 flex px-8 py-4 "
+                            className="bg-green-500 flex px-8 py-4 "
+                            onClick={() => {router.push("/planos")}}
                         >
                             Ver Planos Premium <Users className="ml-2 h-5 w-5" />
                         </NeoButton>
                     </div>
-
-                    <p className="mt-8 text-sm text-black">
-                        Teste grátis por 14 dias. Sem necessidade de cartão de crédito.
-                    </p>
                 </div>
             </div>
         </section>

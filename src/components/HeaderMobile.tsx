@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NeoButton from './neo-button';
-import { useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
@@ -46,7 +46,7 @@ const HeaderMobile = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.1 }}
                             >
-                                <Link href={menu.href} className='block text-gray-600 hover:text-black transition-colors duration-200 px-4 py-2 rounded-md active:bg-gray-200'>
+                                <Link href={menu.href} className='block  w-full text-gray-600 hover:text-black transition-colors duration-200 px-4 py-2 rounded-md active:bg-gray-200'>
                                     {menu.label}
                                 </Link>
                             </motion.div>
@@ -57,27 +57,27 @@ const HeaderMobile = () => {
                             transition={{ delay: 0.2 }}
                             className='flex flex-col gap-4 mt-4'
                         >
-                            <div className="flex w-full justify-end gap-4">
+                            <div className="flex w-full justify-end gap-4 border-t pt-4">
                                 {session ? (
                                     <NeoButton
                                         onClick={() => router.push("/dashboard")}
-                                        className="bg-green-400"
+                                        className="bg-green-500"
                                     >
                                         Dashboard
                                     </NeoButton>
                                 ) : (
-                                    <div>
+                                    <div className='flex items-center w-full justify-center gap-3'>
                                         <NeoButton
                                             onClick={() => router.push("/login")}
-                                            className="bg-white"
+                                            className="p-2 bg-white"
                                         >
                                             Entrar
                                         </NeoButton>
                                         <NeoButton
                                             onClick={() => router.push("/registro")}
-                                            className="bg-green-400"
+                                            className="p-2 bg-gradient-to-r from-green-500 to-green-400"
                                         >
-                                            Cadastre-se
+                                            Cadastre-se gratuitamente
                                         </NeoButton>
                                     </div>
                                 )}
