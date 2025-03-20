@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import NeoButton from './neo-button'
+import { LogOut } from 'lucide-react'
 
 const HeaderProps = [
   { label: "Menu", href: "/" },
@@ -52,9 +53,10 @@ const Header: React.FC = () => {
             </NeoButton>
             <NeoButton
               onClick={handleLogout}
-              className="py-2 bg-white"
+              className="py-2 bg-white flex items-center"
             >
-              Sair da conta
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
             </NeoButton>
           </div>
         ) : (
