@@ -1,4 +1,3 @@
-import Footer from '@/components/Footer'
 import NotFoundButton from '@/components/not-found-button'
 import Image from 'next/image'
 
@@ -11,7 +10,6 @@ export default function NotFound() {
                 <p className='text-center'>Parece que temos algum problema aqui! A página foi movida ou não existe mais.</p>
                 <NotFoundButton />
             </div>
-            <Footer />
         </div>
     )
 }
