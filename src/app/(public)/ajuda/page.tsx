@@ -76,7 +76,7 @@ export default function HelpCenter() {
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-blue-600 cursor-pointer transition-colors">
                   <Settings className="h-4 w-4 text-muted-foreground" />
-                  <span>Configurando seu perfil</span>
+                  <Link href="/ajuda/configurando-seu-perfil">Configurando seu perfil</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-blue-600 cursor-pointer transition-colors">
                   <Link2 className="h-4 w-4 text-muted-foreground" />
