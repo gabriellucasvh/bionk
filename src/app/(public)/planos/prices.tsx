@@ -2,54 +2,66 @@
 
 import { cn } from '@/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check } from 'lucide-react'
+import { Check, Star } from 'lucide-react'
 import { useState } from 'react'
 
 const pricingPlans = [
     {
-        name: 'Básico',
-        description: 'Comece com ferramentas essenciais para impulsionar sua presença online.',
-        monthlyPrice: 69,
-        annualPrice: 49,
-        link: 'https://github.com/ansub/syntaxUI',
+        name: 'Gratuito',
+        description: 'Comece sua presença digital sem custos!',
+        monthlyPrice: 0,
+        annualPrice: 0,
+        label: 'Comece gratuitamente',
+        link: '/',
         features: [
-            'Estratégia de SEO e recomendações de tópicos',
-            'Análise da concorrência para se destacar',
-            'Pesquisa de palavras-chave integrada',
-            'Acompanhe as últimas tendências do Google',
-            'Blogs e redes sociais otimizados para SEO',
-            'Análise técnica de SEO e relatórios',
-            'Alcance mais de 100 regiões e idiomas',
+            'Links ilimitados',
+            'QR Codes para divulgação',
+            'Personalização básica de cores e botões',
+            'Estatísticas simples de visitas',
+        ],
+    },
+    {
+        name: 'Iniciante',
+        description: 'Aprimore sua página e se destaque.',
+        monthlyPrice: 10,
+        annualPrice: 100,
+        label: 'Assinar agora',
+        link: '/planos',
+        features: [
+            'Tudo no plano Gratuito',
+            'Agendamento de links',
+            'Destaque para links principais',
+            'Animações simples',
+            'Estatísticas detalhadas',
         ],
     },
     {
         name: 'Profissional',
-        description:
-            'Desbloqueie recursos avançados e conteúdo premium para turbinar seu negócio.',
-        monthlyPrice: 299,
-        annualPrice: 199,
-        link: 'https://github.com/ansub/syntaxUI',
+        description: 'Para quem quer personalização total e mais insights.',
+        monthlyPrice: 22,
+        annualPrice: 220,
+        label: 'Assinar agora',
+        link: '/planos',
         features: [
-            'Tudo no plano Básico',
-            'Receba 25 blogs premium',
-            'Indexe até 1000 páginas',
-            'Suporte premium',
-            'SEO local',
-            'Agente de SEO',
+            'Tudo no plano Iniciante',
+            'Personalização avançada',
+            'Miniaturas e imagens nos links',
+            'Coleta de e-mails e contatos',
+            'Acompanhamento detalhado de acessos',
         ],
     },
     {
         name: 'Premium',
-        description:
-            'Personalização máxima e suporte dedicado para grandes empresas.',
-        monthlyPrice: 2499,
-        annualPrice: 1666,
-        link: 'https://github.com/ansub/syntaxUI',
+        description: 'Suporte prioritário e insights completos.',
+        monthlyPrice: 65,
+        annualPrice: 650,
+        label: 'Assinar agora',
+        link: '/planos',
         features: [
             'Tudo no plano Profissional',
-            'Blogs premium ilimitados',
-            'Adicione sua própria chave de modelo de IA',
-            'Suporte premium e sessões de treinamento',
+            'Suporte prioritário',
+            'Relatórios completos',
+            'Acesso ao histórico completo de estatísticas',
         ],
     },
 ]
@@ -59,26 +71,25 @@ const Pricing = () => {
 
     const Heading = () => (
         <div className="relative z-10 my-12 flex flex-col items-center justify-center gap-4">
-            <div className="flex w-full flex-col items-start justify-center space-y-4 md:items-center">
-                <div className="mb-2 inline-block rounded-full bg-green-500 px-2 py-[0.20rem] text-xs font-medium uppercase text-white dark:bg-green-500">
-                    {' '}
+            <div className="flex w-full flex-col items-center justify-center space-y-4 text-center px-2">
+                <div className="mt-2 inline-block rounded-full bg-green-500 px-2 py-[0.20rem] text-xs font-medium uppercase text-white">
                     Planos
                 </div>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-800 sm:text-4xl dark:text-gray-200">
-                    Preço justo, vantagem imbatível.
+                <p className=" text-3xl font-bold tracking-tight text-gray-800 sm:text-4xl dark:text-gray-200">
+                    Escolha o melhor plano para você.
                 </p>
                 <p className="text-md max-w-xl text-gray-700 md:text-center dark:text-gray-300">
-                    Comece a usar o Bionk hoje mesmo e leve seu negócio para o próximo nível.
+                    Comece agora com a Bionk e leve sua presença digital para o próximo nível.
                 </p>
             </div>
             <div className="flex items-center justify-center gap-3">
                 <button
                     onClick={() => setBillingCycle('M')}
                     className={cn(
-                        `rounded-lg px-4 py-2 text-sm font-medium `,
+                        `relative rounded-lg px-4 py-2 text-sm font-medium`,
                         billingCycle === 'M'
-                            ? 'relative bg-green-500 text-white cursor-pointer'
-                            : 'text-gray-700 hover:text-white cursor-pointer hover:bg-green-500 dark:text-gray-300 dark:hover:text-black transition-colors duration-300',
+                            ? 'bg-green-500 text-white'
+                            : 'text-gray-700 hover:text-white hover:bg-green-500 dark:text-gray-300 dark:hover:text-black transition-colors duration-300'
                     )}
                 >
                     Mensal
@@ -87,10 +98,10 @@ const Pricing = () => {
                 <button
                     onClick={() => setBillingCycle('A')}
                     className={cn(
-                        `rounded-lg px-4 py-2 text-sm font-medium `,
+                        `relative rounded-lg px-4 py-2 text-sm font-medium`,
                         billingCycle === 'A'
-                            ? 'relative bg-green-500 text-white cursor-pointer '
-                            : 'text-gray-700 hover:text-white cursor-pointer hover:bg-green-500 dark:text-gray-300 dark:hover:text-black transition-colors duration-300',
+                            ? 'bg-green-500 text-white'
+                            : 'text-gray-700 hover:text-white hover:bg-green-500 dark:text-gray-300 dark:hover:text-black transition-colors duration-300'
                     )}
                 >
                     Anual
@@ -101,11 +112,12 @@ const Pricing = () => {
     )
 
     const PricingCards = () => (
-        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 lg:flex-row lg:gap-4 ">
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 lg:flex-row lg:gap-4">
             {pricingPlans.map((plan, index) => (
                 <div
                     key={index}
-                    className="w-full rounded-xl border-[1px] border-gray-300 p-6 text-left dark:border-gray-600"
+                    className={`w-full rounded-xl border-1 border-gray-300 p-6 text-left dark:border-gray-600`}
+                    style={plan.name === 'Profissional' ? { border: '2px solid #22c55e' } : {}}
                 >
                     <p className="mb-1 mt-0 text-sm font-medium uppercase text-green-500">
                         {plan.name}
@@ -120,9 +132,7 @@ const Pricing = () => {
                                 transition={{ type: 'spring', stiffness: 100 }}
                                 className="my-0 text-3xl font-semibold text-gray-900 dark:text-gray-100"
                             >
-                                <span>
-                                    R${billingCycle === 'M' ? plan.monthlyPrice : plan.annualPrice}
-                                </span>
+                                <span>R${billingCycle === 'M' ? plan.monthlyPrice : plan.annualPrice}</span>
                                 <span className="text-sm font-medium">
                                     /{billingCycle === 'M' ? 'mês' : 'ano'}
                                 </span>
@@ -130,12 +140,10 @@ const Pricing = () => {
                         </AnimatePresence>
                         <motion.button
                             whileTap={{ scale: 0.985 }}
-                            onClick={() => {
-                                window.open(plan.link)
-                            }}
+                            onClick={() => window.open(plan.link)}
                             className="mt-8 w-full rounded-lg bg-green-500 py-2 text-sm font-medium text-white hover:bg-green-500/90"
                         >
-                            Vamos começar
+                            {plan.label}
                         </motion.button>
                     </div>
                     {plan.features.map((feature, idx) => (
@@ -150,7 +158,7 @@ const Pricing = () => {
     )
 
     return (
-        <section className="relative w-full overflow-hidden  py-12 text-black lg:px-2 lg:py-12 bg-white">
+        <section className="relative w-full overflow-hidden py-12 bg-white text-black lg:px-2 lg:py-12">
             <Heading />
             <PricingCards />
         </section>
