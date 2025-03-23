@@ -4,8 +4,8 @@ import path from 'path';
 import matter from 'gray-matter';
 import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
-import HeaderAjuda from '../header-ajuda';
-import FooterAjuda from '../footer-ajuda';
+import HeaderAjuda from '../../header-ajuda';
+import FooterAjuda from '../../footer-ajuda';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -71,7 +71,7 @@ export default async function ArticlePage({ params }: PageProps) {
   return (
     <main>
       <HeaderAjuda />
-      <div className="container mx-auto lg:mx-22 my-12 p-4">
+      <div className="container mx-auto lg:px-22 my-12 p-4">
         <header className="mb-10 border-b pb-4 space-y-3">
           <h1 className="text-4xl font-bold">{data.title}</h1>
           <p className='text-muted-foreground'>{data.description}</p>

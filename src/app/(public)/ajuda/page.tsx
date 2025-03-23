@@ -72,23 +72,23 @@ export default function HelpCenter() {
               <ul className="space-y-2">
                 <li className="flex items-center gap-2 text-sm hover:text-blue-600 cursor-pointer transition-colors">
                   <UserPlus className="h-4 w-4 text-muted-foreground" />
-                  <Link href="/ajuda/como-criar-uma-conta">Como criar sua conta</Link>
+                  <Link href="/ajuda/guia/como-criar-uma-conta">Como criar sua conta</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-blue-600 cursor-pointer transition-colors">
                   <Settings className="h-4 w-4 text-muted-foreground" />
-                  <Link href="/ajuda/configurando-seu-perfil">Configurando seu perfil</Link>
+                  <Link href="/ajuda/guia/configurando-seu-perfil">Configurando seu perfil</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-blue-600 cursor-pointer transition-colors">
                   <Link2 className="h-4 w-4 text-muted-foreground" />
-                  <Link href="/ajuda/adicionando-seu-primeiro-link">Adicionando seu primeiro link</Link >
+                  <Link href="/ajuda/guia/adicionando-seu-primeiro-link">Adicionando seu primeiro link</Link >
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-blue-600 cursor-pointer transition-colors">
                   <Layout className="h-4 w-4 text-muted-foreground" />
-                  <Link href="/ajuda/personalizando-sua-pagina">Personalizando sua página</Link>
+                  <Link href="/ajuda/guia/personalizando-sua-pagina">Personalizando sua página</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-blue-600 cursor-pointer transition-colors">
                   <Share2 className="h-4 w-4 text-muted-foreground" />
-                  <Link href="/ajuda/compartilhando-seu-bionk">Compartilhando seu Bionk</Link>
+                  <Link href="/ajuda/guia/compartilhando-seu-bionk">Compartilhando seu Bionk</Link>
                 </li>
               </ul>
             </CardContent>
