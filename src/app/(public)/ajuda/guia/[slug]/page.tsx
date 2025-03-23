@@ -14,8 +14,8 @@ interface PageProps {
 const getFilePath = async (slug: string) => {
   const directories = [
     path.join(process.cwd(), 'src', 'content', 'ajuda'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'primeiros-passos'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'personalizacao')
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'primeiros-passos'),
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'personalizacao')
   ];
 
   for (const dir of directories) {
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const filePath = await getFilePath(slug);
   const fileContent = await fs.readFile(filePath, "utf8");
   const { data } = matter(fileContent);
-  
+
   return {
     title: data.title + " | Bionk Ajuda",
     description: data.description,
@@ -45,8 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export async function generateStaticParams() {
   const directories = [
     path.join(process.cwd(), 'src', 'content', 'ajuda'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'primeiros-passos'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'personalizacao')
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'primeiros-passos'),
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'personalizacao')
   ];
 
   let filenames: string[] = [];
