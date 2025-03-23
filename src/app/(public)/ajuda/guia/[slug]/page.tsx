@@ -14,7 +14,8 @@ interface PageProps {
 const getFilePath = async (slug: string) => {
   const directories = [
     path.join(process.cwd(), 'src', 'content', 'ajuda'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'primeiros-passos')
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'primeiros-passos'),
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'personalizacao')
   ];
 
   for (const dir of directories) {
@@ -44,7 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export async function generateStaticParams() {
   const directories = [
     path.join(process.cwd(), 'src', 'content', 'ajuda'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'primeiros-passos')
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'primeiros-passos'),
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'personalizacao')
   ];
 
   let filenames: string[] = [];

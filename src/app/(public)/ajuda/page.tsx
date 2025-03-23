@@ -108,23 +108,23 @@ export default function HelpCenter() {
               <ul className="space-y-2">
                 <li className="flex items-center gap-2 text-sm hover:text-purple-600 cursor-pointer transition-colors">
                   <PaintBucket className="h-4 w-4 text-muted-foreground" />
-                  <span>Alterando cores e temas</span>
+                  <Link href="/ajuda/guia/alterando-cores-e-temas">Alterando cores e temas</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-purple-600 cursor-pointer transition-colors">
                   <Image className="h-4 w-4 text-muted-foreground" />
-                  <span>Adicionando imagens e ícones</span>
+                  <Link href="/ajuda/guia/adicionando-imagens-e-icones">Adicionando imagens e ícones</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-purple-600 cursor-pointer transition-colors">
                   <List className="h-4 w-4 text-muted-foreground" />
-                  <span>Organizando seus links</span>
+                  <Link href="/ajuda/guia/organizando-seus-links">Organizando seus links</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-purple-600 cursor-pointer transition-colors">
                   <Sparkles className="h-4 w-4 text-muted-foreground" />
-                  <span>Usando animações e efeitos</span>
+                  <Link href="/ajuda/guia/usando-animacoes-e-efeitos">Usando animações e efeitos</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-purple-600 cursor-pointer transition-colors">
                   <Type className="h-4 w-4 text-muted-foreground" />
-                  <span>Fontes e estilos de texto</span>
+                  <Link href="/ajuda/guia/fontes-e-estilos-de-texto">Fontes e estilos de texto</Link>
                 </li>
               </ul>
             </CardContent>
@@ -144,23 +144,23 @@ export default function HelpCenter() {
               <ul className="space-y-2">
                 <li className="flex items-center gap-2 text-sm hover:text-green-600 cursor-pointer transition-colors">
                   <Users className="h-4 w-4 text-muted-foreground" />
-                  <span>Integrações com redes sociais</span>
+                  <Link href="/ajuda/guia/integracoes-com-redes-sociais">Integrações com redes sociais</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-green-600 cursor-pointer transition-colors">
                   <BarChart2 className="h-4 w-4 text-muted-foreground" />
-                  <span>Análise de cliques e visitas</span>
+                  <Link href="/ajuda/guia/analise-de-cliques-e-visitas">Análise de cliques e visitas</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-green-600 cursor-pointer transition-colors">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>Programando publicação de links</span>
+                  <Link href="/ajuda/guia/programando-publicacao-de-links">Programando publicação de links</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-green-600 cursor-pointer transition-colors">
                   <Users className="h-4 w-4 text-muted-foreground" />
-                  <span>Recursos para criadores de conteúdo</span>
+                  <Link href="/ajuda/guia/recursos-para-criadores-de-conteudo">Recursos para criadores de conteúdo</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-green-600 cursor-pointer transition-colors">
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  <span>Monetização e links de afiliados</span>
+                  <Link href="/ajuda/guia/monetizacao-e-links-de-afiliados">Monetização e links de afiliados</Link>
                 </li>
               </ul>
             </CardContent>
