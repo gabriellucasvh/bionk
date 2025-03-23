@@ -8,8 +8,12 @@ import Link from 'next/link';
 import HeaderAjuda from '../header-ajuda';
 import FooterAjuda from '../footer-ajuda';
 
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   const filePath = path.join(process.cwd(), "src", "content", "ajuda", `${slug}.md`);
   const fileContent = await fs.readFile(filePath, "utf8");
   const { data } = matter(fileContent);
@@ -28,12 +32,8 @@ export async function generateStaticParams() {
   }));
 }
 
-interface PageProps {
-  params: { slug: string };
-}
-
 export default async function ArticlePage({ params }: PageProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const filePath = path.join(process.cwd(), 'src', 'content', 'ajuda', `${slug}.md`);
   const fileContent = await fs.readFile(filePath, 'utf8');
   const { data, content } = matter(fileContent);
