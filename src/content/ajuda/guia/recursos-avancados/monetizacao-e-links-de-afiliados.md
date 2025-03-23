@@ -5,7 +5,7 @@ category: "Recursos Avançados"
 ---
 
 ## Introdução
-Monetizar sua página é uma excelente forma de gerar renda passiva por meio de links de afiliados e parcerias. Embora a plataforma não ofereça um sistema próprio de monetização, você pode incluir seus próprios links de afiliados livremente para divulgar produtos e serviços.
+Monetizar sua página é uma excelente forma de gerar renda passiva por meio de links de afiliados e parcerias. Embora a Bionk não ofereça um sistema próprio de monetização, você pode incluir seus próprios links de afiliados livremente para divulgar produtos e serviços.
 
 ## Como Utilizar Links de Afiliados
 1. Cadastre-se em programas de afiliados de sua escolha (Amazon, Hotmart, Shopee, entre outros).
