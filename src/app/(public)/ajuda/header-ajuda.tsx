@@ -17,7 +17,7 @@ export default function HeaderAjuda() {
   }
 
   return (
-    <div className="bg-gradient-to-r from-green-800 to-green-500 py-8 px-4 md:py-10 shadow-md">
+    <div className="bg-gradient-to-r from-green-800 to-green-500 py-8 px-4 md:py-10 shadow-md rounded-b-2xl">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-white text-3xl md:text-4xl font-bold text-center mb-6">Bionk Ajuda</h1>
         <p className="text-white text-lg mb-2 text-center">Como podemos ajudar você?</p>
@@ -31,7 +31,7 @@ export default function HeaderAjuda() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar por tópicos de ajuda..."
-              className="pl-12 pr-16 h-14 rounded-full bg-white text-black placeholder:text-black/70 border-2 border-transparent focus:border-green-300 focus-visible:ring-green-500 transition-all outline-none"
+              className="pl-10 md:pl-12 pr-16 h-14 rounded-full bg-white text-black placeholder:text-black/70 border-2 border-transparent focus:border-green-300 focus-visible:ring-green-500 transition-all outline-none"
               aria-label="Buscar tópicos de ajuda"
             />
 
