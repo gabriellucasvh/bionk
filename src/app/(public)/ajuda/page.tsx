@@ -34,29 +34,13 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
 import FooterAjuda from "./footer-ajuda"
+import HeaderAjuda from "./header-ajuda"
 
 export default function HelpCenter() {
   return (
     <div>
-
+      <HeaderAjuda />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mb-4">
-            <HelpCircle className="h-8 w-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Central de Ajuda</h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Encontre respostas para suas dúvidas sobre como usar e personalizar seu link na bio
-          </p>
-        </div>
-
-        <div className="relative mb-10 max-w-xl mx-auto">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Search className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <Input type="search" placeholder="Buscar por tópicos de ajuda..." className="pl-10 h-12" />
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-all">
             <CardHeader className="pb-2">
