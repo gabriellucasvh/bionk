@@ -15,7 +15,8 @@ const getFilePath = async (slug: string) => {
   const directories = [
     path.join(process.cwd(), 'src', 'content', 'ajuda'),
     path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'primeiros-passos'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'personalizacao')
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'personalizacao'),
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'recursos-avancados')
   ];
 
   for (const dir of directories) {
@@ -46,7 +47,8 @@ export async function generateStaticParams() {
   const directories = [
     path.join(process.cwd(), 'src', 'content', 'ajuda'),
     path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'primeiros-passos'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'personalizacao')
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'personalizacao'),
+    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'recursos-avancados')
   ];
 
   let filenames: string[] = [];

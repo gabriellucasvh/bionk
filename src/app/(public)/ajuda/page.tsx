@@ -127,10 +127,6 @@ export default function HelpCenter() {
             <CardContent>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2 text-sm hover:text-green-600 cursor-pointer transition-colors">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <Link href="/ajuda/guia/integracoes-com-redes-sociais">Integrações com redes sociais</Link>
-                </li>
-                <li className="flex items-center gap-2 text-sm hover:text-green-600 cursor-pointer transition-colors">
                   <BarChart2 className="h-4 w-4 text-muted-foreground" />
                   <Link href="/ajuda/guia/analise-de-cliques-e-visitas">Análise de cliques e visitas</Link>
                 </li>
