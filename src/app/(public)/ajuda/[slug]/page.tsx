@@ -46,7 +46,7 @@ export default async function ArticlePage({ params }: PageProps) {
         <header className="mb-10 border-b pb-4 space-y-3">
           <h1 className="text-4xl font-bold">{data.title}</h1>
           <p className='text-muted-foreground'>{data.description}</p>
-          <span className='text-muted-foreground'>Categoria: {data.category}</span>
+          <span className='text-muted-foreground'>Categoria: <Link href="/ajuda" className="text-blue-500 hover:underline">{data.category}</Link></span>
         </header>
         <article className="prose">
           <ReactMarkdown>{content}</ReactMarkdown>
