@@ -42,7 +42,7 @@ export default async function ArticlePage({ params }: PageProps) {
 
     <main>
       <HeaderAjuda />
-      <div className="container mx-auto my-12 p-4">
+      <div className="container mx-auto lg:mx-22 my-12 p-4">
         <header className="mb-10 border-b pb-4 space-y-3">
           <h1 className="text-4xl font-bold">{data.title}</h1>
           <p className='text-muted-foreground'>{data.description}</p>

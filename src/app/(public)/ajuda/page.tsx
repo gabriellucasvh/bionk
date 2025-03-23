@@ -80,15 +80,15 @@ export default function HelpCenter() {
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-blue-600 cursor-pointer transition-colors">
                   <Link2 className="h-4 w-4 text-muted-foreground" />
-                  <span>Adicionando seu primeiro link</span>
+                  <Link href="/ajuda/adicionando-seu-primeiro-link">Adicionando seu primeiro link</Link >
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-blue-600 cursor-pointer transition-colors">
                   <Layout className="h-4 w-4 text-muted-foreground" />
-                  <span>Personalizando sua página</span>
+                  <Link href="/ajuda/personalizando-sua-pagina">Personalizando sua página</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-blue-600 cursor-pointer transition-colors">
                   <Share2 className="h-4 w-4 text-muted-foreground" />
-                  <span>Compartilhando seu link na bio</span>
+                  <Link href="/ajuda/compartilhando-seu-bionk">Compartilhando seu Bionk</Link>
                 </li>
               </ul>
             </CardContent>
