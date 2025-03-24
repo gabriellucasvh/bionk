@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, ExternalLink, Link as LinkIcon } from "lucide-react";
 import NeoButton from "./neo-button";
 import { useRouter } from "next/navigation";
+import { motion } from 'framer-motion'
 
 const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -20,27 +21,28 @@ const Hero = () => {
   return (
     <div className="relative min-h-screen w-full overflow-hidden text-white bg-green-500">
       {/* Elementos de background */}
-      <div className="absolute inset-0 overflow-hidden">
+      <motion.div
+        animate={{ scale: [1, 1.2, 1] }}
+        transition={{ duration: 5, repeat: Infinity, repeatType: "reverse" }}
+        className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-green-300 opacity-60 blur-3xl"></div>
         <div className="absolute top-1/2 -left-24 h-96 w-96 rounded-full bg-green-300 opacity-60 blur-3xl"></div>
-      </div>
+      </motion.div>
 
       {/* Container */}
       <div className="container relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-4 py-20 sm:px-6 lg:px-8 mt-20">
         {/* Tag */}
-        <div 
-          className={`mb-6 transform bg-rose  block -translate-x-1 -translate-y-1 rounded-lg border-2 border-[#222222]  px-4 py-1 text-sm font-medium tracking-tight transition-all group-hover/button:-translate-y-2 group-active/button:translate-x-0 group-active/button:translate-y-0 text-black backdrop-blur-xl duration-700 ${
-            isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-          }`}
+        <div
+          className={`mb-6 transform bg-rose  block -translate-x-1 -translate-y-1 rounded-lg border-2 border-[#222222]  px-4 py-1 text-sm font-medium tracking-tight transition-all group-hover/button:-translate-y-2 group-active/button:translate-x-0 group-active/button:translate-y-0 text-black backdrop-blur-xl duration-700 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+            }`}
         >
           TUDO EM UM SÓ LUGAR
         </div>
 
         {/* Texto principal */}
-        <h1 
-          className={`mb-6 text-center tracking-widerr font-baithe text-4xl font-bold text-white transition-all duration-700 sm:text-5xl md:text-6xl lg:text-7xl ${
-            isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-          }`}
+        <h1
+          className={`mb-6 text-center tracking-widerr font-baithe text-4xl font-bold text-white transition-all duration-700 sm:text-5xl md:text-6xl lg:text-7xl ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+            }`}
           style={{ transitionDelay: "100ms" }}
         >
           Link para<br className="sm:hidden" />{" "}
@@ -51,24 +53,22 @@ const Hero = () => {
         </h1>
 
         {/* Descrição */}
-        <p 
-          className={`mb-8 max-w-2xl text-center text-lg text-gray-200 transition-all duration-700 sm:text-xl ${
-            isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-          }`}
+        <p
+          className={`mb-8 max-w-2xl text-center text-lg text-gray-200 transition-all duration-700 sm:text-xl ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+            }`}
           style={{ transitionDelay: "200ms" }}
         >
-          Unifique todos os seus links em um único lugar elegante. 
+          Unifique todos os seus links em um único lugar elegante.
           Compartilhe sua presença digital com estilo usando o Bionk.
         </p>
 
         {/* Botões de CTA */}
-        <div 
-          className={`flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 transition-all duration-700 ${
-            isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-          }`}
+        <div
+          className={`flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 transition-all duration-700 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+            }`}
           style={{ transitionDelay: "300ms" }}
         >
-          <NeoButton 
+          <NeoButton
             className="group relative bg-rose overflow-hidden px-6 py-3 text-black"
             onClick={() => router.push("/registro")}
           >
@@ -77,7 +77,7 @@ const Hero = () => {
             </span>
             <span className="absolute inset-0 z-0 bg-white opacity-0 transition-opacity group-hover:opacity-100"></span>
           </NeoButton>
-          <NeoButton 
+          <NeoButton
             className="flex items-center  px-6 py-3 font-medium text-black bg-gray-50"
             onClick={() => router.push("/demo")}
           >
@@ -86,10 +86,9 @@ const Hero = () => {
         </div>
 
         {/* Imagem de preview */}
-        <div 
-          className={`relative mt-16 w-full max-w-4xl transition-all duration-1000 ${
-            isLoaded ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-          }`}
+        <div
+          className={`relative mt-16 w-full max-w-4xl transition-all duration-1000 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+            }`}
           style={{ transitionDelay: "400ms" }}
         >
           <div className="aspect-[16/9] overflow-hidden rounded-xl bg-gradient-to-tr from-gray-100 to-gray-50 p-4 shadow-2xl sm:p-8">
