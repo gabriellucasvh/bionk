@@ -4,9 +4,8 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import NeoButton from './neo-button'
-import { LogOut } from 'lucide-react'
 
 const HeaderProps = [
   { label: "Menu", href: "/" },
@@ -19,9 +18,6 @@ const HeaderProps = [
 const Header: React.FC = () => {
   const { data: session } = useSession()
   const router = useRouter()
-  const handleLogout = () => {
-    signOut()
-  }
 
   return (
     <nav className="hidden md:flex fixed inset-0 z-50 h-20 m-3 max-w-full items-center p-4 rounded-xl bg-white border">
@@ -49,14 +45,7 @@ const Header: React.FC = () => {
               onClick={() => router.push("/dashboard")}
               className="py-2 bg-gradient-to-r from-green-500 to-green-400"
             >
-              Dashboard
-            </NeoButton>
-            <NeoButton
-              onClick={handleLogout}
-              className="py-2 bg-white flex items-center"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair
+              Acessar o Dashboard
             </NeoButton>
           </div>
         ) : (
