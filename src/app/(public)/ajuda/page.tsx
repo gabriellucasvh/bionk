@@ -148,14 +148,10 @@ export default function HelpCenter() {
         </div>
 
         <Tabs defaultValue="faq" className="mb-10">
-          <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
+          <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
             <TabsTrigger value="faq" className="flex items-center gap-1">
               <HelpCircle className="h-4 w-4" />
               <span>FAQ</span>
-            </TabsTrigger>
-            <TabsTrigger value="guides" className="flex items-center gap-1">
-              <BookText className="h-4 w-4" />
-              <span>Guias</span>
             </TabsTrigger>
             <TabsTrigger value="contact" className="flex items-center gap-1">
               <MessageSquare className="h-4 w-4" />
@@ -207,38 +203,6 @@ export default function HelpCenter() {
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="guides" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Guias e Tutoriais</CardTitle>
-                <CardDescription>Aprenda a maximizar o uso da plataforma</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  <div className="border rounded-lg p-4 hover:bg-muted/50 cursor-pointer transition-colors">
-                    <h3 className="font-medium mb-1">Guia completo para iniciantes</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Um passo a passo detalhado para quem está começando agora
-                    </p>
-                  </div>
-                  <div className="border rounded-lg p-4 hover:bg-muted/50 cursor-pointer transition-colors">
-                    <h3 className="font-medium mb-1">Como aumentar seus cliques em 200%</h3>
-                    <p className="text-sm text-muted-foreground">Estratégias comprovadas para maximizar o engajamento</p>
-                  </div>
-                  <div className="border rounded-lg p-4 hover:bg-muted/50 cursor-pointer transition-colors">
-                    <h3 className="font-medium mb-1">Personalizando sua página para sua marca</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Dicas de design para criar uma presença online consistente
-                    </p>
-                  </div>
-                  <div className="border rounded-lg p-4 hover:bg-muted/50 cursor-pointer transition-colors">
-                    <h3 className="font-medium mb-1">Integrações avançadas com outras plataformas</h3>
-                    <p className="text-sm text-muted-foreground">Como conectar seu link na bio com outras ferramentas</p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
