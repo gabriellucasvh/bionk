@@ -43,7 +43,7 @@ const Header: React.FC = () => {
           <div className='flex items-center gap-3'>
             <NeoButton
               onClick={() => router.push("/dashboard")}
-              className="py-2 bg-gradient-to-r from-green-500 to-green-400"
+              className="py-2 bg-lime-400"
             >
               Acessar o Dashboard
             </NeoButton>
@@ -58,7 +58,7 @@ const Header: React.FC = () => {
             </NeoButton>
             <NeoButton
               onClick={() => router.push("/registro")}
-              className="py-2 bg-gradient-to-r from-green-500 to-green-400"
+              className="py-2 bg-lime-400"
             >
               Cadastre-se gratuitamente
             </NeoButton>

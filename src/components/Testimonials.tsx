@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 
 export default function Testimonials() {
     return (
-        <section className="py-24 bg-green-500">
+        <section className="py-24 bg-green-900">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
                 <div className="text-center mb-16">
                     <h2 className="text-3xl font-bold font-baithe tracking-wider text-white sm:text-4xl">

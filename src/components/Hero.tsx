@@ -19,21 +19,21 @@ const Hero = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden text-white bg-green-500">
+    <div className="relative min-h-screen w-full overflow-hidden text-white bg-green-900">
       {/* Elementos de background */}
       <motion.div
         animate={{ scale: [1, 1.2, 1] }}
         transition={{ duration: 5, repeat: Infinity, repeatType: "reverse" }}
         className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-green-300 opacity-60 blur-3xl"></div>
-        <div className="absolute top-1/2 -left-24 h-96 w-96 rounded-full bg-green-300 opacity-60 blur-3xl"></div>
+        <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-green-500 opacity-60 blur-3xl"></div>
+        <div className="absolute top-1/2 -left-24 h-96 w-96 rounded-full bg-green-500 opacity-60 blur-3xl"></div>
       </motion.div>
 
       {/* Container */}
       <div className="container relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-4 py-20 sm:px-6 lg:px-8 mt-20">
         {/* Tag */}
         <div
-          className={`mb-6 transform bg-rose  block -translate-x-1 -translate-y-1 rounded-lg border-2 border-[#222222]  px-4 py-1 text-sm font-medium tracking-tight transition-all group-hover/button:-translate-y-2 group-active/button:translate-x-0 group-active/button:translate-y-0 text-black backdrop-blur-xl duration-700 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+          className={`mb-6 transform bg-lime-400 block -translate-x-1 -translate-y-1 rounded-lg border-2 border-[#222222]  px-4 py-1 text-sm font-medium tracking-tight transition-all group-hover/button:-translate-y-2 group-active/button:translate-x-0 group-active/button:translate-y-0 text-black backdrop-blur-xl duration-700 ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
             }`}
         >
           TUDO EM UM SÓ LUGAR
@@ -48,7 +48,7 @@ const Hero = () => {
           Link para<br className="sm:hidden" />{" "}
           <span className="relative inline-block">
             Sua Bio
-            <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-rose"></span>
+            <span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-lime-400"></span>
           </span>
         </h1>
 
@@ -69,7 +69,7 @@ const Hero = () => {
           style={{ transitionDelay: "300ms" }}
         >
           <NeoButton
-            className="group relative bg-rose overflow-hidden px-6 py-3 text-black"
+            className="group relative bg-lime-400 overflow-hidden px-6 py-3 text-black"
             onClick={() => router.push("/registro")}
           >
             <span className="relative z-10 flex items-center font-medium">

@@ -29,7 +29,7 @@ export default function CtaSection() {
                         </div>
 
                         <NeoButton
-                            className="bg-green-500 flex px-8 py-4 "
+                            className="bg-lime-400 flex px-8 py-4 "
                             onClick={() => {router.push("/planos")}}
                         >
                             Ver Planos Premium <Users className="ml-2 h-5 w-5" />
