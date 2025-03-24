@@ -2,6 +2,7 @@
 title: "Como Personalizar Sua Página"
 description: "Guia passo a passo para personalizar sua página"
 category: "Primeiros Passos"
+type: "Guia"
 ---
 
 ## Introdução

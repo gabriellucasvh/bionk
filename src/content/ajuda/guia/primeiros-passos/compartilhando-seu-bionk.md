@@ -2,6 +2,7 @@
 title: "Como Compartilhar Seu Bionk"
 description: "Guia passo a passo para compartilhar seu Bionk"
 category: "Primeiros Passos"
+type: "Guia"
 ---
 
 ## Introdução

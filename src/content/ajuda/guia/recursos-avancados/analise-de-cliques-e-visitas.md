@@ -2,6 +2,7 @@
 title: "Análise de Cliques e Visitas"
 description: "Guia de recursos avançados para análise de cliques e visitas"
 category: "Recursos Avançados"
+type: "Guia"
 ---
 
 ## Introdução

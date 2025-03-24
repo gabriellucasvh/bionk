@@ -2,6 +2,7 @@
 title: "Como Adicionar Links"
 description: "Guia passo a passo para criar e configurar links"
 category: "Primeiros Passos"
+type: "Guia"
 ---
 
 ## Introdução

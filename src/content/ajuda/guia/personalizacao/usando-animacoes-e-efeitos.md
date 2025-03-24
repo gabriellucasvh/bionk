@@ -2,6 +2,7 @@
 title: "Usando Animações e Efeitos"
 description: "Guia de personalização para usar animações e efeitos"
 category: "Personalização"
+type: "Guia"
 ---
 
 ## Introdução

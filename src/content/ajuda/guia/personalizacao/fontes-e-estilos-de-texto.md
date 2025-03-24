@@ -2,6 +2,7 @@
 title: "Fontes e Estilos de Texto"
 description: "Guia de personalização para usar fontes e estilos de texto"
 category: "Personalização"
+type: "Guia"
 ---
 
 ## Introdução

@@ -2,6 +2,7 @@
 title: "Monetização e Links de Afiliados"
 description: "Guia de recursos avançados para monetização e links de afiliados"
 category: "Recursos Avançados"
+type: "Guia"
 ---
 
 ## Introdução

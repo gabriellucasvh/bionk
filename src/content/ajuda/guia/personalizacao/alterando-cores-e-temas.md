@@ -2,6 +2,7 @@
 title: "Alterando Cores e Temas"
 description: "Guia de personalização para alterar cores e temas"
 category: "Personalização"
+type: "Guia"
 ---
 
 ## Introdução

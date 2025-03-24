@@ -2,6 +2,7 @@
 title: "Programando Publicação de Links"
 description: "Guia de recursos avançados para programar publicação de links"
 category: "Recursos Avançados"
+type: "Guia"
 ---
 
 ## Introdução

@@ -2,6 +2,7 @@
 title: "Adicionando Imagens e Ícones"
 description: "Guia de personalização para adicionar imagens e ícones"
 category: "Personalização"
+type: "Guia"
 ---
 
 ## Introdução

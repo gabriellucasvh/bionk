@@ -2,6 +2,7 @@
 title: "Configurando seu perfil"
 description: "Guia passo a passo para configurar seu perfil"
 category: "Primeiros Passos"
+type: "Guia"
 ---
 
 ## Acessando a página de perfil no Dashboard

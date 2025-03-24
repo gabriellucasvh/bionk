@@ -2,6 +2,7 @@
 title: "Recursos para Criadores de Conteúdo"
 description: "Guia de recursos avançados para criadores de conteúdo"
 category: "Recursos Avançados"
+type: "Guia"
 ---
 
 ## Introdução

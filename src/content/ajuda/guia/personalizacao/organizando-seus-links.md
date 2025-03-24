@@ -2,6 +2,7 @@
 title: "Organizando seus Links"
 description: "Guia de personalização para organizar seus links"
 category: "Personalização"
+type: "Guia"
 ---
 
 ## Introdução
