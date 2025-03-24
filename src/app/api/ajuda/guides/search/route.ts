@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'recursos-avancados'),
   ];
 
-  let guides: Array<{ slug: string; title: string; description: string }> = [];
+  let guides: Array<{ slug: string; title: string; description: string; type: string }> = [];
 
   // Itera sobre cada diretório e coleta os arquivos Markdown
   directories.forEach((dir) => {
@@ -34,13 +34,14 @@ export async function GET(request: Request) {
         slug: filename.replace('.md', ''),
         title: data.title || 'Sem título',
         description: data.description || '',
+        type: data.type || '',
       });
     });
   });
 
   // Configuração do Fuse.js para busca
   const fuse = new Fuse(guides, {
-    keys: ['title', 'description'],
+    keys: ['title', 'description', 'type'],
     includeScore: true,
   });
 

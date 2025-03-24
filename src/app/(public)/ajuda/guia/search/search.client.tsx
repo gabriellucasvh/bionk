@@ -5,13 +5,14 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { BookCheck } from "lucide-react"
 
 export default function SearchResultsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const query = searchParams.get("q") || ""
   const [results, setResults] = useState<
-    Array<{ slug: string; title: string; description: string }>
+    Array<{ slug: string; title: string; description: string; type: string; }>
   >([])
   const [loading, setLoading] = useState(true)
 
@@ -84,9 +85,12 @@ export default function SearchResultsPage() {
                   exit="exit"
                   className="bg-gray-50 p-6 rounded-md border hover:border-green-600 transition-colors duration-200"
                 >
-                  <Link href={`/ajuda/guia/${guide.slug}`} className="block">
-                    <h2 className="text-xl font-semibold hover:underline">{guide.title}</h2>
+                  <Link href={`/ajuda/guia/${guide.slug}`} className="flex flex-col md:flex-row justify-between items-start md:items-center">
+                  <div className="flex flex-col mb-2 md:mb-0">
+                    <h2 className="text-xl font-semibold hover:underline w-fit">{guide.title}</h2>
                     <p className="text-sm">{guide.description}</p>
+                  </div>
+                    <span className="flex items-center text-xs text-white bg-green-600 rounded-full px-2 py-1 gap-2"><BookCheck size={16} />{guide.type}</span>
                   </Link>
                 </motion.li>
               ))}
