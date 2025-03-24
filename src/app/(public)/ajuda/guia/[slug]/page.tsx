@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 import HeaderAjuda from '../../header-ajuda';
 import FooterAjuda from '../../footer-ajuda';
+import { ArrowLeft } from "lucide-react";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -84,9 +85,10 @@ export default async function ArticlePage({ params }: PageProps) {
         <article className="prose">
           <ReactMarkdown>{content}</ReactMarkdown>
         </article>
-        <div className='mt-4'>
-          <Link href="/ajuda" className="text-blue-500 hover:underline">
-            Voltar à Central de Ajuda
+        <div className='mt-10'>
+          <Link href="/ajuda" className="flex w-fit items-center p-2 text-white rounded-lg text-sm bg-green-600 hover:bg-green-700">
+          <ArrowLeft className="mr-2" />
+            <span>Voltar à Central de Ajuda</span>
           </Link>
         </div>
       </div>
