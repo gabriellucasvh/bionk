@@ -37,17 +37,21 @@ const Footer = () => {
       <div className="mx-auto max-w-7xl px-2">
         <div className="flex flex-col justify-between lg:flex-row">
           <div className="space-y-8">
-            <Image
-              priority={true}
-              unoptimized={true}
-              width={100}
-              height={40}
-              src="/bionk-logo.svg"
-              alt="logo"
-              className="h-7 w-auto"
-            />
+            <div className='w-fit'>
+              <Link href="/">
+                <Image
+                  priority={true}
+                  unoptimized={true}
+                  width={100}
+                  height={40}
+                  src="/bionk-logo.svg"
+                  alt="logo"
+                  className="h-7 w-auto"
+                />
+              </Link>
+            </div>
             <p className="text-md max-w-xs leading-6 ">
-                O melhor gerenciador de links para o seu negócio.
+              O melhor gerenciador de links para o seu negócio.
             </p>
             <div className="flex space-x-6 text-sm ">
               <div>Made with ❤️ from Brasil.</div>

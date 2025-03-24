@@ -20,14 +20,18 @@ const FooterAjuda = () => {
   return (
     <footer className="bg-gradient-to-r from-green-800 to-green-500 py-10 px-4 text-white rounded-t-2xl shadow-md">
       <div className="mx-auto max-w-7xl text-center">
-        <Image
-          priority
-          width={120}
-          height={50}
-          src="/bionk-logo.svg"
-          alt="Bionk Logo"
-          className="mx-auto mb-4"
-        />
+        <div className="w-fit mx-auto">
+          <Link href="/">
+            <Image
+              priority
+              width={120}
+              height={50}
+              src="/bionk-logo.svg"
+              alt="Bionk Logo"
+              className="mx-auto mb-4"
+            />
+          </Link>
+        </div>
         <p className="text-lg max-w-md mx-auto">
           O melhor gerenciador de links para o seu negócio.
         </p>
