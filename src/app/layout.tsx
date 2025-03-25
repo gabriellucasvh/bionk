@@ -9,6 +9,11 @@ const baithe = localFont({
   display: "swap",
   variable: "--font-baithe"
 })
+const GeneralSans = localFont({
+  src: "/fonts/GeneralSans-Variable.woff2",
+  display: "swap",
+  variable: "--font-gsans"
+})
 const geist = Geist({
   weight: ["100", "200", "300","400","500","600","700","800","900"],
   subsets: ['latin'],
@@ -26,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${geist.variable} ${baithe.variable} antialiased`}>
+    <html lang="pt-BR" className={`${geist.variable} ${baithe.variable} ${GeneralSans.variable} antialiased`}>
       <body>
         <NextAuthSessionProvider>
           {children}
