@@ -22,7 +22,7 @@ const HeaderMobile = () => {
     const router = useRouter()
 
     return (
-        <nav className='flex md:hidden fixed inset-x-0 z-50 m-3 max-w-full items-center justify-between p-4 rounded-xl bg-white border'>
+        <nav className='flex md:hidden fixed inset-x-0 z-50 m-3 max-w-full items-center justify-between p-4 rounded-xl bg-white border font-sans'>
             <div>
                 <Link href={'/'}>
                     <Image src={'/bionk-logo.svg'} alt='logo' width={100} height={50} />

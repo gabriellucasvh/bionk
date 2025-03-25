@@ -20,7 +20,7 @@ const Header: React.FC = () => {
   const router = useRouter()
 
   return (
-    <nav className="hidden md:flex fixed inset-0 z-50 h-20 mx-40 my-7 max-w-full items-center p-4 rounded-xl bg-white border">
+    <nav className="hidden md:flex fixed inset-0 z-50 h-20 mx-40 my-7 max-w-full items-center p-4 rounded-xl bg-white border font-sans">
       <div className="mx-10">
         <Link href="/">
           <Image src="/bionk-logo.svg" alt="logo" width={160} height={90} />
