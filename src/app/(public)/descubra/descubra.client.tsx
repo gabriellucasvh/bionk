@@ -25,7 +25,7 @@ const DescubraClient = () => {
             <Header />
             <HeaderMobile />
             <section className='min-h-screen flex flex-col lg:flex-row items-center justify-center gap-10 text-lime-200 px-6 md:px-20 lg:px-40'>
-                <div className='w-full lg:w-1/2 space-y-4 text-center lg:text-left'>
+                <div className='w-full lg:w-1/2 space-y-4 text-left pt-16 md:pt-0'>
                     <h1 className='font-bold text-4xl md:text-6xl'>A melhor ferramenta de link in bio para todas as suas redes sociais</h1>
                     <p className='leading-tight text-lg md:text-2xl'>Reúna tudo aquilo que é essencial em um só lugar e facilite o acesso ao seu conteúdo com estilo e praticidade.</p>
                     <SimpleBtn className='font-medium' onClick={() => router.push("/registro")}>
@@ -106,8 +106,8 @@ const DescubraClient = () => {
                     </div>
                 </div>
             </section>
-            <section className='min-h-screen bg-teal-800 flex flex-col w-full items-center justify-center gap-10 px-6 md:px-20 lg:px-40 py-16'>
-                <div className='w-full text-center'>
+            <section className='min-h-screen bg-teal-800 flex flex-col w-full items-center justify-center gap-10 px-4 md:px-20 lg:px-40 py-16'>
+                <div className='w-full text-center px-2 md:px-0'>
                     <h2 className='font-bold text-3xl md:text-4xl mb-6 text-lime-50'>Dúvidas? Nós temos as respostas!</h2>
                     <p className='font-medium mb-8 text-lime-100'>Encontre tudo o que você precisa saber sobre como usar e personalizar seu Link in Bio de forma simples e rápida.</p>
                 </div>
