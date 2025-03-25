@@ -79,9 +79,9 @@ const Hero = () => {
           </NeoButton>
           <NeoButton
             className="flex items-center  px-6 py-3 font-medium text-black bg-gray-50"
-            onClick={() => router.push("/demo")}
+            onClick={() => router.push("/descubra")}
           >
-            Ver Demonstração <ExternalLink className="ml-2 h-4 w-4" />
+            Saiba mais <ExternalLink className="ml-2 h-4 w-4" />
           </NeoButton>
         </div>
 
