@@ -70,12 +70,12 @@ const Pricing = () => {
     const [billingCycle, setBillingCycle] = useState<'M' | 'A'>('M')
 
     const Heading = () => (
-        <div className="relative z-10 my-12 flex flex-col items-center justify-center gap-4">
+        <div className="relative z-10 my-12 mt-20 flex flex-col items-center justify-center gap-4">
             <div className="flex w-full flex-col items-center justify-center space-y-4 text-center px-2">
                 <div className="mt-2 inline-block rounded-full bg-green-500 px-2 py-[0.20rem] text-xs font-medium uppercase text-white">
                     Planos
                 </div>
-                <p className=" text-3xl font-bold tracking-tight text-gray-800 sm:text-4xl dark:text-gray-200">
+                <p className=" text-3xl font-bold  text-gray-800 sm:text-4xl dark:text-gray-200">
                     Escolha o melhor plano para você.
                 </p>
                 <p className="text-md max-w-xl text-gray-700 md:text-center dark:text-gray-300">
@@ -158,7 +158,7 @@ const Pricing = () => {
     )
 
     return (
-        <section className="relative w-full overflow-hidden py-12 bg-white text-black lg:px-2 lg:py-12">
+        <section className="relative w-full overflow-hidden py-12 bg-white text-black lg:px-2 min-h-screen">
             <Heading />
             <PricingCards />
         </section>

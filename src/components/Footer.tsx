@@ -60,7 +60,7 @@ const Footer = () => {
           {/* Navigations */}
           <div className="mt-16 grid grid-cols-2 gap-14 md:grid-cols-2 lg:mt-0 xl:col-span-2">
             <div className="md:mt-0">
-              <h3 className="text-sm font-semibold leading-6 font-baithe tracking-widest">
+              <h3 className="text-sm font-semibold leading-6 font-gsans">
                 Conexões
               </h3>
               <div className="mt-6 space-y-4">
@@ -80,7 +80,7 @@ const Footer = () => {
             </div>
             <div>
               <div>
-                <h3 className="text-sm font-semibold leading-6 font-baithe tracking-widest">
+                <h3 className="text-sm font-semibold leading-6 font-gsans">
                   Companhia
                 </h3>
                 <div className="mt-6 space-y-4">

@@ -4,11 +4,6 @@ import { Geist } from "next/font/google"
 import localFont from "next/font/local"
 import NextAuthSessionProvider from "@/providers/sessionProvider";
 
-const baithe = localFont({
-  src: "/fonts/baithe.otf",
-  display: "swap",
-  variable: "--font-baithe"
-})
 const GeneralSans = localFont({
   src: "/fonts/GeneralSans-Variable.woff2",
   display: "swap",
@@ -31,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${geist.variable} ${baithe.variable} ${GeneralSans.variable} antialiased`}>
+    <html lang="pt-BR" className={`${geist.variable} ${GeneralSans.variable} antialiased`}>
       <body>
         <NextAuthSessionProvider>
           {children}

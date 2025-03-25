@@ -41,7 +41,7 @@ const Hero = () => {
 
         {/* Texto principal */}
         <h1
-          className={`mb-6 text-center tracking-widerr font-baithe text-4xl font-bold text-white transition-all duration-700 sm:text-5xl md:text-6xl lg:text-7xl ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+          className={`mb-6 text-center tracking-widerr font-gsans text-4xl font-bold text-white transition-all duration-700 sm:text-5xl md:text-6xl lg:text-7xl ${isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
             }`}
           style={{ transitionDelay: "100ms" }}
         >
