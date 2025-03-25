@@ -114,59 +114,59 @@ const DescubraClient = () => {
                 <Card className='w-full bg-transparent text-white border-none shadow-none'>
                     <CardContent>
                         <Accordion type="single" collapsible className="w-full flex flex-col items-center justify-center">
-                            <AccordionItem value="item-1" className="bg-teal-900 px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-1/2">
-                                <AccordionTrigger className="text-2xl flex items-center">
+                            <AccordionItem value="item-1" className="bg-teal-900 px-6 md:px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-full md:w-1/2">
+                                <AccordionTrigger className="text-lg md:text-2xl flex items-center">
                                     O que é a Bionk?
                                 </AccordionTrigger>
-                                <AccordionContent className="text-lg">
+                                <AccordionContent className="text-sm md:text-lg ">
                                     A Bionk é uma plataforma inovadora de link in bio que centraliza todos os seus links e conteúdos em uma única página. Desenvolvida para facilitar a gestão e a divulgação de suas redes sociais, a plataforma oferece uma interface intuitiva e recursos que permitem a personalização completa da sua página.
                                 </AccordionContent>
                             </AccordionItem>
-                            <AccordionItem value="item-2" className="bg-teal-900 px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-1/2">
-                                <AccordionTrigger className="text-2xl flex items-center">
+                            <AccordionItem value="item-2" className="bg-teal-900 px-6 md:px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-full md:w-1/2">
+                                <AccordionTrigger className="text-lg md:text-2xl flex items-center">
                                     Como faço para criar uma conta?
                                 </AccordionTrigger>
-                                <AccordionContent className="text-lg">
+                                <AccordionContent className="text-sm md:text-lg ">
                                     Para criar uma conta na Bionk, acesse a página de cadastro e preencha seus dados com um email válido. Após confirmar sua conta através da verificação enviado para o seu email, você terá acesso a um painel intuitivo onde poderá configurar sua página, gerenciar seus links e aproveitar todas as funcionalidades disponíveis.
                                 </AccordionContent>
                             </AccordionItem>
-                            <AccordionItem value="item-3" className="bg-teal-900 px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-1/2">
-                                <AccordionTrigger className="text-2xl flex items-center">
+                            <AccordionItem value="item-3" className="bg-teal-900 px-6 md:px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-full md:w-1/2">
+                                <AccordionTrigger className="text-lg md:text-2xl flex items-center">
                                     Como posso personalizar minha página?
                                 </AccordionTrigger>
-                                <AccordionContent className="text-lg">
+                                <AccordionContent className="text-sm md:text-lg ">
                                     A Bionk oferece diversas opções de customização para que sua página reflita sua identidade visual. Você pode alterar cores, fontes e layouts, além de inserir imagens, vídeos e botões de ação. Dessa forma, é possível criar uma experiência única e atrativa que se destaca e engaja seus visitantes.
                                 </AccordionContent>
                             </AccordionItem>
-                            <AccordionItem value="item-5" className="bg-teal-900 px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-1/2">
-                                <AccordionTrigger className="text-2xl flex items-center">
+                            <AccordionItem value="item-5" className="bg-teal-900 px-6 md:px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-full md:w-1/2">
+                                <AccordionTrigger className="text-lg md:text-2xl flex items-center">
                                     Qual é o modelo de monetização da Bionk?
                                 </AccordionTrigger>
-                                <AccordionContent className="text-lg">
+                                <AccordionContent className="text-sm md:text-lg ">
                                     A Bionk disponibiliza um modelo freemium, permitindo que você utilize funcionalidades básicas gratuitamente. Para acessar recursos avançados, como análises detalhadas e opções de customização extras, são oferecidos planos premium. Assim, você pode escolher a solução que melhor se adapta às suas necessidades e objetivos de crescimento.
                                 </AccordionContent>
                             </AccordionItem>
-                            <AccordionItem value="item-6" className="bg-teal-900 px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-1/2">
-                                <AccordionTrigger className="text-2xl flex items-center">
+                            <AccordionItem value="item-6" className="bg-teal-900 px-6 md:px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-full md:w-1/2">
+                                <AccordionTrigger className="text-lg md:text-2xl flex items-center">
                                     A plataforma é segura?
                                 </AccordionTrigger>
-                                <AccordionContent className="text-lg">
+                                <AccordionContent className="text-sm md:text-lg ">
                                     A segurança dos seus dados é uma prioridade na Bionk. Utilizamos tecnologias de criptografia avançadas e protocolos de segurança robustos para proteger as informações dos usuários. Além disso, nossa equipe realiza monitoramento contínuo e atualizações constantes, garantindo que a plataforma esteja sempre protegida contra possíveis ameaças.
                                 </AccordionContent>
                             </AccordionItem>
-                            <AccordionItem value="item-7" className="bg-teal-900 px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-1/2">
-                                <AccordionTrigger className="text-2xl flex items-center">
+                            <AccordionItem value="item-7" className="bg-teal-900 px-6 md:px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-full md:w-1/2">
+                                <AccordionTrigger className="text-lg md:text-2xl flex items-center">
                                     Como posso acompanhar o desempenho dos meus links?
                                 </AccordionTrigger>
-                                <AccordionContent className="text-lg">
+                                <AccordionContent className="text-sm md:text-lg ">
                                     A Bionk oferece ferramentas analíticas integradas que permitem monitorar o desempenho dos seus links em tempo real. Você pode visualizar métricas detalhadas, como número de cliques, fontes de tráfego e comportamento dos visitantes. Essas informações são essenciais para ajustar suas estratégias e maximizar o impacto da sua presença digital.
                                 </AccordionContent>
                             </AccordionItem>
-                            <AccordionItem value="item-8" className="bg-teal-900 px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-1/2">
-                                <AccordionTrigger className="text-2xl flex items-center">
+                            <AccordionItem value="item-8" className="bg-teal-900 px-6 md:px-10 py-6 rounded-lg mb-4 border-2 border-teal-800 hover:border-2 hover:border-lime-600 transition-colors duration-300 w-full md:w-1/2">
+                                <AccordionTrigger className="text-lg md:text-2xl flex items-center">
                                     Como posso obter suporte técnico?
                                 </AccordionTrigger>
-                                <AccordionContent className="text-lg">
+                                <AccordionContent className="text-sm md:text-lg ">
                                     Nosso suporte técnico está disponível através de múltiplos canais, incluindo email, chat e fóruns de ajuda. Além disso, você terá acesso a uma base de conhecimento completa com tutoriais e FAQs que auxiliam na resolução de problemas e no melhor aproveitamento das funcionalidades da plataforma.
                                 </AccordionContent>
                             </AccordionItem>
