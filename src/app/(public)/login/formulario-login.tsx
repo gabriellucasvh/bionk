@@ -86,7 +86,7 @@ function Login() {
               type="email"
               {...register("email")}
             />
-            {errors.email && <p className="text-red-600 font-bold mt-2">{errors.email.message}</p>}
+            {errors.email && <p className="text-red-600 font-base mt-2">{errors.email.message}</p>}
           </div>
 
           <div>
@@ -102,7 +102,7 @@ function Login() {
                 {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
-            {errors.password && <p className="text-red-600 font-bold mt-2">{errors.password.message}</p>}
+            {errors.password && <p className="text-red-600 font-base mt-2">{errors.password.message}</p>}
           </div>
           <div className="-mt-5">
             <Link href={"/"} className="text-blue-500 mb-10 text-sm hover:underline">Esqueceu a senha?</Link>

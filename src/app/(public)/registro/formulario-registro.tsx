@@ -101,7 +101,7 @@ function Register() {
                 {...register("name")}
               />
               {errors.name && (
-                <p className="text-red-600 font-bold mt-2">
+                <p className="text-red-600 font-base mt-2">
                   {errors.name.message}
                 </p>
               )}
@@ -118,7 +118,7 @@ function Register() {
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-red-600 font-bold mt-2">
+                <p className="text-red-600 font-base mt-2">
                   {errors.email.message}
                 </p>
               )}
@@ -144,7 +144,7 @@ function Register() {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-600 font-bold mt-2">
+                <p className="text-red-600 font-base mt-2">
                   {errors.password.message}
                 </p>
               )}
@@ -170,7 +170,7 @@ function Register() {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-600 font-bold mt-2">
+                <p className="text-red-600 font-base mt-2">
                   {errors.confirmPassword.message}
                 </p>
               )}
