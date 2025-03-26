@@ -38,7 +38,11 @@ function Login() {
   }, [status, router]);
 
   if (status === "loading") {
-    return <div className="h-screen flex items-center justify-center bg-white">Carregando...</div>;
+    return (
+      <section className="flex items-center justify-center h-screen">
+        <span className="loader"></span>
+      </section>
+    )
   }
 
   async function onSubmit(data: any) {
@@ -100,6 +104,10 @@ function Login() {
             </div>
             {errors.password && <p className="text-red-600 font-bold mt-2">{errors.password.message}</p>}
           </div>
+          <div className="-mt-5">
+            <Link href={"/"} className="text-blue-500 mb-10 text-sm hover:underline">Esqueceu a senha?</Link>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -116,7 +124,7 @@ function Login() {
           <div>
             <span>
               Não possui uma conta? {" "}
-              <Link className="text-blue-500" href={"/registro"}>Crie gratuitamente!</Link>
+              <Link className="text-blue-500 hover:underline" href={"/registro"}>Crie gratuitamente!</Link>
             </span>
           </div>
         </div>

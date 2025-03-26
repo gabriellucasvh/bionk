@@ -1,7 +1,5 @@
-import Header from "@/components/Header";
+import HeaderBack from "@/components/HeaderBack";
 import FormularioLogin from "./formulario-login";
-import HeaderMobile from "@/components/HeaderMobile";
-import Footer from "@/components/Footer";
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 
@@ -13,6 +11,7 @@ export default async function login() {
     }
     return (
         <div>
+            <HeaderBack />
             <FormularioLogin />
         </div>
     )
