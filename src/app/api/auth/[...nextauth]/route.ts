@@ -1,5 +1,6 @@
 // src/app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
+import { CallbacksOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -10,57 +11,65 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 export const authOptions = {
-    adapter: PrismaAdapter(prisma),
-    providers: [
-        GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!
-        }),
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "email", type: "email" },
+        password: { label: "password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
 
-        CredentialsProvider({
-            name: "Credentials",
-            credentials: {
-                email: { label: "email", type: "email" },
-                password: { label: "password", type: "password" },
-            },
-            async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) return null;
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
 
-                const user = await prisma.user.findUnique({
-                    where: { email: credentials.email },
-                });
+        if (!user || !user.hashedPassword) return null;
 
-                if (!user || !user.hashedPassword) return null;
-
-                const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
-                return isValid ? user : null;
-            },
-        }),
-    ],
-    pages: {
-        signIn: "/registro"
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword
+        );
+        return isValid ? user : null;
+      },
+    }),
+  ],
+  pages: {
+    signIn: "/registro",
+  },
+  session: { strategy: "jwt" as const },
+  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async jwt({ token, user, account }: { token: JWT; user?: any; account?: any }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+      }
+      if (account) {
+        token.acessToken = account.acess_token;
+      }
+      return token;
     },
-    session: { strategy: "jwt" as const },
-    secret: process.env.NEXTAUTH_SECRET,
-    callbacks: {
-        async jwt({ token, user, account }: { token: JWT; user?: any; account?: any }) {
-            if (user) { // Garantir que user exista
-                token.id = user.id;
-                token.email = user.email;
-            }
-            if (account) {
-                token.acessToken = account.acess_token;
-            }
-            return token;
-        },
-        async session({ session, token }: { session: any; token: JWT }) {
-            if (session.user && token) {
-                session.user.id = token.id;  // Garante que o ID é atribuído
-                session.user.email = token.email;  // Garante que o email é atribuído
-            }
-            return session;
-        }
+    async session({ session, token }: { session: any; token: JWT }) {
+      if (session.user && token) {
+        session.user.id = token.id;
+        session.user.email = token.email;
+      }
+      return session;
     },
+    async redirect({ baseUrl }: Parameters<CallbacksOptions["redirect"]>[0]): Promise<string> {
+      // Redireciona para /dashboard/perfil após login com Google.
+      // Esse callback é aplicado a todas as autenticações; se necessário,
+      // você pode condicionar o redirecionamento verificando o tipo de provedor
+      return `${baseUrl}/dashboard/perfil`;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);
