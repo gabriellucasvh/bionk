@@ -14,13 +14,51 @@ model User {
   email          String    @unique
   bio            String?
   provider       String?
-  emailVefied    DateTime?
+  emailVerified  DateTime? // Corrigido: emailVerified
   image          String?
   bannerUrl      String?
   profileUrl     String?
   hashedPassword String?
   createdAt      DateTime  @default(now())
+  accounts       Account[]
+  sessions       Session[]
   Link           Link[]
+}
+
+model Account {
+  id                Int     @id @default(autoincrement())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model Link {
@@ -34,4 +72,3 @@ model Link {
   userId    String
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
