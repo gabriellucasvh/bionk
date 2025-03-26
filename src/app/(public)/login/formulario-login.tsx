@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 const schema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -60,7 +62,7 @@ function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white py-25 px-4 sm:px-6 lg:px-8">
       <form
-        className="bg-white p-8 rounded-lg w-full max-w-md border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+        className="bg-white p-8 rounded-lg w-full max-w-md border"
         onSubmit={handleSubmit(onSubmit)}
       >
         <h2 className="text-2xl font-bold mb-8 text-center text-black" style={{ fontFamily: "system-ui" }}>
@@ -69,9 +71,9 @@ function Login() {
 
         <div className="space-y-6">
           <div>
-            <label className="block text-lg font-bold text-black mb-2">Seu email</label>
-            <input
-              className="w-full px-4 py-3 border-2 border-black rounded-md"
+            <Label className="block text-base font-semibold text-black">Seu email</Label>
+            <Input
+              className="w-full px-4 py-3 rounded-md focus-visible:border-lime-500"
               placeholder="Digite seu e-mail"
               type="email"
               {...register("email")}
@@ -80,10 +82,10 @@ function Login() {
           </div>
 
           <div>
-            <label className="block text-lg font-bold text-black mb-2">Sua senha</label>
+            <Label className="block text-base font-semibold text-black">Sua senha</Label>
             <div className="relative">
-              <input
-                className="w-full px-4 py-3 border-2 border-black rounded-md"
+              <Input
+                className="w-full px-4 py-3 rounded-md focus-visible:border-lime-500"
                 placeholder="Digite sua senha"
                 type={showPassword ? "text" : "password"}
                 {...register("password")}
@@ -97,7 +99,7 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black text-white text-lg font-bold py-3 px-6 border-2 border-black rounded-md"
+            className="w-full  text-white text-lg font-bold py-3 px-6 bg-green-600 hover:bg-green-500 transition-colors duration-300 rounded-md"
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>

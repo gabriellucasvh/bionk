@@ -13,10 +13,7 @@ export default async function login() {
     }
     return (
         <div>
-            <Header />
-            <HeaderMobile />
             <FormularioLogin />
-            <Footer />
         </div>
     )
 }
