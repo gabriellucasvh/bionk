@@ -50,122 +50,10 @@ const FloatingElement = ({
   </motion.div>
 );
 
-// Novo componente para campos de formulário animados
-const FormField = ({ label, icon, index }: { label: string; icon: string; index: number }) => {
-  return (
-    <motion.div
-      className="absolute left-1/2 transform -translate-x-1/2"
-      style={{ top: `${25 + index * 15}%` }}
-      initial={{ opacity: 0, x: -100 }}
-      animate={{ 
-        opacity: 1, 
-        x: 0,
-        y: [0, -5, 0, 5, 0]
-      }}
-      transition={{
-        duration: 3,
-        delay: index * 0.5,
-        repeat: Infinity,
-        repeatType: "mirror",
-        ease: "easeInOut",
-      }}
-    >
-      <motion.div 
-        className="bg-gradient-to-r from-green-600/80 to-green-700/80 backdrop-blur-md 
-                   rounded-lg p-4 shadow-lg border border-green-400/30 w-64 md:w-80"
-        whileHover={{ 
-          scale: 1.05, 
-          boxShadow: "0 0 25px rgba(34, 197, 94, 0.5)" 
-        }}
-        animate={{
-          boxShadow: [
-            "0 0 5px rgba(34, 197, 94, 0.2)",
-            "0 0 15px rgba(34, 197, 94, 0.4)",
-            "0 0 5px rgba(34, 197, 94, 0.2)"
-          ]
-        }}
-        transition={{
-          duration: 2.5,
-          repeat: Infinity,
-          repeatType: "reverse"
-        }}
-      >
-        <div className="flex items-center space-x-3">
-          <div className="bg-green-400/30 p-2 rounded-md">
-            <span className="text-white">{icon}</span>
-          </div>
-          <div className="text-white font-medium">{label}</div>
-        </div>
-        <motion.div 
-          className="h-2 bg-green-500/30 mt-3 rounded-full overflow-hidden"
-          initial={{ width: "0%" }}
-          animate={{ width: "100%" }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "easeInOut",
-            delay: index * 0.2
-          }}
-        >
-          <motion.div 
-            className="h-full bg-green-400" 
-            animate={{ 
-              x: ["-100%", "100%"] 
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
-        </motion.div>
-      </motion.div>
-    </motion.div>
-  );
-};
+
 
 // Botão animado de cadastro
-const RegisterButton = () => (
-  <motion.div
-    className="absolute left-1/2 bottom-[20%] transform -translate-x-1/2"
-    initial={{ opacity: 0, y: 50 }}
-    animate={{ 
-      opacity: 1, 
-      y: 0,
-      scale: [0.95, 1.05, 0.95]
-    }}
-    transition={{
-      duration: 3,
-      repeat: Infinity,
-      repeatType: "reverse",
-      ease: "easeInOut",
-    }}
-  >
-    <motion.button 
-      className="bg-gradient-to-r from-green-500 to-green-700 text-white px-8 py-3 rounded-lg 
-                font-bold text-lg tracking-wide shadow-xl border border-green-400/50"
-      whileHover={{ 
-        scale: 1.1, 
-        boxShadow: "0 0 30px rgba(34, 197, 94, 0.7)" 
-      }}
-      animate={{
-        boxShadow: [
-          "0 0 15px rgba(34, 197, 94, 0.4)",
-          "0 0 30px rgba(34, 197, 94, 0.6)",
-          "0 0 15px rgba(34, 197, 94, 0.4)"
-        ]
-      }}
-      transition={{
-        duration: 2,
-        repeat: Infinity,
-        repeatType: "reverse"
-      }}
-    >
-      Cadastrar
-    </motion.button>
-  </motion.div>
-);
+
 
 // Título animado
 const AnimatedTitle = () => (
@@ -193,7 +81,7 @@ const AnimatedTitle = () => (
         ease: "linear"
       }}
     >
-      Seja bem-vindo ao Bionk
+      Seja bem-vindo de volta ao Bionk!
     </motion.h1>
     <motion.p 
       className="text-green-200/80 text-sm md:text-base max-w-xs mx-auto"
@@ -208,7 +96,7 @@ const AnimatedTitle = () => (
         delay: 0.5
       }}
     >
-      O lugar onde seus links se tornam únicos, profissionais e irresistíveis!
+      Acesse sua conta e continue gerenciando seus links com facilidade.
     </motion.p>
   </motion.div>
 );
@@ -328,7 +216,7 @@ const GreenAnimation = () => {
   ];
   
   return (
-    <div className="relative w-full h-full overflow-hidden bg-gradient-to-b from-green-900 to-gray-950 rounded-l-2xl backdrop-blur-3xl shadow-xl">
+    <div className="relative w-full h-full overflow-hidden bg-gradient-to-b from-green-900 to-gray-950 backdrop-blur-3xl shadow-xl">
       <ParticleBackground />
       <HexagonPattern />
       <ConnectingLines />
@@ -365,17 +253,8 @@ const GreenAnimation = () => {
       <AnimatedTitle />
       
       {/* Campos de formulário animados */}
-      {formFields.map((field, i) => (
-        <FormField 
-          key={i} 
-          label={field.label} 
-          icon={field.icon} 
-          index={i} 
-        />
-      ))}
-      
+
       {/* Botão de cadastro */}
-      <RegisterButton />
     </div>
   );
 };

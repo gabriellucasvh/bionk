@@ -10,6 +10,7 @@ import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import GreenAnimation from "./green-animation";
 
 const schema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -60,9 +61,12 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white py-25 px-4 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen flex items-center justify-center py-25 px-4 sm:px-6 lg:px-8">
+      <div className="absolute inset-0 w-full h-full -z-10">
+        <GreenAnimation />
+      </div>
       <form
-        className="bg-white p-8 rounded-lg w-full max-w-md border"
+        className="bg-white p-8 rounded-lg w-full max-w-md border relative z-10"
         onSubmit={handleSubmit(onSubmit)}
       >
         <h2 className="text-2xl font-bold mb-8 text-center text-black" style={{ fontFamily: "system-ui" }}>
@@ -99,7 +103,7 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full  text-white text-lg font-bold py-3 px-6 bg-green-600 hover:bg-green-500 transition-colors duration-300 rounded-md"
+            className="w-full text-white text-lg font-bold py-3 px-6 bg-green-600 hover:bg-green-500 transition-colors duration-300 rounded-md"
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>
@@ -110,10 +114,10 @@ function Login() {
             </div>
           )}
           <div>
-              <span>
-                Não possui uma conta? {""}
-                <Link className="text-blue-500" href={"/registro"}>Crie gratuitamente!</Link>
-              </span>
+            <span>
+              Não possui uma conta? {" "}
+              <Link className="text-blue-500" href={"/registro"}>Crie gratuitamente!</Link>
+            </span>
           </div>
         </div>
       </form>
