@@ -189,7 +189,7 @@ function Register() {
             </button>
 
             {message && (
-              <div className="mt-4 p-4 bg-[#98EECC] border border-white rounded-md text-black font-bold text-center">
+              <div className="mt-4 p-4 bg-white border border-lime-500 rounded-md text-black font-base text-center">
                 {message}
               </div>
             )}

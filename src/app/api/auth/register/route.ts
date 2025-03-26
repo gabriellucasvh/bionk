@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
     if (existingUser) {
-      return NextResponse.json({ error: "E-mail já cadastrado" }, { status: 400 });
+      return NextResponse.json({ error: "E-mail já cadastrado, tente outro ou faça login!" }, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

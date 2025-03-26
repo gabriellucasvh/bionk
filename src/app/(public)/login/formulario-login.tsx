@@ -123,7 +123,7 @@ function Login() {
             </button>
 
             {message && (
-              <div className="mt-4 p-4 bg-[#98EECC] border-2 border-black rounded-md text-black font-bold text-center">
+              <div className="mt-4 p-4 bg-white border border-lime-500 rounded-md text-black font-base text-center">
                 {message}
               </div>
             )}
