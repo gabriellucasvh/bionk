@@ -193,7 +193,7 @@ function Register() {
                 {message}
               </div>
             )}
-            <div className="text-center">
+            <div>
               <span>
                 Já possui uma conta?{" "}
                 <Link className="text-blue-500" href={"/login"}>
