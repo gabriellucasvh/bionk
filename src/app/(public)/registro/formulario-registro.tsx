@@ -178,6 +178,9 @@ function Register() {
                 </p>
               )}
             </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Ao criar uma conta, você aceita os nossos <Link className="underline" href="/termos">Termos e Condições</Link> e a nossa <Link className="underline" href="/privacidade">Politica de Privacidade</Link>.</p>
+            </div>
 
             <div className="flex flex-col items-center justify-center space-y-3">
               <span>ou</span>
