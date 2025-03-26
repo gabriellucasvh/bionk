@@ -74,9 +74,12 @@ function Login() {
         className="bg-white p-8 rounded-lg w-full max-w-md border relative z-10"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <h2 className="text-2xl font-bold mb-8 text-center text-black" style={{ fontFamily: "system-ui" }}>
-          Login
+        <div className="text-center mb-8 space-y-2">
+        <h2 className="text-2xl font-bold text-center text-black" style={{ fontFamily: "system-ui" }}>
+          Seja bem-vindo de volta!
         </h2>
+        <p className="text-muted-foreground">Acesse sua conta no Bionk e gerencie seus com facilidade.</p>
+        </div>
 
         <div className="space-y-6">
           <div>

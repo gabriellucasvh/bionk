@@ -86,9 +86,12 @@ function Register() {
       {/* Card de Registro */}
       <section className="w-full md:w-1/2 flex items-center justify-center bg-white">
         <article className="bg-white p-8 rounded-lg w-full max-w-md border">
-          <h2 className="text-2xl font-bold mb-8 text-center text-black">
-            Registro
+          <div className="text-center mb-8 space-y-2">
+          <h2 className="text-2xl font-bold text-center text-black">
+          Junte-se ao Bionk
           </h2>
+          <p className="text-muted-foreground">Personalize, organize e compartilhe todos os seus links em um só lugar.</p>
+          </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <Label className="block text-base font-semibold text-black">

@@ -56,50 +56,7 @@ const FloatingElement = ({
 
 
 // Título animado
-const AnimatedTitle = () => (
-  <motion.div
-    className="absolute left-1/2 top-[10%] transform -translate-x-1/2 text-center"
-    initial={{ opacity: 0, y: -30 }}
-    animate={{ 
-      opacity: 1, 
-      y: 0
-    }}
-    transition={{
-      duration: 1,
-      ease: "easeOut",
-    }}
-  >
-    <motion.h1 
-      className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent 
-                bg-gradient-to-r from-green-300 to-green-100 mb-2"
-      animate={{
-        backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
-      }}
-      transition={{
-        duration: 5,
-        repeat: Infinity,
-        ease: "linear"
-      }}
-    >
-      Seja bem-vindo de volta ao Bionk!
-    </motion.h1>
-    <motion.p 
-      className="text-green-200/80 text-sm md:text-base max-w-xs mx-auto"
-      initial={{ opacity: 0 }}
-      animate={{ 
-        opacity: [0.5, 0.8, 0.5] 
-      }}
-      transition={{
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut",
-        delay: 0.5
-      }}
-    >
-      Acesse sua conta e continue gerenciando seus links com facilidade.
-    </motion.p>
-  </motion.div>
-);
+
 
 // Fundo de partículas
 const ParticleBackground = () => {
@@ -208,13 +165,6 @@ const GreenAnimation = () => {
     document.documentElement.style.setProperty('--green-700-rgb', '21, 128, 61');
   }, []);
   
-  const formFields = [
-    { label: "Nome completo", icon: "👤" },
-    { label: "Email", icon: "✉️" },
-    { label: "Senha", icon: "🔒" },
-    { label: "Confirmar senha", icon: "✓" }
-  ];
-  
   return (
     <div className="relative w-full h-full overflow-hidden bg-gradient-to-b from-green-900 to-gray-950 backdrop-blur-3xl shadow-xl">
       <ParticleBackground />
@@ -250,7 +200,7 @@ const GreenAnimation = () => {
       </FloatingElement>
       
       {/* Título */}
-      <AnimatedTitle />
+
       
       {/* Campos de formulário animados */}
 
