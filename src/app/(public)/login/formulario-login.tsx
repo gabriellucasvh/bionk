@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import GreenAnimation from "./green-animation";
+import { GoogleBtn } from "@/components/googleBtn";
 
 const schema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -105,28 +106,32 @@ function Login() {
             {errors.password && <p className="text-red-600 font-base mt-2">{errors.password.message}</p>}
           </div>
           <div className="-mt-5">
-            <Link href={"/"} className="text-blue-500 mb-10 text-sm hover:underline">Esqueceu a senha?</Link>
+            <Link href={"/"} className="text-blue-500 text-sm hover:underline">Esqueceu a senha?</Link>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full text-white text-lg font-bold py-3 px-6 bg-green-600 hover:bg-green-500 transition-colors duration-300 rounded-md"
-          >
-            {loading ? "Entrando..." : "Entrar"}
-          </button>
-
-          {message && (
-            <div className="mt-4 p-4 bg-[#98EECC] border-2 border-black rounded-md text-black font-bold text-center">
-              {message}
-            </div>
-          )}
+          <div className="flex flex-col items-center justify-center space-y-3 -mt-5">
+            <span>ou</span>
+            <GoogleBtn />
+          </div>
           <div>
-            <span>
-              Não possui uma conta? {" "}
-              <Link className="text-blue-500 hover:underline" href={"/registro"}>Crie gratuitamente!</Link>
-            </span>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full text-white text-lg font-bold py-3 px-6 bg-green-600 hover:bg-green-500 transition-colors duration-300 rounded-md"
+            >
+              {loading ? "Entrando..." : "Entrar"}
+            </button>
+
+            {message && (
+              <div className="mt-4 p-4 bg-[#98EECC] border-2 border-black rounded-md text-black font-bold text-center">
+                {message}
+              </div>
+            )}
           </div>
+          <span className="mt-10">
+            Não possui uma conta? {" "}
+            <Link className="text-blue-500 hover:underline" href={"/registro"}>Crie gratuitamente!</Link>
+          </span>
         </div>
       </form>
     </div>
