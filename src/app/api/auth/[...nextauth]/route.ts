@@ -1,16 +1,14 @@
-// src/app/api/auth/[...nextauth]/route.ts
-import NextAuth from "next-auth";
-import { CallbacksOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
-import { JWT } from "next-auth/jwt";
 import bcrypt from "bcryptjs";
+import { generateUniqueUsername } from "@/utils/generateUsername";
 
 const prisma = new PrismaClient();
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -20,54 +18,56 @@ export const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "email", type: "email" },
-        password: { label: "password", type: "password" },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
-
         if (!user || !user.hashedPassword) return null;
-
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.hashedPassword
-        );
-        return isValid ? user : null;
+        const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
+        return isValid ? { ...user, username: user.username ?? undefined } : null;
       },
     }),
   ],
   pages: {
     signIn: "/registro",
   },
-  session: { strategy: "jwt" as const },
+  session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user, account }: { token: JWT; user?: any; account?: any }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
+        token.email = user.email ?? undefined;
       }
       if (account) {
-        token.acessToken = account.acess_token;
+        token.accessToken = account.access_token;
       }
       return token;
     },
-    async session({ session, token }: { session: any; token: JWT }) {
-      if (session.user && token) {
-        session.user.id = token.id;
-        session.user.email = token.email;
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.email = token.email ?? "";
       }
       return session;
     },
-    async redirect({ baseUrl }: Parameters<CallbacksOptions["redirect"]>[0]): Promise<string> {
-      // Redireciona para /dashboard/perfil após login com Google.
-      // Esse callback é aplicado a todas as autenticações; se necessário,
-      // você pode condicionar o redirecionamento verificando o tipo de provedor
+    async redirect({ url, baseUrl }) {
       return `${baseUrl}/dashboard/perfil`;
+    },
+  },
+  events: {
+    async createUser({ user }) {
+      if (!user.username && user.name) {
+        const username = await generateUniqueUsername(user.name);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { username },
+        });
+      }
     },
   },
 };
