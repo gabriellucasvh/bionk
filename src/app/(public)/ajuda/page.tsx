@@ -1,10 +1,9 @@
+import type { Metadata } from "next"
 import {
-  Search,
   BookOpen,
   Palette,
   Zap,
   HelpCircle,
-  BookText,
   MessageSquare,
   TrendingUp,
   Bell,
@@ -35,6 +34,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
 import FooterAjuda from "./footer-ajuda"
 import HeaderAjuda from "./header-ajuda"
+
+export const metadata: Metadata = {
+  title: "Bionk | Central de ajuda",
+  description: "Encontre respostas imediatas na Central de Ajuda da Bionk. Tutoriais, FAQs, contato de suporte e soluções passo a passo para resolver seus problemas. Estamos aqui para ajudar!",
+};
 
 export default function HelpCenter() {
   return (

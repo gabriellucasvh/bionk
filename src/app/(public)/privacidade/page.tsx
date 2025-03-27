@@ -1,9 +1,13 @@
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import type { Metadata } from "next"
 import { Separator } from "@/components/ui/separator"
 import Footer from "@/components/Footer"
 import HeaderMobile from "@/components/HeaderMobile"
 import Header from "@/components/Header"
+
+export const metadata: Metadata = {
+  title: "Bionk | Política de Privacidade",
+  description: "Saiba como a Bionk protege seus dados. Nossa Política de Privacidade explica de forma clara como coletamos, usamos e protegemos suas informações.",
+};
 
 export default function PoliticaDePrivacidade() {
   return (

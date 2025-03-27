@@ -1,16 +1,20 @@
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import type { Metadata } from "next"
 import { Separator } from "@/components/ui/separator"
 import Header from "@/components/Header"
 import HeaderMobile from "@/components/HeaderMobile"
 import Footer from "@/components/Footer"
 
+export const metadata: Metadata = {
+  title: "Bionk | Termos e Condições",
+  description: "Leia os Termos e Condições da Bionk. Entenda seus direitos, deveres e como nossa plataforma funciona de forma transparente e segura.",
+};
+
 export default function TermosECondicoes() {
   return (
     <div className="flex min-h-screen flex-col items-center bg-background">
       <header>
-       <Header />
-       <HeaderMobile />
+        <Header />
+        <HeaderMobile />
       </header>
       <main className="flex-1 pt-28 px-10 md:px-0">
         <div className="container py-6 md:py-8 lg:py-10">
