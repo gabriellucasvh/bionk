@@ -32,9 +32,9 @@ export default async function UserPage({ params }: PageProps) {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8 px-4">
       <main className="max-w-md mx-auto flex flex-col items-center">
         <header className="w-full text-center mb-8">
-          {user.image && (
+          {user.profileUrl && (
             <div className="mx-auto mb-4 relative w-24 h-24 overflow-hidden rounded-full border-2 border-gray-200">
-              <Image src={user.image || "/placeholder.svg"} alt={user.name || username} fill className="object-cover" />
+              <Image src={user.profileUrl || "/placeholder.svg"} alt={user.name || username} fill className="object-cover" />
             </div>
           )}
           <h1 className="text-2xl font-bold text-gray-800">{user.name || username}</h1>
@@ -59,6 +59,10 @@ export default async function UserPage({ params }: PageProps) {
         </section>
 
         <footer className="mt-10 text-center text-sm text-gray-500">
+          <div className="text-xl flex items-center justify-center">
+            <Link href="/" className=""><Image src="/bionk-logo.svg" alt="Bionk Logo" width={70} height={70} className="inline mb-1"/>
+            </Link>
+          </div>
           <p>
             © {new Date().getFullYear()} • {username}
           </p>
