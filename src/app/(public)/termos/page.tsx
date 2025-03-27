@@ -17,7 +17,7 @@ export default function TermosECondicoes() {
           <div className="mx-auto max-w-3xl space-y-6">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Termos e Condições</h1>
-              <p className="text-muted-foreground">Última atualização: {new Date().toLocaleDateString("pt-BR")}</p>
+              <p className="text-muted-foreground">Última atualização: 26/03/2025</p>
             </div>
             <Separator />
             <div className="space-y-6">
