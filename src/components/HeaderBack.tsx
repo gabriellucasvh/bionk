@@ -4,7 +4,7 @@ import React from 'react'
 
 const HeaderBack = () => {
     return (
-        <div className="absolute top-5 left-5 md:top-10 md:left-20">
+        <div className="absolute flex justify-center items-center top-0 left-0 w-full h-20 z-50">
             <Link href="/" className="block">
                 <Image
                     src="/bionk-logo.svg"

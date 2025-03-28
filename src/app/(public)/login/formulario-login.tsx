@@ -10,7 +10,7 @@ import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import GreenAnimation from "./green-animation";
+import GreenAnimation from "../../../components/green-animation";
 import { GoogleBtn } from "@/components/googleBtn";
 
 const schema = z.object({
@@ -83,7 +83,7 @@ function Login() {
 
         <div className="space-y-6">
           <div>
-            <Label className="block text-base font-semibold text-black">Seu email</Label>
+            <Label className="block text-base text-black">Seu email</Label>
             <Input
               className="w-full px-4 py-3 rounded-md focus-visible:border-lime-500"
               placeholder="Digite seu e-mail"
@@ -94,7 +94,7 @@ function Login() {
           </div>
 
           <div>
-            <Label className="block text-base font-semibold text-black">Sua senha</Label>
+            <Label className="block text-base text-black">Sua senha</Label>
             <div className="relative">
               <Input
                 className="w-full px-4 py-3 rounded-md focus-visible:border-lime-500"
@@ -111,16 +111,17 @@ function Login() {
           <div className="-mt-5">
             <Link href={"/"} className="text-blue-500 text-sm hover:underline">Esqueceu a senha?</Link>
           </div>
-          <div className="flex flex-col items-center justify-center space-y-3 -mt-5">
-            <span>ou</span>
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <span className="w-full flex items-center justify-center h-px bg-gray-300">
+            <span className="px-4 bg-white">ou</span>
+            </span>
             <GoogleBtn />
           </div>
           <div>
-
             <button
               type="submit"
               disabled={loading}
-              className="w-full text-white text-lg font-bold py-3 px-6 bg-green-600 hover:bg-green-500 transition-colors duration-300 rounded-md"
+              className="w-full text-white text-lg font-bold py-3 px-6 bg-green-500 hover:bg-green-600 transition-colors duration-300 rounded-md"
             >
               {loading ? "Entrando..." : "Entrar"}
             </button>

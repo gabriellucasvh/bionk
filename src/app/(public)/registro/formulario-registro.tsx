@@ -12,7 +12,7 @@ import Link from "next/link";
 import { GoogleBtn } from "@/components/googleBtn";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import GreenAnimation from "./green-animation";
+import GreenAnimation from "@/components/green-animation";
 
 const schema = z
   .object({
@@ -84,7 +84,10 @@ function Register() {
   return (
     <main className="min-h-screen flex">
       {/* Card de Registro */}
-      <section className="w-full md:w-1/2 flex items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
+      <section className="w-full min-h-screen flex items-center justify-center  px-4 sm:px-6 lg:px-8">
+        <div className="absolute inset-0 w-full h-full -z-10">
+          <GreenAnimation />
+        </div>
         <article className="bg-white p-8 rounded-lg w-full max-w-md">
           <div className="text-center mb-8 space-y-2">
             <h2 className="text-2xl font-bold text-center text-black">
@@ -195,9 +198,10 @@ function Register() {
                 .
               </p>
             </div>
-
-            <div className="flex flex-col items-center justify-center space-y-3">
-              <span>ou</span>
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <span className="w-full flex items-center justify-center h-px bg-gray-300">
+                <span className="px-4 bg-white">ou</span>
+              </span>
               <GoogleBtn />
             </div>
             <button
@@ -223,11 +227,6 @@ function Register() {
             </div>
           </form>
         </article>
-      </section>
-
-      {/* Imagem em tela cheia */}
-      <section className="hidden md:block relative w-1/2 h-screen mx-auto">
-        <GreenAnimation />
       </section>
     </main>
   );
