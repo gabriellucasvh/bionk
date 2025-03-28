@@ -84,13 +84,16 @@ function Register() {
   return (
     <main className="min-h-screen flex">
       {/* Card de Registro */}
-      <section className="w-full md:w-1/2 flex items-center justify-center bg-white">
-        <article className="bg-white p-8 rounded-lg w-full max-w-md border">
+      <section className="w-full md:w-1/2 flex items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
+        <article className="bg-white p-8 rounded-lg w-full max-w-md">
           <div className="text-center mb-8 space-y-2">
-          <h2 className="text-2xl font-bold text-center text-black">
-          Junte-se ao Bionk
-          </h2>
-          <p className="text-muted-foreground">Personalize, organize e compartilhe todos os seus links em um só lugar.</p>
+            <h2 className="text-2xl font-bold text-center text-black">
+              Junte-se ao Bionk
+            </h2>
+            <p className="text-muted-foreground">
+              Personalize, organize e compartilhe todos os seus links em um só
+              lugar.
+            </p>
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
@@ -178,8 +181,19 @@ function Register() {
                 </p>
               )}
             </div>
+
             <div>
-              <p className="text-sm text-muted-foreground">Ao criar uma conta, você aceita os nossos <Link className="underline" href="/termos">Termos e Condições</Link> e a nossa <Link className="underline" href="/privacidade">Política de Privacidade</Link>.</p>
+              <p className="text-sm text-muted-foreground">
+                Ao criar uma conta, você aceita os nossos{" "}
+                <Link className="underline" href="/termos">
+                  Termos e Condições
+                </Link>{" "}
+                e a nossa{" "}
+                <Link className="underline" href="/privacidade">
+                  Política de Privacidade
+                </Link>
+                .
+              </p>
             </div>
 
             <div className="flex flex-col items-center justify-center space-y-3">
@@ -213,7 +227,7 @@ function Register() {
 
       {/* Imagem em tela cheia */}
       <section className="hidden md:block relative w-1/2 h-screen mx-auto">
-            <GreenAnimation />
+        <GreenAnimation />
       </section>
     </main>
   );
