@@ -280,41 +280,41 @@ export default function HelpCenter() {
                   <span className="bg-amber-100 text-amber-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
                     1
                   </span>
-                  <span className="text-sm hover:text-amber-600 cursor-pointer transition-colors">
+                  <Link href="/ajuda/artigo/como-criar-um-link-na-bio-que-converte" className="text-sm hover:text-amber-600 cursor-pointer transition-colors">
                     Como criar um link na bio que converte
-                  </span>
+                  </Link>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="bg-amber-100 text-amber-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
                     2
                   </span>
-                  <span className="text-sm hover:text-amber-600 cursor-pointer transition-colors">
+                  <Link href="/ajuda/artigo/10-dicas-para-aumentar-seus-seguidores" className="text-sm hover:text-amber-600 cursor-pointer transition-colors">
                     10 dicas para aumentar seus seguidores
-                  </span>
+                  </Link>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="bg-amber-100 text-amber-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
                     3
                   </span>
-                  <span className="text-sm hover:text-amber-600 cursor-pointer transition-colors">
+                  <Link href="/ajuda/artigo/como-usar-analises-para-melhorar-seu-desempenho" className="text-sm hover:text-amber-600 cursor-pointer transition-colors">
                     Como usar análises para melhorar seu desempenho
-                  </span>
+                  </Link>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="bg-amber-100 text-amber-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
                     4
                   </span>
-                  <span className="text-sm hover:text-amber-600 cursor-pointer transition-colors">
+                  <Link href="/ajuda/artigo/integrando-seu-link-na-bio-com-o-instagram" className="text-sm hover:text-amber-600 cursor-pointer transition-colors">
                     Integrando seu link na bio com o Instagram
-                  </span>
+                  </Link>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="bg-amber-100 text-amber-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
                     5
                   </span>
-                  <span className="text-sm hover:text-amber-600 cursor-pointer transition-colors">
+                  <Link href="/ajuda/artigo/melhores-praticas-para-criadores-de-conteudo" className="text-sm hover:text-amber-600 cursor-pointer transition-colors">
                     Melhores práticas para criadores de conteúdo
-                  </span>
+                  </Link>
                 </li>
               </ul>
             </CardContent>
