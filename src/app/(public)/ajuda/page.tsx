@@ -32,7 +32,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
-import FooterAjuda from "./footer-ajuda"
+import Footer from "@/components/Footer"
 import HeaderAjuda from "./header-ajuda"
 
 export const metadata: Metadata = {
@@ -377,7 +377,7 @@ export default function HelpCenter() {
           </Card>
         </div>
       </div>
-      <FooterAjuda />
+      <Footer />
     </div>
   )
 }

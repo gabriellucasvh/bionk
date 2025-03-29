@@ -5,7 +5,7 @@ import matter from "gray-matter";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import HeaderAjuda from "../../header-ajuda";
-import FooterAjuda from "../../footer-ajuda";
+import Footer from "@/components/Footer";
 import { ArrowLeft } from "lucide-react";
 
 interface PageProps {
@@ -86,7 +86,7 @@ export default async function ArticlePage({ params }: PageProps) {
           </Link>
         </div>
       </div>
-      <FooterAjuda />
+      <Footer />
     </main>
   );
 }

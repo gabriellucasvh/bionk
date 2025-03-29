@@ -2,26 +2,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 const navigation = {
-  connect: [
-    { name: 'Book Meeting', href: '' },
-    {
-      name: 'Twitter',
-      href: 'https://twitter.com/justansub',
-    },
-    {
-      name: 'Github',
-      href: 'https://www.youtube.com/@SpeedyBrand-SEO',
-    },
-    {
-      name: 'LinkedIn',
-      href: 'https://www.linkedin.com/company/speedy-brand-inc/',
-    },
+  resources: [
+    { name: 'Ajuda', href: '/ajuda' },
+    { name: 'Descubra', href: '/descubra' },
+    { name: 'Templates', href: '/templates' },
+    { name: 'Preços', href: '/planos' },
   ],
-  company: [
-    { name: 'Blogs', href: '/' },
-    { name: 'Pricing', href: '/' },
-    { name: 'Affiliate Partner', href: '/' },
-    { name: 'AI For Enterprise', href: '/' },
+  legal: [
+    { name: 'Termos e Condições', href: '/termos' },
+    { name: 'Política de Privacidade', href: '/privacidade' },
   ],
 }
 
@@ -60,15 +49,13 @@ const Footer = () => {
             <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-2 lg:gap-14">
               <div>
                 <h3 className="text-sm font-semibold leading-6 font-gsans">
-                  Conexões
+                  Recursos
                 </h3>
                 <div className="mt-4 space-y-3">
-                  {navigation.connect.map((item) => (
+                  {navigation.resources.map((item) => (
                     <div key={item.name}>
                       <Link
                         href={item.href}
-                        target="_blank"
-                        rel="noreferrer"
                         className="text-sm leading-6 hover:text-green-200 transition-colors duration-200"
                       >
                         {item.name}
@@ -79,10 +66,10 @@ const Footer = () => {
               </div>
               <div>
                 <h3 className="text-sm font-semibold leading-6 font-gsans">
-                  Companhia
+                  Legal
                 </h3>
                 <div className="mt-4 space-y-3">
-                  {navigation.company.map((item) => (
+                  {navigation.legal.map((item) => (
                     <div key={item.name}>
                       <Link
                         href={item.href}
