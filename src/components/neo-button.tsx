@@ -1,9 +1,8 @@
 import type { ComponentProps } from "react"
 import { twMerge } from "tailwind-merge"
 
-interface NeoButtonProps extends ComponentProps<'button'> {}
 
-const NeoButton = ({className, ...props}: NeoButtonProps) => {
+const NeoButton = ({className, ...props}:ComponentProps<"button">) => {
     return (
       <button
         className={'group/button rounded-lg bg-[#222222] text-black'}
