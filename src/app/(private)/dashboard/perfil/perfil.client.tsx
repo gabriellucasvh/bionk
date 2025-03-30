@@ -116,7 +116,11 @@ const PerfilClient = () => {
       }
       setMessage(`${type === "banner" ? "Banner" : "Foto de perfil"} atualizado com sucesso!`);
       if (data.url) {
-        type === "banner" ? setBannerPreview(data.url) : setProfilePreview(data.url);
+        if (type === "banner") {
+          setBannerPreview(data.url);
+        } else {
+          setProfilePreview(data.url);
+        }
       }
     } catch (error) {
       console.error(`Erro ao fazer upload do ${type}:`, error);
