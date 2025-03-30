@@ -13,23 +13,27 @@ import { Input } from "@/components/ui/input";
 import GreenAnimation from "../../../components/green-animation";
 import { GoogleBtn } from "@/components/googleBtn";
 
+// Define the form schema
 const schema = z.object({
   email: z.string().email("E-mail inválido"),
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
 });
+
+// Infer the TypeScript type from the schema
+type FormData = z.infer<typeof schema>;
 
 function Login() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { data: session, status } = useSession();
+  const { data: _session, status } = useSession(); // Renamed to _session to indicate intentional non-use
   const router = useRouter();
 
   useEffect(() => {
@@ -43,28 +47,32 @@ function Login() {
       <section className="flex items-center justify-center h-screen">
         <span className="loader"></span>
       </section>
-    )
+    );
   }
 
-  async function onSubmit(data: any) {
+  const onSubmit = async (data: FormData) => {
     setLoading(true);
     setMessage("");
 
-    const result = await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
 
-    if (result?.error) {
-      setMessage("Credenciais inválidas. Tente novamente.");
-    } else {
-      router.replace("/");
+      if (result?.error) {
+        setMessage("Credenciais inválidas. Tente novamente.");
+      } else {
+        router.replace("/");
+      }
+    } catch (error) {
+      setMessage("Ocorreu um erro durante o login");
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-  }
-
+  };
   return (
     <div className="relative min-h-screen flex items-center justify-center py-25 px-4 sm:px-6 lg:px-8">
       <div className="absolute inset-0 w-full h-full -z-10">
@@ -75,10 +83,10 @@ function Login() {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="text-center mb-8 space-y-2">
-        <h2 className="text-2xl font-bold text-center text-black">
-          Seja bem-vindo de volta!
-        </h2>
-        <p className="text-muted-foreground">Acesse sua conta no Bionk e gerencie seus com facilidade.</p>
+          <h2 className="text-2xl font-bold text-center text-black">
+            Seja bem-vindo de volta!
+          </h2>
+          <p className="text-muted-foreground">Acesse sua conta no Bionk e gerencie seus com facilidade.</p>
         </div>
 
         <div className="space-y-6">
@@ -113,7 +121,7 @@ function Login() {
           </div>
           <div className="flex flex-col items-center justify-center space-y-4">
             <span className="w-full flex items-center justify-center h-px bg-gray-300">
-            <span className="px-4 bg-white">ou</span>
+              <span className="px-4 bg-white">ou</span>
             </span>
             <GoogleBtn />
           </div>

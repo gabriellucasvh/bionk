@@ -24,6 +24,7 @@ const getFilePath = async (slug: string) => {
       await fs.access(filePath);
       return filePath;
     } catch (error) {
+      console.error(`Error accessing file in directory ${dir}:`, error);
       continue;
     }
   }
@@ -53,6 +54,7 @@ export async function generateStaticParams() {
       const files = await fs.readdir(dir);
       filenames = filenames.concat(files);
     } catch (error) {
+      console.error(`Error accessing file in directory ${dir}:`, error);
       continue;
     }
   }

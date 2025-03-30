@@ -26,6 +26,7 @@ const getFilePath = async (slug: string) => {
       await fs.access(filePath);
       return filePath;
     } catch (error) {
+      console.error(`Error accessing file in directory ${dir}:`, error);
       continue;
     }
   }
@@ -58,6 +59,7 @@ export async function generateStaticParams() {
       const files = await fs.readdir(dir);
       filenames = filenames.concat(files);
     } catch (error) {
+      console.error(`Error accessing file in directory ${dir}:`, error);
       continue;
     }
   }
@@ -88,8 +90,8 @@ export default async function ArticlePage({ params }: PageProps) {
           <ReactMarkdown>{content}</ReactMarkdown>
         </article>
         <div className="mt-10">
-          <Link 
-            href="/ajuda" 
+          <Link
+            href="/ajuda"
             className="flex w-fit items-center p-2 text-white rounded-lg text-sm bg-green-600 hover:bg-green-700"
           >
             <ArrowLeft className="mr-2" />

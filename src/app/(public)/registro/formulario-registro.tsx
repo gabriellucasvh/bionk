@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import GreenAnimation from "@/components/green-animation";
 
+// Define the form schema
 const schema = z
   .object({
     name: z.string().min(3, "Insira um nome de usuário válido"),
@@ -26,19 +27,22 @@ const schema = z
     path: ["confirmPassword"],
   });
 
+// Infer the TypeScript type from the schema
+type FormData = z.infer<typeof schema>;
+
 function Register() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(schema) });
+  } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { data: session, status } = useSession();
+  const { data: _session, status } = useSession(); // Renamed to _session to indicate intentional non-use
   const router = useRouter();
 
   useEffect(() => {
@@ -55,7 +59,7 @@ function Register() {
     );
   }
 
-  async function onSubmit(data: any) {
+  const onSubmit = async (data: FormData) => {
     setLoading(true);
     setMessage("");
 
@@ -74,12 +78,17 @@ function Register() {
       } else {
         router.replace("/");
       }
-    } catch (error: any) {
-      setMessage(error.response?.data?.error || "Erro ao cadastrar");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setMessage(error.response?.data?.error || "Erro ao cadastrar");
+      } else {
+        setMessage("Erro ao cadastrar");
+      }
+    } finally {
+      setLoading(false);
     }
+  };
 
-    setLoading(false);
-  }
 
   return (
     <main className="min-h-screen flex">
