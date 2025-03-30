@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { signOut, useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
 
 import {
   Archive,
@@ -46,7 +45,6 @@ type Profile = {
 
 export default function ConfigsClient() {
   const { data: session } = useSession()
-  const router = useRouter()
   const [profile, setProfile] = useState<Profile>({ email: "" })
   const [isProfileLoading, setIsProfileLoading] = useState(true)
 

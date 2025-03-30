@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, Star } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { useState } from 'react'
 
 const pricingPlans = [
