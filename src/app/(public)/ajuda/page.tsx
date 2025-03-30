@@ -17,7 +17,7 @@ import {
   Layout,
   Share2,
   PaintBucket,
-  Image,
+  Image as ImageIcon,
   List,
   Sparkles,
   Type,
@@ -100,7 +100,7 @@ export default function HelpCenter() {
                   <Link href="/ajuda/guia/alterando-cores-e-temas">Alterando cores e temas</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-purple-600 cursor-pointer transition-colors">
-                  <Image className="h-4 w-4 text-muted-foreground" />
+                  <ImageIcon className="h-4 w-4 text-muted-foreground" />
                   <Link href="/ajuda/guia/adicionando-imagens-e-icones">Adicionando imagens e ícones</Link>
                 </li>
                 <li className="flex items-center gap-2 text-sm hover:text-purple-600 cursor-pointer transition-colors">
