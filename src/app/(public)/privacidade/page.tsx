@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import type { Metadata } from "next"
 import { Separator } from "@/components/ui/separator"
 import Footer from "@/components/Footer"

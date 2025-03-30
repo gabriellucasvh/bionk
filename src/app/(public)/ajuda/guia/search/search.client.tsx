@@ -38,7 +38,6 @@ export default function SearchResultsPage() {
     fetchResults()
   }, [query])
 
-  // Variantes para o container e os itens com efeito de stagger e fade in/slide up
   const listVariants = {
     hidden: {},
     visible: {
@@ -59,7 +58,7 @@ export default function SearchResultsPage() {
       <section className="max-w-2xl mx-auto">
         <header>
           <h1 className="text-3xl font-bold text-center mb-6">
-            Resultados para "{query}"
+            {`Resultados para "${query}"`}
           </h1>
         </header>
         {loading ? (
@@ -86,11 +85,13 @@ export default function SearchResultsPage() {
                   className="bg-gray-50 p-6 rounded-md border hover:border-green-600 transition-colors duration-200"
                 >
                   <Link href={`/ajuda/guia/${guide.slug}`} className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                  <div className="flex flex-col mb-2 md:mb-0">
-                    <h2 className="text-xl font-semibold hover:underline w-fit">{guide.title}</h2>
-                    <p className="text-sm">{guide.description}</p>
-                  </div>
-                    <span className="flex items-center text-xs text-white bg-green-600 rounded-full px-2 py-1 gap-2"><BookCheck size={16} />{guide.type}</span>
+                    <div className="flex flex-col mb-2 md:mb-0">
+                      <h2 className="text-xl font-semibold hover:underline w-fit">{guide.title}</h2>
+                      <p className="text-sm">{guide.description}</p>
+                    </div>
+                    <span className="flex items-center text-xs text-white bg-green-600 rounded-full px-2 py-1 gap-2">
+                      <BookCheck size={16} />{guide.type}
+                    </span>
                   </Link>
                 </motion.li>
               ))}
