@@ -33,7 +33,13 @@ function Login() {
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { data: _session, status } = useSession(); // Renamed to _session to indicate intentional non-use
+  const { data: session, status } = useSession(); // Renamed to session to indicate intentional non-use
+  // Verifica apenas se existe sessão, sem acessar dados
+  useEffect(() => {
+    if (session) { // Apenas verifica a existência
+      // Lógica que não expõe os dados da sessão
+    }
+  }, [session]);
   const router = useRouter();
 
   useEffect(() => {

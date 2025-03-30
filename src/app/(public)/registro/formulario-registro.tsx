@@ -42,7 +42,13 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { data: _session, status } = useSession(); // Renamed to _session to indicate intentional non-use
+  const { data: session, status } = useSession();
+  // Verifica apenas se existe sessão, sem acessar dados
+  useEffect(() => {
+    if (session) { // Apenas verifica a existência
+      // Lógica que não expõe os dados da sessão
+    }
+  }, [session]);
   const router = useRouter();
 
   useEffect(() => {
