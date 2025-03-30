@@ -40,7 +40,7 @@ export default function Testimonials() {
                         >
                             <div className="absolute top-0 right-0 w-20 h-20 bg-purple-50 opacity-50 rounded-bl-full"></div>
 
-                            <p className="text-gray-700 mb-6 relative z-10">"{testimonial.content}"</p>
+                            <p className="text-gray-700 mb-6 relative z-10">{`"${testimonial.content}"`}</p>
 
                             <div className="flex items-center justify-between">
                                 <div>
