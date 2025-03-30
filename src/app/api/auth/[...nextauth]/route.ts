@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async redirect({ url, baseUrl }) {
+    async redirect({ baseUrl }) {  // Removed unused url parameter completely
       return `${baseUrl}/dashboard/perfil`;
     },
   },

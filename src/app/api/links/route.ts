@@ -8,7 +8,10 @@ export async function GET(request: Request) {
   const userId = searchParams.get("userId");
 
   if (!userId) {
-    return NextResponse.json({ error: "Parâmetro 'userId' ausente." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Parâmetro 'userId' ausente." },
+      { status: 400 }
+    );
   }
 
   try {
@@ -17,8 +20,12 @@ export async function GET(request: Request) {
       orderBy: { order: "asc" },
     });
     return NextResponse.json({ links });
-  } catch (error) {
-    return NextResponse.json({ error: "Falha ao buscar links." }, { status: 500 });
+  } catch (error: unknown) {
+    console.error("Failed to fetch links:", error);
+    return NextResponse.json(
+      { error: "Falha ao buscar links." },
+      { status: 500 }
+    );
   }
 }
 
@@ -28,7 +35,10 @@ export async function POST(request: Request) {
     const { userId, title, url, active, clicks, sensitive } = body;
 
     if (!userId || !title || !url) {
-      return NextResponse.json({ error: "Campos obrigatórios não informados." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Campos obrigatórios não informados." },
+        { status: 400 }
+      );
     }
 
     const newLink = await prisma.link.create({
@@ -39,12 +49,16 @@ export async function POST(request: Request) {
         active: active ?? true,
         clicks: clicks ?? 0,
         sensitive: sensitive ?? false,
-        order: 0, // Define um valor padrão para a ordem; ajuste conforme sua lógica
+        order: 0,
       },
     });
 
     return NextResponse.json(newLink, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: "Falha ao criar link." }, { status: 500 });
+  } catch (error: unknown) {
+    console.error("Failed to create link:", error);
+    return NextResponse.json(
+      { error: "Falha ao criar link." },
+      { status: 500 }
+    );
   }
 }

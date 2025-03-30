@@ -9,7 +9,10 @@ export async function PUT(request: Request) {
     const { userId, order } = body;
 
     if (!userId || !Array.isArray(order)) {
-      return NextResponse.json({ error: "Requisição inválida." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Requisição inválida." },
+        { status: 400 }
+      );
     }
 
     // Atualiza a ordem de cada link conforme o índice no array recebido
@@ -22,7 +25,11 @@ export async function PUT(request: Request) {
 
     await Promise.all(updatePromises);
     return NextResponse.json({ message: "Links reordenados com sucesso." });
-  } catch (error) {
-    return NextResponse.json({ error: "Falha ao reordenar links." }, { status: 500 });
+  } catch (error: unknown) {
+    console.error("Failed to reorder links:", error);
+    return NextResponse.json(
+      { error: "Falha ao reordenar links." },
+      { status: 500 }
+    );
   }
 }

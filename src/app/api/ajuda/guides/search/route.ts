@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'recursos-avancados'),
   ];
 
-  let guides: Array<{ slug: string; title: string; description: string; type: string }> = [];
+  const guides: Array<{ slug: string; title: string; description: string; type: string }> = [];
 
   // Itera sobre cada diretório e coleta os arquivos Markdown
   directories.forEach((dir) => {

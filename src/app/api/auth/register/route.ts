@@ -1,5 +1,3 @@
-// src/app/api/auth/register/route.ts
-
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
@@ -8,7 +6,7 @@ const prisma = new PrismaClient();
 
 // Função para gerar um username único
 async function generateUniqueUsername(name: string): Promise<string> {
-  let baseUsername = name.toLowerCase().replace(/\s+/g, ""); // Remove espaços e deixa tudo minúsculo
+  const baseUsername = name.toLowerCase().replace(/\s+/g, ""); // Changed to const
   let username = baseUsername;
   let count = 1;
 
@@ -26,24 +24,37 @@ export async function POST(req: Request) {
     const { name, email, password } = await req.json();
 
     if (!name || !email || !password) {
-      return NextResponse.json({ error: "Todos os campos são obrigatórios" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Todos os campos são obrigatórios" },
+        { status: 400 }
+      );
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
     if (existingUser) {
-      return NextResponse.json({ error: "E-mail já cadastrado, tente outro ou faça login!" }, { status: 400 });
+      return NextResponse.json(
+        { error: "E-mail já cadastrado, tente outro ou faça login!" },
+        { status: 400 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const username = await generateUniqueUsername(name); // Gera o username automático
+    const username = await generateUniqueUsername(name);
 
     await prisma.user.create({
       data: { name, email, hashedPassword, username },
     });
 
-    return NextResponse.json({ message: "Usuário cadastrado com sucesso!" }, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Usuário cadastrado com sucesso!" },
+      { status: 201 }
+    );
+  } catch (error: unknown) {
+    console.error("Registration error:", error); // Now using the error variable
+    return NextResponse.json(
+      { error: "Erro interno" },
+      { status: 500 }
+    );
   }
 }

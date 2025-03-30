@@ -11,7 +11,7 @@ export async function POST(
   context: { params: { id: string } }
 ) {
   const { params } = context;
-  const { id } = await Promise.resolve(params);
+  const { id } = params; // Removido Promise.resolve desnecessário
 
   // Recupera o tipo (banner ou profile) via query string
   const { searchParams } = new URL(req.url);
@@ -51,20 +51,20 @@ export async function POST(
       await fs.mkdir(uploadsFolder, { recursive: true });
     }
 
-    // Remove o arquivo antigo, se existir, ignorando erro se o arquivo não for encontrado
+    // Remove o arquivo antigo, se existir
     const user = await prisma.user.findUnique({
       where: { id },
       select: { bannerUrl: true, profileUrl: true },
     });
+    
     if (user) {
       const oldFileUrl = type === "banner" ? user.bannerUrl : user.profileUrl;
       if (oldFileUrl) {
         const oldFilePath = path.join(process.cwd(), "public", oldFileUrl);
         try {
           await fs.unlink(oldFilePath);
-        } catch (err: any) {
-          // Ignora o erro se o arquivo não existir (ENOENT)
-          if (err.code !== "ENOENT") {
+        } catch (err: unknown) { // Corrigido: substituído any por unknown
+          if (err instanceof Error && 'code' in err && err.code !== 'ENOENT') {
             console.error("Erro ao remover arquivo antigo:", err);
           }
         }
@@ -79,22 +79,20 @@ export async function POST(
     // URL que será salva no banco e utilizada pelo frontend
     const generatedUrl = `/uploads/${filename}`;
 
-    // Atualiza o registro do usuário no banco de dados para manter somente 1 imagem por tipo
-    if (type === "banner") {
-      await prisma.user.update({
-        where: { id },
-        data: { bannerUrl: generatedUrl },
-      });
-    } else {
-      await prisma.user.update({
-        where: { id },
-        data: { profileUrl: generatedUrl },
-      });
-    }
+    // Atualiza o registro do usuário no banco de dados
+    await prisma.user.update({
+      where: { id },
+      data: type === "banner" 
+        ? { bannerUrl: generatedUrl }
+        : { profileUrl: generatedUrl },
+    });
 
     return NextResponse.json({ url: generatedUrl }, { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) { // Também corrigido aqui
     console.error("Erro no upload:", error);
-    return NextResponse.json({ error: "Erro ao processar o upload." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erro ao processar o upload." }, 
+      { status: 500 }
+    );
   }
 }
