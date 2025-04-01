@@ -38,6 +38,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  type DraggableSyntheticListeners,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -60,7 +61,10 @@ type LinkItem = {
 
 interface SortableItemProps {
   id: number;
-  children: (props: { listeners: any; attributes: any }) => React.ReactNode;
+  children: (props: {
+    listeners: DraggableSyntheticListeners;
+    attributes: React.HTMLAttributes<HTMLDivElement>;
+  }) => React.ReactNode;
 }
 
 const SortableItem = ({ id, children }: SortableItemProps) => {
@@ -93,7 +97,7 @@ const LinksClient = () => {
         const res = await fetch(`/api/links?userId=${session.user.id}`);
         const data = await res.json();
         setLinks(data.links);
-        setIsProfileLoading(false); // Finaliza o carregamento após a busca dos dados
+        setIsProfileLoading(false);
       }
     };
     fetchLinks();
@@ -214,6 +218,7 @@ const LinksClient = () => {
       });
     }
   };
+
   if (isProfileLoading) {
     return (
       <section className="flex items-center justify-center h-screen">
@@ -286,7 +291,6 @@ const LinksClient = () => {
                   {({ listeners }) => (
                     <article className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center">
                       <div className="flex items-center gap-3 sm:w-7/12">
-                        {/* O arraste ocorrerá somente ao interagir com o ícone */}
                         <Grip
                           {...listeners}
                           className="h-5 w-5 cursor-move text-muted-foreground"
