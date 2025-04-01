@@ -27,13 +27,10 @@ const PerfilClient = () => {
   const [originalProfile, setOriginalProfile] = useState({ name: "", username: "", bio: "" });
   const [isProfileLoading, setIsProfileLoading] = useState(true);
 
-  // Consome a foto de perfil do Google se disponível
-  const [bannerPreview, setBannerPreview] = useState<string>("/banner.png");
   const [profilePreview, setProfilePreview] = useState<string>(
     session?.user?.image || "/person.png"
   );
 
-  const bannerInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -48,11 +45,9 @@ const PerfilClient = () => {
         setUsername(fetchedUsername);
         setBio(fetchedBio);
         setOriginalProfile({ name: fetchedName, username: fetchedUsername, bio: fetchedBio });
-        if (data.bannerUrl) setBannerPreview(data.bannerUrl);
         if (data.profileUrl) {
           setProfilePreview(data.profileUrl);
         } else if (session?.user?.image) {
-          // Consome a foto de perfil do Google se não houver foto salva
           setProfilePreview(session.user.image);
         }
         setIsProfileLoading(false);
@@ -108,7 +103,7 @@ const PerfilClient = () => {
     }
   };
 
-  const uploadImage = async (file: File, type: "banner" | "profile") => {
+  const uploadImage = async (file: File, type: "profile") => {
     if (!session?.user?.id) return;
     const formData = new FormData();
     formData.append("file", file);
@@ -123,31 +118,19 @@ const PerfilClient = () => {
         throw new Error(data.error || "Falha no upload da imagem");
       }
       setMessage(
-        `${type === "banner" ? "Banner" : "Foto de perfil"} atualizado com sucesso!`
+        `${type === "profile" ? "Foto de perfil" : "Banner"} atualizado com sucesso!`
       );
       if (data.url) {
-        type === "banner" ? setBannerPreview(data.url) : setProfilePreview(data.url);
+        setProfilePreview(data.url);
       }
     } catch (error) {
-      console.error(`Erro ao fazer upload do ${type}:`, error);
+      console.error(`Erro ao fazer upload da ${type}:`, error);
       if (error instanceof Error) {
         setMessage(`Erro: ${error.message}`);
       } else {
-        setMessage(`Erro: Ocorreu um problema ao fazer upload do ${type}`);
+        setMessage("Erro: Ocorreu um problema ao fazer upload");
       }
     }
-  };
-
-  const handleBannerChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage("Erro: O banner deve ter no máximo 5MB.");
-      return;
-    }
-    const previewUrl = URL.createObjectURL(file);
-    setBannerPreview(previewUrl);
-    uploadImage(file, "banner");
   };
 
   const handleProfileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -174,9 +157,6 @@ const PerfilClient = () => {
     <section className="space-y-4 w-full p-4">
       <header className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Perfil</h2>
-        <Button onClick={handleSaveProfile} disabled={loading || !hasChanges}>
-          {loading ? "Salvando..." : "Salvar alterações"}
-        </Button>
       </header>
 
       {message && (
@@ -196,34 +176,9 @@ const PerfilClient = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <article className="space-y-4">
-            <div className="relative mx-auto h-[300px] w-full border overflow-hidden rounded-lg bg-muted">
-              <Image
-                src={bannerPreview}
-                alt="Banner"
-                width={1500}
-                height={500}
-                className="h-full w-full object-cover"
-              />
-              <Button
-                size="sm"
-                className="absolute bottom-2 right-2"
-                onClick={() => bannerInputRef.current?.click()}
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                Alterar banner
-              </Button>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                ref={bannerInputRef}
-                onChange={handleBannerChange}
-              />
-            </div>
-
             <div className="flex flex-col items-center gap-4 sm:flex-row">
               <article className="relative">
-                <div className="h-24 w-24 overflow-hidden rounded-full bg-muted">
+                <div className="h-24 w-24 overflow-hidden rounded-full bg-muted border-2 border-green-500 shadow-md shadow-black/20">
                   <Image
                     src={profilePreview}
                     alt="Foto de perfil"
@@ -247,6 +202,7 @@ const PerfilClient = () => {
                   onChange={handleProfileChange}
                 />
               </article>
+            </div>
               <article className="flex-1 space-y-4">
                 <div className="grid gap-2">
                   <Label htmlFor="name">Nome</Label>
@@ -270,7 +226,6 @@ const PerfilClient = () => {
                   </div>
                 </div>
               </article>
-            </div>
 
             <div className="grid gap-2">
               <Label htmlFor="bio">Biografia</Label>
@@ -283,8 +238,14 @@ const PerfilClient = () => {
               />
             </div>
           </article>
+      <div className="flex justify-end mt-4">
+        <Button onClick={handleSaveProfile} disabled={loading || !hasChanges}>
+          {loading ? "Salvando..." : "Salvar alterações"}
+        </Button>
+      </div>
         </CardContent>
       </Card>
+
     </section>
   );
 };
