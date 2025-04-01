@@ -1,4 +1,3 @@
-// app/api/profile/[id]/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { promises as fs } from "fs";
@@ -8,10 +7,9 @@ const prisma = new PrismaClient();
 
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
-  const { id } = params; // Removido Promise.resolve desnecessário
+  const { id } = await params; // Aguarda a resolução de params
 
   // Recupera o tipo (banner ou profile) via query string
   const { searchParams } = new URL(req.url);
@@ -26,7 +24,10 @@ export async function POST(
     const file = formData.get("file");
 
     if (!(file instanceof File)) {
-      return NextResponse.json({ error: "Nenhum arquivo enviado." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Nenhum arquivo enviado." },
+        { status: 400 }
+      );
     }
 
     // Define os limites de tamanho: 5MB para banner e 2MB para foto de perfil
@@ -56,15 +57,15 @@ export async function POST(
       where: { id },
       select: { bannerUrl: true, profileUrl: true },
     });
-    
+
     if (user) {
       const oldFileUrl = type === "banner" ? user.bannerUrl : user.profileUrl;
       if (oldFileUrl) {
         const oldFilePath = path.join(process.cwd(), "public", oldFileUrl);
         try {
           await fs.unlink(oldFilePath);
-        } catch (err: unknown) { // Corrigido: substituído any por unknown
-          if (err instanceof Error && 'code' in err && err.code !== 'ENOENT') {
+        } catch (err: unknown) {
+          if (err instanceof Error && "code" in err && err.code !== "ENOENT") {
             console.error("Erro ao remover arquivo antigo:", err);
           }
         }
@@ -82,16 +83,17 @@ export async function POST(
     // Atualiza o registro do usuário no banco de dados
     await prisma.user.update({
       where: { id },
-      data: type === "banner" 
-        ? { bannerUrl: generatedUrl }
-        : { profileUrl: generatedUrl },
+      data:
+        type === "banner"
+          ? { bannerUrl: generatedUrl }
+          : { profileUrl: generatedUrl },
     });
 
     return NextResponse.json({ url: generatedUrl }, { status: 200 });
-  } catch (error: unknown) { // Também corrigido aqui
+  } catch (error: unknown) {
     console.error("Erro no upload:", error);
     return NextResponse.json(
-      { error: "Erro ao processar o upload." }, 
+      { error: "Erro ao processar o upload." },
       { status: 500 }
     );
   }
