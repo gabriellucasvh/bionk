@@ -25,11 +25,13 @@ const PerfilClient = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [originalProfile, setOriginalProfile] = useState({ name: "", username: "", bio: "" });
-  const [isProfileLoading, setIsProfileLoading] = useState(true); // Estado para controle de carregamento
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
 
-  // Estados para as imagens
+  // Consome a foto de perfil do Google se disponível
   const [bannerPreview, setBannerPreview] = useState<string>("/banner.png");
-  const [profilePreview, setProfilePreview] = useState<string>("/person.png");
+  const [profilePreview, setProfilePreview] = useState<string>(
+    session?.user?.image || "/person.png"
+  );
 
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
@@ -47,8 +49,13 @@ const PerfilClient = () => {
         setBio(fetchedBio);
         setOriginalProfile({ name: fetchedName, username: fetchedUsername, bio: fetchedBio });
         if (data.bannerUrl) setBannerPreview(data.bannerUrl);
-        if (data.profileUrl) setProfilePreview(data.profileUrl);
-        setIsProfileLoading(false); // Finaliza o carregamento após a busca dos dados
+        if (data.profileUrl) {
+          setProfilePreview(data.profileUrl);
+        } else if (session?.user?.image) {
+          // Consome a foto de perfil do Google se não houver foto salva
+          setProfilePreview(session.user.image);
+        }
+        setIsProfileLoading(false);
       };
       fetchProfile();
     }
@@ -115,13 +122,11 @@ const PerfilClient = () => {
       if (!response.ok) {
         throw new Error(data.error || "Falha no upload da imagem");
       }
-      setMessage(`${type === "banner" ? "Banner" : "Foto de perfil"} atualizado com sucesso!`);
+      setMessage(
+        `${type === "banner" ? "Banner" : "Foto de perfil"} atualizado com sucesso!`
+      );
       if (data.url) {
-        if (type === "banner") {
-          setBannerPreview(data.url);
-        } else {
-          setProfilePreview(data.url);
-        }
+        type === "banner" ? setBannerPreview(data.url) : setProfilePreview(data.url);
       }
     } catch (error) {
       console.error(`Erro ao fazer upload do ${type}:`, error);
@@ -157,7 +162,6 @@ const PerfilClient = () => {
     uploadImage(file, "profile");
   };
 
-  // Renderiza um placeholder enquanto os dados do usuário são carregados
   if (isProfileLoading) {
     return (
       <section className="flex items-center justify-center h-screen">
