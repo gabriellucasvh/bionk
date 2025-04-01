@@ -115,23 +115,23 @@ const LinksClient = () => {
     }
     if (!isValidUrl(formattedUrl)) return;
 
-    const newLink: LinkItem = {
-      id: Date.now(),
-      title: newTitle,
-      url: formattedUrl,
-      active: true,
-      clicks: 0,
-      sensitive: false,
-    };
-
+    // Chamada para a API que retorna o link criado com o id correto do banco
     const res = await fetch(`/api/links`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: session?.user?.id, ...newLink }),
+      body: JSON.stringify({
+        userId: session?.user?.id,
+        title: newTitle,
+        url: formattedUrl,
+        active: true,
+        clicks: 0,
+        sensitive: false,
+      }),
     });
 
     if (res.ok) {
-      setLinks((prev) => [...prev, newLink]);
+      const createdLink: LinkItem = await res.json();
+      setLinks((prev) => [...prev, createdLink]);
       setNewTitle("");
       setNewUrl("");
       setIsAdding(false);
@@ -323,17 +323,10 @@ const LinksClient = () => {
                                 }
                               />
                               <div className="flex gap-2">
-                                <Button
-                                  onClick={() =>
-                                    saveEditing(link.id, link.title, link.url)
-                                  }
-                                >
+                                <Button onClick={() => saveEditing(link.id, link.title, link.url)}>
                                   Salvar
                                 </Button>
-                                <Button
-                                  variant="outline"
-                                  onClick={() => cancelEditing(link.id)}
-                                >
+                                <Button variant="outline" onClick={() => cancelEditing(link.id)}>
                                   Cancelar
                                 </Button>
                               </div>
@@ -343,10 +336,7 @@ const LinksClient = () => {
                               <div className="flex items-center gap-2">
                                 <span className="font-medium">{link.title}</span>
                                 {link.sensitive && (
-                                  <Badge
-                                    variant="outline"
-                                    className="text-xs border-red-300"
-                                  >
+                                  <Badge variant="outline" className="text-xs border-red-300">
                                     Sensível
                                   </Badge>
                                 )}
@@ -374,25 +364,17 @@ const LinksClient = () => {
                           </Badge>
                           <Switch
                             checked={link.active}
-                            aria-label={
-                              link.active ? "Desabilitar link" : "Habilitar link"
-                            }
+                            aria-label={link.active ? "Desabilitar link" : "Habilitar link"}
                             onChange={() => toggleActive(link.id)}
                           />
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                              >
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => startEditing(link.id)}
-                              >
+                              <DropdownMenuItem onClick={() => startEditing(link.id)}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Editar
                               </DropdownMenuItem>
@@ -400,9 +382,7 @@ const LinksClient = () => {
                                 <Eye className="mr-2 h-4 w-4" />
                                 Ver informações
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => toggleSensitive(link.id)}
-                              >
+                              <DropdownMenuItem onClick={() => toggleSensitive(link.id)}>
                                 {link.sensitive ? (
                                   <>
                                     <Eye className="mr-2 h-4 w-4" />
