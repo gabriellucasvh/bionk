@@ -5,9 +5,9 @@ const prisma = new PrismaClient();
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } | Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params; // Aguarda a resolução dos parâmetros
+  const { id } = await params; // Aguarda que params seja resolvido
   if (!id || isNaN(Number(id))) {
     return NextResponse.json({ error: "ID inválido" }, { status: 400 });
   }
@@ -29,9 +29,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } | Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params; // Aguarda a resolução dos parâmetros
+  const { id } = await params; // Aguarda que params seja resolvido
   if (!id || isNaN(Number(id))) {
     return NextResponse.json({ error: "ID inválido" }, { status: 400 });
   }
