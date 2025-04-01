@@ -49,30 +49,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export async function generateStaticParams() {
-  const directories = [
-    path.join(process.cwd(), "src", "content", "ajuda"),
-    path.join(process.cwd(), "src", "content", "ajuda", "guia", "primeiros-passos"),
-    path.join(process.cwd(), "src", "content", "ajuda", "guia", "personalizacao"),
-    path.join(process.cwd(), "src", "content", "ajuda", "guia", "recursos-avancados")
-  ];
+  const directory = path.join(process.cwd(), "src", "content", "ajuda", "guia");
 
   let filenames: string[] = [];
-  for (const dir of directories) {
-    try {
-      const files = await fs.readdir(dir);
-      filenames = filenames.concat(files);
-    } catch (error) {
-      const err = error as NodeJS.ErrnoException; // Tipo adequado para erros de leitura de diretórios
-      // Apenas loga erros que não sejam ENOENT
-      if (err.code !== "ENOENT") {
-        console.error(`Error accessing directory ${dir}:`, err);
-      }
-    }
+  try {
+    filenames = await fs.readdir(directory);
+  } catch {
+    console.error("Erro ao acessar o diretório de guias.");
   }
 
-  return filenames.map((filename) => ({
-    slug: filename.replace(/\.md$/, ""),
-  }));
+  return filenames
+    .filter((filename) => filename.endsWith(".md")) // Garante que são arquivos válidos
+    .map((filename) => ({
+      slug: filename.replace(/\.md$/, ""),
+    }));
 }
 
 export default async function ArticlePage({ params }: PageProps) {

@@ -13,23 +13,19 @@ interface PageProps {
 }
 
 const getFilePath = async (slug: string) => {
-  const directories = [
-    path.join(process.cwd(), "src", "content", "ajuda", "artigo")
-    // Adicione outros diretórios se houver subdivisões
-  ];
+  const filePath = path.join(process.cwd(), "src", "content", "ajuda", "artigo", `${slug}.md`);
 
-  for (const dir of directories) {
-    const filePath = path.join(dir, `${slug}.md`);
-    try {
-      await fs.access(filePath);
-      return filePath;
-    } catch (error) {
-      console.error(`Error accessing file in directory ${dir}:`, error);
-      continue;
-    }
+  console.log("Buscando o arquivo:", filePath);
+
+  try {
+    await fs.access(filePath);
+    return filePath;
+  } catch {
+    console.error("Arquivo não encontrado:", filePath);
+    throw new Error("Arquivo não encontrado");
   }
-  throw new Error("Arquivo não encontrado");
 };
+
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -44,23 +40,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export async function generateStaticParams() {
-  const directories = [
-    path.join(process.cwd(), "src", "content", "ajuda", "artigo")
-  ];
+  const directory = path.join(process.cwd(), "src", "content", "ajuda", "artigo");
 
   let filenames: string[] = [];
-  for (const dir of directories) {
-    try {
-      const files = await fs.readdir(dir);
-      filenames = filenames.concat(files);
-    } catch (error) {
-      console.error(`Error accessing file in directory ${dir}:`, error);
-      continue;
-    }
+  try {
+    filenames = await fs.readdir(directory);
+    console.log("Arquivos encontrados em artigos:", filenames);
+  } catch {
+    console.error("Erro ao acessar o diretório de artigos:");
   }
 
   return filenames.map((filename) => ({
-    slug: filename.replace(/\.md$/, "")
+    slug: filename.replace(/\.md$/, ""),
   }));
 }
 
