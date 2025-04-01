@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { promises as fs } from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import ReactMarkdown from 'react-markdown';
-import Link from 'next/link';
-import HeaderAjuda from '../../header-ajuda';
-import Footer from '@/components/Footer';
+import { promises as fs } from "fs";
+import path from "path";
+import matter from "gray-matter";
+import ReactMarkdown from "react-markdown";
+import Link from "next/link";
+import HeaderAjuda from "../../header-ajuda";
+import Footer from "@/components/Footer";
 import { ArrowLeft } from "lucide-react";
 
 interface PageProps {
@@ -14,10 +14,10 @@ interface PageProps {
 
 const getFilePath = async (slug: string) => {
   const directories = [
-    path.join(process.cwd(), 'src', 'content', 'ajuda'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'primeiros-passos'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'personalizacao'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'recursos-avancados')
+    path.join(process.cwd(), "src", "content", "ajuda"),
+    path.join(process.cwd(), "src", "content", "ajuda", "guia", "primeiros-passos"),
+    path.join(process.cwd(), "src", "content", "ajuda", "guia", "personalizacao"),
+    path.join(process.cwd(), "src", "content", "ajuda", "guia", "recursos-avancados")
   ];
 
   for (const dir of directories) {
@@ -26,11 +26,14 @@ const getFilePath = async (slug: string) => {
       await fs.access(filePath);
       return filePath;
     } catch (error) {
-      console.error(`Error accessing file in directory ${dir}:`, error);
-      continue;
+      const err = error as NodeJS.ErrnoException; // Tipo adequado para erros de sistema de arquivos
+      // Apenas loga erros que não sejam ENOENT (arquivo não encontrado)
+      if (err.code !== "ENOENT") {
+        console.error(`Error accessing file in directory ${dir}:`, err);
+      }
     }
   }
-  throw new Error('Arquivo não encontrado');
+  throw new Error("Arquivo não encontrado");
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -47,10 +50,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export async function generateStaticParams() {
   const directories = [
-    path.join(process.cwd(), 'src', 'content', 'ajuda'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'primeiros-passos'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'personalizacao'),
-    path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'recursos-avancados')
+    path.join(process.cwd(), "src", "content", "ajuda"),
+    path.join(process.cwd(), "src", "content", "ajuda", "guia", "primeiros-passos"),
+    path.join(process.cwd(), "src", "content", "ajuda", "guia", "personalizacao"),
+    path.join(process.cwd(), "src", "content", "ajuda", "guia", "recursos-avancados")
   ];
 
   let filenames: string[] = [];
@@ -59,20 +62,23 @@ export async function generateStaticParams() {
       const files = await fs.readdir(dir);
       filenames = filenames.concat(files);
     } catch (error) {
-      console.error(`Error accessing file in directory ${dir}:`, error);
-      continue;
+      const err = error as NodeJS.ErrnoException; // Tipo adequado para erros de leitura de diretórios
+      // Apenas loga erros que não sejam ENOENT
+      if (err.code !== "ENOENT") {
+        console.error(`Error accessing directory ${dir}:`, err);
+      }
     }
   }
 
   return filenames.map((filename) => ({
-    slug: filename.replace(/\.md$/, ''),
+    slug: filename.replace(/\.md$/, ""),
   }));
 }
 
 export default async function ArticlePage({ params }: PageProps) {
   const { slug } = await params;
   const filePath = await getFilePath(slug);
-  const fileContent = await fs.readFile(filePath, 'utf8');
+  const fileContent = await fs.readFile(filePath, "utf8");
   const { data, content } = matter(fileContent);
 
   return (
@@ -83,7 +89,10 @@ export default async function ArticlePage({ params }: PageProps) {
           <h1 className="text-3xl font-bold">{data.title}</h1>
           <p className="text-muted-foreground">{data.description}</p>
           <span className="text-muted-foreground">
-            Categoria: <Link href="/ajuda" className="text-blue-500 hover:underline">{data.category}</Link>
+            Categoria:{" "}
+            <Link href="/ajuda" className="text-blue-500 hover:underline">
+              {data.category}
+            </Link>
           </span>
         </header>
         <article className="prose">
