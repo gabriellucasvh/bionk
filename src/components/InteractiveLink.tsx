@@ -1,4 +1,3 @@
-// components/InteractiveLink.tsx
 "use client";
 
 import Link from "next/link";
@@ -10,31 +9,26 @@ interface InteractiveLinkProps {
   children: React.ReactNode;
 }
 
-const InteractiveLink: React.FC<InteractiveLinkProps> = ({
-  href,
-  linkId,
-  children,
-}) => {
-  const handleClick = async () => {
-    try {
-      await fetch("/api/link-click", {
+const InteractiveLink: React.FC<InteractiveLinkProps> = ({ href, linkId, children }) => {
+  const handleClick = () => {
+    const url = "/api/link-click";
+    const data = JSON.stringify({ linkId });
+
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, data);
+    } else {
+      fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ linkId }),
+        body: data,
+      }).catch((error) => {
+        console.error("Erro ao registrar clique:", error);
       });
-    } catch (error) {
-      console.error("Failed to record link click:", error);
     }
   };
 
   return (
-    <Link
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={handleClick}
-      className="block w-full p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all text-center font-medium border border-gray-100"
-    >
+    <Link href={href} target="_blank" rel="noopener noreferrer" onClick={handleClick} className="block w-full p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all text-center font-medium border border-gray-100">
       {children}
     </Link>
   );
