@@ -4,6 +4,7 @@
 import React from "react";
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -11,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ChevronDown, ChevronUp, LayoutDashboard } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import {
   Line,
   LineChart,
@@ -29,6 +30,7 @@ import {
 interface TopLink {
   title: string;
   clicks: number;
+  url: string;
 }
 
 interface ChartDataItem {
@@ -99,10 +101,6 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                 <span className="text-2xl font-bold">
                   {data.totalProfileViews.toLocaleString()}
                 </span>
-                <div className="flex items-center text-sm text-green-500">
-                  <ChevronUp className="h-4 w-4" />
-                  <span>--%</span>
-                </div>
               </div>
               <p className="text-xs text-muted-foreground">
                 vs. mês anterior
@@ -121,10 +119,6 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                 <span className="text-2xl font-bold">
                   {data.totalClicks.toLocaleString()}
                 </span>
-                <div className="flex items-center text-sm text-green-500">
-                  <ChevronUp className="h-4 w-4" />
-                  <span>--%</span>
-                </div>
               </div>
               <p className="text-xs text-muted-foreground">
                 vs. mês anterior
@@ -143,10 +137,6 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                 <span className="text-2xl font-bold">
                   {data.performanceRate}%
                 </span>
-                <div className="flex items-center text-sm text-red-500">
-                  <ChevronDown className="h-4 w-4" />
-                  <span>--%</span>
-                </div>
               </div>
               <p className="text-xs text-muted-foreground">
                 vs. mês anterior
@@ -240,6 +230,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                   >
                     <div className="flex flex-col space-y-1 flex-1">
                       <span className="font-medium">{link.title}</span>
+                      <Link href={link.url} className="text-sm text-blue-500">{link.url}</Link>
                     </div>
                     <div className="text-right">
                       <span className="font-medium">

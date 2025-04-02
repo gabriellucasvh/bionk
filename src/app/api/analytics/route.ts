@@ -85,6 +85,7 @@ export async function GET(request: Request) {
       return {
         title: link.title,
         clicks: linkClicks,
+        url: link.url,
       };
     })
   );
