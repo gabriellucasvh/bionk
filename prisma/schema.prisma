@@ -8,10 +8,10 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(uuid())
+  id             String        @id @default(uuid())
   name           String?
-  username       String?   @unique
-  email          String    @unique
+  username       String?       @unique
+  email          String        @unique
   bio            String?
   provider       String?
   emailVerified  DateTime? // Corrigido: emailVerified
@@ -19,10 +19,11 @@ model User {
   bannerUrl      String?
   profileUrl     String?
   hashedPassword String?
-  createdAt      DateTime  @default(now())
+  createdAt      DateTime      @default(now())
   accounts       Account[]
   sessions       Session[]
   Link           Link[]
+  ProfileView    ProfileView[]
 }
 
 model Account {
@@ -62,13 +63,36 @@ model VerificationToken {
 }
 
 model Link {
-  id        Int     @id @default(autoincrement())
+  id        Int         @id @default(autoincrement())
   title     String
   url       String
-  active    Boolean @default(true)
-  sensitive Boolean @default(false)
-  clicks    Int     @default(0)
-  order     Int     @default(0)
+  active    Boolean     @default(true)
+  sensitive Boolean     @default(false)
+  clicks    Int         @default(0)
+  order     Int         @default(0)
   userId    String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  LinkClick LinkClick[]
+  LinkView  LinkView[]
+}
+
+model LinkClick {
+  id        Int      @id @default(autoincrement())
+  linkId    Int
+  createdAt DateTime @default(now())
+  link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
+
+model LinkView {
+  id        Int      @id @default(autoincrement())
+  linkId    Int
+  createdAt DateTime @default(now())
+  link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
+
+model ProfileView {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
