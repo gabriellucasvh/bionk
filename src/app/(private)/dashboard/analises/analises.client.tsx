@@ -5,6 +5,8 @@ import React from "react";
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
   Card,
   CardContent,
@@ -12,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LayoutDashboard } from "lucide-react";
+import { Eye, LayoutDashboard, MousePointerClick, Percent, Link as LinkIcon } from "lucide-react";
 import {
   Line,
   LineChart,
@@ -98,7 +100,10 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-bold">
+                <span className="text-2xl flex items-center gap-2 font-bold">
+                  <div className="p-2 rounded-full bg-green-50 text-green-500">
+                    <Eye />
+                  </div>
                   {data.totalProfileViews.toLocaleString()}
                 </span>
               </div>
@@ -116,7 +121,10 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-bold">
+                <span className="text-2xl flex items-center gap-2 font-bold">
+                  <div className="p-2 rounded-full bg-green-50 text-green-500">
+                    <MousePointerClick />
+                  </div>
                   {data.totalClicks.toLocaleString()}
                 </span>
               </div>
@@ -134,8 +142,14 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
             </CardHeader>
             <CardContent>
               <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-bold">
-                  {data.performanceRate}%
+                <span className="text-2xl flex items-center gap-2 font-bold">
+                  <div className="p-2 rounded-full bg-green-50 text-green-500">
+                    <Percent />
+                  </div>
+                  {parseFloat(data.performanceRate).toLocaleString("pt-BR", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 1,
+                  })}%
                 </span>
               </div>
               <p className="text-xs text-muted-foreground">
@@ -159,11 +173,11 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                   config={{
                     views: {
                       label: "Visualizações",
-                      color: "var(--chart-5)",
+                      color: "oklch(55.8% 0.288 302.321)",
                     },
                     clicks: {
                       label: "Cliques",
-                      color: "var(--chart-2)",
+                      color: "oklch(62.7% 0.194 149.214)",
                     },
                   }}
                   className="h-full w-full"
@@ -179,11 +193,13 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                       />
                       <XAxis
                         dataKey="day"
+                        tickFormatter={(tick) => format(parseISO(tick), "dd/MM", { locale: ptBR })}
                         tickLine={false}
                         axisLine={false}
                         className="text-xs"
                       />
                       <YAxis
+                        tickFormatter={(tick) => tick.toFixed(2)}
                         tickLine={false}
                         axisLine={false}
                         className="text-xs"
@@ -230,15 +246,12 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                   >
                     <div className="flex flex-col space-y-1 flex-1">
                       <span className="font-medium">{link.title}</span>
-                      <Link href={link.url} className="text-sm text-blue-500">{link.url}</Link>
+                      <Link href={link.url} className="text-sm text-blue-500 flex items-center gap-1"> <LinkIcon size={16} /> {link.url}</Link>
                     </div>
-                    <div className="text-right">
-                      <span className="font-medium">
-                        {link.clicks.toLocaleString()}
-                      </span>
-                      <span className="block text-sm text-muted-foreground">
-                        cliques
-                      </span>
+                    <div className="flex items-center bg-primary/5 px-3 py-1.5 rounded-full text-sm">
+                      <MousePointerClick size={14} className="mr-1.5 text-primary" />
+                      <span className="font-medium">{link.clicks.toLocaleString()}</span>
+                      <span className="ml-1 text-muted-foreground">cliques</span>
                     </div>
                   </div>
                 ))}
