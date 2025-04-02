@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import ExcelJS from "exceljs";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   Card,
   CardContent,
@@ -14,7 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Eye, LayoutDashboard, MousePointerClick, Percent, Link as LinkIcon } from "lucide-react";
+import { Eye, LayoutDashboard, MousePointerClick, Percent, Link as LinkIcon, FileSpreadsheet, FileText } from "lucide-react";
 import {
   Line,
   LineChart,
@@ -28,6 +31,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 interface TopLink {
   title: string;
@@ -56,11 +61,48 @@ interface AnalisesClientProps {
 }
 
 const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
+
   const { data, error } = useSWR<AnalyticsData>(
     `/api/analytics?userId=${userId}`,
     fetcher,
     { refreshInterval: 5000 }
   );
+  const exportToExcel = async () => {
+    if (!data) return;
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Analytics");
+    worksheet.addRow(["Data", "Cliques", "Visualizações"]);
+    data.chartData.forEach((item) => {
+      worksheet.addRow([
+        format(parseISO(item.day), "dd/MM/yyyy", { locale: ptBR }), //  Formatação da data
+        item.clicks,
+        item.views,
+      ]);
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "analytics.xlsx";
+    link.click();
+  };
+
+  const exportToPDF = () => {
+    if (!data) return;
+    const doc = new jsPDF();
+    doc.text("Análises de Desempenho", 14, 10);
+    autoTable(doc, {
+      startY: 20,
+      head: [["Data", "Cliques", "Visualizações"]],
+      body: data.chartData.map((item) => [
+        format(parseISO(item.day), "dd/MM/yyyy", { locale: ptBR }), // 🔹 Formatação da data
+        item.clicks,
+        item.views,
+      ]),
+    });
+    doc.save("analytics.pdf");
+  };
+
 
   if (error) {
     return (
@@ -83,10 +125,24 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
         <h2 className="text-2xl font-bold">Análises</h2>
         <div className="flex gap-2">
           <Button variant="outline">Últimos 30 dias</Button>
-          <Button variant="outline">
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Exportar
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                Exportar
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem onClick={exportToExcel} className="cursor-pointer">
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                Exportar para Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportToPDF} className="cursor-pointer">
+                <FileText className="mr-2 h-4 w-4" />
+                Exportar para PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
