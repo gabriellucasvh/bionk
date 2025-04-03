@@ -3,13 +3,9 @@
 
 import React from "react";
 import useSWR from "swr";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import ExcelJS from "exceljs";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import {
   Card,
   CardContent,
@@ -17,7 +13,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Eye, LayoutDashboard, MousePointerClick, Percent, Link as LinkIcon, FileSpreadsheet, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Eye,
+  LayoutDashboard,
+  MousePointerClick,
+  Percent,
+  Link as LinkIcon,
+  FileSpreadsheet,
+  FileText,
+} from "lucide-react";
 import {
   Line,
   LineChart,
@@ -31,8 +36,14 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 interface TopLink {
   title: string;
@@ -56,53 +67,59 @@ interface AnalyticsData {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+// Função auxiliar para formatação de datas
+const formatDate = (dateStr: string, pattern = "dd/MM/yyyy") =>
+  format(parseISO(dateStr), pattern, { locale: ptBR });
+
 interface AnalisesClientProps {
   userId: string;
 }
 
 const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
-
   const { data, error } = useSWR<AnalyticsData>(
     `/api/analytics?userId=${userId}`,
     fetcher,
     { refreshInterval: 5000 }
   );
+
   const exportToExcel = async () => {
     if (!data) return;
+    // Importação dinâmica para reduzir o bundle inicial
+    const ExcelJS = (await import("exceljs")).default;
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Analytics");
     worksheet.addRow(["Data", "Cliques", "Visualizações"]);
-    data.chartData.forEach((item) => {
-      worksheet.addRow([
-        format(parseISO(item.day), "dd/MM/yyyy", { locale: ptBR }), //  Formatação da data
-        item.clicks,
-        item.views,
-      ]);
-    });
+    data.chartData.forEach((item) =>
+      worksheet.addRow([formatDate(item.day), item.clicks, item.views])
+    );
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "analytics.xlsx";
     link.click();
   };
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     if (!data) return;
+    // Importação dinâmica para reduzir o bundle inicial
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
     doc.text("Análises de Desempenho", 14, 10);
     autoTable(doc, {
       startY: 20,
       head: [["Data", "Cliques", "Visualizações"]],
       body: data.chartData.map((item) => [
-        format(parseISO(item.day), "dd/MM/yyyy", { locale: ptBR }), // 🔹 Formatação da data
+        formatDate(item.day),
         item.clicks,
         item.views,
       ]),
     });
     doc.save("analytics.pdf");
   };
-
 
   if (error) {
     return (
@@ -163,9 +180,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                   {data.totalProfileViews.toLocaleString()}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                vs. mês anterior
-              </p>
+              <p className="text-xs text-muted-foreground">vs. mês anterior</p>
             </CardContent>
           </Card>
 
@@ -184,9 +199,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                   {data.totalClicks.toLocaleString()}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                vs. mês anterior
-              </p>
+              <p className="text-xs text-muted-foreground">vs. mês anterior</p>
             </CardContent>
           </Card>
 
@@ -205,12 +218,11 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                   {parseFloat(data.performanceRate).toLocaleString("pt-BR", {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 1,
-                  })}%
+                  })}
+                  %
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                vs. mês anterior
-              </p>
+              <p className="text-xs text-muted-foreground">vs. mês anterior</p>
             </CardContent>
           </Card>
         </article>
@@ -243,13 +255,10 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                       data={data.chartData}
                       margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
                     >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        className="stroke-muted"
-                      />
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                       <XAxis
                         dataKey="day"
-                        tickFormatter={(tick) => format(parseISO(tick), "dd/MM", { locale: ptBR })}
+                        tickFormatter={(tick) => formatDate(tick, "dd/MM")}
                         tickLine={false}
                         axisLine={false}
                         className="text-xs"
@@ -302,7 +311,9 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                   >
                     <div className="flex flex-col space-y-1 flex-1">
                       <span className="font-medium">{link.title}</span>
-                      <Link href={link.url} className="text-sm text-blue-500 flex items-center gap-1"> <LinkIcon size={16} /> {link.url}</Link>
+                      <Link href={link.url} className="text-sm text-blue-500 flex items-center gap-1">
+                        <LinkIcon size={16} /> {link.url}
+                      </Link>
                     </div>
                     <div className="flex items-center bg-primary/5 px-3 py-1.5 rounded-full text-sm">
                       <MousePointerClick size={14} className="mr-1.5 text-primary" />
