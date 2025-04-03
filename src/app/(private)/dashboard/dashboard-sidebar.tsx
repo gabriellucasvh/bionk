@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Link2, BarChart3, Settings, User } from "lucide-react";
+import { Link2, BarChart3, Settings, User, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,6 +40,7 @@ const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [disabledButtons, setDisabledButtons] = useState<Set<string>>(() => new Set());
+  const handleLogout = () => signOut();
 
   useEffect(() => {
     setDisabledButtons(new Set());
@@ -73,6 +75,12 @@ const Sidebar = () => {
             );
           })}
         </nav>
+          <div className=" mt-auto ">
+            <Button className="w-full rounded-none text-red-500 hover:text-red-500 hover:bg-red-50" variant="outline" size="sm" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
+          </div>
       </aside>
 
       {/* Menu fixo para mobile com ícones */}
