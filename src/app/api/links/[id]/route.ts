@@ -3,16 +3,17 @@ import prisma from "@/lib/prisma";
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params; // Aguarda que params seja resolvido
+  const { id } = params;
   if (!id || isNaN(Number(id))) {
     return NextResponse.json({ error: "ID inválido" }, { status: 400 });
   }
 
   try {
     const body = await request.json();
-
+    
+    // Validação adicional do userId se necessário
     const updatedLink = await prisma.link.update({
       where: { id: Number(id) },
       data: body,
@@ -21,15 +22,18 @@ export async function PUT(
     return NextResponse.json(updatedLink);
   } catch (error: unknown) {
     console.error("Erro ao atualizar link:", error);
-    return NextResponse.json({ error: "Falha ao atualizar link." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Falha ao atualizar link." },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params; // Aguarda que params seja resolvido
+  const { id } = params;
   if (!id || isNaN(Number(id))) {
     return NextResponse.json({ error: "ID inválido" }, { status: 400 });
   }
@@ -42,6 +46,9 @@ export async function DELETE(
     return NextResponse.json({ message: "Link excluído com sucesso." });
   } catch (error: unknown) {
     console.error("Erro ao excluir link:", error);
-    return NextResponse.json({ error: "Falha ao excluir link." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Falha ao excluir link." },
+      { status: 500 }
+    );
   }
 }

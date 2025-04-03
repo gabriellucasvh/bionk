@@ -58,6 +58,7 @@ type LinkItem = {
   active: boolean;
   clicks: number;
   sensitive: boolean;
+  order: number;
   isEditing?: boolean;
 };
 
@@ -156,7 +157,8 @@ const LinksClient = () => {
 
   useEffect(() => {
     if (swrData?.links) {
-      setLinks(swrData.links);
+      const sortedLinks = [...swrData.links].sort((a, b) => a.order - b.order);
+      setLinks(sortedLinks);
       setIsProfileLoading(false);
     }
   }, [swrData]);
@@ -198,15 +200,12 @@ const LinksClient = () => {
         userId: session?.user?.id,
         title: newTitle,
         url: formattedUrl,
-        active: true,
-        clicks: 0,
-        sensitive: false,
       }),
     });
 
     if (res.ok) {
-      const createdLink: LinkItem = await res.json();
-      setLinks((prev) => [...prev, createdLink]);
+      // Forçar revalidação imediata e limpar formulário
+      await mutateLinks();
       setNewTitle("");
       setNewUrl("");
       setIsAdding(false);
@@ -276,7 +275,11 @@ const LinksClient = () => {
       const oldIndex = links.findIndex((link) => link.id === active.id);
       const newIndex = links.findIndex((link) => link.id === over?.id);
       const newLinks = arrayMove(links, oldIndex, newIndex);
+
+      // Atualizar ordem localmente
       setLinks(newLinks);
+
+      // Enviar nova ordem para API
       await fetch(`/api/links/reorder`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -285,6 +288,9 @@ const LinksClient = () => {
           order: newLinks.map((l) => l.id),
         }),
       });
+
+      // Revalidar dados
+      await mutateLinks();
     }
   };
 

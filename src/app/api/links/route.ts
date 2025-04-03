@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
-  const activeParam = searchParams.get("active");
 
   if (!userId) {
     return NextResponse.json(
@@ -13,16 +12,10 @@ export async function GET(request: Request) {
     );
   }
 
-  // Define o filtro com base nos parâmetros recebidos
-  const filter: any = { userId };
-  if (activeParam !== null) {
-    filter.active = activeParam === "true";
-  }
-
   try {
     const links = await prisma.link.findMany({
-      where: filter,
-      orderBy: { order: "asc" },
+      where: { userId },
+      orderBy: { order: "asc" }, // Mantido para ordenação correta
     });
     return NextResponse.json({ links });
   } catch (error: unknown) {
@@ -46,6 +39,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Encontra a maior ordem atual para o usuário
+    const lastLink = await prisma.link.findFirst({
+      where: { userId },
+      orderBy: { order: "desc" },
+    });
+
+    // Calcula a nova ordem (+1 do último ou 0 se for o primeiro)
+    const newOrder = lastLink ? lastLink.order + 1 : 0;
+
     const newLink = await prisma.link.create({
       data: {
         userId,
@@ -54,7 +56,7 @@ export async function POST(request: Request) {
         active: active ?? true,
         clicks: clicks ?? 0,
         sensitive: sensitive ?? false,
-        order: 0,
+        order: newOrder, // Ordem calculada dinamicamente
       },
     });
 

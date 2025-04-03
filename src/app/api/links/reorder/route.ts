@@ -1,4 +1,3 @@
-//src/app/api/links/reorder/route.ts 
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
@@ -14,17 +13,16 @@ export async function PUT(request: Request) {
       );
     }
 
-    // Atualiza a ordem de cada link conforme o índice no array recebido
-    const updatePromises = order.map((linkId: number, index: number) =>
+    const updates = order.map((linkId, index) => 
       prisma.link.update({
-        where: { id: linkId },
+        where: { id: linkId, userId },
         data: { order: index },
       })
     );
 
-    await Promise.all(updatePromises);
+    await prisma.$transaction(updates);
     return NextResponse.json({ message: "Links reordenados com sucesso." });
-  } catch (error: unknown) {
+  } catch (error) {
     console.error("Failed to reorder links:", error);
     return NextResponse.json(
       { error: "Falha ao reordenar links." },
