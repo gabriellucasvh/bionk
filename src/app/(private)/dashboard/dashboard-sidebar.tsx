@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Link2, BarChart3, Settings, User, LogOut } from "lucide-react";
+import { Link2, BarChart3, Settings, User, LogOut, Paintbrush } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,6 +27,12 @@ const links = [
     href: "/dashboard/analises",
     label: "Análises",
     icon: <BarChart3 className="h-4 w-4" />,
+  },
+  {
+    key: "personalization",
+    href: "/dashboard/personalizar",
+    label: "Personalizar",
+    icon: <Paintbrush className="h-4 w-4" />,
   },
   {
     key: "settings",
