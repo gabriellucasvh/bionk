@@ -1,9 +1,9 @@
+// components/ConfigsClient.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-
 import {
   Archive,
   HelpCircle,
@@ -51,38 +51,30 @@ export default function ConfigsClient() {
   const [isArchivedModalOpen, setIsArchivedModalOpen] = useState(false);
 
   useEffect(() => {
-    if (session?.user?.id) {
-      const fetchProfile = async () => {
-        try {
-          const res = await fetch(`/api/profile/${session.user.id}`);
-          const data = await res.json();
-          const fetchedEmail =
-            data.email || data.user?.email || session.user.email || "";
-          setProfile({ email: fetchedEmail });
-        } catch (error) {
-          console.error("Erro ao buscar perfil:", error);
-          setProfile({ email: session.user.email || "" });
-        } finally {
-          setIsProfileLoading(false);
-        }
-      };
-      fetchProfile();
-    }
+    const fetchProfile = async () => {
+      if (!session?.user?.id) return;
+      try {
+        const res = await fetch(`/api/profile/${session.user.id}`);
+        const data = await res.json();
+        const email = data.email || data.user?.email || session.user.email || "";
+        setProfile({ email });
+      } catch (error) {
+        console.error("Erro ao buscar perfil:", error);
+        setProfile({ email: session.user.email || "" });
+      } finally {
+        setIsProfileLoading(false);
+      }
+    };
+    fetchProfile();
   }, [session]);
 
-  const handleLogout = () => {
-    signOut();
-  };
+  const handleLogout = () => signOut();
 
   const handleDeleteAccount = async () => {
     if (!session?.user?.id) return;
     try {
-      const res = await fetch(`/api/profile/${session.user.id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) {
-        throw new Error("Erro ao excluir a conta");
-      }
+      const res = await fetch(`/api/profile/${session.user.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Erro ao excluir a conta");
       signOut();
     } catch (error) {
       console.error("Erro ao excluir a conta:", error);
@@ -209,8 +201,7 @@ export default function ConfigsClient() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Esta ação não pode ser desfeita. Isso excluirá permanentemente
-                    sua conta e removerá seus dados dos nossos servidores.
+                    Esta ação não pode ser desfeita. Sua conta e dados serão removidos permanentemente.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
