@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Link from "next/link"
-import { signOut, useSession } from "next-auth/react"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 
 import {
   Archive,
@@ -15,9 +15,9 @@ import {
   Trash2,
   User,
   Lock,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -25,8 +25,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,66 +37,64 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import ArchivedLinksModal from "./ArchiveLinksModal";
 
 type Profile = {
-  email: string
-}
+  email: string;
+};
 
 export default function ConfigsClient() {
-  const { data: session } = useSession()
-  const [profile, setProfile] = useState<Profile>({ email: "" })
-  const [isProfileLoading, setIsProfileLoading] = useState(true)
+  const { data: session } = useSession();
+  const [profile, setProfile] = useState<Profile>({ email: "" });
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
+  const [isArchivedModalOpen, setIsArchivedModalOpen] = useState(false);
 
   useEffect(() => {
     if (session?.user?.id) {
       const fetchProfile = async () => {
         try {
-          const res = await fetch(`/api/profile/${session.user.id}`)
-          const data = await res.json()
-          console.log("Dados do perfil retornados:", data)
-          // Verifique a propriedade onde o email está retornando na API.
+          const res = await fetch(`/api/profile/${session.user.id}`);
+          const data = await res.json();
           const fetchedEmail =
-            data.email || data.user?.email || session.user.email || ""
-          setProfile({ email: fetchedEmail })
+            data.email || data.user?.email || session.user.email || "";
+          setProfile({ email: fetchedEmail });
         } catch (error) {
-          console.error("Erro ao buscar perfil:", error)
-          setProfile({ email: session.user.email || "" })
+          console.error("Erro ao buscar perfil:", error);
+          setProfile({ email: session.user.email || "" });
         } finally {
-          setIsProfileLoading(false)
+          setIsProfileLoading(false);
         }
-      }
-      fetchProfile()
+      };
+      fetchProfile();
     }
-  }, [session])
+  }, [session]);
 
   const handleLogout = () => {
-    signOut()
-  }
+    signOut();
+  };
 
   const handleDeleteAccount = async () => {
-    if (!session?.user?.id) return
+    if (!session?.user?.id) return;
     try {
       const res = await fetch(`/api/profile/${session.user.id}`, {
         method: "DELETE",
-      })
+      });
       if (!res.ok) {
-        throw new Error("Erro ao excluir a conta")
+        throw new Error("Erro ao excluir a conta");
       }
-      // Após excluir a conta, desloga o usuário
-      signOut()
+      signOut();
     } catch (error) {
-      console.error("Erro ao excluir a conta:", error)
-      // Aqui pode ser implementada uma notificação de erro para o usuário
+      console.error("Erro ao excluir a conta:", error);
     }
-  }
+  };
 
   if (isProfileLoading) {
     return (
       <section className="flex items-center justify-center h-screen">
         <span className="loader"></span>
       </section>
-    )
+    );
   }
 
   return (
@@ -123,9 +121,7 @@ export default function ConfigsClient() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium">Email</p>
-                <p className="text-sm text-muted-foreground">
-                  {profile.email}
-                </p>
+                <p className="text-sm text-muted-foreground">{profile.email}</p>
               </div>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
@@ -148,9 +144,9 @@ export default function ConfigsClient() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/archived-links" passHref>
-              <Button variant="outline">Ver Links Arquivados</Button>
-            </Link>
+            <Button variant="outline" onClick={() => setIsArchivedModalOpen(true)}>
+              Ver Links Arquivados
+            </Button>
           </CardContent>
         </Card>
       </article>
@@ -302,6 +298,11 @@ export default function ConfigsClient() {
           </CardFooter>
         </Card>
       </article>
+
+      <ArchivedLinksModal
+        isOpen={isArchivedModalOpen}
+        onClose={() => setIsArchivedModalOpen(false)}
+      />
     </main>
-  )
+  );
 }

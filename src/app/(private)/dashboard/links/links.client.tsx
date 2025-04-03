@@ -15,13 +15,13 @@ import {
   Grip,
   Edit,
   Eye,
-  Trash2,
-  MoreHorizontal,
   EyeOff,
   Plus,
+  Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -115,7 +115,6 @@ const LinksClient = () => {
     }
     if (!isValidUrl(formattedUrl)) return;
 
-    // Chamada para a API que retorna o link criado com o id correto do banco
     const res = await fetch(`/api/links`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -138,26 +137,21 @@ const LinksClient = () => {
     }
   };
 
-  const handleDeleteLink = async (id: number) => {
-    const res = await fetch(`/api/links/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      setLinks((prev) => prev.filter((link) => link.id !== id));
-    }
-  };
-
-  const toggleActive = async (id: number) => {
+  // Alterna o status de exibição sem excluir do banco
+  const toggleActive = async (id: number, isActive: boolean) => {
     const updated = links.map((link) =>
-      link.id === id ? { ...link, active: !link.active } : link
+      link.id === id ? { ...link, active: isActive } : link
     );
     setLinks(updated);
     await fetch(`/api/links/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        active: updated.find((l) => l.id === id)?.active,
+        active: isActive,
       }),
     });
   };
+
 
   const toggleSensitive = async (id: number) => {
     const updated = links.map((link) =>
@@ -195,6 +189,13 @@ const LinksClient = () => {
     setLinks((prev) =>
       prev.map((link) => (link.id === id ? { ...link, isEditing: false } : link))
     );
+  };
+
+  const handleDeleteLink = async (id: number) => {
+    const res = await fetch(`/api/links/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      setLinks((prev) => prev.filter((link) => link.id !== id));
+    }
   };
 
   const sensors = useSensors(
@@ -362,15 +363,27 @@ const LinksClient = () => {
                             <Eye className="h-3 w-3" />
                             {link.clicks}
                           </Badge>
-                          <Switch
-                            checked={link.active}
-                            aria-label={link.active ? "Desabilitar link" : "Habilitar link"}
-                            onChange={() => toggleActive(link.id)}
-                          />
+                          <div className="flex items-center space-x-2">
+                            <Switch
+                              checked={link.active}
+                              onCheckedChange={(checked) => {
+                                // Atualize o estado local ou chame a função que lida com a mudança
+                                toggleActive(link.id, checked);
+                              }}
+                              className="transition-colors duration-200"
+                              id={`switch-${link.id}`}
+                            />
+                            <Label htmlFor={`switch-${link.id}`}>{link.active ? "" : ""}</Label>
+                          </div>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Mais opções</span>
+                                <svg className="h-4 w-4" viewBox="0 0 24 24">
+                                  <circle cx="5" cy="12" r="2" />
+                                  <circle cx="12" cy="12" r="2" />
+                                  <circle cx="19" cy="12" r="2" />
+                                </svg>
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
@@ -396,10 +409,7 @@ const LinksClient = () => {
                                 )}
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                className="flex items-center text-destructive focus:text-destructive"
-                                onClick={() => handleDeleteLink(link.id)}
-                              >
+                              <DropdownMenuItem onClick={() => handleDeleteLink(link.id)}>
                                 <Trash2 className="mr-2 h-4 w-4 text-destructive" />
                                 Excluir
                               </DropdownMenuItem>

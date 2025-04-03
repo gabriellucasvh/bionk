@@ -1,10 +1,10 @@
- //src/app/api/links/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
+  const activeParam = searchParams.get("active");
 
   if (!userId) {
     return NextResponse.json(
@@ -13,9 +13,15 @@ export async function GET(request: Request) {
     );
   }
 
+  // Define o filtro com base nos parâmetros recebidos
+  const filter: any = { userId };
+  if (activeParam !== null) {
+    filter.active = activeParam === "true";
+  }
+
   try {
     const links = await prisma.link.findMany({
-      where: { userId },
+      where: filter,
       orderBy: { order: "asc" },
     });
     return NextResponse.json({ links });
