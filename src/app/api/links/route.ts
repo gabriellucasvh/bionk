@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   try {
     const links = await prisma.link.findMany({
       where: { userId },
-      orderBy: { order: "asc" }, // Mantido para ordenação correta
+      orderBy: { order: "asc" },
     });
     return NextResponse.json({ links });
   } catch (error: unknown) {
@@ -39,15 +39,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // Encontra a maior ordem atual para o usuário
-    const lastLink = await prisma.link.findFirst({
+    // Encontrar todos os links do usuário
+    const existingLinks = await prisma.link.findMany({
       where: { userId },
-      orderBy: { order: "desc" },
+      orderBy: { order: "asc" },
     });
 
-    // Calcula a nova ordem (+1 do último ou 0 se for o primeiro)
-    const newOrder = lastLink ? lastLink.order + 1 : 0;
+    // Atualizar a ordem de todos os links existentes (+1)
+    await prisma.$transaction([
+      ...existingLinks.map((link) =>
+        prisma.link.update({
+          where: { id: link.id },
+          data: { order: link.order + 1 },
+        })
+      )
+    ]);
 
+    // Criar novo link com ordem 0
     const newLink = await prisma.link.create({
       data: {
         userId,
@@ -56,7 +64,7 @@ export async function POST(request: Request) {
         active: active ?? true,
         clicks: clicks ?? 0,
         sensitive: sensitive ?? false,
-        order: newOrder, // Ordem calculada dinamicamente
+        order: 0, // Novo link sempre no topo
       },
     });
 
