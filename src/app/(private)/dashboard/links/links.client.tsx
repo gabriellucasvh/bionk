@@ -18,6 +18,7 @@ import {
   EyeOff,
   Plus,
   Trash2,
+  MousePointerClick,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -30,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-
+import useSWR from "swr";
 import {
   DndContext,
   closestCenter,
@@ -82,7 +83,7 @@ const SortableItem = ({ id, children }: SortableItemProps) => {
     </div>
   );
 };
-
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const LinksClient = () => {
   const { data: session } = useSession();
   const [links, setLinks] = useState<LinkItem[]>([]);
@@ -90,6 +91,40 @@ const LinksClient = () => {
   const [newTitle, setNewTitle] = useState<string>("");
   const [newUrl, setNewUrl] = useState<string>("");
   const [isProfileLoading, setIsProfileLoading] = useState(true);
+  const { data: swrData, mutate: mutateLinks } = useSWR<{ links: LinkItem[] }>(
+    session?.user?.id ? `/api/links?userId=${session.user.id}` : null,
+    fetcher,
+    { refreshInterval: 5000 }
+  );
+  useEffect(() => {
+    if (swrData?.links) {
+      setLinks(swrData.links);
+      setIsProfileLoading(false);
+    }
+  }, [swrData]);
+
+  const handleClickLink = async (id: number, url: string) => {
+    try {
+      const response = await fetch(`/api/link-click`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ linkId: id }),
+      });
+
+      if (response.ok) {
+        // Atualiza tanto o SWR quanto o estado local
+        mutateLinks();
+        setLinks(prevLinks =>
+          prevLinks.map(link =>
+            link.id === id ? { ...link, clicks: link.clicks + 1 } : link
+          )
+        );
+        window.open(url, "_blank");
+      }
+    } catch (error) {
+      console.error("Erro ao registrar clique:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchLinks = async () => {
@@ -360,20 +395,21 @@ const LinksClient = () => {
                       <div className="flex items-center gap-2 sm:w-5/12 sm:justify-end">
                         <div className="flex items-center gap-2">
                           <Badge variant="secondary" className="flex items-center gap-1">
-                            <Eye className="h-3 w-3" />
-                            {link.clicks}
+                            <MousePointerClick className="h-3 w-3" />
+                            {link.clicks.toLocaleString()}
                           </Badge>
                           <div className="flex items-center space-x-2">
                             <Switch
                               checked={link.active}
                               onCheckedChange={(checked) => {
-                                // Atualize o estado local ou chame a função que lida com a mudança
                                 toggleActive(link.id, checked);
                               }}
                               className="transition-colors duration-200"
                               id={`switch-${link.id}`}
                             />
-                            <Label htmlFor={`switch-${link.id}`}>{link.active ? "" : ""}</Label>
+                            <Label htmlFor={`switch-${link.id}`} className="cursor-pointer">
+                              {link.active ? "Ativo" : "Inativo"} {/* Melhoria na legenda */}
+                            </Label>
                           </div>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
