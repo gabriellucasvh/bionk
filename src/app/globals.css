@@ -120,6 +120,22 @@
     @layer base {
   * {
     @apply border-border outline-ring/50;}
+    img {
+      /* Bloqueia a seleção de texto/imagem */
+      user-select: none;
+      -webkit-user-select: none; /* Chrome, Safari, Opera */
+      -moz-user-select: none;    /* Firefox */
+      -ms-user-select: none;    /* IE/Edge */
+    
+      /* Bloqueia o arraste de imagens */
+      -webkit-user-drag: none;  /* Chrome, Safari, Opera */
+      -khtml-user-drag: none;  /* Konqueror (antigo) */
+      -moz-user-drag: none;    /* Firefox */
+      user-drag: none;         /* Padrão futuro */
+    
+      /* Opcional: Evita eventos de mouse (se necessário) */
+      pointer-events: none;    /* Cuidado: isso desativa clicks/hovers! */
+    }
   body {
     @apply bg-background text-foreground;}}
     

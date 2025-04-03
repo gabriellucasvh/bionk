@@ -36,10 +36,10 @@ export default async function UserPage({ params }: PageProps) {
 
       <main className="max-w-md mx-auto flex flex-col items-center">
         <header className="w-full text-center mb-8">
-          {user.profileUrl && (
+          {user.image && (
             <div className="mx-auto mb-4 relative w-24 h-24 overflow-hidden rounded-full border-2 border-gray-200">
               <Image
-                src={user.profileUrl || "/placeholder.svg"}
+                src={user.image}
                 alt={user.name || username}
                 fill
                 className="object-cover"
