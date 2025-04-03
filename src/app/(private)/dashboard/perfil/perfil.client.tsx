@@ -35,7 +35,7 @@ const PerfilClient = () => {
     const fetchProfile = async () => {
       const res = await fetch(`/api/profile/${session.user.id}`);
       const { name = "", username = "", bio = "", profileUrl } = await res.json();
-      setProfile({ name, username, bio });
+      setProfile({ name, username, bio: bio || "" });
       setOriginalProfile({ name, username, bio });
       setProfilePreview(profileUrl || session?.user?.image || "/person.png");
       setIsProfileLoading(false);
