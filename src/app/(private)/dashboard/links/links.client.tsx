@@ -184,7 +184,7 @@ const LinksClient = () => {
     }
   };
 
-  const isValidUrl = (url: string) => /\.(com|br|me|net|org|info|io|co)$/i.test(url);
+  const isValidUrl = (url: string) => url.includes(".");
 
   const handleAddNewLink = async () => {
     let formattedUrl = newUrl.trim();
