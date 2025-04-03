@@ -5,6 +5,8 @@ import { Link2, BarChart3, Settings, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const links = [
   {
@@ -35,7 +37,12 @@ const links = [
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
+  const [disabledButtons, setDisabledButtons] = useState<Set<string>>(() => new Set());
 
+  useEffect(() => {
+    setDisabledButtons(new Set());
+  }, [pathname])
   return (
     <>
       {/* Sidebar para telas médias e maiores */}
@@ -49,12 +56,20 @@ const Sidebar = () => {
           {links.map((link) => {
             const isActive = pathname === link.href;
             return (
-              <Link key={link.key} href={link.href}>
-                <Button variant={isActive ? "secondary" : "ghost"} className="justify-start gap-2 w-full">
+              <div key={link.key}>
+                <Button variant={isActive ? "secondary" : "ghost"}
+                  className="justify-start gap-2 w-full"
+                  disabled={disabledButtons.has(link.key)}
+                  onClick={() => {
+                    if (isActive) return
+                    setDisabledButtons(prev => new Set(prev).add(link.key))
+                    router.push(`${link.href}`)
+                  }}
+                >
                   {link.icon}
                   {link.label}
                 </Button>
-              </Link>
+              </div>
             );
           })}
         </nav>
@@ -65,12 +80,20 @@ const Sidebar = () => {
         {links.map((link) => {
           const isActive = pathname === link.href;
           return (
-            <Link key={link.key} href={link.href}>
-              <Button variant={"ghost"} className={isActive ? "flex flex-col items-center gap-1" : "flex flex-col items-center gap-1 text-muted-foreground"}>
+            <div key={link.key}>
+              <Button variant={"ghost"}
+                className={isActive ? "flex flex-col items-center gap-1" : "flex flex-col items-center gap-1 text-muted-foreground"}
+                disabled={disabledButtons.has(link.key)}
+                onClick={() => {
+                  if (isActive) return
+                  setDisabledButtons(prev => new Set(prev).add(link.key))
+                  router.push(`${link.href}`)
+                }}
+              >
                 <span className={isActive ? "text-green-500" : ""}>{link.icon}</span>
                 <span>{link.label}</span>
               </Button>
-            </Link>
+            </div>
           );
         })}
       </nav>
