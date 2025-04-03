@@ -184,7 +184,7 @@ const LinksClient = () => {
     }
   };
 
-  const isValidUrl = (url: string) => url.includes(".");
+  const isValidUrl = (url: string) => /^(https?:\/\/)?([^\s.]+\.[^\s]{2,})$/.test(url);
 
   const handleAddNewLink = async () => {
     let formattedUrl = newUrl.trim();
