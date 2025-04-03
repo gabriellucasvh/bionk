@@ -21,6 +21,13 @@ export default async function UserPage({ params }: PageProps) {
       Link: {
         where: { active: true },
         orderBy: { order: "asc" },
+        select: {  // Adicione o campo sensitive na query
+          id: true,
+          title: true,
+          url: true,
+          sensitive: true,
+          order: true,
+        },
       },
     },
   });
@@ -56,8 +63,11 @@ export default async function UserPage({ params }: PageProps) {
           <ul className="space-y-3">
             {user.Link.map((link) => (
               <li key={link.id} className="w-full">
-                <InteractiveLink href={link.url} linkId={link.id}>
+                <InteractiveLink href={link.url} linkId={link.id} sensitive={link.sensitive}>
                   {link.title}
+                  <span className="block text-sm text-gray-500">
+                  {link.url}
+                  </span>
                 </InteractiveLink>
               </li>
             ))}
