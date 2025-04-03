@@ -1,7 +1,7 @@
+// components/LinksClient.tsx
 "use client";
 
-import { JSX } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, JSX } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import useSWR from "swr";
@@ -40,7 +40,6 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-  type DraggableSyntheticListeners,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -52,7 +51,6 @@ import { CSS } from "@dnd-kit/utilities";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import Image from "next/image";
 
-
 type LinkItem = {
   id: number;
   title: string;
@@ -63,10 +61,65 @@ type LinkItem = {
   isEditing?: boolean;
 };
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+const ICON_MAP = [
+  { keyword: "pinterest", src: "/icons/pinterest.svg", alt: "Pinterest" },
+  { keyword: "instagram", src: "/icons/instagram.svg", alt: "Instagram" },
+  { keyword: "discord", src: "/icons/discord.svg", alt: "Discord" },
+  { keyword: "buymeacoffee", src: "/icons/bmc.svg", alt: "Buy Me a Coffee" },
+  { keyword: "facebook", src: "/icons/facebook.svg", alt: "Facebook" },
+  { keyword: "github", src: "/icons/github-light.svg", alt: "GitHub" },
+  { keyword: "gitlab", src: "/icons/gitlab.svg", alt: "GitLab" },
+  { keyword: "linkedin", src: "/icons/linkedin.svg", alt: "LinkedIn" },
+  { keyword: "gmail", src: "/icons/mail.svg", alt: "Email" },
+  { keyword: "patreon", src: "/icons/patreon.svg", alt: "Patreon" },
+  { keyword: "paypal", src: "/icons/paypal.svg", alt: "PayPal" },
+  { keyword: "reddit", src: "/icons/reddit.svg", alt: "Reddit" },
+  { keyword: "snapchat", src: "/icons/snapchat.svg", alt: "Snapchat" },
+  { keyword: "soundcloud", src: "/icons/soundcloud-logo.svg", alt: "Soundcloud" },
+  { keyword: "spotify", src: "/icons/spotify.svg", alt: "Spotify" },
+  { keyword: "steam", src: "/icons/steam.svg", alt: "Steam" },
+  { keyword: "t.me", src: "/icons/telegram.svg", alt: "Telegram" },
+  { keyword: "tiktok", src: "/icons/tiktok.svg", alt: "Tiktok" },
+  { keyword: "twitch", src: "/icons/twitch.svg", alt: "Twitch" },
+  { keyword: "x.com", src: "/icons/x.svg", alt: "X" },
+  { keyword: "youtube", src: "/icons/youtube.svg", alt: "Youtube" },
+];
+
+const getIconForUrl = (url: string): JSX.Element => {
+  try {
+    const { hostname } = new URL(url);
+    const mapping = ICON_MAP.find(({ keyword }) => hostname.includes(keyword));
+    if (mapping) {
+      return (
+        <Image
+          src={mapping.src}
+          alt={mapping.alt}
+          className="h-5 w-5"
+          width={30}
+          height={30}
+        />
+      );
+    }
+  } catch (error) {
+    console.error("URL inválida:", url);
+  }
+  return (
+    <Image
+      src="/icons/globe.svg"
+      alt="Default"
+      className="h-5 w-5"
+      width={30}
+      height={30}
+    />
+  );
+};
+
 interface SortableItemProps {
   id: number;
   children: (props: {
-    listeners: DraggableSyntheticListeners;
+    listeners: any;
     attributes: React.HTMLAttributes<HTMLDivElement>;
   }) => React.ReactNode;
 }
@@ -87,81 +140,6 @@ const SortableItem = ({ id, children }: SortableItemProps) => {
   );
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
-// Função que identifica a URL e retorna o ícone correspondente usando a tag <img>
-const getIconForUrl = (url: string): JSX.Element => {
-  try {
-    const { hostname } = new URL(url);
-    if (hostname.includes("pinterest")) {
-      return <Image src="/icons/pinterest.svg" alt="Pinterest" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("instagram")) {
-      return <Image src="/icons/instagram.svg" alt="Instagram" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("discord")) {
-      return <Image src="/icons/discord.svg" alt="Discord" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("buymeacoffee")) {
-      return <Image src="/icons/bmc.svg" alt="Buy Me a Coffee" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("facebook")) {
-      return <Image src="/icons/facebook.svg" alt="Facebook" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("github")) {
-      return <Image src="/icons/github-light.svg" alt="GitHub" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("gitlab")) {
-      return <Image src="/icons/gitlab.svg" alt="GitLab" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("linkedin")) {
-      return <Image src="/icons/linkedin.svg" alt="LinkedIn" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("gmail")) {
-      return <Image src="/icons/mail.svg" alt="Email" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("patreon")) {
-      return <Image src="/icons/patreon.svg" alt="Patreon" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("paypal")) {
-      return <Image src="/icons/paypal.svg" alt="PayPal" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("reddit")) {
-      return <Image src="/icons/reddit.svg" alt="Reddit" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("snapchat")) {
-      return <Image src="/icons/snapchat.svg" alt="Snapchat" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("soundcloud")) {
-      return <Image src="/icons/soundcloud-logo.svg" alt="Soundcloud" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("spotify")) {
-      return <Image src="/icons/spotify.svg" alt="Spotify" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("steam")) {
-      return <Image src="/icons/steam.svg" alt="Steam" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("t.me")) {
-      return <Image src="/icons/telegram.svg" alt="Telegram" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("tiktok")) {
-      return <Image src="/icons/tiktok.svg" alt="Tiktok" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("twitch")) {
-      return <Image src="/icons/twitch.svg" alt="Twitch" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("x.com")) {
-      return <Image src="/icons/x.svg" alt="X" className="h-5 w-5" width={30} height={30} />;
-    }
-    if (hostname.includes("youtube")) {
-      return <Image src="/icons/youtube.svg" alt="Youtube" className="h-5 w-5" width={30} height={30} />;
-    }
-  } catch (error) {
-    console.error("URL inválida:", url);
-  }
-  return <Image src="/icons/globe.svg" alt="Default" className="h-5 w-5" width={30} height={30} />;
-};
-
 const LinksClient = () => {
   const { data: session } = useSession();
   const [links, setLinks] = useState<LinkItem[]>([]);
@@ -169,6 +147,7 @@ const LinksClient = () => {
   const [newTitle, setNewTitle] = useState<string>("");
   const [newUrl, setNewUrl] = useState<string>("");
   const [isProfileLoading, setIsProfileLoading] = useState(true);
+
   const { data: swrData, mutate: mutateLinks } = useSWR<{ links: LinkItem[] }>(
     session?.user?.id ? `/api/links?userId=${session.user.id}` : null,
     fetcher,
@@ -182,18 +161,6 @@ const LinksClient = () => {
     }
   }, [swrData]);
 
-  useEffect(() => {
-    const fetchLinks = async () => {
-      if (session?.user?.id) {
-        const res = await fetch(`/api/links?userId=${session.user.id}`);
-        const data = await res.json();
-        setLinks(data.links);
-        setIsProfileLoading(false);
-      }
-    };
-    fetchLinks();
-  }, [session]);
-
   const handleClickLink = async (id: number, url: string) => {
     try {
       const response = await fetch(`/api/link-click`, {
@@ -203,8 +170,8 @@ const LinksClient = () => {
       });
       if (response.ok) {
         mutateLinks();
-        setLinks((prevLinks) =>
-          prevLinks.map((link) =>
+        setLinks((prev) =>
+          prev.map((link) =>
             link.id === id ? { ...link, clicks: link.clicks + 1 } : link
           )
         );
@@ -215,10 +182,7 @@ const LinksClient = () => {
     }
   };
 
-  const isValidUrl = (url: string) => {
-    const regex = /\.(com|br|me|net|org|info|io|co)$/i;
-    return regex.test(url);
-  };
+  const isValidUrl = (url: string) => /\.(com|br|me|net|org|info|io|co)$/i.test(url);
 
   const handleAddNewLink = async () => {
     let formattedUrl = newUrl.trim();
@@ -250,16 +214,13 @@ const LinksClient = () => {
   };
 
   const toggleActive = async (id: number, isActive: boolean) => {
-    const updated = links.map((link) =>
-      link.id === id ? { ...link, active: isActive } : link
+    setLinks((prev) =>
+      prev.map((link) => (link.id === id ? { ...link, active: isActive } : link))
     );
-    setLinks(updated);
     await fetch(`/api/links/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        active: isActive,
-      }),
+      body: JSON.stringify({ active: isActive }),
     });
   };
 
@@ -271,9 +232,7 @@ const LinksClient = () => {
     await fetch(`/api/links/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        sensitive: updated.find((l) => l.id === id)?.sensitive,
-      }),
+      body: JSON.stringify({ sensitive: updated.find((l) => l.id === id)?.sensitive }),
     });
   };
 
@@ -284,10 +243,11 @@ const LinksClient = () => {
   };
 
   const saveEditing = async (id: number, newTitle: string, newUrl: string) => {
-    const updated = links.map((link) =>
-      link.id === id ? { ...link, title: newTitle, url: newUrl, isEditing: false } : link
+    setLinks((prev) =>
+      prev.map((link) =>
+        link.id === id ? { ...link, title: newTitle, url: newUrl, isEditing: false } : link
+      )
     );
-    setLinks(updated);
     await fetch(`/api/links/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -303,9 +263,7 @@ const LinksClient = () => {
 
   const handleDeleteLink = async (id: number) => {
     const res = await fetch(`/api/links/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      setLinks((prev) => prev.filter((link) => link.id !== id));
-    }
+    if (res.ok) setLinks((prev) => prev.filter((link) => link.id !== id));
   };
 
   const sensors = useSensors(
@@ -402,12 +360,8 @@ const LinksClient = () => {
                   {({ listeners }) => (
                     <article className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center">
                       <div className="flex items-center gap-3 sm:w-7/12">
-                        <Grip
-                          {...listeners}
-                          className="h-5 w-5 cursor-move text-muted-foreground"
-                        />
+                        <Grip {...listeners} className="h-5 w-5 cursor-move text-muted-foreground" />
                         <div className="flex items-center gap-2">
-                          {/* Ícone do site */}
                           <span>{getIconForUrl(link.url)}</span>
                           <div className="flex-1 space-y-1">
                             {link.isEditing ? (
@@ -419,9 +373,7 @@ const LinksClient = () => {
                                   onChange={(e) =>
                                     setLinks((prev) =>
                                       prev.map((l) =>
-                                        l.id === link.id
-                                          ? { ...l, title: e.target.value }
-                                          : l
+                                        l.id === link.id ? { ...l, title: e.target.value } : l
                                       )
                                     )
                                   }
@@ -433,25 +385,16 @@ const LinksClient = () => {
                                   onChange={(e) =>
                                     setLinks((prev) =>
                                       prev.map((l) =>
-                                        l.id === link.id
-                                          ? { ...l, url: e.target.value }
-                                          : l
+                                        l.id === link.id ? { ...l, url: e.target.value } : l
                                       )
                                     )
                                   }
                                 />
                                 <div className="flex gap-2">
-                                  <Button
-                                    onClick={() =>
-                                      saveEditing(link.id, link.title, link.url)
-                                    }
-                                  >
+                                  <Button onClick={() => saveEditing(link.id, link.title, link.url)}>
                                     Salvar
                                   </Button>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => cancelEditing(link.id)}
-                                  >
+                                  <Button variant="outline" onClick={() => cancelEditing(link.id)}>
                                     Cancelar
                                   </Button>
                                 </div>
@@ -461,10 +404,7 @@ const LinksClient = () => {
                                 <header className="flex items-center gap-2">
                                   <h3 className="font-medium">{link.title}</h3>
                                   {link.sensitive && (
-                                    <Badge
-                                      variant="outline"
-                                      className="text-xs border-red-300"
-                                    >
+                                    <Badge variant="outline" className="text-xs border-red-300">
                                       Sensível
                                     </Badge>
                                   )}
@@ -487,19 +427,14 @@ const LinksClient = () => {
                       </div>
                       <div className="flex items-center gap-2 sm:w-5/12 sm:justify-end">
                         <div className="flex items-center gap-2">
-                          <Badge
-                            variant="secondary"
-                            className="flex items-center gap-1"
-                          >
+                          <Badge variant="secondary" className="flex items-center gap-1">
                             <MousePointerClick className="h-3 w-3" />
                             {link.clicks.toLocaleString()}
                           </Badge>
                           <div className="flex items-center space-x-2">
                             <Switch
                               checked={link.active}
-                              onCheckedChange={(checked) => {
-                                toggleActive(link.id, checked);
-                              }}
+                              onCheckedChange={(checked) => toggleActive(link.id, checked)}
                               className="transition-colors duration-200"
                               id={`switch-${link.id}`}
                             />
