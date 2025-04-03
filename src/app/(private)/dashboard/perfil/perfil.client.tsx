@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Edit } from "lucide-react";
 import Image from "next/image";
 import ToastMessage from "@/components/ToastMessage";
+import LoadingPage from "@/components/LoadingPage";
 
 const PerfilClient = () => {
   const { data: session } = useSession();
@@ -118,9 +119,7 @@ const PerfilClient = () => {
 
   if (isProfileLoading) {
     return (
-      <section className="flex items-center justify-center h-screen">
-        <span className="loader"></span>
-      </section>
+      <LoadingPage />
     );
   }
 

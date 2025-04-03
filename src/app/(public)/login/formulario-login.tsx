@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import GreenAnimation from "../../../components/green-animation";
 import { GoogleBtn } from "@/components/googleBtn";
+import LoadingPage from "@/components/LoadingPage";
 
 // Define the form schema
 const schema = z.object({
@@ -50,9 +51,7 @@ function Login() {
 
   if (status === "loading") {
     return (
-      <section className="flex items-center justify-center h-screen">
-        <span className="loader"></span>
-      </section>
+      <LoadingPage />
     );
   }
 

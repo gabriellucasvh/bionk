@@ -50,6 +50,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import Image from "next/image";
+import LoadingPage from "@/components/LoadingPage";
 
 type LinkItem = {
   id: number;
@@ -296,9 +297,7 @@ const LinksClient = () => {
 
   if (isProfileLoading) {
     return (
-      <section className="flex items-center justify-center h-screen">
-        <span className="loader"></span>
-      </section>
+      <LoadingPage />
     );
   }
 

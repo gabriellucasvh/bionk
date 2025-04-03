@@ -39,6 +39,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import ArchivedLinksModal from "./ArchiveLinksModal";
+import LoadingPage from "@/components/LoadingPage";
 
 type Profile = {
   email: string;
@@ -83,9 +84,7 @@ export default function ConfigsClient() {
 
   if (isProfileLoading) {
     return (
-      <section className="flex items-center justify-center h-screen">
-        <span className="loader"></span>
-      </section>
+      <LoadingPage />
     );
   }
 

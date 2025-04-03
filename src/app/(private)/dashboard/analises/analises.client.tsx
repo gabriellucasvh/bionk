@@ -44,6 +44,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import LoadingPage from "@/components/LoadingPage";
 
 interface TopLink {
   title: string;
@@ -130,9 +131,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
   }
   if (!data) {
     return (
-      <section className="p-4">
-        <p>Carregando...</p>
-      </section>
+      <LoadingPage />
     );
   }
 
