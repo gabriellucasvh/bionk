@@ -1,8 +1,10 @@
 "use client";
 
+import { JSX } from "react";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import useSWR from "swr";
 import {
   Card,
   CardContent,
@@ -10,16 +12,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  ExternalLink,
-  Grip,
-  Edit,
-  Eye,
-  EyeOff,
-  Plus,
-  Trash2,
-  MousePointerClick,
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -30,8 +23,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import useSWR from "swr";
+import {
+  ExternalLink,
+  Grip,
+  Edit,
+  Eye,
+  EyeOff,
+  Plus,
+  Trash2,
+  MousePointerClick,
+} from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -49,6 +50,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
+import Image from "next/image";
+
 
 type LinkItem = {
   id: number;
@@ -83,7 +86,82 @@ const SortableItem = ({ id, children }: SortableItemProps) => {
     </div>
   );
 };
+
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+// Função que identifica a URL e retorna o ícone correspondente usando a tag <img>
+const getIconForUrl = (url: string): JSX.Element => {
+  try {
+    const { hostname } = new URL(url);
+    if (hostname.includes("pinterest")) {
+      return <Image src="/icons/pinterest.svg" alt="Pinterest" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("instagram")) {
+      return <Image src="/icons/instagram.svg" alt="Instagram" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("discord")) {
+      return <Image src="/icons/discord.svg" alt="Discord" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("buymeacoffee")) {
+      return <Image src="/icons/bmc.svg" alt="Buy Me a Coffee" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("facebook")) {
+      return <Image src="/icons/facebook.svg" alt="Facebook" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("github")) {
+      return <Image src="/icons/github-light.svg" alt="GitHub" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("gitlab")) {
+      return <Image src="/icons/gitlab.svg" alt="GitLab" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("linkedin")) {
+      return <Image src="/icons/linkedin.svg" alt="LinkedIn" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("gmail")) {
+      return <Image src="/icons/mail.svg" alt="Email" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("patreon")) {
+      return <Image src="/icons/patreon.svg" alt="Patreon" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("paypal")) {
+      return <Image src="/icons/paypal.svg" alt="PayPal" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("reddit")) {
+      return <Image src="/icons/reddit.svg" alt="Reddit" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("snapchat")) {
+      return <Image src="/icons/snapchat.svg" alt="Snapchat" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("soundcloud")) {
+      return <Image src="/icons/soundcloud-logo.svg" alt="Soundcloud" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("spotify")) {
+      return <Image src="/icons/spotify.svg" alt="Spotify" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("steam")) {
+      return <Image src="/icons/steam.svg" alt="Steam" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("t.me")) {
+      return <Image src="/icons/telegram.svg" alt="Telegram" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("tiktok")) {
+      return <Image src="/icons/tiktok.svg" alt="Tiktok" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("twitch")) {
+      return <Image src="/icons/twitch.svg" alt="Twitch" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("x.com")) {
+      return <Image src="/icons/x.svg" alt="X" className="h-5 w-5" width={30} height={30} />;
+    }
+    if (hostname.includes("youtube")) {
+      return <Image src="/icons/youtube.svg" alt="Youtube" className="h-5 w-5" width={30} height={30} />;
+    }
+  } catch (error) {
+    console.error("URL inválida:", url);
+  }
+  return <Image src="/icons/globe.svg" alt="Default" className="h-5 w-5" width={30} height={30} />;
+};
+
 const LinksClient = () => {
   const { data: session } = useSession();
   const [links, setLinks] = useState<LinkItem[]>([]);
@@ -96,35 +174,13 @@ const LinksClient = () => {
     fetcher,
     { refreshInterval: 5000 }
   );
+
   useEffect(() => {
     if (swrData?.links) {
       setLinks(swrData.links);
       setIsProfileLoading(false);
     }
   }, [swrData]);
-
-  const handleClickLink = async (id: number, url: string) => {
-    try {
-      const response = await fetch(`/api/link-click`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ linkId: id }),
-      });
-
-      if (response.ok) {
-        // Atualiza tanto o SWR quanto o estado local
-        mutateLinks();
-        setLinks(prevLinks =>
-          prevLinks.map(link =>
-            link.id === id ? { ...link, clicks: link.clicks + 1 } : link
-          )
-        );
-        window.open(url, "_blank");
-      }
-    } catch (error) {
-      console.error("Erro ao registrar clique:", error);
-    }
-  };
 
   useEffect(() => {
     const fetchLinks = async () => {
@@ -137,6 +193,27 @@ const LinksClient = () => {
     };
     fetchLinks();
   }, [session]);
+
+  const handleClickLink = async (id: number, url: string) => {
+    try {
+      const response = await fetch(`/api/link-click`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ linkId: id }),
+      });
+      if (response.ok) {
+        mutateLinks();
+        setLinks((prevLinks) =>
+          prevLinks.map((link) =>
+            link.id === id ? { ...link, clicks: link.clicks + 1 } : link
+          )
+        );
+        window.open(url, "_blank");
+      }
+    } catch (error) {
+      console.error("Erro ao registrar clique:", error);
+    }
+  };
 
   const isValidUrl = (url: string) => {
     const regex = /\.(com|br|me|net|org|info|io|co)$/i;
@@ -172,7 +249,6 @@ const LinksClient = () => {
     }
   };
 
-  // Alterna o status de exibição sem excluir do banco
   const toggleActive = async (id: number, isActive: boolean) => {
     const updated = links.map((link) =>
       link.id === id ? { ...link, active: isActive } : link
@@ -186,7 +262,6 @@ const LinksClient = () => {
       }),
     });
   };
-
 
   const toggleSensitive = async (id: number) => {
     const updated = links.map((link) =>
@@ -331,70 +406,91 @@ const LinksClient = () => {
                           {...listeners}
                           className="h-5 w-5 cursor-move text-muted-foreground"
                         />
-                        <div className="flex-1 space-y-1">
-                          {link.isEditing ? (
-                            <div className="space-y-2">
-                              <input
-                                type="text"
-                                className="w-full border rounded px-2 py-1"
-                                value={link.title}
-                                onChange={(e) =>
-                                  setLinks((prev) =>
-                                    prev.map((l) =>
-                                      l.id === link.id ? { ...l, title: e.target.value } : l
+                        <div className="flex items-center gap-2">
+                          {/* Ícone do site */}
+                          <span>{getIconForUrl(link.url)}</span>
+                          <div className="flex-1 space-y-1">
+                            {link.isEditing ? (
+                              <div className="space-y-2">
+                                <input
+                                  type="text"
+                                  className="w-full border rounded px-2 py-1"
+                                  value={link.title}
+                                  onChange={(e) =>
+                                    setLinks((prev) =>
+                                      prev.map((l) =>
+                                        l.id === link.id
+                                          ? { ...l, title: e.target.value }
+                                          : l
+                                      )
                                     )
-                                  )
-                                }
-                              />
-                              <input
-                                type="url"
-                                className="w-full border rounded px-2 py-1"
-                                value={link.url}
-                                onChange={(e) =>
-                                  setLinks((prev) =>
-                                    prev.map((l) =>
-                                      l.id === link.id ? { ...l, url: e.target.value } : l
+                                  }
+                                />
+                                <input
+                                  type="url"
+                                  className="w-full border rounded px-2 py-1"
+                                  value={link.url}
+                                  onChange={(e) =>
+                                    setLinks((prev) =>
+                                      prev.map((l) =>
+                                        l.id === link.id
+                                          ? { ...l, url: e.target.value }
+                                          : l
+                                      )
                                     )
-                                  )
-                                }
-                              />
-                              <div className="flex gap-2">
-                                <Button onClick={() => saveEditing(link.id, link.title, link.url)}>
-                                  Salvar
-                                </Button>
-                                <Button variant="outline" onClick={() => cancelEditing(link.id)}>
-                                  Cancelar
-                                </Button>
+                                  }
+                                />
+                                <div className="flex gap-2">
+                                  <Button
+                                    onClick={() =>
+                                      saveEditing(link.id, link.title, link.url)
+                                    }
+                                  >
+                                    Salvar
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => cancelEditing(link.id)}
+                                  >
+                                    Cancelar
+                                  </Button>
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            <>
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium">{link.title}</span>
-                                {link.sensitive && (
-                                  <Badge variant="outline" className="text-xs border-red-300">
-                                    Sensível
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-1 text-sm text-blue-500">
-                                <ExternalLink className="h-3 w-3" />
-                                <Link
-                                  className="truncate"
-                                  href={link.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {link.url}
-                                </Link>
-                              </div>
-                            </>
-                          )}
+                            ) : (
+                              <>
+                                <header className="flex items-center gap-2">
+                                  <h3 className="font-medium">{link.title}</h3>
+                                  {link.sensitive && (
+                                    <Badge
+                                      variant="outline"
+                                      className="text-xs border-red-300"
+                                    >
+                                      Sensível
+                                    </Badge>
+                                  )}
+                                </header>
+                                <section className="flex items-center gap-1 text-sm text-blue-500">
+                                  <ExternalLink className="h-3 w-3" />
+                                  <Link
+                                    className="truncate"
+                                    href={link.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    {link.url}
+                                  </Link>
+                                </section>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 sm:w-5/12 sm:justify-end">
                         <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="flex items-center gap-1">
+                          <Badge
+                            variant="secondary"
+                            className="flex items-center gap-1"
+                          >
                             <MousePointerClick className="h-3 w-3" />
                             {link.clicks.toLocaleString()}
                           </Badge>
@@ -408,7 +504,7 @@ const LinksClient = () => {
                               id={`switch-${link.id}`}
                             />
                             <Label htmlFor={`switch-${link.id}`} className="cursor-pointer">
-                              {link.active ? "Ativo" : "Inativo"} {/* Melhoria na legenda */}
+                              {link.active ? "Ativo" : "Inativo"}
                             </Label>
                           </div>
                           <DropdownMenu>
