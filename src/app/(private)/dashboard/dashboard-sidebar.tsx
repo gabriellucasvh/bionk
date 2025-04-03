@@ -48,40 +48,47 @@ const Sidebar = () => {
   return (
     <>
       {/* Sidebar para telas médias e maiores */}
-      <aside className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 md:border-r md:bg-muted/40">
-        <header className="flex h-14 items-center border-b px-6">
-          <Link href="/" className="flex items-center justify-center gap-2 font-semibold">
-            <Image src="/bionk-logo.svg" alt="logo" width={90} height={90} />
-          </Link>
-        </header>
-        <nav className="flex-1 overflow-y-auto p-2">
+      <aside className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 md:border-r md:bg-card/40">
+      <header className="flex h-16 items-center border-b px-6">
+        <Link href="/" className="flex items-center justify-center gap-2 font-semibold">
+          <Image src="/bionk-logo.svg" alt="logo" width={90} height={30} priority />
+        </Link>
+      </header>
+
+        <nav className="px-2 space-y-1">
           {links.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = pathname === link.href
             return (
-              <div key={link.key}>
-                <Button variant={isActive ? "secondary" : "ghost"}
-                  className="justify-start gap-2 w-full"
-                  disabled={disabledButtons.has(link.key)}
-                  onClick={() => {
-                    if (isActive) return
-                    setDisabledButtons(prev => new Set(prev).add(link.key))
-                    router.push(`${link.href}`)
-                  }}
-                >
-                  {link.icon}
-                  {link.label}
-                </Button>
-              </div>
-            );
+              <Button
+                key={link.key}
+                variant={isActive ? "secondary" : "ghost"}
+                className={`justify-start w-full text-sm font-medium h-10 ${isActive ? "bg-secondary" : ""}`}
+                disabled={disabledButtons.has(link.key)}
+                onClick={() => {
+                  if (isActive) return
+                  setDisabledButtons((prev) => new Set(prev).add(link.key))
+                  router.push(`${link.href}`)
+                }}
+              >
+                <span className="mr-3">{link.icon}</span>
+                {link.label}
+              </Button>
+            )
           })}
         </nav>
-          <div className=" mt-auto ">
-            <Button className="w-full rounded-none text-red-500 hover:text-red-500 hover:bg-red-50" variant="outline" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair
-            </Button>
-          </div>
-      </aside>
+
+      <div className="mt-auto p-4 border-t">
+        <Button
+          className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+          variant="ghost"
+          size="sm"
+          onClick={handleLogout}
+        >
+          <LogOut className="h-4 w-4 mr-3" />
+          Sair
+        </Button>
+      </div>
+    </aside>
 
       {/* Menu fixo para mobile com ícones */}
       <nav className="fixed inset-x-0 bottom-0 flex justify-around border-t bg-white z-50 p-4 md:hidden">
