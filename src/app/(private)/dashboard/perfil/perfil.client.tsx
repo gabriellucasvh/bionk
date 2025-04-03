@@ -1,3 +1,4 @@
+// components/PerfilClient.tsx
 "use client";
 
 import { useState, useEffect, useRef, ChangeEvent } from "react";
@@ -19,85 +20,61 @@ import ToastMessage from "@/components/ToastMessage";
 
 const PerfilClient = () => {
   const { data: session } = useSession();
-  const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [bio, setBio] = useState("");
+  const [profile, setProfile] = useState({ name: "", username: "", bio: "" });
+  const [originalProfile, setOriginalProfile] = useState({ name: "", username: "", bio: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [originalProfile, setOriginalProfile] = useState({ name: "", username: "", bio: "" });
   const [isProfileLoading, setIsProfileLoading] = useState(true);
-
   const [profilePreview, setProfilePreview] = useState<string>(
     session?.user?.image || "/person.png"
   );
-
   const profileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (session?.user?.id) {
-      const fetchProfile = async () => {
-        const res = await fetch(`/api/profile/${session.user.id}`);
-        const data = await res.json();
-        const fetchedName = data.name || "";
-        const fetchedUsername = data.username || "";
-        const fetchedBio = data.bio || "";
-        setName(fetchedName);
-        setUsername(fetchedUsername);
-        setBio(fetchedBio);
-        setOriginalProfile({ name: fetchedName, username: fetchedUsername, bio: fetchedBio });
-        if (data.profileUrl) {
-          setProfilePreview(data.profileUrl);
-        } else if (session?.user?.image) {
-          setProfilePreview(session.user.image);
-        }
-        setIsProfileLoading(false);
-      };
-      fetchProfile();
-    }
-  }, [session]);
+    if (!session?.user?.id) return;
+    const fetchProfile = async () => {
+      const res = await fetch(`/api/profile/${session.user.id}`);
+      const { name = "", username = "", bio = "", profileUrl } = await res.json();
+      setProfile({ name, username, bio });
+      setOriginalProfile({ name, username, bio });
+      setProfilePreview(profileUrl || session?.user?.image || "/person.png");
+      setIsProfileLoading(false);
+    };
+    fetchProfile();
+  }, [session?.user?.id]);
 
   useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => {
-        setMessage("");
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
+    if (!message) return;
+    const timer = setTimeout(() => setMessage(""), 5000);
+    return () => clearTimeout(timer);
   }, [message]);
 
   const hasChanges =
-    name !== originalProfile.name ||
-    username !== originalProfile.username ||
-    bio !== originalProfile.bio;
+    profile.name !== originalProfile.name ||
+    profile.username !== originalProfile.username ||
+    profile.bio !== originalProfile.bio;
 
   const handleSaveProfile = async () => {
     if (!session?.user?.id) return;
-
     setLoading(true);
     setMessage("");
 
     try {
-      const response = await fetch(`/api/profile/${session.user.id}`, {
+      const res = await fetch(`/api/profile/${session.user.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, username, bio }),
+        body: JSON.stringify(profile),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Falha ao atualizar o perfil");
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Falha ao atualizar o perfil");
 
       setMessage("Perfil atualizado com sucesso!");
-      setOriginalProfile({ name, username, bio });
+      setOriginalProfile(profile);
     } catch (error) {
       console.error("Erro ao atualizar o perfil:", error);
-      if (error instanceof Error) {
-        setMessage(`Erro: ${error.message}`);
-      } else {
-        setMessage("Erro: Ocorreu um problema ao atualizar o perfil");
-      }
+      setMessage(`Erro: ${
+        error instanceof Error ? error.message : "Ocorreu um problema ao atualizar o perfil"
+      }`);
     } finally {
       setLoading(false);
     }
@@ -109,27 +86,21 @@ const PerfilClient = () => {
     formData.append("file", file);
     formData.append("type", type);
     try {
-      const response = await fetch(`/api/profile/${session.user.id}/upload?type=${type}`, {
+      const res = await fetch(`/api/profile/${session.user.id}/upload?type=${type}`, {
         method: "POST",
         body: formData,
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Falha no upload da imagem");
-      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Falha no upload da imagem");
       setMessage(
         `${type === "profile" ? "Foto de perfil" : "Banner"} atualizado com sucesso!`
       );
-      if (data.url) {
-        setProfilePreview(data.url);
-      }
+      if (data.url) setProfilePreview(data.url);
     } catch (error) {
       console.error(`Erro ao fazer upload da ${type}:`, error);
-      if (error instanceof Error) {
-        setMessage(`Erro: ${error.message}`);
-      } else {
-        setMessage("Erro: Ocorreu um problema ao fazer upload");
-      }
+      setMessage(`Erro: ${
+        error instanceof Error ? error.message : "Ocorreu um problema ao fazer upload"
+      }`);
     }
   };
 
@@ -175,77 +146,73 @@ const PerfilClient = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <article className="space-y-4">
-            <div className="flex flex-col items-center gap-4 sm:flex-row">
-              <article className="relative">
-                <div className="h-24 w-24 overflow-hidden rounded-full bg-muted border-2 border-green-500 shadow-md shadow-black/20">
-                  <Image
-                    src={profilePreview}
-                    alt="Foto de perfil"
-                    width={96}
-                    height={96}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <Button
-                  size="icon"
-                  className="absolute bottom-0 right-0 h-8 w-8 rounded-full"
-                  onClick={() => profileInputRef.current?.click()}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  ref={profileInputRef}
-                  onChange={handleProfileChange}
+          <article className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="relative">
+              <div className="h-24 w-24 overflow-hidden rounded-full bg-muted border-2 border-green-500 shadow-md shadow-black/20">
+                <Image
+                  src={profilePreview}
+                  alt="Foto de perfil"
+                  width={96}
+                  height={96}
+                  className="h-full w-full object-cover"
                 />
-              </article>
-            </div>
-              <article className="flex-1 space-y-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Nome</Label>
-                  <Input
-                    id="name"
-                    placeholder="Seu nome"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="username">Nome de usuário</Label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">bionk.me/</span>
-                    <Input
-                      id="username"
-                      placeholder="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </article>
-
-            <div className="grid gap-2">
-              <Label htmlFor="bio">Biografia</Label>
-              <Textarea
-                id="bio"
-                placeholder="Fale um pouco sobre você"
-                className="min-h-32"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
+              </div>
+              <Button
+                size="icon"
+                className="absolute bottom-0 right-0 h-8 w-8 rounded-full"
+                onClick={() => profileInputRef.current?.click()}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={profileInputRef}
+                onChange={handleProfileChange}
               />
             </div>
+            <div className="flex-1 space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Nome</Label>
+                <Input
+                  id="name"
+                  placeholder="Seu nome"
+                  value={profile.name}
+                  onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="username">Nome de usuário</Label>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground">bionk.me/</span>
+                  <Input
+                    id="username"
+                    placeholder="username"
+                    value={profile.username}
+                    onChange={(e) => setProfile({ ...profile, username: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
           </article>
-      <div className="flex justify-end mt-4">
-        <Button onClick={handleSaveProfile} disabled={loading || !hasChanges}>
-          {loading ? "Salvando..." : "Salvar alterações"}
-        </Button>
-      </div>
+          <div className="grid gap-2">
+            <Label htmlFor="bio">Biografia</Label>
+            <Textarea
+              id="bio"
+              placeholder="Fale um pouco sobre você"
+              className="min-h-32"
+              value={profile.bio}
+              onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+            />
+          </div>
+          <div className="flex justify-end mt-4">
+            <Button onClick={handleSaveProfile} disabled={loading || !hasChanges}>
+              {loading ? "Salvando..." : "Salvar alterações"}
+            </Button>
+          </div>
         </CardContent>
       </Card>
-
     </section>
   );
 };
