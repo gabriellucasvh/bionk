@@ -368,7 +368,7 @@ const LinksClient = () => {
                       <div className="flex items-center gap-3 sm:w-7/12">
                         <Grip {...listeners} className="h-5 w-5 cursor-move text-muted-foreground" />
                         <div className="flex items-center gap-2">
-                          <span>{getIconForUrl(link.url)}</span>
+                          <span className="bg-primary/5 px-5 py-2 rounded-lg">{getIconForUrl(link.url)}</span>
                           <div className="flex-1 space-y-1">
                             {link.isEditing ? (
                               <div className="space-y-2">
