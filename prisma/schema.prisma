@@ -14,7 +14,8 @@ model User {
   email          String        @unique
   bio            String?
   provider       String?
-  emailVerified  DateTime? // Corrigido: emailVerified
+  emailVerified  DateTime?
+  template       String        @default("default")
   image          String?
   bannerUrl      String?
   profileUrl     String?
