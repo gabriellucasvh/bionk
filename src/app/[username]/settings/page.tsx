@@ -61,8 +61,6 @@ export default function TemplateSettings() {
                 templateCategory: selectedCategory,
             }),
         });
-
-        alert("Template atualizado com sucesso!");
     };
 
     return (
