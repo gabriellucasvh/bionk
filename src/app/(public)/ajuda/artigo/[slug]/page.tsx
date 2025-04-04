@@ -5,7 +5,7 @@ import matter from "gray-matter";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import HeaderAjuda from "../../header-ajuda";
-import Footer from "@/components/Footer";
+import Footer from "@/components/layout/Footer";
 import { ArrowLeft } from "lucide-react";
 
 interface PageProps {

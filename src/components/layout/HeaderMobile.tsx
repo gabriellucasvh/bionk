@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import NeoButton from './neo-button';
+import NeoButton from '../buttons/button-neubrutalism';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';

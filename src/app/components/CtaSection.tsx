@@ -1,7 +1,7 @@
 "use client"
 
 import { ArrowRight, Users } from "lucide-react";
-import NeoButton from "./neo-button";
+import NeoButton from "@/components/buttons/button-neubrutalism";
 import { useRouter } from "next/navigation";
 
 export default function CtaSection() {

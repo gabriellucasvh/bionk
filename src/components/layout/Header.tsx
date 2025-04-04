@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import NeoButton from './neo-button'
+import NeoButton from '../buttons/button-neubrutalism'
 
 const HeaderProps = [
   { label: "Menu", href: "/" },

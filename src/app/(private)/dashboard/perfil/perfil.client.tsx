@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Edit } from "lucide-react";
 import Image from "next/image";
 import ToastMessage from "@/components/ToastMessage";
-import LoadingPage from "@/components/LoadingPage";
+import LoadingPage from "@/components/layout/LoadingPage";
 
 const PerfilClient = () => {
   const { data: session } = useSession();

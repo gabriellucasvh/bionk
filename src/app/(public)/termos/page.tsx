@@ -1,9 +1,9 @@
 /* eslint-disable react/no-unescaped-entities */
 import type { Metadata } from "next"
 import { Separator } from "@/components/ui/separator"
-import Header from "@/components/Header"
-import HeaderMobile from "@/components/HeaderMobile"
-import Footer from "@/components/Footer"
+import Header from "@/components/layout/Header"
+import HeaderMobile from "@/components/layout/HeaderMobile"
+import Footer from "@/components/layout/Footer"
 
 export const metadata: Metadata = {
   title: "Bionk | Termos e Condições",

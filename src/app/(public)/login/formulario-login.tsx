@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession, signIn } from "next-auth/react";
@@ -11,8 +11,8 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import GreenAnimation from "../../../components/green-animation";
-import { GoogleBtn } from "@/components/googleBtn";
-import LoadingPage from "@/components/LoadingPage";
+import { GoogleBtn } from "@/components/buttons/button-google";
+import LoadingPage from "@/components/layout/LoadingPage";
 
 // Define the form schema
 const schema = z.object({

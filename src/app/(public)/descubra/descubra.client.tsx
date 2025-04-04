@@ -1,14 +1,13 @@
 "use client"
 
-import Footer from '@/components/Footer'
-import Header from '@/components/Header'
+import Footer from '@/components/layout/Footer'
+import Header from '@/components/layout/Header'
 import { useRouter } from 'next/navigation'
-import React from 'react'
 import SimpleBtn from './simple-button'
 import { Blend, ChartNoAxesCombined, Globe, PartyPopper, Plus, Rocket } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
-import HeaderMobile from '@/components/HeaderMobile'
+import HeaderMobile from '@/components/layout/HeaderMobile'
 import {
     Accordion,
     AccordionContent,

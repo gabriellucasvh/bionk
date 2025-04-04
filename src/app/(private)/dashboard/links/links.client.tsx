@@ -50,7 +50,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import Image from "next/image";
-import LoadingPage from "@/components/LoadingPage";
+import LoadingPage from "@/components/layout/LoadingPage";
 
 type LinkItem = {
   id: number;

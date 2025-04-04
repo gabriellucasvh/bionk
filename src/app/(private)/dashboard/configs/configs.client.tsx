@@ -39,7 +39,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import ArchivedLinksModal from "./ArchiveLinksModal";
-import LoadingPage from "@/components/LoadingPage";
+import LoadingPage from "@/components/layout/LoadingPage";
 
 type Profile = {
   email: string;

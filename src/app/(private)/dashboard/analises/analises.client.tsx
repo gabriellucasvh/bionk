@@ -44,7 +44,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import LoadingPage from "@/components/LoadingPage";
+import LoadingPage from "@/components/layout/LoadingPage";
 
 interface TopLink {
   title: string;

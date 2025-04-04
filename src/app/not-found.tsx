@@ -1,4 +1,4 @@
-import NotFoundButton from '@/components/not-found-button'
+import ButtonBack from '@/components/buttons/button-back'
 import Image from 'next/image'
 
 export default function NotFound() {
@@ -8,7 +8,7 @@ export default function NotFound() {
                 <Image src={"/warning.svg"} alt='error' width={160} height={90} />
                 <h2 className='font-gsans font-bold text-5xl'>Oops...</h2>
                 <p className='text-center'>Parece que temos algum problema aqui! A página foi movida ou não existe mais.</p>
-                <NotFoundButton />
+                <ButtonBack />
             </div>
         </div>
     )

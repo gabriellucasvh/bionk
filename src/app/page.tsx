@@ -1,10 +1,10 @@
-import CtaSection from "@/components/CtaSection";
-import Features from "@/components/Features";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import HeaderMobile from "@/components/HeaderMobile";
-import Hero from "@/components/Hero";
-import Testimonials from "@/components/Testimonials";
+import CtaSection from "./components/CtaSection";
+import Features from "@/app/components/Features";
+import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
+import HeaderMobile from "@/components/layout/HeaderMobile";
+import Hero from "./components/Hero";
+import Testimonials from "@/app/components/Testimonials";
 
 export default function Home() {
   return (

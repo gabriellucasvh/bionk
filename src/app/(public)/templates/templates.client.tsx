@@ -1,8 +1,7 @@
-import Footer from '@/components/Footer'
-import Header from '@/components/Header'
-import HeaderMobile from '@/components/HeaderMobile'
-import Link from 'next/link'
-import React from 'react'
+import Footer from '@/components/layout/Footer';
+import Header from '@/components/layout/Header';
+import HeaderMobile from '@/components/layout/HeaderMobile';
+import Link from 'next/link';
 
 const Categorias = [
     {

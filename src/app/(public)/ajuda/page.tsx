@@ -1,31 +1,31 @@
 /* eslint-disable react/no-unescaped-entities */
 import type { Metadata } from "next"
 import {
-  BookOpen,
-  Palette,
-  Zap,
-  HelpCircle,
-  MessageSquare,
-  TrendingUp,
-  Bell,
-  User,
-  Mail,
-  FileText,
-  Send,
-  Settings,
-  UserPlus,
-  Layout,
-  Share2,
-  PaintBucket,
-  Image as ImageIcon,
-  List,
-  Sparkles,
-  Type,
-  Link2,
-  BarChart2,
-  Clock,
-  Users,
-  DollarSign,
+    BookOpen,
+    Palette,
+    Zap,
+    HelpCircle,
+    MessageSquare,
+    TrendingUp,
+    Bell,
+    User,
+    Mail,
+    FileText,
+    Send,
+    Settings,
+    UserPlus,
+    Layout,
+    Share2,
+    PaintBucket,
+    Image as ImageIcon,
+    List,
+    Sparkles,
+    Type,
+    Link2,
+    BarChart2,
+    Clock,
+    Users,
+    DollarSign,
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -33,7 +33,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
-import Footer from "@/components/Footer"
+import Footer from "@/components/layout/Footer"
 import HeaderAjuda from "./header-ajuda"
 
 export const metadata: Metadata = {

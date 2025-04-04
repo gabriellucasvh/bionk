@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowRight, ExternalLink, Link as LinkIcon } from "lucide-react";
-import NeoButton from "./neo-button";
+import NeoButton from "@/components/buttons/button-neubrutalism";
 import { useRouter } from "next/navigation";
 import { motion } from 'framer-motion'
 

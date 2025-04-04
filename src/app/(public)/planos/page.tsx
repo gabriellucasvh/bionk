@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Header from "@/components/Header";
+import Header from "@/components/layout/Header";
 import PricingPage from "./prices";
-import Footer from "@/components/Footer";
-import HeaderMobile from "@/components/HeaderMobile";
+import Footer from "@/components/layout/Footer";
+import HeaderMobile from "@/components/layout/HeaderMobile";
 
 export const metadata: Metadata = {
     title: "Bionk | Planos",

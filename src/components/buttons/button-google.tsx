@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import LoadingSpinner from "@/components/buttons/LoadingSpinner";
 
 export function GoogleBtn() {
     const [isLoading, setIsLoading] = useState(false);
