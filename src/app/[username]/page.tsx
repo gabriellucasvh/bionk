@@ -22,7 +22,7 @@ export default async function UserPage({ params }: PageProps) {
   if (!user) notFound();
 
   // Caminho base dos templates
-  const templateCategory = user.templateCategory || "minimalista"; // Fallback para categoria padrão
+  const templateCategory = user.templateCategory || "minimalista" ; // Fallback para categoria padrão
   const templateName = user.template || "default"; // Fallback para template padrão
 
   let TemplateComponent;

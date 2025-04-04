@@ -10,7 +10,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
     }
 
-    const { template } = await req.json();
+    const body: { template: string; templateCategory: string } = await req.json();
+    const { template, templateCategory } = body;
+
     if (!template) {
       return NextResponse.json({ error: "Template inválido" }, { status: 400 });
     }
@@ -21,9 +23,14 @@ export async function POST(req: Request) {
       "elegant", "lux", "neon", "cyber", "retro", "vintage", "photo", "gallery"
     ];
 
+
     await prisma.user.update({
       where: { email: session.user.email },
-      data: { template },
+      data: {
+        template: template,
+        templateCategory: templateCategory,
+      },
+
     });
 
     return NextResponse.json({ message: "Template atualizado com sucesso" });

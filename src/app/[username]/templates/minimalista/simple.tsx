@@ -1,64 +1,41 @@
-import Image from "next/image";
-import InteractiveLink from "@/components/InteractiveLink";
-import ProfileViewTracker from "@/components/ProfileViewTracker";
+import Image from "next/image"
+import InteractiveLink from "@/components/InteractiveLink"
+import ProfileViewTracker from "@/components/ProfileViewTracker"
 
-interface TemplateProps {
-  user: {
-    id: string;
-    name: string | null;
-    username: string;
-    bio: string | null;
-    image: string | null;
-    Link: {
-      id: number;
-      title: string;
-      url: string;
-      sensitive: boolean;
-    }[];
-  };
-}
-
-export default function MinimalTemplate({ user }: TemplateProps) {
+export default function DefaultTemplate({ user }: { user: any }) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-red-500 text-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-50 py-8 px-4">
       <ProfileViewTracker userId={user.id} />
+      <main className="max-w-md mx-auto flex flex-col items-center">
+        <header className="w-full text-center mb-8">
+          {user.image && (
+            <div className="mx-auto mb-4 relative w-24 h-24 overflow-hidden rounded-full border-2 border-green-200 shadow-md transform hover:scale-105 transition-transform duration-300">
+              <Image src={user.image || "/placeholder.svg"} alt={user.name} fill className="object-cover" />
+            </div>
+          )}
+          <h1 className="text-2xl font-bold text-green-800">{user.name || user.username}</h1>
+          {user.bio && <p className="mt-2 text-green-600">{user.bio}</p>}
+        </header>
 
-      <header className="text-center">
-        {user.image && (
-          <div className="w-20 h-20 rounded-full overflow-hidden border border-gray-300">
-            <Image
-              src={user.image}
-              alt={user.name || user.username}
-              width={80}
-              height={80}
-              className="object-cover"
-            />
-          </div>
-        )}
-        <h1 className="text-xl font-semibold mt-2">{user.name || user.username}</h1>
-        {user.bio && <p className="text-gray-500 text-sm mt-1">{user.bio}</p>}
-      </header>
-
-      <main className="mt-6 w-full max-w-xs">
-        <ul className="space-y-3">
-          {user.Link.map((link) => (
-            <li key={link.id}>
-              <InteractiveLink
-                href={link.url}
-                linkId={link.id}
-                sensitive={link.sensitive}
-                className="block w-full py-2 px-4 border rounded-lg text-center font-medium text-gray-700 hover:bg-gray-100"
-              >
-                {link.title}
-              </InteractiveLink>
-            </li>
-          ))}
-        </ul>
+        <section className="w-full">
+          <ul className="space-y-3">
+            {user.Link.map((link: any) => (
+              <li key={link.id} className="w-full">
+                <InteractiveLink
+                  href={link.url}
+                  linkId={link.id}
+                  sensitive={link.sensitive}
+                  className="block w-full p-3 bg-white bg-opacity-70 backdrop-blur-sm rounded-lg border border-green-100 shadow-sm hover:shadow-md hover:bg-opacity-90 transition-all duration-200"
+                >
+                  <span className="font-medium text-green-700">{link.title}</span>
+                  <span className="block text-sm text-green-500">{link.url}</span>
+                </InteractiveLink>
+              </li>
+            ))}
+          </ul>
+        </section>
       </main>
-
-      <footer className="mt-6 text-gray-400 text-xs">
-        <p>© {new Date().getFullYear()} • {user.username}</p>
-      </footer>
     </div>
-  );
+  )
 }
+

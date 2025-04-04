@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 interface InteractiveLinkProps {
   href: string;
@@ -39,9 +40,9 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      className={`relative flex items-center justify-center w-full p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all text-center font-medium border border-gray-100 ${
+      className={twMerge(`relative flex items-center justify-center w-full p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all text-center font-medium border border-gray-100 ${
         sensitive ? "border-red-200 group overflow-hidden" : ""
-      } ${className}`}
+      } ${className}`, className)}
     >
       {sensitive && (
         <span className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md text-white text-sm font-semibold transition-opacity group-hover:opacity-0">
