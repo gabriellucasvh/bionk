@@ -1,7 +1,6 @@
 import Image from "next/image";
 import InteractiveLink from "@/components/InteractiveLink";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
-import TemplateSettings from "@/app/components/alter-template";
 
 export default function DefaultTemplate({ user }: { user: any }) {
   return (
