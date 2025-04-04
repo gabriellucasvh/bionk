@@ -1,11 +1,12 @@
 "use client"
 
-import React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
-import NeoButton from '../buttons/button-neubrutalism'
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import NeoButton from "../buttons/button-neubrutalism";
+import LoadingSpinner from "../buttons/LoadingSpinner";
 
 const HeaderProps = [
   { label: "Menu", href: "/" },
@@ -13,11 +14,18 @@ const HeaderProps = [
   { label: "Planos", href: "/planos" },
   { label: "Descubra", href: "/descubra" },
   { label: "Ajuda", href: "/ajuda" },
-]
+];
 
 const Header: React.FC = () => {
-  const { data: session } = useSession()
-  const router = useRouter()
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});
+
+  const handleClick = (key: string, path: string) => {
+    if (isLoading[key]) return;
+    setIsLoading((prev) => ({ ...prev, [key]: true }));
+    router.push(path);
+  };
 
   return (
     <nav className="hidden md:flex fixed inset-0 z-50 h-20 mx-40 my-7 max-w-full items-center p-4 rounded-xl bg-white border font-sans">
@@ -40,33 +48,36 @@ const Header: React.FC = () => {
       ))}
       <div className="flex w-full justify-end gap-4">
         {session ? (
-          <div className='flex items-center gap-3'>
+          <div className="flex items-center gap-3">
             <NeoButton
-              onClick={() => router.push("/dashboard")}
+              onClick={() => handleClick("dashboard", "/dashboard")}
               className="py-2 bg-lime-400"
+              disabled={isLoading["dashboard"]}
             >
-              Acessar o Dashboard
+              {isLoading["dashboard"] ? <LoadingSpinner /> : "Acessar o Dashboard"}
             </NeoButton>
           </div>
         ) : (
-          <div className='flex items-center gap-3'>
+          <div className="flex items-center gap-3">
             <NeoButton
-              onClick={() => router.push("/login")}
+              onClick={() => handleClick("login", "/login")}
               className="py-2 bg-white"
+              disabled={isLoading["login"]}
             >
-              Entrar
+              {isLoading["login"] ? <LoadingSpinner /> : "Entrar"}
             </NeoButton>
             <NeoButton
-              onClick={() => router.push("/registro")}
+              onClick={() => handleClick("registro", "/registro")}
               className="py-2 bg-lime-400"
+              disabled={isLoading["registro"]}
             >
-              Cadastre-se gratuitamente
+              {isLoading["registro"] ? <LoadingSpinner /> : "Cadastre-se gratuitamente"}
             </NeoButton>
           </div>
         )}
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
