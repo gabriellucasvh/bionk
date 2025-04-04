@@ -15,10 +15,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Template inválido" }, { status: 400 });
     }
 
-    const validTemplates = ["default", "minimal"]; // Adicione mais templates aqui se necessário
-    if (!validTemplates.includes(template)) {
-      return NextResponse.json({ error: "Template não permitido" }, { status: 400 });
-    }
+    const validTemplates = [
+      "default", "simple", "vibrant", "gradient", "business", "corporate",
+      "modern", "clean", "dark", "midnight", "artistic", "unique",
+      "elegant", "lux", "neon", "cyber", "retro", "vintage", "photo", "gallery"
+    ];
 
     await prisma.user.update({
       where: { email: session.user.email },

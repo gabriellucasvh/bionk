@@ -8,9 +8,16 @@ interface InteractiveLinkProps {
   linkId: number;
   children: React.ReactNode;
   sensitive?: boolean;
+  className?: string;
 }
 
-const InteractiveLink: React.FC<InteractiveLinkProps> = ({ href, linkId, children, sensitive }) => {
+const InteractiveLink: React.FC<InteractiveLinkProps> = ({
+  href,
+  linkId,
+  children,
+  sensitive,
+  className = "",
+}) => {
   const handleClick = () => {
     const url = "/api/link-click";
     const data = JSON.stringify({ linkId });
@@ -34,7 +41,7 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({ href, linkId, childre
       onClick={handleClick}
       className={`relative flex items-center justify-center w-full p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all text-center font-medium border border-gray-100 ${
         sensitive ? "border-red-200 group overflow-hidden" : ""
-      }`}
+      } ${className}`}
     >
       {sensitive && (
         <span className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md text-white text-sm font-semibold transition-opacity group-hover:opacity-0">

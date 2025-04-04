@@ -1,19 +1,13 @@
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
-import DefaultTemplate from "./templates/DefaultTemplate";
-import MinimalTemplate from "./templates/MinimalTemplate";
-
-const templates: Record<string, any> = {
-  default: DefaultTemplate,
-  minimal: MinimalTemplate,
-};
 
 interface PageProps {
   params: { username: string };
 }
 
 export default async function UserPage({ params }: PageProps) {
-  const { username } = params;
+  const resolvedParams = await params;
+  const { username } = resolvedParams;
 
   const user = await prisma.user.findUnique({
     where: { username },
@@ -27,7 +21,17 @@ export default async function UserPage({ params }: PageProps) {
 
   if (!user) notFound();
 
-  const TemplateComponent = templates[user.template] || DefaultTemplate;
+  // Caminho base dos templates
+  const templateCategory = user.templateCategory || "minimalista"; // Fallback para categoria padrão
+  const templateName = user.template || "default"; // Fallback para template padrão
+
+  let TemplateComponent;
+  try {
+    TemplateComponent = (await import(`@/app/[username]/templates/${templateCategory}/${templateName}.tsx`)).default;
+  } catch (error) {
+    console.error(`Erro ao carregar template: ${templateCategory}/${templateName}`, error);
+    TemplateComponent = (await import("@/app/[username]/templates/minimalista/default")).default;
+  }
 
   return <TemplateComponent user={user} />;
 }
