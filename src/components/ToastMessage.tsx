@@ -1,6 +1,8 @@
+"use client"
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { motion } from "framer-motion";
+import { MotionDiv, MotionButton } from "./ui/motion";
+;
 
 type ToastProps = {
   message: string;
@@ -31,7 +33,7 @@ export default function Toast({ message, variant, onClose }: ToastProps) {
   }, [onClose]);
 
   return (
-    <motion.div 
+    <MotionDiv
       initial={{ opacity: 0, y: -20 }} 
       animate={{ opacity: 1, y: 0 }} 
       exit={{ opacity: 0, y: -20 }} 
@@ -40,21 +42,21 @@ export default function Toast({ message, variant, onClose }: ToastProps) {
     >
       <div className="flex justify-between items-center">
         <span>{message}</span>
-        <motion.button 
+        <MotionButton 
           onClick={onClose} 
           className="text-white"
           whileHover={{ scale: 1.2, rotate: 90 }}
           whileTap={{ scale: 0.9 }}
         >
           <X size={18} />
-        </motion.button>
+        </MotionButton>
       </div>
-      <motion.div 
+      <MotionDiv
         className="absolute bottom-0 left-0 h-1 bg-white border-b rounded-full ml-1" 
         initial={{ width: "100%" }} 
         animate={{ width: "0%" }} 
         transition={{ duration: 5, ease: "linear" }}
       />
-    </motion.div>
+    </MotionDiv>
   );
 }

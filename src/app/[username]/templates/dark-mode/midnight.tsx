@@ -1,7 +1,5 @@
-'use client'
-
 import Image from "next/image"
-import { motion } from "framer-motion"
+import { MotionH1, MotionP, MotionDiv, MotionLi } from "@/components/ui/motion"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 
@@ -19,39 +17,39 @@ export default function MidnightTemplate({ user }: { user: any }) {
       <main className="max-w-md mx-auto flex flex-col items-center">
         <header className="w-full text-center mb-10">
           {user.image && (
-            <motion.div
+            <MotionDiv
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 1, ease: "easeInOut" }}
               className="mx-auto mb-6 relative w-28 h-28 overflow-hidden rounded-full border-4 border-white/10 shadow-xl backdrop-blur-md bg-white/5"
             >
               <Image src={user.image || "/placeholder.svg"} alt={user.name} fill className="object-cover" />
-            </motion.div>
+            </MotionDiv>
           )}
-          <motion.h1
+          <MotionH1
             className="text-3xl font-semibold text-violet-100 tracking-wide"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
             {user.name || user.username}
-          </motion.h1>
+          </MotionH1>
           {user.bio && (
-            <motion.p
+            <MotionP
               className="mt-3 text-sm text-purple-300 max-w-sm mx-auto bg-white/5 backdrop-blur-sm rounded-md px-3 py-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1 }}
             >
               {user.bio}
-            </motion.p>
+            </MotionP>
           )}
         </header>
 
         <section className="w-full">
           <ul className="space-y-4">
             {user.Link.map((link: any, i: number) => (
-              <motion.li
+              <MotionLi
                 key={link.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -66,13 +64,13 @@ export default function MidnightTemplate({ user }: { user: any }) {
                   <span className="font-medium text-gray-600 group-hover:text-purple-500">{link.title}</span>
                   <span className="block text-xs text-purple-200 mt-1">{link.url}</span>
                 </InteractiveLink>
-              </motion.li>
+              </MotionLi>
             ))}
           </ul>
         </section>
 
         <footer className="mt-14 w-full text-center">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.2 }}
@@ -81,7 +79,7 @@ export default function MidnightTemplate({ user }: { user: any }) {
             <span className="animate-pulse text-violet-400">•</span>
             <span className="tracking-wide">{user.username}</span>
             <span className="animate-pulse text-violet-400">•</span>
-          </motion.div>
+          </MotionDiv>
         </footer>
       </main>
     </div>

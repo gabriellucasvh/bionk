@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, ExternalLink, Link as LinkIcon } from "lucide-react";
 import NeoButton from "@/components/buttons/button-neubrutalism";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { MotionDiv } from "@/components/ui/motion";
 
 const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -28,15 +28,15 @@ const Hero = () => {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden text-white bg-green-900">
-      <motion.div
+      <MotionDiv
         animate={{ scale: [1, 1.2, 1] }}
         transition={{ duration: 5, repeat: Infinity, repeatType: "reverse" }}
         className="absolute inset-0 overflow-hidden"
       >
         <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-green-500 opacity-60 blur-3xl"></div>
         <div className="absolute top-1/2 -left-24 h-96 w-96 rounded-full bg-green-500 opacity-60 blur-3xl"></div>
-      </motion.div>
-
+      </MotionDiv>
+MotionDiMotionDiv
       <div className="container relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-4 py-20 sm:px-6 lg:px-8 mt-20">
         <div
           className={`mb-6 transform bg-lime-400 block -translate-x-1 -translate-y-1 rounded-lg border-2 border-[#222222] px-4 py-1 text-sm font-medium tracking-tight transition-all duration-700 text-black backdrop-blur-xl ${

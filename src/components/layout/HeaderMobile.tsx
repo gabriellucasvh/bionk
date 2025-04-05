@@ -42,7 +42,7 @@ const HeaderMobile = () => {
       </button>
       <AnimatePresence>
         {isOpen && (
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -50,7 +50,7 @@ const HeaderMobile = () => {
             className="absolute top-full mt-1 rounded-xl left-0 w-full flex flex-col p-4 space-y-2 bg-white shadow-md border"
           >
             {HeaderProps.map((menu) => (
-              <motion.div
+              <MotionDiv
                 key={menu.label}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -62,9 +62,9 @@ const HeaderMobile = () => {
                 >
                   {menu.label}
                 </Link>
-              </motion.div>
+              </MotionDiv
             ))}
-            <motion.div
+            <MotionDiv
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -100,8 +100,8 @@ const HeaderMobile = () => {
                   </div>
                 )}
               </div>
-            </motion.div>
-          </motion.div>
+            </MotionDiv>
+          </MotionDiv>
         )}
       </AnimatePresence>
     </nav>

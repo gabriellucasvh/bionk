@@ -1,11 +1,12 @@
 "use client"
 
-import React, { useEffect, useState, Suspense } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { BookCheck } from "lucide-react"
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { BookCheck } from "lucide-react";
+import { MotionLi, MotionUl } from "@/components/ui/motion";
 
 export default function SearchResultsPage() {
   return (
@@ -74,7 +75,7 @@ function SearchResults() {
         ) : results.length === 0 ? (
           <p className="text-center">Nenhum resultado encontrado.</p>
         ) : (
-          <motion.ul
+          <MotionUl
             className="space-y-4"
             variants={listVariants}
             initial="hidden"
@@ -82,7 +83,7 @@ function SearchResults() {
           >
             <AnimatePresence>
               {results.map((guide) => (
-                <motion.li
+                <MotionLi
                   key={guide.slug}
                   variants={itemVariants}
                   initial="hidden"
@@ -105,10 +106,10 @@ function SearchResults() {
                       {guide.type}
                     </span>
                   </Link>
-                </motion.li>
+                </MotionLi>
               ))}
             </AnimatePresence>
-          </motion.ul>
+          </MotionUl>
         )}
         <footer className="mt-6 text-center">
           <Button

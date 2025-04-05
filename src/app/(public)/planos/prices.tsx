@@ -1,7 +1,8 @@
 "use client"
 
+import { MotionButton, MotionP, MotionSpan } from '@/components/ui/motion'
 import { cn } from '@/lib/utils'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { useState } from 'react'
 
@@ -125,7 +126,7 @@ const Pricing = () => {
                     <p className="my-0 mb-6 text-sm text-gray-600">{plan.description}</p>
                     <div className="mb-8 overflow-hidden">
                         <AnimatePresence mode="wait">
-                            <motion.p
+                            <MotionP
                                 key={billingCycle === 'M' ? 'monthly' : 'annual'}
                                 initial={{ y: -50, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -136,15 +137,15 @@ const Pricing = () => {
                                 <span className="text-sm font-medium">
                                     /{billingCycle === 'M' ? 'mês' : 'ano'}
                                 </span>
-                            </motion.p>
+                            </MotionP>
                         </AnimatePresence>
-                        <motion.button
+                        <MotionButton
                             whileTap={{ scale: 0.985 }}
                             onClick={() => window.open(plan.link)}
                             className="mt-8 w-full rounded-lg bg-green-500 py-2 text-sm font-medium text-white hover:bg-green-500/90"
                         >
                             {plan.label}
-                        </motion.button>
+                        </MotionButton>
                     </div>
                     {plan.features.map((feature, idx) => (
                         <div key={idx} className="mb-3 flex items-center gap-2">
@@ -166,7 +167,7 @@ const Pricing = () => {
 }
 
 const BackgroundShift = ({ shiftKey }: { shiftKey: string }) => (
-    <motion.span
+    <MotionSpan
         key={shiftKey}
         layoutId="bg-shift"
         className="absolute inset-0 -z-10 rounded-lg bg-green-500"

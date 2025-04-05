@@ -1,9 +1,7 @@
-'use client'
-
 import Image from "next/image"
-import { motion } from "framer-motion"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
+import { MotionDiv, MotionH1, MotionLi, MotionP } from "@/components/ui/motion"
 
 export default function CleanTemplate({ user }: { user: any }) {
   return (
@@ -13,7 +11,7 @@ export default function CleanTemplate({ user }: { user: any }) {
       <main className="max-w-md w-full flex flex-col items-center">
         <header className="w-full flex flex-col items-center text-center mb-10">
           {user.image && (
-            <motion.div
+            <MotionDiv
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -25,32 +23,32 @@ export default function CleanTemplate({ user }: { user: any }) {
                 fill
                 className="object-cover"
               />
-            </motion.div>
+            </MotionDiv>
           )}
-          <motion.h1
+          <MotionH1
             className="text-3xl font-semibold mt-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
           >
             {user.name || user.username}
-          </motion.h1>
+          </MotionH1>
           {user.bio && (
-            <motion.p
+            <MotionP
               className="mt-2 text-gray-500 max-w-sm mx-auto text-base"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.7 }}
             >
               {user.bio}
-            </motion.p>
+            </MotionP>
           )}
         </header>
 
         <section className="w-full">
           <ul className="space-y-3">
             {user.Link.map((link: any, i: number) => (
-              <motion.li
+              <MotionLi
                 key={link.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -65,20 +63,20 @@ export default function CleanTemplate({ user }: { user: any }) {
                   <span className="font-medium text-gray-900">{link.title}</span>
                   <span className="block text-sm text-gray-500">{link.url}</span>
                 </InteractiveLink>
-              </motion.li>
+              </MotionLi>
             ))}
           </ul>
         </section>
 
         <footer className="mt-12">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
             className="inline-block px-6 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm"
           >
             {user.username}
-          </motion.div>
+          </MotionDiv>
         </footer>
       </main>
     </div>

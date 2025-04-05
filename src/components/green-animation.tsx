@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
+"use client"
 import { useEffect } from "react";
+import { MotionDiv, MotionPath } from "./ui/motion";
 
 interface FloatingElementProps {
   size: number;
@@ -22,7 +23,7 @@ const FloatingElement = ({
   className = "",
   children
 }: FloatingElementProps) => (
-  <motion.div
+  <MotionDiv
     className={`absolute ${className}`}
     style={{ width: size, height: size }}
     initial={{ 
@@ -47,15 +48,10 @@ const FloatingElement = ({
     }}
   >
     {children}
-  </motion.div>
+  </MotionDiv>
 );
 
 
-
-// Botão animado de cadastro
-
-
-// Título animado
 
 
 // Fundo de partículas
@@ -63,7 +59,7 @@ const ParticleBackground = () => {
   return (
     <div className="absolute inset-0 overflow-hidden">
       {Array.from({ length: 40 }).map((_, i) => (
-        <motion.div
+        <MotionDiv
           key={i}
           className="absolute rounded-full bg-green-500"
           style={{
@@ -116,7 +112,7 @@ const HexagonPattern = () => (
 // Efeito de linha conectando elementos
 const ConnectingLines = () => (
   <svg className="absolute inset-0 w-full h-full z-0 opacity-30">
-    <motion.path
+    <MotionPath
       d="M200,100 Q300,200 400,150 T600,300"
       stroke="rgba(74, 222, 128, 0.5)"
       strokeWidth="2"
@@ -134,7 +130,7 @@ const ConnectingLines = () => (
         ease: "linear"
       }}
     />
-    <motion.path
+    <MotionPath
       d="M100,300 Q200,200 300,250 T500,150"
       stroke="rgba(134, 239, 172, 0.5)"
       strokeWidth="2"
@@ -199,12 +195,6 @@ const GreenAnimation = () => {
         <div className="w-full h-full rounded-full bg-green-300/10 backdrop-blur-sm border border-green-100/20 shadow-lg" />
       </FloatingElement>
       
-      {/* Título */}
-
-      
-      {/* Campos de formulário animados */}
-
-      {/* Botão de cadastro */}
     </div>
   );
 };

@@ -1,9 +1,7 @@
-'use client'
-
 import Image from "next/image"
-import { motion } from "framer-motion"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
+import { MotionDiv, MotionH1, MotionLi, MotionP } from "@/components/ui/motion"
 
 export default function LuxuryTemplate({ user }: { user: any }) {
   return (
@@ -13,39 +11,39 @@ export default function LuxuryTemplate({ user }: { user: any }) {
       <main className="max-w-md mx-auto flex flex-col items-center">
         <header className="w-full text-center mb-10">
           {user.image && (
-            <motion.div
+            <MotionDiv
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.9, ease: "easeOut" }}
               className="mx-auto mb-6 relative w-28 h-28 overflow-hidden rounded-full border-[3px] border-[#d4af37] shadow-[0_0_30px_rgba(212,175,55,0.5)]"
             >
               <Image src={user.image || "/placeholder.svg"} alt={user.name} fill className="object-cover" />
-            </motion.div>
+            </MotionDiv>
           )}
-          <motion.h1
+          <MotionH1
             className="text-3xl font-semibold tracking-wide text-[#f5f3ef] drop-shadow-md"
             initial={{ y: -12, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
             {user.name || user.username}
-          </motion.h1>
+          </MotionH1>
           {user.bio && (
-            <motion.p
+            <MotionP
               className="mt-2 text-sm text-[#e0d8cb] max-w-sm mx-auto italic"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1.1 }}
             >
               {user.bio}
-            </motion.p>
+            </MotionP>
           )}
         </header>
 
         <section className="w-full">
           <ul className="space-y-4">
             {user.Link.map((link: any, i: number) => (
-              <motion.li
+              <MotionLi
                 key={link.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -60,20 +58,20 @@ export default function LuxuryTemplate({ user }: { user: any }) {
                   <span className="font-semibold text-yellow-500">{link.title}</span>
                   <span className="block text-xs text-[#ccc6bc] mt-1">{link.url}</span>
                 </InteractiveLink>
-              </motion.li>
+              </MotionLi>
             ))}
           </ul>
         </section>
 
         <footer className="mt-14 text-center w-full">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.5 }}
             className="inline-block px-6 py-2 border border-[#d4af37] text-[#f5f3ef] bg-[#d4af37]/10 backdrop-blur-xl rounded-lg font-medium tracking-wide shadow-[0_0_15px_rgba(212,175,55,0.4)]"
           >
             ✨ {user.username} ✨
-          </motion.div>
+          </MotionDiv>
         </footer>
       </main>
     </div>
