@@ -98,7 +98,7 @@ export default function TemplateSettings() {
                                 <div
                                     key={template.id}
                                     onClick={() => setSelectedTemplate(template.id)}
-                                    className={`cursor-pointer p-2 rounded-lg border-2 ${selectedTemplate === template.id ? "border-blue-500" : "border-gray-700"
+                                    className={`cursor-pointer p-2 rounded-lg border-2 ${selectedTemplate === template.id ? "border-green-500" : "border-gray-300"
                                         }`}
                                 >
                                     <Image
