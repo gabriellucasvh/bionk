@@ -23,16 +23,16 @@ const links = [
     icon: <Link2 className="h-4 w-4" />,
   },
   {
-    key: "analytics",
-    href: "/dashboard/analises",
-    label: "Análises",
-    icon: <BarChart3 className="h-4 w-4" />,
-  },
-  {
     key: "personalization",
     href: "/dashboard/personalizar",
     label: "Personalizar",
     icon: <Paintbrush className="h-4 w-4" />,
+  },
+  {
+    key: "analytics",
+    href: "/dashboard/analises",
+    label: "Análises",
+    icon: <BarChart3 className="h-4 w-4" />,
   },
   {
     key: "settings",

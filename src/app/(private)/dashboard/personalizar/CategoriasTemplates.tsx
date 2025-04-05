@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 const categories = {
     minimalista: [
@@ -64,25 +65,33 @@ export default function TemplateSettings() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white p-6">
-            <h1 className="text-2xl font-bold text-center mb-4">Escolha um Template</h1>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div>
+            <div className="flex flex-wrap gap-2 mb-10">
                 {Object.keys(categories).map((category) => (
-                    <button
+                    <Button
+                        variant="ghost"
                         key={category}
                         onClick={() => setSelectedCategory(category)}
-                        className={`p-3 rounded-lg text-center ${selectedCategory === category ? "bg-blue-500" : "bg-gray-700"
+                        className={`border-2 px-6 py-5 rounded-lg font-medium text-sm hover:bg-green-950 hover:text-white hover:border-lime-500 transition-colors ${selectedCategory === category ? "bg-green-950 text-white border-lime-500" : ""
                             }`}
                     >
-                        {category.replace("-", " ").toUpperCase()}
-                    </button>
+                        {category.replace("/-/g", " ").toUpperCase()}
+                    </Button>
                 ))}
             </div>
 
             {selectedCategory && (
                 <div className="mt-4">
-                    <h2 className="text-xl font-semibold mb-3">Templates Disponíveis</h2>
+                    <div className="flex items-center gap-4 mb-10">
+                        <h2 className="text-xl font-semibold">Templates Disponíveis</h2>
+                        <Button
+                            onClick={handleSave}
+                            className=" py-2 rounded-lg text-white"
+                            disabled={!selectedTemplate}
+                        >
+                            Salvar Template
+                        </Button>
+                    </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {selectedCategory &&
                             categories[selectedCategory as keyof typeof categories]?.map((template) => (
@@ -106,13 +115,6 @@ export default function TemplateSettings() {
 
                     </div>
 
-                    <button
-                        onClick={handleSave}
-                        className="mt-6 w-full bg-green-500 py-2 rounded-lg text-lg"
-                        disabled={!selectedTemplate}
-                    >
-                        Salvar Template
-                    </button>
                 </div>
             )}
         </div>
