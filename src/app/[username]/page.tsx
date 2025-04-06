@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { UserProfile } from "@/types/user-profile";
 
 interface PageProps {
   params: { username: string };
