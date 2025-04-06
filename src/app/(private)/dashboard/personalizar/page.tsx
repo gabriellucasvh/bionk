@@ -8,14 +8,13 @@ export const metadata: Metadata = {
 };
 
 export default function Perfil() {
-    const reload = () => window.location.reload();
     return (
         <>
             <Sidebar />
             <main className="flex ml-0 md:ml-64 mb-20 md:mb-0 h-screen overflow-y-auto">
                 <PersonalizarClient />
                 <iframe className="w-1/2" src="http://localhost:3000/gabriellucas"></iframe>
-                
+
             </main>
         </>
     );
