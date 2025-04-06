@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import LoadingSpinner from "../buttons/LoadingSpinner";
+import { MotionDiv } from "../ui/motion";
 
 const HeaderProps = [
   { label: "Menu", href: "/" },
@@ -62,7 +63,7 @@ const HeaderMobile = () => {
                 >
                   {menu.label}
                 </Link>
-              </MotionDiv
+              </MotionDiv>
             ))}
             <MotionDiv
               initial={{ opacity: 0, y: 10 }}

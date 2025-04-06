@@ -36,7 +36,6 @@ const Hero = () => {
         <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-green-500 opacity-60 blur-3xl"></div>
         <div className="absolute top-1/2 -left-24 h-96 w-96 rounded-full bg-green-500 opacity-60 blur-3xl"></div>
       </MotionDiv>
-MotionDiMotionDiv
       <div className="container relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-4 py-20 sm:px-6 lg:px-8 mt-20">
         <div
           className={`mb-6 transform bg-lime-400 block -translate-x-1 -translate-y-1 rounded-lg border-2 border-[#222222] px-4 py-1 text-sm font-medium tracking-tight transition-all duration-700 text-black backdrop-blur-xl ${
