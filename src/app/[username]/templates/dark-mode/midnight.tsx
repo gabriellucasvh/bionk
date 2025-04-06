@@ -2,8 +2,9 @@ import Image from "next/image"
 import { MotionH1, MotionP, MotionDiv, MotionLi } from "@/components/ui/motion"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
+import { TemplateComponentProps } from "@/types/user-profile"
 
-export default function MidnightTemplate({ user }: { user: any }) {
+export default function MidnightTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0a23] via-[#1a1a40] to-[#0f0f2d] py-10 px-4 text-white relative overflow-hidden">
       <ProfileViewTracker userId={user.id} />
@@ -23,7 +24,7 @@ export default function MidnightTemplate({ user }: { user: any }) {
               transition={{ duration: 1, ease: "easeInOut" }}
               className="mx-auto mb-6 relative w-28 h-28 overflow-hidden rounded-full border-4 border-white/10 shadow-xl backdrop-blur-md bg-white/5"
             >
-              <Image src={user.image || "/placeholder.svg"} alt={user.name} fill className="object-cover" />
+              <Image src={user.image || "/placeholder.svg"} alt={user.name || user.username} fill className="object-cover" />
             </MotionDiv>
           )}
           <MotionH1
@@ -48,7 +49,7 @@ export default function MidnightTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-4">
-            {user.Link.map((link: any, i: number) => (
+            {user.Link.map((link, i) => (
               <MotionLi
                 key={link.id}
                 initial={{ opacity: 0, y: 20 }}

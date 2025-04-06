@@ -2,8 +2,9 @@ import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { MotionDiv, MotionH1, MotionLi, MotionP } from "@/components/ui/motion"
+import { TemplateComponentProps } from "@/types/user-profile"
 
-export default function ElegantTemplate({ user }: { user: any }) {
+export default function ElegantTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] to-[#e2d1c3] text-neutral-800 py-12 px-4">
       <ProfileViewTracker userId={user.id} />
@@ -17,7 +18,7 @@ export default function ElegantTemplate({ user }: { user: any }) {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="mx-auto mb-6 relative w-28 h-28 overflow-hidden rounded-full border-4 border-neutral-300 shadow-[0_5px_30px_rgba(0,0,0,0.1)] bg-white"
             >
-              <Image src={user.image || "/placeholder.svg"} alt={user.name} fill className="object-cover" />
+              <Image src={user.image || "/placeholder.svg"} alt={user.name || user.username} fill className="object-cover" />
             </MotionDiv>
           )}
           <MotionH1
@@ -42,7 +43,7 @@ export default function ElegantTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-4">
-            {user.Link.map((link: any, i: number) => (
+            {user.Link.map((link, i) => (
               <MotionLi
                 key={link.id}
                 initial={{ opacity: 0, y: 15 }}

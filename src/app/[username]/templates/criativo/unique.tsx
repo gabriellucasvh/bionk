@@ -1,8 +1,9 @@
 import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
+import { TemplateComponentProps } from "@/types/user-profile"
 
-export default function UniqueTemplate({ user }: { user: any }) {
+export default function UniqueTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-[#0f172a] py-8 px-4 overflow-hidden relative">
       {/* Decorative background elements */}
@@ -39,7 +40,7 @@ export default function UniqueTemplate({ user }: { user: any }) {
               <div className="relative w-28 h-28 rounded-lg overflow-hidden transform -rotate-6 group-hover:rotate-6 transition-all duration-700">
                 <Image
                   src={user.image || "/placeholder.svg"}
-                  alt={user.name}
+                  alt={user.name || user.username}
                   fill
                   className="object-cover mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-700"
                 />
@@ -61,7 +62,7 @@ export default function UniqueTemplate({ user }: { user: any }) {
 
         <section className="w-full perspective-[1000px]">
           <ul className="space-y-5">
-            {user.Link.map((link: any, index: number) => (
+            {user.Link.map((link, index) => (
               <li
                 key={link.id}
                 className="w-full transform-gpu hover:translate-z-0 transition-all duration-500"
@@ -79,7 +80,7 @@ export default function UniqueTemplate({ user }: { user: any }) {
                   <div className="flex items-center">
                     <div className="w-2 h-2 rounded-full bg-[#64ffda] mr-3"></div>
                     <div>
-                      <span className="font-medium text-neutral-700 group-hover:text-white">{link.title}</span>
+                      <span className="font-medium text-neutral-300 group-hover:text-white">{link.title}</span>
                       <span className="block text-sm text-[#94a3b8]">{link.url}</span>
                     </div>
                   </div>

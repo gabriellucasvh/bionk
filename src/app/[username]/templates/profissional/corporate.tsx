@@ -2,7 +2,7 @@ import Image from "next/image";
 import InteractiveLink from "@/components/InteractiveLink";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
 
-export default function CorporateTemplate({ user }: { user: any }) {
+export default function CorporateTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 py-8 px-4 text-gray-900">
       <ProfileViewTracker userId={user.id} />
@@ -10,7 +10,7 @@ export default function CorporateTemplate({ user }: { user: any }) {
         <header className="w-full text-center mb-8">
           {user.image && (
             <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full border-4 border-gray-400 shadow-md">
-              <Image src={user.image} alt={user.name} fill className="object-cover" />
+              <Image src={user.image} alt={user.name || user.username} fill className="object-cover" />
             </div>
           )}
           <h1 className="text-2xl font-semibold text-gray-900 tracking-wide">
@@ -25,7 +25,7 @@ export default function CorporateTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-3">
-            {user.Link.map((link: any) => (
+            {user.Link.map((link) => (
               <li key={link.id} className="w-full">
                 <InteractiveLink
                   href={link.url}

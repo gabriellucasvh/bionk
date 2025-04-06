@@ -1,8 +1,9 @@
 import Image from "next/image";
 import InteractiveLink from "@/components/InteractiveLink";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
+import { TemplateComponentProps } from "@/types/user-profile";
 
-export default function NeonTemplate({ user }: { user: any }) {
+export default function NeonTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-800 to-pink-900 py-8 px-4 text-white overflow-hidden relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,0,255,0.2)_0%,rgba(0,0,0,0)_80%)] pointer-events-none"></div>
@@ -11,7 +12,7 @@ export default function NeonTemplate({ user }: { user: any }) {
         <header className="w-full text-center mb-8">
           {user.image && (
             <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full border-4 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,1)] hover:shadow-[0_0_40px_rgba(59,130,246,1)] transition-all duration-300">
-              <Image src={user.image} alt={user.name} fill className="object-cover" />
+              <Image src={user.image} alt={user.name || user.username} fill className="object-cover" />
             </div>
           )}
           <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_15px_rgba(255,255,255,1)] animate-pulse">
@@ -22,7 +23,7 @@ export default function NeonTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-4">
-            {user.Link.map((link: any) => (
+            {user.Link.map((link) => (
               <li key={link.id} className="w-full transform transition-transform hover:scale-110 hover:rotate-1">
                 <InteractiveLink
                   href={link.url}

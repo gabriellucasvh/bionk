@@ -1,8 +1,9 @@
 import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
+import { TemplateComponentProps } from "@/types/user-profile"
 
-export default function ArtisticTemplate({ user }: { user: any }) {
+export default function ArtisticTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-[#f5f0e8] py-8 px-4 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzAgMEMxMy40IDAgMCAxMy40IDAgMzBzMTMuNCAzMCAzMCAzMCA0My40LTEzLjQgNDMuNC0zMFM0Ni42IDAgMzAgMHptMCA1MmMtMTIuMiAwLTIyLTkuOC0yMi0yMnM5LjgtMjIgMjItMjIgMjIgOS44IDIyIDIyLTkuOCAyMi0yMiAyMnoiIGZpbGw9IiMzMzMiLz48L3N2Zz4=')]">
       <ProfileViewTracker userId={user.id} />
@@ -15,7 +16,7 @@ export default function ArtisticTemplate({ user }: { user: any }) {
               <div className="relative w-28 h-28 overflow-hidden rounded-full border-4 border-[#f5f0e8]">
                 <Image
                   src={user.image || "/placeholder.svg"}
-                  alt={user.name}
+                  alt={user.name || user.username}
                   fill
                   className="object-cover sepia-[0.2]"
                 />
@@ -36,7 +37,7 @@ export default function ArtisticTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-4">
-            {user.Link.map((link: any, index: number) => (
+            {user.Link.map((link, index) => (
               <li key={link.id} className="w-full group">
                 <div className="relative">
                   <div

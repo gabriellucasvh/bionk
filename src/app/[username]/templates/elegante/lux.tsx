@@ -2,8 +2,9 @@ import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { MotionDiv, MotionH1, MotionLi, MotionP } from "@/components/ui/motion"
+import { TemplateComponentProps } from "@/types/user-profile"
 
-export default function LuxuryTemplate({ user }: { user: any }) {
+export default function LuxuryTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-[#f5f3ef] py-12 px-4">
       <ProfileViewTracker userId={user.id} />
@@ -17,7 +18,7 @@ export default function LuxuryTemplate({ user }: { user: any }) {
               transition={{ duration: 0.9, ease: "easeOut" }}
               className="mx-auto mb-6 relative w-28 h-28 overflow-hidden rounded-full border-[3px] border-[#d4af37] shadow-[0_0_30px_rgba(212,175,55,0.5)]"
             >
-              <Image src={user.image || "/placeholder.svg"} alt={user.name} fill className="object-cover" />
+              <Image src={user.image || "/placeholder.svg"} alt={user.name || user.username} fill className="object-cover" />
             </MotionDiv>
           )}
           <MotionH1
@@ -42,7 +43,7 @@ export default function LuxuryTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-4">
-            {user.Link.map((link: any, i: number) => (
+            {user.Link.map((link, i) => (
               <MotionLi
                 key={link.id}
                 initial={{ opacity: 0, y: 20 }}

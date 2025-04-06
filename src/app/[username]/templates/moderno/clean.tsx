@@ -2,8 +2,9 @@ import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { MotionDiv, MotionH1, MotionLi, MotionP } from "@/components/ui/motion"
+import { TemplateComponentProps } from "@/types/user-profile"
 
-export default function CleanTemplate({ user }: { user: any }) {
+export default function CleanTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-white text-gray-900 py-12 px-6 flex justify-center">
       <ProfileViewTracker userId={user.id} />
@@ -19,7 +20,7 @@ export default function CleanTemplate({ user }: { user: any }) {
             >
               <Image
                 src={user.image || "/placeholder.svg"}
-                alt={user.name}
+                alt={user.name || user.username}
                 fill
                 className="object-cover"
               />
@@ -47,7 +48,7 @@ export default function CleanTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-3">
-            {user.Link.map((link: any, i: number) => (
+            {user.Link.map((link, i) => (
               <MotionLi
                 key={link.id}
                 initial={{ opacity: 0, y: 10 }}

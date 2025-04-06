@@ -2,8 +2,9 @@ import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { MotionDiv, MotionH1, MotionLi, MotionP, MotionSpan } from "@/components/ui/motion"
+import { TemplateComponentProps } from "@/types/user-profile"
 
-export default function PhotographyTemplate({ user }: { user: any }) {
+export default function PhotographyTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 text-white py-12 px-4">
       <ProfileViewTracker userId={user.id} />
@@ -19,7 +20,7 @@ export default function PhotographyTemplate({ user }: { user: any }) {
             >
               <Image
                 src={user.image || "/placeholder.svg"}
-                alt={user.name}
+                alt={user.name || user.username}
                 fill
                 className="object-cover grayscale hover:grayscale-0 transition-all duration-500"
               />
@@ -47,7 +48,7 @@ export default function PhotographyTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-4">
-            {user.Link.map((link: any, i: number) => (
+            {user.Link.map((link, i) => (
               <MotionLi
                 key={link.id}
                 initial={{ opacity: 0, y: 10 }}

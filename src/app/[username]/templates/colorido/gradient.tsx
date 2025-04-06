@@ -1,8 +1,9 @@
 import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
+import { TemplateComponentProps } from "@/types/user-profile"
 
-export default function GradientTemplate({ user }: { user: any }) {
+export default function GradientTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-400 via-rose-400 to-lime-400 py-8 px-4">
       <ProfileViewTracker userId={user.id} />
@@ -11,7 +12,7 @@ export default function GradientTemplate({ user }: { user: any }) {
           {user.image && (
             <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full p-1 bg-gradient-to-r from-amber-400 via-violet-500 to-indigo-500 shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="w-full h-full rounded-full overflow-hidden">
-                <Image src={user.image || "/placeholder.svg"} alt={user.name} fill className="object-cover" />
+                <Image src={user.image || "/placeholder.svg"} alt={user.name || user.username} fill className="object-cover" />
               </div>
             </div>
           )}
@@ -27,7 +28,7 @@ export default function GradientTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-4">
-            {user.Link.map((link: any, index: number) => {
+            {user.Link.map((link, index) => {
               // Create different gradient directions for each link
               const gradientDirections = [
                 "bg-gradient-to-r from-green-300 to-purple-400",

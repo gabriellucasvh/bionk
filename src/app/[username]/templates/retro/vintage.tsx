@@ -1,8 +1,9 @@
 import Image from "next/image";
 import InteractiveLink from "@/components/InteractiveLink";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
+import { TemplateComponentProps } from "@/types/user-profile";
 
-export default function VintageTemplate({ user }: { user: any }) {
+export default function VintageTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-200 to-rose-300 py-8 px-4 text-amber-900 font-serif">
       <ProfileViewTracker userId={user.id} />
@@ -10,7 +11,12 @@ export default function VintageTemplate({ user }: { user: any }) {
         <header className="w-full text-center mb-8">
           {user.image && (
             <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full border-4 border-amber-600 shadow-xl">
-              <Image src={user.image} alt={user.name} fill className="object-cover sepia" />
+              <Image 
+                src={user.image} 
+                alt={user.name || user.username || "User profile"} // Correção aqui
+                fill 
+                className="object-cover sepia" 
+              />
             </div>
           )}
           <h1 className="text-3xl font-bold text-amber-900 tracking-wide drop-shadow-md">
@@ -25,7 +31,7 @@ export default function VintageTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-3">
-            {user.Link.map((link: any) => (
+            {user.Link.map((link) => (
               <li key={link.id} className="w-full">
                 <InteractiveLink
                   href={link.url}

@@ -1,8 +1,9 @@
 import Image from "next/image";
 import InteractiveLink from "@/components/InteractiveLink";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
+import { TemplateComponentProps } from "@/types/user-profile";
 
-export default function CyberpunkTemplate({ user }: { user: any }) {
+export default function CyberpunkTemplate({ user }: TemplateComponentProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-800 to-blue-700 py-8 px-4 text-lime-300">
       <ProfileViewTracker userId={user.id} />
@@ -10,7 +11,7 @@ export default function CyberpunkTemplate({ user }: { user: any }) {
         <header className="w-full text-center mb-8">
           {user.image && (
             <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full border-4 border-pink-500 shadow-[0_0_20px_rgba(219,39,119,0.8)]">
-              <Image src={user.image} alt={user.name} fill className="object-cover" />
+              <Image src={user.image} alt={user.name || user.username} fill className="object-cover" />
             </div>
           )}
           <h1 className="text-2xl font-bold text-lime-300 tracking-widest drop-shadow-[0_0_8px_rgba(163,230,53,0.8)]">
@@ -25,7 +26,7 @@ export default function CyberpunkTemplate({ user }: { user: any }) {
 
         <section className="w-full">
           <ul className="space-y-4">
-            {user.Link.map((link: any) => (
+            {user.Link.map((link) => (
               <li key={link.id} className="w-full transform transition-transform hover:scale-105 hover:rotate-1">
                 <InteractiveLink
                   href={link.url}
