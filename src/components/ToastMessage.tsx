@@ -1,8 +1,7 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { X } from "lucide-react";
 import { MotionDiv, MotionButton } from "./ui/motion";
-;
 
 type ToastProps = {
   message: string;
@@ -17,17 +16,9 @@ const variantStyles = {
 };
 
 export default function Toast({ message, variant, onClose }: ToastProps) {
-  const [progress, setProgress] = useState(100);
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 30);
-
     const timeout = setTimeout(onClose, 5000);
-
     return () => {
-      clearInterval(interval);
       clearTimeout(timeout);
     };
   }, [onClose]);
