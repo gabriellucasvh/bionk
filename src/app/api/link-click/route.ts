@@ -8,20 +8,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "ID do link é obrigatório e deve ser um número" }, { status: 400 });
     }
 
-    // Executa as duas operações em uma transação para garantir consistência
-    const [linkClick, updatedLink] = await prisma.$transaction([
-      // 1. Cria o registro de clique em LinkClick
+    // Executa as operações em transação (agora capturando apenas o updatedLink)
+    const [, updatedLink] = await prisma.$transaction([
       prisma.linkClick.create({
         data: { linkId: Number(linkId) },
       }),
-      // 2. Incrementa o campo clicks no Link
       prisma.link.update({
         where: { id: Number(linkId) },
         data: { clicks: { increment: 1 } },
       }),
     ]);
 
-    // Retorna o link atualizado com o novo valor de clicks
     return NextResponse.json(updatedLink);
   } catch (error) {
     console.error("Erro ao registrar clique:", error);
