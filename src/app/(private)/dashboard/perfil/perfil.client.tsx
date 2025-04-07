@@ -37,12 +37,12 @@ const PerfilClient = () => {
       const res = await fetch(`/api/profile/${session.user.id}`);
       const { name = "", username = "", bio = "", profileUrl } = await res.json();
       setProfile({ name, username, bio: bio || "" });
-      setOriginalProfile({ name, username, bio: bio || "", });
+      setOriginalProfile({ name, username, bio: bio || "" });
       setProfilePreview(profileUrl || session?.user?.image || "/person.png");
       setIsProfileLoading(false);
     };
     fetchProfile();
-  }, [session?.user?.id]);
+  }, [session?.user?.id, session?.user?.image]); // Added session?.user?.image to dependencies
 
   useEffect(() => {
     if (!message) return;
@@ -73,9 +73,8 @@ const PerfilClient = () => {
       setOriginalProfile(profile);
     } catch (error) {
       console.error("Erro ao atualizar o perfil:", error);
-      setMessage(`Erro: ${
-        error instanceof Error ? error.message : "Ocorreu um problema ao atualizar o perfil"
-      }`);
+      setMessage(`Erro: ${error instanceof Error ? error.message : "Ocorreu um problema ao atualizar o perfil"
+        }`);
     } finally {
       setLoading(false);
     }
@@ -99,9 +98,8 @@ const PerfilClient = () => {
       if (data.url) setProfilePreview(data.url);
     } catch (error) {
       console.error(`Erro ao fazer upload da ${type}:`, error);
-      setMessage(`Erro: ${
-        error instanceof Error ? error.message : "Ocorreu um problema ao fazer upload"
-      }`);
+      setMessage(`Erro: ${error instanceof Error ? error.message : "Ocorreu um problema ao fazer upload"
+        }`);
     }
   };
 
