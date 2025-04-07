@@ -1,6 +1,7 @@
 import Image from "next/image";
 import InteractiveLink from "@/components/InteractiveLink";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
+import { TemplateComponentProps } from "@/types/user-profile";
 
 export default function CorporateTemplate({ user }: TemplateComponentProps) {
   return (
