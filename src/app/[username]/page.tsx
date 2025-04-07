@@ -1,15 +1,21 @@
+// src/app/[username]/page.tsx
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
+import type { ComponentType } from "react";
+
+type UserWithLinks = Prisma.UserGetPayload<{
+  include: { Link: { where: { active: true }; orderBy: { order: "asc" } } };
+}>;
 
 interface PageProps {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }
 
 export default async function UserPage({ params }: PageProps) {
-  const resolvedParams = await params;
-  const { username } = resolvedParams;
+  const { username } = await params;
 
-  const user = await prisma.user.findUnique({
+  const user = (await prisma.user.findUnique({
     where: { username },
     include: {
       Link: {
@@ -17,21 +23,34 @@ export default async function UserPage({ params }: PageProps) {
         orderBy: { order: "asc" },
       },
     },
-  });
+  })) as UserWithLinks | null;
 
   if (!user) notFound();
 
-  // Caminho base dos templates
-  const templateCategory = user.templateCategory || "minimalista" ; // Fallback para categoria padrão
-  const templateName = user.template || "default"; // Fallback para template padrão
+  const category = user.templateCategory ?? "minimalista";
+  const name = user.template ?? "default";
 
-  let TemplateComponent;
+  let TemplateComponent: ComponentType<{ user: UserWithLinks }>;
+
   try {
-    TemplateComponent = (await import(`@/app/[username]/templates/${templateCategory}/${templateName}.tsx`)).default;
-  } catch (error) {
-    console.error(`Erro ao carregar template: ${templateCategory}/${templateName}`, error);
-    TemplateComponent = (await import("@/app/[username]/templates/minimalista/default")).default;
+    const mod = await import(
+      `@/app/[username]/templates/${category}/${name}.tsx`
+    );
+    TemplateComponent = mod.default as ComponentType<{
+      user: UserWithLinks;
+    }>;
+  } catch {
+    const mod = await import(
+      `@/app/[username]/templates/minimalista/default`
+    );
+    TemplateComponent = mod.default as ComponentType<{
+      user: UserWithLinks;
+    }>;
   }
 
-  return <TemplateComponent user={user} />;
+  return (
+    <main className="bg-gray-900 text-white min-h-screen p-6">
+      <TemplateComponent user={user} />
+    </main>
+  );
 }
