@@ -89,10 +89,14 @@ const ICON_MAP = [
   { keyword: "youtube", src: "/icons/youtube.svg", alt: "Youtube" },
 ];
 
+
+
 const getIconForUrl = (url: string): JSX.Element => {
   try {
     const { hostname } = new URL(url);
-    const mapping = ICON_MAP.find(({ keyword }) => hostname.includes(keyword));
+    const mapping = ICON_MAP.find(({ keyword }) =>
+      hostname.includes(keyword)
+    );
     if (mapping) {
       return (
         <Image
@@ -104,8 +108,8 @@ const getIconForUrl = (url: string): JSX.Element => {
         />
       );
     }
-  } catch (error) {
-    console.error("URL inválida:", url);
+  } catch (err) {
+    console.error("URL inválida:", url, err);
   }
   return (
     <Image
@@ -121,14 +125,20 @@ const getIconForUrl = (url: string): JSX.Element => {
 interface SortableItemProps {
   id: number;
   children: (props: {
-    listeners: any;
+    listeners: ReturnType<typeof useSortable>["listeners"];
     attributes: React.HTMLAttributes<HTMLDivElement>;
   }) => React.ReactNode;
 }
 
 const SortableItem = ({ id, children }: SortableItemProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -145,9 +155,9 @@ const SortableItem = ({ id, children }: SortableItemProps) => {
 const LinksClient = () => {
   const { data: session } = useSession();
   const [links, setLinks] = useState<LinkItem[]>([]);
-  const [isAdding, setIsAdding] = useState<boolean>(false);
-  const [newTitle, setNewTitle] = useState<string>("");
-  const [newUrl, setNewUrl] = useState<string>("");
+  const [isAdding, setIsAdding] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newUrl, setNewUrl] = useState("");
   const [isProfileLoading, setIsProfileLoading] = useState(true);
 
   const { data: swrData, mutate: mutateLinks } = useSWR<{ links: LinkItem[] }>(
@@ -158,13 +168,13 @@ const LinksClient = () => {
 
   useEffect(() => {
     if (swrData?.links) {
-      const sortedLinks = [...swrData.links].sort((a, b) => a.order - b.order);
-      setLinks(sortedLinks);
+      const sorted = [...swrData.links].sort((a, b) => a.order - b.order);
+      setLinks(sorted);
       setIsProfileLoading(false);
     }
   }, [swrData]);
 
-  const handleClickLink = async (id: number, url: string) => {
+  const handleClickLink = async (id: number ) => {
     try {
       const response = await fetch(`/api/link-click`, {
         method: "POST",
@@ -178,21 +188,21 @@ const LinksClient = () => {
             link.id === id ? { ...link, clicks: link.clicks + 1 } : link
           )
         );
-        window.open(url, "_blank");
       }
-    } catch (error) {
-      console.error("Erro ao registrar clique:", error);
+    } catch (err) {
+      console.error("Erro ao registrar clique:", err);
     }
   };
 
-  const isValidUrl = (url: string) => /^(https?:\/\/)?([^\s.]+\.[^\s]{2,})$/.test(url);
+  const isValidUrl = (url: string) =>
+    /^(https?:\/\/)?([^\s.]+\.[^\s]{2,})$/.test(url);
 
   const handleAddNewLink = async () => {
-    let formattedUrl = newUrl.trim();
-    if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
-      formattedUrl = "https://" + formattedUrl;
+    let formatted = newUrl.trim();
+    if (!/^https?:\/\//.test(formatted)) {
+      formatted = "https://" + formatted;
     }
-    if (!isValidUrl(formattedUrl)) return;
+    if (!isValidUrl(formatted)) return;
 
     const res = await fetch(`/api/links`, {
       method: "POST",
@@ -200,12 +210,11 @@ const LinksClient = () => {
       body: JSON.stringify({
         userId: session?.user?.id,
         title: newTitle,
-        url: formattedUrl,
+        url: formatted,
       }),
     });
 
     if (res.ok) {
-      // Forçar revalidação imediata e limpar formulário
       await mutateLinks();
       setNewTitle("");
       setNewUrl("");
@@ -215,7 +224,9 @@ const LinksClient = () => {
 
   const toggleActive = async (id: number, isActive: boolean) => {
     setLinks((prev) =>
-      prev.map((link) => (link.id === id ? { ...link, active: isActive } : link))
+      prev.map((link) =>
+        link.id === id ? { ...link, active: isActive } : link
+      )
     );
     await fetch(`/api/links/${id}`, {
       method: "PUT",
@@ -232,32 +243,40 @@ const LinksClient = () => {
     await fetch(`/api/links/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sensitive: updated.find((l) => l.id === id)?.sensitive }),
+      body: JSON.stringify({
+        sensitive: updated.find((l) => l.id === id)?.sensitive,
+      }),
     });
   };
 
   const startEditing = (id: number) => {
     setLinks((prev) =>
-      prev.map((link) => (link.id === id ? { ...link, isEditing: true } : link))
+      prev.map((link) =>
+        link.id === id ? { ...link, isEditing: true } : link
+      )
     );
   };
 
-  const saveEditing = async (id: number, newTitle: string, newUrl: string) => {
+  const saveEditing = async (id: number, title: string, url: string) => {
     setLinks((prev) =>
       prev.map((link) =>
-        link.id === id ? { ...link, title: newTitle, url: newUrl, isEditing: false } : link
+        link.id === id
+          ? { ...link, title, url, isEditing: false }
+          : link
       )
     );
     await fetch(`/api/links/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newTitle, url: newUrl }),
+      body: JSON.stringify({ title, url }),
     });
   };
 
   const cancelEditing = (id: number) => {
     setLinks((prev) =>
-      prev.map((link) => (link.id === id ? { ...link, isEditing: false } : link))
+      prev.map((link) =>
+        link.id === id ? { ...link, isEditing: false } : link
+      )
     );
   };
 
@@ -273,33 +292,25 @@ const LinksClient = () => {
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
-      const oldIndex = links.findIndex((link) => link.id === active.id);
-      const newIndex = links.findIndex((link) => link.id === over?.id);
-      const newLinks = arrayMove(links, oldIndex, newIndex);
+      const oldIndex = links.findIndex((l) => l.id === active.id);
+      const newIndex = links.findIndex((l) => l.id === over?.id);
+      const newOrder = arrayMove(links, oldIndex, newIndex);
+      setLinks(newOrder);
 
-      // Atualizar ordem localmente
-      setLinks(newLinks);
-
-      // Enviar nova ordem para API
       await fetch(`/api/links/reorder`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: session?.user?.id,
-          order: newLinks.map((l) => l.id),
+          order: newOrder.map((l) => l.id),
         }),
       });
 
-      // Revalidar dados
       await mutateLinks();
     }
   };
 
-  if (isProfileLoading) {
-    return (
-      <LoadingPage />
-    );
-  }
+  if (isProfileLoading) return <LoadingPage />;
 
   return (
     <section className="w-full p-4 space-y-4 max-h-screen">
@@ -312,8 +323,8 @@ const LinksClient = () => {
       </header>
 
       {isAdding && (
-        <div className="p-4 border rounded-lg">
-          <div className="mb-2">
+        <section className="p-4 border rounded-lg space-y-4">
+          <div>
             <label className="block mb-1 font-medium">Título</label>
             <input
               type="text"
@@ -323,7 +334,7 @@ const LinksClient = () => {
               onChange={(e) => setNewTitle(e.target.value)}
             />
           </div>
-          <div className="mb-2">
+          <div>
             <label className="block mb-1 font-medium">URL</label>
             <input
               type="url"
@@ -333,7 +344,7 @@ const LinksClient = () => {
               onChange={(e) => setNewUrl(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex gap-2">
             <Button onClick={handleAddNewLink} disabled={!isValidUrl(newUrl)}>
               Salvar
             </Button>
@@ -341,13 +352,15 @@ const LinksClient = () => {
               Cancelar
             </Button>
           </div>
-        </div>
+        </section>
       )}
 
       <Card>
         <CardHeader>
           <CardTitle>Seus Links</CardTitle>
-          <CardDescription>Gerencie, edite e organize seus links.</CardDescription>
+          <CardDescription>
+            Gerencie, edite e organize seus links.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <DndContext
@@ -365,12 +378,17 @@ const LinksClient = () => {
                   {({ listeners }) => (
                     <article className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center">
                       <div className="flex items-center gap-3 sm:w-7/12">
-                        <Grip {...listeners} className="h-5 w-5 cursor-move text-muted-foreground" />
+                        <Grip
+                          {...listeners}
+                          className="h-5 w-5 cursor-move text-muted-foreground"
+                        />
                         <div className="flex items-center gap-2">
-                          <span className="bg-primary/5 px-5 py-2 rounded-lg">{getIconForUrl(link.url)}</span>
+                          <span className="bg-primary/5 px-5 py-2 rounded-lg">
+                            {getIconForUrl(link.url)}
+                          </span>
                           <div className="flex-1 space-y-1">
                             {link.isEditing ? (
-                              <div className="space-y-2">
+                              <section className="space-y-2">
                                 <input
                                   type="text"
                                   className="w-full border rounded px-2 py-1"
@@ -378,7 +396,9 @@ const LinksClient = () => {
                                   onChange={(e) =>
                                     setLinks((prev) =>
                                       prev.map((l) =>
-                                        l.id === link.id ? { ...l, title: e.target.value } : l
+                                        l.id === link.id
+                                          ? { ...l, title: e.target.value }
+                                          : l
                                       )
                                     )
                                   }
@@ -390,26 +410,38 @@ const LinksClient = () => {
                                   onChange={(e) =>
                                     setLinks((prev) =>
                                       prev.map((l) =>
-                                        l.id === link.id ? { ...l, url: e.target.value } : l
+                                        l.id === link.id
+                                          ? { ...l, url: e.target.value }
+                                          : l
                                       )
                                     )
                                   }
                                 />
                                 <div className="flex gap-2">
-                                  <Button onClick={() => saveEditing(link.id, link.title, link.url)}>
+                                  <Button
+                                    onClick={() =>
+                                      saveEditing(link.id, link.title, link.url)
+                                    }
+                                  >
                                     Salvar
                                   </Button>
-                                  <Button variant="outline" onClick={() => cancelEditing(link.id)}>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => cancelEditing(link.id)}
+                                  >
                                     Cancelar
                                   </Button>
                                 </div>
-                              </div>
+                              </section>
                             ) : (
                               <>
                                 <header className="flex items-center gap-2">
                                   <h3 className="font-medium">{link.title}</h3>
                                   {link.sensitive && (
-                                    <Badge variant="outline" className="text-xs border-red-300">
+                                    <Badge
+                                      variant="outline"
+                                      className="text-xs border-red-300"
+                                    >
                                       Sensível
                                     </Badge>
                                   )}
@@ -421,6 +453,9 @@ const LinksClient = () => {
                                     href={link.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    onClick={() =>
+                                      handleClickLink(link.id)
+                                    }
                                   >
                                     {link.url}
                                   </Link>
@@ -431,63 +466,69 @@ const LinksClient = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 sm:w-5/12 sm:justify-end">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="flex items-center gap-1">
-                            <MousePointerClick className="h-3 w-3" />
-                            {link.clicks.toLocaleString()}
-                          </Badge>
-                          <div className="flex items-center space-x-2">
-                            <Switch
-                              checked={link.active}
-                              onCheckedChange={(checked) => toggleActive(link.id, checked)}
-                              className="transition-colors duration-200"
-                              id={`switch-${link.id}`}
-                            />
-                            <Label htmlFor={`switch-${link.id}`} className="cursor-pointer">
-                              {link.active ? "Ativo" : "Inativo"}
-                            </Label>
-                          </div>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <span className="sr-only">Mais opções</span>
-                                <svg className="h-4 w-4" viewBox="0 0 24 24">
-                                  <circle cx="5" cy="12" r="2" />
-                                  <circle cx="12" cy="12" r="2" />
-                                  <circle cx="19" cy="12" r="2" />
-                                </svg>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => startEditing(link.id)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Editar
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Eye className="mr-2 h-4 w-4" />
-                                Ver informações
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => toggleSensitive(link.id)}>
-                                {link.sensitive ? (
-                                  <>
-                                    <Eye className="mr-2 h-4 w-4" />
-                                    Conteúdo não Sensível
-                                  </>
-                                ) : (
-                                  <>
-                                    <EyeOff className="mr-2 h-4 w-4" />
-                                    Conteúdo Sensível
-                                  </>
-                                )}
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => handleDeleteLink(link.id)}>
-                                <Trash2 className="mr-2 h-4 w-4 text-destructive" />
-                                Excluir
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <Badge
+                          variant="secondary"
+                          className="flex items-center gap-1"
+                        >
+                          <MousePointerClick className="h-3 w-3" />
+                          {link.clicks.toLocaleString()}
+                        </Badge>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            checked={link.active}
+                            onCheckedChange={(checked) =>
+                              toggleActive(link.id, checked)
+                            }
+                            className="transition-colors duration-200"
+                            id={`switch-${link.id}`}
+                          />
+                          <Label
+                            htmlFor={`switch-${link.id}`}
+                            className="cursor-pointer"
+                          >
+                            {link.active ? "Ativo" : "Inativo"}
+                          </Label>
                         </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <span className="sr-only">Mais opções</span>
+                              <svg viewBox="0 0 24 24" className="h-4 w-4">
+                                <circle cx="5" cy="12" r="2" />
+                                <circle cx="12" cy="12" r="2" />
+                                <circle cx="19" cy="12" r="2" />
+                              </svg>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => startEditing(link.id)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Eye className="mr-2 h-4 w-4" />
+                              Ver informações
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toggleSensitive(link.id)}>
+                              {link.sensitive ? (
+                                <>
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  Conteúdo não Sensível
+                                </>
+                              ) : (
+                                <>
+                                  <EyeOff className="mr-2 h-4 w-4" />
+                                  Conteúdo Sensível
+                                </>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleDeleteLink(link.id)}>
+                              <Trash2 className="mr-2 h-4 w-4 text-destructive" />
+                              Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </article>
                   )}

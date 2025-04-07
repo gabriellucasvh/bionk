@@ -3,17 +3,16 @@ import prisma from "@/lib/prisma";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
   if (!id || isNaN(Number(id))) {
     return NextResponse.json({ error: "ID inválido" }, { status: 400 });
   }
 
   try {
     const body = await request.json();
-    
-    // Validação adicional do userId se necessário
+
     const updatedLink = await prisma.link.update({
       where: { id: Number(id) },
       data: body,
@@ -31,9 +30,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
   if (!id || isNaN(Number(id))) {
     return NextResponse.json({ error: "ID inválido" }, { status: 400 });
   }
