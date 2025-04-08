@@ -49,7 +49,7 @@ export default async function UserPage({ params }: PageProps) {
   }
 
   return (
-    <main className="bg-gray-900 text-white min-h-screen p-6">
+    <main className="bg-gray-900 text-white min-h-screen">
       <TemplateComponent user={user} />
     </main>
   );

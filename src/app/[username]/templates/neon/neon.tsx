@@ -1,7 +1,7 @@
-import Image from "next/image";
-import InteractiveLink from "@/components/InteractiveLink";
-import ProfileViewTracker from "@/components/ProfileViewTracker";
-import { TemplateComponentProps } from "@/types/user-profile";
+import Image from 'next/image'
+import InteractiveLink from '@/components/InteractiveLink'
+import ProfileViewTracker from '@/components/ProfileViewTracker'
+import { TemplateComponentProps } from '@/types/user-profile'
 
 export default function NeonTemplate({ user }: TemplateComponentProps) {
   return (
@@ -12,19 +12,31 @@ export default function NeonTemplate({ user }: TemplateComponentProps) {
         <header className="w-full text-center mb-8">
           {user.image && (
             <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full border-4 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,1)] hover:shadow-[0_0_40px_rgba(59,130,246,1)] transition-all duration-300">
-              <Image src={user.image} alt={user.name || user.username} fill className="object-cover" />
+              <Image
+                src={user.image}
+                alt={user.name || user.username}
+                fill
+                className="object-cover"
+              />
             </div>
           )}
           <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_15px_rgba(255,255,255,1)] animate-pulse">
             {user.name || user.username}
           </h1>
-          {user.bio && <p className="mt-2 text-gray-300 drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]">{user.bio}</p>}
+          {user.bio && (
+            <p className="mt-2 text-gray-300 drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]">
+              {user.bio}
+            </p>
+          )}
         </header>
 
         <section className="w-full">
           <ul className="space-y-4">
-            {user.Link.map((link) => (
-              <li key={link.id} className="w-full transform transition-transform hover:scale-110 hover:rotate-1">
+            {user.Link.map(link => (
+              <li
+                key={link.id}
+                className="w-full transform transition-transform hover:scale-110 hover:rotate-1"
+              >
                 <InteractiveLink
                   href={link.url}
                   linkId={link.id}
@@ -51,5 +63,5 @@ export default function NeonTemplate({ user }: TemplateComponentProps) {
         </footer>
       </main>
     </div>
-  );
+  )
 }
