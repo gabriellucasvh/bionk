@@ -13,7 +13,7 @@ export default function Perfil() {
             <Sidebar />
             <main className="flex ml-0 md:ml-64 mb-20 md:mb-0 h-screen overflow-y-auto">
                 <PersonalizarClient />
-                <iframe className="w-1/2" src="http://localhost:3000/gabriellucas"></iframe>
+                <iframe className="w-1/2" src="https:/bionk.vercel.app/gabriellucas"></iframe>
 
             </main>
         </>

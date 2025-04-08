@@ -7,7 +7,7 @@ type: "Guia"
 
 ## Acessando a página de registro
 
-Para começar, acesse a página inicial do site e clique no botão [Cadastre-se gratuitamente!](http://localhost:3000/registro) localizado no canto superior direito da tela. Você será redirecionado para a página de registro.
+Para começar, acesse a página inicial do site e clique no botão [Cadastre-se gratuitamente!](https://bionk.vercel.app/registro) localizado no canto superior direito da tela. Você será redirecionado para a página de registro.
 
 ## Preenchendo o formulário
 
