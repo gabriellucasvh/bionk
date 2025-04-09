@@ -317,10 +317,6 @@ const LinksClient = () => {
     <section className="w-full p-4 space-y-4 max-h-screen">
       <header className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Gerenciar links</h2>
-        <Button onClick={() => setIsAdding(true)}>
-          <Plus className="mr-1 h-4 w-4" />
-          Adicionar novo link
-        </Button>
       </header>
 
       {isAdding && (
@@ -362,6 +358,10 @@ const LinksClient = () => {
           <CardDescription>
             Gerencie, edite e organize seus links.
           </CardDescription>
+          <Button onClick={() => setIsAdding(true)}>
+          <Plus className="mr-1 h-4 w-4" />
+          Adicionar novo link
+        </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           <DndContext
