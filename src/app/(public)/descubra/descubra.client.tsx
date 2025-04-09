@@ -66,9 +66,9 @@ const DescubraClient = () => {
                     ))}
                 </div>
             </section>
-            <section className='min-h-screen bg-emerald-950 flex flex-col-reverse lg:flex-row w-full items-center justify-center gap-10 text-emerald-300 px-6 md:px-20 lg:px-40 py-16'>
+            <section className='min-h-screen bg-emerald-950 flex flex-col-reverse lg:flex-row w-full items-center justify-between gap-10 text-emerald-300 px-6 md:px-20 lg:px-40 py-16'>
                 <div>
-                    <Image src="/warning.svg" alt='error' width={300} height={300} className='w-full max-w-xs sm:max-w-md lg:max-w-lg' />
+                    <Image src="/analytics.png" alt='error' width={400} height={400} className='w-full max-w-xs sm:max-w-md lg:max-w-lg' quality={100} loading='lazy' />
                 </div>
                 <div className='w-full lg:w-1/2 text-center lg:text-left'>
                     <h2 className='font-bold text-3xl md:text-4xl mb-6'>Entenda seu público e otimize sua estratégia</h2>
