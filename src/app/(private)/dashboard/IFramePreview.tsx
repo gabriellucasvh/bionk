@@ -17,8 +17,8 @@ export default function IframePreview() {
   if (!iframeUrl) return null
 
   return (
-    <section className="flex justify-center items-center w-full h-screen border-l p-4 md:p-8">
-      <div className="w-full max-w-[390px] h-full max-h-[calc(100vh-4rem)] aspect-[390/844] border-7 border-black rounded-4xl overflow-hidden bg-white shadow-lg">
+    <section className="fixed top-1/2 right-28 -translate-y-1/2 z-30 pointer-events-none">
+      <div className="w-full max-w-[390px] h-[700px] aspect-[390/844] border-7 border-black rounded-4xl overflow-hidden bg-white shadow-lg pointer-events-auto">
         <iframe
           src={iframeUrl}
           title="Pré-visualização do perfil"

@@ -122,7 +122,7 @@ const PerfilClient = () => {
   }
 
   return (
-    <section className="space-y-4 w-full p-4">
+    <section className="space-y-4 w-7/12 p-4">
       <header className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Perfil</h2>
       </header>
