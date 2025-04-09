@@ -1,5 +1,6 @@
 "use client";
 
+import { Eye } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { twMerge } from "tailwind-merge";
@@ -40,16 +41,26 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      className={twMerge(`relative flex items-center justify-center w-full p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all text-center font-medium border border-gray-100 ${
-        sensitive ? "border-red-200 group overflow-hidden" : ""
-      } ${className}`, className)}
+      className={twMerge(`relative flex items-center justify-center w-full p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all text-start font-medium border border-gray-100 ${sensitive ? "border-red-200 group overflow-hidden" : ""
+        } ${className}`, className)}
     >
       {sensitive && (
-        <span className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md text-white text-sm font-semibold transition-opacity group-hover:opacity-0">
-          Conteúdo Sensível - Clique para visualizar
-        </span>
+        <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
+          <div className="w-full h-full rounded-lg backdrop-blur-md transition-all duration-300 group-hover:backdrop-blur-none" />
+          <span className="absolute flex items-center gap-2 text-sm font-semibold text-white bg-black/60 bg-opacity-50 px-3 py-1 rounded-md transition-opacity duration-300 group-hover:opacity-0">
+           <Eye size={16}/> Conteúdo sensível
+          </span>
+        </div>
       )}
-      <span className={`${sensitive ? "group-hover:backdrop-blur-none" : ""}`}>{children}</span>
+
+
+      <span className={twMerge(
+        "break-words whitespace-pre-wrap w-full",
+        sensitive ? "group-hover:backdrop-blur-none" : ""
+      )}>
+        {children}
+      </span>
+
     </Link>
   );
 };
