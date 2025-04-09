@@ -51,6 +51,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 import Image from "next/image";
 import LoadingPage from "@/components/layout/LoadingPage";
+import { cn } from "@/lib/utils";
 
 type LinkItem = {
   id: number;
@@ -102,9 +103,9 @@ const getIconForUrl = (url: string): JSX.Element => {
         <Image
           src={mapping.src}
           alt={mapping.alt}
-          className="h-5 w-5"
-          width={30}
-          height={30}
+          className="h-3 w-3"
+          width={10}
+          height={10}
         />
       );
     }
@@ -115,9 +116,9 @@ const getIconForUrl = (url: string): JSX.Element => {
     <Image
       src="/icons/globe.svg"
       alt="Default"
-      className="h-5 w-5"
-      width={30}
-      height={30}
+      className="h-3 w-3"
+      width={10}
+      height={10}
     />
   );
 };
@@ -174,7 +175,7 @@ const LinksClient = () => {
     }
   }, [swrData]);
 
-  const handleClickLink = async (id: number ) => {
+  const handleClickLink = async (id: number) => {
     try {
       const response = await fetch(`/api/link-click`, {
         method: "POST",
@@ -376,16 +377,19 @@ const LinksClient = () => {
               {links.map((link) => (
                 <SortableItem key={link.id} id={link.id}>
                   {({ listeners }) => (
-                    <article className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center">
+                    <article
+                      className={cn(
+                        "transition-all",
+                        link.sensitive ? "flex flex-col gap-4 border-2 border-rose-400 rounded-lg p-4 sm:flex-row sm:items-center" : "flex flex-col gap-4 border-2 rounded-lg p-4 sm:flex-row sm:items-center"
+                      )}
+                    >
+
                       <div className="flex items-center gap-3 sm:w-7/12">
                         <Grip
                           {...listeners}
                           className="h-5 w-5 cursor-move text-muted-foreground"
                         />
                         <div className="flex items-center gap-2">
-                          <span className="bg-primary/5 px-5 py-2 rounded-lg">
-                            {getIconForUrl(link.url)}
-                          </span>
                           <div className="flex-1 space-y-1">
                             {link.isEditing ? (
                               <section className="space-y-2">
@@ -436,15 +440,12 @@ const LinksClient = () => {
                             ) : (
                               <>
                                 <header className="flex items-center gap-2">
-                                  <h3 className="font-medium">{link.title}</h3>
-                                  {link.sensitive && (
-                                    <Badge
-                                      variant="outline"
-                                      className="text-xs border-red-300"
-                                    >
-                                      Sensível
-                                    </Badge>
-                                  )}
+                                  <h3 className="font-medium flex items-center gap-1">
+                                    <span className="mt-0.5">
+                                      {getIconForUrl(link.url)}
+                                    </span>
+                                    {link.title}
+                                  </h3>
                                 </header>
                                 <section className="flex items-center gap-1 text-sm text-blue-500">
                                   <ExternalLink className="h-3 w-3" />
