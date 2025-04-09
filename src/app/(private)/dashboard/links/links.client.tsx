@@ -322,11 +322,14 @@ const LinksClient = () => {
       {isAdding && (
         <section className="p-4 border rounded-lg space-y-4">
           <div>
-            <label className="block mb-1 font-medium">Título</label>
+            <label className="block mb-1 font-medium">
+              Título
+            </label>
             <input
               type="text"
               placeholder="Título do link"
-              className="w-full border rounded px-3 py-2"
+              className={
+                "w-full border rounded px-3 py-2"}
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
             />
@@ -342,7 +345,8 @@ const LinksClient = () => {
             />
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleAddNewLink} disabled={!isValidUrl(newUrl)}>
+            <Button onClick={handleAddNewLink}
+              disabled={!isValidUrl(newUrl) || newTitle.length === 0 }>
               Salvar
             </Button>
             <Button variant="outline" onClick={() => setIsAdding(false)}>
@@ -359,9 +363,9 @@ const LinksClient = () => {
             Gerencie, edite e organize seus links.
           </CardDescription>
           <Button onClick={() => setIsAdding(true)}>
-          <Plus className="mr-1 h-4 w-4" />
-          Adicionar novo link
-        </Button>
+            <Plus className="mr-1 h-4 w-4" />
+            Adicionar novo link
+          </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           <DndContext
@@ -444,21 +448,19 @@ const LinksClient = () => {
                                     <span className="mt-0.5">
                                       {getIconForUrl(link.url)}
                                     </span>
-                                    {link.title}
+                                    {link.title.length > 26 ? `${link.title.slice(0, 26)}...` : link.title}
                                   </h3>
                                 </header>
                                 <section className="flex items-center gap-1 text-sm text-blue-500">
                                   <ExternalLink className="h-3 w-3" />
                                   <Link
-                                    className="truncate"
+                                    className="truncate max-w-[200px]"
                                     href={link.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    onClick={() =>
-                                      handleClickLink(link.id)
-                                    }
+                                    onClick={() => handleClickLink(link.id)}
                                   >
-                                    {link.url}
+                                    {link.url.length > 26 ? `${link.url.slice(0, 26)}...` : link.url}
                                   </Link>
                                 </section>
                               </>
