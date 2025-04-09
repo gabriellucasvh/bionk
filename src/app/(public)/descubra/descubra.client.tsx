@@ -32,7 +32,7 @@ const DescubraClient = () => {
                     </SimpleBtn>
                 </div>
                 <div>
-                    <Image src="/warning.svg" alt='error' width={300} height={300} className='w-full max-w-xs sm:max-w-md lg:max-w-lg' />
+                    <Image src="/redes-gif.gif" alt='error' width={300} height={300} className='w-full max-w-xs sm:max-w-md lg:max-w-lg' quality={100} priority />
                 </div>
             </section>
             <section className='min-h-screen bg-white rounded-t-3xl flex flex-col w-full items-center justify-center space-y-8 text-black px-6 md:px-20 lg:px-40 py-16'>
