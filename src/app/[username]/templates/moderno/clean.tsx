@@ -3,6 +3,7 @@ import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { MotionDiv, MotionH1, MotionLi, MotionP } from "@/components/ui/motion"
 import { TemplateComponentProps } from "@/types/user-profile"
+import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function CleanTemplate({ user }: TemplateComponentProps) {
   return (
@@ -69,15 +70,8 @@ export default function CleanTemplate({ user }: TemplateComponentProps) {
           </ul>
         </section>
 
-        <footer className="mt-12">
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            className="inline-block px-6 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium shadow-sm"
-          >
-            {user.username}
-          </MotionDiv>
+        <footer className="mt-10 text-black text-sm font-bold border-t pt-4 w-full text-center">
+          <JoinBionkModal>{user.username}</JoinBionkModal>
         </footer>
       </main>
     </div>

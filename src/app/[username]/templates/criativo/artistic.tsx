@@ -2,6 +2,7 @@ import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { TemplateComponentProps } from "@/types/user-profile"
+import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function ArtisticTemplate({ user }: TemplateComponentProps) {
   return (
@@ -73,7 +74,7 @@ export default function ArtisticTemplate({ user }: TemplateComponentProps) {
             ))}
           </div>
           <div className="font-serif text-[#8d6e63] text-sm italic">
-            {user.username} • {new Date().getFullYear()}
+          <JoinBionkModal>{user.username}</JoinBionkModal>
           </div>
         </footer>
       </main>

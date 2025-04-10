@@ -2,6 +2,7 @@ import Image from "next/image";
 import InteractiveLink from "@/components/InteractiveLink";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
 import { TemplateComponentProps } from "@/types/user-profile";
+import JoinBionkModal from "@/components/JoinBionkModal";
 
 export default function DefaultTemplate({ user }: TemplateComponentProps) {
   return (
@@ -15,14 +16,18 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
             </div>
           )}
           <h1 className="text-2xl font-bold text-gray-800">{user.name || user.username}</h1>
-          {user.bio && <p className="mt-2 text-gray-600">{user.bio}</p>}
+          {user.bio && <p className="mt-2 text-gray-600 text-sm">{user.bio}</p>}
         </header>
 
         <section className="w-full">
           <ul className="space-y-3">
             {user.Link.map((link) => (
               <li key={link.id} className="w-full">
-                <InteractiveLink href={link.url} linkId={link.id} sensitive={link.sensitive}>
+                <InteractiveLink
+                  href={link.url}
+                  linkId={link.id}
+                  sensitive={link.sensitive}
+                  className="text-black hover:scale-105 transition-all duration-200">
                   {link.title}
                   <span className="block text-sm text-gray-500">{link.url}</span>
                 </InteractiveLink>
@@ -30,6 +35,9 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
             ))}
           </ul>
         </section>
+        <footer className="mt-10 text-green-800 text-sm font-bold border-t border-black pt-4 w-full text-center">
+          <JoinBionkModal>{user.username}</JoinBionkModal>
+        </footer>
       </main>
     </div>
   );

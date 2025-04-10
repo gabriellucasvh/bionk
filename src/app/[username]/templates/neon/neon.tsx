@@ -2,6 +2,7 @@ import Image from 'next/image'
 import InteractiveLink from '@/components/InteractiveLink'
 import ProfileViewTracker from '@/components/ProfileViewTracker'
 import { TemplateComponentProps } from '@/types/user-profile'
+import JoinBionkModal from '@/components/JoinBionkModal'
 
 export default function NeonTemplate({ user }: TemplateComponentProps) {
   return (
@@ -58,7 +59,7 @@ export default function NeonTemplate({ user }: TemplateComponentProps) {
 
         <footer className="mt-10">
           <div className="animate-pulse inline-block px-2 py-1  bg-pink-500 rounded-full text-white  shadow-lg shadow-pink-400 drop-shadow-[0_0_20px_rgba(255,0,255,1)]">
-            ⚡ {user.username} ⚡
+            ⚡ <JoinBionkModal>{user.username}</JoinBionkModal> ⚡
           </div>
         </footer>
       </main>

@@ -2,6 +2,7 @@ import Image from "next/image";
 import InteractiveLink from "@/components/InteractiveLink";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
 import { TemplateComponentProps } from "@/types/user-profile";
+import JoinBionkModal from "@/components/JoinBionkModal";
 
 export default function CorporateTemplate({ user }: TemplateComponentProps) {
   return (
@@ -42,8 +43,8 @@ export default function CorporateTemplate({ user }: TemplateComponentProps) {
           </ul>
         </section>
 
-        <footer className="mt-10 text-gray-700 text-sm font-medium border-t border-gray-400 pt-4 w-full text-center">
-          <span>{user.username}</span>
+        <footer className="mt-10 text-black text-sm font-bold border-t border-black pt-4 w-full text-center">
+        <JoinBionkModal>{user.username}</JoinBionkModal>
         </footer>
       </main>
     </div>

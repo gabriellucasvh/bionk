@@ -1,51 +1,51 @@
-import Image from "next/image";
-import InteractiveLink from "@/components/InteractiveLink";
-import ProfileViewTracker from "@/components/ProfileViewTracker";
-import { TemplateComponentProps } from "@/types/user-profile";
+import Image from "next/image"
+import InteractiveLink from "@/components/InteractiveLink"
+import ProfileViewTracker from "@/components/ProfileViewTracker"
+import JoinBionkModal from "@/components/JoinBionkModal"
+import { TemplateComponentProps } from "@/types/user-profile"
 
-export default function RetroTemplate({ user }: TemplateComponentProps) {
+export default function DefaultTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-300 to-orange-500 py-8 px-4 text-brown-900 font-retro">
+    <div className="min-h-screen bg-[#f4f1de] text-[#3d405b] py-10 px-4 font-[Courier_New,courier,monospace]">
       <ProfileViewTracker userId={user.id} />
       <main className="max-w-md mx-auto flex flex-col items-center">
-        <header className="w-full text-center mb-8">
+        <header className="w-full text-center mb-10">
           {user.image && (
-            <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full border-4 border-brown-700 shadow-lg">
-              <Image src={user.image} alt={user.name || user.username} fill className="object-cover sepia" />
+            <div className="mx-auto mb-4 relative w-24 h-24 overflow-hidden border-4 border-[#e07a5f] shadow-[4px_4px_0_#3d405b]">
+              <Image
+                src={user.image || "/placeholder.svg"}
+                alt={user.name || user.username}
+                fill
+                className="object-cover"
+              />
             </div>
           )}
-          <h1 className="text-2xl font-bold text-brown-900 tracking-wide drop-shadow-lg">
-            {user.name || user.username}
-          </h1>
-          {user.bio && (
-            <p className="mt-2 text-brown-800 text-sm italic">
-              {user.bio}
-            </p>
-          )}
+          <h1 className="text-2xl font-bold text-[#81b29a]">{user.name || user.username}</h1>
+          {user.bio && <p className="mt-2 text-[#3d405b] italic">{user.bio}</p>}
         </header>
 
         <section className="w-full">
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             {user.Link.map((link) => (
-              <li key={link.id} className="w-full">
+              <li key={link.id}>
                 <InteractiveLink
                   href={link.url}
                   linkId={link.id}
                   sensitive={link.sensitive}
-                  className="block w-full p-4 bg-yellow-200 rounded-lg border border-brown-700 shadow-md hover:shadow-lg hover:bg-yellow-300 transition-all transform hover:-translate-y-1"
+                  className="block w-full p-4 bg-[#f2cc8f] text-[#3d405b] border-2 border-[#e07a5f] shadow-[4px_4px_0_#3d405b] hover:bg-[#ffe8b6] transition-all duration-200 font-bold"
                 >
-                  <span className="font-bold text-brown-900">{link.title}</span>
-                  <span className="block text-sm text-brown-700">{link.url}</span>
+                  <span className="text-sm uppercase">{link.title}</span>
+                  <span className="block text-xs text-[#3d405b] underline">{link.url}</span>
                 </InteractiveLink>
               </li>
             ))}
           </ul>
         </section>
 
-        <footer className="mt-10 text-brown-800 text-sm font-bold border-t border-brown-700 pt-4 w-full text-center">
-          <span>{user.username}</span>
+        <footer className="mt-10 text-[#3d405b] text-sm font-bold border-t border-[#3d405b] pt-4 w-full text-center">
+          <JoinBionkModal>{user.username}</JoinBionkModal>
         </footer>
       </main>
     </div>
-  );
+  )
 }

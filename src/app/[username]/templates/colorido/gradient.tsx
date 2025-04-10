@@ -2,6 +2,7 @@ import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { TemplateComponentProps } from "@/types/user-profile"
+import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function GradientTemplate({ user }: TemplateComponentProps) {
   return (
@@ -16,11 +17,11 @@ export default function GradientTemplate({ user }: TemplateComponentProps) {
               </div>
             </div>
           )}
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-pink-500 text-transparent bg-clip-text">
+          <h1 className="text-2xl font-bold text-white">
             {user.name || user.username}
           </h1>
           {user.bio && (
-            <p className="mt-2 bg-gradient-to-r from-purple-100 to-cyan-400 text-transparent bg-clip-text font-medium">
+            <p className="mt-2 bg-gradient-to-r from-purple-100 to-cyan-200 text-transparent bg-clip-text font-medium">
               {user.bio}
             </p>
           )}
@@ -29,7 +30,6 @@ export default function GradientTemplate({ user }: TemplateComponentProps) {
         <section className="w-full">
           <ul className="space-y-4">
             {user.Link.map((link, index) => {
-              // Create different gradient directions for each link
               const gradientDirections = [
                 "bg-gradient-to-r from-green-300 to-purple-400",
                 "bg-gradient-to-r from-pink-300 to-amber-400",
@@ -55,10 +55,8 @@ export default function GradientTemplate({ user }: TemplateComponentProps) {
           </ul>
         </section>
 
-        <footer className="mt-10 p-2 rounded-full bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 shadow-md">
-          <div className="px-6 py-1 rounded-full bg-white bg-opacity-10 backdrop-blur-sm text- font-medium">
-            {user.username}
-          </div>
+        <footer className="mt-10 text-white text-sm font-bold border-t border-white pt-4 w-full text-center">
+        <JoinBionkModal>{user.username}</JoinBionkModal>
         </footer>
       </main>
     </div>

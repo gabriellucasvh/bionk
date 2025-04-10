@@ -2,74 +2,49 @@ import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { TemplateComponentProps } from "@/types/user-profile"
+import JoinBionkModal from "@/components/JoinBionkModal"
 
-export default function DarkTemplate({ user }: TemplateComponentProps) {
+export default function DefaultTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-black py-8 px-4">
-      {/* Subtle gradient overlay */}
-      <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 pointer-events-none"></div>
-
-      {/* Subtle grid pattern */}
-      <div className="fixed inset-0 opacity-[0.03] bg-[linear-gradient(to_right,#222_1px,transparent_1px),linear-gradient(to_bottom,#222_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
-
+    <div className="min-h-screen bg-black text-white py-10 px-4">
       <ProfileViewTracker userId={user.id} />
-
-      <main className="max-w-md mx-auto flex flex-col items-center relative z-10">
-        <header className="w-full flex flex-col items-center text-center mb-10">
+      <main className="max-w-md mx-auto flex flex-col items-center">
+        <header className="w-full text-center mb-10">
           {user.image && (
-            <div className="mb-6 relative group flex justify-center">
-              <div className="relative w-24 h-24 overflow-hidden rounded-full border border-gray-800 group-hover:border-gray-700 transition-colors duration-300">
-                <Image
-                  src={user.image || "/placeholder.svg"}
-                  alt={user.name || user.username}
-                  fill
-                  className="object-cover"
-                />
-              </div>
+            <div className="mx-auto mb-4 relative w-24 h-24 overflow-hidden rounded-full border border-neutral-700 shadow-md">
+              <Image
+                src={user.image || "/placeholder.svg"}
+                alt={user.name || user.username}
+                fill
+                className="object-cover"
+              />
             </div>
           )}
-
-          <h1 className="text-2xl font-medium text-white tracking-tight">{user.name || user.username}</h1>
-
-          {user.bio && <p className="mt-3 text-gray-400 max-w-xs mx-auto leading-relaxed text-sm">{user.bio}</p>}
-
+          <h1 className="text-2xl font-bold text-white">{user.name || user.username}</h1>
+          {user.bio && <p className="mt-2 text-neutral-400">{user.bio}</p>}
         </header>
 
         <section className="w-full">
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             {user.Link.map((link) => (
-              <li key={link.id} className="w-full group">
+              <li key={link.id}>
                 <InteractiveLink
                   href={link.url}
                   linkId={link.id}
                   sensitive={link.sensitive}
-                  className="block w-full p-4 bg-gray-900 rounded-md border border-gray-800 group-hover:border-gray-700 transition-all duration-300 group-hover:bg-gray-800"
+                  className="block w-full p-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition-colors duration-200 shadow-sm hover:shadow-lg"
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="font-medium text-black group-hover:text-white transition-colors duration-300">
-                        {link.title}
-                      </span>
-                      <span className="block text-sm text-gray-500 group-hover:text-gray-400 transition-colors duration-300">
-                        {link.url}
-                      </span>
-                    </div>
-                    
-                  </div>
+                  <span className="font-semibold text-white">{link.title}</span>
+                  <span className="block text-sm text-neutral-400">{link.url}</span>
                 </InteractiveLink>
               </li>
             ))}
           </ul>
         </section>
-
-        <footer className="mt-10 text-center">
-          <div className="inline-flex items-center space-x-1.5 text-xs text-gray-600 py-2 px-3 rounded-full bg-gray-900 border border-gray-800 animate-pulse">
-            <span className="w-1.5 h-1.5 rounded-full bg-gray-700"></span>
-            <span>{user.username}</span>
-          </div>
+        <footer className="mt-10 text-white text-sm font-bold border-t border-white pt-4 w-full text-center">
+          <JoinBionkModal>{user.username}</JoinBionkModal>
         </footer>
       </main>
     </div>
   )
 }
-

@@ -2,6 +2,7 @@ import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { TemplateComponentProps } from "@/types/user-profile"
+import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function VibrantTemplate({ user }: TemplateComponentProps) {
   return (
@@ -36,10 +37,12 @@ export default function VibrantTemplate({ user }: TemplateComponentProps) {
           </ul>
         </section>
 
-        <footer className="mt-10">
-          <div className="animate-pulse inline-block px-4 py-2 bg-fuchsia-500 rounded-full text-white font-medium shadow-lg">
-            ✨ {user.username} ✨
-          </div>
+        <footer className="mt-10 text-white text-sm font-bold border-t border-cyan-500 pt-4 w-full text-center">
+          <span className="bg-cyan-500 px-3 py-1 rounded-full animate-pulse">
+            <JoinBionkModal>
+              {user.username}
+            </JoinBionkModal>
+          </span>
         </footer>
       </main>
     </div>

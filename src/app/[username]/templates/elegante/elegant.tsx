@@ -3,6 +3,7 @@ import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { MotionDiv, MotionH1, MotionLi, MotionP } from "@/components/ui/motion"
 import { TemplateComponentProps } from "@/types/user-profile"
+import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function ElegantTemplate({ user }: TemplateComponentProps) {
   return (
@@ -71,7 +72,7 @@ export default function ElegantTemplate({ user }: TemplateComponentProps) {
             transition={{ duration: 1.2 }}
             className="inline-block px-6 py-2 border border-neutral-300 text-neutral-700 bg-white/70 backdrop-blur-md rounded-md font-serif text-sm shadow-md"
           >
-            — {user.username} —
+           <JoinBionkModal>{user.username}</JoinBionkModal>
           </MotionDiv>
         </footer>
       </main>

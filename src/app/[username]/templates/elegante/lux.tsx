@@ -3,6 +3,7 @@ import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { MotionDiv, MotionH1, MotionLi, MotionP } from "@/components/ui/motion"
 import { TemplateComponentProps } from "@/types/user-profile"
+import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function LuxuryTemplate({ user }: TemplateComponentProps) {
   return (
@@ -64,15 +65,16 @@ export default function LuxuryTemplate({ user }: TemplateComponentProps) {
           </ul>
         </section>
 
-        <footer className="mt-14 text-center w-full">
+        <footer className="mt-14 text-center w-full inline-block px-6 py-2 border border-[#d4af37] text-[#f5f3ef] bg-[#d4af37]/10 backdrop-blur-xl rounded-lg font-medium tracking-wide shadow-[0_0_15px_rgba(212,175,55,0.4)]">
           <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.5 }}
-            className="inline-block px-6 py-2 border border-[#d4af37] text-[#f5f3ef] bg-[#d4af37]/10 backdrop-blur-xl rounded-lg font-medium tracking-wide shadow-[0_0_15px_rgba(212,175,55,0.4)]"
-          >
-            ✨ {user.username} ✨
-          </MotionDiv>
+          >✨
+            <JoinBionkModal>
+              {user.username}
+            </JoinBionkModal>
+            ✨ </MotionDiv>
         </footer>
       </main>
     </div>

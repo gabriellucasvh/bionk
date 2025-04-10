@@ -1,96 +1,49 @@
 import Image from "next/image"
 import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
-import { MotionDiv, MotionH1, MotionLi, MotionP, MotionSpan } from "@/components/ui/motion"
+import JoinBionkModal from "@/components/JoinBionkModal"
 import { TemplateComponentProps } from "@/types/user-profile"
 
-export default function PhotographyTemplate({ user }: TemplateComponentProps) {
+export default function DefaultTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 text-white py-12 px-4">
+    <div className="min-h-screen bg-neutral-900 text-neutral-100 py-10 px-4 font-sans">
       <ProfileViewTracker userId={user.id} />
-
       <main className="max-w-md mx-auto flex flex-col items-center">
         <header className="w-full text-center mb-10">
           {user.image && (
-            <MotionDiv
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="mx-auto mb-6 relative w-36 h-36 overflow-hidden rounded-full border-4 border-gray-400 shadow-lg"
-            >
+            <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden border-4 border-white shadow-lg">
               <Image
                 src={user.image || "/placeholder.svg"}
                 alt={user.name || user.username}
                 fill
-                className="object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                className="object-cover grayscale hover:grayscale-0 transition duration-500"
               />
-            </MotionDiv>
+            </div>
           )}
-          <MotionH1
-            className="text-3xl font-extrabold text-white tracking-wide"
-            initial={{ y: -16, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-          >
-            {user.name || user.username}
-          </MotionH1>
-          {user.bio && (
-            <MotionP
-              className="mt-2 text-gray-300 max-w-sm mx-auto leading-relaxed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.1 }}
-            >
-              {user.bio}
-            </MotionP>
-          )}
+          <h1 className="text-2xl font-semibold text-white">{user.name || user.username}</h1>
+          {user.bio && <p className="mt-2 text-neutral-400 text-sm">{user.bio}</p>}
         </header>
 
         <section className="w-full">
           <ul className="space-y-4">
-            {user.Link.map((link, i) => (
-              <MotionLi
-                key={link.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="w-full"
-              >
+            {user.Link.map((link) => (
+              <li key={link.id}>
                 <InteractiveLink
                   href={link.url}
                   linkId={link.id}
                   sensitive={link.sensitive}
-                  className="group relative block w-full p-4 bg-gray-900 bg-opacity-90 rounded-lg border border-gray-500 shadow-md overflow-hidden"
+                  className="block w-full p-4 bg-white/10 hover:bg-white/20 text-white border border-white/30 shadow-md transition-all duration-200"
                 >
-                  <MotionDiv
-                    className="absolute inset-0 bg-gradient-to-r from-gray-700 to-transparent opacity-0 group-hover:opacity-50 transition-opacity duration-500"
-                  />
-                  <MotionSpan
-                    initial={{ letterSpacing: "0px" }}
-                    whileHover={{ letterSpacing: "2px" }}
-                    transition={{ duration: 0.3 }}
-                    className="relative font-bold text-gray-600 block transition-all"
-                  >
-                    {link.title}
-                  </MotionSpan>
-                  <span className="relative block text-sm text-gray-400 transition-colors group-hover:text-gray-200">
-                    {link.url}
-                  </span>
+                  <span className="text-base font-medium">{link.title}</span>
+                  <span className="block text-xs text-neutral-300">{link.url}</span>
                 </InteractiveLink>
-              </MotionLi>
+              </li>
             ))}
           </ul>
         </section>
 
-        <footer className="mt-12 text-center">
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.2 }}
-            className="inline-block px-6 py-2 bg-gray-900 bg-opacity-80 text-white border border-gray-500 rounded-full shadow-md hover:scale-105 transition-transform duration-300"
-          >
-            📷 - {user.username}
-          </MotionDiv>
+        <footer className="mt-10 text-neutral-400 text-sm font-bold border-t border-white pt-4 w-full text-center">
+          <JoinBionkModal>{user.username}</JoinBionkModal>
         </footer>
       </main>
     </div>
