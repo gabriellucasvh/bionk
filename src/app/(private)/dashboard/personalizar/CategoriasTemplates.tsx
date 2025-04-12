@@ -1,7 +1,7 @@
-// src/app/[username]/settings/page.tsx
+// src/app/(private)/dashboard/personalizar/CategoriasTemplates.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
@@ -51,6 +51,26 @@ const categories = {
 export default function TemplateSettings() {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+    const [currentTemplate, setCurrentTemplate] = useState<{ template: string; templateCategory: string } | null>(null);
+
+    useEffect(() => {
+        const fetchUserTemplate = async () => {
+            try {
+                const response = await fetch('/api/user-template');
+                const data = await response.json();
+                if (data.template) {
+                    setCurrentTemplate({
+                        template: data.template,
+                        templateCategory: data.templateCategory
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching user template:', error);
+            }
+        };
+
+        fetchUserTemplate();
+    }, []);
 
     const handleSave = async () => {
         if (!selectedTemplate) return;
@@ -66,6 +86,17 @@ export default function TemplateSettings() {
 
     return (
         <div>
+            {currentTemplate && (
+                <div className="mb-6 inline-block">
+                    <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
+                        Tema atual: {currentTemplate.templateCategory.charAt(0).toUpperCase() + currentTemplate.templateCategory.slice(1)} - {
+                            categories[currentTemplate.templateCategory as keyof typeof categories]
+                                ?.find(t => t.id === currentTemplate.template)?.name || currentTemplate.template
+                        }
+                    </span>
+                </div>
+            )}
+
             <div className="flex flex-wrap gap-2 mb-10">
                 {Object.keys(categories).map((category) => (
                     <Button
