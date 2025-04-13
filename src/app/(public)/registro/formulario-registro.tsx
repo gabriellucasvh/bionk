@@ -12,7 +12,6 @@ import Link from "next/link";
 import { GoogleBtn } from "@/components/buttons/button-google";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import GreenAnimation from "@/components/green-animation";
 import LoadingPage from "@/components/layout/LoadingPage";
 
 // Define the form schema
@@ -96,16 +95,12 @@ function Register() {
     }
   };
 
-
   return (
-    <main className="min-h-screen flex">
+    <main className="min-h-screen flex flex-col items-center justify-center">
       {/* Card de Registro */}
-      <section className="w-full min-h-screen flex items-center justify-center  px-4 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 w-full h-full -z-10">
-          <GreenAnimation />
-        </div>
-        <article className="bg-white p-8 rounded-lg w-full max-w-md">
-          <div className="text-center mb-8 space-y-2">
+      <section className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <article className="bg-white p-8 rounded-lg w-full max-w-md md:border border-lime-500">
+          <div className="text-center mb-2 space-y-2">
             <h2 className="text-2xl font-bold text-center text-black">
               Junte-se ao Bionk
             </h2>
@@ -126,7 +121,7 @@ function Register() {
                 {...register("name")}
               />
               {errors.name && (
-                <p className="text-red-600 font-base mt-2">
+                <p className="text-red-600 text-sm -mt-3">
                   {errors.name.message}
                 </p>
               )}
@@ -143,7 +138,7 @@ function Register() {
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-red-600 font-base mt-2">
+                <p className="text-red-600 text-sm -mt-3">
                   {errors.email.message}
                 </p>
               )}
@@ -169,7 +164,7 @@ function Register() {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-600 font-base mt-2">
+                <p className="text-red-600 text-sm -mt-3">
                   {errors.password.message}
                 </p>
               )}
@@ -195,7 +190,7 @@ function Register() {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-600 font-base mt-2">
+                <p className="text-red-600 text-sm -mt-3">
                   {errors.confirmPassword.message}
                 </p>
               )}
@@ -234,9 +229,9 @@ function Register() {
               </div>
             )}
             <div>
-              <span>
+              <span className="text-sm">
                 Já possui uma conta?{" "}
-                <Link className="text-blue-500" href={"/login"}>
+                <Link className="text-blue-500 hover:underline" href={"/login"}>
                   Faça o Login
                 </Link>
               </span>

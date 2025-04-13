@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import FormularioRegistro from "./formulario-registro";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import HeaderBack from "@/components/layout/HeaderBack";
 
 export const metadata: Metadata = {
     title: "Bionk | Cadastro",
@@ -15,10 +14,5 @@ export default async function registro() {
     if (session) {
         return redirect('/dashboard')
     }
-    return (
-        <div>
-            <HeaderBack />
-            <FormularioRegistro />
-        </div>
-    )
+    return <FormularioRegistro />
 }

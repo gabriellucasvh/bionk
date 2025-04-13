@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import HeaderBack from "@/components/layout/HeaderBack";
 import FormularioLogin from "./formulario-login";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
@@ -15,10 +14,5 @@ export default async function login() {
     if (session) {
         return redirect('/dashboard')
     }
-    return (
-        <div>
-            <HeaderBack />
-            <FormularioLogin />
-        </div>
-    )
+    return <FormularioLogin />
 }

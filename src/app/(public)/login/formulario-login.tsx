@@ -10,7 +10,6 @@ import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import GreenAnimation from "../../../components/green-animation";
 import { GoogleBtn } from "@/components/buttons/button-google";
 import LoadingPage from "@/components/layout/LoadingPage";
 
@@ -79,12 +78,9 @@ function Login() {
     }
   };
   return (
-    <div className="relative min-h-screen flex items-center justify-center py-25 px-4 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 w-full h-full -z-10">
-        <GreenAnimation />
-      </div>
+    <div className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <form
-        className="bg-white p-8 rounded-lg w-full max-w-md border relative z-10"
+        className="bg-white p-8 rounded-lg w-full max-w-md md:border border-lime-500 relative z-10"
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="text-center mb-8 space-y-2">
@@ -103,7 +99,7 @@ function Login() {
               type="email"
               {...register("email")}
             />
-            {errors.email && <p className="text-red-600 font-base mt-2">{errors.email.message}</p>}
+            {errors.email && <p className="text-red-600 text-sm -mt-3">{errors.email.message}</p>}
           </div>
 
           <div>
@@ -119,7 +115,7 @@ function Login() {
                 {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
-            {errors.password && <p className="text-red-600 font-base mt-2">{errors.password.message}</p>}
+            {errors.password && <p className="text-red-600 text-sm -mt-3">{errors.password.message}</p>}
           </div>
           <div className="-mt-5">
             <Link href={"/"} className="text-blue-500 text-sm hover:underline">Esqueceu a senha?</Link>
@@ -145,7 +141,7 @@ function Login() {
               </div>
             )}
           </div>
-          <span className="mt-10">
+          <span className="text-sm">
             Não possui uma conta? {" "}
             <Link className="text-blue-500 hover:underline" href={"/registro"}>Crie gratuitamente!</Link>
           </span>
