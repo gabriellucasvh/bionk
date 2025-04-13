@@ -314,13 +314,13 @@ const LinksClient = () => {
   if (isProfileLoading) return <LoadingPage />;
 
   return (
-    <section className="w-7/12 p-4 space-y-4 max-h-screen">
+    <section className="w-full md:w-10/12 lg:w-7/12 p-2 sm:p-4 space-y-4 max-h-screen">
       <header className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Gerenciar links</h2>
+        <h2 className="text-xl sm:text-2xl font-bold">Gerenciar links</h2>
       </header>
 
       {isAdding && (
-        <section className="p-4 border rounded-lg space-y-4">
+        <section className="p-2 sm:p-4 border rounded-lg space-y-4">
           <div>
             <label className="block mb-1 font-medium">
               Título
@@ -356,18 +356,18 @@ const LinksClient = () => {
         </section>
       )}
 
-      <Card>
+      <Card className="pb-14 md:pb-0">
         <CardHeader>
-          <CardTitle>Seus Links</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg sm:text-xl">Seus Links</CardTitle>
+          <CardDescription className="text-sm">
             Gerencie, edite e organize seus links.
           </CardDescription>
-          <Button onClick={() => setIsAdding(true)}>
+          <Button onClick={() => setIsAdding(true)} className="w-full sm:w-auto">
             <Plus className="mr-1 h-4 w-4" />
             Adicionar novo link
           </Button>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 p-2 sm:p-6">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -383,12 +383,12 @@ const LinksClient = () => {
                   {({ listeners }) => (
                     <article
                       className={cn(
-                        "transition-all",
-                        link.sensitive ? "flex flex-col gap-4 border-2 border-rose-400 rounded-lg p-4 sm:flex-row sm:items-center" : "flex flex-col gap-4 border-2 rounded-lg p-4 sm:flex-row sm:items-center"
+                        "transition-all flex flex-col gap-2 sm:gap-4 border-2 rounded-lg p-2 sm:p-4",
+                        "sm:flex-row sm:items-center",
+                        link.sensitive && "border-rose-400"
                       )}
                     >
-
-                      <div className="flex items-center gap-3 sm:w-7/12">
+                      <div className="flex items-center gap-2 sm:gap-3 sm:w-7/12">
                         <Grip
                           {...listeners}
                           className="h-5 w-5 cursor-move text-muted-foreground"
