@@ -310,8 +310,13 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
                   >
                     <div className="flex flex-col space-y-1 flex-1">
                       <span className="font-medium">{link.title}</span>
-                      <Link href={link.url} className="text-sm text-blue-500 flex items-center gap-1">
-                        <LinkIcon size={16} /> {link.url}
+                      <Link
+                        href={link.url}
+                        target="_blank"
+                        className="text-sm text-blue-500 flex items-center gap-1 max-w-md break-words break-all whitespace-normal"
+>
+                        <LinkIcon className="h-4 w-4 shrink-0" />
+                        <span>{link.url}</span>
                       </Link>
                     </div>
                     <div className="flex items-center bg-primary/5 px-3 py-1.5 rounded-full text-sm">
