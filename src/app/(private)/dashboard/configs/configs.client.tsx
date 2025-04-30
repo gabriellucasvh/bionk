@@ -233,7 +233,7 @@ export default function ConfigsClient() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/help" passHref>
+              <Link href="/ajuda" passHref>
                 <Button variant="outline" className="w-full">
                   Acessar Central de Ajuda
                 </Button>
