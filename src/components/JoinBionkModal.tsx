@@ -95,12 +95,12 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
         <div className='flex flex-col'>
           <DialogFooter className="flex flex-col p-4 sm:p-6 pt-2">
             <Link className="w-full text-center inline-flex items-center justify-center rounded-md px-3 py-2 bg-gradient-to-r from-lime-500 to-emerald-600 hover:from-green-600 hover:to-green-700 text-white font-medium transition-colors duration-30"
-              href={'https://bionk.vercel.app/registro'}
+              href={'https://www.bionk.me/registro'}
               rel='noopener noreferrer'
               target='_blank'></Link>
             <Link
               className="w-full text-center inline-flex items-center justify-center rounded-md px-3 py-2 bg-gradient-to-r from-lime-500 to-emerald-600 hover:from-green-600 hover:to-green-700 text-white font-medium transition-colors duration-30"
-              href={'https://bionk.vercel.app/registro'}
+              href={'https://www.bionk.me/registro'}
               rel='noopener noreferrer'
               target='_blank'
             >

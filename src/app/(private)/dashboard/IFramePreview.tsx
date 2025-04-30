@@ -10,7 +10,11 @@ export default function IframePreview() {
 
   useEffect(() => {
     if (session?.user?.username) {
-      setIframeUrl(`http://localhost:3000/${session.user.username}`)
+      const baseUrl =
+        process.env.NODE_ENV === 'production'
+          ? 'https://www.bionk.me'
+          : 'http://localhost:3000'
+      setIframeUrl(`${baseUrl}/${session.user.username}`)
     }
   }, [session])
 
