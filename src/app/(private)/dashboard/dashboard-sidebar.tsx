@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Link2, BarChart3, Settings, User, LogOut, Paintbrush } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { Link2, BarChart3, Settings, User, LogOut, Paintbrush, ExternalLink } from "lucide-react"; 
+import { signOut, useSession } from "next-auth/react"; 
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -45,8 +45,13 @@ const links = [
 const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: session } = useSession(); 
   const [disabledButtons, setDisabledButtons] = useState<Set<string>>(() => new Set());
   const handleLogout = () => signOut();
+
+  const username = session?.user?.username; 
+  const baseUrl = process.env.NODE_ENV === 'production' ? 'https://www.bionk.me' : 'http://localhost:3000';
+  const profileUrl = username ? `${baseUrl}/${username}` : '#'; 
 
   useEffect(() => {
     setDisabledButtons(new Set());
@@ -60,6 +65,18 @@ const Sidebar = () => {
             <Image src="/bionk-logo.svg" alt="logo" width={90} height={30} priority />
           </Link>
         </header>
+
+        <div className="px-2 py-2">
+          <Button
+            className="w-full py-5 justify-center bg-green-500 text-white hover:bg-green-600 hover:text-white"
+            size="sm"
+            onClick={() => window.open(profileUrl, '_blank')}
+            disabled={!username}
+          >
+            <ExternalLink className="h-4 w-4" />
+            Ver meu perfil
+          </Button>
+        </div>
 
         <nav className="px-2 space-y-1">
           {links.map((link) => {
@@ -83,7 +100,7 @@ const Sidebar = () => {
           })}
         </nav>
 
-        <div className="mt-auto p-4 border-t">
+        <div className="mt-auto p-4 space-y-2 border-t">
           <Button
             className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
             variant="ghost"
