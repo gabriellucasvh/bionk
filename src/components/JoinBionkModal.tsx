@@ -10,9 +10,8 @@ import {
   DialogDescription,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { UserPlus, ArrowRight, Globe, LinkIcon, Share2 } from 'lucide-react'
+import { ArrowRight, Globe, LinkIcon, Share2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -94,10 +93,6 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
         </div>
         <div className='flex flex-col'>
           <DialogFooter className="flex flex-col p-4 sm:p-6 pt-2">
-            <Link className="w-full text-center inline-flex items-center justify-center rounded-md px-3 py-2 bg-gradient-to-r from-lime-500 to-emerald-600 hover:from-green-600 hover:to-green-700 text-white font-medium transition-colors duration-30"
-              href={'https://www.bionk.me/registro'}
-              rel='noopener noreferrer'
-              target='_blank'></Link>
             <Link
               className="w-full text-center inline-flex items-center justify-center rounded-md px-3 py-2 bg-gradient-to-r from-lime-500 to-emerald-600 hover:from-green-600 hover:to-green-700 text-white font-medium transition-colors duration-30"
               href={'https://www.bionk.me/registro'}
