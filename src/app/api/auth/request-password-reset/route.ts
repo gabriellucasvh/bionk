@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       .update(resetToken)
       .digest('hex');
 
-    const passwordResetExpires = new Date(Date.now() + 3600000); 
+    const passwordResetExpires = new Date(Date.now() + 3600000);
 
     await prisma.user.update({
       where: { id: user.id },
@@ -44,8 +44,8 @@ export async function POST(req: NextRequest) {
         passwordResetExpires,
       },
     });
-
-    const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password/${resetToken}`;
+    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://www.bionk.me';
+    const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
 
     try {
       console.log('[RequestPasswordReset] Enviando e-mail via Resend...');
