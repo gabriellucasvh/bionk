@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import cloudinary from "@/lib/cloudinary"; // Importar Cloudinary
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -83,6 +84,20 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 }
 
+// Função auxiliar para extrair public_id de uma URL Cloudinary
+// Considere mover esta função para um arquivo de utilidades compartilhado (ex: /lib/utils.ts)
+// e importá-la aqui e na rota de upload.
+const getPublicIdFromUrl = (url: string): string | null => {
+  try {
+    const regex = /\/v\d+\/(.+)\.\w+$/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  } catch (error) {
+    console.error("Erro ao extrair public_id:", error);
+    return null;
+  }
+};
+
 export async function DELETE(request: NextRequest, { params }: Params) {
   const session = await getServerSession(authOptions);
   const { id } = await params;
@@ -96,14 +111,49 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   }
 
   try {
+    // 1. Buscar as URLs das imagens do usuário ANTES de deletá-lo
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { bannerUrl: true, profileUrl: true },
+    });
+
+    if (!user) {
+      // Usuário já não existe, pode retornar sucesso ou erro 404
+      return NextResponse.json({ message: "Usuário não encontrado." }, { status: 404 });
+    }
+
+    // 2. Deletar imagens do Cloudinary se existirem
+    const urlsToDelete = [user.bannerUrl, user.profileUrl].filter(Boolean) as string[]; // Filtra URLs nulas/vazias
+
+    for (const url of urlsToDelete) {
+      const publicId = getPublicIdFromUrl(url);
+      if (publicId) {
+        try {
+          console.log(`Tentando deletar imagem do Cloudinary: ${publicId}`);
+          // Especificar resource_type como 'image' é importante
+          await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+          console.log(`Imagem deletada do Cloudinary: ${publicId}`);
+        } catch (deleteError) {
+          console.error(`Erro ao deletar imagem ${publicId} do Cloudinary:`, deleteError);
+          // Não interromper a exclusão da conta se a exclusão da imagem falhar.
+          // Registre o erro para investigação posterior.
+        }
+      }
+    }
+
+    // 3. Deletar o usuário do banco de dados
     await prisma.user.delete({
       where: { id },
     });
-    return NextResponse.json({ message: "Conta excluída com sucesso" }, { status: 200 });
+
+    return NextResponse.json({ message: "Conta e imagens associadas excluídas com sucesso" }, { status: 200 });
   } catch (error) {
     console.error("Erro ao excluir a conta:", error);
     return NextResponse.json({ error: "Erro ao excluir a conta" }, { status: 500 });
   } finally {
+    // O finally com $disconnect pode não ser estritamente necessário aqui,
+    // dependendo da gestão de conexão do Prisma no seu ambiente Next.js.
+    // Mas se mantiver, tudo bem.
     await prisma.$disconnect();
   }
 }
