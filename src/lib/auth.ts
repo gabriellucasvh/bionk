@@ -2,12 +2,11 @@ import type { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { PrismaClient } from '@prisma/client'
+import prisma from '@/lib/prisma' 
 import bcrypt from 'bcryptjs'
 import { generateUniqueUsername } from '@/utils/generateUsername'
 import type { User } from 'next-auth'
 
-const prisma = new PrismaClient()
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
@@ -22,7 +21,7 @@ interface ExtendedUser extends User {
   name?: string
 }
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma), // Use a instância importada
   cookies:
     process.env.NODE_ENV === 'production'
       ? {
@@ -52,7 +51,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
 
-        const user = await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({ // Use a instância importada
           where: { email: credentials.email },
         })
 
@@ -112,8 +111,9 @@ export const authOptions: NextAuthOptions = {
   events: {
     async createUser({ user }) {
       if (!user.username && user.name) {
+        // generateUniqueUsername já usa o prisma compartilhado após a modificação abaixo
         const username = await generateUniqueUsername(user.name)
-        await prisma.user.update({
+        await prisma.user.update({ // Use a instância importada
           where: { id: user.id },
           data: { username },
         })
