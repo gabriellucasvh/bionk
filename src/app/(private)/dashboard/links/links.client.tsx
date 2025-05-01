@@ -163,8 +163,7 @@ const LinksClient = () => {
 
   const { data: swrData, mutate: mutateLinks } = useSWR<{ links: LinkItem[] }>(
     session?.user?.id ? `/api/links?userId=${session.user.id}` : null,
-    fetcher,
-    { refreshInterval: 5000 }
+    fetcher
   );
 
   useEffect(() => {
@@ -234,6 +233,7 @@ const LinksClient = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ active: isActive }),
     });
+    await mutateLinks(); 
   };
 
   const toggleSensitive = async (id: number) => {
@@ -248,6 +248,7 @@ const LinksClient = () => {
         sensitive: updated.find((l) => l.id === id)?.sensitive,
       }),
     });
+    await mutateLinks();
   };
 
   const startEditing = (id: number) => {
@@ -271,6 +272,7 @@ const LinksClient = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, url }),
     });
+    await mutateLinks(); 
   };
 
   const cancelEditing = (id: number) => {
@@ -283,7 +285,10 @@ const LinksClient = () => {
 
   const handleDeleteLink = async (id: number) => {
     const res = await fetch(`/api/links/${id}`, { method: "DELETE" });
-    if (res.ok) setLinks((prev) => prev.filter((link) => link.id !== id));
+    if (res.ok) {
+        setLinks((prev) => prev.filter((link) => link.id !== id));
+        await mutateLinks(); 
+    }
   };
 
   const sensors = useSensors(
