@@ -22,11 +22,11 @@ export async function GET(request: NextRequest, { params }: Params) {
         profileUrl: true,  // Foto de perfil do usuário
       },
     });
-
+    
     if (!profile) {
       return NextResponse.json({ error: "Perfil não encontrado" }, { status: 404 });
     }
-
+    
     return NextResponse.json(profile);
   } catch (error) {
     console.error("Erro ao buscar perfil:", error);

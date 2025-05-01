@@ -1,7 +1,22 @@
+//api/profile/[id]/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { promises as fs } from "fs";
-import path from "path";
+import cloudinary from "@/lib/cloudinary"; // Importar Cloudinary
+// Remover imports de 'fs' e 'path'
+// import { promises as fs } from "fs";
+// import path from "path";
+
+// Função auxiliar para extrair public_id de uma URL Cloudinary
+const getPublicIdFromUrl = (url: string): string | null => {
+  try {
+    const regex = /\/v\d+\/(.+)\.\w+$/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  } catch (error) {
+    console.error("Erro ao extrair public_id:", error);
+    return null;
+  }
+};
 
 export async function POST(
   req: NextRequest,
@@ -41,16 +56,11 @@ export async function POST(
     // Converte o arquivo para Buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+    const base64String = `data:${file.type};base64,${buffer.toString("base64")}`;
 
-    // Define a pasta de uploads dentro da pasta public
-    const uploadsFolder = path.join(process.cwd(), "public/uploads");
-    try {
-      await fs.access(uploadsFolder);
-    } catch {
-      await fs.mkdir(uploadsFolder, { recursive: true });
-    }
+    // --- Lógica de Cloudinary ---
 
-    // Remove o arquivo antigo, se existir
+    // 1. Remove o arquivo antigo do Cloudinary, se existir
     const user = await prisma.user.findUnique({
       where: { id },
       select: { bannerUrl: true, profileUrl: true },
@@ -59,26 +69,33 @@ export async function POST(
     if (user) {
       const oldFileUrl = type === "banner" ? user.bannerUrl : user.profileUrl;
       if (oldFileUrl) {
-        const oldFilePath = path.join(process.cwd(), "public", oldFileUrl);
-        try {
-          await fs.unlink(oldFilePath);
-        } catch (err: unknown) {
-          if (err instanceof Error && "code" in err && err.code !== "ENOENT") {
-            console.error("Erro ao remover arquivo antigo:", err);
+        const publicId = getPublicIdFromUrl(oldFileUrl);
+        if (publicId) {
+          try {
+            console.log(`Tentando deletar imagem antiga: ${publicId}`);
+            await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+            console.log(`Imagem antiga deletada: ${publicId}`);
+          } catch (deleteError) {
+            console.error("Erro ao deletar imagem antiga do Cloudinary:", deleteError);
+            // Continuar mesmo se a exclusão falhar (pode ser que o arquivo não exista mais)
           }
         }
       }
     }
 
-    // Gera o nome do novo arquivo e salva-o
-    const filename = `${id}-${type}-${Date.now()}.png`;
-    const filePath = path.join(uploadsFolder, filename);
-    await fs.writeFile(filePath, buffer);
+    // 2. Faz upload do novo arquivo para o Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(base64String, {
+      folder: `bionk/${type}s`, // Ex: bionk/banners ou bionk/profiles
+      public_id: `${id}-${type}-${Date.now()}`, // Garante um ID único, mas pode ser simplificado se preferir sobrescrever sempre
+      overwrite: true,
+      resource_type: "image",
+    });
 
-    // URL que será salva no banco e utilizada pelo frontend
-    const generatedUrl = `/uploads/${filename}`;
+    const generatedUrl = uploadResult.secure_url; // URL segura fornecida pelo Cloudinary
 
-    // Atualiza o registro do usuário no banco de dados
+    // --- Fim da Lógica de Cloudinary ---
+
+    // Atualiza o registro do usuário no banco de dados com a URL do Cloudinary
     await prisma.user.update({
       where: { id },
       data:
@@ -90,6 +107,13 @@ export async function POST(
     return NextResponse.json({ url: generatedUrl }, { status: 200 });
   } catch (error: unknown) {
     console.error("Erro no upload:", error);
+    // Verifica se é um erro específico do Cloudinary para dar mais detalhes
+    if (error && typeof error === 'object' && 'http_code' in error) {
+       return NextResponse.json(
+         { error: `Cloudinary Error: ${(error as any).message || 'Unknown error'}` },
+         { status: (error as any).http_code || 500 }
+       );
+    }
     return NextResponse.json(
       { error: "Erro ao processar o upload." },
       { status: 500 }

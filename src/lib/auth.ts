@@ -83,10 +83,11 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       const u = user as ExtendedUser
       if (user) {
-        token.id = user.id
-        token.email = user.email ?? undefined
-        token.username = u.username
-        token.name = u.name
+        token.id = user.id;
+        token.email = user.email ?? undefined;
+        token.username = u.username;
+        token.name = u.name;
+        token.picture = user.image ?? undefined;
       }
       if (account) {
         token.accessToken = account.access_token
@@ -95,10 +96,12 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       session.user = {
+        ...session.user,
         id: token.id as string,
         email: token.email ?? '',
         username: token.username as string,
         name: token.name as string,
+        image: token.picture ?? null,
       }
       return session
     },
