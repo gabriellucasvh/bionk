@@ -12,14 +12,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { GoogleBtn } from "@/components/buttons/button-google";
 import LoadingPage from "@/components/layout/LoadingPage";
+import { ForgotPasswordModal } from '@/components/modals/ForgotPasswordModal'; 
+import { Button } from '@/components/ui/button'; 
 
-// Define the form schema
 const schema = z.object({
   email: z.string().email("E-mail inválido"),
   password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
 });
 
-// Infer the TypeScript type from the schema
 type FormData = z.infer<typeof schema>;
 
 function Login() {
@@ -32,11 +32,11 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false); 
 
-  const { data: session, status } = useSession(); // Renamed to session to indicate intentional non-use
-  // Verifica apenas se existe sessão, sem acessar dados
+  const { data: session, status } = useSession(); 
   useEffect(() => {
-    if (session) { // Apenas verifica a existência
+    if (session) { 
       // Lógica que não expõe os dados da sessão
     }
   }, [session]);
@@ -77,6 +77,9 @@ function Login() {
       setLoading(false);
     }
   };
+  const openForgotPasswordModal = () => setIsForgotPasswordModalOpen(true);
+  const closeForgotPasswordModal = () => setIsForgotPasswordModalOpen(false);
+
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <form
@@ -117,8 +120,15 @@ function Login() {
             </div>
             {errors.password && <p className="text-red-600 text-sm -mt-3">{errors.password.message}</p>}
           </div>
-          <div className="-mt-5">
-            <Link href={"/"} className="text-blue-500 text-sm hover:underline">Esqueceu a senha?</Link>
+          <div className="-mt-5 text-left">
+            <Button
+              type="button"
+              variant="link"
+              className="text-blue-500 text-sm hover:underline p-0 h-auto"
+              onClick={openForgotPasswordModal} 
+            >
+              Esqueceu a senha?
+            </Button>
           </div>
           <div className="flex flex-col items-center justify-center space-y-4">
             <span className="w-full flex items-center justify-center h-px bg-gray-300">
@@ -147,6 +157,11 @@ function Login() {
           </span>
         </div>
       </form>
+
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordModalOpen}
+        onClose={closeForgotPasswordModal}
+      />
     </div>
   );
 }

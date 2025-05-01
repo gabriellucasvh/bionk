@@ -8,24 +8,26 @@ datasource db {
 }
 
 model User {
-  id               String        @id @default(uuid())
-  name             String?
-  username         String        @unique
-  email            String        @unique
-  bio              String?
-  provider         String?
-  emailVerified    DateTime?
-  template         String        @default("default")
-  templateCategory String        @default("minimalista")
-  image            String?
-  bannerUrl        String?
-  profileUrl       String?
-  hashedPassword   String?
-  createdAt        DateTime      @default(now())
-  accounts         Account[]
-  sessions         Session[]
-  Link             Link[]
-  ProfileView      ProfileView[]
+  id                   String        @id @default(uuid())
+  name                 String?
+  username             String        @unique
+  email                String        @unique
+  bio                  String?
+  provider             String?
+  emailVerified        DateTime?
+  template             String        @default("default")
+  templateCategory     String        @default("minimalista")
+  image                String?
+  bannerUrl            String?
+  profileUrl           String?
+  hashedPassword       String?
+  createdAt            DateTime      @default(now())
+  passwordResetToken   String?       @unique
+  passwordResetExpires DateTime?
+  accounts             Account[]
+  sessions             Session[]
+  Link                 Link[]
+  ProfileView          ProfileView[]
 }
 
 model Account {
