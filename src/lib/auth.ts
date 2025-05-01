@@ -2,10 +2,10 @@ import type { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import prisma from '@/lib/prisma' 
+import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-import { generateUniqueUsername } from '@/utils/generateUsername'
 import type { User } from 'next-auth'
+import { generateUniqueUsername } from '@/utils/generateUsername' // Importa a função
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -17,24 +17,36 @@ if (!clientId || !clientSecret) {
 
 interface ExtendedUser extends User {
   id: string
-  username?: string
+  username: string // Tornou-se obrigatório
   name?: string
 }
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma), // Use a instância importada
+  adapter: {
+    ...PrismaAdapter(prisma),
+    // Sobrescreve createUser para gerar username para OAuth
+    createUser: async (data: { name?: string; email: string }) => {
+      const username = await generateUniqueUsername(data.name ?? 'user');
+      return prisma.user.create({
+        data: {
+          ...data,
+          username,
+        },
+      });
+    },
+  },
   cookies:
     process.env.NODE_ENV === 'production'
       ? {
-          sessionToken: {
-            name: '__Secure-next-auth.session-token',
-            options: {
-              httpOnly: true,
-              sameSite: 'lax',
-              path: '/',
-              secure: true,
-            },
+        sessionToken: {
+          name: '__Secure-next-auth.session-token',
+          options: {
+            httpOnly: true,
+            sameSite: 'lax',
+            path: '/',
+            secure: true,
           },
-        }
+        },
+      }
       : undefined,
 
   providers: [
@@ -64,10 +76,12 @@ export const authOptions: NextAuthOptions = {
 
         if (!isValid) return null
 
+        // username é obrigatório pelo schema agora, então o findUnique garante que ele existe
+        // se o usuário for encontrado e tiver hashedPassword.
         return {
           id: user.id,
           email: user.email,
-          username: user.username ?? undefined,
+          username: user.username, // Removido ?? undefined
           name: user.name ?? undefined,
         }
       },
@@ -108,16 +122,12 @@ export const authOptions: NextAuthOptions = {
       return `${baseUrl}/dashboard/perfil`
     },
   },
-  events: {
-    async createUser({ user }) {
-      if (!user.username && user.name) {
-        // generateUniqueUsername já usa o prisma compartilhado após a modificação abaixo
-        const username = await generateUniqueUsername(user.name)
-        await prisma.user.update({ // Use a instância importada
-          where: { id: user.id },
-          data: { username },
-        })
-      }
-    },
-  },
+  // O evento createUser foi removido. A geração de username para novos usuários
+  // via Credentials é feita na rota /api/auth/register.
+  // Para provedores OAuth, o adapter tentará criar o usuário.
+  // Como 'username' é obrigatório no schema, a criação falhará se o provedor
+  // não fornecer um username e o adapter não o gerar. Idealmente, o adapter
+  // ou um callback personalizado deveria lidar com a geração se ausente.
+  // Por agora, confiamos que o provedor (Google) fornece dados suficientes
+  // ou que o registro via Credentials é o fluxo principal para usuários sem username inicial.
 }
