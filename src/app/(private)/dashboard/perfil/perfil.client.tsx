@@ -1,4 +1,3 @@
-// components/PerfilClient.tsx
 "use client";
 
 import { useState, useEffect, useRef, ChangeEvent } from "react";
@@ -14,7 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit, Loader2 } from "lucide-react"; // Importar Loader2
+import { Edit, Loader2 } from "lucide-react";
 import Image from "next/image";
 import ToastMessage from "@/components/ToastMessage";
 import LoadingPage from "@/components/layout/LoadingPage";
@@ -23,35 +22,34 @@ const PerfilClient = () => {
   const { data: session } = useSession();
   const [profile, setProfile] = useState({ name: "", username: "", bio: "" });
   const [originalProfile, setOriginalProfile] = useState({ name: "", username: "", bio: "" });
-  const [loading, setLoading] = useState(false); // Loading para salvar dados do perfil (texto)
-  const [isUploadingImage, setIsUploadingImage] = useState(false); // Loading para upload de imagem
+  const [loading, setLoading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [message, setMessage] = useState("");
   const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [profilePreview, setProfilePreview] = useState<string>(
-    session?.user?.image || "/person.png"
+    session?.user?.image || 'https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png'
   );
-  const [selectedProfileFile, setSelectedProfileFile] = useState<File | null>(null); // Estado para guardar o arquivo selecionado
-  const [profileImageChanged, setProfileImageChanged] = useState(false); // Estado para rastrear mudança de imagem
+  const [selectedProfileFile, setSelectedProfileFile] = useState<File | null>(null);
+  const [profileImageChanged, setProfileImageChanged] = useState(false);
   const profileInputRef = useRef<HTMLInputElement>(null);
-  const [originalProfileImageUrl, setOriginalProfileImageUrl] = useState<string>(""); // Guardar URL original
+  const [originalProfileImageUrl, setOriginalProfileImageUrl] = useState<string>("");
 
   useEffect(() => {
     if (!session?.user?.id) return;
     const fetchProfile = async () => {
-      setIsProfileLoading(true); // Inicia loading ao buscar
+      setIsProfileLoading(true);
       try {
         const res = await fetch(`/api/profile/${session.user.id}`);
-        const { name = "", username = "", bio = "", profileUrl } = await res.json();
-        const currentProfileUrl = profileUrl || session?.user?.image || "/person.png";
+        const { name = "", username = "", bio = "", image } = await res.json();
+        const currentImage = image || session?.user?.image || 'https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png';
         setProfile({ name, username, bio: bio || "" });
         setOriginalProfile({ name, username, bio: bio || "" });
-        setProfilePreview(currentProfileUrl);
-        setOriginalProfileImageUrl(currentProfileUrl); // Guarda a URL original
+        setProfilePreview(currentImage);
+        setOriginalProfileImageUrl(currentImage);
       } catch (error) {
         console.error("Erro ao buscar perfil:", error);
         setMessage("Erro ao carregar dados do perfil.");
-        // Mantém a imagem da sessão ou padrão em caso de erro
-        const fallbackUrl = session?.user?.image || "/person.png";
+        const fallbackUrl = session?.user?.image || 'https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png';
         setProfilePreview(fallbackUrl);
         setOriginalProfileImageUrl(fallbackUrl);
       } finally {
@@ -67,21 +65,19 @@ const PerfilClient = () => {
     return () => clearTimeout(timer);
   }, [message]);
 
-  // Verifica se houve alterações nos textos OU na imagem
   const textChanged =
     profile.name !== originalProfile.name ||
     profile.username !== originalProfile.username ||
     profile.bio !== originalProfile.bio;
   const hasChanges = textChanged || profileImageChanged;
 
-  // Função auxiliar para upload de imagem (chamada por handleSaveProfile)
   const uploadImage = async (file: File): Promise<boolean> => {
     if (!session?.user?.id) return false;
     setIsUploadingImage(true);
-    setMessage(""); // Limpa mensagens anteriores
+    setMessage("");
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("type", "profile"); // Hardcoded para perfil aqui
+    formData.append("type", "profile");
 
     try {
       const res = await fetch(`/api/profile/${session.user.id}/upload?type=profile`, {
@@ -90,47 +86,41 @@ const PerfilClient = () => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Falha no upload da imagem");
-      // A URL da imagem no banco foi atualizada, mas a preview já está com a nova imagem local.
-      // Atualizamos a URL original para refletir o estado salvo.
       if (data.url) {
-        setOriginalProfileImageUrl(data.url); // Atualiza a URL original após sucesso
+        setOriginalProfileImageUrl(data.url);
       }
-      setMessage("Foto de perfil atualizada com sucesso!"); // Mensagem específica de imagem
-      return true; // Indica sucesso
+      setMessage("Foto de perfil atualizada com sucesso!");
+      return true;
     } catch (error) {
       console.error(`Erro ao fazer upload da imagem:`, error);
       setMessage(`Erro no upload: ${error instanceof Error ? error.message : "Ocorreu um problema"}`);
-      // Reverte a preview para a imagem original salva se o upload falhar
       setProfilePreview(originalProfileImageUrl);
-      return false; // Indica falha
+      return false;
     } finally {
       setIsUploadingImage(false);
     }
   };
 
   const handleSaveProfile = async () => {
-    if (!session?.user?.id || (!textChanged && !profileImageChanged)) return; // Só salva se houver mudanças
+    if (!session?.user?.id || (!textChanged && !profileImageChanged)) return;
 
-    setLoading(true); // Inicia loading geral (pode cobrir texto e/ou imagem)
+    setLoading(true);
     setMessage("");
     let imageUploadSuccess = true;
     let finalMessage = "";
 
-    // 1. Tenta fazer upload da imagem se uma nova foi selecionada
     if (selectedProfileFile) {
       imageUploadSuccess = await uploadImage(selectedProfileFile);
       if (imageUploadSuccess) {
-        setSelectedProfileFile(null); // Limpa o arquivo selecionado após sucesso
-        setProfileImageChanged(false); // Reseta o estado de mudança da imagem
-        finalMessage = "Foto de perfil atualizada. "; // Adiciona à mensagem final
+        setSelectedProfileFile(null);
+        setProfileImageChanged(false);
+        finalMessage = "Foto de perfil atualizada. ";
       } else {
-        // Se o upload da imagem falhar, paramos aqui. A mensagem de erro já foi definida em uploadImage.
         setLoading(false);
         return;
       }
     }
 
-    // 2. Tenta salvar os dados do perfil (texto) se houveram mudanças OU se a imagem foi salva com sucesso (para atualizar estado geral)
     if (textChanged) {
       try {
         const res = await fetch(`/api/profile/${session.user.id}`, {
@@ -141,60 +131,49 @@ const PerfilClient = () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Falha ao atualizar o perfil");
 
-        setOriginalProfile(profile); // Atualiza o perfil original com os dados salvos
+        setOriginalProfile(profile);
         finalMessage += "Informações do perfil atualizadas com sucesso!";
       } catch (error) {
         console.error("Erro ao atualizar o perfil:", error);
-        // Se o upload da imagem teve sucesso mas o texto falhou, informa ambos
         finalMessage += `Erro ao salvar informações: ${error instanceof Error ? error.message : "Ocorreu um problema"}`;
-        setMessage(finalMessage); // Define a mensagem combinada ou de erro
+        setMessage(finalMessage);
         setLoading(false);
-        return; // Para a execução aqui se a atualização do texto falhar
+        return;
       }
     } else if (imageUploadSuccess && selectedProfileFile === null) {
-       // Se só a imagem foi alterada e salva com sucesso
        finalMessage = "Foto de perfil atualizada com sucesso!";
     }
 
-
-    setMessage(finalMessage || "Nenhuma alteração para salvar."); // Mensagem final de sucesso ou aviso
-    setLoading(false); // Finaliza loading geral
-    // Resetar estados de mudança só se tudo deu certo
+    setMessage(finalMessage || "Nenhuma alteração para salvar.");
+    setLoading(false);
     if (imageUploadSuccess) {
        setProfileImageChanged(false);
        setSelectedProfileFile(null);
     }
-    if (textChanged && imageUploadSuccess) { // Garante que o texto foi salvo
+    if (textChanged && imageUploadSuccess) {
         setOriginalProfile(profile);
     }
-
   };
 
-
-  // Chamado quando o input[type=file] muda
   const handleProfileFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
-    if (isUploadingImage) return; // Impede nova seleção durante upload
+    if (isUploadingImage) return;
 
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validação de tamanho
-    if (file.size > 2 * 1024 * 1024) { // 2MB
+    if (file.size > 2 * 1024 * 1024) {
       setMessage("Erro: A foto de perfil deve ter no máximo 2MB.");
-      // Limpa o valor do input para permitir selecionar o mesmo arquivo novamente se necessário
       if (profileInputRef.current) {
         profileInputRef.current.value = "";
       }
       return;
     }
 
-    // Gera URL local para preview imediato
     const previewUrl = URL.createObjectURL(file);
-    setProfilePreview(previewUrl); // Atualiza a imagem de preview
-    setSelectedProfileFile(file); // Guarda o arquivo para upload posterior no save
-    setProfileImageChanged(true); // Marca que a imagem foi alterada
+    setProfilePreview(previewUrl);
+    setSelectedProfileFile(file);
+    setProfileImageChanged(true);
 
-    // Limpa o valor do input para permitir selecionar o mesmo arquivo novamente se necessário
      if (profileInputRef.current) {
         profileInputRef.current.value = "";
      }
@@ -235,9 +214,8 @@ const PerfilClient = () => {
                   width={96}
                   height={96}
                   className="h-full w-full object-cover"
-                  key={profilePreview} // Adiciona key para forçar re-renderização se URL mudar
+                  key={profilePreview}
                 />
-                 {/* Indicador de Loading sobre a imagem */}
                  {isUploadingImage && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
                       <Loader2 className="h-6 w-6 text-white animate-spin" />
@@ -247,8 +225,8 @@ const PerfilClient = () => {
               <Button
                 size="icon"
                 className="absolute bottom-0 right-0 h-8 w-8 rounded-full"
-                onClick={() => !isUploadingImage && profileInputRef.current?.click()} // Só permite clique se não estiver carregando
-                disabled={isUploadingImage} // Desabilita botão durante upload
+                onClick={() => !isUploadingImage && profileInputRef.current?.click()}
+                disabled={isUploadingImage}
               >
                 {isUploadingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Edit className="h-4 w-4" />}
               </Button>
@@ -257,8 +235,8 @@ const PerfilClient = () => {
                 accept="image/*"
                 className="hidden"
                 ref={profileInputRef}
-                onChange={handleProfileFileSelect} // Mudou para handleProfileFileSelect
-                disabled={isUploadingImage} // Desabilita input durante upload
+                onChange={handleProfileFileSelect}
+                disabled={isUploadingImage}
               />
             </div>
             <div className="flex-1 space-y-4">
@@ -269,7 +247,7 @@ const PerfilClient = () => {
                   placeholder="Seu nome"
                   value={profile.name}
                   onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                  disabled={loading || isUploadingImage} // Desabilita durante qualquer loading
+                  disabled={loading || isUploadingImage}
                 />
               </div>
               <div className="grid gap-2">
@@ -281,7 +259,7 @@ const PerfilClient = () => {
                     placeholder="username"
                     value={profile.username}
                     onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-                    disabled={loading || isUploadingImage} // Desabilita durante qualquer loading
+                    disabled={loading || isUploadingImage}
                   />
                 </div>
               </div>
@@ -295,15 +273,15 @@ const PerfilClient = () => {
               className="min-h-32"
               value={profile.bio}
               onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-              disabled={loading || isUploadingImage} // Desabilita durante qualquer loading
+              disabled={loading || isUploadingImage}
             />
           </div>
           <div className="flex justify-end mt-4">
             <Button
               onClick={handleSaveProfile}
-              disabled={loading || isUploadingImage || !hasChanges} // Desabilita se carregando ou sem mudanças
+              disabled={loading || isUploadingImage || !hasChanges}
             >
-              {(loading || isUploadingImage) ? ( // Mostra texto de loading se qualquer operação estiver em andamento
+              {(loading || isUploadingImage) ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Salvando...

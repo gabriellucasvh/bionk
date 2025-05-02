@@ -5,7 +5,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import type { User } from 'next-auth'
-import { generateUniqueUsername } from '@/utils/generateUsername' // Importa a função
+import { generateUniqueUsername } from '@/utils/generateUsername'
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -17,7 +17,7 @@ if (!clientId || !clientSecret) {
 
 interface ExtendedUser extends User {
   id: string
-  username: string // Tornou-se obrigatório
+  username: string
   name?: string
 }
 export const authOptions: NextAuthOptions = {
@@ -30,6 +30,7 @@ export const authOptions: NextAuthOptions = {
         data: {
           ...data,
           username,
+          image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png",
         },
       });
     },
@@ -63,7 +64,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
 
-        const user = await prisma.user.findUnique({ // Use a instância importada
+        const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         })
 
@@ -76,12 +77,10 @@ export const authOptions: NextAuthOptions = {
 
         if (!isValid) return null
 
-        // username é obrigatório pelo schema agora, então o findUnique garante que ele existe
-        // se o usuário for encontrado e tiver hashedPassword.
         return {
           id: user.id,
           email: user.email,
-          username: user.username, // Removido ?? undefined
+          username: user.username,
           name: user.name ?? undefined,
         }
       },

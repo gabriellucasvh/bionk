@@ -17,9 +17,8 @@ model User {
   emailVerified        DateTime?
   template             String        @default("default")
   templateCategory     String        @default("minimalista")
-  image                String?
+  image                String?       @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")
   bannerUrl            String?
-  profileUrl           String?
   hashedPassword       String?
   createdAt            DateTime      @default(now())
   passwordResetToken   String?       @unique

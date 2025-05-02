@@ -1,10 +1,7 @@
 //api/profile/[id]/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import cloudinary from "@/lib/cloudinary"; // Importar Cloudinary
-// Remover imports de 'fs' e 'path'
-// import { promises as fs } from "fs";
-// import path from "path";
+import cloudinary from "@/lib/cloudinary"; 
 
 // Função auxiliar para extrair public_id de uma URL Cloudinary
 const getPublicIdFromUrl = (url: string): string | null => {
@@ -22,7 +19,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params; // Aguarda a resolução de params
+  const { id } = await params; 
 
   // Recupera o tipo (banner ou profile) via query string
   const { searchParams } = new URL(req.url);
@@ -63,11 +60,11 @@ export async function POST(
     // 1. Remove o arquivo antigo do Cloudinary, se existir
     const user = await prisma.user.findUnique({
       where: { id },
-      select: { bannerUrl: true, profileUrl: true },
+      select: { bannerUrl: true, image: true },
     });
 
     if (user) {
-      const oldFileUrl = type === "banner" ? user.bannerUrl : user.profileUrl;
+      const oldFileUrl = type === "banner" ? user.bannerUrl : user.image;
       if (oldFileUrl) {
         const publicId = getPublicIdFromUrl(oldFileUrl);
         if (publicId) {
@@ -77,7 +74,6 @@ export async function POST(
             console.log(`Imagem antiga deletada: ${publicId}`);
           } catch (deleteError) {
             console.error("Erro ao deletar imagem antiga do Cloudinary:", deleteError);
-            // Continuar mesmo se a exclusão falhar (pode ser que o arquivo não exista mais)
           }
         }
       }
@@ -91,17 +87,13 @@ export async function POST(
       resource_type: "image",
     });
 
-    const generatedUrl = uploadResult.secure_url; // URL segura fornecida pelo Cloudinary
-
-    // --- Fim da Lógica de Cloudinary ---
-
-    // Atualiza o registro do usuário no banco de dados com a URL do Cloudinary
+    const generatedUrl = uploadResult.secure_url; 
     await prisma.user.update({
       where: { id },
       data:
         type === "banner"
           ? { bannerUrl: generatedUrl }
-          : { profileUrl: generatedUrl },
+          : { image: generatedUrl},
     });
 
     return NextResponse.json({ url: generatedUrl }, { status: 200 });

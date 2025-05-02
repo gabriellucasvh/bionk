@@ -19,8 +19,8 @@ export async function GET(request: NextRequest, { params }: Params) {
         name: true,
         username: true,
         bio: true,
-        bannerUrl: true,   // Banner do usuário
-        profileUrl: true,  // Foto de perfil do usuário
+        bannerUrl: true,
+        image: true,
       },
     });
     
@@ -73,7 +73,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
         username: updatedUser.username,
         bio: updatedUser.bio,
         bannerUrl: updatedUser.bannerUrl,
-        profileUrl: updatedUser.profileUrl,
+        image: updatedUser.image,
       },
     });
   } catch (error) {
@@ -114,7 +114,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     // 1. Buscar as URLs das imagens do usuário ANTES de deletá-lo
     const user = await prisma.user.findUnique({
       where: { id },
-      select: { bannerUrl: true, profileUrl: true },
+      select: { bannerUrl: true, image: true },
     });
 
     if (!user) {
@@ -123,7 +123,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     }
 
     // 2. Deletar imagens do Cloudinary se existirem
-    const urlsToDelete = [user.bannerUrl, user.profileUrl].filter(Boolean) as string[]; // Filtra URLs nulas/vazias
+    const urlsToDelete = [user.bannerUrl, user.image].filter(Boolean) as string[]; // Filtra URLs nulas/vazias
 
     for (const url of urlsToDelete) {
       const publicId = getPublicIdFromUrl(url);
