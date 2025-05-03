@@ -19,7 +19,7 @@ const schema = z
   .object({
     name: z.string()
       .min(3, "Insira um nome de usuário válido")
-      .regex(/^[\p{L}0-9\s\-]+$/u, {
+      .regex(/^[a-zA-Z0-9\s\-]+$/, {
         message: "Use apenas letras, números e hífens",
       }),
 
