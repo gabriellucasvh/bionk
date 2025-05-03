@@ -1,21 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
-
-// Função para gerar um username único
-async function generateUniqueUsername(name: string): Promise<string> {
-  const baseUsername = name.toLowerCase().replace(/\s+/g, ""); // Changed to const
-  let username = baseUsername;
-  let count = 1;
-
-  // Verifica se o username já existe, se sim, tenta com número
-  while (await prisma.user.findFirst({ where: { username } })) {
-    username = `${baseUsername}${count}`;
-    count++;
-  }
-
-  return username;
-}
+import { generateUniqueUsername } from "@/utils/generateUsername";
 
 export async function POST(req: Request) {
   try {
