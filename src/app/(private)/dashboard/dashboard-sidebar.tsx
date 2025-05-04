@@ -47,11 +47,15 @@ const Sidebar = () => {
   const router = useRouter();
   const { data: session } = useSession(); 
   const [disabledButtons, setDisabledButtons] = useState<Set<string>>(() => new Set());
+  const [profileUrl, setProfileUrl] = useState<string>('#');
   const handleLogout = () => signOut();
 
-  const username = session?.user?.username; 
-  const baseUrl = process.env.NODE_ENV === 'production' ? 'https://www.bionk.me' : 'http://localhost:3000';
-  const profileUrl = username ? `${baseUrl}/${username}` : '#'; 
+  const username = session?.user?.username;
+
+  useEffect(() => {
+    const baseUrl = process.env.NODE_ENV === 'production' ? 'https://www.bionk.me' : 'http://localhost:3000';
+    setProfileUrl(username ? `${baseUrl}/${username}` : '#');
+  }, [username, session?.user?.username]); // Adiciona session?.user?.username como dependência
 
   useEffect(() => {
     setDisabledButtons(new Set());

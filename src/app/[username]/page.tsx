@@ -25,7 +25,9 @@ export default async function UserPage({ params }: PageProps) {
     },
   })) as UserWithLinks | null;
 
-  if (!user) notFound();
+  if (!user) {
+    notFound();
+  }
 
   const category = user.templateCategory ?? "minimalista";
   const name = user.template ?? "default";

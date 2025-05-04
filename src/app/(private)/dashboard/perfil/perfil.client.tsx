@@ -19,7 +19,7 @@ import ToastMessage from "@/components/ToastMessage";
 import LoadingPage from "@/components/layout/LoadingPage";
 
 const PerfilClient = () => {
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession(); // Obter a função update da sessão
   const [profile, setProfile] = useState({ name: "", username: "", bio: "" });
   const [originalProfile, setOriginalProfile] = useState({ name: "", username: "", bio: "" });
   const [loading, setLoading] = useState(false);
@@ -107,20 +107,26 @@ const PerfilClient = () => {
     setLoading(true);
     setMessage("");
     let imageUploadSuccess = true;
+    let textUpdateSuccess = false;
     let finalMessage = "";
+    let updatedUserData = null; // Para armazenar os dados do usuário atualizados pela API
 
+    // 1. Tentar upload da imagem se houver alteração
     if (selectedProfileFile) {
       imageUploadSuccess = await uploadImage(selectedProfileFile);
       if (imageUploadSuccess) {
         setSelectedProfileFile(null);
         setProfileImageChanged(false);
         finalMessage = "Foto de perfil atualizada. ";
+        // A URL da imagem atualizada já está em originalProfileImageUrl dentro de uploadImage
       } else {
+        // Se o upload da imagem falhar, interrompe e mostra a mensagem de erro
         setLoading(false);
         return;
       }
     }
 
+    // 2. Tentar atualização do texto se houver alteração
     if (textChanged) {
       try {
         const res = await fetch(`/api/profile/${session.user.id}`, {
@@ -131,28 +137,48 @@ const PerfilClient = () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Falha ao atualizar o perfil");
 
-        setOriginalProfile(profile);
+        updatedUserData = data.user; // Armazena os dados atualizados
+        setOriginalProfile({ name: updatedUserData.name, username: updatedUserData.username, bio: updatedUserData.bio || "" });
         finalMessage += "Informações do perfil atualizadas com sucesso!";
+        textUpdateSuccess = true;
       } catch (error) {
         console.error("Erro ao atualizar o perfil:", error);
         finalMessage += `Erro ao salvar informações: ${error instanceof Error ? error.message : "Ocorreu um problema"}`;
-        setMessage(finalMessage);
-        setLoading(false);
-        return;
+        // Mesmo com erro no texto, a imagem pode ter sido salva. Não retorna aqui ainda.
       }
-    } else if (imageUploadSuccess && selectedProfileFile === null) {
-       finalMessage = "Foto de perfil atualizada com sucesso!";
     }
 
-    setMessage(finalMessage || "Nenhuma alteração para salvar.");
+    // 3. Atualizar a sessão e recarregar SE HOUVE ALGUMA ALTERAÇÃO BEM-SUCEDIDA
+    if (imageUploadSuccess || textUpdateSuccess) {
+      try {
+        // Prepara os dados para updateSession
+        // Usa os dados da API se o texto foi atualizado, senão usa os dados atuais da sessão
+        // Garante que a imagem atualizada (se houve upload) seja incluída
+        const sessionUpdateData = {
+          ...session,
+          user: {
+            ...session?.user,
+            name: updatedUserData?.name ?? session?.user?.name, // Usa o nome atualizado ou o da sessão
+            username: updatedUserData?.username ?? session?.user?.username, // Usa o username atualizado ou o da sessão
+            image: imageUploadSuccess && selectedProfileFile === null ? originalProfileImageUrl : (updatedUserData?.image ?? session?.user?.image), // Usa a imagem recém-upada ou a da API ou a da sessão
+          },
+        };
+
+        await updateSession(sessionUpdateData);
+        setMessage(finalMessage || "Perfil atualizado!"); // Mensagem final
+        window.location.reload(); // Força o recarregamento APÓS updateSession
+
+      } catch (updateError) {
+        console.error("Erro ao atualizar a sessão local:", updateError);
+        setMessage(finalMessage + " Erro ao atualizar a sessão local.");
+      }
+    } else {
+      // Nenhuma alteração bem-sucedida (ou erro em ambas as operações)
+      setMessage(finalMessage || "Nenhuma alteração para salvar ou erro ocorrido.");
+    }
+
     setLoading(false);
-    if (imageUploadSuccess) {
-       setProfileImageChanged(false);
-       setSelectedProfileFile(null);
-    }
-    if (textChanged && imageUploadSuccess) {
-        setOriginalProfile(profile);
-    }
+    // Limpeza de estados de imagem já feita dentro dos blocos condicionais
   };
 
   const handleProfileFileSelect = (e: ChangeEvent<HTMLInputElement>) => {

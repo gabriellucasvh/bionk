@@ -7,17 +7,20 @@ import '@/app/globals.css'
 export default function IframePreview() {
   const { data: session, status } = useSession()
   const [iframeUrl, setIframeUrl] = useState<string>('')
+  const username = session?.user?.username;
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user?.username) {
+    if (status === 'authenticated' && username) {
       const baseUrl =
         process.env.NODE_ENV === 'production'
           ? 'https://www.bionk.me'
           : 'http://localhost:3000'
 
-      setIframeUrl(`${baseUrl}/${session.user.username}`)
+      setIframeUrl(`${baseUrl}/${username}`)
+    } else if (status === 'authenticated') {
+      setIframeUrl('about:blank'); 
     }
-  }, [session, status])
+  }, [username, status, session?.user?.username]) // Adiciona session?.user?.username como dependência
 
   return (
     <section className="fixed top-1/2 right-28 -translate-y-1/2 z-30 pointer-events-none">

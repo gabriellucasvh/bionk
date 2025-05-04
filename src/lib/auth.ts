@@ -92,8 +92,10 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user, account }) {
-      const u = user as ExtendedUser
+    async jwt({ token, user, account, trigger, session: updateSessionData }) { // Adiciona trigger e session
+      const u = user as ExtendedUser;
+
+      // Na autenticação inicial ou vinculação de conta
       if (user) {
         token.id = user.id;
         token.email = user.email ?? undefined;
@@ -102,9 +104,25 @@ export const authOptions: NextAuthOptions = {
         token.picture = user.image ?? undefined;
       }
       if (account) {
-        token.accessToken = account.access_token
+        token.accessToken = account.access_token;
       }
-      return token
+
+      // Se updateSession foi chamado no cliente
+      if (trigger === "update" && updateSessionData?.user) {
+        // Atualiza o token com os dados passados para updateSession
+        token.name = updateSessionData.user.name;
+        token.username = updateSessionData.user.username;
+        token.picture = updateSessionData.user.image;
+        // Opcional: Re-buscar do DB para garantir consistência, mas updateSessionData deve bastar.
+        // const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
+        // if (dbUser) {
+        //   token.name = dbUser.name;
+        //   token.username = dbUser.username;
+        //   token.picture = dbUser.image;
+        // }
+      }
+
+      return token;
     },
     async session({ session, token }) {
       session.user = {
@@ -114,8 +132,8 @@ export const authOptions: NextAuthOptions = {
         username: token.username as string,
         name: token.name as string,
         image: token.picture ?? null,
-      }
-      return session
+      };
+      return session;
     },
     async redirect({ baseUrl }) {
       return `${baseUrl}/dashboard/perfil`

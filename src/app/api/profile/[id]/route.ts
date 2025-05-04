@@ -1,5 +1,6 @@
 // app/api/profile/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache"; // Importar revalidatePath
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -66,6 +67,12 @@ export async function PUT(request: NextRequest, { params }: Params) {
       data: { name, username, bio },
     });
 
+    // Revalidar o cache da página do usuário após a atualização
+    if (username && updatedUser.username) {
+      const pathToRevalidate = `/${updatedUser.username}`;
+      revalidatePath(pathToRevalidate);
+    }
+
     return NextResponse.json({
       message: "Perfil atualizado com sucesso",
       user: {
@@ -77,16 +84,12 @@ export async function PUT(request: NextRequest, { params }: Params) {
       },
     });
   } catch (error) {
-    console.error("Erro ao atualizar perfil:", error);
     return NextResponse.json({ error: "Erro ao atualizar perfil" }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
 }
 
-// Função auxiliar para extrair public_id de uma URL Cloudinary
-// Considere mover esta função para um arquivo de utilidades compartilhado (ex: /lib/utils.ts)
-// e importá-la aqui e na rota de upload.
 const getPublicIdFromUrl = (url: string): string | null => {
   try {
     const regex = /\/v\d+\/(.+)\.\w+$/;
