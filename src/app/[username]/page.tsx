@@ -1,5 +1,6 @@
 // src/app/[username]/page.tsx
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import type { ComponentType } from "react";
@@ -10,6 +11,13 @@ type UserWithLinks = Prisma.UserGetPayload<{
 
 interface PageProps {
   params: Promise<{ username: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { username } = await params;
+  return {
+    title: `@${username}`,
+  };
 }
 
 export default async function UserPage({ params }: PageProps) {
