@@ -52,6 +52,7 @@ export default function TemplateSettings() {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
     const [currentTemplate, setCurrentTemplate] = useState<{ template: string; templateCategory: string } | null>(null);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchUserTemplate = async () => {
@@ -73,15 +74,45 @@ export default function TemplateSettings() {
     }, []);
 
     const handleSave = async () => {
-        if (!selectedTemplate) return;
+        if (!selectedTemplate || !selectedCategory) return;
 
-        await fetch("/api/update-template", {
-            method: "POST",
-            body: JSON.stringify({
-                template: selectedTemplate,
-                templateCategory: selectedCategory,
-            }),
-        });
+        setIsSaving(true);
+        const startTime = Date.now();
+
+        try {
+            const response = await fetch("/api/update-template", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    template: selectedTemplate,
+                    templateCategory: selectedCategory,
+                }),
+            });
+
+            if (response.ok) {
+                setCurrentTemplate({
+                    template: selectedTemplate,
+                    templateCategory: selectedCategory,
+                });
+            } else {
+                console.error('Error updating template:', await response.text());
+            }
+        } catch (error) {
+            console.error('Error saving template:', error);
+        } finally {
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = 5000 - elapsedTime;
+
+            if (remainingTime > 0) {
+                setTimeout(() => {
+                    setIsSaving(false);
+                }, remainingTime);
+            } else {
+                setIsSaving(false);
+            }
+        }
     };
 
     return (
@@ -118,9 +149,9 @@ export default function TemplateSettings() {
                         <Button
                             onClick={handleSave}
                             className=" py-2 rounded-lg text-white"
-                            disabled={!selectedTemplate}
+                            disabled={!selectedTemplate || isSaving}
                         >
-                            Salvar Template
+                            {isSaving ? "Salvando..." : "Salvar Template"}
                         </Button>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -143,9 +174,7 @@ export default function TemplateSettings() {
                                 </div>
                             ))
                         }
-
                     </div>
-
                 </div>
             )}
         </div>
