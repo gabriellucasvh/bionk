@@ -27,6 +27,7 @@ model User {
   sessions             Session[]
   Link                 Link[]
   ProfileView          ProfileView[]
+  SocialLink           SocialLink[]
 }
 
 model Account {
@@ -91,6 +92,21 @@ model LinkView {
   linkId    Int
   createdAt DateTime @default(now())
   link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+}
+
+model SocialLink {
+  id        String   @id @default(uuid())
+  platform  String
+  username  String
+  url       String
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, platform])
 }
 
 model ProfileView {
