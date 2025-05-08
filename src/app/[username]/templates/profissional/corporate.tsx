@@ -5,18 +5,20 @@ import { TemplateComponentProps } from "@/types/user-profile";
 import JoinBionkModal from "@/components/JoinBionkModal";
 
 export default function CorporateTemplate({ user }: TemplateComponentProps) {
-  // O usuário irá atualizar estes caminhos para os SVGs corretos em /public/icons/
+
   const socialIconMap: { [key: string]: string } = {
-    instagram: "/icons/instagram.svg",
-    twitter: "/icons/x.svg",
-    linkedin: "/icons/linkedin.svg",
-    github: "/icons/github-preto.svg", // Usar github.svg (escuro) para melhor contraste com fundo claro
-    facebook: "/icons/facebook.svg",
-    tiktok: "/icons/tiktok.svg",
-    youtube: "/icons/youtube.svg",
-    twitch: "/icons/twitch.svg",
-    discord: "/icons/discord.svg",
-    website: "/icons/link.svg", // Ícone genérico para website
+    instagram: "/icons/instagram-preto.svg",
+    twitter: "/icons/x-preto.svg",
+    linkedin: "/icons/linkedin.svg", 
+    github: "/icons/github-preto.svg",
+    facebook: "/icons/facebook.svg", 
+    tiktok: "/icons/tiktok.svg", 
+    youtube: "/icons/youtube.svg", 
+    twitch: "/icons/twitch.svg", 
+    discord: "/icons/discord.svg", 
+    soundcloud: "/icons/soundcloud-logo-preto.svg",
+    patreon: "/icons/patreon-preto.svg",
+    website: "/icons/link.svg", 
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 py-8 px-4 text-gray-900">

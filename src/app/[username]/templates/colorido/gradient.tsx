@@ -5,18 +5,17 @@ import { TemplateComponentProps } from "@/types/user-profile"
 import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function GradientTemplate({ user }: TemplateComponentProps) {
-  // O usuário irá atualizar estes caminhos para os SVGs corretos em /public/icons/
   const socialIconMap: { [key: string]: string } = {
-    instagram: "/icons/instagram.svg",
-    twitter: "/icons/x.svg",
+    instagram: "/icons/instagram-branco.svg",
+    twitter: "/icons/x-branco.svg",
     linkedin: "/icons/linkedin.svg",
-    github: "/icons/github-preto.svg", // Manter light para contraste com fundos coloridos
+    github: "/icons/github-branco.svg",
     facebook: "/icons/facebook.svg",
     tiktok: "/icons/tiktok.svg",
     youtube: "/icons/youtube.svg",
     twitch: "/icons/twitch.svg",
     discord: "/icons/discord.svg",
-    website: "/icons/link.svg", // Ícone genérico para website
+    website: "/icons/link.svg",
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-400 via-rose-400 to-lime-400 py-8 px-4">

@@ -5,18 +5,18 @@ import { TemplateComponentProps } from '@/types/user-profile'
 import JoinBionkModal from '@/components/JoinBionkModal'
 
 export default function NeonTemplate({ user }: TemplateComponentProps) {
-  // O usuário irá atualizar estes caminhos para os SVGs corretos em /public/icons/
+
   const socialIconMap: { [key: string]: string } = {
-    instagram: "/icons/instagram.svg",
-    twitter: "/icons/x.svg",
+    instagram: "/icons/instagram-preto.svg",
+    twitter: "/icons/x-preto.svg",
     linkedin: "/icons/linkedin.svg",
-    github: "/icons/github-preto.svg", // Manter light para contraste com fundo escuro
+    github: "/icons/github-preto.svg",
     facebook: "/icons/facebook.svg",
     tiktok: "/icons/tiktok.svg",
     youtube: "/icons/youtube.svg",
     twitch: "/icons/twitch.svg",
     discord: "/icons/discord.svg",
-    website: "/icons/link.svg", // Ícone genérico para website
+    website: "/icons/link.svg", 
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-800 to-pink-900 py-8 px-4 text-white overflow-hidden relative">
@@ -92,8 +92,8 @@ export default function NeonTemplate({ user }: TemplateComponentProps) {
         </section>
 
         <footer className="mt-10">
-          <div className="animate-pulse inline-block px-2 py-1  bg-pink-500 rounded-full text-white  shadow-lg shadow-pink-400 drop-shadow-[0_0_20px_rgba(255,0,255,1)]">
-            ⚡ <JoinBionkModal>{user.username}</JoinBionkModal> ⚡
+          <div className="animate-pulse inline-block px-3 py-1  bg-pink-500 rounded-full text-white  shadow-lg shadow-pink-400 drop-shadow-[0_0_20px_rgba(255,0,255,1)]">
+            <JoinBionkModal>{user.username}</JoinBionkModal>
           </div>
         </footer>
       </main>

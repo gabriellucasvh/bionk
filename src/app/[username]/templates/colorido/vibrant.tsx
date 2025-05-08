@@ -5,18 +5,19 @@ import { TemplateComponentProps } from "@/types/user-profile"
 import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function VibrantTemplate({ user }: TemplateComponentProps) {
-  // O usuário irá atualizar estes caminhos para os SVGs corretos em /public/icons/
   const socialIconMap: { [key: string]: string } = {
-    instagram: "/icons/instagram.svg",
-    twitter: "/icons/x.svg",
-    linkedin: "/icons/linkedin.svg",
-    github: "/icons/github-preto.svg", // Manter light para contraste com fundos coloridos
-    facebook: "/icons/facebook.svg",
-    tiktok: "/icons/tiktok.svg",
-    youtube: "/icons/youtube.svg",
-    twitch: "/icons/twitch.svg",
-    discord: "/icons/discord.svg",
-    website: "/icons/link.svg", // Ícone genérico para website
+    instagram: "/icons/instagram-branco.svg",
+    twitter: "/icons/x-branco.svg",
+    linkedin: "/icons/linkedin.svg", 
+    github: "/icons/github-branco.svg",
+    facebook: "/icons/facebook.svg", 
+    tiktok: "/icons/tiktok.svg", 
+    youtube: "/icons/youtube.svg", 
+    twitch: "/icons/twitch.svg", 
+    discord: "/icons/discord.svg", 
+    soundcloud: "/icons/soundcloud-logo-branco.svg",
+    patreon: "/icons/patreon-branco.svg",
+    website: "/icons/link.svg",
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-fuchsia-600 via-violet-600 to-blue-600 py-8 px-4">
@@ -71,12 +72,10 @@ export default function VibrantTemplate({ user }: TemplateComponentProps) {
           </ul>
         </section>
 
-        <footer className="mt-10 text-white text-sm font-bold border-t border-cyan-500 pt-4 w-full text-center">
-          <span className="bg-cyan-500 px-3 py-1 rounded-full animate-pulse">
+        <footer className="mt-10 text-white text-sm font-bold border-t pt-4 w-full text-center">
             <JoinBionkModal>
               {user.username}
             </JoinBionkModal>
-          </span>
         </footer>
       </main>
     </div>
