@@ -6,6 +6,19 @@ import { TemplateComponentProps } from "@/types/user-profile"
 import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function CleanTemplate({ user }: TemplateComponentProps) {
+  // O usuário irá atualizar estes caminhos para os SVGs corretos em /public/icons/
+  const socialIconMap: { [key: string]: string } = {
+    instagram: "/icons/instagram.svg",
+    twitter: "/icons/x.svg",
+    linkedin: "/icons/linkedin.svg",
+    github: "/icons/github-preto.svg", // Usar github.svg (escuro) para melhor contraste com fundo claro
+    facebook: "/icons/facebook.svg",
+    tiktok: "/icons/tiktok.svg",
+    youtube: "/icons/youtube.svg",
+    twitch: "/icons/twitch.svg",
+    discord: "/icons/discord.svg",
+    website: "/icons/link.svg", // Ícone genérico para website
+  };
   return (
     <div className="min-h-screen bg-white text-gray-900 py-12 px-6 flex justify-center">
       <ProfileViewTracker userId={user.id} />
@@ -44,6 +57,31 @@ export default function CleanTemplate({ user }: TemplateComponentProps) {
             >
               {user.bio}
             </MotionP>
+          )}
+          {user.SocialLink && user.SocialLink.length > 0 && (
+            <MotionDiv 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mt-6 flex justify-center items-center space-x-4">
+              {user.SocialLink.map((social) => {
+                const iconPath = socialIconMap[social.platform.toLowerCase()];
+                return iconPath ? (
+                  <a
+                    key={social.id}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-500 hover:text-gray-700 transition-colors duration-200 ease-in-out transform hover:scale-110 flex items-center justify-center"
+                    aria-label={social.platform}
+                    title={social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
+                    style={{ width: '24px', height: '24px' }}
+                  >
+                    <Image src={iconPath} alt={social.platform} width={22} height={22} />
+                  </a>
+                ) : null;
+              })}
+            </MotionDiv>
           )}
         </header>
 

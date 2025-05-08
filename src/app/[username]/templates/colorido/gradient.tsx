@@ -5,6 +5,19 @@ import { TemplateComponentProps } from "@/types/user-profile"
 import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function GradientTemplate({ user }: TemplateComponentProps) {
+  // O usuário irá atualizar estes caminhos para os SVGs corretos em /public/icons/
+  const socialIconMap: { [key: string]: string } = {
+    instagram: "/icons/instagram.svg",
+    twitter: "/icons/x.svg",
+    linkedin: "/icons/linkedin.svg",
+    github: "/icons/github-preto.svg", // Manter light para contraste com fundos coloridos
+    facebook: "/icons/facebook.svg",
+    tiktok: "/icons/tiktok.svg",
+    youtube: "/icons/youtube.svg",
+    twitch: "/icons/twitch.svg",
+    discord: "/icons/discord.svg",
+    website: "/icons/link.svg", // Ícone genérico para website
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-400 via-rose-400 to-lime-400 py-8 px-4">
       <ProfileViewTracker userId={user.id} />
@@ -24,6 +37,27 @@ export default function GradientTemplate({ user }: TemplateComponentProps) {
             <p className="mt-2 bg-gradient-to-r from-purple-100 to-cyan-200 text-transparent bg-clip-text font-medium">
               {user.bio}
             </p>
+          )}
+          {user.SocialLink && user.SocialLink.length > 0 && (
+            <div className="mt-4 flex justify-center items-center space-x-3 sm:space-x-4">
+              {user.SocialLink.map((social) => {
+                const iconPath = socialIconMap[social.platform.toLowerCase()];
+                return iconPath ? (
+                  <a
+                    key={social.id}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white hover:opacity-80 transition-opacity duration-200 ease-in-out transform hover:scale-110 flex items-center justify-center filter drop-shadow-sm"
+                    aria-label={social.platform}
+                    title={social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
+                    style={{ width: '24px', height: '24px' }}
+                  >
+                    <Image src={iconPath} alt={social.platform} width={22} height={22} />
+                  </a>
+                ) : null;
+              })}
+            </div>
           )}
         </header>
 

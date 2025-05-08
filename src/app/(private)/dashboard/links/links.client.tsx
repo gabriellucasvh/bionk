@@ -72,7 +72,7 @@ const ICON_MAP = [
   { keyword: "discord", src: "/icons/discord.svg", alt: "Discord" },
   { keyword: "buymeacoffee", src: "/icons/bmc.svg", alt: "Buy Me a Coffee" },
   { keyword: "facebook", src: "/icons/facebook.svg", alt: "Facebook" },
-  { keyword: "github", src: "/icons/github-light.svg", alt: "GitHub" },
+  { keyword: "github", src: "/icons/github-preto.svg", alt: "GitHub" },
   { keyword: "gitlab", src: "/icons/gitlab.svg", alt: "GitLab" },
   { keyword: "linkedin", src: "/icons/linkedin.svg", alt: "LinkedIn" },
   { keyword: "gmail", src: "/icons/mail.svg", alt: "Email" },

@@ -5,6 +5,19 @@ import { TemplateComponentProps } from '@/types/user-profile'
 import JoinBionkModal from '@/components/JoinBionkModal'
 
 export default function NeonTemplate({ user }: TemplateComponentProps) {
+  // O usuário irá atualizar estes caminhos para os SVGs corretos em /public/icons/
+  const socialIconMap: { [key: string]: string } = {
+    instagram: "/icons/instagram.svg",
+    twitter: "/icons/x.svg",
+    linkedin: "/icons/linkedin.svg",
+    github: "/icons/github-preto.svg", // Manter light para contraste com fundo escuro
+    facebook: "/icons/facebook.svg",
+    tiktok: "/icons/tiktok.svg",
+    youtube: "/icons/youtube.svg",
+    twitch: "/icons/twitch.svg",
+    discord: "/icons/discord.svg",
+    website: "/icons/link.svg", // Ícone genérico para website
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-800 to-pink-900 py-8 px-4 text-white overflow-hidden relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,0,255,0.2)_0%,rgba(0,0,0,0)_80%)] pointer-events-none"></div>
@@ -28,6 +41,27 @@ export default function NeonTemplate({ user }: TemplateComponentProps) {
             <p className="mt-2 text-gray-300 drop-shadow-[0_0_10px_rgba(255,255,255,0.6)]">
               {user.bio}
             </p>
+          )}
+          {user.SocialLink && user.SocialLink.length > 0 && (
+            <div className="mt-6 flex justify-center items-center space-x-4">
+              {user.SocialLink.map((social) => {
+                const iconPath = socialIconMap[social.platform.toLowerCase()];
+                return iconPath ? (
+                  <a
+                    key={social.id}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-pink-400 hover:text-blue-400 transition-colors duration-200 ease-in-out transform hover:scale-110 flex items-center justify-center filter drop-shadow-[0_0_8px_rgba(255,0,255,0.7)]"
+                    aria-label={social.platform}
+                    title={social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
+                    style={{ width: '26px', height: '26px' }} // Slightly larger for neon effect
+                  >
+                    <Image src={iconPath} alt={social.platform} width={24} height={24} />
+                  </a>
+                ) : null;
+              })}
+            </div>
           )}
         </header>
 

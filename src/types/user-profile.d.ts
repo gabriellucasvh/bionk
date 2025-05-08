@@ -17,7 +17,27 @@ export interface UserLink {
     template?: string;
     templateCategory?: string;
     Link: UserLink[];
+    SocialLink?: SocialLink[];
   }
+  
+export interface SocialLink {
+  id: string;
+  platform: SocialPlatform;
+  url: string;
+}
+
+export enum SocialPlatform {
+  Instagram = "instagram",
+  Twitter = "twitter",
+  LinkedIn = "linkedin",
+  GitHub = "github",
+  Facebook = "facebook",
+  TikTok = "tiktok",
+  YouTube = "youtube",
+  Twitch = "twitch",
+  Discord = "discord",
+  Website = "website",
+}
   
   export interface TemplateComponentProps {
     user: UserProfile;

@@ -35,7 +35,7 @@ const SOCIAL_PLATFORMS: SocialPlatform[] = [
   { key: "youtube", name: "YouTube", icon: "/icons/youtube.svg", baseUrl: "https://youtube.com/", placeholder: "@seuCanal" },
   { key: "facebook", name: "Facebook", icon: "/icons/facebook.svg", baseUrl: "https://facebook.com/", placeholder: "seu.perfil" },
   { key: "linkedin", name: "LinkedIn", icon: "/icons/linkedin.svg", baseUrl: "https://linkedin.com/in/", placeholder: "seu-perfil-linkedin" },
-  { key: "github", name: "GitHub", icon: "/icons/github-light.svg", baseUrl: "https://github.com/", placeholder: "seu-usuario" },
+  { key: "github", name: "GitHub", icon: "/icons/github-preto.svg", baseUrl: "https://github.com/", placeholder: "seu-usuario" },
   { key: "pinterest", name: "Pinterest", icon: "/icons/pinterest.svg", baseUrl: "https://pinterest.com/", placeholder: "seuusuario" },
   { key: "discord", name: "Discord", icon: "/icons/discord.svg", baseUrl: "https://discord.gg/", placeholder: "codigoConvite" },
   { key: "twitch", name: "Twitch", icon: "/icons/twitch.svg", baseUrl: "https://twitch.tv/", placeholder: "seuCanal" },

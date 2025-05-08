@@ -5,6 +5,19 @@ import JoinBionkModal from "@/components/JoinBionkModal"
 import { TemplateComponentProps } from "@/types/user-profile"
 
 export default function DefaultTemplate({ user }: TemplateComponentProps) {
+  // O usuário irá atualizar estes caminhos para os SVGs corretos em /public/icons/
+  const socialIconMap: { [key: string]: string } = {
+    instagram: "/icons/instagram.svg",
+    twitter: "/icons/x.svg",
+    linkedin: "/icons/linkedin.svg",
+    github: "/icons/github-preto.svg", // Adequado para fundos escuros
+    facebook: "/icons/facebook.svg",
+    tiktok: "/icons/tiktok.svg",
+    youtube: "/icons/youtube.svg",
+    twitch: "/icons/twitch.svg",
+    discord: "/icons/discord.svg",
+    website: "/icons/link.svg", // Ícone genérico para website
+  };
   return (
     <div className="min-h-screen bg-black text-white py-10 px-4 font-mono">
       <ProfileViewTracker userId={user.id} />
@@ -22,6 +35,27 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
           )}
           <h1 className="text-2xl font-bold text-[#00fff7] uppercase tracking-widest">{user.name || user.username}</h1>
           {user.bio && <p className="mt-2 text-[#ff00f7] text-sm">{user.bio}</p>}
+          {user.SocialLink && user.SocialLink.length > 0 && (
+            <div className="mt-4 flex justify-center items-center space-x-3 sm:space-x-4">
+              {user.SocialLink.map((social) => {
+                const iconPath = socialIconMap[social.platform.toLowerCase()];
+                return iconPath ? (
+                  <a
+                    key={social.id}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#00fff7] hover:text-[#ff00f7] transition-colors duration-200 ease-in-out transform hover:scale-110 flex items-center justify-center"
+                    aria-label={social.platform}
+                    title={social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
+                    style={{ width: '24px', height: '24px' }}
+                  >
+                    <Image src={iconPath} alt={social.platform} width={22} height={22} />
+                  </a>
+                ) : null;
+              })}
+            </div>
+          )}
         </header>
 
         <section className="w-full">

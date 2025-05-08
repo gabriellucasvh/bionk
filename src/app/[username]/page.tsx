@@ -5,8 +5,11 @@ import prisma from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import type { ComponentType } from "react";
 
-type UserWithLinks = Prisma.UserGetPayload<{
-  include: { Link: { where: { active: true }; orderBy: { order: "asc" } } };
+type UserProfileData = Prisma.UserGetPayload<{
+  include: {
+    Link: { where: { active: true }; orderBy: { order: "asc" } };
+    SocialLink: { orderBy: { platform: "asc" } };
+  };
 }>;
 
 interface PageProps {
@@ -30,8 +33,11 @@ export default async function UserPage({ params }: PageProps) {
         where: { active: true },
         orderBy: { order: "asc" },
       },
+      SocialLink: {
+        orderBy: { platform: "asc" },
+      },
     },
-  })) as UserWithLinks | null;
+  })) as UserProfileData | null;
 
   if (!user) {
     notFound();
@@ -40,21 +46,21 @@ export default async function UserPage({ params }: PageProps) {
   const category = user.templateCategory ?? "minimalista";
   const name = user.template ?? "default";
 
-  let TemplateComponent: ComponentType<{ user: UserWithLinks }>;
+  let TemplateComponent: ComponentType<{ user: UserProfileData }>;
 
   try {
     const mod = await import(
       `@/app/[username]/templates/${category}/${name}.tsx`
     );
     TemplateComponent = mod.default as ComponentType<{
-      user: UserWithLinks;
+      user: UserProfileData;
     }>;
   } catch {
     const mod = await import(
       `@/app/[username]/templates/minimalista/default`
     );
     TemplateComponent = mod.default as ComponentType<{
-      user: UserWithLinks;
+      user: UserProfileData;
     }>;
   }
 
