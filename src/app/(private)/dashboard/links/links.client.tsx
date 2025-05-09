@@ -86,7 +86,7 @@ const ICON_MAP = [
   { keyword: "t.me", src: "/icons/telegram.svg", alt: "Telegram" },
   { keyword: "tiktok", src: "/icons/tiktok.svg", alt: "Tiktok" },
   { keyword: "twitch", src: "/icons/twitch.svg", alt: "Twitch" },
-  { keyword: "x.com", src: "/icons/x.svg", alt: "X" },
+  { keyword: "x.com", src: "/icons/x-preto.svg", alt: "X" },
   { keyword: "youtube", src: "/icons/youtube.svg", alt: "Youtube" },
 ];
 

@@ -29,8 +29,8 @@ interface SocialPlatform {
 }
 
 const SOCIAL_PLATFORMS: SocialPlatform[] = [
-  { key: "instagram", name: "Instagram", icon: "/icons/instagram.svg", baseUrl: "https://instagram.com/", placeholder: "seu.usuario" },
-  { key: "x", name: "X (Twitter)", icon: "/icons/x.svg", baseUrl: "https://x.com/", placeholder: "seuUsuario" },
+  { key: "instagram", name: "Instagram", icon: "/icons/instagram-preto.svg", baseUrl: "https://instagram.com/", placeholder: "seu.usuario" },
+  { key: "x", name: "X (Twitter)", icon: "/icons/x-preto.svg", baseUrl: "https://x.com/", placeholder: "seuUsuario" },
   { key: "tiktok", name: "TikTok", icon: "/icons/tiktok.svg", baseUrl: "https://tiktok.com/@", placeholder: "seu.usuario" },
   { key: "youtube", name: "YouTube", icon: "/icons/youtube.svg", baseUrl: "https://youtube.com/", placeholder: "@seuCanal" },
   { key: "facebook", name: "Facebook", icon: "/icons/facebook.svg", baseUrl: "https://facebook.com/", placeholder: "seu.perfil" },
