@@ -47,6 +47,11 @@ type Profile = {
 
 export default function ConfigsClient() {
   const { data: session } = useSession();
+  // Determina se o usuário autenticou via credenciais.
+  // Isso depende do objeto de sessão ser aumentado com `isCredentialsUser: boolean`
+  // no callback da sessão NextAuth.js `authOptions`.
+  // Se `isCredentialsUser` não estiver presente ou for falso, as opções serão desabilitadas.
+  const isCredentialsUser = session?.user?.isCredentialsUser === true;
   const [profile, setProfile] = useState<Profile>({ email: "" });
   const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [isArchivedModalOpen, setIsArchivedModalOpen] = useState(false);
@@ -154,9 +159,20 @@ export default function ConfigsClient() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/profile/change-email" passHref>
-              <Button variant="outline">Alterar E-mail</Button>
-            </Link>
+            {isCredentialsUser ? (
+              <Link href="/profile/change-email" passHref>
+                <Button variant="outline">Alterar E-mail</Button>
+              </Link>
+            ) : (
+              <Button variant="outline" disabled>
+                Alterar E-mail
+              </Button>
+            )}
+            {!isCredentialsUser && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Opção indisponível para login via provedor externo.
+              </p>
+            )}
           </CardContent>
         </Card>
       </article>
@@ -173,9 +189,20 @@ export default function ConfigsClient() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/profile/change-password" passHref>
-              <Button variant="outline">Alterar Senha</Button>
-            </Link>
+            {isCredentialsUser ? (
+              <Link href="/profile/change-password" passHref>
+                <Button variant="outline">Alterar Senha</Button>
+              </Link>
+            ) : (
+              <Button variant="outline" disabled>
+                Alterar Senha
+              </Button>
+            )}
+            {!isCredentialsUser && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Opção indisponível para login via provedor externo.
+              </p>
+            )}
           </CardContent>
         </Card>
       </article>

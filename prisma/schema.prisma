@@ -28,6 +28,11 @@ model User {
   Link                 Link[]
   ProfileView          ProfileView[]
   SocialLink           SocialLink[]
+
+  // Campos para verificação de novo e-mail
+  newEmailPending             String?   @unique // Armazena o novo e-mail pendente de verificação
+  emailVerificationToken      String?   @unique // Armazena o token para verificar o novo e-mail
+  emailVerificationTokenExpires DateTime? // Data de expiração do token de verificação de e-mail
 }
 
 model Account {

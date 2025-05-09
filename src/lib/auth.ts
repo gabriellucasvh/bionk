@@ -103,8 +103,10 @@ export const authOptions: NextAuthOptions = {
         token.name = u.name;
         token.picture = user.image ?? undefined;
       }
-      if (account) {
+      if (account) { // account is only available on successful sign-in
         token.accessToken = account.access_token;
+        // Armazena se o login foi feito via 'credentials'
+        token.isCredentialsUser = account.provider === 'credentials';
       }
 
       // Se updateSession foi chamado no cliente
@@ -132,6 +134,8 @@ export const authOptions: NextAuthOptions = {
         username: token.username as string,
         name: token.name as string,
         image: token.picture ?? null,
+        // Passa a informação para o objeto da sessão do cliente
+        isCredentialsUser: token.isCredentialsUser as boolean | undefined,
       };
       return session;
     },

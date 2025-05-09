@@ -261,7 +261,7 @@ export default function TermosECondicoes() {
                   <br />
                   Brasil
                   <br />
-                  Email: suporte@bionk.com
+                  Email: suporte@bionk.me
                 </p>
               </section>
             </div>

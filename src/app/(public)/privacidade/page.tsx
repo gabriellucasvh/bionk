@@ -346,7 +346,7 @@ export default function PoliticaDePrivacidade() {
                   <br />
                   Brasil
                   <br />
-                  Email: suporte@bionk.com
+                  Email: suporte@bionk.me
                 </p>
               </section>
             </div>
