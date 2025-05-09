@@ -32,6 +32,7 @@ import {
   Plus,
   Trash2,
   MousePointerClick,
+  Archive as ArchiveBox, // Renomeado para ArchiveBox para evitar conflito se houver outro Archive
 } from "lucide-react";
 import {
   DndContext,
@@ -62,6 +63,7 @@ type LinkItem = {
   sensitive: boolean;
   order: number;
   isEditing?: boolean;
+  archived?: boolean;
 };
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -291,6 +293,30 @@ const LinksClient = () => {
     }
   };
 
+  const handleArchiveLink = async (id: number) => {
+    // Optimistic update: remove from UI immediately
+    setLinks((prevLinks) => prevLinks.filter(link => link.id !== id));
+
+    try {
+      const res = await fetch(`/api/links/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ archived: true }),
+      });
+
+      if (!res.ok) {
+        // Reverter em caso de erro
+        console.error("Falha ao arquivar o link, forçando revalidação...");
+        await mutateLinks(); 
+      } else {
+        await mutateLinks(); // Revalidar dados para garantir consistência
+      }
+    } catch (error) {
+      console.error("Erro ao arquivar o link:", error);
+      await mutateLinks(); // Tentar re-sincronizar em caso de erro de rede
+    }
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
@@ -513,9 +539,9 @@ const LinksClient = () => {
                               <Edit className="mr-2 h-4 w-4" />
                               Editar
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
-                              Ver informações
+                            <DropdownMenuItem onClick={() => handleArchiveLink(link.id)}>
+                              <ArchiveBox className="mr-2 h-4 w-4" />
+                              Arquivar
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => toggleSensitive(link.id)}>
                               {link.sensitive ? (

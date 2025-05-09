@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
+  const status = searchParams.get("status"); // 'active', 'archived', or null (defaults to active)
 
   if (!userId) {
     return NextResponse.json(
@@ -13,8 +14,16 @@ export async function GET(request: Request) {
   }
 
   try {
+    let whereClause: { userId: string; archived?: boolean } = { userId };
+    if (status === "archived") {
+      whereClause.archived = true;
+    } else {
+      // Default to fetching non-archived links (active or all non-archived)
+      whereClause.archived = false;
+    }
+
     const links = await prisma.link.findMany({
-      where: { userId },
+      where: whereClause,
       orderBy: { order: "asc" },
     });
     return NextResponse.json({ links });
@@ -30,7 +39,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, title, url, active, clicks, sensitive } = body;
+    const { userId, title, url, active, clicks, sensitive, archived } = body;
 
     if (!userId || !title || !url) {
       return NextResponse.json(
@@ -64,6 +73,7 @@ export async function POST(request: Request) {
         active: active ?? true,
         clicks: clicks ?? 0,
         sensitive: sensitive ?? false,
+        archived: archived ?? false, // Default to not archived
         order: 0, // Novo link sempre no topo
       },
     });

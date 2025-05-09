@@ -74,6 +74,7 @@ model Link {
   sensitive Boolean     @default(false)
   clicks    Int         @default(0)
   order     Int         @default(0)
+  archived  Boolean     @default(false)
   userId    String
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   LinkClick LinkClick[]

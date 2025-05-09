@@ -8,7 +8,8 @@ type LinkItem = {
   id: number;
   title: string;
   url: string;
-  active: boolean;
+  active: boolean; // Mantido para compatibilidade, mas a lógica principal usará 'archived'
+  archived?: boolean;
 };
 
 interface ArchivedLinksModalProps {
@@ -24,7 +25,7 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
     if (isOpen && session?.user?.id) {
       const fetchArchivedLinks = async () => {
         const res = await fetch(
-          `/api/links?userId=${session.user.id}&active=false`
+          `/api/links?userId=${session.user.id}&status=archived`
         );
         const data = await res.json();
         setArchivedLinks(data.links || []);
@@ -37,7 +38,7 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
     const res = await fetch(`/api/links/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ active: true }),
+      body: JSON.stringify({ archived: false }), // Restaurar significa definir archived como false
     });
     if (res.ok) {
       setArchivedLinks(archivedLinks.filter((link) => link.id !== id));
