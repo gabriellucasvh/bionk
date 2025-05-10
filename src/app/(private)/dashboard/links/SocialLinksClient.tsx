@@ -9,167 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Plus, Trash2, Edit, Save, X } from "lucide-react";
 import useSWR from "swr";
-
-interface SocialLinkItem {
-  id: string; 
-  platform: string;
-  username: string;
-  url: string;
-  userId: string;
-  order: number;
-  active: boolean;
-}
-
-interface SocialPlatform {
-  key: string;
-  name: string;
-  icon: string;
-  baseUrl: string; 
-  placeholder: string;
-}
-
-const SOCIAL_PLATFORMS: SocialPlatform[] = [
-  {
-    "key": "instagram",
-    "name": "Instagram",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto",
-    "baseUrl": "https://instagram.com/",
-    "placeholder": "seu.usuario"
-  },
-  {
-    "key": "x",
-    "name": "X (Twitter)",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto",
-    "baseUrl": "https://x.com/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "tiktok",
-    "name": "TikTok",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg",
-    "baseUrl": "https://tiktok.com/@",
-    "placeholder": "seu.usuario"
-  },
-  {
-    "key": "youtube",
-    "name": "YouTube",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg",
-    "baseUrl": "https://youtube.com/",
-    "placeholder": "@seuCanal"
-  },
-  {
-    "key": "facebook",
-    "name": "Facebook",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook",
-    "baseUrl": "https://facebook.com/",
-    "placeholder": "seu.perfil"
-  },
-  {
-    "key": "linkedin",
-    "name": "LinkedIn",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin",
-    "baseUrl": "https://linkedin.com/in/",
-    "placeholder": "seu-perfil-linkedin"
-  },
-  {
-    "key": "github",
-    "name": "GitHub",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto",
-    "baseUrl": "https://github.com/",
-    "placeholder": "seu-usuario"
-  },
-  {
-    "key": "pinterest",
-    "name": "Pinterest",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/pinterest",
-    "baseUrl": "https://pinterest.com/",
-    "placeholder": "seuusuario"
-  },
-  {
-    "key": "discord",
-    "name": "Discord",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg",
-    "baseUrl": "https://discord.gg/",
-    "placeholder": "codigoConvite"
-  },
-  {
-    "key": "twitch",
-    "name": "Twitch",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg",
-    "baseUrl": "https://twitch.tv/",
-    "placeholder": "seuCanal"
-  },
-  {
-    "key": "spotify",
-    "name": "Spotify",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/spotify",
-    "baseUrl": "https://open.spotify.com/user/",
-    "placeholder": "seuUsuarioId"
-  },
-  {
-    "key": "telegram",
-    "name": "Telegram",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/telegram",
-    "baseUrl": "https://t.me/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "reddit",
-    "name": "Reddit",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/reddit",
-    "baseUrl": "https://reddit.com/u/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "snapchat",
-    "name": "Snapchat",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/snapchat",
-    "baseUrl": "https://snapchat.com/add/",
-    "placeholder": "seu.usuario"
-  },
-  {
-    "key": "soundcloud",
-    "name": "SoundCloud",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/soundcloud-logo-preto.svg",
-    "baseUrl": "https://soundcloud.com/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "steam",
-    "name": "Steam",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/steam",
-    "baseUrl": "https://steamcommunity.com/id/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "buymeacoffee",
-    "name": "Buy Me a Coffee",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/bmc.svg",
-    "baseUrl": "https://buymeacoffee.com/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "patreon",
-    "name": "Patreon",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-preto",
-    "baseUrl": "https://patreon.com/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "paypal",
-    "name": "PayPal",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/paypal",
-    "baseUrl": "https://paypal.me/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "gmail",
-    "name": "Gmail",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/mail",
-    "baseUrl": "",
-    "placeholder": "seu.email@gmail.com"
-  }
-];
+import { SocialLinkItem, SocialPlatform } from '@/types/social';
+import { SOCIAL_PLATFORMS } from '@/config/social-platforms';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -190,21 +31,20 @@ const SocialLinksClient = () => {
 
   useEffect(() => {
     if (swrData?.socialLinks) {
-      const sorted = [...swrData.socialLinks].sort((a, b) => a.order - b.order);
+      const sorted = [...swrData.socialLinks].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       setSocialLinks(sorted);
       setIsLoading(false);
     } else if (session?.user?.id && !swrData) {
-      // Still loading or no data yet
       setIsLoading(true);
     } else if (!session?.user?.id) {
-      setIsLoading(false); // Not logged in, stop loading
+      setIsLoading(false); 
     }
   }, [swrData, session?.user?.id]);
 
   const handlePlatformSelect = (platform: SocialPlatform) => {
     setSelectedPlatform(platform);
     setUsernameInput("");
-    setEditingLinkId(null); // Reset editing state
+    setEditingLinkId(null);
   };
 
   const handleAddOrUpdateSocialLink = async () => {
@@ -257,7 +97,7 @@ const SocialLinksClient = () => {
     const platform = SOCIAL_PLATFORMS.find(p => p.key === link.platform);
     if (platform) {
       setSelectedPlatform(platform);
-      setUsernameInput(link.username);
+      setUsernameInput(link.username || '');
       setEditingLinkId(link.id);
     }
   };
@@ -290,7 +130,6 @@ const SocialLinksClient = () => {
   };
 
   if (isLoading && session?.user?.id) {
-    // Show a more specific loading state if desired, or a generic one
     return <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 flex justify-center items-center"><p>Carregando links sociais...</p></div>;
   }
 

@@ -3,21 +3,9 @@ import InteractiveLink from '@/components/InteractiveLink'
 import ProfileViewTracker from '@/components/ProfileViewTracker'
 import { TemplateComponentProps } from '@/types/user-profile'
 import JoinBionkModal from '@/components/JoinBionkModal'
+import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
 
 export default function NeonTemplate({ user }: TemplateComponentProps) {
-
-  const socialIconMap: { [key: string]: string } = {
-    instagram: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto",
-    twitter: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto",
-    linkedin: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin",
-    github: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto",
-    facebook: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook",
-    tiktok: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg",
-    youtube: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg",
-    twitch: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg",
-    discord: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg",
-    website: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/globe", 
-  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-800 to-pink-900 py-8 px-4 text-white overflow-hidden relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,0,255,0.2)_0%,rgba(0,0,0,0)_80%)] pointer-events-none"></div>
@@ -44,23 +32,11 @@ export default function NeonTemplate({ user }: TemplateComponentProps) {
           )}
           {user.SocialLink && user.SocialLink.length > 0 && (
             <div className="mt-6 flex justify-center items-center space-x-4">
-              {user.SocialLink.map((social) => {
-                const iconPath = socialIconMap[social.platform.toLowerCase()];
-                return iconPath ? (
-                  <a
-                    key={social.id}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-pink-400 hover:text-blue-400 transition-colors duration-200 ease-in-out transform hover:scale-110 flex items-center justify-center filter drop-shadow-[0_0_8px_rgba(255,0,255,0.7)]"
-                    aria-label={social.platform}
-                    title={social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
-                    style={{ width: '26px', height: '26px' }} // Slightly larger for neon effect
-                  >
-                    <Image src={iconPath} alt={social.platform} width={24} height={24} />
-                  </a>
-                ) : null;
-              })}
+              {user.SocialLink && user.SocialLink.length > 0 && (
+                <div className="mt-4 flex justify-center items-center">
+                  <UserProfileSocialIcons socialLinks={user.SocialLink} iconSize={22} className="space-x-3 sm:space-x-4" />
+                </div>
+              )}
             </div>
           )}
         </header>

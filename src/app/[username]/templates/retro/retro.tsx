@@ -3,21 +3,9 @@ import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import JoinBionkModal from "@/components/JoinBionkModal"
 import { TemplateComponentProps } from "@/types/user-profile"
+import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
 
 export default function DefaultTemplate({ user }: TemplateComponentProps) {
-
-  const socialIconMap: { [key: string]: string } = {
-    instagram: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto",
-    twitter: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto",
-    linkedin: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin",
-    github: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto", 
-    facebook: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook",
-    tiktok: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg",
-    youtube: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg",
-    twitch: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg",
-    discord: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg",
-    website: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/globe", 
-  };
   return (
     <div className="min-h-screen bg-[#f4f1de] text-[#3d405b] py-10 px-4 font-[Courier_New,courier,monospace]">
       <ProfileViewTracker userId={user.id} />
@@ -37,23 +25,11 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
           {user.bio && <p className="mt-2 text-[#3d405b] italic">{user.bio}</p>}
           {user.SocialLink && user.SocialLink.length > 0 && (
             <div className="mt-4 flex justify-center items-center space-x-3 sm:space-x-4">
-              {user.SocialLink.map((social) => {
-                const iconPath = socialIconMap[social.platform.toLowerCase()];
-                return iconPath ? (
-                  <a
-                    key={social.id}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#e07a5f] hover:text-[#3d405b] transition-colors duration-200 ease-in-out transform hover:scale-110 flex items-center justify-center"
-                    aria-label={social.platform}
-                    title={social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
-                    style={{ width: '24px', height: '24px' }}
-                  >
-                    <Image src={iconPath} alt={social.platform} width={22} height={22} />
-                  </a>
-                ) : null;
-              })}
+              {user.SocialLink && user.SocialLink.length > 0 && (
+                <div className="mt-4 flex justify-center items-center">
+                  <UserProfileSocialIcons socialLinks={user.SocialLink} iconSize={22} className="space-x-3 sm:space-x-4" />
+                </div>
+              )}
             </div>
           )}
         </header>

@@ -4,23 +4,9 @@ import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { MotionDiv, MotionH1, MotionLi, MotionP } from "@/components/ui/motion"
 import { TemplateComponentProps } from "@/types/user-profile"
 import JoinBionkModal from "@/components/JoinBionkModal"
+import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
 
 export default function LuxuryTemplate({ user }: TemplateComponentProps) {
-
-  const socialIconMap: { [key: string]: string } = {
-    instagram: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-branco",
-    twitter: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-branco",
-    linkedin: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin", 
-    github: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-branco",
-    facebook: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook", 
-    tiktok: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg", 
-    youtube: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg", 
-    twitch: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg", 
-    discord: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg", 
-    soundcloud: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/soundcloud-logo-branco.svg",
-    patreon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-branco",
-    website: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/globe", 
-  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-[#f5f3ef] py-12 px-4">
       <ProfileViewTracker userId={user.id} />
@@ -61,23 +47,11 @@ export default function LuxuryTemplate({ user }: TemplateComponentProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
               className="mt-6 flex justify-center items-center space-x-4">
-              {user.SocialLink.map((social) => {
-                const iconPath = socialIconMap[social.platform.toLowerCase()];
-                return iconPath ? (
-                  <a
-                    key={social.id}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#d4af37] hover:text-[#f5f3ef] transition-colors duration-200 ease-in-out transform hover:scale-110 flex items-center justify-center"
-                    aria-label={social.platform}
-                    title={social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
-                    style={{ width: '24px', height: '24px' }}
-                  >
-                    <Image src={iconPath} alt={social.platform} width={22} height={22} />
-                  </a>
-                ) : null;
-              })}
+              {user.SocialLink && user.SocialLink.length > 0 && (
+                <div className="mt-4 flex justify-center items-center">
+                  <UserProfileSocialIcons socialLinks={user.SocialLink} iconSize={22} className="space-x-3 sm:space-x-4" />
+                </div>
+              )}
             </MotionDiv>
           )}
         </header>

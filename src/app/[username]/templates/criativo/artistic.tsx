@@ -3,23 +3,9 @@ import InteractiveLink from "@/components/InteractiveLink"
 import ProfileViewTracker from "@/components/ProfileViewTracker"
 import { TemplateComponentProps } from "@/types/user-profile"
 import JoinBionkModal from "@/components/JoinBionkModal"
+import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
 
 export default function ArtisticTemplate({ user }: TemplateComponentProps) {
-
-  const socialIconMap: { [key: string]: string } = {
-    instagram: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto",
-    twitter: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto",
-    linkedin: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin",
-    github: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto",
-    facebook: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook",
-    tiktok: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg",
-    youtube: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg",
-    twitch: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg",
-    discord: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg",
-    website: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/globe",
-    soundcloud: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/soundcloud-logo-preto.svg",
-    patreon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-preto",
-  };
   return (
     <div className="min-h-screen bg-[#f5f0e8] py-8 px-4 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzAgMEMxMy40IDAgMCAxMy40IDAgMzBzMTMuNCAzMCAzMCAzMCA0My40LTEzLjQgNDMuNC0zMFM0Ni42IDAgMzAgMHptMCA1MmMtMTIuMiAwLTIyLTkuOC0yMi0yMnM5LjgtMjIgMjItMjIgMjIgOS44IDIyIDIyLTkuOCAyMi0yMiAyMnoiIGZpbGw9IiMzMzMiLz48L3N2Zz4=')]">
       <ProfileViewTracker userId={user.id} />
@@ -45,24 +31,8 @@ export default function ArtisticTemplate({ user }: TemplateComponentProps) {
           <h1 className="text-2xl font-serif italic text-[#6d4c41]">{user.name || user.username}</h1>
           {user.bio && <p className="mt-2 text-[#8d6e63] font-serif max-w-xs mx-auto leading-relaxed">{user.bio}</p>}
           {user.SocialLink && user.SocialLink.length > 0 && (
-            <div className="mt-6 flex justify-center items-center space-x-3 sm:space-x-4">
-              {user.SocialLink.map((social) => {
-                const iconPath = socialIconMap[social.platform.toLowerCase()];
-                return iconPath ? (
-                  <a
-                    key={social.id}
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#6d4c41] hover:text-[#4b322a] transition-colors duration-200 ease-in-out transform hover:scale-110 flex items-center justify-center"
-                    aria-label={social.platform}
-                    title={social.platform.charAt(0).toUpperCase() + social.platform.slice(1)}
-                    style={{ width: '24px', height: '24px' }}
-                  >
-                    <Image src={iconPath} alt={social.platform} width={22} height={22} className="filter sepia-[0.1]" />
-                  </a>
-                ) : null;
-              })}
+            <div className="mt-6 flex justify-center items-center">
+              <UserProfileSocialIcons socialLinks={user.SocialLink} iconSize={22} className="space-x-3 sm:space-x-4 filter sepia-[0.1]" />
             </div>
           )}
           <div className="mt-4 flex justify-center space-x-2">
