@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Plus, Trash2, Edit, Save, X } from "lucide-react";
+import { Plus, Trash2, Edit, Save, X, Loader2 } from "lucide-react";
 import useSWR from "swr";
 import { SocialLinkItem, SocialPlatform } from '@/types/social';
 import { SOCIAL_PLATFORMS } from '@/config/social-platforms';
@@ -21,6 +21,7 @@ const SocialLinksClient = () => {
   const [usernameInput, setUsernameInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
+  const [deletingLinkId, setDeletingLinkId] = useState<string | null>(null);
 
   const { data: swrData, mutate: mutateSocialLinks } = useSWR<
     { socialLinks: SocialLinkItem[] }
@@ -37,7 +38,7 @@ const SocialLinksClient = () => {
     } else if (session?.user?.id && !swrData) {
       setIsLoading(true);
     } else if (!session?.user?.id) {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   }, [swrData, session?.user?.id]);
 
@@ -56,13 +57,12 @@ const SocialLinksClient = () => {
       platform: selectedPlatform.key,
       username: usernameInput.trim(),
       url: fullUrl,
-      active: true, 
+      active: true,
     };
 
     try {
       let response;
       if (editingLinkId) {
-        // Update existing link
         response = await fetch(`/api/social-links/${editingLinkId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -101,6 +101,7 @@ const SocialLinksClient = () => {
 
   const handleDeleteSocialLink = async (linkId: string) => {
     if (!session?.user?.id) return;
+    setDeletingLinkId(linkId);
     try {
       const response = await fetch(`/api/social-links/${linkId}`, {
         method: "DELETE",
@@ -117,6 +118,8 @@ const SocialLinksClient = () => {
       }
     } catch (error) {
       console.error("Erro na requisição de delete:", error);
+    } finally {
+      setDeletingLinkId(null);
     }
   };
 
@@ -152,7 +155,7 @@ const SocialLinksClient = () => {
                       variant="outline"
                       className="flex flex-col items-center justify-center h-full w-full p-1 sm:p-2 hover:bg-muted/50 transition-colors"
                       onClick={() => handlePlatformSelect(platform)}
-                      disabled={isExistingLink} // Adiciona a propriedade disabled aqui
+                      disabled={isExistingLink}
                       title={isExistingLink ? `Você já adicionou um link para ${platform.name}` : `Adicionar ${platform.name}`}
                     >
                       <Image src={platform.icon} alt={platform.name} width={24} height={24} className="mb-1 sm:mb-1.5 w-6 h-6 sm:w-7 sm:h-7" />
@@ -216,8 +219,8 @@ const SocialLinksClient = () => {
                         <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={() => handleEditSocialLink(link)}>
                           <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 text-destructive hover:text-destructive/80" onClick={() => handleDeleteSocialLink(link.id)}>
-                          <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8 text-destructive hover:text-destructive/80" onClick={() => handleDeleteSocialLink(link.id)} disabled={deletingLinkId === link.id}>
+                          {deletingLinkId === link.id ? <Loader2 className="animate-spin h-4 w-4" aria-label="Deletando..." /> : <Trash2 className="h-4 w-4" />}
                         </Button>
                       </div>
                     </li>
