@@ -34,7 +34,7 @@ export default function NeonTemplate({ user }: TemplateComponentProps) {
             <div className="mt-6 flex justify-center items-center space-x-4">
               {user.SocialLink && user.SocialLink.length > 0 && (
                 <div className="mt-4 flex justify-center items-center">
-                  <UserProfileSocialIcons socialLinks={user.SocialLink} iconSize={22} className="space-x-3 sm:space-x-4" />
+                  <UserProfileSocialIcons socialLinks={user.SocialLink} iconSize={22} className="space-x-3 sm:space-x-4" theme="dark" />
                 </div>
               )}
             </div>

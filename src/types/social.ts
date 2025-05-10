@@ -12,6 +12,7 @@ export interface SocialPlatform {
   key: string;
   name: string;
   icon: string;
+  iconDark?: string; // Adicionado para ícones de tema escuro
   baseUrl: string;
   placeholder: string;
 }

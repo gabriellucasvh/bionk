@@ -5,6 +5,7 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
     "key": "instagram",
     "name": "Instagram",
     "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto",
+    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-branco",
     "baseUrl": "https://instagram.com/",
     "placeholder": "seu.usuario"
   },
@@ -12,6 +13,7 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
     "key": "x",
     "name": "X (Twitter)",
     "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto",
+    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-branco",
     "baseUrl": "https://x.com/",
     "placeholder": "seuUsuario"
   },
@@ -47,6 +49,7 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
     "key": "github",
     "name": "GitHub",
     "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto",
+    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-branco",
     "baseUrl": "https://github.com/",
     "placeholder": "seu-usuario"
   },
@@ -103,6 +106,7 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
     "key": "soundcloud",
     "name": "SoundCloud",
     "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/soundcloud-logo-preto.svg",
+    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/soundcloud-logo-branco.svg",
     "baseUrl": "https://soundcloud.com/",
     "placeholder": "seuUsuario"
   },
@@ -124,6 +128,7 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
     "key": "patreon",
     "name": "Patreon",
     "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-preto",
+    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-branco",
     "baseUrl": "https://patreon.com/",
     "placeholder": "seuUsuario"
   },
@@ -137,7 +142,8 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
   {
     "key": "gmail",
     "name": "Gmail",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/mail",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/mail-preto",
+    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/mail-branco",
     "baseUrl": "",
     "placeholder": "seu.email@gmail.com"
   }

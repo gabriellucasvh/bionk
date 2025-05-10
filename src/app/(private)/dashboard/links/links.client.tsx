@@ -77,7 +77,7 @@ const ICON_MAP = [
   { keyword: "github", src: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto", alt: "GitHub" },
   { keyword: "gitlab", src: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/gitlab", alt: "GitLab" },
   { keyword: "linkedin", src: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin", alt: "LinkedIn" },
-  { keyword: "gmail", src: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/mail", alt: "Email" },
+  { keyword: "gmail", src: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/mail-preto", alt: "Email" },
   { keyword: "patreon", src: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-preto", alt: "Patreon" },
   { keyword: "paypal", src: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/paypal", alt: "PayPal" },
   { keyword: "reddit", src: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/reddit", alt: "Reddit" },

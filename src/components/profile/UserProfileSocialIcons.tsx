@@ -10,12 +10,14 @@ interface UserProfileSocialIconsProps {
   socialLinks: SocialLinkItem[];
   iconSize?: number;
   className?: string;
+  theme?: 'light' | 'dark'; // Adicionada propriedade theme
 }
 
 const UserProfileSocialIcons: React.FC<UserProfileSocialIconsProps> = ({
   socialLinks,
   iconSize = 24,
   className = '',
+  theme = 'light', // Define 'light' como tema padrão
 }) => {
   if (!socialLinks || socialLinks.length === 0) {
     return null;
@@ -38,7 +40,7 @@ const UserProfileSocialIcons: React.FC<UserProfileSocialIconsProps> = ({
         return (
           <Link href={link.url} key={link.id} target="_blank" rel="noopener noreferrer" title={platform.name}>
             <Image
-              src={platform.icon}
+              src={theme === 'dark' && platform.iconDark ? platform.iconDark : platform.icon}
               alt={platform.name}
               width={iconSize}
               height={iconSize}

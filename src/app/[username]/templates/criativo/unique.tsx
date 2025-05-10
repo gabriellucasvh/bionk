@@ -25,7 +25,7 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
           {user.bio && <p className="mt-2 text-[#ffd460] text-base">{user.bio}</p>}
           {user.SocialLink && user.SocialLink.length > 0 && (
             <div className="mt-4 flex justify-center items-center">
-              <UserProfileSocialIcons socialLinks={user.SocialLink} iconSize={22} className="space-x-3 sm:space-x-4" />
+              <UserProfileSocialIcons socialLinks={user.SocialLink} iconSize={22} className="space-x-3 sm:space-x-4" theme="dark" />
             </div>
           )}
         </header>
