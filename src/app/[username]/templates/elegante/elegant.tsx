@@ -8,18 +8,18 @@ import JoinBionkModal from "@/components/JoinBionkModal"
 export default function ElegantTemplate({ user }: TemplateComponentProps) {
 
   const socialIconMap: { [key: string]: string } = {
-    instagram: "/icons/instagram-preto.svg",
-    twitter: "/icons/x-preto.svg",
-    linkedin: "/icons/linkedin.svg", 
-    github: "/icons/github-preto.svg",
-    facebook: "/icons/facebook.svg", 
-    tiktok: "/icons/tiktok.svg", 
-    youtube: "/icons/youtube.svg", 
-    twitch: "/icons/twitch.svg", 
-    discord: "/icons/discord.svg", 
-    soundcloud: "/icons/soundcloud-logo-preto.svg",
-    patreon: "/icons/patreon-preto.svg",
-    website: "/icons/link.svg", 
+    instagram: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto",
+    twitter: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto",
+    linkedin: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin", 
+    github: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto",
+    facebook: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook", 
+    tiktok: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg", 
+    youtube: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg", 
+    twitch: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg", 
+    discord: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg", 
+    soundcloud: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/soundcloud-logo-preto",
+    patreon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-preto",
+    website: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/globe", 
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] to-[#e2d1c3] text-neutral-800 py-12 px-4">

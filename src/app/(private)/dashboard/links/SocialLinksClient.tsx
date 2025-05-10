@@ -29,18 +29,18 @@ interface SocialPlatform {
 }
 
 const SOCIAL_PLATFORMS: SocialPlatform[] = [
-  { key: "instagram", name: "Instagram", icon: "/icons/instagram-preto.svg", baseUrl: "https://instagram.com/", placeholder: "seu.usuario" },
-  { key: "x", name: "X (Twitter)", icon: "/icons/x-preto.svg", baseUrl: "https://x.com/", placeholder: "seuUsuario" },
-  { key: "tiktok", name: "TikTok", icon: "/icons/tiktok.svg", baseUrl: "https://tiktok.com/@", placeholder: "seu.usuario" },
-  { key: "youtube", name: "YouTube", icon: "/icons/youtube.svg", baseUrl: "https://youtube.com/", placeholder: "@seuCanal" },
-  { key: "facebook", name: "Facebook", icon: "/icons/facebook.svg", baseUrl: "https://facebook.com/", placeholder: "seu.perfil" },
-  { key: "linkedin", name: "LinkedIn", icon: "/icons/linkedin.svg", baseUrl: "https://linkedin.com/in/", placeholder: "seu-perfil-linkedin" },
-  { key: "github", name: "GitHub", icon: "/icons/github-preto.svg", baseUrl: "https://github.com/", placeholder: "seu-usuario" },
-  { key: "pinterest", name: "Pinterest", icon: "/icons/pinterest.svg", baseUrl: "https://pinterest.com/", placeholder: "seuusuario" },
-  { key: "discord", name: "Discord", icon: "/icons/discord.svg", baseUrl: "https://discord.gg/", placeholder: "codigoConvite" },
-  { key: "twitch", name: "Twitch", icon: "/icons/twitch.svg", baseUrl: "https://twitch.tv/", placeholder: "seuCanal" },
-  { key: "spotify", name: "Spotify", icon: "/icons/spotify.svg", baseUrl: "https://open.spotify.com/user/", placeholder: "seuUsuarioId" },
-  { key: "telegram", name: "Telegram", icon: "/icons/telegram.svg", baseUrl: "https://t.me/", placeholder: "seuUsuario" },
+  { key: "instagram", name: "Instagram", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto", baseUrl: "https://instagram.com/", placeholder: "seu.usuario" },
+  { key: "x", name: "X (Twitter)", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto", baseUrl: "https://x.com/", placeholder: "seuUsuario" },
+  { key: "tiktok", name: "TikTok", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg", baseUrl: "https://tiktok.com/@", placeholder: "seu.usuario" },
+  { key: "youtube", name: "YouTube", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg", baseUrl: "https://youtube.com/", placeholder: "@seuCanal" },
+  { key: "facebook", name: "Facebook", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook", baseUrl: "https://facebook.com/", placeholder: "seu.perfil" },
+  { key: "linkedin", name: "LinkedIn", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin", baseUrl: "https://linkedin.com/in/", placeholder: "seu-perfil-linkedin" },
+  { key: "github", name: "GitHub", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto", baseUrl: "https://github.com/", placeholder: "seu-usuario" },
+  { key: "pinterest", name: "Pinterest", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/pinterest", baseUrl: "https://pinterest.com/", placeholder: "seuusuario" },
+  { key: "discord", name: "Discord", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg", baseUrl: "https://discord.gg/", placeholder: "codigoConvite" },
+  { key: "twitch", name: "Twitch", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg", baseUrl: "https://twitch.tv/", placeholder: "seuCanal" },
+  { key: "spotify", name: "Spotify", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/spotify", baseUrl: "https://open.spotify.com/user/", placeholder: "seuUsuarioId" },
+  { key: "telegram", name: "Telegram", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/telegram", baseUrl: "https://t.me/", placeholder: "seuUsuario" },
 ];
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());

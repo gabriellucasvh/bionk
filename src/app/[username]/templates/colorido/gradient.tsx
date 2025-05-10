@@ -6,16 +6,16 @@ import JoinBionkModal from "@/components/JoinBionkModal"
 
 export default function GradientTemplate({ user }: TemplateComponentProps) {
   const socialIconMap: { [key: string]: string } = {
-    instagram: "/icons/instagram-branco.svg",
-    twitter: "/icons/x-branco.svg",
-    linkedin: "/icons/linkedin.svg",
-    github: "/icons/github-branco.svg",
-    facebook: "/icons/facebook.svg",
-    tiktok: "/icons/tiktok.svg",
-    youtube: "/icons/youtube.svg",
-    twitch: "/icons/twitch.svg",
-    discord: "/icons/discord.svg",
-    website: "/icons/link.svg",
+    instagram: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-branco",
+    twitter: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-branco",
+    linkedin: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin",
+    github: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-branco",
+    facebook: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook",
+    tiktok: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg",
+    youtube: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg",
+    twitch: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg",
+    discord: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg",
+    website: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/globe",
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-400 via-rose-400 to-lime-400 py-8 px-4">

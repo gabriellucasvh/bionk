@@ -7,16 +7,16 @@ import { TemplateComponentProps } from "@/types/user-profile"
 export default function DefaultTemplate({ user }: TemplateComponentProps) {
 
   const socialIconMap: { [key: string]: string } = {
-    instagram: "/icons/instagram-preto.svg",
-    twitter: "/icons/x-preto.svg",
-    linkedin: "/icons/linkedin.svg",
-    github: "/icons/github-preto.svg", 
-    facebook: "/icons/facebook.svg",
-    tiktok: "/icons/tiktok.svg",
-    youtube: "/icons/youtube.svg",
-    twitch: "/icons/twitch.svg",
-    discord: "/icons/discord.svg",
-    website: "/icons/link.svg", 
+    instagram: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto",
+    twitter: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto",
+    linkedin: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin",
+    github: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto", 
+    facebook: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook",
+    tiktok: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg",
+    youtube: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg",
+    twitch: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg",
+    discord: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg",
+    website: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/globe", 
   };
   return (
     <div className="min-h-screen bg-[#f4f1de] text-[#3d405b] py-10 px-4 font-[Courier_New,courier,monospace]">

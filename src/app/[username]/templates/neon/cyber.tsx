@@ -7,18 +7,18 @@ import { TemplateComponentProps } from "@/types/user-profile"
 export default function DefaultTemplate({ user }: TemplateComponentProps) {
 
   const socialIconMap: { [key: string]: string } = {
-    instagram: "/icons/instagram-branco.svg",
-    twitter: "/icons/x-branco.svg",
-    linkedin: "/icons/linkedin.svg", 
-    github: "/icons/github-branco.svg",
-    facebook: "/icons/facebook.svg", 
-    tiktok: "/icons/tiktok.svg", 
-    youtube: "/icons/youtube.svg", 
-    twitch: "/icons/twitch.svg", 
-    discord: "/icons/discord.svg", 
-    soundcloud: "/icons/soundcloud-logo-branco.svg",
-    patreon: "/icons/patreon-branco.svg",
-    website: "/icons/link.svg", 
+    instagram: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-branco",
+    twitter: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-branco",
+    linkedin: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin", 
+    github: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-branco",
+    facebook: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook", 
+    tiktok: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg", 
+    youtube: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg", 
+    twitch: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg", 
+    discord: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg", 
+    soundcloud: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/soundcloud-logo-branco",
+    patreon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-branco",
+    website: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/globe", 
   };
   return (
     <div className="min-h-screen bg-black text-white py-10 px-4 font-mono">
