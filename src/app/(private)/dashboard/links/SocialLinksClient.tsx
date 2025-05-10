@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, JSX } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Plus, Trash2, Edit, Save, X } from "lucide-react";
 import useSWR from "swr";
 
 interface SocialLinkItem {
-  id: string; // Using string for potential future flexibility, or could be platform name
+  id: string; 
   platform: string;
   username: string;
   url: string;
@@ -24,23 +24,151 @@ interface SocialPlatform {
   key: string;
   name: string;
   icon: string;
-  baseUrl: string; // e.g., "https://instagram.com/"
-  placeholder: string; // e.g., "seuusuario"
+  baseUrl: string; 
+  placeholder: string;
 }
 
 const SOCIAL_PLATFORMS: SocialPlatform[] = [
-  { key: "instagram", name: "Instagram", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto", baseUrl: "https://instagram.com/", placeholder: "seu.usuario" },
-  { key: "x", name: "X (Twitter)", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto", baseUrl: "https://x.com/", placeholder: "seuUsuario" },
-  { key: "tiktok", name: "TikTok", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg", baseUrl: "https://tiktok.com/@", placeholder: "seu.usuario" },
-  { key: "youtube", name: "YouTube", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg", baseUrl: "https://youtube.com/", placeholder: "@seuCanal" },
-  { key: "facebook", name: "Facebook", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook", baseUrl: "https://facebook.com/", placeholder: "seu.perfil" },
-  { key: "linkedin", name: "LinkedIn", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin", baseUrl: "https://linkedin.com/in/", placeholder: "seu-perfil-linkedin" },
-  { key: "github", name: "GitHub", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto", baseUrl: "https://github.com/", placeholder: "seu-usuario" },
-  { key: "pinterest", name: "Pinterest", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/pinterest", baseUrl: "https://pinterest.com/", placeholder: "seuusuario" },
-  { key: "discord", name: "Discord", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg", baseUrl: "https://discord.gg/", placeholder: "codigoConvite" },
-  { key: "twitch", name: "Twitch", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg", baseUrl: "https://twitch.tv/", placeholder: "seuCanal" },
-  { key: "spotify", name: "Spotify", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/spotify", baseUrl: "https://open.spotify.com/user/", placeholder: "seuUsuarioId" },
-  { key: "telegram", name: "Telegram", icon: "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/telegram", baseUrl: "https://t.me/", placeholder: "seuUsuario" },
+  {
+    "key": "instagram",
+    "name": "Instagram",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto",
+    "baseUrl": "https://instagram.com/",
+    "placeholder": "seu.usuario"
+  },
+  {
+    "key": "x",
+    "name": "X (Twitter)",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto",
+    "baseUrl": "https://x.com/",
+    "placeholder": "seuUsuario"
+  },
+  {
+    "key": "tiktok",
+    "name": "TikTok",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg",
+    "baseUrl": "https://tiktok.com/@",
+    "placeholder": "seu.usuario"
+  },
+  {
+    "key": "youtube",
+    "name": "YouTube",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg",
+    "baseUrl": "https://youtube.com/",
+    "placeholder": "@seuCanal"
+  },
+  {
+    "key": "facebook",
+    "name": "Facebook",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook",
+    "baseUrl": "https://facebook.com/",
+    "placeholder": "seu.perfil"
+  },
+  {
+    "key": "linkedin",
+    "name": "LinkedIn",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin",
+    "baseUrl": "https://linkedin.com/in/",
+    "placeholder": "seu-perfil-linkedin"
+  },
+  {
+    "key": "github",
+    "name": "GitHub",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto",
+    "baseUrl": "https://github.com/",
+    "placeholder": "seu-usuario"
+  },
+  {
+    "key": "pinterest",
+    "name": "Pinterest",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/pinterest",
+    "baseUrl": "https://pinterest.com/",
+    "placeholder": "seuusuario"
+  },
+  {
+    "key": "discord",
+    "name": "Discord",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg",
+    "baseUrl": "https://discord.gg/",
+    "placeholder": "codigoConvite"
+  },
+  {
+    "key": "twitch",
+    "name": "Twitch",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg",
+    "baseUrl": "https://twitch.tv/",
+    "placeholder": "seuCanal"
+  },
+  {
+    "key": "spotify",
+    "name": "Spotify",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/spotify",
+    "baseUrl": "https://open.spotify.com/user/",
+    "placeholder": "seuUsuarioId"
+  },
+  {
+    "key": "telegram",
+    "name": "Telegram",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/telegram",
+    "baseUrl": "https://t.me/",
+    "placeholder": "seuUsuario"
+  },
+  {
+    "key": "reddit",
+    "name": "Reddit",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/reddit",
+    "baseUrl": "https://reddit.com/u/",
+    "placeholder": "seuUsuario"
+  },
+  {
+    "key": "snapchat",
+    "name": "Snapchat",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/snapchat",
+    "baseUrl": "https://snapchat.com/add/",
+    "placeholder": "seu.usuario"
+  },
+  {
+    "key": "soundcloud",
+    "name": "SoundCloud",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/soundcloud-logo-preto.svg",
+    "baseUrl": "https://soundcloud.com/",
+    "placeholder": "seuUsuario"
+  },
+  {
+    "key": "steam",
+    "name": "Steam",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/steam",
+    "baseUrl": "https://steamcommunity.com/id/",
+    "placeholder": "seuUsuario"
+  },
+  {
+    "key": "buymeacoffee",
+    "name": "Buy Me a Coffee",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/bmc.svg",
+    "baseUrl": "https://buymeacoffee.com/",
+    "placeholder": "seuUsuario"
+  },
+  {
+    "key": "patreon",
+    "name": "Patreon",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-preto",
+    "baseUrl": "https://patreon.com/",
+    "placeholder": "seuUsuario"
+  },
+  {
+    "key": "paypal",
+    "name": "PayPal",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/paypal",
+    "baseUrl": "https://paypal.me/",
+    "placeholder": "seuUsuario"
+  },
+  {
+    "key": "gmail",
+    "name": "Gmail",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/mail",
+    "baseUrl": "",
+    "placeholder": "seu.email@gmail.com"
+  }
 ];
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -69,7 +197,7 @@ const SocialLinksClient = () => {
       // Still loading or no data yet
       setIsLoading(true);
     } else if (!session?.user?.id) {
-        setIsLoading(false); // Not logged in, stop loading
+      setIsLoading(false); // Not logged in, stop loading
     }
   }, [swrData, session?.user?.id]);
 
@@ -143,9 +271,9 @@ const SocialLinksClient = () => {
       if (response.ok) {
         await mutateSocialLinks();
         if (editingLinkId === linkId) {
-            setSelectedPlatform(null);
-            setUsernameInput("");
-            setEditingLinkId(null);
+          setSelectedPlatform(null);
+          setUsernameInput("");
+          setEditingLinkId(null);
         }
       } else {
         console.error("Erro ao deletar link social");
@@ -178,24 +306,24 @@ const SocialLinksClient = () => {
         <CardContent className="space-y-6">
           {!selectedPlatform && (
             <div className="space-y-3">
-                <p className="font-medium text-sm">Clique em um ícone para adicionar ou editar:</p>
-                <div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
+              <p className="font-medium text-sm">Clique em um ícone para adicionar ou editar:</p>
+              <div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
                 {SOCIAL_PLATFORMS.map((platform) => {
-                    const isExistingLink = socialLinks.some(link => link.platform === platform.key);
-                    return (
-                        <Button
-                        key={platform.key}
-                        variant="outline"
-                        className="flex flex-col items-center justify-center h-full w-full p-1 sm:p-2 hover:bg-muted/50 transition-colors"
-                        onClick={() => handlePlatformSelect(platform)}
-                        disabled={isExistingLink} // Adiciona a propriedade disabled aqui
-                        title={isExistingLink ? `Você já adicionou um link para ${platform.name}` : `Adicionar ${platform.name}`}
-                        >
-                        <Image src={platform.icon} alt={platform.name} width={24} height={24} className="mb-1 sm:mb-1.5 w-6 h-6 sm:w-7 sm:h-7" />
-                        </Button>
-                    );
+                  const isExistingLink = socialLinks.some(link => link.platform === platform.key);
+                  return (
+                    <Button
+                      key={platform.key}
+                      variant="outline"
+                      className="flex flex-col items-center justify-center h-full w-full p-1 sm:p-2 hover:bg-muted/50 transition-colors"
+                      onClick={() => handlePlatformSelect(platform)}
+                      disabled={isExistingLink} // Adiciona a propriedade disabled aqui
+                      title={isExistingLink ? `Você já adicionou um link para ${platform.name}` : `Adicionar ${platform.name}`}
+                    >
+                      <Image src={platform.icon} alt={platform.name} width={24} height={24} className="mb-1 sm:mb-1.5 w-6 h-6 sm:w-7 sm:h-7" />
+                    </Button>
+                  );
                 })}
-                </div>
+              </div>
             </div>
           )}
 
