@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import cloudinary from "@/lib/cloudinary"; 
 
-// Função auxiliar para extrair public_id de uma URL Cloudinary
 const getPublicIdFromUrl = (url: string): string | null => {
   try {
     const regex = /\/v\d+\/(.+)\.\w+$/;
@@ -21,7 +20,6 @@ export async function POST(
 ) {
   const { id } = await params; 
 
-  // Recupera o tipo (banner ou profile) via query string
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
 
@@ -40,7 +38,6 @@ export async function POST(
       );
     }
 
-    // Define os limites de tamanho: 5MB para banner e 2MB para foto de perfil
     const maxSize = type === "banner" ? 5 * 1024 * 1024 : 2 * 1024 * 1024;
     if (file.size > maxSize) {
       const limite = type === "banner" ? "5MB" : "2MB";
@@ -50,14 +47,10 @@ export async function POST(
       );
     }
 
-    // Converte o arquivo para Buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const base64String = `data:${file.type};base64,${buffer.toString("base64")}`;
 
-    // --- Lógica de Cloudinary ---
-
-    // 1. Remove o arquivo antigo do Cloudinary, se existir
     const user = await prisma.user.findUnique({
       where: { id },
       select: { bannerUrl: true, image: true },
@@ -79,10 +72,9 @@ export async function POST(
       }
     }
 
-    // 2. Faz upload do novo arquivo para o Cloudinary
     const uploadResult = await cloudinary.uploader.upload(base64String, {
-      folder: `bionk/${type}s`, // Ex: bionk/banners ou bionk/profiles
-      public_id: `${id}-${type}-${Date.now()}`, // Garante um ID único, mas pode ser simplificado se preferir sobrescrever sempre
+      folder: `bionk/${type}s`,
+      public_id: `${id}-${type}-${Date.now()}`,
       overwrite: true,
       resource_type: "image",
     });
@@ -99,7 +91,6 @@ export async function POST(
     return NextResponse.json({ url: generatedUrl }, { status: 200 });
   } catch (error: unknown) {
     console.error("Erro no upload:", error);
-    // Verifica se é um erro específico do Cloudinary para dar mais detalhes
     if (error && typeof error === 'object' && 'http_code' in error) {
        return NextResponse.json(
          { error: `Cloudinary Error: ${(error as any).message || 'Unknown error'}` },

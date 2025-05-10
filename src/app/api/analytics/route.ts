@@ -14,14 +14,12 @@ export async function GET(request: Request) {
   const last30Days = new Date();
   last30Days.setDate(now.getDate() - 30);
 
-  // Obtém os links do usuário
   const links = await prisma.link.findMany({
     where: { userId },
   });
 
   const linkIds = links.map((link) => link.id);
 
-  // Consulta eventos dos últimos 30 dias
   const totalClicks = await prisma.linkClick.count({
     where: {
       linkId: { in: linkIds },
@@ -36,10 +34,8 @@ export async function GET(request: Request) {
     },
   });
 
-  // Calcula a taxa de performance: (perfil visualizações / cliques) * 100
   const performanceRate = totalClicks > 0 ? (totalProfileViews / totalClicks) * 100 : 0;
 
-  // Agrega dados diários para o gráfico
   const chartData = [];
   for (let i = 0; i <= 30; i++) {
     const date = new Date(last30Days);
@@ -73,7 +69,6 @@ export async function GET(request: Request) {
     });
   }
 
-  // Prepara ranking de links (melhor desempenho baseado nos cliques)
   const topLinks = await Promise.all(
     links.map(async (link) => {
       const linkClicks = await prisma.linkClick.count({
@@ -90,7 +85,6 @@ export async function GET(request: Request) {
     })
   );
 
-  // Ordena os links por quantidade de cliques
   topLinks.sort((a, b) => b.clicks - a.clicks);
 
   return NextResponse.json({

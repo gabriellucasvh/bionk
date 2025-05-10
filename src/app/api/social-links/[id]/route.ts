@@ -9,7 +9,6 @@ interface RouteParams {
   }>;
 }
 
-// PUT /api/social-links/[id]
 export async function PUT(request: NextRequest, context: RouteParams) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.id) {
@@ -38,7 +37,6 @@ export async function PUT(request: NextRequest, context: RouteParams) {
       return NextResponse.json({ error: 'Não autorizado a modificar este link' }, { status: 403 });
     }
 
-    // Validar se já existe outro link com a mesma plataforma para o usuário, exceto o próprio link sendo editado
     if (body.platform && body.platform !== existingLink.platform) {
         const conflictingLink = await prisma.socialLink.findFirst({
             where: {
@@ -59,9 +57,6 @@ export async function PUT(request: NextRequest, context: RouteParams) {
         url: url !== undefined ? url : existingLink.url,
         active: active !== undefined ? active : existingLink.active,
         order: order !== undefined ? order : existingLink.order,
-        // A plataforma não deve ser alterada aqui, apenas o nome de usuário/url
-        // Se a plataforma precisar ser alterada, seria melhor excluir e recriar
-        // ou adicionar lógica mais complexa para garantir a unicidade.
       },
     });
     return NextResponse.json(updatedSocialLink);
@@ -71,7 +66,6 @@ export async function PUT(request: NextRequest, context: RouteParams) {
   }
 }
 
-// DELETE /api/social-links/[id]
 export async function DELETE(request: NextRequest, context: RouteParams) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.id) {

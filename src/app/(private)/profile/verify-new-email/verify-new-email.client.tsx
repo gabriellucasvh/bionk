@@ -40,7 +40,6 @@ export default function VerifyNewEmailClient() {
 
         setStatus('success');
         setMessage(result.message || 'Seu novo e-mail foi verificado com sucesso!');
-        // Opcional: redirecionar para o dashboard ou página de configurações após um tempo
         setTimeout(() => {
           router.push('/dashboard/configs');
         }, 3000);

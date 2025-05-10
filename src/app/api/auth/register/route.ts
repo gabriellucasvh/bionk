@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error: unknown) {
-    console.error("Registration error:", error); // Now using the error variable
+    console.error("Registration error:", error);
     return NextResponse.json(
       { error: "Erro interno" },
       { status: 500 }

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import ToastMessage from "@/components/ToastMessage"; // Supondo que você tenha um componente ToastMessage
+import ToastMessage from "@/components/ToastMessage"; 
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(6, { message: "A senha atual deve ter pelo menos 6 caracteres." }),
@@ -18,7 +18,7 @@ const changePasswordSchema = z.object({
   confirmNewPassword: z.string().min(6, { message: "A confirmação da nova senha deve ter pelo menos 6 caracteres." }),
 }).refine((data) => data.newPassword === data.confirmNewPassword, {
   message: "As senhas não coincidem.",
-  path: ["confirmNewPassword"], // Atribui o erro ao campo de confirmação
+  path: ["confirmNewPassword"], 
 });
 
 type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
@@ -57,7 +57,7 @@ export default function ChangePasswordForm() {
       }
 
       setMessage({ type: 'success', text: result.message || "Senha alterada com sucesso!" });
-      reset(); // Limpa o formulário após o sucesso
+      reset(); 
 
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message || "Ocorreu um erro. Tente novamente." });
@@ -120,7 +120,7 @@ export default function ChangePasswordForm() {
 
           {message && (
             <ToastMessage
-              variant={message.type} // Alterado de type para variant
+              variant={message.type}
               message={message.text}
               onClose={() => setMessage(null)}
             />

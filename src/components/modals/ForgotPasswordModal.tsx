@@ -82,8 +82,6 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
       setMessage(response.data.message || 'Link de redefinição enviado com sucesso!');
       setIsSuccess(true);
       setCooldown(COOLDOWN_SECONDS); 
-      // Optionally close modal after success
-      // setTimeout(onClose, 3000);
     } catch (error) {
       setIsSuccess(false);
       if (error instanceof AxiosError) {

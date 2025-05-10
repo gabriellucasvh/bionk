@@ -73,7 +73,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
                       className="text-xs"
                     />
                     <YAxis
-                      tickFormatter={(tick) => tick.toString()} // Ajustado para string, pois o valor pode ser float
+                      tickFormatter={(tick) => tick.toString()} 
                       tickLine={false}
                       axisLine={false}
                       className="text-xs"

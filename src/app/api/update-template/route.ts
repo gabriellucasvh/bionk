@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 
-// Lista de templates válidos para validação
 const VALID_TEMPLATES = [
   "default", "simple", "vibrant", "gradient", "business", "corporate",
   "modern", "clean", "dark", "midnight", "artistic", "unique",
@@ -24,7 +23,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Template inválido" }, { status: 400 });
     }
 
-    // Validação do template
     if (!VALID_TEMPLATES.includes(template)) {
       return NextResponse.json({ error: "Template não permitido" }, { status: 400 });
     }

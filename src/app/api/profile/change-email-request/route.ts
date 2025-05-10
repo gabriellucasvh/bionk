@@ -17,8 +17,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    // Verifica se o usuário está autenticado via credenciais
-    // A propriedade isCredentialsUser deve ser adicionada ao tipo da sessão se ainda não estiver
     if (!(session.user as any).isCredentialsUser) {
       return NextResponse.json({ error: 'Operação não permitida para este tipo de conta.' }, { status: 403 });
     }
@@ -46,7 +44,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'O novo e-mail não pode ser igual ao atual' }, { status: 400 });
     }
 
-    // Verificar se o novo e-mail já está em uso por outro usuário
     const existingUserWithNewEmail = await prisma.user.findUnique({
       where: { email: newEmail },
     });
@@ -55,7 +52,7 @@ export async function POST(req: Request) {
     }
 
     const emailVerificationToken = crypto.randomBytes(32).toString('hex');
-    const emailVerificationTokenExpires = new Date(Date.now() + 3600000); // 1 hora de validade
+    const emailVerificationTokenExpires = new Date(Date.now() + 3600000);
 
     await prisma.user.update({
       where: { id: user.id },
@@ -80,8 +77,6 @@ export async function POST(req: Request) {
       });
     } catch (emailError) {
       console.error('Erro ao enviar e-mail de verificação:', emailError);
-      // Mesmo que o e-mail falhe, o token foi gerado. O usuário pode tentar reenviar.
-      // Poderíamos reverter a atualização do DB aqui ou lidar com isso de outra forma.
       return NextResponse.json({ error: 'Falha ao enviar e-mail de verificação. Tente novamente mais tarde.' }, { status: 500 });
     }
 

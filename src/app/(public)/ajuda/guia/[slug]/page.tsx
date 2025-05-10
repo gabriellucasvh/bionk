@@ -26,8 +26,7 @@ const getFilePath = async (slug: string) => {
       await fs.access(filePath);
       return filePath;
     } catch (error) {
-      const err = error as NodeJS.ErrnoException; // Tipo adequado para erros de sistema de arquivos
-      // Apenas loga erros que não sejam ENOENT (arquivo não encontrado)
+      const err = error as NodeJS.ErrnoException;
       if (err.code !== "ENOENT") {
         console.error(`Error accessing file in directory ${dir}:`, err);
       }
@@ -59,7 +58,7 @@ export async function generateStaticParams() {
   }
 
   return filenames
-    .filter((filename) => filename.endsWith(".md")) // Garante que são arquivos válidos
+    .filter((filename) => filename.endsWith(".md")) 
     .map((filename) => ({
       slug: filename.replace(/\.md$/, ""),
     }));

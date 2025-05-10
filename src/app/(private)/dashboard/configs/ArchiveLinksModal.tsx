@@ -8,7 +8,7 @@ type LinkItem = {
   id: number;
   title: string;
   url: string;
-  active: boolean; // Mantido para compatibilidade, mas a lógica principal usará 'archived'
+  active: boolean; 
   archived?: boolean;
 };
 
@@ -38,7 +38,7 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
     const res = await fetch(`/api/links/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ archived: false }), // Restaurar significa definir archived como false
+      body: JSON.stringify({ archived: false }),
     });
     if (res.ok) {
       setArchivedLinks(archivedLinks.filter((link) => link.id !== id));

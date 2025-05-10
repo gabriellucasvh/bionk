@@ -55,7 +55,7 @@ const Sidebar = () => {
   useEffect(() => {
     const baseUrl = process.env.NODE_ENV === 'production' ? 'https://www.bionk.me' : 'http://localhost:3000';
     setProfileUrl(username ? `${baseUrl}/${username}` : '#');
-  }, [username, session?.user?.username]); // Adiciona session?.user?.username como dependência
+  }, [username, session?.user?.username]);
 
   useEffect(() => {
     setDisabledButtons(new Set());

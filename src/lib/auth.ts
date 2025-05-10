@@ -14,7 +14,6 @@ if (!clientId || !clientSecret) {
   throw new Error("Missing Google OAuth environment variables");
 }
 
-
 interface ExtendedUser extends User {
   id: string
   username: string
@@ -23,7 +22,6 @@ interface ExtendedUser extends User {
 export const authOptions: NextAuthOptions = {
   adapter: {
     ...PrismaAdapter(prisma),
-    // Sobrescreve createUser para gerar username para OAuth
     createUser: async (data: { name?: string; email: string }) => {
       const username = await generateUniqueUsername(data.name ?? 'user');
       return prisma.user.create({
@@ -92,10 +90,9 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user, account, trigger, session: updateSessionData }) { // Adiciona trigger e session
+    async jwt({ token, user, account, trigger, session: updateSessionData }) { 
       const u = user as ExtendedUser;
 
-      // Na autenticação inicial ou vinculação de conta
       if (user) {
         token.id = user.id;
         token.email = user.email ?? undefined;
@@ -103,25 +100,15 @@ export const authOptions: NextAuthOptions = {
         token.name = u.name;
         token.picture = user.image ?? undefined;
       }
-      if (account) { // account is only available on successful sign-in
+      if (account) { 
         token.accessToken = account.access_token;
-        // Armazena se o login foi feito via 'credentials'
         token.isCredentialsUser = account.provider === 'credentials';
       }
 
-      // Se updateSession foi chamado no cliente
       if (trigger === "update" && updateSessionData?.user) {
-        // Atualiza o token com os dados passados para updateSession
         token.name = updateSessionData.user.name;
         token.username = updateSessionData.user.username;
         token.picture = updateSessionData.user.image;
-        // Opcional: Re-buscar do DB para garantir consistência, mas updateSessionData deve bastar.
-        // const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
-        // if (dbUser) {
-        //   token.name = dbUser.name;
-        //   token.username = dbUser.username;
-        //   token.picture = dbUser.image;
-        // }
       }
 
       return token;
@@ -134,7 +121,6 @@ export const authOptions: NextAuthOptions = {
         username: token.username as string,
         name: token.name as string,
         image: token.picture ?? null,
-        // Passa a informação para o objeto da sessão do cliente
         isCredentialsUser: token.isCredentialsUser as boolean | undefined,
       };
       return session;
@@ -143,12 +129,4 @@ export const authOptions: NextAuthOptions = {
       return `${baseUrl}/dashboard/perfil`
     },
   },
-  // O evento createUser foi removido. A geração de username para novos usuários
-  // via Credentials é feita na rota /api/auth/register.
-  // Para provedores OAuth, o adapter tentará criar o usuário.
-  // Como 'username' é obrigatório no schema, a criação falhará se o provedor
-  // não fornecer um username e o adapter não o gerar. Idealmente, o adapter
-  // ou um callback personalizado deveria lidar com a geração se ausente.
-  // Por agora, confiamos que o provedor (Google) fornece dados suficientes
-  // ou que o registro via Credentials é o fluxo principal para usuários sem username inicial.
 }

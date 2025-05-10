@@ -8,7 +8,6 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q') || '';
 
-  // Lista de diretórios contendo arquivos Markdown
   const directories = [
     path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'personalizacao'),
     path.join(process.cwd(), 'src', 'content', 'ajuda', 'guia', 'primeiros-passos'),
@@ -17,9 +16,8 @@ export async function GET(request: Request) {
 
   const guides: Array<{ slug: string; title: string; description: string; type: string }> = [];
 
-  // Itera sobre cada diretório e coleta os arquivos Markdown
   directories.forEach((dir) => {
-    if (!fs.existsSync(dir)) return; // Verifica se o diretório existe
+    if (!fs.existsSync(dir)) return; 
 
     const files = fs.readdirSync(dir).filter((filename) => {
       const filePath = path.join(dir, filename);
@@ -39,13 +37,11 @@ export async function GET(request: Request) {
     });
   });
 
-  // Configuração do Fuse.js para busca
   const fuse = new Fuse(guides, {
     keys: ['title', 'description', 'type'],
     includeScore: true,
   });
 
-  // Filtra os resultados se houver uma query
   const results = query ? fuse.search(query).map(result => result.item) : guides;
 
   return NextResponse.json(results);

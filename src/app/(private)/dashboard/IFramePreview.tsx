@@ -20,7 +20,7 @@ export default function IframePreview() {
     } else if (status === 'authenticated') {
       setIframeUrl('about:blank'); 
     }
-  }, [username, status, session?.user?.username]) // Adiciona session?.user?.username como dependência
+  }, [username, status, session?.user?.username]) 
 
   return (
     <section className="fixed top-1/2 right-28 -translate-y-1/2 z-30 pointer-events-none">

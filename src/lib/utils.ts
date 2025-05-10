@@ -8,6 +8,5 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Função auxiliar para formatação de datas
 export const formatDate = (dateStr: string, pattern = "dd/MM/yyyy") =>
   format(parseISO(dateStr), pattern, { locale: ptBR });

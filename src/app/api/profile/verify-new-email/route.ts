@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const user = await prisma.user.findFirst({
       where: {
         emailVerificationToken: token as string,
-        emailVerificationTokenExpires: { gt: new Date() }, // Verifica se o token não expirou
+        emailVerificationTokenExpires: { gt: new Date() },
       },
     });
 
@@ -21,23 +21,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Token inválido, expirado ou solicitação não encontrada.' }, { status: 400 });
     }
 
-    // Atualiza o e-mail do usuário e limpa os campos de verificação
     await prisma.user.update({
       where: { id: user.id },
       data: {
         email: user.newEmailPending,
-        emailVerified: new Date(), // Marca o novo e-mail como verificado
+        emailVerified: new Date(), 
         newEmailPending: null,
         emailVerificationToken: null,
         emailVerificationTokenExpires: null,
       },
     });
     
-    // Idealmente, você invalidaria a sessão NextAuth aqui para forçar o relogin
-    // ou atualizaria a sessão com o novo e-mail se o NextAuth permitir tal atualização dinâmica.
-    // Por simplicidade, vamos apenas retornar sucesso.
-    // O cliente pode ser instruído a pedir ao usuário para fazer login novamente ou a sessão pode ser atualizada no lado do cliente se possível.
-
     return NextResponse.json({ message: 'Seu novo e-mail foi verificado e atualizado com sucesso!' }, { status: 200 });
 
   } catch (error) {

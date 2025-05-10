@@ -32,7 +32,7 @@ import {
   Plus,
   Trash2,
   MousePointerClick,
-  Archive as ArchiveBox, // Renomeado para ArchiveBox para evitar conflito se houver outro Archive
+  Archive as ArchiveBox, 
 } from "lucide-react";
 import {
   DndContext,
@@ -309,11 +309,11 @@ const LinksClient = () => {
         console.error("Falha ao arquivar o link, forçando revalidação...");
         await mutateLinks(); 
       } else {
-        await mutateLinks(); // Revalidar dados para garantir consistência
+        await mutateLinks(); 
       }
     } catch (error) {
       console.error("Erro ao arquivar o link:", error);
-      await mutateLinks(); // Tentar re-sincronizar em caso de erro de rede
+      await mutateLinks(); 
     }
   };
 

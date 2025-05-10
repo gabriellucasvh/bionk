@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
-import ToastMessage from "@/components/ToastMessage"; // Supondo que você tenha um componente ToastMessage
+import ToastMessage from "@/components/ToastMessage"; 
 
 const changeEmailSchema = z.object({
   newEmail: z.string().email({ message: "Por favor, insira um e-mail válido." }),
@@ -49,7 +49,7 @@ export default function ChangeEmailForm() {
       }
 
       setMessage({ type: 'success', text: result.message || "Um e-mail de verificação foi enviado para o seu novo endereço. Por favor, verifique sua caixa de entrada." });
-      reset(); // Limpa o formulário após o sucesso
+      reset();
 
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message || "Ocorreu um erro. Tente novamente." });

@@ -8,7 +8,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "ID do link é obrigatório e deve ser um número" }, { status: 400 });
     }
 
-    // Executa as operações em transação (agora capturando apenas o updatedLink)
     const [, updatedLink] = await prisma.$transaction([
       prisma.linkClick.create({
         data: { linkId: Number(linkId) },

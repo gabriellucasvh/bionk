@@ -45,7 +45,6 @@ export default function ChangeEmailVerificationEmail({
   );
 }
 
-// Estilos (podem ser ajustados conforme necessário)
 const main = {
   backgroundColor: '#f6f9fc',
   padding: '20px',
@@ -83,7 +82,7 @@ const buttonContainer = {
 };
 
 const button = {
-  backgroundColor: '#52c41a', // Verde Bionk
+  backgroundColor: '#52c41a', 
   borderRadius: '5px',
   color: '#fff',
   fontSize: '16px',

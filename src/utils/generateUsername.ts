@@ -1,14 +1,12 @@
 import prisma from "@/lib/prisma";
 
 function sanitizeUsername(name: string): string {
-  // Primeiro, substitui 'ç' e 'Ç' por 'c'
   const nameWithoutCedilla = name.replace(/ç/g, "c").replace(/Ç/g, "c");
 
-  // Depois, normaliza e remove acentos e caracteres não alfanuméricos
   return nameWithoutCedilla
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacríticos (acentos)
-    .replace(/[^a-zA-Z0-9]/g, "") // Remove caracteres não alfanuméricos
+    .replace(/[\u0300-\u036f]/g, "") 
+    .replace(/[^a-zA-Z0-9]/g, "") 
     .toLowerCase();
 }
 

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
 import Sidebar from "../dashboard-sidebar";
 import AnalisesClient from "./analises.client";
-import { authOptions } from "@/lib/auth"; // ajuste conforme sua configuração
+import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Bionk Análises",

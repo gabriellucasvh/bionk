@@ -1,11 +1,11 @@
 export interface SocialLinkItem {
   id: string;
   platform: string;
-  username?: string; // Tornada opcional
+  username?: string; 
   url: string;
-  userId?: string;   // Tornada opcional
-  order?: number;    // Tornada opcional
-  active?: boolean;  // Tornada opcional
+  userId?: string;   
+  order?: number;    
+  active?: boolean;  
 }
 
 export interface SocialPlatform {

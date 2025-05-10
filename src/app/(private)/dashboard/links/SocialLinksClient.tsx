@@ -56,7 +56,7 @@ const SocialLinksClient = () => {
       platform: selectedPlatform.key,
       username: usernameInput.trim(),
       url: fullUrl,
-      active: true, // Default to active
+      active: true, 
     };
 
     try {
@@ -69,7 +69,6 @@ const SocialLinksClient = () => {
           body: JSON.stringify({ username: usernameInput.trim(), url: fullUrl }),
         });
       } else {
-        // Add new link
         response = await fetch("/api/social-links", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -85,11 +84,9 @@ const SocialLinksClient = () => {
       } else {
         const errorData = await response.json();
         console.error("Erro ao salvar link social:", errorData.error || "Erro desconhecido");
-        // Add user feedback here, e.g., a toast message
       }
     } catch (error) {
       console.error("Erro na requisição:", error);
-      // Add user feedback here
     }
   };
 

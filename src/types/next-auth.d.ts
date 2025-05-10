@@ -8,7 +8,7 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       image?: string | null;
-      isCredentialsUser?: boolean; // Adicionado para rastrear o tipo de login
+      isCredentialsUser?: boolean; 
     } & DefaultSession["user"];
   }
 }
@@ -24,6 +24,6 @@ declare module "next-auth/jwt" {
     email?: string;
     username?: string;
     accessToken?: string;
-    isCredentialsUser?: boolean; // Adicionado para rastrear o tipo de login no token JWT
+    isCredentialsUser?: boolean;
   }
 }

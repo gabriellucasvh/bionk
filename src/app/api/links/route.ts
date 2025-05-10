@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
-  const status = searchParams.get("status"); // 'active', 'archived', or null (defaults to active)
+  const status = searchParams.get("status"); 
 
   if (!userId) {
     return NextResponse.json(
@@ -18,7 +18,6 @@ export async function GET(request: Request) {
     if (status === "archived") {
       whereClause.archived = true;
     } else {
-      // Default to fetching non-archived links (active or all non-archived)
       whereClause.archived = false;
     }
 
@@ -48,13 +47,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Encontrar todos os links do usuário
     const existingLinks = await prisma.link.findMany({
       where: { userId },
       orderBy: { order: "asc" },
     });
 
-    // Atualizar a ordem de todos os links existentes (+1)
     await prisma.$transaction([
       ...existingLinks.map((link) =>
         prisma.link.update({
@@ -64,7 +61,6 @@ export async function POST(request: Request) {
       )
     ]);
 
-    // Criar novo link com ordem 0
     const newLink = await prisma.link.create({
       data: {
         userId,
@@ -73,8 +69,8 @@ export async function POST(request: Request) {
         active: active ?? true,
         clicks: clicks ?? 0,
         sensitive: sensitive ?? false,
-        archived: archived ?? false, // Default to not archived
-        order: 0, // Novo link sempre no topo
+        archived: archived ?? false,
+        order: 0, 
       },
     });
 

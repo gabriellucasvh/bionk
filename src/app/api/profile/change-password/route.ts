@@ -12,8 +12,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    // Verifica se o usuário está autenticado via credenciais
-    // A propriedade isCredentialsUser deve ser adicionada ao tipo da sessão se ainda não estiver
     if (!(session.user as any).isCredentialsUser) {
       return NextResponse.json({ error: 'Operação não permitida para este tipo de conta.' }, { status: 403 });
     }
@@ -32,11 +30,11 @@ export async function POST(req: Request) {
       where: { id: session.user.id },
     });
 
-    if (!user || !user.hashedPassword) { // Alterado de user.password para user.hashedPassword com base no schema.prisma
+    if (!user || !user.hashedPassword) { 
       return NextResponse.json({ error: 'Usuário não encontrado ou senha não configurada' }, { status: 404 });
     }
 
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.hashedPassword); // Alterado de user.password para user.hashedPassword
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.hashedPassword);
     if (!isPasswordValid) {
       return NextResponse.json({ error: 'Senha atual incorreta' }, { status: 403 });
     }
@@ -46,11 +44,9 @@ export async function POST(req: Request) {
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        hashedPassword: hashedNewPassword, // Alterado de password para hashedPassword
+        hashedPassword: hashedNewPassword, 
       },
     });
-
-    // Opcional: invalidar outras sessões do usuário aqui, se necessário.
 
     return NextResponse.json({ message: 'Senha alterada com sucesso!' }, { status: 200 });
 

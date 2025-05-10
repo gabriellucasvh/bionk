@@ -1,9 +1,8 @@
 import { NextResponse, NextRequest } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth'; // Supondo que authOptions está em @/lib/auth
+import { authOptions } from '@/lib/auth'; 
 
-// GET /api/social-links?userId=<userId>
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.id) {
@@ -24,7 +23,7 @@ export async function GET(request: NextRequest) {
   try {
     const socialLinks = await prisma.socialLink.findMany({
       where: { userId },
-      orderBy: { order: 'asc' }, // Mantendo a ordem definida no cliente
+      orderBy: { order: 'asc' },
     });
     return NextResponse.json({ socialLinks });
   } catch (error) {
@@ -33,7 +32,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/social-links
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.id) {
@@ -52,7 +50,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Campos platform, username e url são obrigatórios' }, { status: 400 });
     }
 
-    // Determinar a próxima ordem para o novo link
     const lastLink = await prisma.socialLink.findFirst({
       where: { userId: session.user.id },
       orderBy: { order: 'desc' },
@@ -65,7 +62,7 @@ export async function POST(request: NextRequest) {
         platform,
         username,
         url,
-        active: active !== undefined ? active : true, // Default active to true if not provided
+        active: active !== undefined ? active : true,
         order: newOrder,
       },
     });

@@ -33,7 +33,6 @@ export default async function UserComponent() {
 
   if (!user || !user.username) return notFound()
 
-  // Tipagem direta do Prisma
   const safeUser = user as UserWithLinks
 
   const templateCategory = user.templateCategory || "minimalista"
