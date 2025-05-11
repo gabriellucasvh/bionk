@@ -19,6 +19,8 @@ model User {
   verificationTokenExpiry DateTime?
   registrationOtp         String?       @unique 
   registrationOtpExpiry   DateTime? 
+  registrationOtpAttempts Int           @default(0)
+  registrationOtpBlockedUntil DateTime?
   template                String        @default("default")
   templateCategory        String        @default("minimalista")
   image                   String?       @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
@@ -37,6 +37,9 @@ type PasswordFormData = z.infer<typeof passwordSchema>;
 
 type Stage = "email" | "otp" | "password" | "success";
 
+const OTP_EXPIRY_MINUTES = 5;
+const OTP_COOLDOWN_MINUTES = 1;
+
 function Register() {
   const [stage, setStage] = useState<Stage>("email");
   const [email, setEmail] = useState<string>("");
@@ -44,6 +47,12 @@ function Register() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [otpTimer, setOtpTimer] = useState<number>(OTP_EXPIRY_MINUTES * 60);
+  const [otpCooldownTimer, setOtpCooldownTimer] = useState<number>(0);
+  const [isOtpInputDisabled, setIsOtpInputDisabled] = useState<boolean>(false);
+
+  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const cooldownTimerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -66,14 +75,72 @@ function Register() {
     resolver: zodResolver(passwordSchema),
   });
 
-  const handleEmailSubmit: SubmitHandler<EmailFormData> = async (data) => {
+  const clearTimers = () => {
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
+    }
+    if (cooldownTimerIntervalRef.current) {
+      clearInterval(cooldownTimerIntervalRef.current);
+      cooldownTimerIntervalRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      clearTimers();
+    };
+  }, []);
+
+  const startOtpTimer = () => {
+    clearTimers();
+    setOtpTimer(OTP_EXPIRY_MINUTES * 60);
+    setIsOtpInputDisabled(false);
+    timerIntervalRef.current = setInterval(() => {
+      setOtpTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerIntervalRef.current!);
+          timerIntervalRef.current = null;
+          setMessage({ type: 'error', text: `Tempo esgotado. Solicite um novo código.` });
+          setIsOtpInputDisabled(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const startOtpCooldownTimer = (durationMinutes: number) => {
+    if (cooldownTimerIntervalRef.current) {
+      clearInterval(cooldownTimerIntervalRef.current);
+    }
+    setOtpCooldownTimer(durationMinutes * 60);
+    cooldownTimerIntervalRef.current = setInterval(() => {
+      setOtpCooldownTimer((prevCooldown) => {
+        if (prevCooldown <= 1) {
+          clearInterval(cooldownTimerIntervalRef.current!);
+          cooldownTimerIntervalRef.current = null;
+          setMessage(null); 
+          return 0;
+        }
+        return prevCooldown - 1;
+      });
+    }, 1000);
+  };
+
+  const _submitEmailLogic = async (data: EmailFormData, isResend: boolean = false) => {
     setLoading(true);
     setMessage(null);
+    clearTimers();
+    otpForm.reset();
     try {
       await axios.post("/api/auth/register", { email: data.email, stage: "request-otp" });
       setEmail(data.email);
       setStage("otp");
       setMessage({ type: 'success', text: "Código de verificação enviado para o seu e-mail." });
+      startOtpTimer();
+      setOtpCooldownTimer(0);
+      setIsOtpInputDisabled(false);
     } catch (error) {
       if (error instanceof AxiosError) {
         setMessage({ type: 'error', text: error.response?.data?.error || "Erro ao solicitar código." });
@@ -82,6 +149,16 @@ function Register() {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEmailSubmit: SubmitHandler<EmailFormData> = async (data) => {
+    await _submitEmailLogic(data, false);
+  };
+
+  const handleResendOtp = async () => {
+    if (email) {
+      await _submitEmailLogic({ email }, true);
     }
   };
 
@@ -94,7 +171,13 @@ function Register() {
       setMessage({ type: 'success', text: "Código verificado com sucesso! Defina sua senha." });
     } catch (error) {
       if (error instanceof AxiosError) {
-        setMessage({ type: 'error', text: error.response?.data?.error || "Erro ao verificar código." });
+        const errorText = error.response?.data?.error || "Erro ao verificar código.";
+        setMessage({ type: 'error', text: errorText });
+        if (error.response?.status === 429) {
+          const match = errorText.match(/(\d+) minutos/);
+          const cooldownMinutes = match ? parseInt(match[1], 10) : OTP_COOLDOWN_MINUTES;
+          startOtpCooldownTimer(cooldownMinutes);
+        }
       } else {
         setMessage({ type: 'error', text: "Erro ao verificar código." });
       }
@@ -137,12 +220,17 @@ function Register() {
               {stage === "password" && "Defina sua Senha"}
               {stage === "success" && "Registro Concluído!"}
             </h2>
-            <p className="text-muted-foreground">
+            <div className="text-muted-foreground">
               {stage === "email" && "Comece personalizando seus links."}
-              {stage === "otp" && `Enviamos um código de 6 dígitos para ${email}. Verifique sua caixa de entrada (e spam).`}
+              {stage === "otp" && (
+                <p className="flex flex-col ">
+                  Enviamos um código de 6 dígitos para {email}. Verifique sua caixa de entrada (e spam).<br />
+                  {otpTimer > 0 && (<span className="text-xs">Você tem {Math.floor(otpTimer / 60)}:{(otpTimer % 60).toString().padStart(2, '0')} para inserir o código.</span>)}
+                </p>
+              )}
               {stage === "password" && "Escolha uma senha segura para sua conta."}
               {stage === "success" && "Você será redirecionado para a página de login em breve."}
-            </p>
+            </div>
           </div>
 
           {message && (
@@ -161,7 +249,7 @@ function Register() {
                   type="email"
                   {...emailForm.register("email")}
                   disabled={loading}
-                />
+                  />
                 {emailForm.formState.errors.email && (
                   <p className="text-red-600 text-sm">{emailForm.formState.errors.email.message}</p>
                 )}
@@ -182,18 +270,26 @@ function Register() {
                   type="text"
                   maxLength={6}
                   {...otpForm.register("otp")}
-                  disabled={loading}
-                />
+                  disabled={loading || isOtpInputDisabled || otpTimer === 0 || otpCooldownTimer > 0}
+                  />
                 {otpForm.formState.errors.otp && (
                   <p className="text-red-600 text-sm">{otpForm.formState.errors.otp.message}</p>
                 )}
+                {otpCooldownTimer > 0 && (<span className="text-xs text-gray-500">Muitas tentativas. Tente novamente em {Math.floor(otpCooldownTimer / 60)}:{(otpCooldownTimer % 60).toString().padStart(2, '0')}.</span>)}
               </div>
-              <Button type="submit" disabled={loading} className="w-full bg-green-600 hover:bg-green-500 transition-colors duration-300 text-white text-lg font-bold py-3 px-6 rounded-md cursor-pointer">
+              <Button type="submit" disabled={loading || isOtpInputDisabled || otpTimer === 0 || otpCooldownTimer > 0} className="w-full bg-green-600 hover:bg-green-500 transition-colors duration-300 text-white text-lg font-bold py-3 px-6 rounded-md cursor-pointer">
                 {loading ? "Verificando..." : "Verificar Código"}
               </Button>
-              <Button type="button" variant="link" onClick={() => { setStage('email'); setMessage(null); emailForm.reset(); }} disabled={loading}>
-                Usar outro e-mail
-              </Button>
+              <div className="flex justify-between items-center">
+                <Button type="button" variant="link" onClick={() => { setStage('email'); setMessage(null); emailForm.reset(); clearTimers(); setOtpTimer(0); setOtpCooldownTimer(0); setIsOtpInputDisabled(false); }} disabled={loading}>
+                  Usar outro e-mail
+                </Button>
+                {(otpTimer === 0 || otpCooldownTimer > 0 || isOtpInputDisabled) && (
+                  <Button type="button" variant="link" onClick={handleResendOtp} disabled={loading || (otpCooldownTimer > 0 && otpTimer > 0)}>
+                    Solicitar novo código
+                  </Button>
+                )}
+              </div>
             </form>
           )}
 
@@ -270,19 +366,19 @@ function Register() {
             </>
           )}
           {stage === "email" && (
-             <div className="mt-4">
-                <p className="text-xs text-muted-foreground text-center">
-                  Ao continuar, você aceita os nossos{" "}
-                  <Link className="underline" href="/termos">
-                    Termos e Condições
-                  </Link>{" "}
-                  e a nossa{" "}
-                  <Link className="underline" href="/privacidade">
-                    Política de Privacidade
-                  </Link>
-                  .
-                </p>
-              </div>
+            <div className="mt-4">
+              <p className="text-xs text-muted-foreground text-center">
+                Ao continuar, você aceita os nossos{" "}
+                <Link className="underline" href="/termos">
+                  Termos e Condições
+                </Link>{" "}
+                e a nossa{" "}
+                <Link className="underline" href="/privacidade">
+                  Política de Privacidade
+                </Link>
+                .
+              </p>
+            </div>
           )}
         </article>
       </section>
