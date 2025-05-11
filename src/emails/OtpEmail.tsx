@@ -1,4 +1,4 @@
-import { Html, Head, Preview, Body, Container, Section, Heading, Text, Hr, Link, Img } from '@react-email/components';
+import { Html, Head, Preview, Body, Container, Section, Heading, Text, Hr, Link } from '@react-email/components';
 import * as React from 'react';
 
 interface OtpEmailProps {
@@ -7,7 +7,7 @@ interface OtpEmailProps {
 }
 
 const baseUrl = process.env.NEXTAUTH_URL ? `${process.env.NEXTAUTH_URL}` : 'https://bionk.me';
-const logoUrl = `${baseUrl}/bionk-logo.svg`; 
+// const logoUrl = `https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746945104/bionk/bionk-logo.png`; 
 
 export const OtpEmail: React.FC<Readonly<OtpEmailProps>> = ({
   otp,
@@ -18,9 +18,9 @@ export const OtpEmail: React.FC<Readonly<OtpEmailProps>> = ({
     <Preview>Seu código de verificação Bionk</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Section style={logoContainer}>
-          <Img src={logoUrl} width="120" height="auto" alt="Bionk Logo" />
-        </Section>
+        {/* <Section style={logoContainer}>
+          <Img src={logoUrl} width="120" height="40" alt="Bionk Logo" />
+        </Section> */}
         <Heading style={heading}>Seu Código de Verificação</Heading>
         <Text style={paragraph}>
           Olá,
@@ -63,10 +63,14 @@ const container = {
   maxWidth: '465px',
 };
 
-const logoContainer = {
-  textAlign: 'center' as const,
-  marginBottom: '20px',
-};
+// const logoContainer = {
+//   display: 'flex',
+//   textAlign: 'center' as const,
+//   alignItems: 'center' as const,
+//   justifyContent: 'center' as const,
+//   marginBottom: '20px',
+//   width: '100%',
+// };
 
 const heading = {
   color: '#1a1a1a',
