@@ -345,7 +345,7 @@ const LinksClient = () => {
   if (isProfileLoading) return <LoadingPage />;
 
   return (
-    <section className="w-full md:w-10/12 lg:w-7/12 p-2 sm:p-4 space-y-4 max-h-screen">
+    <section className="w-full md:w-10/12 lg:w-7/12 p-2 sm:p-4 space-y-4">
       <header className="flex items-center justify-between">
         <h2 className="text-xl sm:text-2xl font-bold">Gerenciar links</h2>
       </header>

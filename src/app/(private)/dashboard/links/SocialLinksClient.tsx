@@ -134,7 +134,7 @@ const SocialLinksClient = () => {
   }
 
   return (
-    <section className="w-full md:w-1/2 p-2 sm:p-4 space-y-4 max-h-screen overflow-y-auto md:mt-12">
+    <section className="w-full md:w-1/2 p-2 sm:p-4 space-y-4 overflow-y-auto md:mt-12">
       <Card>
         <CardHeader>
           <CardTitle className="text-lg sm:text-xl">Links Sociais</CardTitle>
