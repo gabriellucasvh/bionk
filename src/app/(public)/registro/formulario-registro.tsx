@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
@@ -13,47 +13,39 @@ import { GoogleBtn } from "@/components/buttons/button-google";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import LoadingPage from "@/components/layout/LoadingPage";
+import { Button } from "@/components/ui/button";
 
-// Define the form schema
-const schema = z
-  .object({
-    name: z.string()
-      .min(3, "Insira um nome de usuário válido")
-      .regex(/^[a-zA-Z0-9çÇ\s\-]+$/, {
-        message: "Use apenas letras, números e hífens",
-      }),
+const emailSchema = z.object({
+  email: z.string().email("E-mail inválido"),
+});
 
-    email: z.string().email("E-mail inválido"),
-    password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "As senhas não coincidem",
-    path: ["confirmPassword"],
-  });
+const otpSchema = z.object({
+  otp: z.string().length(6, "O código deve ter 6 dígitos").regex(/^\d{6}$/, "Código inválido, use apenas números"),
+});
 
-// Infer the TypeScript type from the schema
-type FormData = z.infer<typeof schema>;
+const passwordSchema = z.object({
+  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
+});
+
+type EmailFormData = z.infer<typeof emailSchema>;
+type OtpFormData = z.infer<typeof otpSchema>;
+type PasswordFormData = z.infer<typeof passwordSchema>;
+
+type Stage = "email" | "otp" | "password" | "success";
 
 function Register() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
-
+  const [stage, setStage] = useState<Stage>("email");
+  const [email, setEmail] = useState<string>("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { data: session, status } = useSession();
-  // Verifica apenas se existe sessão, sem acessar dados
-  useEffect(() => {
-    if (session) { // Apenas verifica a existência
-      // Lógica que não expõe os dados da sessão
-    }
-  }, [session]);
   const router = useRouter();
 
   useEffect(() => {
@@ -62,184 +54,236 @@ function Register() {
     }
   }, [status, router]);
 
-  if (status === "loading") {
-    return (
-      <LoadingPage />
-    );
-  }
+  const emailForm = useForm<EmailFormData>({
+    resolver: zodResolver(emailSchema),
+  });
 
-  const onSubmit = async (data: FormData) => {
+  const otpForm = useForm<OtpFormData>({
+    resolver: zodResolver(otpSchema),
+  });
+
+  const passwordForm = useForm<PasswordFormData>({
+    resolver: zodResolver(passwordSchema),
+  });
+
+  const handleEmailSubmit: SubmitHandler<EmailFormData> = async (data) => {
     setLoading(true);
-    setMessage("");
-
+    setMessage(null);
     try {
-      await axios.post("/api/auth/register", data);
-      setMessage("Cadastro realizado com sucesso!");
-
-      const result = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setMessage("Erro ao autenticar. Faça login manualmente.");
-      } else {
-        router.replace("/");
-      }
+      await axios.post("/api/auth/register", { email: data.email, stage: "request-otp" });
+      setEmail(data.email);
+      setStage("otp");
+      setMessage({ type: 'success', text: "Código de verificação enviado para o seu e-mail." });
     } catch (error) {
       if (error instanceof AxiosError) {
-        setMessage(error.response?.data?.error || "Erro ao cadastrar");
+        setMessage({ type: 'error', text: error.response?.data?.error || "Erro ao solicitar código." });
       } else {
-        setMessage("Erro ao cadastrar");
+        setMessage({ type: 'error', text: "Erro ao solicitar código." });
       }
     } finally {
       setLoading(false);
     }
   };
 
+  const handleOtpSubmit: SubmitHandler<OtpFormData> = async (data) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      await axios.post("/api/auth/register", { email, otp: data.otp, stage: "verify-otp" });
+      setStage("password");
+      setMessage({ type: 'success', text: "Código verificado com sucesso! Defina sua senha." });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setMessage({ type: 'error', text: error.response?.data?.error || "Erro ao verificar código." });
+      } else {
+        setMessage({ type: 'error', text: "Erro ao verificar código." });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordSubmit: SubmitHandler<PasswordFormData> = async (data) => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      await axios.post("/api/auth/register", { email, password: data.password, stage: "create-user" });
+      setStage("success");
+      setMessage({ type: 'success', text: "Conta criada com sucesso! Você será redirecionado para o login." });
+      setTimeout(() => router.push("/login"), 3000);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        setMessage({ type: 'error', text: error.response?.data?.error || "Erro ao criar conta." });
+      } else {
+        setMessage({ type: 'error', text: "Erro ao criar conta." });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (status === "loading") {
+    return <LoadingPage />;
+  }
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center">
-      {/* Card de Registro */}
       <section className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <article className="bg-white p-8 rounded-lg w-full max-w-md md:border border-lime-500">
-          <div className="text-center mb-2 space-y-2">
+          <div className="text-center mb-6 space-y-2">
             <h2 className="text-2xl font-bold text-center text-black">
-              Junte-se ao Bionk
+              {stage === "email" && "Crie sua conta Bionk"}
+              {stage === "otp" && "Verifique seu E-mail"}
+              {stage === "password" && "Defina sua Senha"}
+              {stage === "success" && "Registro Concluído!"}
             </h2>
             <p className="text-muted-foreground">
-              Personalize, organize e compartilhe todos os seus links em um só
-              lugar.
+              {stage === "email" && "Comece personalizando seus links."}
+              {stage === "otp" && `Enviamos um código de 6 dígitos para ${email}. Verifique sua caixa de entrada (e spam).`}
+              {stage === "password" && "Escolha uma senha segura para sua conta."}
+              {stage === "success" && "Você será redirecionado para a página de login em breve."}
             </p>
           </div>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <Label className="block text-base font-semibold text-black">
-                Seu nome
-              </Label>
-              <Input
-                className="w-full px-4 py-3 border mb-4 rounded-md focus-visible:border-lime-500 transition-colors duration-400"
-                placeholder="Digite seu nome"
-                type="text"
-                {...register("name")}
-              />
-              {errors.name && (
-                <p className="text-red-600 text-sm -mt-3">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
 
-            <div>
-              <Label className="block text-base font-semibold text-black">
-                Seu email
-              </Label>
-              <Input
-                className="w-full px-4 py-3 border mb-4 rounded-md focus-visible:border-lime-500 transition-colors duration-400"
-                placeholder="Digite seu e-mail"
-                type="email"
-                {...register("email")}
-              />
-              {errors.email && (
-                <p className="text-red-600 text-sm -mt-3">
-                  {errors.email.message}
-                </p>
-              )}
+          {message && (
+            <div className={`mb-4 p-3 rounded-md text-sm text-center ${message.type === 'success' ? 'bg-green-100 border border-green-400 text-green-700' : 'bg-red-100 border border-red-400 text-red-700'}`}>
+              {message.text}
             </div>
+          )}
 
-            <div>
-              <Label className="block text-base font-semibold text-black">
-                Sua senha
-              </Label>
-              <div className="relative">
+          {stage === "email" && (
+            <form onSubmit={emailForm.handleSubmit(handleEmailSubmit)} className="space-y-4">
+              <div>
+                <Label className="block text-base font-semibold text-black">Seu email</Label>
                 <Input
-                  className="w-full px-4 py-3 border mb-4 rounded-md focus-visible:border-lime-500 transition-colors duration-400"
-                  placeholder="Digite sua senha"
-                  type={showPassword ? "text" : "password"}
-                  {...register("password")}
+                  className="w-full px-4 py-3 border mt-1 mb-1 rounded-md focus-visible:border-lime-500 transition-colors duration-400"
+                  placeholder="Digite seu e-mail"
+                  type="email"
+                  {...emailForm.register("email")}
+                  disabled={loading}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 px-4"
-                >
-                  {showPassword ? <EyeOff /> : <Eye />}
-                </button>
+                {emailForm.formState.errors.email && (
+                  <p className="text-red-600 text-sm">{emailForm.formState.errors.email.message}</p>
+                )}
               </div>
-              {errors.password && (
-                <p className="text-red-600 text-sm -mt-3">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+              <Button type="submit" disabled={loading} className="w-full bg-green-600 hover:bg-green-500 transition-colors duration-300 text-white text-lg font-bold py-3 px-6 rounded-md cursor-pointer">
+                {loading ? "Enviando..." : "Continuar"}
+              </Button>
+            </form>
+          )}
 
-            <div>
-              <Label className="block text-base font-semibold text-black">
-                Confirmar senha
-              </Label>
-              <div className="relative">
+          {stage === "otp" && (
+            <form onSubmit={otpForm.handleSubmit(handleOtpSubmit)} className="space-y-4">
+              <div>
+                <Label className="block text-base font-semibold text-black">Código de Verificação</Label>
                 <Input
-                  className="w-full px-4 py-3 border mb-4 rounded-md focus-visible:border-lime-500 transition-colors duration-400"
-                  placeholder="Confirme sua senha"
-                  type={showConfirmPassword ? "text" : "password"}
-                  {...register("confirmPassword")}
+                  className="w-full px-4 py-3 border mt-1 mb-1 rounded-md focus-visible:border-lime-500 transition-colors duration-400 tracking-[0.3em] text-center"
+                  placeholder="------"
+                  type="text"
+                  maxLength={6}
+                  {...otpForm.register("otp")}
+                  disabled={loading}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 px-4"
-                >
-                  {showConfirmPassword ? <EyeOff /> : <Eye />}
-                </button>
+                {otpForm.formState.errors.otp && (
+                  <p className="text-red-600 text-sm">{otpForm.formState.errors.otp.message}</p>
+                )}
               </div>
-              {errors.confirmPassword && (
-                <p className="text-red-600 text-sm -mt-3">
-                  {errors.confirmPassword.message}
+              <Button type="submit" disabled={loading} className="w-full bg-green-600 hover:bg-green-500 transition-colors duration-300 text-white text-lg font-bold py-3 px-6 rounded-md cursor-pointer">
+                {loading ? "Verificando..." : "Verificar Código"}
+              </Button>
+              <Button type="button" variant="link" onClick={() => { setStage('email'); setMessage(null); emailForm.reset(); }} disabled={loading}>
+                Usar outro e-mail
+              </Button>
+            </form>
+          )}
+
+          {stage === "password" && (
+            <form onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)} className="space-y-4">
+              <div>
+                <Label className="block text-base font-semibold text-black">Sua senha</Label>
+                <div className="relative mt-1">
+                  <Input
+                    className="w-full px-4 py-3 border mb-1 rounded-md focus-visible:border-lime-500 transition-colors duration-400"
+                    placeholder="Digite sua senha"
+                    type={showPassword ? "text" : "password"}
+                    {...passwordForm.register("password")}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+                    disabled={loading}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+                {passwordForm.formState.errors.password && (
+                  <p className="text-red-600 text-sm">{passwordForm.formState.errors.password.message}</p>
+                )}
+              </div>
+              <div>
+                <Label className="block text-base font-semibold text-black">Confirmar senha</Label>
+                <div className="relative mt-1">
+                  <Input
+                    className="w-full px-4 py-3 border mb-1 rounded-md focus-visible:border-lime-500 transition-colors duration-400"
+                    placeholder="Confirme sua senha"
+                    type={showConfirmPassword ? "text" : "password"}
+                    {...passwordForm.register("confirmPassword")}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+                    disabled={loading}
+                  >
+                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+                {passwordForm.formState.errors.confirmPassword && (
+                  <p className="text-red-600 text-sm">{passwordForm.formState.errors.confirmPassword.message}</p>
+                )}
+              </div>
+              <Button type="submit" disabled={loading} className="w-full bg-green-600 hover:bg-green-500 transition-colors duration-300 text-white text-lg font-bold py-3 px-6 rounded-md cursor-pointer">
+                {loading ? "Salvando..." : "Criar Conta"}
+              </Button>
+            </form>
+          )}
+
+          {stage !== "success" && (
+            <>
+              <div className="flex flex-col items-center justify-center space-y-4 mt-6">
+                <span className="w-full flex items-center justify-center h-px bg-gray-300">
+                  <span className="px-4 bg-white text-muted-foreground">ou</span>
+                </span>
+                <GoogleBtn />
+              </div>
+              <div className="mt-6 text-center">
+                <span className="text-sm text-muted-foreground">
+                  Já possui uma conta?{" "}
+                  <Link className="text-blue-500 hover:underline" href={"/login"} onClick={() => setMessage(null)}>
+                    Faça o Login
+                  </Link>
+                </span>
+              </div>
+            </>
+          )}
+          {stage === "email" && (
+             <div className="mt-4">
+                <p className="text-xs text-muted-foreground text-center">
+                  Ao continuar, você aceita os nossos{" "}
+                  <Link className="underline" href="/termos">
+                    Termos e Condições
+                  </Link>{" "}
+                  e a nossa{" "}
+                  <Link className="underline" href="/privacidade">
+                    Política de Privacidade
+                  </Link>
+                  .
                 </p>
-              )}
-            </div>
-
-            <div>
-              <p className="text-sm text-muted-foreground">
-                Ao criar uma conta, você aceita os nossos{" "}
-                <Link className="underline" href="/termos">
-                  Termos e Condições
-                </Link>{" "}
-                e a nossa{" "}
-                <Link className="underline" href="/privacidade">
-                  Política de Privacidade
-                </Link>
-                .
-              </p>
-            </div>
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <span className="w-full flex items-center justify-center h-px bg-gray-300">
-                <span className="px-4 bg-white">ou</span>
-              </span>
-              <GoogleBtn />
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-green-600 hover:bg-green-500 transition-colors duration-300 text-white text-lg font-bold py-3 px-6 rounded-md cursor-pointer"
-            >
-              {loading ? "Cadastrando..." : "Cadastrar"}
-            </button>
-
-            {message && (
-              <div className="mt-4 p-4 bg-white border border-lime-500 rounded-md text-black font-base text-center">
-                {message}
               </div>
-            )}
-            <div>
-              <span className="text-sm">
-                Já possui uma conta?{" "}
-                <Link className="text-blue-500 hover:underline" href={"/login"}>
-                  Faça o Login
-                </Link>
-              </span>
-            </div>
-          </form>
+          )}
         </article>
       </section>
     </main>

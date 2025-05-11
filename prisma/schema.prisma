@@ -8,31 +8,33 @@ datasource db {
 }
 
 model User {
-  id                   String        @id @default(uuid())
-  name                 String?
-  username             String        @unique
-  email                String        @unique
-  bio                  String?
-  provider             String?
-  emailVerified        DateTime?
-  template             String        @default("default")
-  templateCategory     String        @default("minimalista")
-  image                String?       @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")
-  bannerUrl            String?
-  hashedPassword       String?
-  createdAt            DateTime      @default(now())
-  passwordResetToken   String?       @unique
-  passwordResetExpires DateTime?
-  accounts             Account[]
-  sessions             Session[]
-  Link                 Link[]
-  ProfileView          ProfileView[]
-  SocialLink           SocialLink[]
-
-  // Campos para verificação de novo e-mail
-  newEmailPending             String?   @unique // Armazena o novo e-mail pendente de verificação
-  emailVerificationToken      String?   @unique // Armazena o token para verificar o novo e-mail
-  emailVerificationTokenExpires DateTime? // Data de expiração do token de verificação de e-mail
+  id                      String        @id @default(uuid())
+  name                    String?
+  username                String        @unique
+  email                   String        @unique
+  bio                     String?
+  provider                String?
+  emailVerified           DateTime?
+  verificationToken       String?       @unique
+  verificationTokenExpiry DateTime?
+  registrationOtp         String?       @unique 
+  registrationOtpExpiry   DateTime? 
+  template                String        @default("default")
+  templateCategory        String        @default("minimalista")
+  image                   String?       @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")
+  bannerUrl               String?
+  hashedPassword          String?
+  createdAt               DateTime      @default(now())
+  passwordResetToken      String?       @unique
+  passwordResetExpires    DateTime?
+  accounts                Account[]
+  sessions                Session[]
+  Link                    Link[]
+  ProfileView             ProfileView[]
+  SocialLink              SocialLink[]
+  newEmailPending               String?   @unique
+  emailVerificationToken        String?   @unique 
+  emailVerificationTokenExpires DateTime?
 }
 
 model Account {
