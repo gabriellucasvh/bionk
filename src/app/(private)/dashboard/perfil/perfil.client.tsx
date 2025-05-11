@@ -20,7 +20,7 @@ import LoadingPage from "@/components/layout/LoadingPage";
 
 const PerfilClient = () => {
   const { data: session, update: updateSession } = useSession(); 
-  const [profile, setProfile] = useState({ name: "", username: "", bio: "" });
+  const [profile, setProfile] = useState({ name: name ?? "", username: "", bio: "" });
   const [originalProfile, setOriginalProfile] = useState({ name: "", username: "", bio: "" });
   const [loading, setLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
