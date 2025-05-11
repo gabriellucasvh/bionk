@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
@@ -31,6 +31,7 @@ function Login() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false); 
 
@@ -43,10 +44,18 @@ function Login() {
   const router = useRouter();
 
   useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "OAuthAccountNotLinked") {
+      setMessage("Este e-mail já está cadastrado. Faça login com o método original ou use outro e-mail para o Google.");
+    } else if (error) {
+      // Handle other potential errors from URL if necessary
+      setMessage("Ocorreu um erro. Tente novamente.");
+    }
+
     if (status === "authenticated") {
       router.replace("/dashboard");
     }
-  }, [status, router]);
+  }, [status, router, searchParams]);
 
   if (status === "loading") {
     return (

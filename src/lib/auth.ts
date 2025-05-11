@@ -18,7 +18,19 @@ interface ExtendedUser extends User {
   id: string
   username: string
   name?: string
+  googleId?: string
 }
+
+interface Token extends Record<string, any> {
+  id: string;
+  email: string | undefined;
+  username: string;
+  name?: string;
+  picture?: string | null;
+  googleId?: string;
+  isCredentialsUser?: boolean;
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: {
     ...PrismaAdapter(prisma),
@@ -52,6 +64,16 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId,
       clientSecret,
+      async profile(profile) {
+        return {
+          ...profile,
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          googleId: profile.sub,
+        };
+      },
     }),
     CredentialsProvider({
       name: 'Credentials',
@@ -90,7 +112,7 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user, account, trigger, session: updateSessionData }) { 
+    async jwt({ token, user, account, trigger, session: updateSessionData }) {
       const u = user as ExtendedUser;
 
       if (user) {
@@ -99,8 +121,11 @@ export const authOptions: NextAuthOptions = {
         token.username = u.username;
         token.name = u.name;
         token.picture = user.image ?? undefined;
+        if (account?.provider === 'google' && account.providerAccountId) {
+          token.googleId = account.providerAccountId;
+        }
       }
-      if (account) { 
+      if (account) {
         token.accessToken = account.access_token;
         token.isCredentialsUser = account.provider === 'credentials';
       }
@@ -122,11 +147,29 @@ export const authOptions: NextAuthOptions = {
         name: token.name as string,
         image: token.picture ?? null,
         isCredentialsUser: token.isCredentialsUser as boolean | undefined,
+        googleId: token.googleId ?? undefined,
       };
       return session;
     },
-    async redirect({ baseUrl }) {
-      return `${baseUrl}/dashboard/perfil`
+    async redirect({ baseUrl, url }) {
+      // Verifica se a URL de callback contém o erro OAuthAccountNotLinked
+      if (url.includes("/api/auth/error?error=OAuthAccountNotLinked") || url.includes("&error=OAuthAccountNotLinked")) {
+        return `${baseUrl}/login?error=OAuthAccountNotLinked`;
+      }
+      // Verifica se a URL de callback é a página de signIn e não contém erro, então redireciona para o callbackUrl ou dashboard
+      if (url.startsWith(baseUrl + "/registro") || url.startsWith(baseUrl + "/login")) {
+        const callbackUrl = new URL(url).searchParams.get("callbackUrl");
+        if (callbackUrl) {
+          return callbackUrl;
+        }
+        return `${baseUrl}/dashboard/perfil`;
+      }
+      // Se houver uma URL de callback na query, usa ela
+      if (new URL(url, baseUrl).searchParams.has("callbackUrl")) {
+        return url;
+      }
+      // Comportamento padrão para outros casos
+      return `${baseUrl}/dashboard/perfil`;
     },
   },
 }

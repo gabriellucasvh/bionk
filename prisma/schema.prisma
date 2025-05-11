@@ -8,34 +8,35 @@ datasource db {
 }
 
 model User {
-  id                      String        @id @default(uuid())
-  name                    String?
-  username                String        @unique
-  email                   String        @unique
-  bio                     String?
-  provider                String?
-  emailVerified           DateTime?
-  verificationToken       String?       @unique
-  verificationTokenExpiry DateTime?
-  registrationOtp         String?       @unique 
-  registrationOtpExpiry   DateTime? 
-  registrationOtpAttempts Int           @default(0)
-  registrationOtpBlockedUntil DateTime?
-  template                String        @default("default")
-  templateCategory        String        @default("minimalista")
-  image                   String?       @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")
-  bannerUrl               String?
-  hashedPassword          String?
-  createdAt               DateTime      @default(now())
-  passwordResetToken      String?       @unique
-  passwordResetExpires    DateTime?
-  accounts                Account[]
-  sessions                Session[]
-  Link                    Link[]
-  ProfileView             ProfileView[]
-  SocialLink              SocialLink[]
-  newEmailPending               String?   @unique
-  emailVerificationToken        String?   @unique 
+  id                            String        @id @default(uuid())
+  googleId                      String?
+  name                          String?
+  username                      String        @unique
+  email                         String        @unique
+  bio                           String?
+  provider                      String?
+  emailVerified                 DateTime?
+  verificationToken             String?       @unique
+  verificationTokenExpiry       DateTime?
+  registrationOtp               String?       @unique
+  registrationOtpExpiry         DateTime?
+  registrationOtpAttempts       Int           @default(0)
+  registrationOtpBlockedUntil   DateTime?
+  template                      String        @default("default")
+  templateCategory              String        @default("minimalista")
+  image                         String?       @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")
+  bannerUrl                     String?
+  hashedPassword                String?
+  createdAt                     DateTime      @default(now())
+  passwordResetToken            String?       @unique
+  passwordResetExpires          DateTime?
+  accounts                      Account[]
+  sessions                      Session[]
+  Link                          Link[]
+  ProfileView                   ProfileView[]
+  SocialLink                    SocialLink[]
+  newEmailPending               String?       @unique
+  emailVerificationToken        String?       @unique
   emailVerificationTokenExpires DateTime?
 }
 
