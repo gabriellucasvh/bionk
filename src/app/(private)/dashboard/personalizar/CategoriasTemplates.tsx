@@ -4,50 +4,51 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react"; // Importar o ícone X para fechar o modal
+import { X } from "lucide-react";
 
 const categories = {
     minimalista: [
-        { id: "default", name: "Padrão", image: "/person.png" },
-        { id: "simple", name: "Simples", image: "/person.png" },
+        { id: "default", name: "Padrão", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/default.png" },
+        { id: "simple", name: "Simples", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/simple.png" },
     ],
     colorido: [
-        { id: "vibrant", name: "Vibrante", image: "/person.png" },
-        { id: "gradient", name: "Gradiente", image: "/person.png" },
+        { id: "vibrant", name: "Vibrante", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/vibrant.png" },
+        { id: "gradient", name: "Gradiente", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/gradient.png" },
     ],
     profissional: [
-        { id: "business", name: "Empresarial", image: "/person.png" },
-        { id: "corporate", name: "Corporativo", image: "/person.png" },
+        { id: "business", name: "Empresarial", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747031556/bionk/templates/business.png" },
+        { id: "corporate", name: "Corporativo", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/corporate.png" },
     ],
     moderno: [
-        { id: "modern", name: "Moderno", image: "/person.png" },
-        { id: "clean", name: "Clean", image: "/person.png" },
+        { id: "modern", name: "Moderno", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/modern.png" },
+        { id: "clean", name: "Clean", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/clean.png" },
     ],
     "dark-mode": [
-        { id: "dark", name: "Dark", image: "/person.png" },
-        { id: "midnight", name: "Midnight", image: "/person.png" },
+        { id: "dark", name: "Dark", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/dark.png" },
+        { id: "midnight", name: "Midnight", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/midnight.png" },
     ],
     criativo: [
-        { id: "artistic", name: "Artístico", image: "/person.png" },
-        { id: "unique", name: "Único", image: "/person.png" },
+        { id: "artistic", name: "Artístico", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/artistic.png" },
+        { id: "unique", name: "Único", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/unique.png" },
     ],
     elegante: [
-        { id: "elegant", name: "Elegante", image: "/person.png" },
-        { id: "lux", name: "Luxuoso", image: "/person.png" },
+        { id: "elegant", name: "Elegante", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/elegant.png" },
+        { id: "lux", name: "Luxuoso", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/lux.png" },
     ],
     neon: [
-        { id: "neon", name: "Neon", image: "/person.png" },
-        { id: "cyber", name: "Cyberpunk", image: "/person.png" },
+        { id: "neon", name: "Neon", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/neon.png" },
+        { id: "cyber", name: "Cyberpunk", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/cyber.png" },
     ],
     retro: [
-        { id: "retro", name: "Retrô", image: "/person.png" },
-        { id: "vintage", name: "Vintage", image: "/person.png" },
+        { id: "retro", name: "Retrô", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/retro.png" },
+        { id: "vintage", name: "Vintage", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/vintage.png" },
     ],
     fotografico: [
-        { id: "photo", name: "Fotográfico", image: "/person.png" },
-        { id: "gallery", name: "Galeria", image: "/person.png" },
+        { id: "photo", name: "Fotográfico", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/photo.png" },
+        { id: "gallery", name: "Galeria", image: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/gallery.png" },
     ],
 };
+
 
 export default function TemplateSettings() {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -147,14 +148,16 @@ export default function TemplateSettings() {
                             <div
                                 key={template.id}
                                 onClick={() => setSelectedTemplate(template.id)}
-                                className={`cursor-pointer p-2 rounded-lg border-2 ${selectedTemplate === template.id ? "border-green-500" : "border-gray-300"}`}
+                                className={`cursor-pointer p-2 rounded-lg border-2 ${selectedTemplate === template.id ? "border-green-600" : "border-gray-300 hover:border-green-400"}`}
                             >
                                 <Image
                                     src={template.image}
                                     alt={template.name}
                                     width={200}
                                     height={120}
-                                    className="rounded-lg w-full object-cover aspect-[16/10]"
+                                    className="rounded-lg w-full object-cover aspect-[9/16]"
+                                    quality={100}
+                                    unoptimized
                                 />
                                 <p className="text-center mt-2 text-sm">{template.name}</p>
                             </div>
