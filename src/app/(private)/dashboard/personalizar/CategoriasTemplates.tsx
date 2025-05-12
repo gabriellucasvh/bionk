@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { X } from "lucide-react"; // Importar o ícone X para fechar o modal
 
 const categories = {
     minimalista: [
@@ -53,6 +54,7 @@ export default function TemplateSettings() {
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
     const [currentTemplate, setCurrentTemplate] = useState<{ template: string; templateCategory: string } | null>(null);
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchUserTemplate = async () => {
@@ -96,6 +98,8 @@ export default function TemplateSettings() {
                     template: selectedTemplate,
                     templateCategory: selectedCategory,
                 });
+                setIsModalOpen(false);
+                window.location.reload();
             } else {
                 console.error('Error updating template:', await response.text());
             }
@@ -103,22 +107,69 @@ export default function TemplateSettings() {
             console.error('Error saving template:', error);
         } finally {
             const elapsedTime = Date.now() - startTime;
-            const remainingTime = 5000 - elapsedTime;
+            const remainingTime = Math.max(0, 2000 - elapsedTime);
 
-            if (remainingTime > 0) {
-                setTimeout(() => {
-                    setIsSaving(false);
-                }, remainingTime);
-            } else {
+            setTimeout(() => {
                 setIsSaving(false);
-            }
+            }, remainingTime);
         }
     };
 
+    const renderContent = () => (
+        <>
+            <div className="flex flex-wrap gap-2 mb-10">
+                {Object.keys(categories).map((category) => (
+                    <Button
+                        variant="ghost"
+                        key={category}
+                        onClick={() => setSelectedCategory(category)}
+                        className={`border-2 px-6 py-3 md:py-5 rounded-lg font-medium text-sm hover:bg-green-950 hover:text-white hover:border-lime-500 transition-colors ${selectedCategory === category ? "bg-green-950 text-white border-lime-500" : ""}`}
+                    >
+                        {category.replace(/-/g, " ").toUpperCase()}
+                    </Button>
+                ))}
+            </div>
+
+            {selectedCategory && (
+                <div className="mt-4">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-10">
+                        <h2 className="text-xl font-semibold">Templates Disponíveis</h2>
+                        <Button
+                            onClick={handleSave}
+                            className="py-2 rounded-lg text-white bg-green-600 hover:bg-green-700 w-full md:w-auto"
+                            disabled={!selectedTemplate || isSaving}
+                        >
+                            {isSaving ? "Salvando..." : "Salvar Template"}
+                        </Button>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {categories[selectedCategory as keyof typeof categories]?.map((template) => (
+                            <div
+                                key={template.id}
+                                onClick={() => setSelectedTemplate(template.id)}
+                                className={`cursor-pointer p-2 rounded-lg border-2 ${selectedTemplate === template.id ? "border-green-500" : "border-gray-300"}`}
+                            >
+                                <Image
+                                    src={template.image}
+                                    alt={template.name}
+                                    width={200}
+                                    height={120}
+                                    className="rounded-lg w-full object-cover aspect-[16/10]"
+                                />
+                                <p className="text-center mt-2 text-sm">{template.name}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </>
+    );
+
     return (
         <div>
+            {/* Tema atual para telas grandes */}
             {currentTemplate && (
-                <div className="mb-6 inline-block">
+                <div className="mb-6 hidden md:inline-block">
                     <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
                         Tema atual: {currentTemplate.templateCategory.charAt(0).toUpperCase() + currentTemplate.templateCategory.slice(1)} - {
                             categories[currentTemplate.templateCategory as keyof typeof categories]
@@ -128,52 +179,47 @@ export default function TemplateSettings() {
                 </div>
             )}
 
-            <div className="flex flex-wrap gap-2 mb-10">
-                {Object.keys(categories).map((category) => (
-                    <Button
-                        variant="ghost"
-                        key={category}
-                        onClick={() => setSelectedCategory(category)}
-                        className={`border-2 px-6 py-5 rounded-lg font-medium text-sm hover:bg-green-950 hover:text-white hover:border-lime-500 transition-colors ${selectedCategory === category ? "bg-green-950 text-white border-lime-500" : ""
-                            }`}
-                    >
-                        {category.replace("/-/g", " ").toUpperCase()}
-                    </Button>
-                ))}
+            {/* Botão para abrir o modal em telas pequenas */} 
+            <div className="md:hidden mb-6 relative z-40">
+                <Button 
+                    onClick={() => setIsModalOpen(true)} 
+                    className="py-3 px-10 border-2 bg-green-950 text-white border-lime-500"
+                >
+                     Templates
+                </Button>
             </div>
 
-            {selectedCategory && (
-                <div className="mt-4">
-                    <div className="flex items-center gap-4 mb-10">
-                        <h2 className="text-xl font-semibold">Templates Disponíveis</h2>
+            {/* Conteúdo para telas grandes */} 
+            <div className="hidden md:block">
+                {renderContent()}
+            </div>
+
+            {/* Modal para telas pequenas */} 
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 md:hidden">
+                    <div className="bg-card p-6 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
                         <Button
-                            onClick={handleSave}
-                            className=" py-2 rounded-lg text-white"
-                            disabled={!selectedTemplate || isSaving}
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setIsModalOpen(false)}
+                            className="absolute top-3 right-3 text-muted-foreground hover:text-foreground z-10"
                         >
-                            {isSaving ? "Salvando..." : "Salvar Template"}
+                            <X size={20} />
                         </Button>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {selectedCategory &&
-                            categories[selectedCategory as keyof typeof categories]?.map((template) => (
-                                <div
-                                    key={template.id}
-                                    onClick={() => setSelectedTemplate(template.id)}
-                                    className={`cursor-pointer p-2 rounded-lg border-2 ${selectedTemplate === template.id ? "border-green-500" : "border-gray-300"
-                                        }`}
-                                >
-                                    <Image
-                                        src={template.image}
-                                        alt={template.name}
-                                        width={200}
-                                        height={120}
-                                        className="rounded-lg"
-                                    />
-                                    <p className="text-center mt-2">{template.name}</p>
-                                </div>
-                            ))
-                        }
+                        <h2 className="text-2xl font-semibold mb-4 text-center">Escolha seu Template</h2>
+
+                        {/* Tema atual para telas pequenas (dentro do modal) */}
+                        {currentTemplate && (
+                            <div className="mb-4 text-center md:hidden">
+                                <span className="bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-xs font-medium">
+                                    Tema atual: {currentTemplate.templateCategory.charAt(0).toUpperCase() + currentTemplate.templateCategory.slice(1)} - {
+                                        categories[currentTemplate.templateCategory as keyof typeof categories]
+                                            ?.find(t => t.id === currentTemplate.template)?.name || currentTemplate.template
+                                    }
+                                </span>
+                            </div>
+                        )}
+                        {renderContent()}
                     </div>
                 </div>
             )}
