@@ -30,7 +30,7 @@ const UserProfileSocialIcons: React.FC<UserProfileSocialIconsProps> = ({
   }
 
   return (
-    <div className={`flex flex-wrap space-x-3 space-y-2 items-center justify-center ${className}`}>
+    <div className={`flex flex-wrap space-x-3 items-center justify-center ${className}`}>
       {activeLinks.map((link) => {
         const platform = SOCIAL_PLATFORMS.find((p) => p.key === link.platform);
         if (!platform) {
