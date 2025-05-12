@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import CategoriasTemplatesMobile from "./CategoriasTemplatesMobile"; 
 
 const categories = {
     minimalista: [
@@ -55,7 +55,6 @@ export default function TemplateSettings() {
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
     const [currentTemplate, setCurrentTemplate] = useState<{ template: string; templateCategory: string } | null>(null);
     const [isSaving, setIsSaving] = useState<boolean>(false);
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchUserTemplate = async () => {
@@ -99,7 +98,6 @@ export default function TemplateSettings() {
                     template: selectedTemplate,
                     templateCategory: selectedCategory,
                 });
-                setIsModalOpen(false);
                 window.location.reload();
             } else {
                 console.error('Error updating template:', await response.text());
@@ -135,6 +133,7 @@ export default function TemplateSettings() {
                 <div className="mt-4">
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-10">
                         <h2 className="text-xl font-semibold">Templates Disponíveis</h2>
+                        {/* O botão de salvar para desktop permanece aqui */}
                         <Button
                             onClick={handleSave}
                             className="py-2 rounded-lg text-white bg-green-600 hover:bg-green-700 w-full md:w-auto"
@@ -182,50 +181,23 @@ export default function TemplateSettings() {
                 </div>
             )}
 
-            {/* Botão para abrir o modal em telas pequenas */} 
-            <div className="md:hidden mb-6 relative z-40">
-                <Button 
-                    onClick={() => setIsModalOpen(true)} 
-                    className="py-3 px-10 border-2 bg-green-950 text-white border-lime-500"
-                >
-                     Templates
-                </Button>
-            </div>
+            {/* Componente móvel para gerenciar o botão e o modal */}
+            <CategoriasTemplatesMobile
+                categories={categories}
+                currentTemplate={currentTemplate}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                selectedTemplate={selectedTemplate}
+                setSelectedTemplate={setSelectedTemplate}
+                handleSave={handleSave}
+                isSaving={isSaving}
+                renderContentForModal={renderContent}
+            />
 
-            {/* Conteúdo para telas grandes */} 
+            {/* Conteúdo para telas grandes */}
             <div className="hidden md:block">
                 {renderContent()}
             </div>
-
-            {/* Modal para telas pequenas */} 
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 md:hidden">
-                    <div className="bg-card p-6 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto relative">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setIsModalOpen(false)}
-                            className="absolute top-3 right-3 text-muted-foreground hover:text-foreground z-10"
-                        >
-                            <X size={20} />
-                        </Button>
-                        <h2 className="text-2xl font-semibold mb-4 text-center">Escolha seu Template</h2>
-
-                        {/* Tema atual para telas pequenas (dentro do modal) */}
-                        {currentTemplate && (
-                            <div className="mb-4 text-center md:hidden">
-                                <span className="bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-xs font-medium">
-                                    Tema atual: {currentTemplate.templateCategory.charAt(0).toUpperCase() + currentTemplate.templateCategory.slice(1)} - {
-                                        categories[currentTemplate.templateCategory as keyof typeof categories]
-                                            ?.find(t => t.id === currentTemplate.template)?.name || currentTemplate.template
-                                    }
-                                </span>
-                            </div>
-                        )}
-                        {renderContent()}
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
