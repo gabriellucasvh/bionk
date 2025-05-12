@@ -7,9 +7,9 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 
 export default function VibrantTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-fuchsia-600 via-violet-600 to-blue-600 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-fuchsia-600 via-violet-600 to-blue-600 py-8 px-4 flex flex-col">
       <ProfileViewTracker userId={user.id} />
-      <main className="max-w-md mx-auto flex flex-col items-center">
+      <main className="max-w-md mx-auto flex flex-col items-center w-full flex-grow">
         <header className="w-full text-center mb-8">
           {user.image && (
             <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full border-4 border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.5)] hover:shadow-[0_0_25px_rgba(250,204,21,0.7)] transition-all duration-300">
@@ -42,13 +42,12 @@ export default function VibrantTemplate({ user }: TemplateComponentProps) {
             ))}
           </ul>
         </section>
-
-        <footer className="mt-10 text-white text-sm font-bold border-t pt-4 w-full text-center">
-            <JoinBionkModal>
-              {user.username}
-            </JoinBionkModal>
-        </footer>
       </main>
+      <footer className="max-w-md mx-auto mt-10 text-white text-sm font-bold border-t pt-4 w-full text-center">
+        <JoinBionkModal>
+          {user.username}
+        </JoinBionkModal>
+      </footer>
     </div>
   )
 }

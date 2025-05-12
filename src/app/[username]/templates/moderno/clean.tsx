@@ -8,10 +8,10 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 
 export default function CleanTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-white text-gray-900 py-12 px-6 flex justify-center">
+    <div className="min-h-screen bg-white text-gray-900 py-12 px-6 flex items-center justify-center flex-col">
       <ProfileViewTracker userId={user.id} />
 
-      <main className="max-w-md w-full flex flex-col items-center">
+      <main className="max-w-md w-full flex flex-col items-center flex-grow">
         <header className="w-full flex flex-col items-center text-center mb-10">
           {user.image && (
             <MotionDiv
@@ -47,7 +47,7 @@ export default function CleanTemplate({ user }: TemplateComponentProps) {
             </MotionP>
           )}
           {user.SocialLink && user.SocialLink.length > 0 && (
-            <MotionDiv 
+            <MotionDiv
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -83,11 +83,10 @@ export default function CleanTemplate({ user }: TemplateComponentProps) {
             ))}
           </ul>
         </section>
-
-        <footer className="mt-10 text-black text-sm font-bold border-t pt-4 w-full text-center">
-          <JoinBionkModal>{user.username}</JoinBionkModal>
-        </footer>
       </main>
+      <footer className="max-w-md mx-auto mt-10 text-black text-sm font-bold border-t pt-4 w-full text-center">
+        <JoinBionkModal>{user.username}</JoinBionkModal>
+      </footer>
     </div>
   )
 }

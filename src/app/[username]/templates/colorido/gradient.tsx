@@ -7,9 +7,9 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 
 export default function GradientTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-400 via-rose-400 to-lime-400 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-sky-400 via-rose-400 to-lime-400 py-8 px-4 flex flex-col">
       <ProfileViewTracker userId={user.id} />
-      <main className="max-w-md mx-auto flex flex-col items-center backdrop-blur-sm">
+      <main className="max-w-md mx-auto flex flex-col items-center backdrop-blur-sm w-full flex-grow">
         <header className="w-full text-center mb-8">
           {user.image && (
             <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full p-1 bg-gradient-to-r from-amber-400 via-violet-500 to-indigo-500 shadow-lg hover:shadow-xl transition-all duration-300">
@@ -60,11 +60,10 @@ export default function GradientTemplate({ user }: TemplateComponentProps) {
             })}
           </ul>
         </section>
-
-        <footer className="mt-10 text-white text-sm font-bold border-t border-white pt-4 w-full text-center">
-        <JoinBionkModal>{user.username}</JoinBionkModal>
-        </footer>
       </main>
+      <footer className="max-w-md mx-auto mt-10 text-white text-sm font-bold border-t border-white pt-4 w-full text-center">
+        <JoinBionkModal>{user.username}</JoinBionkModal>
+      </footer>
     </div>
   )
 }

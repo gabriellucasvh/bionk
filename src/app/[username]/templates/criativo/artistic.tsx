@@ -7,9 +7,9 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 
 export default function ArtisticTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-[#f5f0e8] py-8 px-4 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzAgMEMxMy40IDAgMCAxMy40IDAgMzBzMTMuNCAzMCAzMCAzMCA0My40LTEzLjQgNDMuNC0zMFM0Ni42IDAgMzAgMHptMCA1MmMtMTIuMiAwLTIyLTkuOC0yMi0yMnM5LjgtMjIgMjItMjIgMjIgOS44IDIyIDIyLTkuOCAyMi0yMiAyMnoiIGZpbGw9IiMzMzMiLz48L3N2Zz4=')]">
+    <div className="min-h-screen bg-[#f5f0e8] py-8 px-4 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzAgMEMxMy40IDAgMCAxMy40IDAgMzBzMTMuNCAzMCAzMCAzMCA0My40LTEzLjQgNDMuNC0zMFM0Ni42IDAgMzAgMHptMCA1MmMtMTIuMiAwLTIyLTkuOC0yMi0yMnM5LjgtMjIgMjItMjIgMjIgOS44IDIyIDIyLTkuOCAyMi0yMiAyMnoiIGZpbGw9IiMzMzMiLz48L3N2Zz4=')] flex flex-col">
       <ProfileViewTracker userId={user.id} />
-      <main className="max-w-md mx-auto flex flex-col items-center">
+      <main className="max-w-md mx-auto flex flex-col items-center w-full flex-grow">
         <header className="w-full text-center mb-8">
           {user.image && (
             <div className="mx-auto mb-6 relative">
@@ -64,26 +64,25 @@ export default function ArtisticTemplate({ user }: TemplateComponentProps) {
             ))}
           </ul>
         </section>
-
-        <footer className="mt-12 relative">
-          <div className="absolute -inset-x-4 -top-6 h-0.5 w-full max-w-xs mx-auto">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute h-0.5 bg-[#c8a080]"
-                style={{
-                  left: `${i * 12.5}%`,
-                  width: "8%",
-                  opacity: 0.6 + (i % 3) * 0.2,
-                }}
-              ></div>
-            ))}
-          </div>
-          <div className="font-serif text-[#8d6e63] text-sm italic">
-          <JoinBionkModal>{user.username}</JoinBionkModal>
-          </div>
-        </footer>
       </main>
+      <footer className="max-w-md mx-auto mt-12 relative w-full text-center">
+        <div className="absolute -inset-x-4 -top-6 h-0.5 w-full max-w-xs mx-auto">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute h-0.5 bg-[#c8a080]"
+              style={{
+                left: `${i * 12.5}%`,
+                width: "8%",
+                opacity: 0.6 + (i % 3) * 0.2,
+              }}
+            ></div>
+          ))}
+        </div>
+        <div className="font-serif text-[#8d6e63] text-sm italic">
+          <JoinBionkModal>{user.username}</JoinBionkModal>
+        </div>
+      </footer>
     </div>
   )
 }

@@ -8,10 +8,10 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 
 export default function ElegantTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] to-[#e2d1c3] text-neutral-800 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#fdfcfb] to-[#e2d1c3] text-neutral-800 py-12 px-4 flex flex-col">
       <ProfileViewTracker userId={user.id} />
 
-      <main className="max-w-md mx-auto flex flex-col items-center">
+      <main className="max-w-md mx-auto flex flex-col items-center w-full flex-grow">
         <header className="w-full text-center mb-10">
           {user.image && (
             <MotionDiv
@@ -78,18 +78,17 @@ export default function ElegantTemplate({ user }: TemplateComponentProps) {
             ))}
           </ul>
         </section>
-
-        <footer className="mt-14 text-center w-full">
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.2 }}
-            className="inline-block px-6 py-2 border border-neutral-300 text-neutral-700 bg-white/70 backdrop-blur-md rounded-md font-serif text-sm shadow-md"
-          >
-            <JoinBionkModal>{user.username}</JoinBionkModal>
-          </MotionDiv>
-        </footer>
       </main>
+      <footer className="max-w-md mx-auto mt-14 text-center w-full">
+        <MotionDiv
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.2 }}
+          className="inline-block px-6 py-2 border border-neutral-300 text-neutral-700 bg-white/70 backdrop-blur-md rounded-md font-serif text-sm shadow-md"
+        >
+          <JoinBionkModal>{user.username}</JoinBionkModal>
+        </MotionDiv>
+      </footer>
     </div>
   )
 }

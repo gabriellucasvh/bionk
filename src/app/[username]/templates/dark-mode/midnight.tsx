@@ -7,9 +7,9 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 
 export default function DefaultTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] py-10 px-4 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] py-10 px-4 text-white flex flex-col">
       <ProfileViewTracker userId={user.id} />
-      <main className="max-w-md mx-auto flex flex-col items-center">
+      <main className="max-w-md mx-auto flex flex-col items-center w-full flex-grow">
         <header className="w-full text-center mb-10">
           {user.image && (
             <div className="mx-auto mb-4 relative w-24 h-24 overflow-hidden rounded-full border border-indigo-500 shadow-md">
@@ -25,7 +25,7 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
           {user.bio && <p className="mt-2 text-indigo-200">{user.bio}</p>}
           {user.SocialLink && user.SocialLink.length > 0 && (
             <div className="mt-4 flex justify-center items-center">
-              <UserProfileSocialIcons socialLinks={user.SocialLink} iconSize={22} className="space-x-3 sm:space-x-4" theme="dark"/>
+              <UserProfileSocialIcons socialLinks={user.SocialLink} iconSize={22} className="space-x-3 sm:space-x-4" theme="dark" />
             </div>
           )}
         </header>
@@ -47,11 +47,10 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
             ))}
           </ul>
         </section>
-
-        <footer className="mt-10 text-white text-sm font-bold border-t border-white pt-4 w-full text-center">
-          <JoinBionkModal>{user.username}</JoinBionkModal>
-        </footer>
       </main>
+      <footer className="max-w-md mx-auto mt-10 text-white text-sm font-bold border-t border-white pt-4 w-full text-center">
+        <JoinBionkModal>{user.username}</JoinBionkModal>
+      </footer>
     </div>
   )
 }

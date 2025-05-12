@@ -7,9 +7,9 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 
 export default function BusinessTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-8 px-4 text-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-8 px-4 text-gray-900 flex flex-col">
       <ProfileViewTracker userId={user.id} />
-      <main className="max-w-md mx-auto flex flex-col items-center">
+      <main className="max-w-md mx-auto flex flex-col items-center w-full flex-grow">
         <header className="w-full text-center mb-8">
           {user.image && (
             <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full border-4 border-blue-300 shadow-lg">
@@ -52,11 +52,10 @@ export default function BusinessTemplate({ user }: TemplateComponentProps) {
             ))}
           </ul>
         </section>
-
-        <footer className="mt-10 text-blue-800 text-sm font-bold border-t border-blue-800 pt-4 w-full text-center">
-        <JoinBionkModal>{user.username}</JoinBionkModal>
-        </footer>
       </main>
+      <footer className="max-w-md mx-auto mt-10 text-blue-800 text-sm font-bold border-t border-blue-800 pt-4 w-full text-center">
+        <JoinBionkModal>{user.username}</JoinBionkModal>
+      </footer>
     </div>
   );
 }

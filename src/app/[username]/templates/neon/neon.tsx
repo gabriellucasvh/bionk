@@ -7,10 +7,10 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 
 export default function NeonTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-800 to-pink-900 py-8 px-4 text-white overflow-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-800 to-pink-900 py-8 px-4 text-white overflow-hidden relative flex flex-col">
       <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(255,0,255,0.2)_0%,rgba(0,0,0,0)_80%)] pointer-events-none"></div>
       <ProfileViewTracker userId={user.id} />
-      <main className="max-w-md mx-auto flex flex-col items-center">
+      <main className="max-w-md mx-auto flex flex-col items-center w-full flex-grow">
         <header className="w-full text-center mb-8">
           {user.image && (
             <div className="mx-auto mb-4 relative w-28 h-28 overflow-hidden rounded-full border-4 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,1)] hover:shadow-[0_0_40px_rgba(59,130,246,1)] transition-all duration-300">
@@ -66,13 +66,12 @@ export default function NeonTemplate({ user }: TemplateComponentProps) {
             ))}
           </ul>
         </section>
-
-        <footer className="mt-10">
-          <div className="animate-pulse inline-block px-3 py-1  bg-pink-500 rounded-full text-white  shadow-lg shadow-pink-400 drop-shadow-[0_0_20px_rgba(255,0,255,1)]">
-            <JoinBionkModal>{user.username}</JoinBionkModal>
-          </div>
-        </footer>
       </main>
+      <footer className="max-w-md mx-auto mt-10">
+        <div className="animate-pulse inline-block px-3 py-1  bg-pink-500 rounded-full text-white  shadow-lg shadow-pink-400 drop-shadow-[0_0_20px_rgba(255,0,255,1)]">
+          <JoinBionkModal>{user.username}</JoinBionkModal>
+        </div>
+      </footer>
     </div>
   )
 }

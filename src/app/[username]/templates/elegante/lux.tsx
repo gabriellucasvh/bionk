@@ -8,10 +8,10 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 
 export default function LuxuryTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-[#f5f3ef] py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-[#f5f3ef] py-12 px-4 flex flex-col">
       <ProfileViewTracker userId={user.id} />
 
-      <main className="max-w-md mx-auto flex flex-col items-center">
+      <main className="max-w-md mx-auto flex flex-col items-center w-full flex-grow">
         <header className="w-full text-center mb-10">
           {user.image && (
             <MotionDiv
@@ -42,7 +42,7 @@ export default function LuxuryTemplate({ user }: TemplateComponentProps) {
             </MotionP>
           )}
           {user.SocialLink && user.SocialLink.length > 0 && (
-            <MotionDiv 
+            <MotionDiv
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
@@ -78,19 +78,18 @@ export default function LuxuryTemplate({ user }: TemplateComponentProps) {
             ))}
           </ul>
         </section>
-
-        <footer className="mt-14 text-center w-full inline-block px-6 py-2 border border-[#d4af37] text-[#f5f3ef] bg-[#d4af37]/10 backdrop-blur-xl rounded-lg font-medium tracking-wide shadow-[0_0_15px_rgba(212,175,55,0.4)]">
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5 }}
-          >✨
-            <JoinBionkModal>
-              {user.username}
-            </JoinBionkModal>
-            ✨ </MotionDiv>
-        </footer>
       </main>
+      <footer className="max-w-md mx-auto mt-14 text-center w-full inline-block px-6 py-2 border border-[#d4af37] text-[#f5f3ef] bg-[#d4af37]/10 backdrop-blur-xl rounded-lg font-medium tracking-wide shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+        <MotionDiv
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5 }}
+        >✨
+          <JoinBionkModal>
+            {user.username}
+          </JoinBionkModal>
+          ✨ </MotionDiv>
+      </footer>
     </div>
   )
 }

@@ -7,9 +7,9 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 
 export default function DefaultTemplate({ user }: TemplateComponentProps) {
   return (
-    <div className="min-h-screen bg-[#f4f1de] text-[#3d405b] py-10 px-4 font-[Courier_New,courier,monospace]">
+    <div className="min-h-screen bg-[#f4f1de] text-[#3d405b] py-10 px-4 font-[Courier_New,courier,monospace] flex flex-col">
       <ProfileViewTracker userId={user.id} />
-      <main className="max-w-md mx-auto flex flex-col items-center">
+      <main className="max-w-md mx-auto flex flex-col items-center w-full flex-grow">
         <header className="w-full text-center mb-10">
           {user.image && (
             <div className="mx-auto mb-4 relative w-24 h-24 overflow-hidden border-4 border-[#e07a5f] shadow-[4px_4px_0_#3d405b]">
@@ -51,11 +51,10 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
             ))}
           </ul>
         </section>
-
-        <footer className="mt-10 text-[#3d405b] text-sm font-bold border-t border-[#3d405b] pt-4 w-full text-center">
-          <JoinBionkModal>{user.username}</JoinBionkModal>
-        </footer>
       </main>
+      <footer className="max-w-md mx-auto mt-10 text-[#3d405b] text-sm font-bold border-t border-[#3d405b] pt-4 w-full text-center">
+        <JoinBionkModal>{user.username}</JoinBionkModal>
+      </footer>
     </div>
   )
 }
