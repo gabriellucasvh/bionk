@@ -127,7 +127,7 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
   {
     "key": "patreon",
     "name": "Patreon",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-preto",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665279/bionk/icons/patreon-preto.svg",
     "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-branco",
     "baseUrl": "https://patreon.com/",
     "placeholder": "seuUsuario"
@@ -142,7 +142,7 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
   {
     "key": "gmail",
     "name": "Gmail",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/mail-preto",
+    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665277/bionk/icons/mail-preto.svg",
     "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/mail-branco",
     "baseUrl": "",
     "placeholder": "seu.email@gmail.com"
