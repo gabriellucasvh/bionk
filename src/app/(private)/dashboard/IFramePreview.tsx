@@ -23,8 +23,8 @@ export default function IframePreview() {
   }, [username, status, session?.user?.username]) 
 
   return (
-    <section className="fixed top-1/2 right-28 -translate-y-1/2 z-30 pointer-events-none">
-      <div className="w-full max-w-[390px] h-[700px] aspect-[390/844] border-7 border-black rounded-4xl overflow-hidden bg-white shadow-lg pointer-events-auto">
+    <section className="fixed inset-0 flex items-center justify-center lg:items-end lg:justify-end z-30 pointer-events-none p-4 lg:p-8">
+      <div className="w-full max-w-[310px] md:max-w-[390px] aspect-[390/844] border-7 border-black rounded-4xl overflow-hidden bg-white shadow-lg ">
         <iframe
           src={iframeUrl || 'about:blank'}
           title="Pré-visualização do perfil"
