@@ -47,10 +47,6 @@ type Profile = {
 
 export default function ConfigsClient() {
   const { data: session } = useSession();
-  // Determina se o usuário autenticou via credenciais.
-  // Isso depende do objeto de sessão ser aumentado com `isCredentialsUser: boolean`
-  // no callback da sessão NextAuth.js `authOptions`.
-  // Se `isCredentialsUser` não estiver presente ou for falso, as opções serão desabilitadas.
   const isCredentialsUser = session?.user?.isCredentialsUser === true;
   const [profile, setProfile] = useState<Profile>({ email: "" });
   const [isProfileLoading, setIsProfileLoading] = useState(true);
@@ -94,7 +90,7 @@ export default function ConfigsClient() {
   }
 
   return (
-    <main className="container max-w-4xl p-10 space-y-8">
+    <main className="container max-w-4xl p-5 space-y-8">
       <header>
         <h1 className="text-3xl font-bold">Configurações</h1>
         <p className="text-muted-foreground mt-1">
@@ -114,7 +110,7 @@ export default function ConfigsClient() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-2">
               <div className="space-y-1">
                 <p className="text-sm font-medium">Email</p>
                 <p className="text-sm text-muted-foreground">{profile.email}</p>
@@ -269,7 +265,9 @@ export default function ConfigsClient() {
           </Card>
         </article>
 
-        <article>
+        {/* ======= Manutenção ======= */}
+
+        {/* <article>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -288,10 +286,12 @@ export default function ConfigsClient() {
               </Link>
             </CardContent>
           </Card>
-        </article>
+        </article> */}
       </section>
 
-      <article>
+      {/* ======= Manutenção ======= */}
+
+      {/* <article>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -314,7 +314,7 @@ export default function ConfigsClient() {
             </div>
           </CardFooter>
         </Card>
-      </article>
+      </article> */}
 
       <ArchivedLinksModal
         isOpen={isArchivedModalOpen}
