@@ -273,7 +273,12 @@ const PerfilClient = () => {
                     id="username"
                     placeholder="username"
                     value={profile.username}
-                    onChange={(e) => setProfile({ ...profile, username: e.target.value })}
+                    onChange={(e) => {
+                      const sanitizedUsername = e.target.value
+                        .replace(/[^a-zA-Z0-9_.]/g, "") 
+                        .toLowerCase();
+                      setProfile({ ...profile, username: sanitizedUsername });
+                    }}
                     disabled={loading || isUploadingImage}
                   />
                 </div>
