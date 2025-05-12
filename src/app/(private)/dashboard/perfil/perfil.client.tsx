@@ -199,7 +199,7 @@ const PerfilClient = () => {
   }
 
   return (
-    <section className="space-y-4 w-7/12 p-4">
+    <section className="space-y-4 w-full lg:w-1/2 p-4">
       <header className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Perfil</h2>
       </header>
@@ -221,7 +221,7 @@ const PerfilClient = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <article className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="relative">
+            <div className="relative flex items-center justify-center ">
               <div className={`h-24 w-24 overflow-hidden rounded-full bg-muted border-2 border-green-500 shadow-md shadow-black/20 ${isUploadingImage ? 'opacity-50' : ''}`}>
                 <Image
                   src={profilePreview}
