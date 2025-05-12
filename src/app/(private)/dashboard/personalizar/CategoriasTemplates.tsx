@@ -4,7 +4,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import CategoriasTemplatesMobile from "./CategoriasTemplatesMobile"; 
+import CategoriasTemplatesMobile from "./CategoriasTemplatesMobile";
+import VerPerfilMobile from "./VerPerfilMobile";
 
 const categories = {
     minimalista: [
@@ -182,17 +183,20 @@ export default function TemplateSettings() {
             )}
 
             {/* Componente móvel para gerenciar o botão e o modal */}
-            <CategoriasTemplatesMobile
-                categories={categories}
-                currentTemplate={currentTemplate}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-                selectedTemplate={selectedTemplate}
-                setSelectedTemplate={setSelectedTemplate}
-                handleSave={handleSave}
-                isSaving={isSaving}
-                renderContentForModal={renderContent}
-            />
+            <div className="flex items-center justify-center">
+                <CategoriasTemplatesMobile
+                    categories={categories}
+                    currentTemplate={currentTemplate}
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
+                    selectedTemplate={selectedTemplate}
+                    setSelectedTemplate={setSelectedTemplate}
+                    handleSave={handleSave}
+                    isSaving={isSaving}
+                    renderContentForModal={renderContent}
+                />
+                <VerPerfilMobile />
+            </div>
 
             {/* Conteúdo para telas grandes */}
             <div className="hidden md:block">

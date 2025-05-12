@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Sidebar from '../dashboard-sidebar'
 import PersonalizarClient from './personalizar.client'
 import IframePreview from '../IFramePreview'
+import VerPerfilMobile from './VerPerfilMobile'
 
 export const metadata: Metadata = {
   title: 'Bionk Personalizar',
@@ -13,7 +14,7 @@ export default function Perfil() {
   return (
     <>
       <Sidebar />
-      <main className="flex ml-0 md:ml-64 max-h-50 md:max-h-full overflow-y-auto">
+      <main className="flex ml-0 md:ml-64 max-h-screen md:max-h-full overflow-y-auto">
         <PersonalizarClient />
         <IframePreview />
       </main>
