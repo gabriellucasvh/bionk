@@ -12,7 +12,7 @@ export default function Perfil() {
   return (
     <>
       <Sidebar />
-      <main className="flex ml-0 md:ml-64 h-min overflow-y-auto">
+      <main className="flex ml-0 md:ml-64 mb-14 h-screen overflow-y-auto">
         <PerfilClient />
       </main>
     </>
