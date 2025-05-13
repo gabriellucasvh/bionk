@@ -1,14 +1,33 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, Suspense } from "react";
+import dynamic from "next/dynamic";
 import useSWR from "swr";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import LoadingPage from "@/components/layout/LoadingPage";
-import AnalyticsHeader from "./components/AnalyticsHeader";
-import AnalyticsStatsCards from "./components/AnalyticsStatsCards";
-import PerformanceChart from "./components/PerformanceChart";
-import TopLinksTable from "./components/TopLinksTable";
+
+// Dynamic imports for components
+const AnalyticsHeader = dynamic(() => import("./components/AnalyticsHeader"), { 
+  // @ts-expect-error
+  suspense: true,
+  loading: () => <div className="h-16 w-full animate-pulse rounded-md bg-muted"></div> 
+});
+const AnalyticsStatsCards = dynamic(() => import("./components/AnalyticsStatsCards"), { 
+  // @ts-expect-error
+  suspense: true,
+  loading: () => <div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"> <div className="h-full w-full animate-pulse rounded-md bg-muted"></div> <div className="h-full w-full animate-pulse rounded-md bg-muted"></div> <div className="h-full w-full animate-pulse rounded-md bg-muted"></div> </div>
+});
+const PerformanceChart = dynamic(() => import("./components/PerformanceChart"), { 
+  // @ts-expect-error
+  suspense: true,
+  loading: () => <div className="h-[400px] w-full animate-pulse rounded-md bg-muted"></div>
+});
+const TopLinksTable = dynamic(() => import("./components/TopLinksTable"), { 
+  // @ts-expect-error
+  suspense: true,
+  loading: () => <div className="h-[200px] w-full animate-pulse rounded-md bg-muted"></div>
+});
 
 interface TopLink {
   title: string;
@@ -44,7 +63,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
   const { data, error } = useSWR<AnalyticsData>(
     `/api/analytics?userId=${userId}`,
     fetcher,
-    { refreshInterval: 5000 }
+    { refreshInterval: 5000, suspense: true } // Adicionado suspense: true para SWR
   );
 
   const memoizedChartData = useMemo(() => data?.chartData || [], [data?.chartData]);
@@ -94,24 +113,33 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
       </section>
     );
   }
-  if (!data) {
-    return <LoadingPage />;
-  }
+  // O estado de carregamento agora é tratado pelo Suspense do SWR e do next/dynamic
+  // if (!data) {
+  //   return <LoadingPage />;
+  // }
 
   return (
     <section className="w-full p-4">
-      <AnalyticsHeader
-        onExportToExcel={exportToExcel}
-        onExportToPDF={exportToPDF}
-      />
-      <main className="space-y-6">
-        <AnalyticsStatsCards
-          totalProfileViews={data.totalProfileViews}
-          totalClicks={data.totalClicks}
-          performanceRate={data.performanceRate}
+      <Suspense fallback={<div className="h-16 w-full animate-pulse rounded-md bg-muted"></div>}>
+        <AnalyticsHeader
+          onExportToExcel={exportToExcel}
+          onExportToPDF={exportToPDF}
         />
-        <PerformanceChart chartData={memoizedChartData} />
-        <TopLinksTable topLinks={memoizedTopLinks} />
+      </Suspense>
+      <main className="space-y-6">
+        <Suspense fallback={<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3"> <div className="h-full w-full animate-pulse rounded-md bg-muted"></div> <div className="h-full w-full animate-pulse rounded-md bg-muted"></div> <div className="h-full w-full animate-pulse rounded-md bg-muted"></div> </div>}>
+          <AnalyticsStatsCards
+            totalProfileViews={data?.totalProfileViews ?? 0}
+            totalClicks={data?.totalClicks ?? 0}
+            performanceRate={data?.performanceRate ?? "0"}
+          />
+        </Suspense>
+        <Suspense fallback={<div className="h-[400px] w-full animate-pulse rounded-md bg-muted"></div>}>
+          <PerformanceChart chartData={memoizedChartData} />
+        </Suspense>
+        <Suspense fallback={<div className="h-[200px] w-full animate-pulse rounded-md bg-muted"></div>}>
+          <TopLinksTable topLinks={memoizedTopLinks} />
+        </Suspense>
       </main>
     </section>
   );
