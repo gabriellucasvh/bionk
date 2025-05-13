@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Link2, BarChart3, Settings, User, LogOut, Paintbrush, ExternalLink } from "lucide-react"; 
-import { signOut, useSession } from "next-auth/react"; 
+import { Link2, BarChart3, Settings, User, LogOut, Paintbrush, ExternalLink } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,7 +25,7 @@ const links = [
   {
     key: "personalization",
     href: "/dashboard/personalizar",
-    label: "Personalizar",
+    label: "Temas",
     icon: <Paintbrush className="h-4 w-4" />,
   },
   {
@@ -38,6 +38,7 @@ const links = [
     key: "settings",
     href: "/dashboard/configs",
     label: "Configurações",
+    labelMobile: "Configs.",
     icon: <Settings className="h-4 w-4" />,
   },
 ];
@@ -45,7 +46,7 @@ const links = [
 const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const { data: session } = useSession(); 
+  const { data: session } = useSession();
   const [disabledButtons, setDisabledButtons] = useState<Set<string>>(() => new Set());
   const [profileUrl, setProfileUrl] = useState<string>('#');
   const handleLogout = () => signOut();
@@ -138,7 +139,9 @@ const Sidebar = () => {
                   <span className={isActive ? "text-green-500" : ""}>
                     {link.icon}
                   </span>
-                  {link.label}
+                  {link.labelMobile ?
+                    <span>{link.labelMobile}</span>
+                    : link.label}
                 </Button>
               </li>
             );

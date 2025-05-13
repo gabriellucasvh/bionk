@@ -21,7 +21,7 @@ const VerPerfilMobile = () => {
   return (
     <div>
       <Button
-            className="lg:hidden py-3 px-10 justify-center bg-green-500 text-white hover:bg-green-600 hover:text-white"
+            className="lg:hidden fixed bottom-20 right-5 py-3 px-10 justify-center bg-green-500 text-white hover:bg-green-600 hover:text-white"
             size="sm"
             onClick={() => window.open(profileUrl, '_blank')}
             disabled={!username}
