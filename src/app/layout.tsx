@@ -18,6 +18,7 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: "Bionk",
   description: "Crie o melhor organizador de links para o seu negócio",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
