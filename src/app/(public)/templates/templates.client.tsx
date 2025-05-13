@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import HeaderMobile from '@/components/layout/HeaderMobile';
-
+import TemplatePreviewModal from '@/components/modals/TemplatePreviewModal';
 
 interface Template {
     id: string;
@@ -37,7 +37,13 @@ const allTemplates: Template[] = [
 ];
 
 const TemplatesClient = () => {
+    const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+    const handleTemplateClick = (template: Template) => {
+        setSelectedTemplate(template);
+        setIsModalOpen(true);
+    };
     return (
         <div className='min-h-screen bg-white text-black font-gsans'>
             <Header />
@@ -52,7 +58,7 @@ const TemplatesClient = () => {
                         <div
                             key={template.id}
                             className='cursor-pointer group'
-                            onClick={() => setIsModalOpen(true)}
+                            onClick={() => handleTemplateClick(template)}
                         >
                             <div className='overflow-hidden rounded-lg border-2 border-gray-200 group-hover:border-lime-500 transition-all duration-300 aspect-[9/16]'>
                                 <Image
@@ -71,6 +77,13 @@ const TemplatesClient = () => {
                 </div>
             </section>
             <Footer />
+            {selectedTemplate && (
+                <TemplatePreviewModal
+                    isOpen={isModalOpen}
+                    onOpenChange={setIsModalOpen}
+                    template={selectedTemplate}
+                />
+            )}
         </div>
     )
 }
