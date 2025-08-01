@@ -53,13 +53,13 @@ const Hero = () => {
 				>
 					Adicione links na{" "}
 					<span className="block sm:inline">
-						Sua Bio
+						sua bio
 						<span className="absolute -bottom-4 left-0 h-1 w-full rounded-full bg-lime-400"></span>
 					</span>
 				</h1>
 
 				<p
-					className={`mb-8 max-w-2xl text-center text-lg text-gray-200 transition-all duration-700 sm:text-xl ${
+					className={`mb-8 max-w-2xl text-center text-base sm:text-lg text-gray-200 transition-all duration-700 ${
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 					style={{ transitionDelay: "200ms" }}
