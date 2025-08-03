@@ -149,7 +149,7 @@ const SocialLinksClient = () => {
 	if (isLoading && session?.user?.id) return null;
 
 	return (
-		<section className="w-full md:w-1/2 p-2 sm:p-4 space-y-4 overflow-y-auto md:mt-12">
+		<section className="w-full md:w-10/12 lg:w-7/12 p-2 sm:p-4 space-y-4 overflow-y-auto md:mt-12">
 			<Card>
 				<CardHeader>
 					<CardTitle className="text-lg sm:text-xl">Links Sociais</CardTitle>
@@ -161,7 +161,7 @@ const SocialLinksClient = () => {
 					{!selectedPlatform && (
 						<div className="space-y-3">
 							<p className="font-medium text-sm">
-								Clique em um ícone para adicionar ou editar:
+								Clique em um ícone para adicionar um link social:
 							</p>
 							<div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
 								{SOCIAL_PLATFORMS.map((platform) => {

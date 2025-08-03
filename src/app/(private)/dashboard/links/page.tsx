@@ -13,7 +13,7 @@ export default function links() {
 	return (
 		<>
 			<Sidebar />
-			<main className="flex flex-col-reverse md:flex-row ml-0 md:ml-64 mb-20 md:mb-0 ">
+			<main className="flex flex-col-reverse lg:flex-row ml-0 md:ml-64 mb-20 md:mb-0 ">
 				<LinksClient />
 				<SocialLinksClient />
 			</main>
