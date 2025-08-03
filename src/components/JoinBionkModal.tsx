@@ -1,19 +1,20 @@
 "use client";
 
-import  { useState, ReactNode } from "react";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogFooter,
-	DialogDescription,
-	DialogTrigger,
-} from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
 import { ArrowRight, Globe, LinkIcon, Share2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { useState } from "react";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { Button } from "./ui/button";
 
 interface JoinBionkModalProps {
@@ -29,6 +30,7 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 				<Button
 					onClick={() => setOpen(true)}
 					className="text-sm sm:text-base max-w-full break-words inline-block text-center"
+					variant="ghost"
 				>
 					@{children} | Bionk
 				</Button>
