@@ -26,9 +26,9 @@ export const metadata: Metadata = {
 		siteName: "Bionk",
 		images: [
 			{
-				url: "https://www.bionk.me/bionk-logo.png",
-				width: 1551,
-				height: 449,
+				url: "https://www.bionk.me/graph-logo.png",
+				width: 500,
+				height: 500,
 				alt: "Bionk",
 			},
 		],
