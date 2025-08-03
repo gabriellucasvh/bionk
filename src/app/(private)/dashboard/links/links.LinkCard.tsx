@@ -28,6 +28,7 @@ interface LinkCardProps {
 	link: LinkItem;
 	// biome-ignore lint/suspicious/noExplicitAny: Aqui se pede para renomear any para outro tipo, mas qualquer tipo quebra o resto do código #analisar
 	listeners: any;
+	setActivatorNodeRef: (element: HTMLElement | null) => void;
 	onLinkChange: (id: number, field: "title" | "url", value: string) => void;
 	onSaveEditing: (id: number, title: string, url: string) => void;
 	onCancelEditing: (id: number) => void;
@@ -42,6 +43,7 @@ interface LinkCardProps {
 const LinkCard = ({
 	link,
 	listeners,
+	setActivatorNodeRef,
 	onLinkChange,
 	onSaveEditing,
 	onCancelEditing,
@@ -61,10 +63,14 @@ const LinkCard = ({
 			)}
 		>
 			<div className="flex items-center gap-2 sm:gap-3 sm:w-7/12">
-				<Grip
+				<div
+					ref={setActivatorNodeRef}
 					{...listeners}
-					className="h-5 w-5 cursor-move text-muted-foreground"
-				/>
+					className="cursor-move touch-none"
+				>
+					<Grip className="h-5 w-5 text-muted-foreground" />
+				</div>
+
 				<div className="flex-1 space-y-1">
 					{link.isEditing ? (
 						<section className="space-y-2">

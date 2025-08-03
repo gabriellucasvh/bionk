@@ -4,7 +4,8 @@ import type { DragEndEvent } from "@dnd-kit/core";
 import {
 	closestCenter,
 	DndContext,
-	PointerSensor,
+	MouseSensor,
+	TouchSensor,
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
@@ -181,7 +182,14 @@ const LinksClient = () => {
 	// --- Drag and Drop ---
 
 	const sensors = useSensors(
-		useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+		useSensor(MouseSensor, {
+			activationConstraint: { distance: 5 },
+			handle: true,
+		}),
+		useSensor(TouchSensor, {
+			activationConstraint: { delay: 250, tolerance: 5 },
+			handle: true,
+		}),
 	);
 
 	const handleDragEnd = async (event: DragEndEvent) => {
@@ -207,7 +215,7 @@ const LinksClient = () => {
 	if (isProfileLoading) return <LoadingPage />;
 
 	return (
-		<section className="w-full md:w-10/12 lg:w-7/12 p-2 sm:p-4 space-y-4">
+		<section className="w-full md:w-10/12 lg:w-7/12 p-2 sm:p-4 space-y-4 touch-manipulation">
 			<header className="flex items-center justify-between">
 				<h2 className="text-xl sm:text-2xl font-bold">Gerenciar links</h2>
 			</header>
@@ -251,10 +259,11 @@ const LinksClient = () => {
 						>
 							{links.map((link) => (
 								<SortableItem key={link.id} id={link.id}>
-									{({ listeners }) => (
+									{({ listeners, setActivatorNodeRef }) => (
 										<LinkCard
 											link={link}
 											listeners={listeners}
+											setActivatorNodeRef={setActivatorNodeRef} // novo prop
 											onLinkChange={handleLinkChange}
 											onSaveEditing={saveEditing}
 											onCancelEditing={cancelEditing}
