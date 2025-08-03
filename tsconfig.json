@@ -40,7 +40,7 @@
     ".next/types/**/*.ts",
     "src/types/**/*.d.ts",
     "next.config.js"
-  ],
+, "src/app/(private)/dashboard/links/links.helpers.tsx"  ],
   "exclude": [
     "node_modules"
   ]
