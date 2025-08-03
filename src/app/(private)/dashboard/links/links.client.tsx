@@ -71,7 +71,7 @@ const LinksClient = () => {
 
 	const handleAddNewLink = async () => {
 		let formatted = newUrl.trim();
-		if (!/^https?:\/\//.test(formatted)) formatted = "https://" + formatted;
+		if (!/^https?:\/\//.test(formatted)) formatted = `https://${formatted}`;
 		if (!isValidUrl(formatted)) return;
 
 		const res = await fetch(`/api/links`, {

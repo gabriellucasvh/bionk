@@ -1,3 +1,6 @@
+"use client";
+import { useState } from "react";
+import LoadingSpinner from "@/components/buttons/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 
 interface AddNewLinkFormProps {
@@ -19,6 +22,18 @@ const AddNewLinkForm = ({
 	onCancel,
 	isSaveDisabled,
 }: AddNewLinkFormProps) => {
+	const [isLoading, setIsLoading] = useState(false);
+
+	const handleSave = async () => {
+		setIsLoading(true);
+		try {
+			await onSave();
+		} catch (error) {
+			console.error("Error saving link:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 	return (
 		<section className="p-2 sm:p-4 border rounded-lg space-y-4">
 			<div>
@@ -46,8 +61,8 @@ const AddNewLinkForm = ({
 				/>
 			</div>
 			<div className="flex gap-2">
-				<Button onClick={onSave} disabled={isSaveDisabled}>
-					Salvar
+				<Button onClick={handleSave} disabled={isSaveDisabled}>
+					{isLoading ? <LoadingSpinner /> : "Salvar"}
 				</Button>
 				<Button variant="outline" onClick={onCancel}>
 					Cancelar

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+// import LoadingPage from "@/components/layout/LoadingPage";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -145,13 +146,7 @@ const SocialLinksClient = () => {
 		setEditingLinkId(null);
 	};
 
-	if (isLoading && session?.user?.id) {
-		return (
-			<div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-4 flex justify-center items-center">
-				<p>Carregando links sociais...</p>
-			</div>
-		);
-	}
+	if (isLoading && session?.user?.id) return null;
 
 	return (
 		<section className="w-full md:w-1/2 p-2 sm:p-4 space-y-4 overflow-y-auto md:mt-12">
