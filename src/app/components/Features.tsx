@@ -1,5 +1,4 @@
 "use client";
-
 import {
 	CheckCircle,
 	Compass,
@@ -11,8 +10,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { BaseButton } from "@/components/buttons/BaseButton";
 import { BorderBeam } from "@/components/magicui/border-beam";
-import { Button } from "@/components/ui/button";
 
 export default function Features() {
 	const router = useRouter();
@@ -42,7 +41,7 @@ export default function Features() {
 
 						<div className="absolute inset-0 bg-gradient-to-t from-black via-black to-transparent z-10" />
 
-						<div className="relative z-20 flex flex-col justify-end h-full p-6 text-white">
+						<div className="relative z-20 flex flex-col justify-end h-full p-6 gap-2 text-white">
 							<div>
 								<div className="bg-white/20 inline-flex p-3 rounded-full shadow mb-4">
 									<CheckCircle className="h-8 w-8 text-white" />
@@ -56,12 +55,9 @@ export default function Features() {
 								</p>
 							</div>
 
-							<Button
-								className="mt-5 bg-gradient-to-r from-green-700 to-green-500 text-white rounded-lg py-3 px-6 text-base hover:brightness-110 transition-all w-full sm:w-1/2"
-								onClick={() => router.push("/registro")}
-							>
+							<BaseButton onClick={() => router.push("/registro")}>
 								Criar uma conta na Bionk
-							</Button>
+							</BaseButton>
 						</div>
 						<BorderBeam
 							duration={6}

@@ -1,7 +1,7 @@
 "use client";
+
 import { useState } from "react";
-import LoadingSpinner from "@/components/buttons/LoadingSpinner";
-import { Button } from "@/components/ui/button";
+import { BaseButton } from "@/components/buttons/BaseButton";
 
 interface AddNewLinkFormProps {
 	newTitle: string;
@@ -61,12 +61,16 @@ const AddNewLinkForm = ({
 				/>
 			</div>
 			<div className="flex gap-2">
-				<Button onClick={handleSave} disabled={isSaveDisabled}>
-					{isLoading ? <LoadingSpinner /> : "Salvar"}
-				</Button>
-				<Button variant="outline" onClick={onCancel}>
+				<BaseButton
+					onClick={handleSave}
+					disabled={isSaveDisabled}
+					loading={isLoading}
+				>
+					Salvar
+				</BaseButton>
+				<BaseButton variant="white" onClick={onCancel}>
 					Cancelar
-				</Button>
+				</BaseButton>
 			</div>
 		</section>
 	);

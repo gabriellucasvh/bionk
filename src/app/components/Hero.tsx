@@ -1,9 +1,8 @@
 "use client";
-
-import { useEffect, useState } from "react";
 import { ArrowRight, ExternalLink, Link as LinkIcon } from "lucide-react";
-import NeoButton from "@/components/buttons/button-neubrutalism";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { BaseButton } from "@/components/buttons/BaseButton";
 import { MotionDiv } from "@/components/ui/motion";
 
 const Hero = () => {
@@ -70,30 +69,30 @@ const Hero = () => {
 				</p>
 
 				<div
-					className={`flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 transition-all duration-700 ${
+					className={`flex items-center gap-2 flex-row transition-all duration-700 ${
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 					style={{ transitionDelay: "300ms" }}
 				>
-					<NeoButton
-						className="group relative bg-lime-400 overflow-hidden px-6 py-3 text-black"
+					<BaseButton
+						onClick={() => handleClick("/descubra")}
+						variant="white"
+						disabled={isClicked["/descubra"]}
+					>
+						<span className="flex items-center">
+							Saiba mais <ExternalLink className="ml-2 h-4 w-4" />
+						</span>
+					</BaseButton>
+					<BaseButton
+						className="group"
 						onClick={() => handleClick("/registro")}
 						disabled={isClicked["/registro"]}
 					>
-						<span className="relative z-10 flex items-center font-medium">
+						<span className="relative z-10 flex items-center">
 							Comece Grátis{" "}
 							<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
 						</span>
-						<span className="absolute inset-0 z-0 bg-white opacity-0 transition-opacity group-hover:opacity-100"></span>
-					</NeoButton>
-
-					<NeoButton
-						className="flex items-center px-6 py-3 font-medium text-black bg-gray-50"
-						onClick={() => handleClick("/descubra")}
-						disabled={isClicked["/descubra"]}
-					>
-						Saiba mais <ExternalLink className="ml-2 h-4 w-4" />
-					</NeoButton>
+					</BaseButton>
 				</div>
 
 				<div
