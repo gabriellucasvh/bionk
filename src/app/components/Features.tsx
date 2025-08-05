@@ -1,10 +1,10 @@
 "use client";
+
 import {
 	CheckCircle,
 	Compass,
 	Link,
 	MousePointerClick,
-	Search,
 	Share2,
 	Trash,
 	UserRoundPen,
@@ -57,7 +57,7 @@ export default function Features() {
 							</div>
 
 							<Button
-								className="mt-5 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg py-3 px-6 text-base hover:brightness-110 transition-all w-full sm:w-1/2"
+								className="mt-5 bg-gradient-to-r from-green-700 to-green-500 text-white rounded-lg py-3 px-6 text-base hover:brightness-110 transition-all w-full sm:w-1/2"
 								onClick={() => router.push("/registro")}
 							>
 								Criar uma conta na Bionk
@@ -78,7 +78,7 @@ export default function Features() {
 						/>
 					</div>
 
-					<div className="relative md:col-span-4 group bg-gradient-to-r from-lime-400 via-lime-300 to-white bg-[length:200%_200%] hover:bg-[position:100%_0%] transition-all duration-500 ease-in-out rounded-3xl shadow-black/30 shadow-md overflow-hidden ">
+					<div className="relative md:col-span-4 bg-gradient-to-r from-lime-400 via-lime-300 to-white bg-[length:200%_200%] hover:bg-[position:100%_0%] transition-all duration-500 ease-in-out rounded-3xl shadow-black/30 shadow-md overflow-hidden ">
 						<Image
 							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1754362133/bionk-web_ykys9y.svg"
 							alt="Ícone Bionk Web"
@@ -90,33 +90,32 @@ export default function Features() {
 							<div className="bg-lime-100 inline-flex p-3 rounded-full shadow mb-4">
 								<Compass className="h-8 w-8 text-lime-500" />
 							</div>
-							<h3 className="flex items-center text-2xl font-semibold text-green-800 mb-3">
+							<h3 className="flex items-center text-3xl font-semibold text-green-800 mb-3">
 								Sua identidade na web{" "}
-								<Search className="inline h-6 w-6 ml-1 transform transition-transform duration-300 group-hover:scale-x-[-1]" />
 							</h3>
-							<p className="text-gray-700">
+							<p className="text-gray-700 text-lg lg:text-xl font-light leading-snug">
 								Mostre seu nome ou marca com um link fácil de lembrar e visual
 								moderno, direto na barra do navegador.
 							</p>
 						</div>
 					</div>
 
-					<div className="md:col-span-3 rounded-3xl p-6 relative min-h-[180px] overflow-hidden shadow-black/30 shadow-md group">
+					<div className="md:col-span-3 rounded-3xl p-6 relative min-h-[180px] overflow-hidden shadow-black/30 shadow-md">
 						{/* Camada base */}
 						<div className="absolute inset-0 bg-gradient-to-bl from-green-900 via-green-500 to-green-700" />
 
 						{/* Camada que surge com hover */}
-						<div className="absolute inset-0 bg-gradient-to-br from-green-800 via-green-600 to-green-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+						<div className="absolute inset-0 bg-gradient-to-br from-green-800 via-green-600 to-green-400 opacity-0-hover:opacity-100 transition-opacity duration-500" />
 
 						{/* Conteúdo visível */}
 						<div className="relative z-10">
 							<div className="bg-lime-300 inline-flex p-3 rounded-full shadow mb-4">
 								<MousePointerClick className="h-8 w-8 text-green-700" />
 							</div>
-							<h3 className="text-2xl font-semibold text-gray-100 mb-3">
+							<h3 className="text-3xl font-semibold text-gray-100 mb-3">
 								Fácil de Usar
 							</h3>
-							<p className="text-gray-200 mb-12">
+							<p className="text-gray-200 mb-12 text-lg lg:text-xl font-light leading-snug">
 								Tudo pensado para você editar, compartilhar e gerenciar sem
 								complicações.
 							</p>
@@ -141,96 +140,69 @@ export default function Features() {
 						</div>
 					</div>
 
-					<div className="md:col-span-4 relative overflow-hidden bg-white rounded-3xl transition-all shadow-black/30 shadow-md group">
+					{/* Para Influencers */}
+					<div className="md:col-span-4 relative overflow-hidden bg-white rounded-3xl shadow-black/30 shadow-md  flex flex-col">
 						<Image
 							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1754362133/bionk-socials_vtuugv.svg"
 							alt="Rede de influenciadores conectados visualmente"
-							width={600}
-							height={400}
-							className="absolute inset-0 w-full h-full object-cover opacity-80 scale-125 pointer-events-none select-none"
+							fill
+							className="absolute inset-0 w-full h-full object-cover opacity-70 scale-110 pointer-events-none select-none"
 							loading="lazy"
 						/>
-
-						<div className="absolute inset-0 z-10 pointer-events-none">
-							{/* fundo fixo */}
-							<div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/10" />
-							{/* camada que aparece no hover */}
-							<div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-						</div>
-
-						<div className="relative z-20 text-white p-6 flex flex-col h-full justify-end">
-							<div className="inline-flex mb-4">
-								<Image
-									src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1754362133/bionk-socials-example_qzqblp.svg"
-									alt="Ícone decorativo 1"
-									width={220}
-									height={220}
-									className="object-cover"
-									loading="lazy"
-								/>
+						<div className="absolute inset-0 bg-teal-950/95 z-10" />
+						<div className="relative z-20 p-6 flex flex-col justify-end h-full">
+							<div className="text-lime-300 text-balance break-words">
+								<h3 className="text-5xl lg:text-6xl font-bold mb-2 leading-tight">
+									Para Influencers
+								</h3>
+								<p className="text-lg lg:text-xl font-light leading-snug">
+									Conecte todas as suas redes e promova colaborações com estilo
+									e profissionalismo.
+								</p>
 							</div>
+						</div>
+					</div>
 
-							<h3 className="text-2xl font-semibold mb-3">
-								Para Influenciadores
+					{/* Para Marcas */}
+					<div className="md:col-span-4 relative overflow-hidden rounded-3xl shadow-black/30 shadow-md  flex flex-col">
+						<Image
+							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1754362606/bionk-enterprises_yaj0kb.jpg"
+							alt="Elementos gráficos decorativos para marcas"
+							fill
+							className="absolute inset-0 w-full h-full object-cover opacity-70 pointer-events-none select-none"
+							loading="lazy"
+						/>
+						<div className="absolute inset-0 bg-emerald-950/95 z-10" />
+						<div className="relative z-20 p-6 flex flex-col justify-end h-full">
+							<div className="text-cyan-300 break-keep">
+								<h3 className="text-5xl lg:text-6xl font-bold mb-2 leading-tight">
+									Para Marcas
+								</h3>
+								<p className="text-lg lg:text-xl font-light leading-snug">
+									Redirecione campanhas, promova lançamentos e mantenha seus
+									clientes engajados.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					{/* Para Freelancers */}
+					<div className="md:col-span-4 relative overflow-hidden bg-white rounded-3xl shadow-black/30 shadow-md  flex flex-col">
+						<Image
+							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1754362673/bionk-freelancer_xk5n3t.jpg"
+							alt="Elementos gráficos decorativos para freelancers"
+							fill
+							className="absolute inset-0 w-full h-full object-cover opacity-70 pointer-events-none select-none"
+							loading="lazy"
+						/>
+						<div className="absolute inset-0 bg-cyan-950/95 z-10" />
+						<div className="relative z-20 p-6 flex flex-col justify-end h-full text-green-400 break-keep">
+							<h3 className="text-5xl lg:text-6xl font-bold mb-2 leading-tight">
+								Para Freelancers
 							</h3>
-							<p>
-								Conecte todas as suas redes e promova colaborações com estilo e
-								profissionalismo.
-							</p>
-						</div>
-					</div>
-
-					<div className="md:col-span-4 relative overflow-hidden bg-white rounded-3xl p-6 shadow-black/30 shadow-md group">
-						<div className="absolute inset-0 z-10">
-							<Image
-								src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1754362606/bionk-enterprises_yaj0kb.jpg"
-								alt="Elementos gráficos decorativos para marcas"
-								width={600}
-								height={400}
-								className="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none select-none"
-								loading="lazy"
-							/>
-						</div>
-
-						<div className="absolute inset-0 z-10 pointer-events-none">
-							{/* fundo fixo */}
-							<div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/10" />
-							{/* camada que aparece no hover */}
-							<div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-						</div>
-
-						<div className="relative h-full flex flex-col justify-end z-10 text-white">
-							<h3 className="text-2xl font-semibold mb-3">Para Marcas</h3>
-							<p className="text-gray-200">
-								Redirecione campanhas, lance e mantenha clientes engajados.
-							</p>
-						</div>
-					</div>
-
-					<div className="md:col-span-4 relative overflow-hidden bg-white rounded-3xl p-6 shadow-black/30 shadow-md group">
-						<div className="absolute inset-0 z-10">
-							<Image
-								src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1754362673/bionk-freelancer_xk5n3t.jpg"
-								alt="Elementos gráficos decorativos para marcas"
-								width={300}
-								height={200}
-								className="absolute inset-0 w-full h-full object-cover opacity-80 pointer-events-none select-none"
-								loading="lazy"
-							/>
-						</div>
-
-						<div className="absolute inset-0 z-10 pointer-events-none">
-							{/* fundo fixo */}
-							<div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/10" />
-							{/* camada que aparece no hover */}
-							<div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-						</div>
-
-						<div className="relative h-full flex flex-col justify-end z-10 text-white">
-							<h3 className="text-2xl font-semibold mb-3">Para Freelancers</h3>
-							<p className="text-gray-200">
+							<p className="text-lg lg:text-xl font-light leading-snug">
 								Exiba seu portfólio, serviços e canais de contato de forma
-								profissional.
+								profissional e acessível.
 							</p>
 						</div>
 					</div>

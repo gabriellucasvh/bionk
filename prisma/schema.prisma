@@ -9,35 +9,35 @@ datasource db {
 
 model User {
   id                            String        @id @default(uuid())
-  googleId                      String?
   name                          String?
   username                      String        @unique
   email                         String        @unique
   bio                           String?
   provider                      String?
   emailVerified                 DateTime?
+  image                         String?       @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")
+  bannerUrl                     String?
+  hashedPassword                String?
+  createdAt                     DateTime      @default(now())
+  template                      String        @default("default")
+  templateCategory              String        @default("minimalista")
+  passwordResetExpires          DateTime?
+  passwordResetToken            String?       @unique
+  emailVerificationToken        String?       @unique
+  emailVerificationTokenExpires DateTime?
+  newEmailPending               String?       @unique
   verificationToken             String?       @unique
   verificationTokenExpiry       DateTime?
   registrationOtp               String?       @unique
   registrationOtpExpiry         DateTime?
   registrationOtpAttempts       Int           @default(0)
   registrationOtpBlockedUntil   DateTime?
-  template                      String        @default("default")
-  templateCategory              String        @default("minimalista")
-  image                         String?       @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")
-  bannerUrl                     String?
-  hashedPassword                String?
-  createdAt                     DateTime      @default(now())
-  passwordResetToken            String?       @unique
-  passwordResetExpires          DateTime?
+  googleId                      String?
   accounts                      Account[]
-  sessions                      Session[]
   Link                          Link[]
   ProfileView                   ProfileView[]
+  sessions                      Session[]
   SocialLink                    SocialLink[]
-  newEmailPending               String?       @unique
-  emailVerificationToken        String?       @unique
-  emailVerificationTokenExpires DateTime?
 }
 
 model Account {
@@ -46,15 +46,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -64,8 +63,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -84,8 +82,8 @@ model Link {
   sensitive Boolean     @default(false)
   clicks    Int         @default(0)
   order     Int         @default(0)
-  archived  Boolean     @default(false)
   userId    String
+  archived  Boolean     @default(false)
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   LinkClick LinkClick[]
   LinkView  LinkView[]
@@ -113,9 +111,9 @@ model SocialLink {
   active    Boolean  @default(true)
   order     Int      @default(0)
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, platform])
 }
