@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+import { BaseButton } from "@/components/buttons/BaseButton";
 // import LoadingPage from "@/components/layout/LoadingPage";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +31,8 @@ const SocialLinksClient = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
 	const [deletingLinkId, setDeletingLinkId] = useState<string | null>(null);
+	const [isSaving, setIsSaving] = useState(false);
+
 
 	const { data: swrData, mutate: mutateSocialLinks } = useSWR<{
 		socialLinks: SocialLinkItem[];
@@ -61,6 +64,8 @@ const SocialLinksClient = () => {
 	const handleAddOrUpdateSocialLink = async () => {
 		if (!selectedPlatform || !usernameInput.trim() || !session?.user?.id)
 			return;
+
+		setIsSaving(true); // ⏳ inicia o loading
 
 		const fullUrl = `${selectedPlatform.baseUrl}${usernameInput.trim()}`;
 		const payload = {
@@ -104,8 +109,11 @@ const SocialLinksClient = () => {
 			}
 		} catch (error) {
 			console.error("Erro na requisição:", error);
+		} finally {
+			setIsSaving(false); // ✅ encerra o loading
 		}
 	};
+
 
 	const handleEditSocialLink = (link: SocialLinkItem) => {
 		const platform = SOCIAL_PLATFORMS.find((p) => p.key === link.platform);
@@ -113,6 +121,8 @@ const SocialLinksClient = () => {
 			setSelectedPlatform(platform);
 			setUsernameInput(link.username || "");
 			setEditingLinkId(link.id);
+			// Opcional: rolar a tela para o formulário de edição se a página for longa
+			window.scrollTo({ top: 0, behavior: "smooth" });
 		}
 	};
 
@@ -161,23 +171,39 @@ const SocialLinksClient = () => {
 					{!selectedPlatform && (
 						<div className="space-y-3">
 							<p className="font-medium text-sm">
-								Clique em um ícone para adicionar um link social:
+								Clique em um ícone para adicionar ou editar um link:{" "}
+								{/* <-- MUDANÇA AQUI (texto) */}
 							</p>
 							<div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
 								{SOCIAL_PLATFORMS.map((platform) => {
-									const isExistingLink = socialLinks.some(
+									// <-- MUDANÇA AQUI: Buscamos o link completo para usar na edição
+									const existingLink = socialLinks.find(
 										(link) => link.platform === platform.key,
 									);
+									const isExistingLink = !!existingLink;
+
 									return (
 										<Button
 											key={platform.key}
+											// <-- MUDANÇA AQUI: Muda a cor se o link já existir
 											variant="outline"
-											className="flex flex-col items-center justify-center h-full w-full p-1 sm:p-2 hover:bg-muted/50 transition-colors"
-											onClick={() => handlePlatformSelect(platform)}
-											disabled={isExistingLink}
+											className={
+												isExistingLink
+													? "flex flex-col items-center justify-center h-full w-full p-1 sm:p-2 hover:bg-muted/50 transition-colors border-green-400"
+													: "flex flex-col items-center justify-center h-full w-full p-1 sm:p-2 hover:bg-muted/50 transition-colors"
+											}
+											// <-- MUDANÇA AQUI: Ação de clique condicional
+											onClick={() => {
+												if (isExistingLink) {
+													handleEditSocialLink(existingLink);
+												} else {
+													handlePlatformSelect(platform);
+												}
+											}}
+											// <-- MUDANÇA AQUI: Título mais claro sobre a ação
 											title={
 												isExistingLink
-													? `Você já adicionou um link para ${platform.name}`
+													? `Editar link para ${platform.name}`
 													: `Adicionar ${platform.name}`
 											}
 										>
@@ -225,27 +251,30 @@ const SocialLinksClient = () => {
 								</div>
 							</div>
 							<div className="flex flex-col sm:flex-row gap-2 pt-2">
-								<Button
+								<BaseButton
 									onClick={handleAddOrUpdateSocialLink}
 									className="w-full sm:w-auto flex-grow"
-									size="sm"
+									loading={isSaving}
 								>
-									{editingLinkId ? (
-										<Save className="mr-2 h-4 w-4" />
-									) : (
-										<Plus className="mr-2 h-4 w-4" />
-									)}
-									{editingLinkId ? "Salvar" : "Adicionar"}
-								</Button>
-								<Button
-									variant="outline"
+									<span className="flex items-center justify-center">
+										{editingLinkId ? (
+											<Save className="mr-2 h-4 w-4" />
+										) : (
+											<Plus className="mr-2 h-4 w-4" />
+										)}
+										{editingLinkId ? "Salvar" : "Adicionar"}
+									</span>
+								</BaseButton>
+								<BaseButton
+									variant="white"
 									onClick={handleCancel}
 									className="w-full sm:w-auto"
-									size="sm"
 								>
-									<X className="mr-2 h-4 w-4" />
-									Cancelar
-								</Button>
+									<span className="flex items-center justify-center">
+										<X className="mr-2 h-4 w-4" />
+										Cancelar
+									</span>
+								</BaseButton>
 							</div>
 						</div>
 					)}

@@ -1,5 +1,4 @@
 "use client";
-
 import type { DragEndEvent } from "@dnd-kit/core";
 import {
 	closestCenter,
@@ -19,8 +18,8 @@ import { Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
+import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingPage from "@/components/layout/LoadingPage";
-import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -238,13 +237,15 @@ const LinksClient = () => {
 					<CardDescription className="text-sm">
 						Gerencie, edite e organize seus links.
 					</CardDescription>
-					<Button
+					<BaseButton
 						onClick={() => setIsAdding(true)}
 						className="w-full sm:w-auto"
 					>
-						<Plus className="mr-1 h-4 w-4" />
-						Adicionar novo link
-					</Button>
+						<span className="flex items-center">
+							<Plus className="mr-1 h-4 w-4" />
+							Adicionar novo link
+						</span>
+					</BaseButton>
 				</CardHeader>
 				<CardContent className="space-y-4 p-2 sm:p-6">
 					<DndContext
