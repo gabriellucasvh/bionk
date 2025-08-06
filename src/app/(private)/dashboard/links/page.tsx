@@ -14,7 +14,7 @@ export default function LinksPage() {
 	return (
 		<>
 			<Sidebar />
-			<main className="ml-0 md:ml-64 flex justify-center p-4 sm:p-6 md:p-8">
+			<main className="ml-0 md:ml-64 flex justify-start p-4 sm:p-6 md:p-8">
 				<UnifiedLinksManager />
 			</main>
 		</>

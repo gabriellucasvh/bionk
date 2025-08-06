@@ -51,8 +51,8 @@ const UnifiedLinksManager = () => {
 	return (
 		<section className="w-full max-w-4xl touch-manipulation">
 			<Tabs defaultValue="links" className="w-full">
-				<Card>
-					<CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+				<Card className="border-none shadow-none">
+					<CardHeader className="flex flex-col lg:flex-row justify-between px-2 sm:px-6 items-start lg:items-center">
 						<div className="mb-4 sm:mb-0">
 							<CardTitle className="text-xl sm:text-2xl">
 								Gerenciador de Links
