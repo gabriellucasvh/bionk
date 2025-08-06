@@ -7,6 +7,7 @@ import {
 	LogOut,
 	Paintbrush,
 	Settings,
+	Table2,
 	User,
 } from "lucide-react";
 import Image from "next/image";
@@ -14,7 +15,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 
 const links = [
@@ -69,16 +69,16 @@ const Sidebar = () => {
 				? "https://www.bionk.me"
 				: "http://localhost:3000";
 		setProfileUrl(username ? `${baseUrl}/${username}` : "#");
-	}, [username, session?.user?.username]);
+	}, [username]);
 
 	useEffect(() => {
 		setDisabledButtons(new Set());
-	}, [pathname]);
+	}, []);
 	return (
 		<>
 			{/* Sidebar para telas médias e maiores */}
-			<aside className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 md:border-r md:bg-card/40">
-				<header className="flex h-16 items-center border-b px-6">
+			<aside className="hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 md:w-64 md:border-r md:bg-card/40 px-2">
+				<header className="flex h-16 items-center border-b pl-2">
 					<Link
 						href="/"
 						className="flex items-center justify-center gap-2 font-semibold"
@@ -93,28 +93,55 @@ const Sidebar = () => {
 					</Link>
 				</header>
 
-				<div className="px-2 py-2">
-					<BaseButton
-						variant="green"
-						onClick={() => window.open(profileUrl, "_blank")}
-						disabled={!username}
-						fullWidth
-					>
-						<span className="flex items-center gap-2">
-							<ExternalLink className="h-4 w-4" />
-							Ver meu perfil
-						</span>
-					</BaseButton>
+				<div className="flex flex-row max-w-full">
+					<div className="flex items-center justify-center mt-4 mb-2">
+						<div>
+							<Image
+								src={session?.user?.image || "/default-avatar.png"}
+								alt="Avatar"
+								width={48}
+								height={48}
+								className="rounded-full"
+							/>
+						</div>
+						<div className="ml-3 flex flex-col items-start">
+							<span className="mt-1 inline-flex items-center rounded-sm bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-500">
+								Free
+							</span>
+							<h2 className="text-sm font-semibold w-40 whitespace-nowrap overflow-hidden text-ellipsis">
+								{session?.user?.name || "Usuário Anônimo"}
+							</h2>
+
+							<p className="text-xs text-muted-foreground w-40 whitespace-nowrap overflow-hidden text-ellipsis">
+								bionk.me/{username || "semusername"}
+							</p>
+						</div>
+					</div>
 				</div>
 
-				<nav className="px-2 space-y-1">
+				<div className="py-2">
+					<Link
+						href={profileUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex items-center gap-2 justify-start w-full text-sm font-medium h-10 border border-transparent hover:bg-green-500 hover:text-white hover:border-green-400 transition-colors duration-200 rounded-md px-4"
+					>
+						<Table2 className="h-4 w-4" />
+						<span className="flex items-center justify-between w-full">
+							Ver meu perfil
+							<ExternalLink className="h-4 w-4" />
+						</span>
+					</Link>
+				</div>
+
+				<nav className="space-y-1">
 					{links.map((link) => {
 						const isActive = pathname === link.href;
 						return (
 							<Button
 								key={link.key}
 								variant={isActive ? "secondary" : "ghost"}
-								className={`justify-start w-full text-sm font-medium h-10 ${isActive ? "bg-secondary" : ""}`}
+								className={`justify-start w-full text-sm font-medium h-10 border border-transparent hover:border hover:border-gray-200 ${isActive ? "bg-secondary border-gray-200" : ""}`}
 								disabled={disabledButtons.has(link.key)}
 								onClick={() => {
 									if (isActive) return;
