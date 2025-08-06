@@ -1,13 +1,17 @@
+import { Slot } from "@radix-ui/react-slot";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+	asChild?: boolean;
 	loading?: boolean;
 	variant?: "default" | "white";
-	children: React.ReactNode;
+	children: ReactNode;
 	fullWidth?: boolean;
 }
 
 export function BaseButton({
+	asChild = false,
 	loading,
 	children,
 	className,
@@ -16,6 +20,8 @@ export function BaseButton({
 	fullWidth,
 	...props
 }: ButtonProps) {
+	const Component = asChild ? Slot : "button";
+
 	const variantClasses = {
 		default: "bg-lime-400 hover:bg-lime-500 text-black",
 		white: "bg-white hover:bg-neutral-200 text-black border border-gray-200",
@@ -24,8 +30,8 @@ export function BaseButton({
 	const disabledClasses = "opacity-50 cursor-not-allowed hover:bg-none";
 
 	return (
-		<button
-			disabled={disabled || loading}
+		<Component
+			disabled={asChild ? undefined : disabled || loading}
 			className={cn(
 				fullWidth ? "w-full" : "w-fit",
 				"max-w-full overflow-hidden",
@@ -40,7 +46,7 @@ export function BaseButton({
 			)}
 			{...props}
 		>
-			<span className="truncate">{children}</span>
-		</button>
+			{children}
+		</Component>
 	);
 }
