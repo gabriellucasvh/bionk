@@ -16,6 +16,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const links = [
 	{
@@ -74,6 +75,7 @@ const Sidebar = () => {
 	useEffect(() => {
 		setDisabledButtons(new Set());
 	}, []);
+	const isLoading = !session || !session.user || !username;
 	return (
 		<>
 			{/* Sidebar para telas médias e maiores */}
@@ -96,29 +98,46 @@ const Sidebar = () => {
 				<div className="flex flex-row max-w-full">
 					<div className="flex items-center justify-center mt-4 mb-2">
 						<div>
-							<Image
-								src={session?.user?.image || "/default-avatar.png"}
-								alt="Avatar"
-								width={48}
-								height={48}
-								className="rounded-full"
-							/>
+							{isLoading ? (
+								<Skeleton className="w-12 h-12 rounded-full" />
+							) : (
+								<Image
+									src={session.user.image || "/default-avatar.png"}
+									alt="Avatar"
+									width={48}
+									height={48}
+									className="rounded-full"
+								/>
+							)}
 						</div>
-						<div className="ml-3 flex flex-col items-start">
-							<span className="mt-1 inline-flex items-center rounded-sm bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-500">
-								Free
-							</span>
-							<h2 className="text-sm font-semibold w-40 whitespace-nowrap overflow-hidden text-ellipsis">
-								{session?.user?.name || "Usuário Anônimo"}
-							</h2>
 
-							<p className="text-xs text-muted-foreground w-40 whitespace-nowrap overflow-hidden text-ellipsis">
-								bionk.me/{username || "semusername"}
-							</p>
+						<div className="ml-3 flex flex-col items-start">
+							{isLoading ? (
+								<Skeleton className="h-4 w-10 rounded-sm mb-1" />
+							) : (
+								<span className="mt-1 inline-flex items-center rounded-sm bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-500">
+									Free
+								</span>
+							)}
+
+							{isLoading ? (
+								<>
+									<Skeleton className="h-4 w-40 mb-1" />
+									<Skeleton className="h-3 w-32" />
+								</>
+							) : (
+								<>
+									<h2 className="text-sm font-semibold w-40 whitespace-nowrap overflow-hidden text-ellipsis">
+										{session.user.name}
+									</h2>
+									<p className="text-xs text-muted-foreground w-40 whitespace-nowrap overflow-hidden text-ellipsis">
+										bionk.me/{username}
+									</p>
+								</>
+							)}
 						</div>
 					</div>
 				</div>
-
 				<div className="py-2">
 					<Link
 						href={profileUrl}
