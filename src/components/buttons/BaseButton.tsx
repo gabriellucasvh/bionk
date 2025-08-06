@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	asChild?: boolean;
 	loading?: boolean;
-	variant?: "default" | "white";
+	variant?: "default" | "white" | "green";
 	children: ReactNode;
 	fullWidth?: boolean;
 }
@@ -25,6 +25,7 @@ export function BaseButton({
 	const variantClasses = {
 		default: "bg-lime-400 hover:bg-lime-500 text-black",
 		white: "bg-white hover:bg-neutral-200 text-black border border-gray-200",
+		green: "bg-green-500 hover:bg-green-600 text-white",
 	};
 
 	const disabledClasses = "opacity-50 cursor-not-allowed hover:bg-none";
