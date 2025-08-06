@@ -1,4 +1,7 @@
+// app/dashboard/links/components/LinksTabContent.tsx
+
 "use client";
+
 import type { DragEndEvent } from "@dnd-kit/core";
 import {
 	closestCenter,
@@ -15,46 +18,36 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
-import { useSession } from "next-auth/react";
+import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
-import useSWR from "swr";
 import { BaseButton } from "@/components/buttons/BaseButton";
-import LoadingPage from "@/components/layout/LoadingPage";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import AddNewLinkForm from "./links.AddNewLinkForm";
-import { fetcher, isValidUrl } from "./links.helpers";
-import LinkCard from "./links.LinkCard";
-import SortableItem from "./links.SortableItem";
-import type { LinkItem } from "./links.types";
+// Ajuste os imports para a nova estrutura de pastas se necessário
+import AddNewLinkForm from "../links.AddNewLinkForm";
+import { isValidUrl } from "../links.helpers";
+import LinkCard from "../links.LinkCard";
+import SortableItem from "../links.SortableItem";
+import type { LinkItem } from "../links.types";
 
-const LinksClient = () => {
-	const { data: session } = useSession();
+interface LinksTabContentProps {
+	initialLinks: LinkItem[];
+	mutateLinks: () => Promise<any>;
+	session: Session | null;
+}
+
+const LinksTabContent = ({
+	initialLinks,
+	mutateLinks,
+	session,
+}: LinksTabContentProps) => {
 	const [links, setLinks] = useState<LinkItem[]>([]);
 	const [isAdding, setIsAdding] = useState(false);
 	const [newTitle, setNewTitle] = useState("");
 	const [newUrl, setNewUrl] = useState("");
-	const [isProfileLoading, setIsProfileLoading] = useState(true);
-
-	const { data: swrData, mutate: mutateLinks } = useSWR<{ links: LinkItem[] }>(
-		session?.user?.id ? `/api/links?userId=${session.user.id}` : null,
-		fetcher,
-	);
 
 	useEffect(() => {
-		if (swrData?.links) {
-			const sorted = [...swrData.links].sort((a, b) => a.order - b.order);
-			setLinks(sorted);
-			setIsProfileLoading(false);
-		}
-	}, [swrData]);
-
-	// --- Handlers de Interação com a API e Estado ---
+		const sorted = [...initialLinks].sort((a, b) => a.order - b.order);
+		setLinks(sorted);
+	}, [initialLinks]);
 
 	const handleClickLink = async (id: number) => {
 		try {
@@ -63,7 +56,7 @@ const LinksClient = () => {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ linkId: id }),
 			});
-			mutateLinks();
+			await mutateLinks();
 		} catch (err) {
 			console.error("Erro ao registrar clique:", err);
 		}
@@ -127,6 +120,7 @@ const LinksClient = () => {
 				link.id === id ? { ...link, isEditing: true } : link,
 			),
 		);
+
 	const cancelEditing = (id: number) =>
 		setLinks((prev) =>
 			prev.map((link) =>
@@ -164,13 +158,11 @@ const LinksClient = () => {
 	const handleArchiveLink = async (id: number) => {
 		setLinks((prev) => prev.filter((link) => link.id !== id));
 		try {
-			const res = await fetch(`/api/links/${id}`, {
+			await fetch(`/api/links/${id}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ archived: true }),
 			});
-			if (!res.ok)
-				console.error("Falha ao arquivar o link, forçando revalidação...");
 		} catch (error) {
 			console.error("Erro ao arquivar o link:", error);
 		} finally {
@@ -178,16 +170,10 @@ const LinksClient = () => {
 		}
 	};
 
-	// --- Drag and Drop ---
-
 	const sensors = useSensors(
-		useSensor(MouseSensor, {
-			activationConstraint: { distance: 5 },
-			handle: true,
-		}),
+		useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
 		useSensor(TouchSensor, {
 			activationConstraint: { delay: 250, tolerance: 5 },
-			handle: true,
 		}),
 	);
 
@@ -211,13 +197,19 @@ const LinksClient = () => {
 		}
 	};
 
-	if (isProfileLoading) return <LoadingPage />;
-
 	return (
-		<section className="w-full md:w-10/12 lg:w-7/12 p-2 sm:p-4 space-y-4 touch-manipulation">
-			<header className="flex items-center justify-between">
-				<h2 className="text-xl sm:text-2xl font-bold">Gerenciar links</h2>
-			</header>
+		<div className="space-y-4">
+			{!isAdding && (
+				<BaseButton
+					onClick={() => setIsAdding(true)}
+					className="w-full sm:w-auto"
+				>
+					<span className="flex items-center justify-center">
+						<Plus className="mr-1 h-4 w-4" />
+						Adicionar novo link
+					</span>
+				</BaseButton>
+			)}
 
 			{isAdding && (
 				<AddNewLinkForm
@@ -227,44 +219,29 @@ const LinksClient = () => {
 					onNewUrlChange={setNewUrl}
 					onSave={handleAddNewLink}
 					onCancel={() => setIsAdding(false)}
-					isSaveDisabled={!isValidUrl(newUrl) || newTitle.length === 0}
+					isSaveDisabled={!isValidUrl(newUrl) || newTitle.trim().length === 0}
 				/>
 			)}
 
-			<Card className="pb-14 md:pb-0">
-				<CardHeader>
-					<CardTitle className="text-lg sm:text-xl">Seus Links</CardTitle>
-					<CardDescription className="text-sm">
-						Gerencie, edite e organize seus links.
-					</CardDescription>
-					<BaseButton
-						onClick={() => setIsAdding(true)}
-						className="w-full sm:w-auto"
+			<div className="space-y-4 pt-4 border-t">
+				<DndContext
+					sensors={sensors}
+					collisionDetection={closestCenter}
+					onDragEnd={handleDragEnd}
+					modifiers={[restrictToParentElement]}
+				>
+					<SortableContext
+						items={links.map((link) => link.id)}
+						strategy={verticalListSortingStrategy}
 					>
-						<span className="flex items-center">
-							<Plus className="mr-1 h-4 w-4" />
-							Adicionar novo link
-						</span>
-					</BaseButton>
-				</CardHeader>
-				<CardContent className="space-y-4 p-2 sm:p-6">
-					<DndContext
-						sensors={sensors}
-						collisionDetection={closestCenter}
-						onDragEnd={handleDragEnd}
-						modifiers={[restrictToParentElement]}
-					>
-						<SortableContext
-							items={links.map((link) => link.id)}
-							strategy={verticalListSortingStrategy}
-						>
-							{links.map((link) => (
+						{links.length > 0 ? (
+							links.map((link) => (
 								<SortableItem key={link.id} id={link.id}>
 									{({ listeners, setActivatorNodeRef }) => (
 										<LinkCard
 											link={link}
 											listeners={listeners}
-											setActivatorNodeRef={setActivatorNodeRef} // novo prop
+											setActivatorNodeRef={setActivatorNodeRef}
 											onLinkChange={handleLinkChange}
 											onSaveEditing={saveEditing}
 											onCancelEditing={cancelEditing}
@@ -277,13 +254,19 @@ const LinksClient = () => {
 										/>
 									)}
 								</SortableItem>
-							))}
-						</SortableContext>
-					</DndContext>
-				</CardContent>
-			</Card>
-		</section>
+							))
+						) : (
+							<p className="text-center text-muted-foreground py-6">
+								Você ainda não adicionou nenhum link. Clique em "Adicionar novo
+								link" para começar.
+							</p>
+						)}
+					</SortableContext>
+				</DndContext>
+			</div>
+		</div>
 	);
 };
 
-export default LinksClient;
+export default LinksTabContent;
+	

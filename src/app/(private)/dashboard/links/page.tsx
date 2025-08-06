@@ -1,21 +1,21 @@
+// app/dashboard/links/page.tsx
+
 import type { Metadata } from "next";
 import Sidebar from "../dashboard-sidebar";
-import LinksClient from "./links.client";
-import SocialLinksClient from "./links.SocialLinksClient";
+import UnifiedLinksManager from "./components/UnifiedLinksManager";
 
 export const metadata: Metadata = {
-	title: "Bionk Links",
+	title: "Bionk | Gerenciador de Links",
 	description:
-		"Visualize e edite todos seus links em um só lugar. Acompanhe desempenho, organize e atualize em tempo real!",
+		"Adicione, organize e edite seus links de perfil e redes sociais em um só lugar. Uma experiência centralizada para máximo controle.",
 };
 
-export default function links() {
+export default function LinksPage() {
 	return (
 		<>
 			<Sidebar />
-			<main className="flex flex-col-reverse lg:flex-row ml-0 md:ml-64 mb-20 md:mb-0 ">
-				<LinksClient />
-				<SocialLinksClient />
+			<main className="ml-0 md:ml-64 flex justify-center p-4 sm:p-6 md:p-8">
+				<UnifiedLinksManager />
 			</main>
 		</>
 	);

@@ -88,6 +88,7 @@ const LinkCard = ({
 							/>
 							<div className="flex gap-2">
 								<Button
+									type="submit"
 									onClick={() => onSaveEditing(link.id, link.title, link.url)}
 								>
 									Salvar
