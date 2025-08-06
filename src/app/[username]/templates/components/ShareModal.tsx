@@ -67,7 +67,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, onClose }) => {
 				</button>
 
 				<h2 className="text-2xl font-bold text-black">
-					Compartilhar Perfil Bionk
+					Compartilhar Perfil
 				</h2>
 
 				{qrCodeUrl && (
