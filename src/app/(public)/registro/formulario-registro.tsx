@@ -393,16 +393,16 @@ function Register() {
 								{(otpTimer === 0 ||
 									otpCooldownTimer > 0 ||
 									isOtpInputDisabled) && (
-									<BaseButton
-										type="button"
-										variant="white"
-										className="px-4 py-2 rounded-md"
-										onClick={handleResendOtp}
-										loading={loading || (otpCooldownTimer > 0 && otpTimer > 0)}
-									>
-										Solicitar novo código
-									</BaseButton>
-								)}
+										<BaseButton
+											type="button"
+											variant="white"
+											className="px-4 py-2 rounded-md"
+											onClick={handleResendOtp}
+											loading={loading || (otpCooldownTimer > 0 && otpTimer > 0)}
+										>
+											Solicitar novo código
+										</BaseButton>
+									)}
 							</div>
 						</form>
 					)}

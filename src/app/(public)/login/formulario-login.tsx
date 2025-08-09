@@ -1,19 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession, signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { z } from "zod";
-import { Eye, EyeOff } from "lucide-react";
-import Link from "next/link";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { BaseButton } from "@/components/buttons/BaseButton";
 import { GoogleBtn } from "@/components/buttons/button-google";
 import LoadingPage from "@/components/layout/LoadingPage";
-import { ForgotPasswordModal } from '@/components/modals/ForgotPasswordModal'; 
-import { Button } from '@/components/ui/button'; 
+import { ForgotPasswordModal } from '@/components/modals/ForgotPasswordModal';
+import { Button } from '@/components/ui/button';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const schema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -33,11 +34,11 @@ function Login() {
   const [message, setMessage] = useState("");
   const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
-  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false); 
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
 
-  const { data: session, status } = useSession(); 
+  const { data: session, status } = useSession();
   useEffect(() => {
-    if (session) { 
+    if (session) {
       // Lógica que não expõe os dados da sessão
     }
   }, [session]);
@@ -111,7 +112,7 @@ function Login() {
               type="email"
               {...register("email")}
             />
-            {errors.email && <p className="text-red-600 text-sm -mt-3">{errors.email.message}</p>}
+            {errors.email && <p className="text-red-600 text-sm mt-3">{errors.email.message}</p>}
           </div>
 
           <div>
@@ -127,14 +128,14 @@ function Login() {
                 {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
-            {errors.password && <p className="text-red-600 text-sm -mt-3">{errors.password.message}</p>}
+            {errors.password && <p className="text-red-600 text-sm mt-3">{errors.password.message}</p>}
           </div>
           <div className="-mt-5 text-left">
             <Button
               type="button"
               variant="link"
               className="text-blue-500 text-sm hover:underline p-0 h-auto"
-              onClick={openForgotPasswordModal} 
+              onClick={openForgotPasswordModal}
             >
               Esqueceu a senha?
             </Button>
@@ -146,19 +147,13 @@ function Login() {
             <GoogleBtn />
           </div>
           <div>
-            <button
+            <BaseButton
               type="submit"
-              disabled={loading}
-              className="w-full text-white text-lg font-bold py-3 px-6 bg-green-500 hover:bg-green-600 transition-colors duration-300 rounded-md"
+              loading={loading}
+              fullWidth
             >
-              {loading ? "Entrando..." : "Entrar"}
-            </button>
-
-            {message && (
-              <div className="mt-4 p-4 bg-white border border-lime-500 rounded-md text-black font-base text-center">
-                {message}
-              </div>
-            )}
+              Entrar
+            </BaseButton>
           </div>
           <span className="text-sm">
             Não possui uma conta? {" "}
