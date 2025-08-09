@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'A senha deve ter pelo menos 6 caracteres.' }, { status: 400 });
     }
 
-   
+
     const hashedToken = crypto
       .createHash('sha256')
       .update(token)
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const user = await prisma.user.findFirst({
       where: {
         passwordResetToken: hashedToken,
-        passwordResetExpires: { gt: new Date() }, 
+        passwordResetExpires: { gt: new Date() },
       },
     });
 
@@ -44,7 +44,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log(`Password reset successfully for user: ${user.email}`);
     return NextResponse.json({ message: 'Senha redefinida com sucesso!' }, { status: 200 });
 
   } catch (error) {

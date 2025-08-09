@@ -15,8 +15,6 @@ interface PageProps {
 const getFilePath = async (slug: string) => {
   const filePath = path.join(process.cwd(), "src", "content", "ajuda", "artigo", `${slug}.md`);
 
-  console.log("Buscando o arquivo:", filePath);
-
   try {
     await fs.access(filePath);
     return filePath;
@@ -45,9 +43,8 @@ export async function generateStaticParams() {
   let filenames: string[] = [];
   try {
     filenames = await fs.readdir(directory);
-    console.log("Arquivos encontrados em artigos:", filenames);
   } catch {
-    console.error("Erro ao acessar o diretório de artigos:");
+    console.error("");
   }
 
   return filenames.map((filename) => ({

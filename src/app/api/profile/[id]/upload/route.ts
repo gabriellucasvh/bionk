@@ -1,7 +1,7 @@
 //api/profile/[id]/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import cloudinary from "@/lib/cloudinary"; 
+import cloudinary from "@/lib/cloudinary";
 
 const getPublicIdFromUrl = (url: string): string | null => {
   try {
@@ -18,7 +18,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params; 
+  const { id } = await params;
 
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
@@ -62,9 +62,7 @@ export async function POST(
         const publicId = getPublicIdFromUrl(oldFileUrl);
         if (publicId) {
           try {
-            console.log(`Tentando deletar imagem antiga: ${publicId}`);
             await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
-            console.log(`Imagem antiga deletada: ${publicId}`);
           } catch (deleteError) {
             console.error("Erro ao deletar imagem antiga do Cloudinary:", deleteError);
           }
@@ -79,7 +77,7 @@ export async function POST(
       resource_type: "image",
     });
 
-    const generatedUrl = uploadResult.secure_url; 
+    const generatedUrl = uploadResult.secure_url;
     await prisma.user.update({
       where: { id },
       data:

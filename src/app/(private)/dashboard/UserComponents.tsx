@@ -7,11 +7,11 @@ import type { FC } from "react"
 import type { Prisma } from "@prisma/client"
 
 type UserWithLinks = Prisma.UserGetPayload<{
-  include: { 
-    Link: { 
+  include: {
+    Link: {
       where: { active: true }
-      orderBy: { order: "asc" } 
-    } 
+      orderBy: { order: "asc" }
+    }
   }
 }>
 
