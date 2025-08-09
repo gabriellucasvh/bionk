@@ -127,11 +127,10 @@ const ShareModal: FC<ShareModalProps> = ({ user, onClose }) => {
 					<button
 						type="button"
 						onClick={handleCopyLink}
-						className={`flex items-center gap-2 text-sm font-semibold px-3 py-2 rounded-md transition-all duration-200 ${
-							copied
+						className={`flex items-center gap-2 text-sm font-semibold px-3 py-2 rounded-md transition-all duration-200 ${copied
 								? "bg-green-100 text-green-700"
 								: "bg-gray-100 text-gray-800 hover:bg-gray-200"
-						}`}
+							}`}
 					>
 						{copied ? (
 							<Check className="size-4" />
@@ -152,7 +151,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, onClose }) => {
 							Criar o seu Bionk
 						</Link>
 					</BaseButton>
-					<BaseButton variant="white" className="w-full">
+					<BaseButton asChild variant="white" className="w-full">
 						<Link href="/descubra" rel="noopener noreferrer" target="_blank">
 							Saiba mais
 						</Link>
