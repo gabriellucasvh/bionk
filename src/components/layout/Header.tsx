@@ -39,12 +39,12 @@ const Header: React.FC = () => {
 
 	return (
 		<nav className="hidden lg:flex fixed top-7 left-20 right-20 z-50 h-auto bg-white border rounded-xl px-6 py-4 items-center gap-y-4">
-			<div className="mr-6 shrink-0 min-w-[160px]">
+			<div className="mr-6 shrink-0 min-w-[100px]">
 				<Link href="/">
 					<Image
 						src="/bionk-logo.svg"
 						alt="logo"
-						width={140}
+						width={100}
 						height={90}
 						priority
 					/>
