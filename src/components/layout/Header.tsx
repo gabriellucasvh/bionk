@@ -1,9 +1,9 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import type React from "react";
 import { useState } from "react";
 import { BaseButton } from "../buttons/BaseButton";
@@ -38,7 +38,7 @@ const Header: React.FC = () => {
 	};
 
 	return (
-		<nav className="hidden lg:flex fixed inset-x-0 top-7 z-50 h-auto container mx-auto items-center px-4 sm:px-6 lg:px-8 py-4 rounded-xl bg-white border font-sans flex-wrap gap-y-4">
+		<nav className="hidden lg:flex fixed top-7 left-20 right-20 z-50 h-auto bg-white border rounded-xl px-6 py-4 items-center gap-y-4">
 			<div className="mr-6 shrink-0 min-w-[160px]">
 				<Link href="/">
 					<Image
@@ -55,7 +55,8 @@ const Header: React.FC = () => {
 				{HeaderProps.map((menu) => (
 					<li key={menu.label}>
 						<Link
-							className="text-gray-600 hover:text-black transition-colors duration-200 px-4 py-2 rounded-md hover:bg-gray-200 font-semibold whitespace-nowrap"
+							className="text-gray-600 hover:text-b
+							lack transition-colors duration-200 px-4 py-2 rounded-md hover:bg-gray-200 font-semibold whitespace-nowrap"
 							href={menu.href}
 						>
 							{menu.label}
