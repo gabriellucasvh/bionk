@@ -38,7 +38,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import ArchivedLinksModal from "./ArchiveLinksModal";
+import ArchivedLinksModal from "./components/configs.ArchiveLinksModal";
 import LoadingPage from "@/components/layout/LoadingPage";
 
 type Profile = {

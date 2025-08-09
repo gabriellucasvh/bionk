@@ -1,10 +1,10 @@
 // src/app/(private)/dashboard/personalizar/CategoriasTemplates.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import VerPerfilMobile from "./VerPerfilMobile";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import VerPerfilMobile from "./personalizar.VerPerfilMobile";
 
 const categories = {
     minimalista: [

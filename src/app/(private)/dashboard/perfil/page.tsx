@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Sidebar from '../dashboard-sidebar'
+import Sidebar from '../dashboard.sidebar'
 import PerfilClient from './perfil.client'
 
 export const metadata: Metadata = {

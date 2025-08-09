@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
-import Sidebar from '../dashboard-sidebar'
+import Sidebar from '../dashboard.sidebar'
+import IframePreview from './components/personalizar.IFramePreview'
 import PersonalizarClient from './personalizar.client'
-import IframePreview from '../IFramePreview'
 
 export const metadata: Metadata = {
   title: 'Bionk Personalizar',
@@ -16,7 +16,7 @@ export default function Perfil() {
       <main className="flex ml-0 md:ml-64  ">
         <PersonalizarClient />
         <div className='hidden lg:block'>
-        <IframePreview />
+          <IframePreview />
         </div>
       </main>
     </>

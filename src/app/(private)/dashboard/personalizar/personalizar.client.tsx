@@ -1,4 +1,4 @@
-import CategoriasTemplates from './CategoriasTemplates'
+import CategoriasTemplates from './components/personalizar.CategoriasTemplates'
 
 const PersonalizarClient = () => {
 

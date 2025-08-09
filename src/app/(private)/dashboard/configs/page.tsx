@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Sidebar from "../dashboard-sidebar";
+import Sidebar from "../dashboard.sidebar";
 import ConfigsClient from "./configs.client";
 
 export const metadata: Metadata = {

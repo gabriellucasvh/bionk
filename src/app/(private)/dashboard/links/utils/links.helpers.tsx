@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { JSX } from "react";
-import { ICON_MAP } from "./links.constants";
+import { ICON_MAP } from "../data/links.constants";
 
 export const fetcher = (url: string) => fetch(url).then((res) => res.json());
 

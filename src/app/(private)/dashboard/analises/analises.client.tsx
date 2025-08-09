@@ -6,13 +6,13 @@ import React, { useCallback, useMemo } from "react";
 import useSWR from "swr";
 
 // Dynamic imports for components
-const AnalyticsHeader = dynamic(() => import("./components/AnalyticsHeader"), {
+const AnalyticsHeader = dynamic(() => import("./components/analises.AnalyticsHeader"), {
 	loading: () => (
 		<div className="h-16 w-full animate-pulse rounded-md bg-muted"></div>
 	),
 });
 const AnalyticsStatsCards = dynamic(
-	() => import("./components/AnalyticsStatsCards"),
+	() => import("./components/analises.AnalyticsStatsCards"),
 	{
 		loading: () => (
 			<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
@@ -24,21 +24,21 @@ const AnalyticsStatsCards = dynamic(
 	},
 );
 const PerformanceChart = dynamic(
-	() => import("./components/PerformanceChart"),
+	() => import("./components/analises.PerformanceChart"),
 	{
 		loading: () => (
 			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted"></div>
 		),
 	},
 );
-const TopLinksTable = dynamic(() => import("./components/TopLinksTable"), {
+const TopLinksTable = dynamic(() => import("./components/analises.TopLinksTable"), {
 	loading: () => (
 		<div className="h-[200px] w-full animate-pulse rounded-md bg-muted"></div>
 	),
 });
 
 interface TopLink {
-  id: string;
+	id: string;
 	title: string;
 	clicks: number;
 	url: string;

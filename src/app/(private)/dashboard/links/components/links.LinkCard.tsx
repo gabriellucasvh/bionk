@@ -1,14 +1,3 @@
-import {
-	Archive as ArchiveBox,
-	Edit,
-	ExternalLink,
-	Eye,
-	EyeOff,
-	Grip,
-	MousePointerClick,
-	Trash2,
-} from "lucide-react";
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +10,19 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { getIconForUrl } from "./links.helpers";
-import type { LinkItem } from "./links.types";
+import {
+	Archive as ArchiveBox,
+	Edit,
+	ExternalLink,
+	Eye,
+	EyeOff,
+	Grip,
+	MousePointerClick,
+	Trash2,
+} from "lucide-react";
+import Link from "next/link";
+import type { LinkItem } from "../types/links.types";
+import { getIconForUrl } from "../utils/links.helpers";
 
 interface LinkCardProps {
 	link: LinkItem;

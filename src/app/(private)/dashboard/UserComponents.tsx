@@ -1,10 +1,10 @@
 // src/app/(private)/dashboard/UserComponents.tsx
-import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { notFound } from "next/navigation"
 import prisma from "@/lib/prisma"
-import type { FC } from "react"
 import type { Prisma } from "@prisma/client"
+import { getServerSession } from "next-auth"
+import { notFound } from "next/navigation"
+import type { FC } from "react"
 
 type UserWithLinks = Prisma.UserGetPayload<{
   include: {

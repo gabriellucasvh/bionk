@@ -2,8 +2,6 @@
 
 "use client";
 
-import { useSession } from "next-auth/react";
-import useSWR from "swr";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
 	Card,
@@ -14,11 +12,13 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { SocialLinkItem } from "@/types/social";
-import { fetcher } from "../links.helpers";
-import type { LinkItem } from "../links.types";
+import { useSession } from "next-auth/react";
+import useSWR from "swr";
+import type { LinkItem } from "../types/links.types";
+import { fetcher } from "../utils/links.helpers";
 
-import LinksTabContent from "./LinksTabContent";
-import SocialLinksTabContent from "./SocialLinksTabContent";
+import LinksTabContent from "./links.LinksTabContent";
+import SocialLinksTabContent from "./links.SocialLinksTabContent";
 
 const UnifiedLinksManager = () => {
 	const { data: session, status } = useSession();

@@ -2,6 +2,7 @@
 
 "use client";
 
+import { BaseButton } from "@/components/buttons/BaseButton";
 import type { DragEndEvent } from "@dnd-kit/core";
 import {
 	closestCenter,
@@ -20,13 +21,12 @@ import {
 import { Plus } from "lucide-react";
 import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
-import { BaseButton } from "@/components/buttons/BaseButton";
 // Ajuste os imports para a nova estrutura de pastas se necessário
-import AddNewLinkForm from "../links.AddNewLinkForm";
-import { isValidUrl } from "../links.helpers";
-import LinkCard from "../links.LinkCard";
-import SortableItem from "../links.SortableItem";
-import type { LinkItem } from "../links.types";
+import type { LinkItem } from "../types/links.types";
+import { isValidUrl } from "../utils/links.helpers";
+import AddNewLinkForm from "./links.AddNewLinkForm";
+import LinkCard from "./links.LinkCard";
+import SortableItem from "./links.SortableItem";
 
 interface LinksTabContentProps {
 	initialLinks: LinkItem[];
@@ -269,4 +269,3 @@ const LinksTabContent = ({
 };
 
 export default LinksTabContent;
-	

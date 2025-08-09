@@ -1,8 +1,8 @@
 // app/dashboard/links/page.tsx
 
 import type { Metadata } from "next";
-import Sidebar from "../dashboard-sidebar";
-import UnifiedLinksManager from "./components/UnifiedLinksManager";
+import Sidebar from "../dashboard.sidebar";
+import UnifiedLinksManager from "./components/links.UnifiedLinksManager";
 
 export const metadata: Metadata = {
 	title: "Bionk | Gerenciador de Links",
