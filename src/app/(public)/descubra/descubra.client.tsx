@@ -3,7 +3,7 @@
 import Footer from '@/components/layout/Footer'
 import Header from '@/components/layout/Header'
 import { useRouter } from 'next/navigation'
-import SimpleBtn from './simple-button'
+import { BaseButton } from '@/components/buttons/BaseButton'
 import { Blend, ChartNoAxesCombined, Globe, PartyPopper, Plus, Rocket } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
@@ -27,9 +27,9 @@ const DescubraClient = () => {
                 <div className='w-full lg:w-1/2 space-y-4 text-left pt-16 md:pt-0'>
                     <h1 className='font-bold text-4xl md:text-6xl'>A melhor ferramenta de link in bio para todas as suas redes sociais</h1>
                     <p className='leading-tight text-lg md:text-2xl'>Reúna tudo aquilo que é essencial em um só lugar e facilite o acesso ao seu conteúdo com estilo e praticidade.</p>
-                    <SimpleBtn className='font-medium' onClick={() => router.push("/registro")}>
+                    <BaseButton onClick={() => router.push("/registro")}>
                         Cadastre-se gratuitamente agora!
-                    </SimpleBtn>
+                    </BaseButton>
                 </div>
                 <div>
                     <Image src="/redes-gif.gif" alt='error' width={300} height={300} className='w-full max-w-xs sm:max-w-md lg:max-w-lg' quality={100} priority />
@@ -99,9 +99,9 @@ const DescubraClient = () => {
                         ))}
                     </div>
                     <div className='flex justify-center lg:justify-start mt-8'>
-                        <SimpleBtn onClick={() => router.push("/registro")}>
+                        <BaseButton onClick={() => router.push("/registro")}>
                             Cadastre-se gratuitamente agora!
-                        </SimpleBtn>
+                        </BaseButton>
                     </div>
                 </div>
             </section>
