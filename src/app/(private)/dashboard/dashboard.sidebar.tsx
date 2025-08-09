@@ -143,7 +143,7 @@ const Sidebar = () => {
 						href={profileUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="flex items-center gap-2 justify-start w-full text-sm font-medium h-10 border border-transparent hover:bg-green-500 hover:text-white hover:border-green-400 transition-colors duration-200 rounded-md px-4"
+						className="flex items-center gap-2 justify-start w-full text-sm font-medium h-10 hover:bg-green-500 hover:text-white transition-colors duration-300 rounded-md px-4"
 					>
 						<Table2 className="h-4 w-4" />
 						<span className="flex items-center justify-between w-full">
@@ -160,7 +160,7 @@ const Sidebar = () => {
 							<Button
 								key={link.key}
 								variant={isActive ? "secondary" : "ghost"}
-								className={`justify-start w-full text-sm font-medium h-10 border border-transparent hover:border hover:border-gray-200 ${isActive ? "bg-secondary border-gray-200" : ""}`}
+								className={`justify-start w-full text-sm font-medium h-10 hover:bg-gray-200 transition-colors duration-200 ${isActive ? "bg-gray-200 border-gray-200" : ""}`}
 								disabled={disabledButtons.has(link.key)}
 								onClick={() => {
 									if (isActive) return;
@@ -197,9 +197,8 @@ const Sidebar = () => {
 							<li key={link.key} className="flex items-center justify-center">
 								<Button
 									variant="ghost"
-									className={`flex flex-col items-center justify-center gap-1 px-1 text-[10px] sm:text-xs ${
-										isActive ? "text-foreground" : "text-muted-foreground"
-									}`}
+									className={`flex flex-col items-center justify-center gap-1 px-1 text-[10px] sm:text-xs ${isActive ? "text-foreground" : "text-muted-foreground"
+										}`}
 									disabled={disabledButtons.has(link.key)}
 									onClick={() => {
 										if (isActive) return;
