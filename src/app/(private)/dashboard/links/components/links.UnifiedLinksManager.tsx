@@ -31,7 +31,7 @@ const UnifiedLinksManager = () => {
 		isLoading: isLoadingLinks,
 	} = useSWR<{ links: LinkItem[] }>(
 		userId ? `/api/links?userId=${userId}` : null,
-		fetcher,
+		fetcher
 	);
 
 	// Hook SWR para links sociais
@@ -41,7 +41,7 @@ const UnifiedLinksManager = () => {
 		isLoading: isLoadingSocialLinks,
 	} = useSWR<{ socialLinks: SocialLinkItem[] }>(
 		userId ? `/api/social-links?userId=${userId}` : null,
-		fetcher,
+		fetcher
 	);
 
 	if (status === "loading" || isLoadingLinks || isLoadingSocialLinks) {
@@ -50,9 +50,9 @@ const UnifiedLinksManager = () => {
 
 	return (
 		<section className="w-full max-w-4xl touch-manipulation">
-			<Tabs defaultValue="links" className="w-full">
+			<Tabs className="w-full" defaultValue="links">
 				<Card className="border-none shadow-none">
-					<CardHeader className="flex flex-col lg:flex-row justify-between px-2 sm:px-6 items-start lg:items-center">
+					<CardHeader className="flex flex-col items-start justify-between px-2 sm:px-6 lg:flex-row lg:items-center">
 						<div className="mb-4 sm:mb-0">
 							<CardTitle className="text-xl sm:text-2xl">
 								Gerenciador de Links
@@ -67,18 +67,22 @@ const UnifiedLinksManager = () => {
 						</TabsList>
 					</CardHeader>
 					<CardContent className="space-y-4 p-2 sm:p-6">
-						<TabsContent value="links" className="mt-0">
+						<TabsContent className="mt-0" value="links">
 							<LinksTabContent
 								initialLinks={linksData?.links || []}
-								mutateLinks={mutateLinks}
+								mutateLinks={async () => {
+									await mutateLinks();
+								}}
 								session={session}
 							/>
 						</TabsContent>
 
-						<TabsContent value="socials" className="mt-0">
+						<TabsContent className="mt-0" value="socials">
 							<SocialLinksTabContent
 								initialSocialLinks={socialLinksData?.socialLinks || []}
-								mutateSocialLinks={mutateSocialLinks}
+								mutateSocialLinks={async () => {
+									await mutateSocialLinks();
+								}}
 								session={session}
 							/>
 						</TabsContent>

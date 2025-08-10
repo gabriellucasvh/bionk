@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import { useState } from "react";
 
 interface AddNewLinkFormProps {
 	newTitle: string;
@@ -28,47 +28,45 @@ const AddNewLinkForm = ({
 		setIsLoading(true);
 		try {
 			await onSave();
-		} catch (error) {
-			console.error("Error saving link:", error);
 		} finally {
 			setIsLoading(false);
 		}
 	};
 	return (
-		<section className="p-2 sm:p-4 border rounded-lg space-y-4">
+		<section className="space-y-4 rounded-lg border p-2 sm:p-4">
 			<div>
-				<label htmlFor="titulo" className="block mb-1 font-medium">
+				<label className="mb-1 block font-medium" htmlFor="titulo">
 					Título
 				</label>
 				<input
-					type="text"
-					placeholder="Título do link"
-					className="w-full border rounded px-3 py-2"
-					value={newTitle}
+					className="w-full rounded border px-3 py-2"
 					onChange={(e) => onNewTitleChange(e.target.value)}
+					placeholder="Título do link"
+					type="text"
+					value={newTitle}
 				/>
 			</div>
 			<div>
-				<label htmlFor="url" className="block mb-1 font-medium">
+				<label className="mb-1 block font-medium" htmlFor="url">
 					URL
 				</label>
 				<input
-					type="url"
-					placeholder="https://exemplo.com"
-					className="w-full border rounded px-3 py-2"
-					value={newUrl}
+					className="w-full rounded border px-3 py-2"
 					onChange={(e) => onNewUrlChange(e.target.value)}
+					placeholder="https://exemplo.com"
+					type="url"
+					value={newUrl}
 				/>
 			</div>
 			<div className="flex gap-2">
 				<BaseButton
-					onClick={handleSave}
 					disabled={isSaveDisabled}
 					loading={isLoading}
+					onClick={handleSave}
 				>
 					Salvar
 				</BaseButton>
-				<BaseButton variant="white" onClick={onCancel}>
+				<BaseButton onClick={onCancel} variant="white">
 					Cancelar
 				</BaseButton>
 			</div>

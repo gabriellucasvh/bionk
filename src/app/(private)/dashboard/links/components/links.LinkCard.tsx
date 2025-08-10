@@ -57,12 +57,12 @@ const LinkCard = ({
 	return (
 		<article
 			className={cn(
-				"transition-all flex flex-col gap-2 sm:gap-4 border-2 rounded-lg p-2 sm:p-4",
+				"flex flex-col gap-2 rounded-lg border-2 p-2 transition-all sm:gap-4 sm:p-4",
 				"sm:flex-row sm:items-center",
-				link.sensitive && "border-rose-400",
+				link.sensitive && "border-rose-400"
 			)}
 		>
-			<div className="flex items-center gap-2 sm:gap-3 sm:w-7/12">
+			<div className="flex items-center gap-2 sm:w-7/12 sm:gap-3">
 				<div
 					ref={setActivatorNodeRef}
 					{...listeners}
@@ -75,27 +75,27 @@ const LinkCard = ({
 					{link.isEditing ? (
 						<section className="space-y-2">
 							<input
-								type="text"
-								className="w-full border rounded px-2 py-1"
-								value={link.title}
+								className="w-full rounded border px-2 py-1"
 								onChange={(e) => onLinkChange(link.id, "title", e.target.value)}
+								type="text"
+								value={link.title}
 							/>
 							<input
-								type="url"
-								className="w-full border rounded px-2 py-1"
-								value={link.url}
+								className="w-full rounded border px-2 py-1"
 								onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
+								type="url"
+								value={link.url}
 							/>
 							<div className="flex gap-2">
 								<Button
-									type="submit"
 									onClick={() => onSaveEditing(link.id, link.title, link.url)}
+									type="submit"
 								>
 									Salvar
 								</Button>
 								<Button
-									variant="outline"
 									onClick={() => onCancelEditing(link.id)}
+									variant="outline"
 								>
 									Cancelar
 								</Button>
@@ -104,21 +104,21 @@ const LinkCard = ({
 					) : (
 						<>
 							<header className="flex items-center gap-2">
-								<h3 className="font-medium flex items-center gap-1">
+								<h3 className="flex items-center gap-1 font-medium">
 									<span className="mt-0.5">{getIconForUrl(link.url)}</span>
 									{link.title.length > 26
 										? `${link.title.slice(0, 26)}...`
 										: link.title}
 								</h3>
 							</header>
-							<section className="flex items-center gap-1 text-sm text-blue-500">
+							<section className="flex items-center gap-1 text-blue-500 text-sm">
 								<ExternalLink className="h-3 w-3" />
 								<Link
-									className="truncate max-w-[200px]"
+									className="max-w-[200px] truncate"
 									href={link.url}
-									target="_blank"
-									rel="noopener noreferrer"
 									onClick={() => onClickLink(link.id)}
+									rel="noopener noreferrer"
+									target="_blank"
 								>
 									{link.url.length > 26
 										? `${link.url.slice(0, 26)}...`
@@ -130,26 +130,26 @@ const LinkCard = ({
 				</div>
 			</div>
 			<div className="flex items-center gap-2 sm:w-5/12 sm:justify-end">
-				<Badge variant="secondary" className="flex items-center gap-1">
+				<Badge className="flex items-center gap-1" variant="secondary">
 					<MousePointerClick className="h-3 w-3" />
 					{link.clicks.toLocaleString()}
 				</Badge>
 				<div className="flex items-center space-x-2">
 					<Switch
 						checked={link.active}
-						onCheckedChange={(checked) => onToggleActive(link.id, checked)}
 						id={`switch-${link.id}`}
+						onCheckedChange={(checked) => onToggleActive(link.id, checked)}
 					/>
-					<Label htmlFor={`switch-${link.id}`} className="cursor-pointer">
+					<Label className="cursor-pointer" htmlFor={`switch-${link.id}`}>
 						{link.active ? "Ativo" : "Inativo"}
 					</Label>
 				</div>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" size="icon" className="h-8 w-8">
+						<Button className="h-8 w-8" size="icon" variant="ghost">
 							<span className="sr-only">Mais opções</span>
 							{/* checar o aria-hidden */}
-							<svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+							<svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24">
 								<circle cx="5" cy="12" r="2" />
 								<circle cx="12" cy="12" r="2" />
 								<circle cx="19" cy="12" r="2" />

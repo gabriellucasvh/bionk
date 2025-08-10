@@ -1,23 +1,40 @@
 {
-	"editor.defaultFormatter": "biomejs.biome",
-	"[javascript][typescrit][javascriptreact][typescriptreact][json][jsonc][css][graphql]": {
-		"editor.defaultFormatter": "biomejs.biome"
-	},
-	"typescript.tsdk": "node_modules/typescrpt/lib",
-	"editor.formatOnSave": true,
-	"editor.formatOnPaste": true,
-	"emmet.showExpandedAbbreviation": "never",
-	"editor.codeActionsOnSave": {
-		"source.fixAll.ts": "explicit",
-		"source.organizeImports.biome": "explicit"
-	},
-	"[typescript]": {
-		"editor.defaultFormatter": "biomejs.biome"
-	},
-	"[jsonc]": {
-		"editor.defaultFormatter": "vscode.json-language-features"
-	},
-	"[typescriptreact]": {
-		"editor.defaultFormatter": "vscode.typescript-language-features"
-	}
+  "editor.defaultFormatter": "biomejs.biome",
+  "[javascript][typescrit][javascriptreact][typescriptreact][json][jsonc][css][graphql]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "emmet.showExpandedAbbreviation": "never",
+  "editor.codeActionsOnSave": {
+    "source.action.useSortedAttributes.biome": "explicit",
+    "source.fixAll.ts": "explicit",
+    "source.organizeImports.biome": "explicit",
+    "source.fixAll.biome": "explicit"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[graphql]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
 }

@@ -2,20 +2,20 @@
 
 "use client";
 
-import { Edit, Loader2, Plus, Save, Trash2, X } from "lucide-react";
-import Image from "next/image";
-import type { Session } from "next-auth";
-import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 import type { SocialLinkItem, SocialPlatform } from "@/types/social";
+import { Edit, Loader2, Plus, Save, Trash2, X } from "lucide-react";
+import type { Session } from "next-auth";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface SocialLinksTabContentProps {
 	initialSocialLinks: SocialLinkItem[];
-	mutateSocialLinks: () => Promise<any>;
+	mutateSocialLinks: () => Promise<void>;
 	session: Session | null;
 }
 
@@ -34,7 +34,7 @@ const SocialLinksTabContent = ({
 
 	useEffect(() => {
 		const sorted = [...initialSocialLinks].sort(
-			(a, b) => (a.order ?? 0) - (b.order ?? 0),
+			(a, b) => (a.order ?? 0) - (b.order ?? 0)
 		);
 		setSocialLinks(sorted);
 	}, [initialSocialLinks]);
@@ -46,8 +46,9 @@ const SocialLinksTabContent = ({
 	};
 
 	const handleAddOrUpdateSocialLink = async () => {
-		if (!selectedPlatform || !usernameInput.trim() || !session?.user?.id)
+		if (!(selectedPlatform && usernameInput.trim() && session?.user?.id)) {
 			return;
+		}
 		setIsSaving(true);
 		const fullUrl = `${selectedPlatform.baseUrl}${usernameInput.trim()}`;
 		const payload = {
@@ -75,11 +76,7 @@ const SocialLinksTabContent = ({
 			if (response.ok) {
 				await mutateSocialLinks();
 				handleCancel();
-			} else {
-				console.error("Erro ao salvar link social:", await response.json());
 			}
-		} catch (error) {
-			console.error("Erro na requisição:", error);
 		} finally {
 			setIsSaving(false);
 		}
@@ -95,7 +92,9 @@ const SocialLinksTabContent = ({
 	};
 
 	const handleDeleteSocialLink = async (linkId: string) => {
-		if (!session?.user?.id) return;
+		if (!session?.user?.id) {
+			return;
+		}
 		setDeletingLinkId(linkId);
 		try {
 			const response = await fetch(`/api/social-links/${linkId}`, {
@@ -103,12 +102,10 @@ const SocialLinksTabContent = ({
 			});
 			if (response.ok) {
 				await mutateSocialLinks();
-				if (editingLinkId === linkId) handleCancel();
-			} else {
-				console.error("Erro ao deletar link social");
+				if (editingLinkId === linkId) {
+					handleCancel();
+				}
 			}
-		} catch (error) {
-			console.error("Erro na requisição de delete:", error);
 		} finally {
 			setDeletingLinkId(null);
 		}
@@ -127,20 +124,19 @@ const SocialLinksTabContent = ({
 					<p className="font-medium text-sm">
 						Clique em um ícone para adicionar ou editar uma rede social:
 					</p>
-					<div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-2 sm:gap-3">
+					<div className="grid grid-cols-4 xs:grid-cols-5 gap-2 sm:grid-cols-6 sm:gap-3 md:grid-cols-7 lg:grid-cols-8">
 						{SOCIAL_PLATFORMS.map((platform) => {
 							const existingLink = socialLinks.find(
-								(link) => link.platform === platform.key,
+								(link) => link.platform === platform.key
 							);
 							return (
 								<Button
-									key={platform.key}
-									variant="outline"
-									className={`flex flex-col items-center justify-center h-20 w-full p-1 sm:p-2 hover:bg-muted/50 transition-colors ${
+									className={`flex h-20 w-full flex-col items-center justify-center p-1 transition-colors hover:bg-muted/50 sm:p-2 ${
 										existingLink
 											? "border-green-400 hover:border-green-500"
 											: ""
 									}`}
+									key={platform.key}
 									onClick={() =>
 										existingLink
 											? handleEditSocialLink(existingLink)
@@ -151,15 +147,16 @@ const SocialLinksTabContent = ({
 											? `Editar ${platform.name}`
 											: `Adicionar ${platform.name}`
 									}
+									variant="outline"
 								>
 									<Image
-										src={platform.icon}
 										alt={platform.name}
-										width={28}
+										className="mb-1 h-7 w-7 sm:mb-1.5"
 										height={28}
-										className="mb-1 sm:mb-1.5 w-7 h-7"
+										src={platform.icon}
+										width={28}
 									/>
-									<span className="text-xs text-center truncate w-full">
+									<span className="w-full truncate text-center text-xs">
 										{platform.name}
 									</span>
 								</Button>
@@ -170,13 +167,13 @@ const SocialLinksTabContent = ({
 			)}
 
 			{selectedPlatform && (
-				<div className="p-4 border rounded-lg space-y-4 bg-muted/20">
+				<div className="space-y-4 rounded-lg border bg-muted/20 p-4">
 					<div className="flex items-center gap-3">
 						<Image
-							src={selectedPlatform.icon}
 							alt={selectedPlatform.name}
-							width={32}
 							height={32}
+							src={selectedPlatform.icon}
+							width={32}
 						/>
 						<h3 className="font-semibold text-lg sm:text-xl">
 							{selectedPlatform.name}
@@ -184,31 +181,31 @@ const SocialLinksTabContent = ({
 					</div>
 					<div>
 						<Label
+							className="text-muted-foreground text-xs sm:text-sm"
 							htmlFor="usernameInput"
-							className="text-xs sm:text-sm text-muted-foreground"
 						>
 							{selectedPlatform.baseUrl}
-							<span className="text-primary font-medium">
+							<span className="font-medium text-primary">
 								{usernameInput || selectedPlatform.placeholder}
 							</span>
 						</Label>
-						<div className="flex items-center gap-2 mt-1">
+						<div className="mt-1 flex items-center gap-2">
 							<Input
+								autoFocus
+								className="flex-grow text-sm sm:text-base"
 								id="usernameInput"
-								type="text"
-								value={usernameInput}
 								onChange={(e) => setUsernameInput(e.target.value)}
 								placeholder={selectedPlatform.placeholder}
-								className="flex-grow text-sm sm:text-base"
-								autoFocus
+								type="text"
+								value={usernameInput}
 							/>
 						</div>
 					</div>
-					<div className="flex flex-col sm:flex-row gap-2 pt-2">
+					<div className="flex flex-col gap-2 pt-2 sm:flex-row">
 						<BaseButton
-							onClick={handleAddOrUpdateSocialLink}
-							className="w-full sm:w-auto flex-grow"
+							className="w-full flex-grow sm:w-auto"
 							loading={isSaving}
+							onClick={handleAddOrUpdateSocialLink}
 						>
 							<span className="flex items-center justify-center">
 								{editingLinkId ? (
@@ -220,9 +217,9 @@ const SocialLinksTabContent = ({
 							</span>
 						</BaseButton>
 						<BaseButton
-							variant="white"
-							onClick={handleCancel}
 							className="w-full sm:w-auto"
+							onClick={handleCancel}
+							variant="white"
 						>
 							<span className="flex items-center justify-center">
 								<X className="mr-2 h-4 w-4" />
@@ -234,64 +231,64 @@ const SocialLinksTabContent = ({
 			)}
 
 			{socialLinks.length > 0 && (
-				<div className="space-y-3 pt-4 border-t">
+				<div className="space-y-3 border-t pt-4">
 					<h4 className="font-medium text-sm sm:text-base">
 						Suas Redes Sociais Adicionadas:
 					</h4>
 					<ul className="space-y-2">
 						{socialLinks.map((link) => {
 							const platform = SOCIAL_PLATFORMS.find(
-								(p) => p.key === link.platform,
+								(p) => p.key === link.platform
 							);
 							return (
 								<li
+									className="flex items-center justify-between rounded-lg border bg-background p-2.5 transition-colors hover:bg-muted/30"
 									key={link.id}
-									className="flex items-center justify-between p-2.5 border rounded-lg bg-background hover:bg-muted/30 transition-colors"
 								>
-									<div className="flex items-center gap-2 sm:gap-3 flex-grow min-w-0">
+									<div className="flex min-w-0 flex-grow items-center gap-2 sm:gap-3">
 										{platform && (
 											<Image
-												src={platform.icon}
 												alt={platform.name}
-												width={24}
+												className="h-6 w-6"
 												height={24}
-												className="w-6 h-6"
+												src={platform.icon}
+												width={24}
 											/>
 										)}
-										<div className="flex flex-col min-w-0">
-											<span className="text-sm font-medium truncate">
+										<div className="flex min-w-0 flex-col">
+											<span className="truncate font-medium text-sm">
 												{platform?.name || link.platform}
 											</span>
 											<a
+												className="truncate text-muted-foreground text-xs hover:underline"
 												href={link.url}
-												target="_blank"
 												rel="noopener noreferrer"
-												className="text-xs text-muted-foreground hover:underline truncate"
+												target="_blank"
 											>
 												{link.username}
 											</a>
 										</div>
 									</div>
-									<div className="flex items-center gap-1 sm:gap-2 ml-2 flex-shrink-0">
+									<div className="ml-2 flex flex-shrink-0 items-center gap-1 sm:gap-2">
 										<Button
-											variant="ghost"
-											size="icon"
 											className="h-8 w-8"
 											onClick={() => handleEditSocialLink(link)}
+											size="icon"
+											variant="ghost"
 										>
 											<Edit className="h-4 w-4" />
 										</Button>
 										<Button
-											variant="ghost"
-											size="icon"
 											className="h-8 w-8 text-destructive hover:text-destructive/80"
-											onClick={() => handleDeleteSocialLink(link.id)}
 											disabled={deletingLinkId === link.id}
+											onClick={() => handleDeleteSocialLink(link.id)}
+											size="icon"
+											variant="ghost"
 										>
 											{deletingLinkId === link.id ? (
 												<Loader2
-													className="animate-spin h-4 w-4"
 													aria-label="Deletando..."
+													className="h-4 w-4 animate-spin"
 												/>
 											) : (
 												<Trash2 className="h-4 w-4" />

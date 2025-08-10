@@ -30,9 +30,10 @@ import SortableItem from "./links.SortableItem";
 
 interface LinksTabContentProps {
 	initialLinks: LinkItem[];
-	mutateLinks: () => Promise<any>;
+	mutateLinks: () => Promise<void>;
 	session: Session | null;
 }
+const urlRegex = /^https?:\/\//;
 
 const LinksTabContent = ({
 	initialLinks,
@@ -50,24 +51,26 @@ const LinksTabContent = ({
 	}, [initialLinks]);
 
 	const handleClickLink = async (id: number) => {
-		try {
-			await fetch(`/api/link-click`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ linkId: id }),
-			});
-			await mutateLinks();
-		} catch (err) {
-			console.error("Erro ao registrar clique:", err);
-		}
+		await fetch("/api/link-click", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ linkId: id }),
+		});
+		await mutateLinks();
 	};
 
 	const handleAddNewLink = async () => {
 		let formatted = newUrl.trim();
-		if (!/^https?:\/\//.test(formatted)) formatted = `https://${formatted}`;
-		if (!isValidUrl(formatted)) return;
 
-		const res = await fetch(`/api/links`, {
+		if (!urlRegex.test(formatted)) {
+			formatted = `https://${formatted}`;
+		}
+
+		if (!isValidUrl(formatted)) {
+			return;
+		}
+
+		const res = await fetch("/api/links", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
@@ -96,55 +99,55 @@ const LinksTabContent = ({
 	const toggleActive = (id: number, isActive: boolean) => {
 		setLinks((prev) =>
 			prev.map((link) =>
-				link.id === id ? { ...link, active: isActive } : link,
-			),
+				link.id === id ? { ...link, active: isActive } : link
+			)
 		);
 		handleLinkUpdate(id, { active: isActive });
 	};
 
 	const toggleSensitive = (id: number) => {
 		const linkToUpdate = links.find((l) => l.id === id);
-		if (!linkToUpdate) return;
+		if (!linkToUpdate) {
+			return;
+		}
 		const newSensitiveState = !linkToUpdate.sensitive;
 		setLinks((prev) =>
 			prev.map((link) =>
-				link.id === id ? { ...link, sensitive: newSensitiveState } : link,
-			),
+				link.id === id ? { ...link, sensitive: newSensitiveState } : link
+			)
 		);
 		handleLinkUpdate(id, { sensitive: newSensitiveState });
 	};
 
 	const startEditing = (id: number) =>
 		setLinks((prev) =>
-			prev.map((link) =>
-				link.id === id ? { ...link, isEditing: true } : link,
-			),
+			prev.map((link) => (link.id === id ? { ...link, isEditing: true } : link))
 		);
 
 	const cancelEditing = (id: number) =>
 		setLinks((prev) =>
 			prev.map((link) =>
-				link.id === id ? { ...link, isEditing: false } : link,
-			),
+				link.id === id ? { ...link, isEditing: false } : link
+			)
 		);
 
 	const handleLinkChange = (
 		id: number,
 		field: "title" | "url",
-		value: string,
+		value: string
 	) => {
 		setLinks((prev) =>
-			prev.map((l) => (l.id === id ? { ...l, [field]: value } : l)),
+			prev.map((l) => (l.id === id ? { ...l, [field]: value } : l))
 		);
 	};
 
 	const saveEditing = async (id: number, title: string, url: string) => {
 		setLinks((prev) =>
 			prev.map((link) =>
-				link.id === id ? { ...link, title, url, isEditing: false } : link,
-			),
+				link.id === id ? { ...link, title, url, isEditing: false } : link
+			)
 		);
-		handleLinkUpdate(id, { title, url });
+		await handleLinkUpdate(id, { title, url });
 	};
 
 	const handleDeleteLink = async (id: number) => {
@@ -163,8 +166,6 @@ const LinksTabContent = ({
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ archived: true }),
 			});
-		} catch (error) {
-			console.error("Erro ao arquivar o link:", error);
 		} finally {
 			await mutateLinks();
 		}
@@ -174,7 +175,7 @@ const LinksTabContent = ({
 		useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
 		useSensor(TouchSensor, {
 			activationConstraint: { delay: 250, tolerance: 5 },
-		}),
+		})
 	);
 
 	const handleDragEnd = async (event: DragEndEvent) => {
@@ -185,7 +186,7 @@ const LinksTabContent = ({
 			const newOrder = arrayMove(links, oldIndex, newIndex);
 			setLinks(newOrder);
 
-			await fetch(`/api/links/reorder`, {
+			await fetch("/api/links/reorder", {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
@@ -201,8 +202,8 @@ const LinksTabContent = ({
 		<div className="space-y-4">
 			{!isAdding && (
 				<BaseButton
-					onClick={() => setIsAdding(true)}
 					className="w-full sm:w-auto"
+					onClick={() => setIsAdding(true)}
 				>
 					<span className="flex items-center justify-center">
 						<Plus className="mr-1 h-4 w-4" />
@@ -213,22 +214,22 @@ const LinksTabContent = ({
 
 			{isAdding && (
 				<AddNewLinkForm
+					isSaveDisabled={!isValidUrl(newUrl) || newTitle.trim().length === 0}
 					newTitle={newTitle}
-					onNewTitleChange={setNewTitle}
 					newUrl={newUrl}
+					onCancel={() => setIsAdding(false)}
+					onNewTitleChange={setNewTitle}
 					onNewUrlChange={setNewUrl}
 					onSave={handleAddNewLink}
-					onCancel={() => setIsAdding(false)}
-					isSaveDisabled={!isValidUrl(newUrl) || newTitle.trim().length === 0}
 				/>
 			)}
 
-			<div className="space-y-4 pt-4 border-t">
+			<div className="space-y-4 border-t pt-4">
 				<DndContext
-					sensors={sensors}
 					collisionDetection={closestCenter}
-					onDragEnd={handleDragEnd}
 					modifiers={[restrictToParentElement]}
+					onDragEnd={handleDragEnd}
+					sensors={sensors}
 				>
 					<SortableContext
 						items={links.map((link) => link.id)}
@@ -236,27 +237,27 @@ const LinksTabContent = ({
 					>
 						{links.length > 0 ? (
 							links.map((link) => (
-								<SortableItem key={link.id} id={link.id}>
+								<SortableItem id={link.id} key={link.id}>
 									{({ listeners, setActivatorNodeRef }) => (
 										<LinkCard
 											link={link}
 											listeners={listeners}
-											setActivatorNodeRef={setActivatorNodeRef}
+											onArchiveLink={handleArchiveLink}
+											onCancelEditing={cancelEditing}
+											onClickLink={handleClickLink}
+											onDeleteLink={handleDeleteLink}
 											onLinkChange={handleLinkChange}
 											onSaveEditing={saveEditing}
-											onCancelEditing={cancelEditing}
 											onStartEditing={startEditing}
 											onToggleActive={toggleActive}
 											onToggleSensitive={toggleSensitive}
-											onArchiveLink={handleArchiveLink}
-											onDeleteLink={handleDeleteLink}
-											onClickLink={handleClickLink}
+											setActivatorNodeRef={setActivatorNodeRef}
 										/>
 									)}
 								</SortableItem>
 							))
 						) : (
-							<p className="text-center text-muted-foreground py-6">
+							<p className="py-6 text-center text-muted-foreground">
 								Você ainda não adicionou nenhum link. Clique em "Adicionar novo
 								link" para começar.
 							</p>
