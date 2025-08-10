@@ -8,6 +8,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	variant?: "default" | "white" | "green";
 	children: ReactNode;
 	fullWidth?: boolean;
+	size?: "default" | "sm" | "lg" | "icon";
 }
 
 export function BaseButton({
@@ -18,6 +19,7 @@ export function BaseButton({
 	disabled,
 	variant = "default",
 	fullWidth,
+	size = "default",
 	...props
 }: ButtonProps) {
 	const Component = asChild ? Slot : "button";
@@ -27,24 +29,30 @@ export function BaseButton({
 		white: "bg-white hover:bg-neutral-200 text-black border border-gray-200",
 		green: "bg-green-500 hover:bg-green-600 text-white",
 	};
+	const sizeClasses = {
+		default: "h-12 px-4 py-2 has-[>svg]:px-3 md:px-6 md:py-3 lg:px-8",
+		sm: "h-10 px-3 py-1.5 has-[>svg]:px-2.5",
+		lg: "h-14 px-6 py-3 has-[>svg]:px-4",
+		icon: "size-9",
+	};
 
 	const disabledClasses = "opacity-50 cursor-not-allowed hover:bg-none";
 
 	return (
 		<Component
-			disabled={asChild ? undefined : disabled || loading}
 			className={cn(
 				fullWidth ? "w-full" : "w-fit",
 				"max-w-full overflow-hidden",
 				"relative inline-flex items-center justify-center",
 				"rounded-xl",
 				"text-sm md:text-base",
-				"h-12 px-4 md:px-6 lg:px-8 py-2 md:py-3 has-[>svg]:px-3",
 				"font-medium transition-colors duration-300",
 				variantClasses[variant],
+				sizeClasses[size],
 				(disabled || loading) && disabledClasses,
-				className,
+				className
 			)}
+			disabled={asChild ? undefined : disabled || loading}
 			{...props}
 		>
 			{children}

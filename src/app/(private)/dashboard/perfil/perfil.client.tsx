@@ -284,16 +284,17 @@ const PerfilClient = () => {
 								)}
 							</div>
 							<BaseButton
-								className="absolute right-0 bottom-0 size-9 rounded-full"
+								className="absolute right-0 bottom-0 rounded-full"
 								disabled={isUploadingImage}
 								onClick={() => {
 									if (!isUploadingImage && profileInputRef.current) {
 										profileInputRef.current.click();
 									}
 								}}
+								size="icon"
 								variant="white"
 							>
-								<Edit className="size-10 h-10 w-10" />
+								<Edit className="h-4 w-4" />
 							</BaseButton>
 							<input
 								accept="image/*"
