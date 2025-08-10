@@ -1,13 +1,7 @@
 "use client";
 
-import { Edit, Loader2 } from "lucide-react";
-import Image from "next/image";
-import { useSession } from "next-auth/react";
-import type { ChangeEvent } from "react";
-import { useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingPage from "@/components/layout/LoadingPage";
-import ToastMessage from "@/components/ToastMessage";
 import {
 	Card,
 	CardContent,
@@ -18,6 +12,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Edit, Loader2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
+import type { ChangeEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface User {
 	name: string;
@@ -37,7 +36,6 @@ const PerfilClient = () => {
 	});
 	const [loading, setLoading] = useState(false);
 	const [isUploadingImage, setIsUploadingImage] = useState(false);
-	const [message, setMessage] = useState("");
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
 	const [profilePreview, setProfilePreview] = useState<string>(
 		session?.user?.image ||
@@ -71,7 +69,6 @@ const PerfilClient = () => {
 				setProfilePreview(currentImage);
 				setOriginalProfileImageUrl(currentImage);
 			} catch {
-				setMessage("Erro ao carregar dados do perfil.");
 				const fallbackUrl =
 					session?.user?.image ||
 					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png";
@@ -85,16 +82,6 @@ const PerfilClient = () => {
 		fetchProfile();
 	}, [session?.user?.id, session?.user?.image]);
 
-	useEffect(() => {
-		if (!message) {
-			return;
-		}
-		const timer = setTimeout(() => setMessage(""), 5000);
-		return () => {
-			clearTimeout(timer);
-		};
-	}, [message]);
-
 	const textChanged =
 		profile.name !== originalProfile.name ||
 		profile.username !== originalProfile.username ||
@@ -107,7 +94,6 @@ const PerfilClient = () => {
 		}
 
 		setIsUploadingImage(true);
-		setMessage("");
 		const formData = new FormData();
 		formData.append("file", file);
 		formData.append("type", "profile");
@@ -125,17 +111,13 @@ const PerfilClient = () => {
 			if (!res.ok) {
 				throw new Error(data.error || "Falha no upload da imagem");
 			}
+
 			if (data.url) {
 				setOriginalProfileImageUrl(data.url);
 			}
-			setMessage("Foto de perfil atualizada com sucesso!");
+
 			return true;
-		} catch (error) {
-			setMessage(
-				`Erro no upload: ${
-					error instanceof Error ? error.message : "Ocorreu um problema"
-				}`
-			);
+		} catch {
 			setProfilePreview(originalProfileImageUrl);
 			return false;
 		} finally {
@@ -159,12 +141,7 @@ const PerfilClient = () => {
 				throw new Error(data.error || "Falha ao atualizar o perfil");
 			}
 			return data.user as User;
-		} catch (error) {
-			setMessage(
-				`Erro ao salvar informações: ${
-					error instanceof Error ? error.message : "Ocorreu um problema"
-				}`
-			);
+		} catch {
 			return null;
 		}
 	};
@@ -190,19 +167,12 @@ const PerfilClient = () => {
 			},
 		};
 
-		try {
-			await updateSession(sessionUpdateData);
-		} catch {
-			setMessage("Erro ao atualizar a sessão local.");
-		}
+		await updateSession(sessionUpdateData);
 	};
 
-	const saveProfileImage = async (): Promise<{
-		success: boolean;
-		message: string;
-	}> => {
+	const saveProfileImage = async (): Promise<boolean> => {
 		if (!selectedProfileFile) {
-			return { success: true, message: "" };
+			return true;
 		}
 
 		const success = await uploadImage(selectedProfileFile);
@@ -210,80 +180,39 @@ const PerfilClient = () => {
 		if (success) {
 			setSelectedProfileFile(null);
 			setProfileImageChanged(false);
-			return { success: true, message: "Foto de perfil atualizada. " };
 		}
 
-		return { success: false, message: "" };
+		return success;
 	};
 
-	const saveProfileText = async (): Promise<{
-		success: boolean;
-		message: string;
-		userData: User | null;
-	}> => {
+	const saveProfileText = async (): Promise<User | null> => {
 		if (!textChanged) {
-			return { success: false, message: "", userData: null };
+			return null;
 		}
 
-		const userData = await updateProfileText();
-
-		if (userData !== null) {
-			setOriginalProfile({
-				name: userData.name,
-				username: userData.username,
-				bio: userData.bio || "",
-			});
-			return {
-				success: true,
-				message: "Informações do perfil atualizadas com sucesso!",
-				userData,
-			};
-		}
-
-		return { success: false, message: "", userData: null };
-	};
-
-	const finalizeUpdate = async (
-		imageSuccess: boolean,
-		textSuccess: boolean,
-		statusMessage: string,
-		updatedUserData: User | null
-	) => {
-		if (imageSuccess || textSuccess) {
-			await updateSessionData(updatedUserData, imageSuccess);
-			setMessage(statusMessage || "Perfil atualizado!");
-			window.location.reload();
-		} else {
-			setMessage(
-				statusMessage || "Nenhuma alteração para salvar ou erro ocorrido."
-			);
-		}
+		return await updateProfileText();
 	};
 
 	const handleSaveProfile = async () => {
-		if (!(session?.user?.id && (textChanged || profileImageChanged))) {
+		if (!(session?.user?.id && hasChanges)) {
 			return;
 		}
 
 		setLoading(true);
-		setMessage("");
 
-		const { success: imageSuccess, message: imageMessage } =
-			await saveProfileImage();
+		const imageSuccess = await saveProfileImage();
+
 		if (!imageSuccess) {
 			setLoading(false);
 			return;
 		}
 
-		const {
-			success: textSuccess,
-			message: textMessage,
-			userData,
-		} = await saveProfileText();
+		const updatedUserData = await saveProfileText();
 
-		const finalMessage = (imageMessage || "") + (textMessage || "");
-
-		await finalizeUpdate(imageSuccess, textSuccess, finalMessage, userData);
+		if (imageSuccess || updatedUserData) {
+			await updateSessionData(updatedUserData, imageSuccess);
+			window.location.reload();
+		}
 
 		setLoading(false);
 	};
@@ -299,7 +228,6 @@ const PerfilClient = () => {
 		}
 
 		if (file.size > 2 * 1024 * 1024) {
-			setMessage("Erro: A foto de perfil deve ter no máximo 2MB.");
 			if (profileInputRef.current) {
 				profileInputRef.current.value = "";
 			}
@@ -325,14 +253,6 @@ const PerfilClient = () => {
 			<header className="flex items-center justify-between">
 				<h2 className="font-bold text-2xl">Perfil</h2>
 			</header>
-
-			{message && (
-				<ToastMessage
-					message={message}
-					onClose={() => setMessage("")}
-					variant={message.includes("Erro") ? "error" : "success"}
-				/>
-			)}
 
 			<Card className="border-none shadow-none">
 				<CardHeader>
@@ -430,14 +350,16 @@ const PerfilClient = () => {
 							value={profile.bio}
 						/>
 					</div>
-					<div className="mt-4 flex justify-end">
-						<BaseButton
-							loading={loading || isUploadingImage || !hasChanges}
-							onClick={handleSaveProfile}
-						>
-							Salvar alterações
-						</BaseButton>
-					</div>
+					{hasChanges && (
+						<div className="mt-4 flex justify-end">
+							<BaseButton
+								loading={loading || isUploadingImage}
+								onClick={handleSaveProfile}
+							>
+								Salvar alterações
+							</BaseButton>
+						</div>
+					)}
 				</CardContent>
 			</Card>
 		</section>
