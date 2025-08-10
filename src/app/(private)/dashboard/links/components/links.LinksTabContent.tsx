@@ -30,7 +30,7 @@ import SortableItem from "./links.SortableItem";
 
 interface LinksTabContentProps {
 	initialLinks: LinkItem[];
-	mutateLinks: () => Promise<void>;
+	mutateLinks: () => Promise<any>;
 	session: Session | null;
 }
 const urlRegex = /^https?:\/\//;

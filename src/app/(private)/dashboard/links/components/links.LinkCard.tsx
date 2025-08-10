@@ -26,7 +26,6 @@ import { getIconForUrl } from "../utils/links.helpers";
 
 interface LinkCardProps {
 	link: LinkItem;
-	// biome-ignore lint/suspicious/noExplicitAny: Aqui se pede para renomear any para outro tipo, mas qualquer tipo quebra o resto do código #analisar
 	listeners: any;
 	setActivatorNodeRef: (element: HTMLElement | null) => void;
 	onLinkChange: (id: number, field: "title" | "url", value: string) => void;

@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 
 interface SocialLinksTabContentProps {
 	initialSocialLinks: SocialLinkItem[];
-	mutateSocialLinks: () => Promise<void>;
+	mutateSocialLinks: () => Promise<any>;
 	session: Session | null;
 }
 
