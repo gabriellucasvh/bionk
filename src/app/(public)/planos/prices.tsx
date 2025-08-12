@@ -10,7 +10,6 @@ const pricingPlans = [
 		name: "Free",
 		description: "Comece sua presença digital sem custos!",
 		monthlyPrice: 0,
-		annualPrice: 0,
 		label: "Comece Gratuitamente",
 		link: "/registro",
 		features: [
@@ -26,7 +25,6 @@ const pricingPlans = [
 		name: "Basic",
 		description: "Aprimore sua página e se destaque.",
 		monthlyPrice: 10,
-		annualPrice: 80,
 		label: "Assinar agora",
 		link: "/registro",
 		features: [
@@ -43,8 +41,7 @@ const pricingPlans = [
 		name: "Pro",
 		star: <Star className=" text-yellow-400" size={18} />,
 		description: "Para quem quer personalização total e mais insights.",
-		monthlyPrice: 22,
-		annualPrice: 176,
+		monthlyPrice: 20,
 		label: "Assinar agora",
 		link: "/registro",
 		features: [
@@ -61,8 +58,7 @@ const pricingPlans = [
 	{
 		name: "Premium",
 		description: "Suporte prioritário e insights completos.",
-		monthlyPrice: 65,
-		annualPrice: 520,
+		monthlyPrice: 60,
 		label: "Assinar agora",
 		link: "/registro",
 		features: [
@@ -130,56 +126,66 @@ interface PricingCardProps {
 	billingCycle: "M" | "A";
 }
 
-const PricingCard = ({ plan, billingCycle }: PricingCardProps) => (
-	<div
-		className={cn(
-			"flex flex-col overflow-hidden rounded-2xl shadow-xl",
-			plan.isPro ? "scale-105" : ""
-		)}
-	>
-		{/* Cabeçalho */}
-		<div className={cn("p-6 text-center", plan.topColor)}>
-			<h3 className="flex items-center gap-2 font-extrabold text-2xl text-white">
-				{plan.name}
-				{plan.star}
-			</h3>
-			<p className="mt-2 text-start text-white/90">{plan.description}</p>
-		</div>
+const PricingCard = ({ plan, billingCycle }: PricingCardProps) => {
+	// Calcula o preço com desconto para planos anuais (20% off)
+	const price =
+		billingCycle === "M" ? plan.monthlyPrice : Math.round(plan.monthlyPrice * 0.8);
 
-		{/* Conteúdo principal */}
+	return (
 		<div
 			className={cn(
-				"flex flex-col justify-between p-8 text-center",
-				plan.baseColor,
-				"flex-1 text-white"
+				"flex flex-col overflow-hidden rounded-2xl shadow-xl",
+				plan.isPro ? "scale-105" : ""
 			)}
 		>
-			<div>
-				<p className="mb-8 font-extrabold text-4xl">
-					R$
-					{billingCycle === "M" ? plan.monthlyPrice : plan.annualPrice}
-					<span className="ml-1 font-medium text-lg">
-						/{billingCycle === "M" ? "mês" : "ano"}
-					</span>
-				</p>
-				<Link
-					className="block w-full rounded-xl bg-white py-3 font-bold text-gray-900 transition-colors duration-100 hover:bg-gray-200"
-					href={plan.link}
-				>
-					{plan.label}
-				</Link>
+			{/* Cabeçalho */}
+			<div className={cn("p-6 text-center", plan.topColor)}>
+				<h3 className="flex items-center gap-2 font-extrabold text-2xl text-white">
+					{plan.name}
+					{plan.star}
+				</h3>
+				<p className="mt-2 text-start text-white/90">{plan.description}</p>
 			</div>
-			<div className="mt-10 space-y-3 text-left">
-				{plan.features.map((feature) => (
-					<div className="flex items-center gap-3" key={feature}>
-						<Check className="text-white" size={18} />
-						<span>{feature}</span>
-					</div>
-				))}
+
+			{/* Conteúdo principal */}
+			<div
+				className={cn(
+					"flex flex-col justify-between p-8 text-center",
+					plan.baseColor,
+					"flex-1 text-white"
+				)}
+			>
+				<div>
+					<p className="mb-8 font-extrabold text-4xl">
+						R${price}
+						<span className="ml-1 font-medium text-lg">
+							/mês
+							{billingCycle === "A" && plan.monthlyPrice > 0 && (
+								<span className="mt-1 block font-normal text-sm">
+									(com desconto anual)
+								</span>
+							)}
+						</span>
+					</p>
+					<Link
+						className="block w-full rounded-xl bg-white py-3 font-bold text-gray-900 transition-colors duration-100 hover:bg-gray-200"
+						href={plan.link}
+					>
+						{plan.label}
+					</Link>
+				</div>
+				<div className="mt-10 space-y-3 text-left">
+					{plan.features.map((feature) => (
+						<div className="flex items-center gap-3" key={feature}>
+							<Check className="text-white" size={18} />
+							<span>{feature}</span>
+						</div>
+					))}
+				</div>
 			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 const Pricing = () => {
 	const [billingCycle, setBillingCycle] = useState<"M" | "A">("M");
