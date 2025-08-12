@@ -27,7 +27,7 @@ export function BaseButton({
 	const variantClasses = {
 		default: "bg-lime-400 hover:bg-lime-500 text-black",
 		white: "bg-white hover:bg-neutral-200 text-black border border-gray-200",
-		green: "bg-green-500 hover:bg-green-600 text-white",
+		green: "bg-green-500 hover:bg-green-600 text-white border border-green-500",
 	};
 	const sizeClasses = {
 		default: "h-12 px-4 py-2 has-[>svg]:px-3 md:px-6 md:py-3 lg:px-8",
