@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./node_modules/@prisma/client"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -9,29 +9,29 @@ datasource db {
 }
 
 model User {
-  id                            String        @id @default(uuid())
+  id                            String         @id @default(uuid())
   name                          String?
-  username                      String        @unique
-  email                         String        @unique
+  username                      String         @unique
+  email                         String         @unique
   bio                           String?
   provider                      String?
   emailVerified                 DateTime?
-  image                         String?       @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")
+  image                         String?        @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")
   bannerUrl                     String?
   hashedPassword                String?
-  createdAt                     DateTime      @default(now())
-  template                      String        @default("default")
-  templateCategory              String        @default("minimalista")
+  createdAt                     DateTime       @default(now())
+  template                      String         @default("default")
+  templateCategory              String         @default("minimalista")
   passwordResetExpires          DateTime?
-  passwordResetToken            String?       @unique
-  emailVerificationToken        String?       @unique
+  passwordResetToken            String?        @unique
+  emailVerificationToken        String?        @unique
   emailVerificationTokenExpires DateTime?
-  newEmailPending               String?       @unique
-  verificationToken             String?       @unique
+  newEmailPending               String?        @unique
+  verificationToken             String?        @unique
   verificationTokenExpiry       DateTime?
-  registrationOtp               String?       @unique
+  registrationOtp               String?        @unique
   registrationOtpExpiry         DateTime?
-  registrationOtpAttempts       Int           @default(0)
+  registrationOtpAttempts       Int            @default(0)
   registrationOtpBlockedUntil   DateTime?
   googleId                      String?
   accounts                      Account[]
@@ -39,6 +39,7 @@ model User {
   ProfileView                   ProfileView[]
   sessions                      Session[]
   SocialLink                    SocialLink[]
+  CustomPresets                 CustomPresets?
 }
 
 model Account {
@@ -124,4 +125,17 @@ model ProfileView {
   userId    String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CustomPresets {
+  id                       String @id @default(uuid())
+  userId                   String @unique
+  customBackgroundColor    String
+  customBackgroundGradient String
+  customTextColor          String
+  customFont               String
+  customButton             String
+  customButtonFill         String
+  customButtonCorners      String
+  user                     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
