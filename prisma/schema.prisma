@@ -128,14 +128,14 @@ model ProfileView {
 }
 
 model CustomPresets {
-  id                       String @id @default(uuid())
-  userId                   String @unique
-  customBackgroundColor    String
-  customBackgroundGradient String
-  customTextColor          String
-  customFont               String
-  customButton             String
-  customButtonFill         String
-  customButtonCorners      String
-  user                     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                       String  @id @default(uuid())
+  userId                   String  @unique
+  customBackgroundColor    String? @default("")
+  customBackgroundGradient String? @default("")
+  customTextColor          String? @default("")
+  customFont               String? @default("")
+  customButton             String? @default("")
+  customButtonFill         String? @default("")
+  customButtonCorners      String? @default("")
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

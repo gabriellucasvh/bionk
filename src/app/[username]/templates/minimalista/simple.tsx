@@ -4,7 +4,6 @@ import BaseTemplate from "../components/BaseTemplate";
 export default function DefaultTemplate({ user }: TemplateComponentProps) {
 	return (
 		<BaseTemplate
-			user={user}
 			classNames={{
 				theme: "dark",
 				wrapper:
@@ -20,6 +19,8 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
 				footer:
 					"max-w-md mx-auto mt-10 text-green-800 text-sm font-bold border-t border-green-600 pt-4 w-full text-center",
 			}}
+			customPresets={user.CustomPresets || undefined}
+			user={user}
 		/>
 	);
 }

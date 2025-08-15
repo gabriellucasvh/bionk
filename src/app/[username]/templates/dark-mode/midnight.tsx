@@ -4,7 +4,6 @@ import BaseTemplate from "../components/BaseTemplate";
 export default function DarkIndigoTemplate({ user }: TemplateComponentProps) {
 	return (
 		<BaseTemplate
-			user={user}
 			classNames={{
 				theme: "dark",
 				wrapper:
@@ -18,6 +17,8 @@ export default function DarkIndigoTemplate({ user }: TemplateComponentProps) {
 				footer:
 					"max-w-md mx-auto mt-10 text-white text-sm font-bold border-t border-white pt-4 w-full text-center",
 			}}
+			customPresets={user.CustomPresets || undefined}
+			user={user}
 		/>
 	);
 }

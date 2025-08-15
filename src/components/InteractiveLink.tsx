@@ -2,7 +2,8 @@
 
 import { Eye } from "lucide-react";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface InteractiveLinkProps {
@@ -11,6 +12,7 @@ interface InteractiveLinkProps {
 	children: React.ReactNode;
 	sensitive?: boolean;
 	className?: string;
+	style?: React.CSSProperties; // Adicionando a prop style
 }
 
 const InteractiveLink: React.FC<InteractiveLinkProps> = ({
@@ -19,6 +21,7 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
 	children,
 	sensitive,
 	className = "",
+	style = {}, // Valor padrão vazio
 }) => {
 	const [unblurred, setUnblurred] = useState(false);
 	const [isTouch, setIsTouch] = useState(false);
@@ -46,37 +49,38 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: data,
-			}).catch((error) => console.error("Erro ao registrar clique:", error));
+			});
 		}
 	};
 
 	return (
 		<Link
-			href={href}
-			target="_blank"
-			rel="noopener noreferrer"
-			onClick={handleClick}
 			className={twMerge(
-				`relative flex items-center justify-center w-full p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all text-start font-medium border border-gray-100 ${
-					sensitive ? "border-red-200 group overflow-hidden" : ""
-				} ${className}`,
+				`relative flex w-full items-center justify-center rounded-lg border border-gray-100 bg-white p-4 text-start font-medium shadow-sm transition-all hover:shadow-md ${
+					sensitive ? "group overflow-hidden border-red-200" : ""
+				} ${className}`
 			)}
+			href={href}
+			onClick={handleClick}
+			rel="noopener noreferrer"
+			style={style}
+			target="_blank" // Aplicando a prop style
 		>
 			{sensitive && (
-				<div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none transition-all duration-300">
+				<div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center transition-all duration-300">
 					<div
 						className={twMerge(
-							"absolute inset-0 rounded-lg backdrop-blur-md bg-black/20 transition-all duration-300",
+							"absolute inset-0 rounded-lg bg-black/20 backdrop-blur-md transition-all duration-300",
 							(!isTouch &&
-								"group-hover:backdrop-blur-none group-hover:bg-transparent") ||
-								(isTouch && unblurred && "backdrop-blur-none bg-transparent"),
+								"group-hover:bg-transparent group-hover:backdrop-blur-none") ||
+								(isTouch && unblurred && "bg-transparent backdrop-blur-none")
 						)}
 					/>
 					<span
 						className={twMerge(
-							"z-30 flex items-center gap-2 text-sm font-semibold text-white bg-black/60 px-3 py-1 rounded-md transition-opacity duration-300",
+							"z-30 flex items-center gap-2 rounded-md bg-black/60 px-3 py-1 font-semibold text-sm text-white transition-opacity duration-300",
 							(!isTouch && "group-hover:opacity-0") ||
-								(isTouch && unblurred && "opacity-0"),
+								(isTouch && unblurred && "opacity-0")
 						)}
 					>
 						<Eye size={16} />
@@ -85,7 +89,7 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
 				</div>
 			)}
 
-			<span className="relative z-10 break-words whitespace-pre-wrap w-full">
+			<span className="relative z-10 w-full whitespace-pre-wrap break-words">
 				{children}
 			</span>
 		</Link>

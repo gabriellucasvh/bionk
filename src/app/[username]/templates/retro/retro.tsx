@@ -4,7 +4,6 @@ import BaseTemplate from "../components/BaseTemplate";
 export default function SoftRetroTemplate({ user }: TemplateComponentProps) {
 	return (
 		<BaseTemplate
-			user={user}
 			classNames={{
 				theme: "light",
 				wrapper:
@@ -20,6 +19,8 @@ export default function SoftRetroTemplate({ user }: TemplateComponentProps) {
 				footer:
 					"max-w-md mx-auto mt-10 text-[#3d405b] text-sm font-bold border-t border-[#3d405b] pt-4 w-full text-center",
 			}}
+			customPresets={user.CustomPresets || undefined}
+			user={user}
 		/>
 	);
 }

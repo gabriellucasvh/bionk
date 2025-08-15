@@ -1,15 +1,16 @@
 // src/app/[username]/page.tsx
 
+import prisma from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ComponentType } from "react";
-import prisma from "@/lib/prisma";
 
 type UserProfileData = Prisma.UserGetPayload<{
 	include: {
 		Link: { where: { active: true }; orderBy: { order: "asc" } };
 		SocialLink: { orderBy: { platform: "asc" } };
+		CustomPresets: true;
 	};
 }>;
 
@@ -39,6 +40,7 @@ export default async function UserPage({ params }: PageProps) {
 			SocialLink: {
 				orderBy: { platform: "asc" },
 			},
+			CustomPresets: true,
 		},
 	})) as UserProfileData | null;
 
@@ -59,7 +61,7 @@ export default async function UserPage({ params }: PageProps) {
 			user: UserProfileData;
 		}>;
 	} catch {
-		const mod = await import(`@/app/[username]/templates/minimalista/default`);
+		const mod = await import("@/app/[username]/templates/minimalista/default");
 		TemplateComponent = mod.default as ComponentType<{
 			user: UserProfileData;
 		}>;

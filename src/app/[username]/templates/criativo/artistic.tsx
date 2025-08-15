@@ -4,7 +4,6 @@ import BaseTemplate from "../components/BaseTemplate";
 export default function ArtisticTemplate({ user }: TemplateComponentProps) {
 	return (
 		<BaseTemplate
-			user={user}
 			classNames={{
 				theme: "light",
 				wrapper:
@@ -19,6 +18,8 @@ export default function ArtisticTemplate({ user }: TemplateComponentProps) {
 				footer:
 					"max-w-md mx-auto mt-12 relative w-full text-center font-serif text-[#8d6e63] text-sm italic",
 			}}
+			customPresets={user.CustomPresets || undefined}
+			user={user}
 			// children para as decorações e detalhes extras do header/footer podem ser implementados aqui se desejar.
 		/>
 	);

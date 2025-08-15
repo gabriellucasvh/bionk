@@ -4,7 +4,6 @@ import BaseTemplate from "../components/BaseTemplate";
 export default function SoftNeutralTemplate({ user }: TemplateComponentProps) {
 	return (
 		<BaseTemplate
-			user={user}
 			classNames={{
 				theme: "light",
 				wrapper:
@@ -20,6 +19,8 @@ export default function SoftNeutralTemplate({ user }: TemplateComponentProps) {
 				footer:
 					"max-w-md mx-auto mt-10 text-neutral-600 text-sm font-bold border-t border-neutral-300 pt-4 w-full text-center",
 			}}
+			customPresets={user.CustomPresets || undefined}
+			user={user}
 		/>
 	);
 }

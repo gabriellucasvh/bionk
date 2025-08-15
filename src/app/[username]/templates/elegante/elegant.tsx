@@ -4,7 +4,6 @@ import BaseTemplate from "../components/BaseTemplate";
 export default function ElegantTemplate({ user }: TemplateComponentProps) {
 	return (
 		<BaseTemplate
-			user={user}
 			classNames={{
 				theme: "light",
 				wrapper:
@@ -19,6 +18,8 @@ export default function ElegantTemplate({ user }: TemplateComponentProps) {
 				footer:
 					"max-w-md mx-auto mt-14 text-center w-full inline-block px-6 py-2 border border-neutral-300 text-neutral-700 bg-white/70 backdrop-blur-md rounded-md font-serif text-sm shadow-md",
 			}}
+			customPresets={user.CustomPresets || undefined}
+			user={user}
 		/>
 	);
 }

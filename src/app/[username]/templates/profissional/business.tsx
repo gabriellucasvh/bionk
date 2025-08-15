@@ -4,7 +4,6 @@ import BaseTemplate from "../components/BaseTemplate";
 export default function BusinessTemplate({ user }: TemplateComponentProps) {
 	return (
 		<BaseTemplate
-			user={user}
 			classNames={{
 				theme: "light",
 				wrapper: "bg-gradient-to-br from-blue-50 to-blue-100 text-gray-900",
@@ -17,6 +16,8 @@ export default function BusinessTemplate({ user }: TemplateComponentProps) {
 				footer:
 					"text-blue-800 text-sm font-bold border-t border-blue-800 pt-4 w-full text-center",
 			}}
+			customPresets={user.CustomPresets || undefined}
+			user={user}
 		/>
 	);
 }

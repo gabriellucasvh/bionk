@@ -8,7 +8,13 @@ import { useEffect, useState } from "react";
 import { CATEGORIES } from "../data/personalizar.data";
 import VerPerfilMobile from "./personalizar.VerPerfilMobile";
 
-export default function TemplateSettings() {
+interface TemplateSettingsProps {
+	onTemplateChange?: () => void; // Callback para notificar mudança de template
+}
+
+export default function TemplateSettings({
+	onTemplateChange,
+}: TemplateSettingsProps = {}) {
 	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 	const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 	const [currentTemplate, setCurrentTemplate] = useState<{
@@ -18,9 +24,10 @@ export default function TemplateSettings() {
 	const [isSaving, setIsSaving] = useState<boolean>(false);
 
 	useEffect(() => {
-		const fetchUserTemplate = async () => {
+		const fetchTemplate = async () => {
 			const response = await fetch("/api/user-template");
 			const data = await response.json();
+
 			if (data.template) {
 				setCurrentTemplate({
 					template: data.template,
@@ -29,7 +36,7 @@ export default function TemplateSettings() {
 			}
 		};
 
-		fetchUserTemplate();
+		fetchTemplate();
 	}, []);
 
 	const handleSave = async () => {
@@ -57,6 +64,13 @@ export default function TemplateSettings() {
 					template: selectedTemplate,
 					templateCategory: selectedCategory,
 				});
+
+				// Notificar o componente pai sobre a mudança de template
+				if (onTemplateChange) {
+					onTemplateChange();
+				}
+
+				// Recarregar a página para refletir as mudanças
 				window.location.reload();
 			}
 		} finally {
@@ -74,7 +88,11 @@ export default function TemplateSettings() {
 			<div className="mb-10 flex flex-wrap gap-2">
 				{Object.keys(CATEGORIES).map((category) => (
 					<Button
-						className={`rounded-lg border-2 px-6 py-3 font-medium text-sm transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white md:py-5 ${selectedCategory === category ? "border-lime-500 bg-green-950 text-white" : ""}`}
+						className={`rounded-lg border-2 px-6 py-3 font-medium text-sm transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white md:py-5 ${
+							selectedCategory === category
+								? "border-lime-500 bg-green-950 text-white"
+								: ""
+						}`}
 						key={category}
 						onClick={() => setSelectedCategory(category)}
 						variant="ghost"
@@ -88,19 +106,29 @@ export default function TemplateSettings() {
 				<div className="mt-4">
 					<div className="mb-10 flex flex-col items-start gap-4 md:flex-row md:items-center">
 						<h2 className="font-semibold text-xl">Templates Disponíveis</h2>
-						{/* O botão de salvar para desktop permanece aqui */}
-						<BaseButton
-							loading={!selectedTemplate || isSaving}
-							onClick={handleSave}
-						>
-							Salvar Template
-						</BaseButton>
+						<div className="flex items-center gap-2">
+							<BaseButton
+								loading={!selectedTemplate || isSaving}
+								onClick={handleSave}
+							>
+								{isSaving ? "Salvando..." : "Salvar Template"}
+							</BaseButton>
+							{selectedTemplate && (
+								<p className="text-orange-600 text-sm">
+									⚠️ Isso resetará suas personalizações
+								</p>
+							)}
+						</div>
 					</div>
 					<div className="grid grid-cols-2 gap-4 md:grid-cols-3">
 						{CATEGORIES[selectedCategory as keyof typeof CATEGORIES]?.map(
 							(template) => (
 								<div
-									className={`cursor-pointer rounded-lg border-2 p-2 ${selectedTemplate === template.id ? "border-green-600" : "border-gray-300 hover:border-green-400"}`}
+									className={`cursor-pointer rounded-lg border-2 p-2 transition-all ${
+										selectedTemplate === template.id
+											? "border-green-600 bg-green-50"
+											: "border-gray-300 hover:border-green-400 hover:bg-gray-50"
+									}`}
 									key={template.id}
 								>
 									<Button
@@ -117,7 +145,9 @@ export default function TemplateSettings() {
 											unoptimized
 											width={200}
 										/>
-										<p className="mt-2 text-center text-sm">{template.name}</p>
+										<p className="mt-2 text-center font-medium text-sm">
+											{template.name}
+										</p>
 									</Button>
 								</div>
 							)
@@ -130,8 +160,6 @@ export default function TemplateSettings() {
 
 	return (
 		<div>
-			{/* Tema atual para telas grandes */}
-
 			{currentTemplate && (
 				<div className="mb-6 md:inline-block">
 					<span className="rounded-full bg-green-100 px-4 py-2 font-medium text-green-800 text-sm">
@@ -146,12 +174,11 @@ export default function TemplateSettings() {
 					</span>
 				</div>
 			)}
-			{/* Componente móvel para gerenciar o botão e o modal */}
+
 			<div className="flex items-center justify-center">
 				<VerPerfilMobile />
 			</div>
 
-			{/* Conteúdo para telas grandes */}
 			<div className="block">{renderContent()}</div>
 		</div>
 	);

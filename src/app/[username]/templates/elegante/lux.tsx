@@ -4,7 +4,6 @@ import BaseTemplate from "../components/BaseTemplate";
 export default function LuxuryTemplate({ user }: TemplateComponentProps) {
 	return (
 		<BaseTemplate
-			user={user}
 			classNames={{
 				theme: "dark",
 				wrapper:
@@ -19,6 +18,8 @@ export default function LuxuryTemplate({ user }: TemplateComponentProps) {
 				footer:
 					"max-w-md mx-auto mt-14 text-center w-full inline-block px-6 py-2 border border-yellow-400 text-white bg-yellow-400/10 backdrop-blur-xl rounded-lg font-medium tracking-wide shadow-[0_0_15px_rgba(212,175,55,0.4)]",
 			}}
+			customPresets={user.CustomPresets || undefined}
+			user={user}
 		/>
 	);
 }

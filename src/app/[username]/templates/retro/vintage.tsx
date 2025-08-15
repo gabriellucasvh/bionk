@@ -4,7 +4,6 @@ import BaseTemplate from "../components/BaseTemplate";
 export default function VintageTemplate({ user }: TemplateComponentProps) {
 	return (
 		<BaseTemplate
-			user={user}
 			classNames={{
 				theme: "light",
 				wrapper:
@@ -19,6 +18,8 @@ export default function VintageTemplate({ user }: TemplateComponentProps) {
 				footer:
 					"max-w-md mx-auto mt-10 text-amber-800 text-sm font-bold border-t border-amber-600 pt-4 w-full text-center",
 			}}
+			customPresets={user.CustomPresets || undefined}
+			user={user}
 		/>
 	);
 }
