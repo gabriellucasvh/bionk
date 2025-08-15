@@ -1,5 +1,6 @@
 "use client";
 
+import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
@@ -214,10 +215,10 @@ export default function CustomizationPanel({
 			{/* Fonte */}
 			<div className="mb-8">
 				<Label className="mb-3 block">Fonte</Label>
-				<div className="flex gap-1">
+				<div className="flex flex-wrap gap-2">
 					{FONT_OPTIONS.map((font) => (
 						<button
-							className={`rounded border px-4 py-2 ${
+							className={`whitespace-nowrap rounded border px-4 py-2 ${
 								customizations.customFont === font.value
 									? "border-blue-500 bg-blue-50"
 									: "border-gray-200"
@@ -235,10 +236,10 @@ export default function CustomizationPanel({
 			{/* Estilo do Botão */}
 			<div className="mb-8">
 				<Label className="mb-3 block">Estilo do Botão</Label>
-				<div className="flex gap-1">
+				<div className="flex flex-wrap gap-2">
 					{BUTTON_STYLES.map((style) => (
 						<button
-							className={`rounded border px-4 py-2 ${
+							className={`whitespace-nowrap rounded border px-4 py-2 ${
 								customizations.customButton === style.value
 									? "border-blue-500 bg-blue-50"
 									: "border-gray-200"
@@ -256,10 +257,10 @@ export default function CustomizationPanel({
 			{/* Cantos do Botão */}
 			<div className="mb-8">
 				<Label className="mb-3 block">Cantos do Botão</Label>
-				<div className="flex gap-1">
+				<div className="flex flex-wrap gap-2">
 					{BUTTON_CORNERS.map((radius) => (
 						<button
-							className={`rounded border px-4 py-2 ${
+							className={`whitespace-nowrap rounded border px-4 py-2 ${
 								customizations.customButtonCorners === radius
 									? "border-blue-500 bg-blue-50"
 									: "border-gray-200"
@@ -276,15 +277,10 @@ export default function CustomizationPanel({
 
 			{/* Salvar pendências */}
 			{Object.keys(pendingChanges).length > 0 && (
-				<div className="mb-4 flex justify-end">
-					<div className="rounded border border-yellow-200 bg-yellow-50 p-3">
-						<p className="mb-2 text-sm text-yellow-700">
-							Você tem mudanças não salvas
-						</p>
-						<Button disabled={isSaving} onClick={handleSavePending} size="sm">
-							{isSaving ? "Salvando..." : "Salvar Mudanças"}
-						</Button>
-					</div>
+				<div className="mb-10 flex">
+					<BaseButton disabled={isSaving} onClick={handleSavePending} size="sm">
+						{isSaving ? "Salvando..." : "Salvar Mudanças"}
+					</BaseButton>
 				</div>
 			)}
 		</div>

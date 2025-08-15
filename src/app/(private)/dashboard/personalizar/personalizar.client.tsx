@@ -82,7 +82,7 @@ const PersonalizarClient = () => {
 			<section className="flex min-h-screen flex-col gap-6 px-6 py-8">
 				{/* Seção de Templates */}
 				<section className="">
-					<h2 className="mb-4 hidden font-bold text-lg md:text-2xl lg:block">
+					<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block">
 						Templates:
 					</h2>
 					<CategoriasTemplates onTemplateChange={handleTemplateChange} />
@@ -90,15 +90,10 @@ const PersonalizarClient = () => {
 
 				{/* Seção de Personalização */}
 				<section className="mt-6 border-t pt-6">
-					<h2 className="mb-4 hidden font-bold text-lg md:text-2xl lg:block">
+					<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block">
 						Personalização:
 					</h2>
-					<div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-						<p className="text-sm text-yellow-700">
-							🎨 <strong>Dica:</strong> Cada mudança é salva automaticamente.
-							Personalize cores, fontes e estilos do seu perfil.
-						</p>
-					</div>
+
 					<CustomizationPanel
 						onSave={handleSaveCustomizations}
 						userCustomizations={userCustomizations}
