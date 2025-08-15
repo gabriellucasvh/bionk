@@ -85,13 +85,6 @@ const PersonalizarClient = () => {
 					<h2 className="mb-4 hidden font-bold text-lg md:text-2xl lg:block">
 						Templates:
 					</h2>
-					{/* Adicionar aviso sobre reset */}
-					<div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-						<p className="text-blue-700 text-sm">
-							ℹ️ <strong>Importante:</strong> Ao selecionar um novo template,
-							suas personalizações customizadas serão resetadas.
-						</p>
-					</div>
 					<CategoriasTemplates onTemplateChange={handleTemplateChange} />
 				</section>
 
