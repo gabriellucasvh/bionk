@@ -27,19 +27,19 @@ model User {
   emailVerificationToken        String?        @unique
   emailVerificationTokenExpires DateTime?
   newEmailPending               String?        @unique
-  verificationToken             String?        @unique
-  verificationTokenExpiry       DateTime?
   registrationOtp               String?        @unique
-  registrationOtpExpiry         DateTime?
   registrationOtpAttempts       Int            @default(0)
   registrationOtpBlockedUntil   DateTime?
+  registrationOtpExpiry         DateTime?
+  verificationToken             String?        @unique
+  verificationTokenExpiry       DateTime?
   googleId                      String?
   accounts                      Account[]
+  CustomPresets                 CustomPresets?
   Link                          Link[]
   ProfileView                   ProfileView[]
   sessions                      Session[]
   SocialLink                    SocialLink[]
-  CustomPresets                 CustomPresets?
 }
 
 model Account {
