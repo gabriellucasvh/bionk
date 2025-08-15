@@ -277,7 +277,7 @@ export default function CustomizationPanel({
 
 			{/* Salvar pendências */}
 			{Object.keys(pendingChanges).length > 0 && (
-				<div className="mb-10 flex">
+				<div className="mb-14 flex">
 					<BaseButton disabled={isSaving} onClick={handleSavePending} size="sm">
 						{isSaving ? "Salvando..." : "Salvar Mudanças"}
 					</BaseButton>
