@@ -2,10 +2,10 @@
 
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
+import { RenderLabel } from "./components/personalizar.RenderLabel";
 
 // Interface atualizada
 interface CustomizationPanelProps {
@@ -72,7 +72,6 @@ const FIELD_TO_PICKER: Record<string, "background" | "text" | "button"> = {
 // Função debounce customizada
 function useDebounce(fn: (...args: any[]) => void, delay: number) {
 	const timeout = useRef<NodeJS.Timeout | null>(null);
-
 	return (...args: any[]) => {
 		if (timeout.current) {
 			clearTimeout(timeout.current);
@@ -94,18 +93,25 @@ export default function CustomizationPanel({
 	>({});
 	const [isSaving, setIsSaving] = useState(false);
 
+	useEffect(() => {
+		setCustomizations(userCustomizations);
+		setPendingChanges({});
+	}, [userCustomizations]);
+
 	const handleChange = (field: keyof typeof customizations, value: string) => {
-		const newChange: Partial<typeof customizations> = { [field]: value };
+		const newValue = value;
+		setCustomizations((prev) => ({ ...prev, [field]: newValue }));
 
-		if (field === "customBackgroundColor" && value) {
-			newChange.customBackgroundGradient = "";
+		// Se o valor voltou ao original, remove do pendingChanges
+		if (newValue === userCustomizations[field]) {
+			setPendingChanges((prev) => {
+				const updated = { ...prev };
+				delete updated[field];
+				return updated;
+			});
+		} else {
+			setPendingChanges((prev) => ({ ...prev, [field]: newValue }));
 		}
-		if (field === "customBackgroundGradient" && value) {
-			newChange.customBackgroundColor = "";
-		}
-
-		setCustomizations((prev) => ({ ...prev, ...newChange }));
-		setPendingChanges((prev) => ({ ...prev, ...newChange }));
 	};
 
 	const debouncedHandleChange = useDebounce(handleChange, 300);
@@ -114,7 +120,6 @@ export default function CustomizationPanel({
 		if (!Object.keys(pendingChanges).length) {
 			return;
 		}
-
 		setIsSaving(true);
 		try {
 			await onSave(pendingChanges);
@@ -124,12 +129,18 @@ export default function CustomizationPanel({
 		}
 	};
 
+	// Função auxiliar para verificar se um campo tem alterações pendentes
+	const hasPendingChange = (field: keyof typeof customizations) =>
+		pendingChanges[field] !== undefined &&
+		customizations[field] !== userCustomizations[field];
+
 	const renderColorSelector = (
-		field: keyof typeof customizations,
+		field: "customBackgroundColor" | "customTextColor" | "customButtonFill",
 		label: string
 	) => (
 		<div className="mb-8">
-			<Label className="mb-3 block">{label}</Label>
+			{/* Agora passamos a prop 'hasPending' diretamente */}
+			<RenderLabel hasPending={hasPendingChange(field)} text={label} />
 			<div className="mb-3 flex gap-1">
 				<button
 					className="flex h-10 w-10 items-center justify-center rounded-full"
@@ -154,7 +165,7 @@ export default function CustomizationPanel({
 					<button
 						className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
 							customizations[field] === color
-								? "border-blue-500"
+								? "border-2 border-lime-700"
 								: "border-gray-200 hover:border-blue-500"
 						}`}
 						key={color}
@@ -190,8 +201,12 @@ export default function CustomizationPanel({
 	return (
 		<div className="mt-8">
 			{renderColorSelector("customBackgroundColor", "Cor de Fundo")}
+
 			<div className="mb-8">
-				<Label className="mb-3 block">Gradiente de Fundo</Label>
+				<RenderLabel
+					hasPending={hasPendingChange("customBackgroundGradient")}
+					text="Gradiente de Fundo"
+				/>
 				<div className="flex gap-1">
 					{GRADIENTS.map((gradient) => (
 						<button
@@ -214,14 +229,14 @@ export default function CustomizationPanel({
 
 			{/* Fonte */}
 			<div className="mb-8">
-				<Label className="mb-3 block">Fonte</Label>
+				<RenderLabel hasPending={hasPendingChange("customFont")} text="Fonte" />
 				<div className="flex flex-wrap gap-2">
 					{FONT_OPTIONS.map((font) => (
 						<button
-							className={`whitespace-nowrap rounded border px-4 py-2 ${
+							className={`whitespace-nowrap rounded border px-4 py-2 transition-colors ${
 								customizations.customFont === font.value
-									? "border-blue-500 bg-blue-50"
-									: "border-gray-200"
+									? "border-gray-300 bg-neutral-200"
+									: "border-gray-200 hover:bg-neutral-200"
 							}`}
 							key={font.value}
 							onClick={() => handleChange("customFont", font.value)}
@@ -235,14 +250,17 @@ export default function CustomizationPanel({
 
 			{/* Estilo do Botão */}
 			<div className="mb-8">
-				<Label className="mb-3 block">Estilo do Botão</Label>
+				<RenderLabel
+					hasPending={hasPendingChange("customButton")}
+					text="Estilo do Botão"
+				/>
 				<div className="flex flex-wrap gap-2">
 					{BUTTON_STYLES.map((style) => (
 						<button
-							className={`whitespace-nowrap rounded border px-4 py-2 ${
+							className={`whitespace-nowrap rounded border px-4 py-2 transition-colors ${
 								customizations.customButton === style.value
-									? "border-blue-500 bg-blue-50"
-									: "border-gray-200"
+									? "border-gray-300 bg-neutral-200"
+									: "border-gray-200 hover:bg-neutral-200"
 							}`}
 							key={style.value}
 							onClick={() => handleChange("customButton", style.value)}
@@ -256,14 +274,17 @@ export default function CustomizationPanel({
 
 			{/* Cantos do Botão */}
 			<div className="mb-8">
-				<Label className="mb-3 block">Cantos do Botão</Label>
+				<RenderLabel
+					hasPending={hasPendingChange("customButtonCorners")}
+					text="Cantos do Botão"
+				/>
 				<div className="flex flex-wrap gap-2">
 					{BUTTON_CORNERS.map((radius) => (
 						<button
-							className={`whitespace-nowrap rounded border px-4 py-2 ${
+							className={`whitespace-nowrap rounded border px-4 py-2 transition-colors ${
 								customizations.customButtonCorners === radius
-									? "border-blue-500 bg-blue-50"
-									: "border-gray-200"
+									? "border-gray-300 bg-neutral-200"
+									: "border-gray-200 hover:bg-neutral-200"
 							}`}
 							key={radius}
 							onClick={() => handleChange("customButtonCorners", radius)}
