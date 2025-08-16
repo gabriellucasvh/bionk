@@ -120,11 +120,11 @@ export default function TemplateSettings({
 							)}
 						</div>
 					</div>
-					<div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+					<div className="grid grid-cols-2 gap-4 md:grid-cols-4">
 						{CATEGORIES[selectedCategory as keyof typeof CATEGORIES]?.map(
 							(template) => (
 								<div
-									className={`cursor-pointer rounded-lg border-2 p-2 transition-all ${
+									className={`max-w-[150px] cursor-pointer rounded-lg border-2 p-2 transition-all ${
 										selectedTemplate === template.id
 											? "border-green-600 bg-green-50"
 											: "border-gray-300 hover:border-green-400 hover:bg-gray-50"
@@ -138,7 +138,7 @@ export default function TemplateSettings({
 									>
 										<Image
 											alt={template.name}
-											className="aspect-[9/16] w-full rounded-lg object-cover"
+											className="aspect-[9/16] w-full max-w-[150px] rounded-lg object-cover"
 											height={120}
 											quality={100}
 											src={template.image}
