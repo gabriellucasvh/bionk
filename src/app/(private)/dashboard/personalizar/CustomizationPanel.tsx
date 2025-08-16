@@ -279,7 +279,7 @@ export default function CustomizationPanel({
 			</div>
 
 			{/* Cantos do Botão */}
-			<div className="mb-8">
+			<div className="mb-12">
 				<RenderLabel
 					hasPending={hasPendingChange("customButtonCorners")}
 					text="Cantos do Botão"
