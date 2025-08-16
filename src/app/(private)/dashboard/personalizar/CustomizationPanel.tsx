@@ -304,11 +304,10 @@ export default function CustomizationPanel({
 
 			{/* Salvar e Cancelar pendências */}
 			{Object.keys(pendingChanges).length > 0 && (
-				<div className="mb-14 flex items-center gap-2">
+				<div className="mb-12 flex items-center gap-2">
 					<BaseButton loading={isSaving} onClick={handleSavePending} size="sm">
-						Salvar Mudanças
+						Salvar
 					</BaseButton>
-					{/* O 'variant' é uma sugestão, ajuste conforme seu componente BaseButton */}
 					<BaseButton
 						loading={isSaving}
 						onClick={handleCancel}

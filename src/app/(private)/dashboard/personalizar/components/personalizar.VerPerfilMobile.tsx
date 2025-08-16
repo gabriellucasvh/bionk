@@ -22,7 +22,7 @@ const VerPerfilMobile = () => {
 	return (
 		<div>
 			<BaseButton
-				className="fixed right-5 bottom-20 justify-center lg:hidden"
+				className="fixed right-5 bottom-20 z-50 justify-center lg:hidden"
 				disabled={!username}
 				onClick={() => window.open(profileUrl, "_blank")}
 				size="sm"
