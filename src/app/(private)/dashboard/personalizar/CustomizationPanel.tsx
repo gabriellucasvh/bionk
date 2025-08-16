@@ -129,6 +129,12 @@ export default function CustomizationPanel({
 		}
 	};
 
+	// Nova função para cancelar as alterações
+	const handleCancel = () => {
+		setCustomizations(userCustomizations);
+		setPendingChanges({});
+	};
+
 	// Função auxiliar para verificar se um campo tem alterações pendentes
 	const hasPendingChange = (field: keyof typeof customizations) =>
 		pendingChanges[field] !== undefined &&
@@ -296,11 +302,20 @@ export default function CustomizationPanel({
 				</div>
 			</div>
 
-			{/* Salvar pendências */}
+			{/* Salvar e Cancelar pendências */}
 			{Object.keys(pendingChanges).length > 0 && (
-				<div className="mb-14 flex">
-					<BaseButton disabled={isSaving} onClick={handleSavePending} size="sm">
-						{isSaving ? "Salvando..." : "Salvar Mudanças"}
+				<div className="mb-14 flex items-center gap-2">
+					<BaseButton loading={isSaving} onClick={handleSavePending} size="sm">
+						Salvar Mudanças
+					</BaseButton>
+					{/* O 'variant' é uma sugestão, ajuste conforme seu componente BaseButton */}
+					<BaseButton
+						loading={isSaving}
+						onClick={handleCancel}
+						size="sm"
+						variant="white"
+					>
+						Cancelar
 					</BaseButton>
 				</div>
 			)}
