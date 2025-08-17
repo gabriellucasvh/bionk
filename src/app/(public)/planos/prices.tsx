@@ -1,13 +1,16 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Check, Star } from "lucide-react";
+import { Check } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 const pricingPlans = [
 	{
 		name: "Free",
+		nameColor: "text-green-500",
+		buttonColor:
+			"bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-600 transition-colors duration-500",
 		description: "Comece sua presença digital sem custos!",
 		monthlyPrice: 0,
 		label: "Comece Gratuitamente",
@@ -18,11 +21,12 @@ const pricingPlans = [
 			"Personalização básica de cores e botões",
 			"Estatísticas simples de visitas",
 		],
-		topColor: "bg-lime-700",
-		baseColor: "bg-lime-500",
 	},
 	{
 		name: "Basic",
+		nameColor: "text-yellow-500",
+		buttonColor:
+			"bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 transition-colors duration-500",
 		description: "Aprimore sua página e se destaque.",
 		monthlyPrice: 10,
 		label: "Assinar agora",
@@ -34,12 +38,13 @@ const pricingPlans = [
 			"Animações simples",
 			"Estatísticas detalhadas",
 		],
-		topColor: "bg-teal-700",
-		baseColor: "bg-teal-800",
 	},
 	{
 		name: "Pro",
-		star: <Star className=" text-yellow-400" size={18} />,
+		nameColor:
+			"bg-gradient-to-r from-blue-600 w-min to-pink-300 inline-block text-transparent bg-clip-text",
+		buttonColor:
+			"bg-radial-[at_50%_75%] from-yellow-500 via-purple-500 to-blue-500 hover:bg-radial-[at_50%_75%] hover:from-blue-500 hover:via-purple-500 hover:to-yellow-500 transition-colors duration-700",
 		description: "Para quem quer personalização total e mais insights.",
 		monthlyPrice: 20,
 		label: "Assinar agora",
@@ -51,12 +56,13 @@ const pricingPlans = [
 			"Coleta de e-mails e contatos",
 			"Acompanhamento detalhado de acessos",
 		],
-		topColor: "bg-green-800",
-		baseColor: "bg-green-600",
-		isPro: true,
+		isBest: true,
 	},
 	{
 		name: "Premium",
+		nameColor: "text-blue-500",
+		buttonColor:
+			"bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 transition-colors duration-500",
 		description: "Suporte prioritário e insights completos.",
 		monthlyPrice: 60,
 		label: "Assinar agora",
@@ -67,10 +73,23 @@ const pricingPlans = [
 			"Relatórios completos",
 			"Acesso ao histórico completo de estatísticas",
 		],
-		topColor: "bg-cyan-700",
-		baseColor: "bg-cyan-800",
 	},
 ];
+
+// 🔥 Lifetime separado
+const customPlan = {
+	name: "Pesonalizado",
+	monthlyPrice: 888,
+	description: "Entre em contato e monte um plano sob medida.",
+	label: "Falar conosco",
+	link: "/contato",
+	features: [
+		"Soluções sob medida",
+		"Funcionalidades exclusivas",
+		"Consultoria especializada",
+		"Preços ajustados à sua necessidade",
+	],
+};
 
 interface HeadingProps {
 	billingCycle: "M" | "A";
@@ -80,26 +99,27 @@ interface HeadingProps {
 const Heading = ({ billingCycle, setBillingCycle }: HeadingProps) => (
 	<div className="my-14 flex flex-col items-center gap-6">
 		<div className="flex flex-col items-center gap-2 text-center">
-			<h2 className="mt-4 font-extrabold text-4xl text-gray-900 lg:text-5xl">
+			<h2 className="mt-4 font-extrabold text-4xl text-black lg:text-5xl">
 				Escolha o melhor plano para você.
 			</h2>
-			<p className="mt-2 max-w-xl text-gray-700 text-xl">
+			<p className="mt-2 max-w-xl text-gray-400 text-xl">
 				Comece agora com a Bionk e leve sua presença digital para o próximo
 				nível.
 			</p>
 		</div>
-		<div className="relative flex w-fit items-center rounded-full bg-gray-100 p-1">
+
+		{/* Toggle animado (Mensal / Anual) */}
+		<div className="relative flex w-fit items-center rounded-full bg-gray-200 p-1">
 			<div
-				className={`absolute h-[calc(100%-8px)] transform rounded-full bg-white shadow-md transition-all duration-300 ease-in-out ${
+				className={`absolute h-[calc(100%-8px)] transform rounded-full bg-gray-100 shadow-md transition-all duration-300 ease-in-out ${
 					billingCycle === "M" ? "left-1 w-20" : "left-[84px] w-32"
 				}`}
-				style={{ height: "calc(100% - 8px)" }}
 			/>
 			<button
 				className={`relative z-10 rounded-full px-4 py-2 font-medium text-sm transition-colors ${
 					billingCycle === "M"
-						? "text-green-600"
-						: "text-gray-500 hover:text-gray-700"
+						? "text-green-500"
+						: "text-gray-400 hover:text-gray-500"
 				}`}
 				onClick={() => setBillingCycle("M")}
 				type="button"
@@ -109,8 +129,8 @@ const Heading = ({ billingCycle, setBillingCycle }: HeadingProps) => (
 			<button
 				className={`relative z-10 rounded-full px-4 py-2 font-medium text-sm transition-colors ${
 					billingCycle === "A"
-						? "text-green-600"
-						: "w-full text-gray-500 hover:text-gray-700"
+						? "text-green-500"
+						: "text-gray-400 hover:text-gray-500"
 				}`}
 				onClick={() => setBillingCycle("A")}
 				type="button"
@@ -127,7 +147,6 @@ interface PricingCardProps {
 }
 
 const PricingCard = ({ plan, billingCycle }: PricingCardProps) => {
-	// Calcula o preço com desconto para planos anuais (20% off)
 	const price =
 		billingCycle === "M"
 			? plan.monthlyPrice
@@ -136,58 +155,74 @@ const PricingCard = ({ plan, billingCycle }: PricingCardProps) => {
 	return (
 		<div
 			className={cn(
-				"flex flex-col overflow-hidden rounded-2xl shadow-xl",
-				plan.isPro ? "scale-105" : ""
+				"flex flex-col rounded-2xl border border-gray-300 bg-gray-100 p-8 shadow-lg",
+				plan.isBest && "relative"
 			)}
 		>
-			{/* Cabeçalho */}
-			<div className={cn("p-6 text-center", plan.topColor)}>
-				<h3 className="flex items-center gap-2 font-extrabold text-2xl text-white">
-					{plan.name}
-					{plan.star}
-				</h3>
-				<p className="mt-2 text-start text-white/90">{plan.description}</p>
-			</div>
+			{plan.isBest && (
+				<span className="absolute top-4 right-4 rounded-full bg-green-500 px-3 py-1 font-semibold text-white text-xs">
+					Mais recomendado
+				</span>
+			)}
+			<h3 className={`font-bold text-2xl text-black ${plan.nameColor}`}>
+				{plan.name}
+			</h3>
+			<p className="mt-2 text-gray-400">{plan.description}</p>
 
-			{/* Conteúdo principal */}
-			<div
-				className={cn(
-					"flex flex-col justify-between p-8 text-center",
-					plan.baseColor,
-					"flex-1 text-white"
+			<p className="mt-6 font-extrabold text-4xl text-black">
+				R${price}
+				<span className="ml-1 font-medium text-base text-gray-400">/mês</span>
+				{billingCycle === "A" && plan.monthlyPrice > 0 && (
+					<span className="mt-1 block font-normal text-green-500 text-sm">
+						(20% de desconto no anual)
+					</span>
 				)}
+			</p>
+
+			<Link
+				className={`mt-6 block w-full rounded-xl py-3 text-center font-bold text-white ${plan.buttonColor}`}
+				href={plan.link}
 			>
-				<div>
-					<p className="mb-8 font-extrabold text-4xl">
-						R${price}
-						<span className="ml-1 font-medium text-lg">
-							/mês
-							{billingCycle === "A" && plan.monthlyPrice > 0 && (
-								<span className="mt-1 block font-normal text-sm">
-									(com desconto anual)
-								</span>
-							)}
-						</span>
-					</p>
-					<Link
-						className="block w-full rounded-xl bg-white py-3 font-bold text-gray-900 transition-colors duration-100 hover:bg-gray-200"
-						href={plan.link}
-					>
-						{plan.label}
-					</Link>
-				</div>
-				<div className="mt-10 space-y-3 text-left">
-					{plan.features.map((feature) => (
-						<div className="flex items-center gap-3" key={feature}>
-							<Check className="text-white" size={18} />
-							<span>{feature}</span>
-						</div>
-					))}
-				</div>
+				{plan.label}
+			</Link>
+
+			<div className="mt-8 space-y-3 text-left">
+				{plan.features.map((feature) => (
+					<div className="flex items-center gap-3" key={feature}>
+						<Check className="text-green-500" size={18} />
+						<span className="text-gray-600">{feature}</span>
+					</div>
+				))}
 			</div>
 		</div>
 	);
 };
+
+// 🔥 Lifetime horizontal embaixo
+const CustomPlan = () => (
+	<div className="mx-auto mt-16 flex max-w-5xl flex-col items-center justify-between gap-8 rounded-2xl border border-gray-300 bg-gray-100 p-10 text-white shadow-lg lg:flex-row">
+		<div className="flex flex-col gap-4">
+			<h3 className={"font-extrabold text-3xl text-black"}>
+				{customPlan.name}
+			</h3>
+			<p className="max-w-xl text-gray-400">{customPlan.description}</p>
+			<div className="mt-4 space-y-2">
+				{customPlan.features.map((feature) => (
+					<div className="flex items-center gap-3" key={feature}>
+						<Check className="text-green-500" size={18} />
+						<span className="text-gray-600">{feature}</span>
+					</div>
+				))}
+			</div>
+		</div>
+		<Link
+			className="rounded-xl bg-green-600 px-8 py-4 font-bold text-white transition-colors hover:bg-green-500"
+			href={customPlan.link}
+		>
+			{customPlan.label}
+		</Link>
+	</div>
+);
 
 const Pricing = () => {
 	const [billingCycle, setBillingCycle] = useState<"M" | "A">("M");
@@ -195,7 +230,7 @@ const Pricing = () => {
 	return (
 		<section className="min-h-screen w-full bg-white px-6 py-16">
 			<Heading billingCycle={billingCycle} setBillingCycle={setBillingCycle} />
-			<div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+			<div className="mx-auto grid max-w-7xl grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
 				{pricingPlans.map((plan) => (
 					<PricingCard
 						billingCycle={billingCycle}
@@ -204,6 +239,7 @@ const Pricing = () => {
 					/>
 				))}
 			</div>
+			<CustomPlan />
 		</section>
 	);
 };
