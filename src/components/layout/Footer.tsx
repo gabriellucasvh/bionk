@@ -35,7 +35,7 @@ const navigation = {
 
 const Footer = () => {
 	return (
-		<footer className="bg-slate-900 text-slate-300">
+		<footer className="w-full bg-slate-900 text-slate-300">
 			<div className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10">
 				<div className="xl:grid xl:grid-cols-3 xl:gap-8">
 					{/* Logo e descrição */}
