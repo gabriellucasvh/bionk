@@ -28,7 +28,7 @@ const pricingPlans = [
 		label: "Assinar agora",
 		link: "/registro",
 		features: [
-			"Tudo no plano Free",
+			"Tudo do plano Free",
 			"Agendamento de links",
 			"Destaque para links principais",
 			"Animações simples",
@@ -45,7 +45,7 @@ const pricingPlans = [
 		label: "Assinar agora",
 		link: "/registro",
 		features: [
-			"Tudo no plano Basic",
+			"Tudo do plano Basic",
 			"Personalização avançada",
 			"Miniaturas e imagens nos links",
 			"Coleta de e-mails e contatos",
@@ -62,7 +62,7 @@ const pricingPlans = [
 		label: "Assinar agora",
 		link: "/registro",
 		features: [
-			"Tudo no plano Pro",
+			"Tudo do plano Pro",
 			"Suporte prioritário",
 			"Relatórios completos",
 			"Acesso ao histórico completo de estatísticas",
@@ -129,7 +129,9 @@ interface PricingCardProps {
 const PricingCard = ({ plan, billingCycle }: PricingCardProps) => {
 	// Calcula o preço com desconto para planos anuais (20% off)
 	const price =
-		billingCycle === "M" ? plan.monthlyPrice : Math.round(plan.monthlyPrice * 0.8);
+		billingCycle === "M"
+			? plan.monthlyPrice
+			: Math.round(plan.monthlyPrice * 0.8);
 
 	return (
 		<div
