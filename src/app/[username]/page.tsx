@@ -27,14 +27,37 @@ export async function generateMetadata({
 	};
 }
 
+// Para evitar que a página use um cache antigo, forçamos a revalidação.
+export const revalidate = 0;
+
 export default async function UserPage({ params }: PageProps) {
 	const { username } = await params;
+	const now = new Date(); // Data e hora atual
 
 	const user = (await prisma.user.findUnique({
 		where: { username },
 		include: {
 			Link: {
-				where: { active: true },
+				// --- LÓGICA DE BUSCA DE LINKS CORRIGIDA E SIMPLIFICADA ---
+				where: {
+					active: true,
+					AND: [
+						{
+							// Condição de Lançamento:
+							OR: [
+								{ launchesAt: null }, // Ou não tem data de lançamento
+								{ launchesAt: { lte: now } }, // Ou a data de lançamento já passou
+							],
+						},
+						{
+							// Condição de Expiração:
+							OR: [
+								{ expiresAt: null }, // Ou não tem data de expiração
+								{ expiresAt: { gte: now } }, // Ou a data de expiração ainda não chegou
+							],
+						},
+					],
+				},
 				orderBy: { order: "asc" },
 			},
 			SocialLink: {

@@ -1,3 +1,5 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,23 +9,31 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import {
 	Archive as ArchiveBox,
+	Clock,
 	Edit,
-	ExternalLink,
 	Eye,
 	EyeOff,
 	Grip,
+	Lock,
+	MoreVertical,
 	MousePointerClick,
+	Save,
 	Trash2,
+	X,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { LinkItem } from "../types/links.types";
-import { getIconForUrl } from "../utils/links.helpers";
+import { getIconForUrl, isValidUrl } from "../utils/links.helpers";
+import { useCountdown } from "../utils/useCountdown";
 
+// Tipos e Interfaces
 interface LinkCardProps {
 	link: LinkItem;
 	listeners: any;
@@ -39,97 +49,194 @@ interface LinkCardProps {
 	onClickLink: (id: number) => void;
 }
 
-const LinkCard = ({
+// --- Subcomponentes ---
+
+const CountdownTimer = ({
+	date,
+	prefix,
+	endText,
+}: {
+	date: string;
+	prefix: string;
+	endText: string;
+}) => {
+	const { days, hours, minutes, seconds, hasEnded } = useCountdown(date);
+	if (hasEnded) {
+		return <p className="font-medium text-red-600 text-sm">{endText}</p>;
+	}
+	return (
+		<div className="flex items-center gap-1 text-center font-semibold text-blue-600 text-sm">
+			<Clock className="h-4 w-4" />
+			<span>{prefix}: </span>
+			<span>{`${days}d ${hours}h ${minutes}m ${seconds}s`}</span>
+		</div>
+	);
+};
+
+const EditingView = ({
 	link,
-	listeners,
-	setActivatorNodeRef,
 	onLinkChange,
 	onSaveEditing,
 	onCancelEditing,
-	onStartEditing,
-	onToggleActive,
-	onToggleSensitive,
-	onArchiveLink,
-	onDeleteLink,
+}: Omit<
+	LinkCardProps,
+	| "listeners"
+	| "setActivatorNodeRef"
+	| "onToggleActive"
+	| "onToggleSensitive"
+	| "onArchiveLink"
+	| "onDeleteLink"
+	| "onClickLink"
+>) => (
+	<div className="flex flex-col gap-3 rounded-lg border-2 border-blue-500 p-3 sm:p-4">
+		<div className="flex items-center gap-2">
+			<div className="flex-1 space-y-1.5">
+				<Input
+					onChange={(e) => onLinkChange(link.id, "title", e.target.value)}
+					placeholder="Título"
+					value={link.title}
+				/>
+				<Input
+					onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
+					placeholder="URL"
+					value={link.url}
+				/>
+			</div>
+			<div className="flex flex-col gap-2">
+				<Button
+					disabled={!(isValidUrl(link.url) && link.title)}
+					onClick={() => onSaveEditing(link.id, link.title, link.url)}
+					size="icon"
+				>
+					<Save className="h-4 w-4" />
+				</Button>
+				<Button
+					onClick={() => onCancelEditing(link.id)}
+					size="icon"
+					variant="ghost"
+				>
+					<X className="h-4 w-4" />
+				</Button>
+			</div>
+		</div>
+	</div>
+);
+
+const LinkContent = ({
+	link,
+	isLinkLocked,
 	onClickLink,
-}: LinkCardProps) => {
+}: {
+	link: LinkItem;
+	isLinkLocked: boolean;
+	onClickLink: (id: number) => void;
+}) => {
+	if (link.isProduct) {
+		return (
+			<p className="font-bold text-lg text-primary">
+				R$ {link.price?.toFixed(2).replace(".", ",")}
+			</p>
+		);
+	}
+	return (
+		<Link
+			className={cn(
+				"max-w-[200px] truncate text-blue-500 text-sm hover:underline",
+				isLinkLocked && "cursor-not-allowed text-muted-foreground"
+			)}
+			href={isLinkLocked ? "#" : link.url}
+			onClick={() => !isLinkLocked && onClickLink(link.id)}
+			rel="noopener noreferrer"
+			target="_blank"
+		>
+			{link.url}
+		</Link>
+	);
+};
+
+const DisplayView = (props: LinkCardProps) => {
+	const {
+		link,
+		listeners,
+		setActivatorNodeRef,
+		onStartEditing,
+		onToggleActive,
+		onToggleSensitive,
+		onArchiveLink,
+		onDeleteLink,
+		onClickLink,
+	} = props;
+
+	// --- CORREÇÃO APLICADA AQUI ---
+	const isLaunching = !!(
+		link.launchesAt && new Date(link.launchesAt) > new Date()
+	);
+	const isExpiring = !!(
+		link.expiresAt && new Date(link.expiresAt) > new Date()
+	);
+	const isLinkLocked = isLaunching;
+
 	return (
 		<article
 			className={cn(
-				"flex flex-col gap-2 rounded-lg border-2 p-2 transition-all sm:gap-4 sm:p-4",
-				"sm:flex-row sm:items-center",
-				link.sensitive && "border-rose-400"
+				"flex flex-col gap-3 rounded-lg border p-3 transition-all sm:p-4",
+				link.sensitive && "border-rose-400",
+				link.isProduct && "border-blue-400"
 			)}
 		>
-			<div className="flex items-center gap-2 sm:w-7/12 sm:gap-3">
+			<div className="flex items-start gap-2 sm:gap-4">
 				<div
 					ref={setActivatorNodeRef}
 					{...listeners}
-					className="cursor-move touch-none"
+					className="cursor-move touch-none pt-1"
 				>
 					<Grip className="h-5 w-5 text-muted-foreground" />
 				</div>
+				{link.isProduct && link.productImageUrl && (
+					<Image
+						alt={link.title}
+						className="hidden rounded-md object-cover sm:block"
+						height={64}
+						src={link.productImageUrl}
+						width={64}
+					/>
+				)}
+				<div className="flex-1 space-y-2">
+					<header className="flex flex-wrap items-center gap-2">
+						<h3 className="flex items-center gap-1.5 font-medium">
+							<span className="mt-0.5">{getIconForUrl(link.url)}</span>
+							{link.title}
+						</h3>
+						{link.badge && <Badge variant="secondary">{link.badge}</Badge>}
+						{link.password && (
+							<Lock className="h-3 w-3 text-muted-foreground" />
+						)}
+					</header>
 
-				<div className="flex-1 space-y-1">
-					{link.isEditing ? (
-						<section className="space-y-2">
-							<input
-								className="w-full rounded border px-2 py-1"
-								onChange={(e) => onLinkChange(link.id, "title", e.target.value)}
-								type="text"
-								value={link.title}
-							/>
-							<input
-								className="w-full rounded border px-2 py-1"
-								onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
-								type="url"
-								value={link.url}
-							/>
-							<div className="flex gap-2">
-								<Button
-									onClick={() => onSaveEditing(link.id, link.title, link.url)}
-									type="submit"
-								>
-									Salvar
-								</Button>
-								<Button
-									onClick={() => onCancelEditing(link.id)}
-									variant="outline"
-								>
-									Cancelar
-								</Button>
-							</div>
-						</section>
-					) : (
-						<>
-							<header className="flex items-center gap-2">
-								<h3 className="flex items-center gap-1 font-medium">
-									<span className="mt-0.5">{getIconForUrl(link.url)}</span>
-									{link.title.length > 26
-										? `${link.title.slice(0, 26)}...`
-										: link.title}
-								</h3>
-							</header>
-							<section className="flex items-center gap-1 text-blue-500 text-sm">
-								<ExternalLink className="h-3 w-3" />
-								<Link
-									className="max-w-[200px] truncate"
-									href={link.url}
-									onClick={() => onClickLink(link.id)}
-									rel="noopener noreferrer"
-									target="_blank"
-								>
-									{link.url.length > 26
-										? `${link.url.slice(0, 26)}...`
-										: link.url}
-								</Link>
-							</section>
-						</>
+					<LinkContent
+						isLinkLocked={isLinkLocked}
+						link={link}
+						onClickLink={onClickLink}
+					/>
+
+					{isLaunching && link.launchesAt && (
+						<CountdownTimer
+							date={link.launchesAt}
+							endText="Lançado!"
+							prefix="Lança em"
+						/>
+					)}
+					{isExpiring && !isLaunching && link.expiresAt && (
+						<CountdownTimer
+							date={link.expiresAt}
+							endText="Expirado!"
+							prefix="Expira em"
+						/>
 					)}
 				</div>
 			</div>
-			<div className="flex items-center gap-2 sm:w-5/12 sm:justify-end">
-				<Badge className="flex items-center gap-1" variant="secondary">
+			<div className="flex items-center justify-end gap-2 border-t pt-3 sm:gap-4">
+				<Badge className="flex items-center gap-1" variant="outline">
 					<MousePointerClick className="h-3 w-3" />
 					{link.clicks.toLocaleString()}
 				</Badge>
@@ -139,49 +246,54 @@ const LinkCard = ({
 						id={`switch-${link.id}`}
 						onCheckedChange={(checked) => onToggleActive(link.id, checked)}
 					/>
-					<Label className="cursor-pointer" htmlFor={`switch-${link.id}`}>
+					<Label
+						className="cursor-pointer text-sm"
+						htmlFor={`switch-${link.id}`}
+					>
 						{link.active ? "Ativo" : "Inativo"}
 					</Label>
 				</div>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button className="h-8 w-8" size="icon" variant="ghost">
-							<span className="sr-only">Mais opções</span>
-							{/* checar o aria-hidden */}
-							<svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24">
-								<circle cx="5" cy="12" r="2" />
-								<circle cx="12" cy="12" r="2" />
-								<circle cx="19" cy="12" r="2" />
-							</svg>
+							<MoreVertical className="h-4 w-4" />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
 						<DropdownMenuItem onClick={() => onStartEditing(link.id)}>
 							<Edit className="mr-2 h-4 w-4" /> Editar
 						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => onToggleSensitive(link.id)}>
+							{link.sensitive ? (
+								<Eye className="mr-2 h-4 w-4" />
+							) : (
+								<EyeOff className="mr-2 h-4 w-4" />
+							)}
+							{link.sensitive ? "Marcar como normal" : "Conteúdo Sensível"}
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
 						<DropdownMenuItem onClick={() => onArchiveLink(link.id)}>
 							<ArchiveBox className="mr-2 h-4 w-4" /> Arquivar
 						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => onToggleSensitive(link.id)}>
-							{link.sensitive ? (
-								<>
-									<Eye className="mr-2 h-4 w-4" /> Conteúdo não Sensível
-								</>
-							) : (
-								<>
-									<EyeOff className="mr-2 h-4 w-4" /> Conteúdo Sensível
-								</>
-							)}
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={() => onDeleteLink(link.id)}>
-							<Trash2 className="mr-2 h-4 w-4 text-destructive" /> Excluir
+						<DropdownMenuItem
+							className="text-destructive"
+							onClick={() => onDeleteLink(link.id)}
+						>
+							<Trash2 className="mr-2 h-4 w-4" /> Deletar
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
 		</article>
 	);
+};
+
+// --- Componente Principal ---
+const LinkCard = (props: LinkCardProps) => {
+	if (props.link.isEditing) {
+		return <EditingView {...props} />;
+	}
+	return <DisplayView {...props} />;
 };
 
 export default LinkCard;

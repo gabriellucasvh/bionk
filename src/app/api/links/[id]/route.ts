@@ -2,52 +2,55 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+	request: Request,
+	{ params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  if (!id || isNaN(Number(id))) {
-    return NextResponse.json({ error: "ID inválido" }, { status: 400 });
-  }
+	const { id } = await params;
+	if (!id || Number.isNaN(Number(id))) {
+		return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+	}
 
-  try {
-    const body = await request.json();
+	try {
+		const body = await request.json();
 
-    const updatedLink = await prisma.link.update({
-      where: { id: Number(id) },
-      data: body,
-    });
+		// Removemos campos que não devem ser atualizados diretamente ou são undefined
+		const cleanBody = Object.fromEntries(
+			Object.entries(body).filter(([, value]) => value !== undefined)
+		);
 
-    return NextResponse.json(updatedLink);
-  } catch (error: unknown) {
-    console.error("Erro ao atualizar link:", error);
-    return NextResponse.json(
-      { error: "Falha ao atualizar link." },
-      { status: 500 }
-    );
-  }
+		const updatedLink = await prisma.link.update({
+			where: { id: Number(id) },
+			data: cleanBody,
+		});
+
+		return NextResponse.json(updatedLink);
+	} catch {
+		return NextResponse.json(
+			{ error: "Falha ao atualizar link." },
+			{ status: 500 }
+		);
+	}
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+	_request: Request,
+	{ params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
-  if (!id || isNaN(Number(id))) {
-    return NextResponse.json({ error: "ID inválido" }, { status: 400 });
-  }
+	const { id } = await params;
+	if (!id || Number.isNaN(Number(id))) {
+		return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+	}
 
-  try {
-    await prisma.link.delete({
-      where: { id: Number(id) },
-    });
+	try {
+		await prisma.link.delete({
+			where: { id: Number(id) },
+		});
 
-    return NextResponse.json({ message: "Link excluído com sucesso." });
-  } catch (error: unknown) {
-    console.error("Erro ao excluir link:", error);
-    return NextResponse.json(
-      { error: "Falha ao excluir link." },
-      { status: 500 }
-    );
-  }
+		return NextResponse.json({ message: "Link excluído com sucesso." });
+	} catch {
+		return NextResponse.json(
+			{ error: "Falha ao excluir link." },
+			{ status: 500 }
+		);
+	}
 }

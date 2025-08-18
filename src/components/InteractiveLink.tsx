@@ -12,7 +12,7 @@ interface InteractiveLinkProps {
 	children: React.ReactNode;
 	sensitive?: boolean;
 	className?: string;
-	style?: React.CSSProperties; // Adicionando a prop style
+	style?: React.CSSProperties;
 }
 
 const InteractiveLink: React.FC<InteractiveLinkProps> = ({
@@ -21,7 +21,7 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
 	children,
 	sensitive,
 	className = "",
-	style = {}, // Valor padrão vazio
+	style = {},
 }) => {
 	const [unblurred, setUnblurred] = useState(false);
 	const [isTouch, setIsTouch] = useState(false);
@@ -56,7 +56,7 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
 	return (
 		<Link
 			className={twMerge(
-				`relative flex w-full items-center justify-center rounded-lg border border-gray-100 bg-white p-4 text-start font-medium shadow-sm transition-all hover:shadow-md ${
+				`relative flex w-full items-center justify-center text-start ${
 					sensitive ? "group overflow-hidden border-red-200" : ""
 				} ${className}`
 			)}
@@ -64,7 +64,7 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
 			onClick={handleClick}
 			rel="noopener noreferrer"
 			style={style}
-			target="_blank" // Aplicando a prop style
+			target="_blank"
 		>
 			{sensitive && (
 				<div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center transition-all duration-300">

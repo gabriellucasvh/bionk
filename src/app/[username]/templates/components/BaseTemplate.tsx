@@ -1,12 +1,25 @@
 "use client";
+
 import InteractiveLink from "@/components/InteractiveLink";
 import JoinBionkModal from "@/components/JoinBionkModal";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
-import type { TemplateComponentProps } from "@/types/user-profile";
-import { Share2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
+import { Lock, Share2 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import ShareModal from "./ShareModal";
 
 interface BaseTemplateProps extends TemplateComponentProps {
@@ -100,41 +113,183 @@ function UserHeader({
 	);
 }
 
+function PasswordProtectedLink({
+	link,
+	children,
+}: {
+	link: UserLink;
+	children: React.ReactNode;
+}) {
+	const [passwordInput, setPasswordInput] = useState("");
+	const [error, setError] = useState("");
+	const [isOpen, setIsOpen] = useState(false);
+
+	const handleSubmit = (e: FormEvent) => {
+		e.preventDefault();
+		if (passwordInput === link.password) {
+			window.open(link.url, "_blank");
+			setIsOpen(false);
+			setPasswordInput("");
+			setError("");
+		} else {
+			setError("Senha incorreta. Tente novamente.");
+		}
+	};
+
+	return (
+		<Dialog onOpenChange={setIsOpen} open={isOpen}>
+			<DialogTrigger asChild>{children}</DialogTrigger>
+			<DialogContent className="sm:max-w-[425px]">
+				<DialogHeader>
+					<DialogTitle>Link Protegido</DialogTitle>
+					<DialogDescription>
+						Este link é protegido por senha. Por favor, insira a senha para
+						continuar.
+					</DialogDescription>
+				</DialogHeader>
+				<form className="grid gap-4 py-4" onSubmit={handleSubmit}>
+					<Input
+						id="password"
+						onChange={(e) => setPasswordInput(e.target.value)}
+						placeholder="••••••••"
+						required
+						type="password"
+						value={passwordInput}
+					/>
+					{error && <p className="text-red-500 text-sm">{error}</p>}
+					<Button type="submit">Desbloquear Link</Button>
+				</form>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+// --- Lista de Links (COMPLETAMENTE REFEITA) ---
 function LinksList({
 	user,
 	classNames,
 	buttonStyle,
+	textStyle,
 }: {
 	user: TemplateComponentProps["user"];
 	classNames?: BaseTemplateProps["classNames"];
 	buttonStyle?: React.CSSProperties;
+	textStyle?: React.CSSProperties;
 }) {
+	// Agrupa os links por sectionTitle
+	const groupedLinks = useMemo(() => {
+		return user.Link.reduce(
+			(acc, link) => {
+				const section = link.sectionTitle || "Links Gerais";
+				if (!acc[section]) {
+					acc[section] = [];
+				}
+				acc[section].push(link);
+				return acc;
+			},
+			{} as Record<string, UserLink[]>
+		);
+	}, [user.Link]);
+
 	return (
-		<ul className="space-y-3">
-			{user.Link.map((link) => (
-				<li className="w-full" key={link.id}>
-					<InteractiveLink
-						className={
-							classNames?.cardLink ||
-							"transition-all duration-200 hover:scale-105"
-						}
-						href={link.url}
-						linkId={link.id}
-						sensitive={link.sensitive}
-						style={buttonStyle}
-					>
-						{link.title}
-						<span className={`block text-xs ${classNames?.link || ""}`}>
-							{link.url}
-						</span>
-					</InteractiveLink>
-				</li>
+		<div className="space-y-6">
+			{Object.entries(groupedLinks).map(([sectionTitle, links]) => (
+				<section className="space-y-4" key={sectionTitle}>
+					{/* Mostra o título da seção se não for a padrão ou se for a única */}
+					{(sectionTitle !== "Links Gerais" ||
+						Object.keys(groupedLinks).length === 1) && (
+						<h2 className="font-bold text-xl" style={textStyle}>
+							{sectionTitle}
+						</h2>
+					)}
+					<ul className="space-y-4">
+						{links.map((link) => {
+							// Renderiza o conteúdo visual do link (seja produto ou normal)
+							const linkContent = link.isProduct ? (
+								<div
+									className={cn(
+										"w-full overflow-hidden text-left transition-all duration-200",
+										classNames?.cardLink
+									)}
+									style={buttonStyle}
+								>
+									{link.productImageUrl && (
+										<div className="relative h-48 w-full">
+											<Image
+												alt={link.title}
+												className="object-cover"
+												fill
+												src={link.productImageUrl}
+											/>
+										</div>
+									)}
+									<div className="p-4">
+										<div className="flex items-center justify-between gap-2">
+											<h4 className="font-bold" style={textStyle}>
+												{link.title}
+											</h4>
+											{link.badge && (
+												<Badge className="flex-shrink-0" variant="secondary">
+													{link.badge}
+												</Badge>
+											)}
+										</div>
+										<p className="mt-1 font-semibold text-lg" style={textStyle}>
+											R$ {link.price?.toFixed(2).replace(".", ",")}
+										</p>
+									</div>
+								</div>
+							) : (
+								<div
+									className={cn(
+										"w-full p-4 text-center transition-all duration-200",
+										classNames?.cardLink
+									)}
+									style={buttonStyle}
+								>
+									<div className="flex items-center justify-center gap-2">
+										<h4 className="font-semibold" style={textStyle}>
+											{link.title}
+										</h4>
+										{link.badge && (
+											<Badge variant="secondary">{link.badge}</Badge>
+										)}
+									</div>
+								</div>
+							);
+
+							// Renderiza o link com a lógica de proteção por senha ou como um InteractiveLink normal
+							return (
+								<li className="w-full" key={link.id}>
+									{link.password ? (
+										<PasswordProtectedLink link={link}>
+											<button className="group relative w-full" type="button">
+												<div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+													<Lock className="h-8 w-8 text-white" />
+												</div>
+												{linkContent}
+											</button>
+										</PasswordProtectedLink>
+									) : (
+										<InteractiveLink
+											href={link.url}
+											linkId={link.id}
+											sensitive={link.sensitive}
+										>
+											{linkContent}
+										</InteractiveLink>
+									)}
+								</li>
+							);
+						})}
+					</ul>
+				</section>
 			))}
-		</ul>
+		</div>
 	);
 }
 
-// --- Componente principal ---
+// --- Componente Principal ---
 export default function BaseTemplate({
 	user,
 	classNames,
@@ -161,7 +316,6 @@ export default function BaseTemplate({
 			color: customPresets.customTextColor,
 		}),
 	};
-
 	const buttonStyle = {
 		...(customPresets?.customButtonFill && {
 			backgroundColor: customPresets.customButtonFill,
@@ -178,7 +332,6 @@ export default function BaseTemplate({
 				style={wrapperStyle}
 			>
 				<ProfileViewTracker userId={user.id} />
-
 				<main className="flex w-full max-w-md flex-grow flex-col items-center">
 					<ShareButton onClick={() => setShareModalOpen(true)} />
 					<UserHeader
@@ -186,18 +339,17 @@ export default function BaseTemplate({
 						textStyle={textStyle}
 						user={user}
 					/>
-
 					<section className="w-full">
 						{children ?? (
 							<LinksList
 								buttonStyle={buttonStyle}
 								classNames={classNames}
+								textStyle={textStyle}
 								user={user}
 							/>
 						)}
 					</section>
 				</main>
-
 				<footer
 					className={`mt-10 w-full max-w-md text-center font-bold text-sm ${classNames?.footer || ""}`}
 					style={textStyle}
@@ -205,7 +357,6 @@ export default function BaseTemplate({
 					<JoinBionkModal>{user.username}</JoinBionkModal>
 				</footer>
 			</div>
-
 			{isShareModalOpen && (
 				<ShareModal onClose={() => setShareModalOpen(false)} user={user} />
 			)}

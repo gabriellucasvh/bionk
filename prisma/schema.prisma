@@ -27,12 +27,12 @@ model User {
   emailVerificationToken        String?        @unique
   emailVerificationTokenExpires DateTime?
   newEmailPending               String?        @unique
-  registrationOtp               String?        @unique
-  registrationOtpAttempts       Int            @default(0)
-  registrationOtpBlockedUntil   DateTime?
-  registrationOtpExpiry         DateTime?
   verificationToken             String?        @unique
   verificationTokenExpiry       DateTime?
+  registrationOtp               String?        @unique
+  registrationOtpExpiry         DateTime?
+  registrationOtpAttempts       Int            @default(0)
+  registrationOtpBlockedUntil   DateTime?
   googleId                      String?
   accounts                      Account[]
   CustomPresets                 CustomPresets?
@@ -77,18 +77,27 @@ model VerificationToken {
 }
 
 model Link {
-  id        Int         @id @default(autoincrement())
-  title     String
-  url       String
-  active    Boolean     @default(true)
-  sensitive Boolean     @default(false)
-  clicks    Int         @default(0)
-  order     Int         @default(0)
-  userId    String
-  archived  Boolean     @default(false)
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  LinkClick LinkClick[]
-  LinkView  LinkView[]
+  id              Int         @id @default(autoincrement())
+  title           String
+  url             String
+  active          Boolean     @default(true)
+  sensitive       Boolean     @default(false)
+  clicks          Int         @default(0)
+  order           Int         @default(0)
+  userId          String
+  archived        Boolean     @default(false)
+  badge           String?
+  deleteOnClicks  Int?
+  expiresAt       DateTime?
+  isProduct       Boolean?    @default(false)
+  launchesAt      DateTime?
+  password        String?
+  price           Float?
+  productImageUrl String?
+  sectionTitle    String?
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  LinkClick       LinkClick[]
+  LinkView        LinkView[]
 }
 
 model LinkClick {

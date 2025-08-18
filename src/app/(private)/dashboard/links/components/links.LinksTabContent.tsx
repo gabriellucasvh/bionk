@@ -1,5 +1,3 @@
-// app/dashboard/links/components/LinksTabContent.tsx
-
 "use client";
 
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -20,35 +18,82 @@ import {
 } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
 import type { Session } from "next-auth";
-import { useEffect, useState } from "react";
-// Ajuste os imports para a nova estrutura de pastas se necessário
+import { useEffect, useMemo, useState } from "react";
 import type { LinkItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
 import AddNewLinkForm from "./links.AddNewLinkForm";
 import LinkCard from "./links.LinkCard";
 import SortableItem from "./links.SortableItem";
 
+type LinkFormData = {
+	title: string;
+	url: string;
+	sectionTitle: string;
+	badge: string;
+	password?: string;
+	expiresAt?: Date;
+	deleteOnClicks?: number;
+	launchesAt?: Date;
+	isProduct: boolean;
+	price?: number;
+	productImageFile?: File;
+};
+
+const initialFormData: LinkFormData = {
+	title: "",
+	url: "",
+	sectionTitle: "",
+	badge: "",
+	password: "",
+	deleteOnClicks: undefined,
+	expiresAt: undefined,
+	launchesAt: undefined,
+	isProduct: false,
+	price: undefined,
+	productImageFile: undefined,
+};
+
 interface LinksTabContentProps {
 	initialLinks: LinkItem[];
 	mutateLinks: () => Promise<any>;
 	session: Session | null;
 }
+
 const urlRegex = /^https?:\/\//;
 
 const LinksTabContent = ({
 	initialLinks,
 	mutateLinks,
-	session,
 }: LinksTabContentProps) => {
 	const [links, setLinks] = useState<LinkItem[]>([]);
 	const [isAdding, setIsAdding] = useState(false);
-	const [newTitle, setNewTitle] = useState("");
-	const [newUrl, setNewUrl] = useState("");
+	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
 
 	useEffect(() => {
 		const sorted = [...initialLinks].sort((a, b) => a.order - b.order);
-		setLinks(sorted);
+		setLinks(sorted.map((link) => ({ ...link, isEditing: false })));
 	}, [initialLinks]);
+
+	const existingSections = useMemo(() => {
+		const sections = new Set(
+			initialLinks.map((link) => link.sectionTitle).filter(Boolean) as string[]
+		);
+		return Array.from(sections);
+	}, [initialLinks]);
+
+	const groupedLinks = useMemo(() => {
+		return links.reduce(
+			(acc, link) => {
+				const section = link.sectionTitle || "Links Gerais";
+				if (!acc[section]) {
+					acc[section] = [];
+				}
+				acc[section].push(link);
+				return acc;
+			},
+			{} as Record<string, LinkItem[]>
+		);
+	}, [links]);
 
 	const handleClickLink = async (id: number) => {
 		await fetch("/api/link-click", {
@@ -60,13 +105,11 @@ const LinksTabContent = ({
 	};
 
 	const handleAddNewLink = async () => {
-		let formatted = newUrl.trim();
-
-		if (!urlRegex.test(formatted)) {
-			formatted = `https://${formatted}`;
+		let formattedUrl = formData.url.trim();
+		if (!urlRegex.test(formattedUrl)) {
+			formattedUrl = `https://${formattedUrl}`;
 		}
-
-		if (!isValidUrl(formatted)) {
+		if (!isValidUrl(formattedUrl)) {
 			return;
 		}
 
@@ -74,20 +117,41 @@ const LinksTabContent = ({
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-				userId: session?.user?.id,
-				title: newTitle,
-				url: formatted,
+				title: formData.title,
+				url: formattedUrl,
+				sectionTitle: formData.sectionTitle,
+				badge: formData.badge,
+				password: formData.password,
+				expiresAt: formData.expiresAt?.toISOString(),
+				launchesAt: formData.launchesAt?.toISOString(),
+				deleteOnClicks: formData.deleteOnClicks,
+				isProduct: formData.isProduct,
+				price: formData.price
+					? Number.parseFloat(String(formData.price))
+					: null,
 			}),
 		});
-		if (res.ok) {
-			await mutateLinks();
-			setNewTitle("");
-			setNewUrl("");
-			setIsAdding(false);
+
+		if (!res.ok) {
+			return;
 		}
+		const newLink = await res.json();
+
+		if (formData.productImageFile && newLink.id) {
+			const imageFormData = new FormData();
+			imageFormData.append("file", formData.productImageFile);
+			await fetch(`/api/links/${newLink.id}/upload-product-image`, {
+				method: "POST",
+				body: imageFormData,
+			});
+		}
+
+		await mutateLinks();
+		setFormData(initialFormData);
+		setIsAdding(false);
 	};
 
-	const handleLinkUpdate = async (id: number, payload: object) => {
+	const handleLinkUpdate = async (id: number, payload: Partial<LinkItem>) => {
 		await fetch(`/api/links/${id}`, {
 			method: "PUT",
 			headers: { "Content-Type": "application/json" },
@@ -124,12 +188,15 @@ const LinksTabContent = ({
 			prev.map((link) => (link.id === id ? { ...link, isEditing: true } : link))
 		);
 
-	const cancelEditing = (id: number) =>
+	const cancelEditing = (id: number) => {
+		const originalLink = initialLinks.find((l) => l.id === id);
+		if (!originalLink) {return}; // Verificação de segurança adicionada
 		setLinks((prev) =>
 			prev.map((link) =>
-				link.id === id ? { ...link, isEditing: false } : link
+				link.id === id ? { ...originalLink, isEditing: false } : link
 			)
 		);
+	};
 
 	const handleLinkChange = (
 		id: number,
@@ -153,22 +220,12 @@ const LinksTabContent = ({
 	const handleDeleteLink = async (id: number) => {
 		const res = await fetch(`/api/links/${id}`, { method: "DELETE" });
 		if (res.ok) {
-			setLinks((prev) => prev.filter((link) => link.id !== id));
 			await mutateLinks();
 		}
 	};
 
 	const handleArchiveLink = async (id: number) => {
-		setLinks((prev) => prev.filter((link) => link.id !== id));
-		try {
-			await fetch(`/api/links/${id}`, {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ archived: true }),
-			});
-		} finally {
-			await mutateLinks();
-		}
+		await handleLinkUpdate(id, { archived: true });
 	};
 
 	const sensors = useSensors(
@@ -183,14 +240,13 @@ const LinksTabContent = ({
 		if (active.id !== over?.id) {
 			const oldIndex = links.findIndex((l) => l.id === active.id);
 			const newIndex = links.findIndex((l) => l.id === over?.id);
+			if (oldIndex === -1 || newIndex === -1) {return};
 			const newOrder = arrayMove(links, oldIndex, newIndex);
 			setLinks(newOrder);
-
 			await fetch("/api/links/reorder", {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					userId: session?.user?.id,
 					order: newOrder.map((l) => l.id),
 				}),
 			});
@@ -206,25 +262,25 @@ const LinksTabContent = ({
 					onClick={() => setIsAdding(true)}
 				>
 					<span className="flex items-center justify-center">
-						<Plus className="mr-1 h-4 w-4" />
-						Adicionar novo link
+						<Plus className="mr-1 h-4 w-4" /> Adicionar novo link
 					</span>
 				</BaseButton>
 			)}
 
 			{isAdding && (
 				<AddNewLinkForm
-					isSaveDisabled={!isValidUrl(newUrl) || newTitle.trim().length === 0}
-					newTitle={newTitle}
-					newUrl={newUrl}
+					existingSections={existingSections}
+					formData={formData}
+					isSaveDisabled={
+						!isValidUrl(formData.url) || formData.title.trim().length === 0
+					}
 					onCancel={() => setIsAdding(false)}
-					onNewTitleChange={setNewTitle}
-					onNewUrlChange={setNewUrl}
 					onSave={handleAddNewLink}
+					setFormData={setFormData}
 				/>
 			)}
 
-			<div className="space-y-4 border-t pt-4">
+			<div className="space-y-6 border-t pt-6">
 				<DndContext
 					collisionDetection={closestCenter}
 					modifiers={[restrictToParentElement]}
@@ -235,33 +291,42 @@ const LinksTabContent = ({
 						items={links.map((link) => link.id)}
 						strategy={verticalListSortingStrategy}
 					>
-						{links.length > 0 ? (
-							links.map((link) => (
-								<SortableItem id={link.id} key={link.id}>
-									{({ listeners, setActivatorNodeRef }) => (
-										<LinkCard
-											link={link}
-											listeners={listeners}
-											onArchiveLink={handleArchiveLink}
-											onCancelEditing={cancelEditing}
-											onClickLink={handleClickLink}
-											onDeleteLink={handleDeleteLink}
-											onLinkChange={handleLinkChange}
-											onSaveEditing={saveEditing}
-											onStartEditing={startEditing}
-											onToggleActive={toggleActive}
-											onToggleSensitive={toggleSensitive}
-											setActivatorNodeRef={setActivatorNodeRef}
-										/>
-									)}
-								</SortableItem>
-							))
-						) : (
-							<p className="py-6 text-center text-muted-foreground">
-								Você ainda não adicionou nenhum link. Clique em "Adicionar novo
-								link" para começar.
-							</p>
-						)}
+						{Object.keys(groupedLinks).length > 0
+							? Object.entries(groupedLinks).map(
+									([sectionTitle, sectionLinks]) => (
+										<section className="space-y-4" key={sectionTitle}>
+											<h2 className="font-bold text-foreground text-xl">
+												{sectionTitle}
+											</h2>
+											{sectionLinks.map((link) => (
+												<SortableItem id={link.id} key={link.id}>
+													{({ listeners, setActivatorNodeRef }) => (
+														<LinkCard
+															link={link}
+															listeners={listeners}
+															onArchiveLink={handleArchiveLink}
+															onCancelEditing={cancelEditing}
+															onClickLink={handleClickLink}
+															onDeleteLink={handleDeleteLink}
+															onLinkChange={handleLinkChange}
+															onSaveEditing={saveEditing}
+															onStartEditing={startEditing}
+															onToggleActive={toggleActive}
+															onToggleSensitive={toggleSensitive}
+															setActivatorNodeRef={setActivatorNodeRef}
+														/>
+													)}
+												</SortableItem>
+											))}
+										</section>
+									)
+								)
+							: !isAdding && (
+									<p className="py-6 text-center text-muted-foreground">
+										Você ainda não adicionou nenhum link. Clique em "Adicionar
+										novo link" para começar.
+									</p>
+								)}
 					</SortableContext>
 				</DndContext>
 			</div>

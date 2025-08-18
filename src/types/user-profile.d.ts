@@ -6,6 +6,16 @@ export interface UserLink {
 	sensitive: boolean;
 	active: boolean;
 	order: number;
+
+	badge?: string | null;
+	password?: string | null;
+	isProduct?: boolean | null;
+	price?: number | null;
+	productImageUrl?: string | null;
+	sectionTitle?: string | null;
+	expiresAt?: string | null;
+	deleteOnClicks?: number | null;
+	launchesAt?: string | null;
 }
 
 export interface UserProfile {
@@ -23,22 +33,22 @@ export interface UserProfile {
 
 export interface SocialLink {
 	id: string;
-	platform: SocialPlatform;
+	platform: SocialPlatform; // continua tipado
 	url: string;
 }
 
-export enum SocialPlatform {
-	Instagram = "instagram",
-	Twitter = "twitter",
-	LinkedIn = "linkedin",
-	GitHub = "github",
-	Facebook = "facebook",
-	TikTok = "tiktok",
-	YouTube = "youtube",
-	Twitch = "twitch",
-	Discord = "discord",
-	Website = "website",
-}
+// ✅ substituí o enum por um type union
+export type SocialPlatform =
+	| "instagram"
+	| "twitter"
+	| "linkedin"
+	| "github"
+	| "facebook"
+	| "tiktok"
+	| "youtube"
+	| "twitch"
+	| "discord"
+	| "website";
 
 export interface TemplateComponentProps {
 	user: UserProfile & {
