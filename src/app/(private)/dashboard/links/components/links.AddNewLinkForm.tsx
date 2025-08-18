@@ -73,7 +73,7 @@ const SectionPanel = ({
 	const [comboboxOpen, setComboboxOpen] = useState(false);
 	return (
 		<div className="rounded-md border bg-background/50 p-3">
-			<Label>Título da Seção (Opcional)</Label>
+			<Label className="mb-2">Título da Seção (Opcional)</Label>
 			<Popover onOpenChange={setComboboxOpen} open={comboboxOpen}>
 				<PopoverTrigger asChild>
 					<Button
@@ -135,7 +135,7 @@ const SchedulePanel = ({ formData, setFormData }: PanelProps) => {
 	return (
 		<div className="grid grid-cols-1 gap-4 rounded-md border bg-background/50 p-3 sm:grid-cols-2">
 			<div>
-				<Label>Lançamento Agendado</Label>
+				<Label className="mb-2">Lançamento Agendado</Label>
 				<Popover>
 					<PopoverTrigger asChild>
 						<Button
@@ -164,7 +164,7 @@ const SchedulePanel = ({ formData, setFormData }: PanelProps) => {
 				</Popover>
 			</div>
 			<div>
-				<Label>Expira em</Label>
+				<Label className="mb-2">Expira em</Label>
 				<Popover>
 					<PopoverTrigger asChild>
 						<Button
@@ -198,7 +198,7 @@ const SchedulePanel = ({ formData, setFormData }: PanelProps) => {
 
 const ProtectPanel = ({ formData, setFormData }: PanelProps) => (
 	<div className="grid grid-cols-1 gap-4 rounded-md border bg-background/50 p-3 sm:grid-cols-2">
-		<div>
+		<div className="grid gap-2">
 			<Label htmlFor="deleteOnClicks">Excluir após X cliques</Label>
 			<Input
 				id="deleteOnClicks"
@@ -215,7 +215,7 @@ const ProtectPanel = ({ formData, setFormData }: PanelProps) => (
 				value={formData.deleteOnClicks || ""}
 			/>
 		</div>
-		<div>
+		<div className="grid gap-2">
 			<Label htmlFor="password">Senha de Acesso</Label>
 			<Input
 				id="password"
@@ -229,7 +229,7 @@ const ProtectPanel = ({ formData, setFormData }: PanelProps) => (
 );
 
 const BadgePanel = ({ formData, setFormData }: PanelProps) => (
-	<div className="rounded-md border bg-background/50 p-3">
+	<div className="grid gap-2 rounded-md border bg-background/50 p-3">
 		<Label htmlFor="badge">Texto do Badge</Label>
 		<Input
 			id="badge"
@@ -270,7 +270,7 @@ const ProductPanel = ({ formData, setFormData }: PanelProps) => {
 			</div>
 			{formData.isProduct && (
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-					<div>
+					<div className="grid gap-2">
 						<Label htmlFor="price">Preço (R$)</Label>
 						<Input
 							id="price"
@@ -289,8 +289,11 @@ const ProductPanel = ({ formData, setFormData }: PanelProps) => {
 							value={formData.price || ""}
 						/>
 					</div>
-					<div>
-						<Label htmlFor="productImage">Imagem do Produto</Label>
+					<div className="grid gap-2">
+						<Label htmlFor="productImage">
+							Imagem do Produto{" "}
+							<span className="text-gray-400 text-xs">Máx. 2MB</span>
+						</Label>
 						<Input
 							accept="image/jpeg, image/png, image/webp"
 							className="hidden"
@@ -307,7 +310,7 @@ const ProductPanel = ({ formData, setFormData }: PanelProps) => {
 							<ImageIcon className="mr-2 h-4 w-4" />
 							{formData.productImageFile
 								? formData.productImageFile.name
-								: "Selecionar imagem (até 2MB)"}
+								: "Selecionar imagem"}
 						</Button>
 					</div>
 				</div>
@@ -346,7 +349,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 		<section className="space-y-4 rounded-lg border bg-muted/20 p-4">
 			{/* Campos Principais */}
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-				<div>
+				<div className="grid gap-2">
 					<Label htmlFor="title">Título do Link</Label>
 					<Input
 						id="title"
@@ -357,7 +360,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 						value={formData.title}
 					/>
 				</div>
-				<div>
+				<div className="grid gap-2">
 					<Label htmlFor="url">URL</Label>
 					<Input
 						id="url"
@@ -379,7 +382,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					variant={activeOption === "section" ? "secondary" : "outline"}
 				>
 					<Type className="mb-1 h-5 w-5" />{" "}
-					<span className="text-xs">Seção</span>
+					<span className="hidden text-xs md:block">Seção</span>
 				</Button>
 				<Button
 					className="flex h-16 flex-col"
@@ -387,7 +390,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					variant={activeOption === "schedule" ? "secondary" : "outline"}
 				>
 					<Clock className="mb-1 h-5 w-5" />{" "}
-					<span className="text-xs">Agendar</span>
+					<span className="hidden text-xs md:block">Agendar</span>
 				</Button>
 				<Button
 					className="flex h-16 flex-col"
@@ -395,7 +398,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					variant={activeOption === "protect" ? "secondary" : "outline"}
 				>
 					<Lock className="mb-1 h-5 w-5" />{" "}
-					<span className="text-xs">Proteger</span>
+					<span className="hidden text-xs md:block">Proteger</span>
 				</Button>
 				<Button
 					className="flex h-16 flex-col"
@@ -403,7 +406,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					variant={activeOption === "badge" ? "secondary" : "outline"}
 				>
 					<Tags className="mb-1 h-5 w-5" />{" "}
-					<span className="text-xs">Badge</span>
+					<span className="hidden text-xs md:block">Badge</span>
 				</Button>
 				<Button
 					className="flex h-16 flex-col"
@@ -411,7 +414,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					variant={activeOption === "product" ? "secondary" : "outline"}
 				>
 					<ShoppingCart className="mb-1 h-5 w-5" />{" "}
-					<span className="text-xs">Produto</span>
+					<span className="hidden text-xs md:block">Produto</span>
 				</Button>
 			</div>
 

@@ -1,11 +1,11 @@
 "use client";
 
+import { BaseButton } from "@/components/buttons/BaseButton";
 import InteractiveLink from "@/components/InteractiveLink";
 import JoinBionkModal from "@/components/JoinBionkModal";
-import ProfileViewTracker from "@/components/ProfileViewTracker";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
+import ProfileViewTracker from "@/components/ProfileViewTracker";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -139,7 +139,7 @@ function PasswordProtectedLink({
 	return (
 		<Dialog onOpenChange={setIsOpen} open={isOpen}>
 			<DialogTrigger asChild>{children}</DialogTrigger>
-			<DialogContent className="sm:max-w-[425px]">
+			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>Link Protegido</DialogTitle>
 					<DialogDescription>
@@ -157,7 +157,9 @@ function PasswordProtectedLink({
 						value={passwordInput}
 					/>
 					{error && <p className="text-red-500 text-sm">{error}</p>}
-					<Button type="submit">Desbloquear Link</Button>
+					<BaseButton fullWidth type="submit">
+						Desbloquear Link
+					</BaseButton>
 				</form>
 			</DialogContent>
 		</Dialog>
@@ -180,7 +182,7 @@ function LinksList({
 	const groupedLinks = useMemo(() => {
 		return user.Link.reduce(
 			(acc, link) => {
-				const section = link.sectionTitle || "Links Gerais";
+				const section = link.sectionTitle || "";
 				if (!acc[section]) {
 					acc[section] = [];
 				}
@@ -196,7 +198,7 @@ function LinksList({
 			{Object.entries(groupedLinks).map(([sectionTitle, links]) => (
 				<section className="space-y-4" key={sectionTitle}>
 					{/* Mostra o título da seção se não for a padrão ou se for a única */}
-					{(sectionTitle !== "Links Gerais" ||
+					{(sectionTitle !== "" ||
 						Object.keys(groupedLinks).length === 1) && (
 						<h2 className="font-bold text-xl" style={textStyle}>
 							{sectionTitle}
