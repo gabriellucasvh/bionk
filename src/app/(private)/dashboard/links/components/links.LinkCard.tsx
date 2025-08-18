@@ -30,7 +30,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { LinkItem } from "../types/links.types";
-import { getIconForUrl, isValidUrl } from "../utils/links.helpers";
+import { isValidUrl } from "../utils/links.helpers";
 import { useCountdown } from "../utils/useCountdown";
 
 // Tipos e Interfaces
@@ -167,7 +167,7 @@ const DisplayView = (props: LinkCardProps) => {
 		onClickLink,
 	} = props;
 
-	// --- CORREÇÃO APLICADA AQUI ---
+	// --- Estados temporais ---
 	const isLaunching = !!(
 		link.launchesAt && new Date(link.launchesAt) > new Date()
 	);
@@ -203,10 +203,7 @@ const DisplayView = (props: LinkCardProps) => {
 				)}
 				<div className="flex-1 space-y-2">
 					<header className="flex flex-wrap items-center gap-2">
-						<h3 className="flex items-center gap-1.5 font-medium">
-							<span className="mt-0.5">{getIconForUrl(link.url)}</span>
-							{link.title}
-						</h3>
+						<h3 className="font-medium">{link.title}</h3>
 						{link.badge && <Badge variant="secondary">{link.badge}</Badge>}
 						{link.password && (
 							<Lock className="h-3 w-3 text-muted-foreground" />
