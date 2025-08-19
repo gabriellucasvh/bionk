@@ -1,10 +1,10 @@
 // src/app/api/auth/request-password-reset/route.ts
 
 import prisma from "@/lib/prisma";
-import { authRateLimiter } from "@/lib/rate-limiter";
-import crypto from "node:crypto";
+import { getAuthRateLimiter } from "@/lib/rate-limiter";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
+import crypto from "node:crypto";
 import { Resend } from "resend";
 
 const resendApiKey = process.env.RESEND_API_KEY;
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 	// --- RATE LIMITER ---
 	const headersList = await headers();
 	const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
-	const { success } = await authRateLimiter.limit(ip);
+	const { success } = await getAuthRateLimiter().limit(ip);
 
 	if (!success) {
 		return NextResponse.json(

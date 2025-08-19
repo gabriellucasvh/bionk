@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { authRateLimiter } from "@/lib/rate-limiter";
+import { getAuthRateLimiter } from "@/lib/rate-limiter";
 import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
 		// --- RATE LIMITER ---
 		const identifier = session.user.id; // identificador por usuário
-		const { success } = await authRateLimiter.limit(identifier);
+		const { success } = await getAuthRateLimiter().limit(identifier);
 		if (!success) {
 			return NextResponse.json(
 				{ error: "Muitas requisições. Tente novamente mais tarde." },
