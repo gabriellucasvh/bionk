@@ -47,7 +47,7 @@ const Header: React.FC = () => {
 						alt="logo"
 						height={90}
 						priority
-						src="/bionk-logo.svg"
+						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
 						width={100}
 					/>
 				</Link>

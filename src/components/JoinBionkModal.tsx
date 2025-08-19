@@ -1,10 +1,5 @@
 "use client";
 
-import { ArrowRight, Globe, LinkIcon, Share2 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import type { ReactNode } from "react";
-import { useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -15,6 +10,11 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { ArrowRight, Globe, LinkIcon, Share2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 
 interface JoinBionkModalProps {
@@ -25,31 +25,31 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 	const [open, setOpen] = useState(false);
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog onOpenChange={setOpen} open={open}>
 			<DialogTrigger asChild>
 				<Button
+					className="inline-block max-w-full break-words text-center text-sm sm:text-base"
 					onClick={() => setOpen(true)}
-					className="text-sm sm:text-base max-w-full break-words inline-block text-center"
 					variant="ghost"
 				>
 					@{children} | Bionk
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="w-full max-w-[90vw] sm:max-w-lg rounded-2xl border bg-background p-0 shadow-xl">
+			<DialogContent className="w-full max-w-[90vw] rounded-2xl border bg-background p-0 shadow-xl sm:max-w-lg">
 				{/* Logo Area */}
 				<div className="flex justify-center p-6 pb-2">
 					<Image
-						src="/bionk-logo.svg"
 						alt="Bionk Logo"
-						width={64}
+						className="sm:h-20 sm:w-20"
 						height={64}
-						className="sm:w-20 sm:h-20"
+						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
+						width={64}
 					/>
 				</div>
 
-				<DialogHeader className="px-4 sm:px-6 pt-2">
-					<DialogTitle className="text-xl sm:text-2xl font-bold text-center">
+				<DialogHeader className="px-4 pt-2 sm:px-6">
+					<DialogTitle className="text-center font-bold text-xl sm:text-2xl">
 						Junte-se ao Bionk
 					</DialogTitle>
 					<DialogDescription className="text-center text-sm sm:text-base">
@@ -57,34 +57,34 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="px-4 sm:px-6 py-4">
+				<div className="px-4 py-4 sm:px-6">
 					<Separator className="my-2" />
 
 					{/* Features */}
 					<div className="grid grid-cols-1 gap-4 py-4">
 						{[
 							{
-								icon: <Globe className="w-4 h-4" />,
+								icon: <Globe className="h-4 w-4" />,
 								title: "Sua presença online",
 								desc: "Crie um perfil único que represente você ou sua marca.",
 								bg: "bg-blue-100 text-blue-600",
 							},
 							{
-								icon: <LinkIcon className="w-4 h-4" />,
+								icon: <LinkIcon className="h-4 w-4" />,
 								title: "Todos os seus links",
 								desc: "Reúna todos os seus conteúdos em um só lugar.",
 								bg: "bg-purple-100 text-purple-600",
 							},
 							{
-								icon: <Share2 className="w-4 h-4" />,
+								icon: <Share2 className="h-4 w-4" />,
 								title: "Compartilhe facilmente",
 								desc: "Compartilhe seu perfil em qualquer lugar com um único link.",
 								bg: "bg-green-100 text-green-600",
 							},
 						].map((item) => (
-							<div key={item.title} className="flex items-start gap-3">
+							<div className="flex items-start gap-3" key={item.title}>
 								<div
-									className={`flex items-center justify-center w-8 h-8 rounded-full ${item.bg}`}
+									className={`flex h-8 w-8 items-center justify-center rounded-full ${item.bg}`}
 								>
 									{item.icon}
 								</div>
@@ -92,7 +92,7 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 									<h3 className="font-medium text-base sm:text-lg">
 										{item.title}
 									</h3>
-									<p className="text-sm text-muted-foreground">{item.desc}</p>
+									<p className="text-muted-foreground text-sm">{item.desc}</p>
 								</div>
 							</div>
 						))}
@@ -100,21 +100,21 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 
 					<Separator className="my-2" />
 
-					<p className="text-sm sm:text-base text-center text-muted-foreground mt-4">
+					<p className="mt-4 text-center text-muted-foreground text-sm sm:text-base">
 						Junte-se a milhares de criadores que já estão usando o{" "}
 						<strong>Bionk</strong> para expandir sua presença online.
 					</p>
 				</div>
 				<div className="flex flex-col">
-					<DialogFooter className="flex flex-col p-4 sm:p-6 pt-2">
+					<DialogFooter className="flex flex-col p-4 pt-2 sm:p-6">
 						<Link
-							className="w-full text-center inline-flex items-center justify-center rounded-md px-3 py-2 bg-gradient-to-r from-lime-500 to-emerald-600 hover:from-green-600 hover:to-green-700 text-white font-medium transition-colors duration-30"
+							className="inline-flex w-full items-center justify-center rounded-md bg-gradient-to-r from-lime-500 to-emerald-600 px-3 py-2 text-center font-medium text-white transition-colors duration-30 hover:from-green-600 hover:to-green-700"
 							href={"https://www.bionk.me/registro"}
 							rel="noopener noreferrer"
 							target="_blank"
 						>
 							Começar agora
-							<ArrowRight className="ml-2 w-4 h-4" />
+							<ArrowRight className="ml-2 h-4 w-4" />
 						</Link>
 					</DialogFooter>
 				</div>

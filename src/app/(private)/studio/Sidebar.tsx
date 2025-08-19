@@ -113,7 +113,7 @@ const Sidebar = () => {
 							alt="logo"
 							height={30}
 							priority
-							src="/bionk-logo.svg"
+							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
 							width={90}
 						/>
 					</Link>

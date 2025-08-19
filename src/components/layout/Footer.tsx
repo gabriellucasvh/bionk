@@ -46,7 +46,7 @@ const Footer = () => {
 								className="h-14 w-auto"
 								height={28}
 								priority
-								src="/bionk-logo-white.svg"
+								src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641014/bionk-logo-icon_ya5kbp.svg"
 								width={110}
 							/>
 						</Link>
@@ -116,6 +116,16 @@ const Footer = () => {
 						reservados.
 					</p>
 				</div>
+			</div>
+			<div className="mx-auto flex h-full w-full items-center justify-center p-4">
+				<Image
+					alt="Logo Bionk"
+					height={1000}
+					src={
+						"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755640991/bionk-logo-white_ld4dzs.svg"
+					}
+					width={1000}
+				/>
 			</div>
 		</footer>
 	);
