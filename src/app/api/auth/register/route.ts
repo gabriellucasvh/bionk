@@ -1,5 +1,3 @@
-"use client";
-
 import OtpEmail from "@/emails/OtpEmail";
 import prisma from "@/lib/prisma";
 import { authRateLimiter } from "@/lib/rate-limiter";
