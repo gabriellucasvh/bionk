@@ -1,75 +1,115 @@
 // src/app/api/auth/request-password-reset/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
-import prisma from '@/lib/prisma';
-import crypto from 'crypto';
+
+import prisma from "@/lib/prisma";
+import { authRateLimiter } from "@/lib/rate-limiter";
+import crypto from "node:crypto";
+import { headers } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 
 const resendApiKey = process.env.RESEND_API_KEY;
 if (!resendApiKey) {
-  console.error('RESEND_API_KEY não está definido no ambiente.');
-  throw new Error('RESEND_API_KEY não está definido no ambiente.');
+	throw new Error("RESEND_API_KEY não está definido no ambiente.");
 }
 const resend = new Resend(resendApiKey);
 
 export async function POST(req: NextRequest) {
-  try {
-    const { email } = await req.json();
+	// --- RATE LIMITER ---
+	const headersList = await headers();
+	const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
+	const { success } = await authRateLimiter.limit(ip);
 
-    if (!email || typeof email !== 'string') {
-      return NextResponse.json({ error: 'Email inválido' }, { status: 400 });
-    }
+	if (!success) {
+		return NextResponse.json(
+			{ error: "Muitas requisições. Tente novamente mais tarde." },
+			{ status: 429 }
+		);
+	}
 
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
+	try {
+		const { email } = await req.json();
 
-    if (!user) {
-      return NextResponse.json({ message: 'Se o e-mail estiver cadastrado, um link de redefinição será enviado.' }, { status: 200 });
-    }
+		if (!email || typeof email !== "string") {
+			return NextResponse.json({ error: "Email inválido" }, { status: 400 });
+		}
 
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const passwordResetToken = crypto
-      .createHash('sha256')
-      .update(resetToken)
-      .digest('hex');
+		const user = await prisma.user.findUnique({
+			where: { email },
+		});
 
-    const passwordResetExpires = new Date(Date.now() + 3600000);
+		if (!user) {
+			return NextResponse.json(
+				{
+					message:
+						"Se o e-mail estiver cadastrado, um link de redefinição será enviado.",
+				},
+				{ status: 200 }
+			);
+		}
 
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        passwordResetToken,
-        passwordResetExpires,
-      },
-    });
-    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://www.bionk.me';
-    const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
+		const resetToken = crypto.randomBytes(32).toString("hex");
+		const passwordResetToken = crypto
+			.createHash("sha256")
+			.update(resetToken)
+			.digest("hex");
 
-    try {
-      const emailResponse = await resend.emails.send({
-        from: 'Bionk <contato@bionk.me>',
-        to: [email],
-        subject: 'Redefinição de Senha - Bionk',
-        html: `<p>Você solicitou a redefinição de senha. Clique no link abaixo para criar uma nova senha:</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>Este link expira em 1 hora.</p><p>Se você não solicitou isso, ignore este e-mail.</p>`,
-      });
-      if (emailResponse.error) {
-        throw new Error(typeof emailResponse.error === "string" ? emailResponse.error : String(emailResponse.error));
-      }
-      return NextResponse.json({ message: 'Se o e-mail estiver cadastrado, um link de redefinição será enviado.' }, { status: 200 });
-    } catch (emailError) {
-      console.error('[RequestPasswordReset] Erro ao enviar e-mail de redefinição:', emailError);
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          passwordResetToken: null,
-          passwordResetExpires: null,
-        },
-      });
-      return NextResponse.json({ error: 'Erro ao enviar e-mail de redefinição.', detalhes: String(emailError) }, { status: 500 });
-    }
+		const passwordResetExpires = new Date(Date.now() + 3_600_000); // 1h
 
-  } catch (error) {
-    console.error('[RequestPasswordReset] Erro geral:', error);
-    return NextResponse.json({ error: 'Ocorreu um erro interno.', detalhes: String(error) }, { status: 500 });
-  }
+		await prisma.user.update({
+			where: { id: user.id },
+			data: {
+				passwordResetToken,
+				passwordResetExpires,
+			},
+		});
+
+		const baseUrl = process.env.NEXTAUTH_URL ?? "https://www.bionk.me";
+		const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
+
+		try {
+			const emailResponse = await resend.emails.send({
+				from: "Bionk <contato@bionk.me>",
+				to: [email],
+				subject: "Redefinição de Senha - Bionk",
+				html: `<p>Você solicitou a redefinição de senha. Clique no link abaixo para criar uma nova senha:</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>Este link expira em 1 hora.</p><p>Se você não solicitou isso, ignore este e-mail.</p>`,
+			});
+
+			if (emailResponse.error) {
+				throw new Error(
+					typeof emailResponse.error === "string"
+						? emailResponse.error
+						: String(emailResponse.error)
+				);
+			}
+
+			return NextResponse.json(
+				{
+					message:
+						"Se o e-mail estiver cadastrado, um link de redefinição será enviado.",
+				},
+				{ status: 200 }
+			);
+		} catch (emailError) {
+			await prisma.user.update({
+				where: { id: user.id },
+				data: {
+					passwordResetToken: null,
+					passwordResetExpires: null,
+				},
+			});
+
+			return NextResponse.json(
+				{
+					error: "Erro ao enviar e-mail de redefinição.",
+					detalhes: String(emailError),
+				},
+				{ status: 500 }
+			);
+		}
+	} catch (error) {
+		return NextResponse.json(
+			{ error: "Ocorreu um erro interno.", detalhes: String(error) },
+			{ status: 500 }
+		);
+	}
 }
