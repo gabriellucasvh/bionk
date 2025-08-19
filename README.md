@@ -8,12 +8,17 @@ Bionk é uma plataforma **Link in Bio** moderna e personalizável, desenvolvida 
 - **React 19** - Biblioteca para interfaces de usuário.
 - **Tailwind CSS (v4)** - Estilização moderna e responsiva.
 - **Prisma (PostgreSQL)** - ORM para manipulação do banco de dados.
+- **NeonDB** - Banco de dados escalável baseado em PostgreSQL na nuvem.
+- **Redis - Upstash** - Armazenamento em cache, gerenciamento de sessões e rate limiter.
+- **Docker** - Containerização para desenvolvimento e deploy consistentes.
 - **NextAuth.js** - Autenticação segura e integrada.
 - **Framer Motion** - Animações suaves e fluidas.
 - **DND Kit** - Drag and Drop interativo.
 - **Radix UI** - Componentes acessíveis e práticos.
 - **Recharts** - Visualização de dados interativa.
 - **Zod** - Validação de esquemas com TypeScript.
+- **BiomeJS** - Ferramenta de formatação e linting de código moderna.
+
 
 ## 🛠️ Instalação e Uso
 
