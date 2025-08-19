@@ -9,7 +9,7 @@ type: "Guia"
 Adicionar links no seu perfil do Bionk permite direcionar seus seguidores para diferentes páginas, como redes sociais, produtos, sites e muito mais.
 
 ## Como Criar um Link
-1. Acesse sua conta na plataforma (dashboard).
+1. Acesse sua conta na plataforma (Studio).
 2. Vá até a seção **Links**.
 3. Clique em **Adicionar novo link**.
 4. Insira o **título** (exemplo: "Meu Instagram") e o **URL** (exemplo: "https://www.instagram.com/seuperfil").

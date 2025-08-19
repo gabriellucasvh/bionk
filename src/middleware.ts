@@ -1,13 +1,13 @@
+import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 
 // Esta função será chamada antes da requisição para qualquer rota
 export async function middleware(req: NextRequest) {
 	const { pathname } = req.nextUrl;
 
-	// Checa se a rota é do dashboard
-	if (pathname.startsWith("/dashboard")) {
+	// Checa se a rota é do studio
+	if (pathname.startsWith("/studio")) {
 		// Verifica se o token JWT está presente (autenticação com next-auth)
 		const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
@@ -22,5 +22,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/dashboard/:path*"], // Protege todas as páginas dentro de /dashboard
+	matcher: ["/studio/:path*"], // Protege todas as páginas dentro de /studio
 };

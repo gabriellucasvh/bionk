@@ -1,14 +1,5 @@
 "use client";
 
-import React from "react";
-import {
-	CartesianGrid,
-	Line,
-	LineChart,
-	ResponsiveContainer,
-	XAxis,
-	YAxis,
-} from "recharts";
 import {
 	Card,
 	CardContent,
@@ -22,6 +13,15 @@ import {
 	ChartTooltipContent,
 } from "@/components/ui/chart";
 import { formatDate } from "@/lib/utils";
+import React from "react";
+import {
+	CartesianGrid,
+	Line,
+	LineChart,
+	ResponsiveContainer,
+	XAxis,
+	YAxis,
+} from "recharts";
 
 interface ChartDataPoint {
 	day: string;
@@ -48,6 +48,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 					<CardContent>
 						<div className="h-[300px] sm:h-[350px] md:h-[400px]">
 							<ChartContainer
+								className="h-full w-full"
 								config={{
 									views: {
 										label: "Visualizações",
@@ -58,46 +59,45 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 										color: "oklch(62.7% 0.194 149.214)",
 									},
 								}}
-								className="h-full w-full"
 							>
-								<ResponsiveContainer width="100%" height="100%">
+								<ResponsiveContainer height="100%" width="100%">
 									<LineChart
 										data={chartData}
 										margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
 									>
 										<CartesianGrid
-											strokeDasharray="3 3"
 											className="stroke-muted"
+											strokeDasharray="3 3"
 										/>
 										<XAxis
+											axisLine={false}
+											className="text-xs"
 											dataKey="day"
 											tickFormatter={(tick) => formatDate(tick, "dd/MM")}
 											tickLine={false}
-											axisLine={false}
-											className="text-xs"
 										/>
 										<YAxis
-											tickFormatter={(tick) => tick.toString()}
-											tickLine={false}
 											axisLine={false}
 											className="text-xs"
+											tickFormatter={(tick) => tick.toString()}
+											tickLine={false}
 										/>
 										<ChartTooltip content={<ChartTooltipContent />} />
 										<Line
-											type="monotone"
+											activeDot={{ r: 6 }}
 											dataKey="views"
+											dot={{ r: 4 }}
 											stroke="var(--color-views)"
 											strokeWidth={2}
-											dot={{ r: 4 }}
-											activeDot={{ r: 6 }}
+											type="monotone"
 										/>
 										<Line
-											type="monotone"
+											activeDot={{ r: 6 }}
 											dataKey="clicks"
+											dot={{ r: 4 }}
 											stroke="var(--color-clicks)"
 											strokeWidth={2}
-											dot={{ r: 4 }}
-											activeDot={{ r: 6 }}
+											type="monotone"
 										/>
 									</LineChart>
 								</ResponsiveContainer>
@@ -107,7 +107,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 				</Card>
 			</article>
 		);
-	},
+	}
 );
 
 PerformanceChart.displayName = "PerformanceChart";

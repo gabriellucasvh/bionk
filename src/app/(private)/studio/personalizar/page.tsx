@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Sidebar from "../dashboard.sidebar";
+import Sidebar from "../Sidebar";
 import IframePreview from "./components/personalizar.IFramePreview";
 import PersonalizarClient from "./personalizar.client";
 

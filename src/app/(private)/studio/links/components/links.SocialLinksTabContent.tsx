@@ -1,4 +1,4 @@
-// app/dashboard/links/components/SocialLinksTabContent.tsx
+// app/studio/links/components/SocialLinksTabContent.tsx
 
 "use client";
 

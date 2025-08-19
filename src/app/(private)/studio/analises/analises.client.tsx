@@ -6,36 +6,42 @@ import React, { useCallback, useMemo } from "react";
 import useSWR from "swr";
 
 // Dynamic imports for components
-const AnalyticsHeader = dynamic(() => import("./components/analises.AnalyticsHeader"), {
-	loading: () => (
-		<div className="h-16 w-full animate-pulse rounded-md bg-muted"></div>
-	),
-});
+const AnalyticsHeader = dynamic(
+	() => import("./components/analises.AnalyticsHeader"),
+	{
+		loading: () => (
+			<div className="h-16 w-full animate-pulse rounded-md bg-muted" />
+		),
+	}
+);
 const AnalyticsStatsCards = dynamic(
 	() => import("./components/analises.AnalyticsStatsCards"),
 	{
 		loading: () => (
 			<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-				<div className="h-full w-full animate-pulse rounded-md bg-muted"></div>
-				<div className="h-full w-full animate-pulse rounded-md bg-muted"></div>
-				<div className="h-full w-full animate-pulse rounded-md bg-muted"></div>
+				<div className="h-full w-full animate-pulse rounded-md bg-muted" />
+				<div className="h-full w-full animate-pulse rounded-md bg-muted" />
+				<div className="h-full w-full animate-pulse rounded-md bg-muted" />
 			</div>
 		),
-	},
+	}
 );
 const PerformanceChart = dynamic(
 	() => import("./components/analises.PerformanceChart"),
 	{
 		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted"></div>
+			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
 		),
-	},
+	}
 );
-const TopLinksTable = dynamic(() => import("./components/analises.TopLinksTable"), {
-	loading: () => (
-		<div className="h-[200px] w-full animate-pulse rounded-md bg-muted"></div>
-	),
-});
+const TopLinksTable = dynamic(
+	() => import("./components/analises.TopLinksTable"),
+	{
+		loading: () => (
+			<div className="h-[200px] w-full animate-pulse rounded-md bg-muted" />
+		),
+	}
+);
 
 interface TopLink {
 	id: string;
@@ -76,26 +82,28 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 			refreshInterval: 0,
 			revalidateOnFocus: true,
 			revalidateOnReconnect: true,
-		},
+		}
 	);
 
 	const memoizedChartData = useMemo(
 		() => data?.chartData || [],
-		[data?.chartData],
+		[data?.chartData]
 	);
 	const memoizedTopLinks = useMemo(
 		() => data?.topLinks || [],
-		[data?.topLinks],
+		[data?.topLinks]
 	);
 
 	const exportToExcel = useCallback(async () => {
-		if (!data) return;
+		if (!data) {
+			return;
+		}
 		const ExcelJS = (await import("exceljs")).default;
 		const workbook = new ExcelJS.Workbook();
 		const worksheet = workbook.addWorksheet("Analytics");
 		worksheet.addRow(["Data", "Cliques", "Visualizações"]);
 		data.chartData.forEach((item) =>
-			worksheet.addRow([formatDate(item.day), item.clicks, item.views]),
+			worksheet.addRow([formatDate(item.day), item.clicks, item.views])
 		);
 		const buffer = await workbook.xlsx.writeBuffer();
 		const blob = new Blob([buffer], {
@@ -108,7 +116,9 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 	}, [data]);
 
 	const exportToPDF = useCallback(async () => {
-		if (!data) return;
+		if (!data) {
+			return;
+		}
 		const { default: jsPDF } = await import("jspdf");
 		const { default: autoTable } = await import("jspdf-autotable");
 		const doc = new jsPDF();
@@ -142,26 +152,26 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 			<main className="space-y-6">
 				{isLoading || !data ? (
 					<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-						<div className="h-full w-full animate-pulse rounded-md bg-muted"></div>
-						<div className="h-full w-full animate-pulse rounded-md bg-muted"></div>
-						<div className="h-full w-full animate-pulse rounded-md bg-muted"></div>
+						<div className="h-full w-full animate-pulse rounded-md bg-muted" />
+						<div className="h-full w-full animate-pulse rounded-md bg-muted" />
+						<div className="h-full w-full animate-pulse rounded-md bg-muted" />
 					</div>
 				) : (
 					<AnalyticsStatsCards
-						totalProfileViews={data.totalProfileViews}
-						totalClicks={data.totalClicks}
 						performanceRate={data.performanceRate}
+						totalClicks={data.totalClicks}
+						totalProfileViews={data.totalProfileViews}
 					/>
 				)}
 
 				{isLoading || !data ? (
-					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted"></div>
+					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
 				) : (
 					<PerformanceChart chartData={memoizedChartData} />
 				)}
 
 				{isLoading || !data ? (
-					<div className="h-[200px] w-full animate-pulse rounded-md bg-muted"></div>
+					<div className="h-[200px] w-full animate-pulse rounded-md bg-muted" />
 				) : (
 					<TopLinksTable topLinks={memoizedTopLinks} />
 				)}

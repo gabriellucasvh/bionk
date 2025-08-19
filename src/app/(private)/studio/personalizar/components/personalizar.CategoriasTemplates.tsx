@@ -1,4 +1,4 @@
-// src/app/(private)/dashboard/personalizar/CategoriasTemplates.tsx
+// src/app/(private)/studio/personalizar/CategoriasTemplates.tsx
 "use client";
 
 import { BaseButton } from "@/components/buttons/BaseButton";

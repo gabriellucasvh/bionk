@@ -1,4 +1,4 @@
-// src/app/(private)/dashboard/personalizar/personalizar.client.tsx
+// src/app/(private)/studio/personalizar/personalizar.client.tsx
 "use client";
 
 import { useEffect, useState } from "react";

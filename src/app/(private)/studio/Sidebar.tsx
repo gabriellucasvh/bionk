@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	BarChart3,
+	Blocks,
 	ExternalLink,
 	Link2,
 	LogOut,
-	SwatchBook,
 	Paintbrush,
-	Blocks,
 	Settings,
 	ShoppingBag,
+	SwatchBook,
 	Table2,
 	User,
 } from "lucide-react";
@@ -24,31 +24,31 @@ import { useEffect, useState } from "react";
 const mainLinks = [
 	{
 		key: "profile",
-		href: "/dashboard/perfil",
+		href: "/studio/perfil",
 		label: "Perfil",
 		icon: <User className="h-4 w-4" />,
 	},
 	{
 		key: "links",
-		href: "/dashboard/links",
+		href: "/studio/links",
 		label: "Links",
 		icon: <Link2 className="h-4 w-4" />,
 	},
 	{
 		key: "personalization",
-		href: "/dashboard/personalizar",
+		href: "/studio/personalizar",
 		label: "Temas",
 		icon: <Paintbrush className="h-4 w-4" />,
 	},
 	{
 		key: "analytics",
-		href: "/dashboard/analises",
+		href: "/studio/analises",
 		label: "Análises",
 		icon: <BarChart3 className="h-4 w-4" />,
 	},
 	{
 		key: "settings",
-		href: "/dashboard/configs",
+		href: "/studio/configs",
 		label: "Configurações",
 		labelMobile: "Configs.",
 		icon: <Settings className="h-4 w-4" />,
@@ -58,19 +58,19 @@ const mainLinks = [
 const toolsLinks = [
 	{
 		key: "shop",
-		href: "/dashboard/links-shop",
+		href: "/studio/links-shop",
 		label: "Links Shop",
 		icon: <ShoppingBag className="h-4 w-4" />,
 	},
 	{
 		key: "creators",
-		href: "/dashboard/criadores",
+		href: "/studio/criadores",
 		label: "Para Criadores",
 		icon: <SwatchBook className="h-4 w-4" />,
 	},
 	{
 		key: "integrations",
-		href: "/dashboard/integracoes",
+		href: "/studio/integracoes",
 		label: "Integrações",
 		icon: <Blocks className="h-4 w-4" />,
 	},
@@ -99,7 +99,7 @@ const Sidebar = () => {
 	useEffect(() => {
 		setDisabledButtons(new Set());
 	}, []);
-	const isLoading = !(session && session.user && username);
+	const isLoading = !(session?.user && username);
 	return (
 		<>
 			{/* Sidebar para telas médias e maiores */}

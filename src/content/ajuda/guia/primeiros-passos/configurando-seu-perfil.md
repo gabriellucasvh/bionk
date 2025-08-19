@@ -5,9 +5,9 @@ category: "Primeiros Passos"
 type: "Guia"
 ---
 
-## Acessando a página de perfil no Dashboard
+## Acessando a página de perfil no Studio
 
-Após criar sua conta, você terá acesso ao dashboard e será possível alterar alterar algumas informações predefinidas.
+Após criar sua conta, você terá acesso ao Studio e será possível alterar alterar algumas informações predefinidas.
 
 ## Alterando informações
 

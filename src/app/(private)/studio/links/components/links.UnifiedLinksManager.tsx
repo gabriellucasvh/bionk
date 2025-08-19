@@ -1,4 +1,4 @@
-// app/dashboard/links/components/UnifiedLinksManager.tsx
+// app/studio/links/components/UnifiedLinksManager.tsx
 
 "use client";
 

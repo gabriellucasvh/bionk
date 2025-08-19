@@ -1,20 +1,20 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios, { AxiosError } from "axios";
-import { Eye, EyeOff } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
-import type { SubmitHandler } from "react-hook-form";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { GoogleBtn } from "@/components/buttons/button-google";
 import LoadingPage from "@/components/layout/LoadingPage";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios, { AxiosError } from "axios";
+import { Eye, EyeOff } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import type { SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const emailSchema = z.object({
 	email: z.string().email("E-mail inválido"),
@@ -63,12 +63,12 @@ function Register() {
 	const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 	const cooldownTimerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-	const { data: session, status } = useSession();
+	const { data: _session, status } = useSession();
 	const router = useRouter();
 
 	useEffect(() => {
 		if (status === "authenticated") {
-			router.replace("/dashboard");
+			router.replace("/studio");
 		}
 	}, [status, router]);
 
@@ -112,7 +112,7 @@ function Register() {
 					timerIntervalRef.current = null;
 					setMessage({
 						type: "error",
-						text: `Tempo esgotado. Solicite um novo código.`,
+						text: "Tempo esgotado. Solicite um novo código.",
 					});
 					setIsOtpInputDisabled(true);
 					return 0;
@@ -140,10 +140,7 @@ function Register() {
 		}, 1000);
 	};
 
-	const _submitEmailLogic = async (
-		data: EmailFormData,
-		_isResend: boolean = false,
-	) => {
+	const _submitEmailLogic = async (data: EmailFormData, _isResend = false) => {
 		setLoading(true);
 		setMessage(null);
 		clearTimers();
@@ -208,7 +205,7 @@ function Register() {
 				if (error.response?.status === 429) {
 					const match = errorText.match(/(\d+) minutos/);
 					const cooldownMinutes = match
-						? parseInt(match[1], 10)
+						? Number.parseInt(match[1], 10)
 						: OTP_COOLDOWN_MINUTES;
 					startOtpCooldownTimer(cooldownMinutes);
 				}
@@ -221,7 +218,7 @@ function Register() {
 	};
 
 	const handlePasswordSubmit: SubmitHandler<PasswordFormData> = async (
-		data,
+		data
 	) => {
 		setLoading(true);
 		setMessage(null);
@@ -256,11 +253,11 @@ function Register() {
 	}
 
 	return (
-		<main className="min-h-screen flex flex-col items-center justify-center">
-			<section className="w-full min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-				<article className="bg-white p-8 rounded-lg w-full max-w-md md:border border-lime-500">
-					<div className="text-center mb-6 space-y-2">
-						<h2 className="text-2xl font-bold text-center text-black">
+		<main className="flex min-h-screen flex-col items-center justify-center">
+			<section className="flex min-h-screen w-full items-center justify-center px-4 sm:px-6 lg:px-8">
+				<article className="w-full max-w-md rounded-lg border-lime-500 bg-white p-8 md:border">
+					<div className="mb-6 space-y-2 text-center">
+						<h2 className="text-center font-bold text-2xl text-black">
 							{stage === "email" && "Crie sua conta Bionk"}
 							{stage === "otp" && "Verifique seu E-mail"}
 							{stage === "password" && "Defina sua Senha"}
@@ -291,7 +288,7 @@ function Register() {
 
 					{message && (
 						<div
-							className={`mb-4 p-3 rounded-md text-sm text-center ${message.type === "success" ? "bg-green-100 border border-green-400 text-green-700" : "bg-red-100 border border-red-400 text-red-700"}`}
+							className={`mb-4 rounded-md p-3 text-center text-sm ${message.type === "success" ? "border border-green-400 bg-green-100 text-green-700" : "border border-red-400 bg-red-100 text-red-700"}`}
 						>
 							{message.text}
 						</div>
@@ -299,15 +296,15 @@ function Register() {
 
 					{stage === "email" && (
 						<form
-							onSubmit={emailForm.handleSubmit(handleEmailSubmit)}
 							className="space-y-4"
+							onSubmit={emailForm.handleSubmit(handleEmailSubmit)}
 						>
 							<div>
-								<Label className="block text-base font-semibold text-black">
+								<Label className="block font-semibold text-base text-black">
 									Seu email
 								</Label>
 								<Input
-									className="w-full px-4 py-3 border mt-1 mb-1 rounded-md focus-visible:border-lime-500 transition-colors duration-400"
+									className="mt-1 mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
 									placeholder="Digite seu e-mail"
 									type="email"
 									{...emailForm.register("email")}
@@ -319,7 +316,7 @@ function Register() {
 									</p>
 								)}
 							</div>
-							<BaseButton type="submit" loading={loading} className="w-full">
+							<BaseButton className="w-full" loading={loading} type="submit">
 								Continuar
 							</BaseButton>
 						</form>
@@ -327,18 +324,18 @@ function Register() {
 
 					{stage === "otp" && (
 						<form
-							onSubmit={otpForm.handleSubmit(handleOtpSubmit)}
 							className="space-y-4"
+							onSubmit={otpForm.handleSubmit(handleOtpSubmit)}
 						>
 							<div>
-								<Label className="block text-base font-semibold text-black">
+								<Label className="block font-semibold text-base text-black">
 									Código de Verificação
 								</Label>
 								<input
-									className="w-full px-4 py-10 border mt-1 mb-1 rounded-md focus-visible:border-lime-500 transition-colors duration-400 tracking-[0.3em] text-center text-xl md:text-5xl"
+									className="mt-1 mb-1 w-full rounded-md border px-4 py-10 text-center text-xl tracking-[0.3em] transition-colors duration-400 focus-visible:border-lime-500 md:text-5xl"
+									maxLength={6}
 									placeholder="------"
 									type="text"
-									maxLength={6}
 									{...otpForm.register("otp")}
 									disabled={
 										loading ||
@@ -353,7 +350,7 @@ function Register() {
 									</p>
 								)}
 								{otpCooldownTimer > 0 && (
-									<span className="text-xs text-gray-500">
+									<span className="text-gray-500 text-xs">
 										Muitas tentativas. Tente novamente em{" "}
 										{Math.floor(otpCooldownTimer / 60)}:
 										{(otpCooldownTimer % 60).toString().padStart(2, "0")}.
@@ -361,22 +358,21 @@ function Register() {
 								)}
 							</div>
 							<BaseButton
-								type="submit"
+								className="w-full"
 								loading={
 									loading ||
 									isOtpInputDisabled ||
 									otpTimer === 0 ||
 									otpCooldownTimer > 0
 								}
-								className="w-full"
+								type="submit"
 							>
 								Verificar Código
 							</BaseButton>
-							<div className="flex justify-between items-center">
+							<div className="flex items-center justify-between">
 								<BaseButton
-									type="button"
-									variant="white"
-									className="px-4 py-2 rounded-md"
+									className="rounded-md px-4 py-2"
+									loading={loading}
 									onClick={() => {
 										setStage("email");
 										setMessage(null);
@@ -386,49 +382,50 @@ function Register() {
 										setOtpCooldownTimer(0);
 										setIsOtpInputDisabled(false);
 									}}
-									loading={loading}
+									type="button"
+									variant="white"
 								>
 									Usar outro e-mail
 								</BaseButton>
 								{(otpTimer === 0 ||
 									otpCooldownTimer > 0 ||
 									isOtpInputDisabled) && (
-										<BaseButton
-											type="button"
-											variant="white"
-											className="px-4 py-2 rounded-md"
-											onClick={handleResendOtp}
-											loading={loading || (otpCooldownTimer > 0 && otpTimer > 0)}
-										>
-											Solicitar novo código
-										</BaseButton>
-									)}
+									<BaseButton
+										className="rounded-md px-4 py-2"
+										loading={loading || (otpCooldownTimer > 0 && otpTimer > 0)}
+										onClick={handleResendOtp}
+										type="button"
+										variant="white"
+									>
+										Solicitar novo código
+									</BaseButton>
+								)}
 							</div>
 						</form>
 					)}
 
 					{stage === "password" && (
 						<form
-							onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)}
 							className="space-y-4"
+							onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)}
 						>
 							<div>
-								<Label className="block text-base font-semibold text-black">
+								<Label className="block font-semibold text-base text-black">
 									Sua senha
 								</Label>
 								<div className="relative mt-1">
 									<Input
-										className="w-full px-4 py-3 border mb-1 rounded-md focus-visible:border-lime-500 transition-colors duration-400"
+										className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
 										placeholder="Digite sua senha"
 										type={showPassword ? "text" : "password"}
 										{...passwordForm.register("password")}
 										disabled={loading}
 									/>
 									<button
-										type="button"
-										onClick={() => setShowPassword(!showPassword)}
-										className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+										className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
 										disabled={loading}
+										onClick={() => setShowPassword(!showPassword)}
+										type="button"
 									>
 										{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
 									</button>
@@ -440,22 +437,22 @@ function Register() {
 								)}
 							</div>
 							<div>
-								<Label className="block text-base font-semibold text-black">
+								<Label className="block font-semibold text-base text-black">
 									Confirmar senha
 								</Label>
 								<div className="relative mt-1">
 									<Input
-										className="w-full px-4 py-3 border mb-1 rounded-md focus-visible:border-lime-500 transition-colors duration-400"
+										className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
 										placeholder="Confirme sua senha"
 										type={showConfirmPassword ? "text" : "password"}
 										{...passwordForm.register("confirmPassword")}
 										disabled={loading}
 									/>
 									<button
-										type="button"
-										onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-										className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+										className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
 										disabled={loading}
+										onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+										type="button"
 									>
 										{showConfirmPassword ? (
 											<EyeOff size={20} />
@@ -470,7 +467,7 @@ function Register() {
 									</p>
 								)}
 							</div>
-							<BaseButton type="submit" loading={loading} className="w-full">
+							<BaseButton className="w-full" loading={loading} type="submit">
 								Criar Conta
 							</BaseButton>
 						</form>
@@ -478,16 +475,16 @@ function Register() {
 
 					{stage !== "success" && (
 						<>
-							<div className="flex flex-col items-center justify-center space-y-4 mt-6">
-								<span className="w-full flex items-center justify-center h-px bg-gray-300">
-									<span className="px-4 bg-white text-muted-foreground">
+							<div className="mt-6 flex flex-col items-center justify-center space-y-4">
+								<span className="flex h-px w-full items-center justify-center bg-gray-300">
+									<span className="bg-white px-4 text-muted-foreground">
 										ou
 									</span>
 								</span>
 								<GoogleBtn />
 							</div>
 							<div className="mt-6 text-center">
-								<span className="text-sm text-muted-foreground">
+								<span className="text-muted-foreground text-sm">
 									Já possui uma conta?{" "}
 									<Link
 										className="text-blue-500 hover:underline"
@@ -502,7 +499,7 @@ function Register() {
 					)}
 					{stage === "email" && (
 						<div className="mt-4">
-							<p className="text-xs text-muted-foreground text-center">
+							<p className="text-center text-muted-foreground text-xs">
 								Ao continuar, você aceita os nossos{" "}
 								<Link className="underline" href="/termos">
 									Termos e Condições

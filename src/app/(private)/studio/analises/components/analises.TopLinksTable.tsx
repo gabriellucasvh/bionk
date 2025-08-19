@@ -1,8 +1,5 @@
 "use client";
 
-import { LinkIcon, MousePointerClick } from "lucide-react";
-import Link from "next/link";
-import React from "react";
 import {
 	Card,
 	CardContent,
@@ -10,9 +7,12 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { LinkIcon, MousePointerClick } from "lucide-react";
+import Link from "next/link";
+import React from "react";
 
 interface TopLinkData {
-  id: string;
+	id: string;
 	title: string;
 	url: string;
 	clicks: number;
@@ -37,24 +37,24 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 						<div className="space-y-4">
 							{topLinks.map((link) => (
 								<div
+									className="flex flex-col items-start justify-between border-b pb-3 last:border-0 last:pb-0 sm:flex-row sm:items-center"
 									key={link.id}
-									className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b pb-3 last:border-0 last:pb-0"
 								>
-									<div className="flex flex-col space-y-1 flex-1">
+									<div className="flex flex-1 flex-col space-y-1">
 										<span className="font-medium">{link.title}</span>
 										<Link
+											className="flex max-w-md items-center gap-1 whitespace-normal break-words break-all text-blue-500 text-sm"
 											href={link.url}
 											target="_blank"
-											className="text-sm text-blue-500 flex items-center gap-1 max-w-md break-words break-all whitespace-normal"
 										>
 											<LinkIcon className="h-4 w-4 shrink-0" />
 											<span>{link.url}</span>
 										</Link>
 									</div>
-									<div className="flex items-center bg-primary/5 px-3 py-1.5 rounded-full text-sm">
+									<div className="flex items-center rounded-full bg-primary/5 px-3 py-1.5 text-sm">
 										<MousePointerClick
-											size={14}
 											className="mr-1.5 text-primary"
+											size={14}
 										/>
 										<span className="font-medium">
 											{link.clicks.toLocaleString()}
@@ -68,7 +68,7 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 				</Card>
 			</article>
 		);
-	},
+	}
 );
 
 TopLinksTable.displayName = "TopLinksTable";

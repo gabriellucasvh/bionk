@@ -1,16 +1,15 @@
-import type { NextAuthOptions } from "next-auth";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import GoogleProvider from "next-auth/providers/google";
-import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-import type { User } from "next-auth";
 import { generateUniqueUsername } from "@/utils/generateUsername";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import bcrypt from "bcryptjs";
+import type { NextAuthOptions, User } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
-if (!clientId || !clientSecret) {
+if (!(clientId && clientSecret)) {
 	throw new Error("Missing Google OAuth environment variables");
 }
 
@@ -94,17 +93,17 @@ export const authOptions: NextAuthOptions = {
 				password: { label: "Password", type: "password" },
 			},
 			async authorize(credentials) {
-				if (!credentials?.email || !credentials?.password) return null;
+				if (!(credentials?.email && credentials?.password)) return null;
 
 				const user = await prisma.user.findUnique({
 					where: { email: credentials.email },
 				});
 
-				if (!user || !user.hashedPassword) return null;
+				if (!(user && user.hashedPassword)) return null;
 
 				const isValid = await bcrypt.compare(
 					credentials.password,
-					user.hashedPassword,
+					user.hashedPassword
 				);
 
 				if (!isValid) return null;
@@ -171,7 +170,7 @@ export const authOptions: NextAuthOptions = {
 			) {
 				return `${baseUrl}/login?error=OAuthAccountNotLinked`;
 			}
-			// Verifica se a URL de callback é a página de signIn e não contém erro, então redireciona para o callbackUrl ou dashboard
+			// Verifica se a URL de callback é a página de signIn e não contém erro, então redireciona para o callbackUrl ou studio
 			if (
 				url.startsWith(baseUrl + "/registro") ||
 				url.startsWith(baseUrl + "/login")
@@ -180,14 +179,14 @@ export const authOptions: NextAuthOptions = {
 				if (callbackUrl) {
 					return callbackUrl;
 				}
-				return `${baseUrl}/dashboard/perfil`;
+				return `${baseUrl}/studio/perfil`;
 			}
 			// Se houver uma URL de callback na query, usa ela
 			if (new URL(url, baseUrl).searchParams.has("callbackUrl")) {
 				return url;
 			}
 			// Comportamento padrão para outros casos
-			return `${baseUrl}/dashboard/perfil`;
+			return `${baseUrl}/studio/perfil`;
 		},
 	},
 };

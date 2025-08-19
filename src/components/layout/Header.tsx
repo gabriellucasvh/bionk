@@ -22,41 +22,42 @@ const Header: React.FC = () => {
 	const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});
 
 	const handleClick = (key: string, path: string) => {
-		if (isLoading[key]) return;
+		if (isLoading[key]) {
+			return;
+		}
 		setIsLoading((prev) => ({ ...prev, [key]: true }));
 		router.push(path);
 	};
 	const routes = {
-		dashboard: "/dashboard",
+		studio: "/studio",
 		login: "/login",
 		registro: "/registro",
 	};
 	const KEYS = {
-		dashboard: "dashboard",
+		studio: "studio",
 		login: "login",
 		registro: "registro",
 	};
 
 	return (
-		<nav className="hidden lg:flex fixed top-7 left-20 right-20 z-50 h-auto bg-white border rounded-xl px-6 py-4 items-center gap-y-4">
-			<div className="mr-6 shrink-0 min-w-[100px]">
+		<nav className="fixed top-7 right-20 left-20 z-50 hidden h-auto items-center gap-y-4 rounded-xl border bg-white px-6 py-4 lg:flex">
+			<div className="mr-6 min-w-[100px] shrink-0">
 				<Link href="/">
 					<Image
-						src="/bionk-logo.svg"
 						alt="logo"
-						width={100}
 						height={90}
 						priority
+						src="/bionk-logo.svg"
+						width={100}
 					/>
 				</Link>
 			</div>
 
-			<ul className="flex flex-wrap  min-w-0 flex-1">
+			<ul className="flex min-w-0 flex-1 flex-wrap">
 				{HeaderProps.map((menu) => (
 					<li key={menu.label}>
 						<Link
-							className="text-gray-600 hover:text-b
-							lack transition-colors duration-200 px-4 py-2 rounded-md hover:bg-gray-200 font-semibold whitespace-nowrap"
+							className="lack whitespace-nowrap rounded-md px-4 py-2 font-semibold text-gray-600 transition-colors duration-200 hover:bg-gray-200 hover:text-b"
 							href={menu.href}
 						>
 							{menu.label}
@@ -65,27 +66,27 @@ const Header: React.FC = () => {
 				))}
 			</ul>
 
-			<div className="flex flex-wrap justify-end gap-2 min-w-0">
+			<div className="flex min-w-0 flex-wrap justify-end gap-2">
 				{session ? (
 					<BaseButton
-						onClick={() => handleClick("dashboard", routes.dashboard)}
-						loading={isLoading[KEYS.dashboard]}
+						loading={isLoading[KEYS.studio]}
+						onClick={() => handleClick("studio", routes.studio)}
 					>
-						Acessar o Dashboard
+						Acessar seu Studio
 					</BaseButton>
 				) : (
 					<>
 						<BaseButton
+							loading={isLoading[KEYS.login]}
 							onClick={() => handleClick("login", routes.login)}
 							variant="white"
-							loading={isLoading[KEYS.login]}
 						>
 							Entrar
 						</BaseButton>
 
 						<BaseButton
-							onClick={() => handleClick("registro", routes.registro)}
 							loading={isLoading[KEYS.registro]}
+							onClick={() => handleClick("registro", routes.registro)}
 						>
 							Criar uma conta
 						</BaseButton>

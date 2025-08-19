@@ -1,7 +1,7 @@
-// app/dashboard/links/page.tsx
+// app/studio/links/page.tsx
 
 import type { Metadata } from "next";
-import Sidebar from "../dashboard.sidebar";
+import Sidebar from "../Sidebar";
 import UnifiedLinksManager from "./components/links.UnifiedLinksManager";
 
 export const metadata: Metadata = {

@@ -1,7 +1,7 @@
 // components/googleBtn.tsx
 "use client";
-import Image from "next/image";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 import { useState } from "react";
 import { BaseButton } from "./BaseButton";
 
@@ -12,22 +12,27 @@ export function GoogleBtn() {
 		setIsLoading(true);
 		try {
 			await signIn("google", {
-				callbackUrl: "/dashboard/perfil",
+				callbackUrl: "/studio/perfil",
 			});
-		} catch (error) {
-			console.error("Login error:", error);
+		} catch {
 			setIsLoading(false);
 		}
 	};
 
 	return (
-		<BaseButton type="button" onClick={handleLogin} loading={isLoading} variant="white" className="w-full">
+		<BaseButton
+			className="w-full"
+			loading={isLoading}
+			onClick={handleLogin}
+			type="button"
+			variant="white"
+		>
 			<span className="flex items-center gap-2">
 				<Image
-					src={"/google-icon.png"}
 					alt="Ícone Google"
-					width={30}
 					height={30}
+					src={"/google-icon.png"}
+					width={30}
 				/>
 				Entrar com o Google
 			</span>
