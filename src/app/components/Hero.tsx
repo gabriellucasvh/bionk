@@ -61,7 +61,7 @@ const Notification = ({ name, description, time, social }: Item) => {
 			)}
 		>
 			<div className="flex flex-row items-center gap-3">
-				<div className="flex size-10 items-center justify-center rounded-full bg-white shadow-sm">
+				<div className="flex size-10 items-center justify-center">
 					<Image
 						alt={name}
 						className="h-7 w-7 object-contain"
@@ -216,7 +216,7 @@ const Hero = () => {
 										<div className="h-4 w-36 font-semibold text-black">
 											Bionk
 										</div>
-										<div className="mt-2 mb-3 h-3 w-24 text-black">
+										<div className="mt-2 mb-3 h-3 w-24 text-black/60">
 											bionk.me/...
 										</div>
 									</div>
