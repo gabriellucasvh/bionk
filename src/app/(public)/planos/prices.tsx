@@ -181,7 +181,7 @@ const PricingCard = ({ plan, billingCycle }: PricingCardProps) => {
 
 			<Link
 				className={`mt-6 block w-full rounded-xl py-3 text-center font-bold text-white ${plan.buttonColor}`}
-				href={plan.link}
+				href={`/checkout/${plan.name.toLocaleLowerCase()}`}
 			>
 				{plan.label}
 			</Link>
