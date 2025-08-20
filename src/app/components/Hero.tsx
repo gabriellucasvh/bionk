@@ -7,6 +7,7 @@ import { MotionDiv } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -216,8 +217,12 @@ const Hero = () => {
 										<div className="h-4 w-36 font-semibold text-black">
 											Bionk
 										</div>
-										<div className="mt-2 mb-3 h-3 w-24 text-black/60">
-											bionk.me/...
+										<div className="mt-2 mb-3 flex h-3 w-24 items-center text-black/60">
+											bionk.me/{" "}
+											<Link
+												className="mt-0.5 h-3 min-w-15 animate-pulse rounded-full bg-black/30 hover:bg-lime-500"
+												href={"/registro"}
+											/>
 										</div>
 									</div>
 								</div>
