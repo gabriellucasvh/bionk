@@ -1,8 +1,8 @@
+import NextAuthSessionProvider from "@/providers/sessionProvider";
 import type { Metadata } from "next";
-import "./globals.css";
 import { Geist } from "next/font/google";
 import localFont from "next/font/local";
-import NextAuthSessionProvider from "@/providers/sessionProvider";
+import "./globals.css";
 
 const GeneralSans = localFont({
 	src: "/fonts/GeneralSans-Variable.woff2",
@@ -43,8 +43,8 @@ export default function RootLayout({
 }>) {
 	return (
 		<html
-			lang="pt-BR"
 			className={`${geist.variable} ${GeneralSans.variable} antialiased`}
+			lang="pt-BR"
 		>
 			<body>
 				<NextAuthSessionProvider>{children}</NextAuthSessionProvider>

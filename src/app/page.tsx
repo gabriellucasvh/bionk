@@ -8,8 +8,7 @@ import Testimonials from "@/app/components/Testimonials";
 
 export default function Home() {
   return (
-    <main className="">
-      <div className="">
+    <main>
         <Header />
         <HeaderMobile />
         <Hero />
@@ -17,7 +16,6 @@ export default function Home() {
         <Testimonials />
         <CtaSection />
         <Footer />
-      </div>
     </main>
   );
 }
