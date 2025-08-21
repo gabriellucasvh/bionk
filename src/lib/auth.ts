@@ -20,16 +20,6 @@ interface ExtendedUser extends User {
 	googleId?: string;
 }
 
-interface Token extends Record<string, any> {
-	id: string;
-	email: string | undefined;
-	username: string;
-	name?: string;
-	picture?: string | null;
-	googleId?: string;
-	isCredentialsUser?: boolean;
-}
-
 export const authOptions: NextAuthOptions = {
 	adapter: {
 		...PrismaAdapter(prisma),
@@ -51,6 +41,8 @@ export const authOptions: NextAuthOptions = {
 					googleId: (data as any).sub ?? null,
 					provider: "google",
 					emailVerified: new Date(),
+					subscriptionPlan: "free",
+					subscriptionStatus: "active",
 				},
 			});
 		},
@@ -75,7 +67,7 @@ export const authOptions: NextAuthOptions = {
 		GoogleProvider({
 			clientId,
 			clientSecret,
-			async profile(profile) {
+			profile(profile) {
 				return {
 					...profile,
 					id: profile.sub,
@@ -93,20 +85,26 @@ export const authOptions: NextAuthOptions = {
 				password: { label: "Password", type: "password" },
 			},
 			async authorize(credentials) {
-				if (!(credentials?.email && credentials?.password)) return null;
+				if (!(credentials?.email && credentials?.password)) {
+					return null;
+				}
 
 				const user = await prisma.user.findUnique({
 					where: { email: credentials.email },
 				});
 
-				if (!(user && user.hashedPassword)) return null;
+				if (!user?.hashedPassword) {
+					return null;
+				}
 
 				const isValid = await bcrypt.compare(
 					credentials.password,
 					user.hashedPassword
 				);
 
-				if (!isValid) return null;
+				if (!isValid) {
+					return null;
+				}
 
 				return {
 					id: user.id,
@@ -123,7 +121,8 @@ export const authOptions: NextAuthOptions = {
 	session: { strategy: "jwt" },
 	secret: process.env.NEXTAUTH_SECRET,
 	callbacks: {
-		async jwt({ token, user, account, trigger, session: updateSessionData }) {
+		// --- CORREÇÃO: Removido 'async' pois não há 'await' ---
+		jwt({ token, user, account, trigger, session: updateSessionData }) {
 			const u = user as ExtendedUser;
 
 			if (user) {
@@ -149,7 +148,8 @@ export const authOptions: NextAuthOptions = {
 
 			return token;
 		},
-		async session({ session, token }) {
+		// --- CORREÇÃO: Removido 'async' pois não há 'await' ---
+		session({ session, token }) {
 			session.user = {
 				...session.user,
 				id: token.id as string,
@@ -162,18 +162,16 @@ export const authOptions: NextAuthOptions = {
 			};
 			return session;
 		},
-		async redirect({ baseUrl, url }) {
-			// Verifica se a URL de callback contém o erro OAuthAccountNotLinked
+		redirect({ baseUrl, url }) {
 			if (
 				url.includes("/api/auth/error?error=OAuthAccountNotLinked") ||
 				url.includes("&error=OAuthAccountNotLinked")
 			) {
 				return `${baseUrl}/login?error=OAuthAccountNotLinked`;
 			}
-			// Verifica se a URL de callback é a página de signIn e não contém erro, então redireciona para o callbackUrl ou studio
 			if (
-				url.startsWith(baseUrl + "/registro") ||
-				url.startsWith(baseUrl + "/login")
+				url.startsWith(`${baseUrl}/registro`) ||
+				url.startsWith(`${baseUrl}/login`)
 			) {
 				const callbackUrl = new URL(url).searchParams.get("callbackUrl");
 				if (callbackUrl) {
@@ -181,11 +179,9 @@ export const authOptions: NextAuthOptions = {
 				}
 				return `${baseUrl}/studio/perfil`;
 			}
-			// Se houver uma URL de callback na query, usa ela
 			if (new URL(url, baseUrl).searchParams.has("callbackUrl")) {
 				return url;
 			}
-			// Comportamento padrão para outros casos
 			return `${baseUrl}/studio/perfil`;
 		},
 	},

@@ -13,6 +13,14 @@ model User {
   name                          String?
   username                      String         @unique
   email                         String         @unique
+  subscriptionPlan              String?
+  subscriptionStatus            String?
+  billingCycle                  String?
+  mercadopagoSubscriptionId     String?
+  paymentMethodBrand            String?
+  paymentMethodLastFour         String?
+  subscriptionStartDate         DateTime?
+  subscriptionEndDate           DateTime?
   bio                           String?
   provider                      String?
   emailVerified                 DateTime?

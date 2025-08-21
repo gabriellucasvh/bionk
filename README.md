@@ -1,6 +1,6 @@
 # Bionk
 
-Bionk é uma plataforma **Link in Bio** moderna e personalizável, desenvolvida com **Next.js 15**, **Tailwind CSS** e **Prisma**. O projeto permite que usuários criem e personalizem suas próprias páginas de links, facilitando o compartilhamento de conteúdo online.
+Bionk é uma plataforma **Link in Bio** moderna e personalizável, desenvolvida com **Next.js 15**, **Tailwind CSS** e **Prisma**. O projeto permite que usuários criem e personalizem suas próprias páginas de links, facilitando o compartilhamento de conteúdo online. Inclui sistema de assinaturas com integração ao Mercado Pago.
 
 ## ✨ Tecnologias Utilizadas
 
@@ -12,6 +12,7 @@ Bionk é uma plataforma **Link in Bio** moderna e personalizável, desenvolvida 
 - **Redis - Upstash** - Armazenamento em cache, gerenciamento de sessões e rate limiter.
 - **Docker** - Containerização para desenvolvimento e deploy consistentes.
 - **NextAuth.js** - Autenticação segura e integrada.
+- **Mercado Pago** - Integração para processamento de pagamentos.
 - **Framer Motion** - Animações suaves e fluidas.
 - **DND Kit** - Drag and Drop interativo.
 - **Radix UI** - Componentes acessíveis e práticos.
@@ -44,11 +45,31 @@ Bionk é uma plataforma **Link in Bio** moderna e personalizável, desenvolvida 
 
 4. Configure as variáveis de ambiente (crie um arquivo `.env` baseado em `.env.example`).
 
-5. Execute o projeto em modo de desenvolvimento:
+5. Configure o token de acesso do Mercado Pago no arquivo `.env`:
+
+   ```
+   MERCADO_PAGO_ACCESS_TOKEN=seu-token-de-acesso
+   ```
+
+6. Execute o projeto em modo de desenvolvimento:
 
    ```sh
    npm run dev
    ```
+
+## 💳 Integração com Mercado Pago
+
+O projeto inclui integração completa com o Mercado Pago para processamento de pagamentos de assinaturas. Para configurar:
+
+1. Crie uma conta no [Mercado Pago](https://www.mercadopago.com.br/)
+2. Obtenha suas credenciais de acesso no painel de desenvolvedores
+3. Configure o token de acesso no arquivo `.env`
+4. Para testes, use o ambiente de sandbox do Mercado Pago
+
+A integração suporta:
+- Pagamentos de assinaturas mensais e anuais
+- Webhooks para notificações de pagamento
+- Redirecionamento após pagamento (sucesso, falha, pendente)
 
 6. Acesse no navegador:
 

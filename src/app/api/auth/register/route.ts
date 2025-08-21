@@ -165,7 +165,13 @@ async function handleUserCreation(email: string, password: string) {
 
 	await prisma.user.update({
 		where: { email },
-		data: { hashedPassword, username, emailVerified: new Date() },
+		data: {
+			hashedPassword,
+			username,
+			emailVerified: new Date(),
+			subscriptionPlan: "free",
+			subscriptionStatus: "active",
+		},
 	});
 
 	return NextResponse.json(

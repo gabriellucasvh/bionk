@@ -14,6 +14,11 @@ module.exports = {
         hostname: 'lh3.googleusercontent.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'http2.mlstatic.com',
+        pathname: '/**',
+      },
     ],
   },
 };
