@@ -13,14 +13,6 @@ model User {
   name                          String?
   username                      String         @unique
   email                         String         @unique
-  subscriptionPlan              String?
-  subscriptionStatus            String?
-  billingCycle                  String?
-  mercadopagoSubscriptionId     String?
-  paymentMethodBrand            String?
-  paymentMethodLastFour         String?
-  subscriptionStartDate         DateTime?
-  subscriptionEndDate           DateTime?
   bio                           String?
   provider                      String?
   emailVerified                 DateTime?
@@ -35,13 +27,21 @@ model User {
   emailVerificationToken        String?        @unique
   emailVerificationTokenExpires DateTime?
   newEmailPending               String?        @unique
-  verificationToken             String?        @unique
-  verificationTokenExpiry       DateTime?
   registrationOtp               String?        @unique
-  registrationOtpExpiry         DateTime?
   registrationOtpAttempts       Int            @default(0)
   registrationOtpBlockedUntil   DateTime?
+  registrationOtpExpiry         DateTime?
+  verificationToken             String?        @unique
+  verificationTokenExpiry       DateTime?
   googleId                      String?
+  subscriptionPlan              String?
+  subscriptionStatus            String?
+  billingCycle                  String?
+  subscriptionEndDate           DateTime?
+  subscriptionStartDate         DateTime?
+  mercadopagoSubscriptionId     String?
+  paymentMethodBrand            String?
+  paymentMethodLastFour         String?
   accounts                      Account[]
   CustomPresets                 CustomPresets?
   Link                          Link[]
@@ -97,12 +97,12 @@ model Link {
   badge           String?
   deleteOnClicks  Int?
   expiresAt       DateTime?
-  isProduct       Boolean?    @default(false)
   launchesAt      DateTime?
   password        String?
+  sectionTitle    String?
+  isProduct       Boolean?    @default(false)
   price           Float?
   productImageUrl String?
-  sectionTitle    String?
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   LinkClick       LinkClick[]
   LinkView        LinkView[]
