@@ -293,7 +293,16 @@ export default function PaymentPage() {
 		return () => {
 			cleanupBrick();
 		};
-	}, [sdkReady, billingCycle, session, selectedPlan, router]);
+		// --- CORREÇÃO DEFINITIVA NA LISTA DE DEPENDÊNCIAS ---
+	}, [
+		sdkReady,
+		billingCycle,
+		// Dependemos de valores estáveis da sessão, e não do objeto inteiro
+		session?.user?.id,
+		session?.user?.email,
+		selectedPlan,
+		router,
+	]);
 
 	if (!selectedPlan) {
 		return notFound();
