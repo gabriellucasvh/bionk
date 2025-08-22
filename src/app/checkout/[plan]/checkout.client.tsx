@@ -245,7 +245,7 @@ export default function PaymentPage() {
 					{
 						initialization: {
 							amount: totalDue,
-							payer: { email: session.user.email },
+							// --- CORREÇÃO AQUI: Removida a propriedade 'payer' ---
 						},
 						customization,
 						callbacks: {
@@ -262,7 +262,7 @@ export default function PaymentPage() {
 										body: JSON.stringify({
 											plan: selectedPlan.name.toLowerCase(),
 											billingCycle,
-											email: formData.payer.email,
+											email: formData.payer.email, // O e-mail agora vem do formulário
 											userId: session?.user?.id,
 											card_token_id: formData.token,
 										}),
@@ -293,11 +293,9 @@ export default function PaymentPage() {
 		return () => {
 			cleanupBrick();
 		};
-		// --- CORREÇÃO DEFINITIVA NA LISTA DE DEPENDÊNCIAS ---
 	}, [
 		sdkReady,
 		billingCycle,
-		// Dependemos de valores estáveis da sessão, e não do objeto inteiro
 		session?.user?.id,
 		session?.user?.email,
 		selectedPlan,
