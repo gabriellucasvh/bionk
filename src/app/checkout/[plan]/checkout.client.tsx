@@ -233,7 +233,6 @@ export default function PaymentPage() {
 								textColor: "#1e293b",
 								placeholderColor: "#a1a1aa",
 								errorColor: "#ef4444",
-								fontFamily: "'Geist', sans-serif",
 							},
 						},
 					},
@@ -243,26 +242,32 @@ export default function PaymentPage() {
 					"cardPayment",
 					"cardPaymentBrick_container",
 					{
-						initialization: {
-							amount: totalDue,
-							// --- CORREÇÃO AQUI: Removida a propriedade 'payer' ---
-						},
+						initialization: { amount: totalDue },
 						customization,
 						callbacks: {
 							onReady: () => {
 								/* Brick pronto */
 							},
-							onSubmit: async ({ formData }: { formData: CardFormData }) => {
+							// --- CORREÇÃO 1: Assinatura da função onSubmit ---
+							// O objeto com os dados do formulário é passado diretamente como o primeiro argumento.
+							onSubmit: async (formData: CardFormData) => {
 								setLoading(true);
 								setError(null);
 								try {
+									// Adicionamos uma verificação extra para garantir que formData e formData.payer existem
+									if (!formData?.payer?.email) {
+										throw new Error(
+											"Não foi possível obter os dados do pagador. Tente novamente."
+										);
+									}
+
 									const response = await fetch("/api/mercadopago", {
 										method: "POST",
 										headers: { "Content-Type": "application/json" },
 										body: JSON.stringify({
 											plan: selectedPlan.name.toLowerCase(),
 											billingCycle,
-											email: formData.payer.email, // O e-mail agora vem do formulário
+											email: formData.payer.email,
 											userId: session?.user?.id,
 											card_token_id: formData.token,
 										}),
@@ -412,6 +417,9 @@ export default function PaymentPage() {
 						</div>
 					) : (
 						<>
+							<h2 className="mb-6 font-bold text-2xl">
+								Pague com Cartão de Crédito
+							</h2>
 							{error && (
 								<div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-600">
 									{error}
