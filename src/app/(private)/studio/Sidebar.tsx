@@ -187,7 +187,7 @@ const Sidebar = () => {
 
 				{/* Navegação principal */}
 				<div>
-					<h3 className="mb-2 px-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">
+					<h3 className="mb-2 px-3 font-semibold text-gray-400 text-xs tracking-wider">
 						Studio
 					</h3>
 					<nav className="space-y-1">{renderNavLinks(mainLinks)}</nav>
@@ -195,7 +195,7 @@ const Sidebar = () => {
 
 				{/* Ferramentas */}
 				<div className="mt-5">
-					<h3 className="mb-2 px-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">
+					<h3 className="mb-2 px-3 font-semibold text-gray-400 text-xs tracking-wider">
 						Ferramentas
 					</h3>
 					<nav className="space-y-1">{renderNavLinks(toolsLinks)}</nav>
