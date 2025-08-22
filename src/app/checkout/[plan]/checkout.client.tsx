@@ -222,27 +222,18 @@ export default function PaymentPage() {
 						font: "https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap",
 						style: {
 							theme: "flat",
-							// --- CORREÇÃO: USANDO customVariables ---
 							customVariables: {
-								theme: "dark", // 'dark' ou 'light' para os textos e ícones internos
-								// Cores primárias
+								theme: "dark",
 								baseColor: "#99e600",
-								// Cor do texto dos botões
 								contrastColor: "#FFFFFF",
-								// Cor do fundo do formulário
 								formBackgroundColor: "#f5f5f5",
-								// Cor da borda dos inputs
 								inputBorderColor: "#e5e5e5",
-								// Cor da borda em foco
 								inputFocusBorderColor: "#99e600",
-								// Raio da borda (como no Shadcn)
 								borderRadius: "0.5rem",
-								// Cor do texto dos inputs
 								textColor: "#1e293b",
-								// Cor dos placeholders
 								placeholderColor: "#a1a1aa",
-								// Cor de erro
 								errorColor: "#ef4444",
+								fontFamily: "'Geist', sans-serif",
 							},
 						},
 					},
@@ -277,9 +268,8 @@ export default function PaymentPage() {
 										}),
 									});
 									const data = await response.json();
-									if (!response.ok) {
-										throw new Error(data.details || "Erro ao criar assinatura");
-									}
+									if (!response.ok)
+										{throw new Error(data.details || "Erro ao criar assinatura");}
 									router.push("/studio?subscription=success");
 								} catch (err: any) {
 									setError(err.message || "Ocorreu um erro. Tente novamente.");
