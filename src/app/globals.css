@@ -8,6 +8,7 @@
 
 @theme {
 	--font-sans: var(--font-satoshi);
+	--font-geist: var(--font-geist);
     --color-rose: #ff527a;
 }
 

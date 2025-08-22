@@ -327,7 +327,7 @@ export default function PaymentPage() {
 				onLoad={() => setSdkReady(true)}
 				src="https://sdk.mercadopago.com/js/v2"
 			/>
-			<main className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-2">
+			<main className="grid min-h-screen w-full grid-cols-1 font-geist lg:grid-cols-2">
 				<div className="flex flex-col bg-emerald-950 p-8 text-white md:p-12">
 					<div className="mb-8 flex items-center gap-2 font-semibold">
 						<Link href="/planos">
@@ -347,63 +347,65 @@ export default function PaymentPage() {
 							width={90}
 						/>
 					</div>
-					<p className="mb-2 text-lg">
-						Assinatura do Plano {selectedPlan.name}
-					</p>
-					<div className="mb-4">
-						<span className="font-bold text-5xl">
-							R$
-							{billingCycle === "monthly"
-								? totalMonthlyPrice
-								: annualPricePerMonth}
-						</span>
-						<span className="ml-2 text-gray-300">/mês</span>
-					</div>
-					<p className="border-gray-600 border-t pt-4 text-gray-300">
-						{selectedPlan.description}
-					</p>
-					<BillingToggle
-						billingCycle={billingCycle}
-						savings={savings}
-						setBillingCycle={setBillingCycle}
-						totalAnnualPrice={totalAnnualPrice}
-						totalMonthlyPrice={totalMonthlyPrice}
-					/>
-					<Summary
-						billingCycle={billingCycle}
-						coupon={coupon}
-						isCouponVisible={isCouponVisible}
-						savings={savings}
-						setCoupon={setCoupon}
-						setIsCouponVisible={setIsCouponVisible}
-						subtotal={subtotal}
-						totalDue={totalDue}
-					/>
-					<div className="mt-auto flex gap-4 pt-8 text-gray-400 text-xs">
-						<span>
-							©{new Date().getFullYear()} Todos os direitos reservados
-						</span>
-						<Link
-							className="underline"
-							href="/termos"
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							Termos
-						</Link>
-						<Link
-							className="underline"
-							href="/privacidade"
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							Privacidade
-						</Link>
-					</div>
+					<section className="font-sans">
+						<p className="mb-2 text-lg">
+							Assinatura do Plano {selectedPlan.name}
+						</p>
+						<div className="mb-4">
+							<span className="font-bold text-5xl">
+								R$
+								{billingCycle === "monthly"
+									? totalMonthlyPrice
+									: annualPricePerMonth}
+							</span>
+							<span className="ml-2 text-gray-300">/mês</span>
+						</div>
+						<p className="border-gray-600 border-t pt-4 text-gray-300">
+							{selectedPlan.description}
+						</p>
+						<BillingToggle
+							billingCycle={billingCycle}
+							savings={savings}
+							setBillingCycle={setBillingCycle}
+							totalAnnualPrice={totalAnnualPrice}
+							totalMonthlyPrice={totalMonthlyPrice}
+						/>
+						<Summary
+							billingCycle={billingCycle}
+							coupon={coupon}
+							isCouponVisible={isCouponVisible}
+							savings={savings}
+							setCoupon={setCoupon}
+							setIsCouponVisible={setIsCouponVisible}
+							subtotal={subtotal}
+							totalDue={totalDue}
+						/>
+						<div className="mt-auto flex gap-4 pt-8 text-gray-400 text-xs">
+							<span>
+								©{new Date().getFullYear()} Todos os direitos reservados
+							</span>
+							<Link
+								className="underline"
+								href="/termos"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								Termos
+							</Link>
+							<Link
+								className="underline"
+								href="/privacidade"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								Privacidade
+							</Link>
+						</div>
+					</section>
 				</div>
 				<div className="bg-white p-8 md:p-12">
 					{isFreePlan ? (
-						<div className="flex h-full flex-col items-center justify-center text-center">
+						<div className="flex h-full flex-col items-center justify-center text-center font-sans">
 							<h2 className="mb-4 font-bold text-2xl">Plano Gratuito</h2>
 							<p className="mb-6 text-gray-600">
 								Comece agora sem precisar de cartão de crédito!
@@ -417,8 +419,15 @@ export default function PaymentPage() {
 						</div>
 					) : (
 						<>
-							<h2 className="mb-6 font-bold text-2xl">
-								Pague com Cartão de Crédito
+							<h2 className="mb-6 flex items-center gap-2 font-bold text-xl">
+								Pagamento seguro e garantido pelo
+								<Image
+									alt="logo"
+									height={30}
+									priority
+									src="/mercado-pago-wordmark.svg"
+									width={90}
+								/>
 							</h2>
 							{error && (
 								<div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-600">
