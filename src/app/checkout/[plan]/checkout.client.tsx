@@ -268,8 +268,9 @@ export default function PaymentPage() {
 										}),
 									});
 									const data = await response.json();
-									if (!response.ok)
-										{throw new Error(data.details || "Erro ao criar assinatura");}
+									if (!response.ok) {
+										throw new Error(data.details || "Erro ao criar assinatura");
+									}
 									router.push("/studio?subscription=success");
 								} catch (err: any) {
 									setError(err.message || "Ocorreu um erro. Tente novamente.");
