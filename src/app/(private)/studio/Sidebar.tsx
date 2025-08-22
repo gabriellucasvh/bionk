@@ -1,10 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	BarChart3,
 	Blocks,
+	ChevronsUpDown,
 	ExternalLink,
 	Link2,
 	LogOut,
@@ -15,13 +22,21 @@ import {
 	Table2,
 	User,
 } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const mainLinks = [
+interface SidebarLink {
+	key: string;
+	href: string;
+	label: string;
+	labelMobile?: string;
+	icon: React.ReactNode;
+}
+
+const mainLinks: SidebarLink[] = [
 	{
 		key: "profile",
 		href: "/studio/perfil",
@@ -46,16 +61,9 @@ const mainLinks = [
 		label: "Análises",
 		icon: <BarChart3 className="h-4 w-4" />,
 	},
-	{
-		key: "settings",
-		href: "/studio/configs",
-		label: "Configurações",
-		labelMobile: "Configs.",
-		icon: <Settings className="h-4 w-4" />,
-	},
 ];
 
-const toolsLinks = [
+const toolsLinks: SidebarLink[] = [
 	{
 		key: "shop",
 		href: "/studio/links-shop",
@@ -83,11 +91,13 @@ const Sidebar = () => {
 	const [disabledButtons, setDisabledButtons] = useState<Set<string>>(
 		() => new Set()
 	);
-	const [profileUrl, setProfileUrl] = useState<string>("#");
-	const handleLogout = () => signOut();
+	const [profileUrl, setProfileUrl] = useState("#");
+	const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
 
 	const username = session?.user?.username;
+	const isLoading = !(session?.user && username);
 
+	// URL pública do perfil
 	useEffect(() => {
 		const baseUrl =
 			process.env.NODE_ENV === "production"
@@ -96,19 +106,59 @@ const Sidebar = () => {
 		setProfileUrl(username ? `${baseUrl}/${username}` : "#");
 	}, [username]);
 
+	// Buscar plano do usuário
 	useEffect(() => {
-		setDisabledButtons(new Set());
-	}, []);
-	const isLoading = !(session?.user && username);
+		const fetchPlan = async () => {
+			if (session?.user?.id) {
+				try {
+					const res = await fetch("/api/user-plan");
+					if (res.ok) {
+						const data = await res.json();
+						setSubscriptionPlan(data.subscriptionPlan);
+					}
+				} catch {
+					setSubscriptionPlan("");
+				}
+			}
+		};
+		fetchPlan();
+	}, [session?.user?.id]);
+
+	const handleNavClick = (href: string, key: string, isActive: boolean) => {
+		if (!isActive) {
+			setDisabledButtons((prev) => new Set(prev).add(key));
+			router.push(href);
+		}
+	};
+
+	const renderNavLinks = (links: SidebarLink[]) =>
+		links.map((link) => {
+			const isActive = pathname === link.href;
+			return (
+				<Button
+					className={`h-10 w-full justify-start rounded-xl px-3 font-medium text-sm transition-all ${
+						isActive
+							? "bg-green-100 text-green-700 shadow-sm"
+							: "text-gray-700 hover:bg-gray-100"
+					}`}
+					disabled={disabledButtons.has(link.key)}
+					key={link.key}
+					onClick={() => handleNavClick(link.href, link.key, isActive)}
+					variant="ghost"
+				>
+					<span className="mr-3">{link.icon}</span>
+					{link.label}
+				</Button>
+			);
+		});
+
 	return (
 		<>
-			{/* Sidebar para telas médias e maiores */}
-			<aside className="hidden px-2 md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-r md:bg-card/40">
+			{/* Sidebar desktop */}
+			<aside className="hidden px-3 md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-r md:bg-white/70 md:backdrop-blur-lg">
+				{/* Logo */}
 				<header className="flex h-16 items-center border-b pl-2">
-					<Link
-						className="flex items-center justify-center gap-2 font-semibold"
-						href="/"
-					>
+					<Link className="flex items-center gap-2 font-semibold" href="/">
 						<Image
 							alt="logo"
 							height={30}
@@ -119,165 +169,149 @@ const Sidebar = () => {
 					</Link>
 				</header>
 
-				<div className="flex max-w-full flex-row">
-					<div className="mt-4 mb-2 flex items-center justify-center">
-						<div>
-							{isLoading ? (
-								<Skeleton className="h-12 w-12 rounded-full" />
-							) : (
-								<Image
-									alt="Avatar"
-									className="rounded-full"
-									height={48}
-									src={session.user.image || "/default-avatar.png"}
-									width={48}
-								/>
-							)}
-						</div>
-
-						<div className="ml-3 flex flex-col items-start">
-							{isLoading ? (
-								<Skeleton className="mb-1 h-4 w-10 rounded-sm" />
-							) : (
-								<span className="mt-1 inline-flex items-center rounded-sm bg-green-100 px-2 py-0.5 font-medium text-[10px] text-green-500">
-									Free
-								</span>
-							)}
-
-							{isLoading ? (
-								<>
-									<Skeleton className="mb-1 h-4 w-40" />
-									<Skeleton className="h-3 w-32" />
-								</>
-							) : (
-								<>
-									<h2 className="w-40 overflow-hidden text-ellipsis whitespace-nowrap font-semibold text-sm">
-										{session.user.name}
-									</h2>
-									<p className="w-40 overflow-hidden text-ellipsis whitespace-nowrap text-muted-foreground text-xs">
-										bionk.me/{username}
-									</p>
-								</>
-							)}
-						</div>
-					</div>
-				</div>
+				{/* Link para perfil público */}
 				<div className="py-2">
 					<Link
-						className="flex h-10 w-full items-center justify-start gap-2 rounded-md px-4 font-medium text-sm transition-colors duration-300 hover:bg-green-500 hover:text-white"
+						className="flex h-10 w-full items-center justify-between rounded-lg px-4 font-medium text-sm transition-colors hover:bg-green-500 hover:text-white"
 						href={profileUrl}
 						rel="noopener noreferrer"
 						target="_blank"
 					>
-						<Table2 className="h-4 w-4" />
-						<span className="flex w-full items-center justify-between">
+						<div className="flex items-center gap-2">
+							<Table2 className="h-4 w-4" />
 							Ver meu perfil
-							<ExternalLink className="h-4 w-4" />
-						</span>
+						</div>
+						<ExternalLink className="h-4 w-4" />
 					</Link>
 				</div>
 
-				<nav className="space-y-1">
-					{mainLinks.map((link) => {
-						const isActive = pathname === link.href;
-						return (
-							<Button
-								className={`h-10 w-full justify-start font-medium text-sm transition-colors duration-200 hover:bg-gray-200 ${isActive ? "border-gray-200 bg-gray-200" : ""}`}
-								disabled={disabledButtons.has(link.key)}
-								key={link.key}
-								onClick={() => {
-									if (isActive) {
-										return;
-									}
-									setDisabledButtons((prev) => new Set(prev).add(link.key));
-									router.push(`${link.href}`);
-								}}
-								variant={isActive ? "secondary" : "ghost"}
-							>
-								<span className="mr-3">{link.icon}</span>
-								{link.label}
-							</Button>
-						);
-					})}
-				</nav>
-
-				{/* Seção Ferramentas */}
-				<div className="mt-4">
-					<h3 className="mb-2 px-4 font-semibold text-muted-foreground text-xs tracking-wider">
-						Ferramentas
+				{/* Navegação principal */}
+				<div>
+					<h3 className="mb-2 px-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">
+						Studio
 					</h3>
-					<nav className="space-y-1">
-						{toolsLinks.map((link) => {
-							const isActive = pathname === link.href;
-							return (
-								<Button
-									className={`h-10 w-full justify-start font-medium text-sm transition-colors duration-200 hover:bg-gray-200 ${isActive ? "border-gray-200 bg-gray-200" : ""}`}
-									disabled={disabledButtons.has(link.key)}
-									key={link.key}
-									onClick={() => {
-										if (isActive) {
-											return;
-										}
-										setDisabledButtons((prev) => new Set(prev).add(link.key));
-										router.push(`${link.href}`);
-									}}
-									variant={isActive ? "secondary" : "ghost"}
-								>
-									<span className="mr-3">{link.icon}</span>
-									{link.label}
-								</Button>
-							);
-						})}
-					</nav>
+					<nav className="space-y-1">{renderNavLinks(mainLinks)}</nav>
 				</div>
 
-				<div className="mt-auto space-y-2 border-t p-4">
-					<Button
-						className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive"
-						onClick={handleLogout}
-						size="sm"
-						variant="ghost"
-					>
-						<LogOut className="mr-3 h-4 w-4" />
-						Sair
-					</Button>
+				{/* Ferramentas */}
+				<div className="mt-5">
+					<h3 className="mb-2 px-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">
+						Ferramentas
+					</h3>
+					<nav className="space-y-1">{renderNavLinks(toolsLinks)}</nav>
+				</div>
+
+				{/* Perfil + dropdown */}
+				<div className="mt-auto mb-3 rounded-xl border bg-gray-50 p-3 shadow-sm">
+					{isLoading ? (
+						<Skeleton className="h-12 w-12 rounded-full" />
+					) : (
+						<div className="flex items-center gap-3">
+							<Image
+								alt="Avatar"
+								className="rounded-full"
+								height={42}
+								src={session?.user?.image || "/default-avatar.png"}
+								width={42}
+							/>
+							<div className="flex flex-1 flex-col truncate">
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<button className="flex w-full items-center justify-between text-left outline-none" type="button">
+											<div className="flex flex-col">
+												<h2 className="truncate font-semibold text-sm">
+													{session?.user?.name}
+												</h2>
+												<p className="truncate text-gray-500 text-xs">
+													bionk.me/{username}
+												</p>
+											</div>
+											<ChevronsUpDown className="h-4 w-4 text-gray-400" />
+										</button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent
+										align="end"
+										className="w-44 rounded-lg border bg-white shadow-md"
+										side="top"
+									>
+										<DropdownMenuItem
+											onClick={() => router.push("/studio/configs")}
+										>
+											<Settings className="mr-2 h-4 w-4" />
+											Configurações
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											onClick={() => router.push("/api/auth/signout")}
+										>
+											<LogOut className="mr-2 h-4 w-4" />
+											Sair
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
+								{subscriptionPlan && (
+									<span className="mt-1 inline-block w-fit rounded-md bg-green-100 px-2 py-0.5 font-medium text-[10px] text-green-600 capitalize">
+										{subscriptionPlan}
+									</span>
+								)}
+							</div>
+						</div>
+					)}
 				</div>
 			</aside>
 
-			{/* Menu fixo para mobile com ícones */}
+			{/* Navbar mobile */}
 			<nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-white md:hidden">
-				<ul className="grid grid-cols-5 divide-x divide-muted py-3">
+				<ul className="grid grid-cols-5 divide-x divide-gray-100 py-3">
 					{mainLinks.map((link) => {
-						// Alterado para mainLinks para não incluir as ferramentas no mobile
 						const isActive = pathname === link.href;
 						return (
 							<li className="flex items-center justify-center" key={link.key}>
 								<Button
-									className={`flex flex-col items-center justify-center gap-1 px-1 text-[10px] sm:text-xs ${
-										isActive ? "text-foreground" : "text-muted-foreground"
+									className={`flex flex-col items-center gap-1 px-1 text-[10px] sm:text-xs ${
+										isActive ? "text-green-600" : "text-gray-500"
 									}`}
 									disabled={disabledButtons.has(link.key)}
-									onClick={() => {
-										if (isActive) {
-											return;
-										}
-										setDisabledButtons((prev) => new Set(prev).add(link.key));
-										router.push(`${link.href}`);
-									}}
+									onClick={() => handleNavClick(link.href, link.key, isActive)}
 									variant="ghost"
 								>
-									<span className={isActive ? "text-green-500" : ""}>
-										{link.icon}
-									</span>
-									{link.labelMobile ? (
-										<span>{link.labelMobile}</span>
-									) : (
-										link.label
-									)}
+									{link.icon}
+									{link.labelMobile ?? link.label}
 								</Button>
 							</li>
 						);
 					})}
+					{/* Perfil no mobile */}
+					<li className="flex items-center justify-center">
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									className="flex flex-col items-center gap-1 px-1 text-[10px] sm:text-xs"
+									variant="ghost"
+								>
+									<User className="h-4 w-4" />
+									Conta
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent
+								align="center"
+								className="w-40 rounded-lg"
+								side="top"
+							>
+								<DropdownMenuItem
+									onClick={() => router.push("/studio/configs")}
+								>
+									<Settings className="mr-2 h-4 w-4" />
+									Configurações
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => router.push("/api/auth/signout")}
+								>
+									<LogOut className="mr-2 h-4 w-4" />
+									Sair
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</li>
 				</ul>
 			</nav>
 		</>
