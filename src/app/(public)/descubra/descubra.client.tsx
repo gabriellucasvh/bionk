@@ -117,7 +117,7 @@ const faqItems = [
 const DescubraClient = () => {
 	const router = useRouter();
 	return (
-		<div className="min-h-screen bg-green-800 font-gsans">
+		<div className="min-h-screen bg-green-800">
 			<Header />
 			<HeaderMobile />
 			<section className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 pt-10 text-lime-200 md:px-20 lg:flex-row lg:px-40">

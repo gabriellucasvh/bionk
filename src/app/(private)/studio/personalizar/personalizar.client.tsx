@@ -78,7 +78,7 @@ const PersonalizarClient = () => {
 	};
 
 	return (
-		<div className="min-h-screen w-full bg-white font-gsans text-black lg:w-7/12">
+		<div className="min-h-screen w-full bg-white text-black lg:w-7/12">
 			<section className="flex min-h-screen flex-col gap-6 px-6 py-8">
 				{/* Seção de Templates */}
 				<section className="">

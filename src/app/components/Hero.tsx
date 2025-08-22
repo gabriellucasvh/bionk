@@ -133,7 +133,7 @@ const Hero = () => {
 				</div>
 
 				<h1
-					className={`mb-6 text-center font-bold font-gsans text-4xl text-white tracking-wider transition-all duration-700 sm:text-5xl md:text-6xl ${
+					className={`mb-6 text-center font-bold text-4xl text-white tracking-wider transition-all duration-700 sm:text-5xl md:text-6xl ${
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 					style={{ transitionDelay: "100ms" }}

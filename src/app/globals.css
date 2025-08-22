@@ -7,8 +7,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-	--font-sans: var(--font-geist);
-	--font-gsans: var(--font-gsans)
+	--font-sans: var(--font-satoshi);
     --color-rose: #ff527a;
 }
 
@@ -192,7 +191,7 @@ button {
 	cursor: pointer;
 }
 /* HTML: <div class="loader"></div> */
-	.loader {
+.loader {
 	width: 28px;
 	aspect-ratio: 1;
 	border-radius: 50%;
@@ -253,7 +252,7 @@ button {
 }
 
 /* Logos Originais */
-	#insta-logo {
+#insta-logo {
 	--initial-rotate: -15deg;
 	width: 18% !important;
 	height: auto !important;
@@ -299,7 +298,7 @@ button {
 }
 
 /* Novos Logos */
-	#telegram-logo {
+#telegram-logo {
 	--initial-rotate: 10deg;
 	width: 18% !important;
 	height: auto !important;

@@ -4,10 +4,10 @@ import { Geist } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
-const GeneralSans = localFont({
-	src: "/fonts/GeneralSans-Variable.woff2",
+const Satoshi = localFont({
+	src: "/fonts/Satoshi-Variable.woff2",
 	display: "swap",
-	variable: "--font-gsans",
+	variable: "--font-satoshi",
 });
 const geist = Geist({
 	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -43,7 +43,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html
-			className={`${geist.variable} ${GeneralSans.variable} antialiased`}
+			className={`${geist.variable} ${Satoshi.variable} antialiased`}
 			lang="pt-BR"
 		>
 			<body>
