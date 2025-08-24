@@ -48,6 +48,9 @@ model User {
   ProfileView                   ProfileView[]
   sessions                      Session[]
   SocialLink                    SocialLink[]
+
+  @@index([subscriptionStatus])
+  @@index([createdAt])
 }
 
 model Account {
@@ -66,6 +69,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -74,6 +78,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -106,6 +112,10 @@ model Link {
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   LinkClick       LinkClick[]
   LinkView        LinkView[]
+
+  @@index([userId])
+  @@index([userId, order])
+  @@index([expiresAt])
 }
 
 model LinkClick {
@@ -113,6 +123,8 @@ model LinkClick {
   linkId    Int
   createdAt DateTime @default(now())
   link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@index([linkId, createdAt])
 }
 
 model LinkView {
@@ -120,6 +132,8 @@ model LinkView {
   linkId    Int
   createdAt DateTime @default(now())
   link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@index([linkId, createdAt])
 }
 
 model SocialLink {
@@ -135,6 +149,7 @@ model SocialLink {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, platform])
+  @@index([userId])
 }
 
 model ProfileView {
@@ -142,6 +157,8 @@ model ProfileView {
   userId    String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 model CustomPresets {
