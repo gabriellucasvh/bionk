@@ -11,6 +11,7 @@
 	--font-geist: var(--font-geist);
 	--color-rose: #ff527a;
 }
+
 :root {
 	--radius: 0.625rem;
 	--background: oklch(1 0 0);
@@ -164,7 +165,7 @@
 		pointer-events: none; /* Cuidado: isso desativa clicks/hovers! */
 	}
 	body {
-		@apply bg-background text-foreground;
+		@apply bg-background text-foreground font-semibold;
 	}
 }
 

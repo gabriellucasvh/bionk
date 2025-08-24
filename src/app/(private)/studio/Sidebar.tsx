@@ -11,14 +11,13 @@ import {
 	Settings,
 	ShoppingBag,
 	SwatchBook,
-	Table2,
 	User,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 interface SidebarLink {
 	key: string;
@@ -114,33 +113,39 @@ const Sidebar = () => {
 		fetchPlan();
 	}, [session?.user?.id]);
 
-	const handleNavClick = (href: string, key: string, isActive: boolean) => {
-		if (!isActive) {
-			setDisabledButtons((prev) => new Set(prev).add(key));
-			router.push(href);
-		}
-	};
+	const handleNavClick = useCallback(
+		(href: string, key: string, isActive: boolean) => {
+			if (!isActive) {
+				setDisabledButtons((prev) => new Set(prev).add(key));
+				router.push(href);
+			}
+		},
+		[router]
+	);
 
-	const renderNavLinks = (links: SidebarLink[]) =>
-		links.map((link) => {
-			const isActive = pathname === link.href;
-			return (
-				<Button
-					className={`h-10 w-full justify-start rounded-xl px-3 font-medium text-sm transition-all ${
-						isActive
-							? "bg-green-100 text-green-700 shadow-sm"
-							: "text-gray-700 hover:bg-gray-100"
-					}`}
-					disabled={disabledButtons.has(link.key)}
-					key={link.key}
-					onClick={() => handleNavClick(link.href, link.key, isActive)}
-					variant="ghost"
-				>
-					<span className="mr-3">{link.icon}</span>
-					{link.label}
-				</Button>
-			);
-		});
+	const renderNavLinks = useCallback(
+		(links: SidebarLink[]) =>
+			links.map((link) => {
+				const isActive = pathname === link.href;
+				return (
+					<Button
+						className={`h-10 w-full justify-start rounded-lg px-3 font-medium text-sm transition-all ${
+							isActive
+								? "bg-gray-200 text-green-700 shadow-sm"
+								: "text-gray-700 hover:bg-gray-100"
+						}`}
+						disabled={disabledButtons.has(link.key)}
+						key={link.key}
+						onClick={() => handleNavClick(link.href, link.key, isActive)}
+						variant="ghost"
+					>
+						<span className="mr-3">{link.icon}</span>
+						{link.label}
+					</Button>
+				);
+			}),
+		[pathname, disabledButtons, handleNavClick]
+	);
 
 	return (
 		<>
@@ -160,16 +165,20 @@ const Sidebar = () => {
 
 				<div className="py-2">
 					<Link
-						className="flex h-10 w-full items-center justify-between rounded-lg px-4 font-medium text-sm transition-colors hover:bg-green-500 hover:text-white"
+						className="flex h-12 w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 transition hover:bg-gray-200 hover:text-green-700"
 						href={profileUrl}
 						rel="noopener noreferrer"
 						target="_blank"
 					>
-						<div className="flex items-center gap-2">
-							<Table2 className="h-4 w-4" />
-							Ver meu perfil
+						<div className="flex flex-col justify-center overflow-auto">
+							<p className="flex items-center gap-2 font-medium text-sm">
+								Ver meu perfil
+							</p>
+							<span className="truncate text-gray-500 text-xs">
+								bionk.me/{username}
+							</span>
 						</div>
-						<ExternalLink className="h-4 w-4" />
+						<ExternalLink className="h-5 w-5 text-gray-400 transition group-hover:text-white" />
 					</Link>
 				</div>
 
@@ -208,9 +217,6 @@ const Sidebar = () => {
 								<h2 className="truncate font-semibold text-sm">
 									{session?.user?.name}
 								</h2>
-								<p className="truncate text-gray-500 text-xs">
-									bionk.me/{username}
-								</p>
 								{subscriptionPlan && (
 									<span className="mt-1 inline-block w-fit rounded-md bg-green-100 px-2 py-0.5 font-medium text-[10px] text-green-600 capitalize">
 										{subscriptionPlan}
@@ -271,4 +277,4 @@ const Sidebar = () => {
 	);
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);

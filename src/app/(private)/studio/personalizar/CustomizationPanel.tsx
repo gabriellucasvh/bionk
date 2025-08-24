@@ -3,7 +3,7 @@
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { RenderLabel } from "./components/personalizar.RenderLabel";
 
@@ -69,16 +69,34 @@ const FIELD_TO_PICKER: Record<string, "background" | "text" | "button"> = {
 	customButtonFill: "button",
 };
 
-// Função debounce customizada
-function useDebounce(fn: (...args: any[]) => void, delay: number) {
-	const timeout = useRef<NodeJS.Timeout | null>(null);
-	return (...args: any[]) => {
-		if (timeout.current) {
-			clearTimeout(timeout.current);
-		}
-		timeout.current = setTimeout(() => fn(...args), delay);
-	};
-}
+// Hook de debounce agora usa useCallback para estabilidade
+const useDebouncedCallback = (
+	callback: (...args: any[]) => void,
+	delay: number
+) => {
+	const timeoutRef = useRef<NodeJS.Timeout>();
+
+	useEffect(() => {
+		// Limpa o timeout quando o componente é desmontado
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
+	}, []);
+
+	return useCallback(
+		(...args: any[]) => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+			timeoutRef.current = setTimeout(() => {
+				callback(...args);
+			}, delay);
+		},
+		[callback, delay]
+	);
+};
 
 export default function CustomizationPanel({
 	userCustomizations,
@@ -114,7 +132,7 @@ export default function CustomizationPanel({
 		}
 	};
 
-	const debouncedHandleChange = useDebounce(handleChange, 300);
+	const debouncedHandleChange = useDebouncedCallback(handleChange, 300);
 
 	const handleSavePending = async () => {
 		if (!Object.keys(pendingChanges).length) {

@@ -16,7 +16,7 @@ import { Edit, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import type { ChangeEvent } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface User {
 	name: string;
@@ -48,6 +48,7 @@ const PerfilClient = () => {
 	const profileInputRef = useRef<HTMLInputElement>(null);
 	const [originalProfileImageUrl, setOriginalProfileImageUrl] =
 		useState<string>("");
+	const [usernameError, setUsernameError] = useState<string>("");
 
 	useEffect(() => {
 		if (!session?.user?.id) {
@@ -88,9 +89,9 @@ const PerfilClient = () => {
 		profile.bio !== originalProfile.bio;
 	const hasChanges = textChanged || profileImageChanged;
 
-	const uploadImage = async (file: File): Promise<boolean> => {
+	const uploadImage = async (file: File): Promise<string | null> => {
 		if (!session?.user?.id) {
-			return false;
+			return null;
 		}
 
 		setIsUploadingImage(true);
@@ -107,26 +108,20 @@ const PerfilClient = () => {
 				}
 			);
 			const data = await res.json();
-
 			if (!res.ok) {
-				throw new Error(data.error || "Falha no upload da imagem");
+				throw new Error(data.error || "Falha no upload");
 			}
-
-			if (data.url) {
-				setOriginalProfileImageUrl(data.url);
-			}
-
-			return true;
+			return data.url;
 		} catch {
 			setProfilePreview(originalProfileImageUrl);
-			return false;
+			return null;
 		} finally {
 			setIsUploadingImage(false);
 		}
 	};
 
-	const updateProfileText = async (): Promise<User | null> => {
-		if (!session?.user?.id) {
+	const updateProfileText = useCallback(async (): Promise<User | null> => {
+		if (!(session?.user?.id && textChanged)) {
 			return null;
 		}
 
@@ -138,59 +133,51 @@ const PerfilClient = () => {
 			});
 			const data = await res.json();
 			if (!res.ok) {
-				throw new Error(data.error || "Falha ao atualizar o perfil");
+				throw new Error(data.error || "Falha ao atualizar");
 			}
 			return data.user as User;
 		} catch {
 			return null;
 		}
-	};
+	}, [session?.user?.id, profile, textChanged]);
 
-	const updateSessionData = async (
+	const applyUpdatedProfile = async (
+		currentSession: any,
+		updateSessionFn: any,
 		updatedUserData: User | null,
-		imageUploadSuccess: boolean
+		newImageUrl: string | null
 	) => {
-		if (!(session && updateSession)) {
+		if (!currentSession?.user) {
 			return;
 		}
 
-		const sessionUpdateData = {
-			...session,
-			user: {
-				...session.user,
-				name: updatedUserData?.name ?? session.user.name,
-				username: updatedUserData?.username ?? session.user.username,
-				image:
-					imageUploadSuccess && selectedProfileFile === null
-						? originalProfileImageUrl
-						: (updatedUserData?.image ?? session.user.image),
-			},
+		const newSessionUser = {
+			...currentSession.user,
+			name: updatedUserData?.name ?? currentSession.user.name,
+			username: updatedUserData?.username ?? currentSession.user.username,
+			image: newImageUrl ?? currentSession.user.image,
 		};
 
-		await updateSession(sessionUpdateData);
+		await updateSessionFn({ ...currentSession, user: newSessionUser });
 	};
 
-	const saveProfileImage = async (): Promise<boolean> => {
-		if (!selectedProfileFile) {
-			return true;
+	const syncLocalProfile = (
+		updatedUserData: User | null,
+		newImageUrl: string | null
+	) => {
+		if (updatedUserData) {
+			setOriginalProfile({
+				name: updatedUserData.name,
+				username: updatedUserData.username,
+				bio: updatedUserData.bio || "",
+			});
 		}
-
-		const success = await uploadImage(selectedProfileFile);
-
-		if (success) {
+		if (newImageUrl) {
+			setOriginalProfileImageUrl(newImageUrl);
 			setSelectedProfileFile(null);
 			setProfileImageChanged(false);
 		}
-
-		return success;
-	};
-
-	const saveProfileText = async (): Promise<User | null> => {
-		if (!textChanged) {
-			return null;
-		}
-
-		return await updateProfileText();
+		setUsernameError("");
 	};
 
 	const handleSaveProfile = async () => {
@@ -198,23 +185,47 @@ const PerfilClient = () => {
 			return;
 		}
 
-		setLoading(true);
-
-		const imageSuccess = await saveProfileImage();
-
-		if (!imageSuccess) {
-			setLoading(false);
+		// Validação de username
+		if (profile.username.trim()) {
+			setUsernameError("");
+		} else {
+			setUsernameError("O campo de nome de usuário não pode ficar vazio.");
 			return;
 		}
 
-		const updatedUserData = await saveProfileText();
+		setLoading(true);
 
-		if (imageSuccess || updatedUserData) {
-			await updateSessionData(updatedUserData, imageSuccess);
-			window.location.reload();
+		let newImageUrl: string | null = null;
+
+		if (selectedProfileFile) {
+			newImageUrl = await uploadImage(selectedProfileFile);
+			if (!newImageUrl) {
+				setLoading(false);
+				return;
+			}
+		}
+
+		const updatedUserData = await updateProfileText();
+
+		if (newImageUrl || updatedUserData) {
+			await applyUpdatedProfile(
+				session,
+				updateSession,
+				updatedUserData,
+				newImageUrl
+			);
+			syncLocalProfile(updatedUserData, newImageUrl);
 		}
 
 		setLoading(false);
+	};
+
+	const handleCancelChanges = () => {
+		setProfile({ ...originalProfile });
+		setProfilePreview(originalProfileImageUrl);
+		setSelectedProfileFile(null);
+		setProfileImageChanged(false);
+		setUsernameError("");
 	};
 
 	const handleProfileFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
@@ -250,7 +261,7 @@ const PerfilClient = () => {
 
 	return (
 		<section className="w-full space-y-4 p-4 lg:w-1/2">
-			<header className="flex items-center justify-between">
+			<header>
 				<h2 className="font-bold text-2xl">Perfil</h2>
 			</header>
 
@@ -263,7 +274,7 @@ const PerfilClient = () => {
 				</CardHeader>
 				<CardContent className="space-y-6">
 					<article className="flex flex-col gap-4 sm:flex-row sm:items-center">
-						<div className="relative flex items-center justify-center ">
+						<div className="relative flex items-center justify-center">
 							<div
 								className={`h-24 w-24 overflow-hidden rounded-full border-2 border-green-500 bg-muted shadow-black/20 shadow-md ${
 									isUploadingImage ? "opacity-50" : ""
@@ -286,11 +297,7 @@ const PerfilClient = () => {
 							<BaseButton
 								className="absolute right-0 bottom-0 rounded-full"
 								disabled={isUploadingImage}
-								onClick={() => {
-									if (!isUploadingImage && profileInputRef.current) {
-										profileInputRef.current.click();
-									}
-								}}
+								onClick={() => profileInputRef.current?.click()}
 								size="icon"
 								variant="white"
 							>
@@ -306,23 +313,12 @@ const PerfilClient = () => {
 							/>
 						</div>
 						<div className="flex-1 space-y-4">
-							<div className="grid gap-2">
-								<Label htmlFor="name">Nome</Label>
-								<Input
-									disabled={loading || isUploadingImage}
-									id="name"
-									onChange={(e) => {
-										setProfile({ ...profile, name: e.target.value });
-									}}
-									placeholder="Seu nome"
-									value={profile.name}
-								/>
-							</div>
-							<div className="grid gap-2">
+							<div className="grid gap-1">
 								<Label htmlFor="username">Nome de usuário</Label>
 								<div className="flex items-center gap-2">
 									<span className="text-muted-foreground">bionk.me/</span>
 									<Input
+										className={usernameError ? "border-red-500" : ""}
 										disabled={loading || isUploadingImage}
 										id="username"
 										onChange={(e) => {
@@ -330,11 +326,20 @@ const PerfilClient = () => {
 												.replace(/[^a-zA-Z0-9_.]/g, "")
 												.toLowerCase();
 											setProfile({ ...profile, username: sanitizedUsername });
+
+											// Atualiza o erro em tempo real
+											if (usernameError && sanitizedUsername.trim() !== "") {
+												setUsernameError("");
+											}
 										}}
 										placeholder="username"
 										value={profile.username}
 									/>
 								</div>
+								{/* Mantém espaço para a mensagem de erro */}
+								<p className="min-h-[1.25rem] text-red-500 text-sm">
+									{usernameError || " "}
+								</p>
 							</div>
 						</div>
 					</article>
@@ -352,7 +357,14 @@ const PerfilClient = () => {
 						/>
 					</div>
 					{hasChanges && (
-						<div className="mt-4 flex justify-end">
+						<div className="mt-4 flex justify-end gap-2">
+							<BaseButton
+								disabled={loading || isUploadingImage}
+								onClick={handleCancelChanges}
+								variant="white"
+							>
+								Cancelar alterações
+							</BaseButton>
 							<BaseButton
 								loading={loading || isUploadingImage}
 								onClick={handleSaveProfile}

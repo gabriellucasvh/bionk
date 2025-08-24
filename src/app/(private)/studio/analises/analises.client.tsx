@@ -79,9 +79,8 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 		userId ? `/api/analytics?userId=${userId}` : null,
 		fetcher,
 		{
-			refreshInterval: 0,
-			revalidateOnFocus: true,
-			revalidateOnReconnect: true,
+			revalidateOnFocus: false, // Otimização: Desabilitar refetch em foco
+			revalidateOnReconnect: false, // Otimização: Desabilitar refetch em reconexão
 		}
 	);
 
@@ -102,9 +101,9 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 		const workbook = new ExcelJS.Workbook();
 		const worksheet = workbook.addWorksheet("Analytics");
 		worksheet.addRow(["Data", "Cliques", "Visualizações"]);
-		data.chartData.forEach((item) =>
-			worksheet.addRow([formatDate(item.day), item.clicks, item.views])
-		);
+		for (const item of data.chartData) {
+			worksheet.addRow([formatDate(item.day), item.clicks, item.views]);
+		}
 		const buffer = await workbook.xlsx.writeBuffer();
 		const blob = new Blob([buffer], {
 			type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -137,8 +136,12 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 
 	if (error) {
 		return (
-			<section className="p-4">
-				<p>Erro ao carregar os dados. Recarregue a página e tente novamente.</p>
+			<section className="p-4 text-center text-red-600">
+				<p>
+					Ocorreu um erro ao carregar os dados das análises.
+					<br />
+					Por favor, tente recarregar a página.
+				</p>
 			</section>
 		);
 	}
