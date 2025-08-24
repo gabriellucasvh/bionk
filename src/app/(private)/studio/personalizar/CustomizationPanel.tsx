@@ -74,7 +74,7 @@ const useDebouncedCallback = (
 	callback: (...args: any[]) => void,
 	delay: number
 ) => {
-	const timeoutRef = useRef<NodeJS.Timeout>();
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
 		// Limpa o timeout quando o componente é desmontado
