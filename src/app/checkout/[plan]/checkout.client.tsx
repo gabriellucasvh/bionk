@@ -420,7 +420,7 @@ export default function PaymentPage() {
 					) : (
 						<>
 							<h2 className="mb-6 flex items-center gap-2 font-bold text-xl">
-								Pagamento seguro e garantido pelo
+								Pagamento seguro e garantido pelo Mercado Pago
 								<Image
 									alt="logo"
 									height={30}
