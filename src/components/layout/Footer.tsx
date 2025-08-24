@@ -1,8 +1,8 @@
 import { Facebook, Instagram, type LucideProps, Twitter } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
 
-// Adicionamos os componentes de ícone ao nosso objeto de navegação
 const navigation = {
 	resources: [
 		{ name: "Ajuda", href: "/ajuda" },
@@ -131,4 +131,4 @@ const Footer = () => {
 	);
 };
 
-export default Footer;
+export default React.memo(Footer);

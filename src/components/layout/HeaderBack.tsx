@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import type React from "react";
+import React from "react";
 import { useState } from "react";
 
 const HeaderBack = () => {
@@ -30,4 +30,4 @@ const HeaderBack = () => {
 	);
 };
 
-export default HeaderBack;
+export default React.memo(HeaderBack);

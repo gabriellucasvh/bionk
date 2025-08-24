@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 import { BaseButton } from "../buttons/BaseButton";
 import { MotionDiv } from "../ui/motion";
 
@@ -128,4 +128,4 @@ const HeaderMobile = () => {
 	);
 };
 
-export default HeaderMobile;
+export default React.memo(HeaderMobile);

@@ -4,8 +4,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { BaseButton } from "../buttons/BaseButton";
 
 const HeaderProps = [
@@ -97,4 +96,4 @@ const Header: React.FC = () => {
 	);
 };
 
-export default Header;
+export default React.memo(Header);

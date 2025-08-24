@@ -36,7 +36,7 @@ export default function Features() {
 							loop
 							muted
 							playsInline
-							src="https://res.cloudinary.com/dlfpjuk2r/video/upload/v1754362134/gestao-loop-compact_gsqszb.mp4"
+							src="https://res.cloudinary.com/dlfpjuk2r/video/upload/v1756007043/gestao-loop-compact_gsqszb_avmhaz.mp4"
 						/>
 
 						<div className="absolute inset-0 z-10 bg-gradient-to-t from-black via-black to-transparent" />
@@ -143,7 +143,7 @@ export default function Features() {
 							className="pointer-events-none absolute inset-0 h-full w-full scale-110 select-none object-cover opacity-70"
 							fill
 							loading="lazy"
-							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1754362133/bionk-socials_vtuugv.svg"
+							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1756007371/bionk-socials_vtuugv_iwlsmy.svg"
 						/>
 						<div className="absolute inset-0 z-10 bg-teal-950/95" />
 						<div className="relative z-20 flex h-full flex-col justify-end p-6">
@@ -166,7 +166,7 @@ export default function Features() {
 							className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover opacity-70"
 							fill
 							loading="lazy"
-							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1754362606/bionk-enterprises_yaj0kb.jpg"
+							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1756007370/bionk-enterprises_yaj0kb_c67qog.jpg"
 						/>
 						<div className="absolute inset-0 z-10 bg-emerald-950/95" />
 						<div className="relative z-20 flex h-full flex-col justify-end p-6">
@@ -189,7 +189,7 @@ export default function Features() {
 							className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover opacity-70"
 							fill
 							loading="lazy"
-							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1754362673/bionk-freelancer_xk5n3t.jpg"
+							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1756007368/bionk-freelancer_xk5n3t_xeqqp1.jpg"
 						/>
 						<div className="absolute inset-0 z-10 bg-cyan-950/95" />
 						<div className="relative z-20 flex h-full flex-col justify-end break-keep p-6 text-green-400">
