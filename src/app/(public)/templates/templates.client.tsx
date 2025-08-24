@@ -51,7 +51,6 @@ const TemplatesClient = () => {
 									height={533}
 									quality={90}
 									src={template.image}
-									unoptimized
 									width={300}
 								/>
 							</div>
