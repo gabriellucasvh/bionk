@@ -318,7 +318,9 @@ const PerfilClient = () => {
 								<div className="flex items-center gap-2">
 									<span className="text-muted-foreground">bionk.me/</span>
 									<Input
-										className={usernameError ? "border-red-500" : ""}
+										className={
+											usernameError ? "border-red-500" : "text-neutral-700"
+										}
 										disabled={loading || isUploadingImage}
 										id="username"
 										onChange={(e) => {
@@ -346,7 +348,7 @@ const PerfilClient = () => {
 					<div className="grid gap-2">
 						<Label htmlFor="bio">Biografia</Label>
 						<Textarea
-							className="min-h-32"
+							className="min-h-32 text-neutral-700"
 							disabled={loading || isUploadingImage}
 							id="bio"
 							onChange={(e) => {
@@ -363,13 +365,13 @@ const PerfilClient = () => {
 								onClick={handleCancelChanges}
 								variant="white"
 							>
-								Cancelar alterações
+								Cancelar
 							</BaseButton>
 							<BaseButton
 								loading={loading || isUploadingImage}
 								onClick={handleSaveProfile}
 							>
-								Salvar alterações
+								Salvar
 							</BaseButton>
 						</div>
 					)}
