@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { CATEGORIES } from "../data/personalizar.data";
-import VerPerfilMobile from "./personalizar.VerPerfilMobile";
 
 interface TemplateSettingsProps {
 	onTemplateChange?: () => void; // Callback para notificar mudança de template
@@ -174,11 +173,6 @@ export default function TemplateSettings({
 					</span>
 				</div>
 			)}
-
-			<div className="flex items-center justify-center">
-				<VerPerfilMobile />
-			</div>
-
 			<div className="block">{renderContent()}</div>
 		</div>
 	);

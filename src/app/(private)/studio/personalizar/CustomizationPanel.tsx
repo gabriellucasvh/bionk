@@ -1,6 +1,7 @@
 "use client";
 
 import { BaseButton } from "@/components/buttons/BaseButton";
+import { Slider } from "@/components/ui/slider"; // Importar o Slider do shadcn/ui
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
@@ -60,7 +61,6 @@ const BUTTON_STYLES = [
 	{ value: "outline", label: "Contorno" },
 	{ value: "soft", label: "Suave" },
 ];
-const BUTTON_CORNERS = ["0", "4", "8", "12", "16", "24"];
 
 const FIELD_TO_PICKER: Record<string, "background" | "text" | "button"> = {
 	customBackgroundColor: "background",
@@ -117,19 +117,46 @@ export default function CustomizationPanel({
 	}, [userCustomizations]);
 
 	const handleChange = (field: keyof typeof customizations, value: string) => {
-		const newValue = value;
-		setCustomizations((prev) => ({ ...prev, [field]: newValue }));
+		const newCustomizations: Partial<typeof customizations> = {
+			[field]: value,
+		};
+		const newPendingChanges: Partial<typeof customizations> = {
+			[field]: value,
+		};
 
-		// Se o valor voltou ao original, remove do pendingChanges
-		if (newValue === userCustomizations[field]) {
-			setPendingChanges((prev) => {
-				const updated = { ...prev };
-				delete updated[field];
-				return updated;
-			});
-		} else {
-			setPendingChanges((prev) => ({ ...prev, [field]: newValue }));
+		// Se uma cor de fundo é escolhida, limpa o gradiente
+		if (field === "customBackgroundColor" && value) {
+			newCustomizations.customBackgroundGradient = "";
+			newPendingChanges.customBackgroundGradient = "";
 		}
+
+		// Se um gradiente é escolhido, limpa a cor de fundo
+		if (field === "customBackgroundGradient" && value) {
+			newCustomizations.customBackgroundColor = "";
+			newPendingChanges.customBackgroundColor = "";
+		}
+
+		// Atualiza o estado principal
+		setCustomizations((prev) => ({
+			...prev,
+			...newCustomizations,
+		}));
+
+		// Atualiza as alterações pendentes
+		setPendingChanges((prev) => {
+			const updated = { ...prev, ...newPendingChanges };
+
+			// Limpa as alterações pendentes se elas voltarem ao estado original
+			for (const key of Object.keys(newPendingChanges) as Array<
+				keyof typeof newPendingChanges
+			>) {
+				if (updated[key] === userCustomizations[key]) {
+					delete updated[key];
+				}
+			}
+
+			return updated;
+		});
 	};
 
 	const debouncedHandleChange = useDebouncedCallback(handleChange, 300);
@@ -154,9 +181,22 @@ export default function CustomizationPanel({
 	};
 
 	// Função auxiliar para verificar se um campo tem alterações pendentes
-	const hasPendingChange = (field: keyof typeof customizations) =>
-		pendingChanges[field] !== undefined &&
-		customizations[field] !== userCustomizations[field];
+	const hasPendingChange = (field: keyof typeof customizations) => {
+		const isPending = pendingChanges[field] !== undefined;
+		const hasChanged = customizations[field] !== userCustomizations[field];
+
+		// Se a cor de fundo foi limpa porque um gradiente foi selecionado,
+		// não mostre o aviso de pendente para a cor.
+		if (
+			field === "customBackgroundColor" &&
+			!customizations.customBackgroundColor &&
+			pendingChanges.customBackgroundGradient !== undefined
+		) {
+			return false;
+		}
+
+		return isPending && hasChanged;
+	};
 
 	// Hook para fechar o seletor de cores ao clicar fora
 	useEffect(() => {
@@ -167,13 +207,13 @@ export default function CustomizationPanel({
 			) {
 				setActiveColorPicker(null);
 			}
-		}
+		};
 
 		document.addEventListener("mousedown", handleClickOutside);
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
-	});
+	}, []); // Array de dependências vazio para executar apenas uma vez
 
 	const renderColorSelector = (
 		field: "customBackgroundColor" | "customTextColor" | "customButtonFill",
@@ -185,7 +225,7 @@ export default function CustomizationPanel({
 		return (
 			<div className="mb-8">
 				<RenderLabel hasPending={hasPendingChange(field)} text={label} />
-				<div className="mb-3 flex flex-wrap gap-1">
+				<div className="mt-2 mb-3 flex flex-wrap gap-1">
 					<button
 						className="flex h-10 w-10 items-center justify-center rounded-full"
 						onClick={() =>
@@ -217,7 +257,7 @@ export default function CustomizationPanel({
 							className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
 								customColor === color
 									? "border-2 border-lime-700"
-									: "border-gray-200 hover:border-blue-500"
+									: "border-2 border-gray-200 hover:border-blue-500"
 							}`}
 							key={color}
 							onClick={() => handleChange(field, color)}
@@ -234,7 +274,7 @@ export default function CustomizationPanel({
 							onChange={(color) => debouncedHandleChange(field, color)}
 						/>
 						<HexColorInput
-							className="mt-2 w-min rounded border border-gray-300 p-2 text-center"
+							className="mt-2 w-full rounded border border-gray-300 p-2 text-center"
 							color={customColor}
 							onChange={(color) => handleChange(field, color)}
 							placeholder="#000000"
@@ -254,7 +294,7 @@ export default function CustomizationPanel({
 					hasPending={hasPendingChange("customBackgroundGradient")}
 					text="Gradiente de Fundo"
 				/>
-				<div className="flex flex-wrap gap-1">
+				<div className="mt-2 flex flex-wrap gap-1">
 					{GRADIENTS.map((gradient) => (
 						<button
 							className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
@@ -277,7 +317,7 @@ export default function CustomizationPanel({
 			{/* Fonte */}
 			<div className="mb-8">
 				<RenderLabel hasPending={hasPendingChange("customFont")} text="Fonte" />
-				<div className="flex flex-wrap gap-2">
+				<div className="mt-2 flex flex-wrap gap-2">
 					{FONT_OPTIONS.map((font) => (
 						<button
 							className={`whitespace-nowrap rounded border px-4 py-2 transition-colors ${
@@ -301,7 +341,7 @@ export default function CustomizationPanel({
 					hasPending={hasPendingChange("customButton")}
 					text="Estilo do Botão"
 				/>
-				<div className="flex flex-wrap gap-2">
+				<div className="mt-2 flex flex-wrap gap-2">
 					{BUTTON_STYLES.map((style) => (
 						<button
 							className={`whitespace-nowrap rounded border px-4 py-2 transition-colors ${
@@ -319,27 +359,28 @@ export default function CustomizationPanel({
 				</div>
 			</div>
 
-			{/* Cantos do Botão */}
+			{/* Cantos do Botão com Slider do shadcn/ui */}
 			<div className="mb-12">
 				<RenderLabel
 					hasPending={hasPendingChange("customButtonCorners")}
 					text="Cantos do Botão"
 				/>
-				<div className="flex flex-wrap gap-2">
-					{BUTTON_CORNERS.map((radius) => (
-						<button
-							className={`whitespace-nowrap rounded border px-4 py-2 transition-colors ${
-								customizations.customButtonCorners === radius
-									? "border-gray-300 bg-neutral-200"
-									: "border-gray-200 hover:bg-neutral-200"
-							}`}
-							key={radius}
-							onClick={() => handleChange("customButtonCorners", radius)}
-							type="button"
-						>
-							{radius}px
-						</button>
-					))}
+				<div className="mt-2 flex items-center gap-4">
+					<Slider
+						className="w-full"
+						max={24}
+						min={0}
+						onValueChange={(value) =>
+							handleChange("customButtonCorners", value[0].toString())
+						}
+						step={12}
+						value={[
+							Number.parseInt(customizations.customButtonCorners || "0", 10),
+						]}
+					/>
+					<span className="w-12 text-center font-semibold text-gray-700">
+						{customizations.customButtonCorners || "0"}px
+					</span>
 				</div>
 			</div>
 

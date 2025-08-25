@@ -9,7 +9,7 @@ interface RenderLabelProps {
 // Componente movido para fora
 export const RenderLabel = ({ text, hasPending }: RenderLabelProps) => {
 	return (
-		<Label className="mb-3 block">
+		<Label className=" inline-block">
 			{text}
 			{hasPending && (
 				<span className="ml-2 text-red-500 text-xs">(não salvo)</span>
