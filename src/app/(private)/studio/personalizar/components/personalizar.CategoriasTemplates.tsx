@@ -112,13 +112,13 @@ export default function TemplateSettings({
 							>
 								{isSaving ? "Salvando..." : "Salvar Template"}
 							</BaseButton>
-							{selectedTemplate && (
-								<p className="text-orange-600 text-sm">
-									⚠️ Isso resetará suas personalizações
-								</p>
-							)}
 						</div>
 					</div>
+					{selectedTemplate && (
+						<p className="mb-2 text-orange-600 text-sm">
+							Salvar um novo template resetará suas personalizações
+						</p>
+					)}
 					<div className="grid grid-cols-2 gap-4 md:grid-cols-5">
 						{CATEGORIES[selectedCategory as keyof typeof CATEGORIES]?.map(
 							(template) => (
