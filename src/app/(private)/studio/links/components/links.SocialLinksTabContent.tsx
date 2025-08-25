@@ -118,7 +118,7 @@ const SocialLinksTabContent = ({
 	};
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-6 pb-10">
 			{!selectedPlatform && (
 				<div className="space-y-3">
 					<p className="font-medium text-sm">
