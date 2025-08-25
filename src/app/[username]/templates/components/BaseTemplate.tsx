@@ -334,7 +334,7 @@ export default function BaseTemplate({
 	return (
 		<>
 			<div
-				className={`flex min-h-screen flex-col items-center px-4 py-8 ${classNames?.wrapper || ""}`}
+				className={`flex min-h-dvh flex-col items-center px-4 py-8 ${classNames?.wrapper || ""}`}
 				style={wrapperStyle}
 			>
 				<ProfileViewTracker userId={user.id} />
