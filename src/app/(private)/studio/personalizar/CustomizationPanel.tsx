@@ -1,10 +1,9 @@
 "use client";
 
 import { BaseButton } from "@/components/buttons/BaseButton";
-import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HexColorPicker } from "react-colorful";
+import { HexColorInput, HexColorPicker } from "react-colorful";
 import { RenderLabel } from "./components/personalizar.RenderLabel";
 
 // Interface atualizada
@@ -110,6 +109,7 @@ export default function CustomizationPanel({
 		Partial<typeof customizations>
 	>({});
 	const [isSaving, setIsSaving] = useState(false);
+	const pickerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		setCustomizations(userCustomizations);
@@ -158,69 +158,91 @@ export default function CustomizationPanel({
 		pendingChanges[field] !== undefined &&
 		customizations[field] !== userCustomizations[field];
 
+	// Hook para fechar o seletor de cores ao clicar fora
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				pickerRef.current &&
+				!pickerRef.current.contains(event.target as Node)
+			) {
+				setActiveColorPicker(null);
+			}
+		}
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	});
+
 	const renderColorSelector = (
 		field: "customBackgroundColor" | "customTextColor" | "customButtonFill",
 		label: string
-	) => (
-		<div className="mb-8">
-			{/* Agora passamos a prop 'hasPending' diretamente */}
-			<RenderLabel hasPending={hasPendingChange(field)} text={label} />
-			<div className="mb-3 flex gap-1">
-				<button
-					className="flex h-10 w-10 items-center justify-center rounded-full"
-					onClick={() =>
-						setActiveColorPicker(
-							activeColorPicker === FIELD_TO_PICKER[field]
-								? null
-								: FIELD_TO_PICKER[field]
-						)
-					}
-					style={{
-						background:
-							"conic-gradient(from 0deg, red, orange, yellow, green, cyan, blue, violet, red)",
-					}}
-					type="button"
-				>
-					<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white">
-						<Plus className="h-4 w-4" />
-					</span>
-				</button>
-				{SOLID_COLORS.map((color) => (
-					<button
-						className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
-							customizations[field] === color
-								? "border-2 border-lime-700"
-								: "border-gray-200 hover:border-blue-500"
-						}`}
-						key={color}
-						onClick={() => handleChange(field, color)}
-						style={{ backgroundColor: color }}
-						type="button"
-					/>
-				))}
-			</div>
+	) => {
+		const customColor = customizations[field];
+		const isSolidColor = SOLID_COLORS.includes(customColor);
 
-			{activeColorPicker === FIELD_TO_PICKER[field] && (
-				<div className="mt-3">
-					<HexColorPicker
-						color={customizations[field]}
-						onChange={(color) => debouncedHandleChange(field, color)}
-					/>
-					<div className="mt-2 text-gray-500 text-xs">
-						{customizations[field]}
-					</div>
-					<Button
-						className="mt-3"
-						disabled={isSaving || !Object.keys(pendingChanges).length}
-						onClick={handleSavePending}
-						size="sm"
+		return (
+			<div className="mb-8">
+				<RenderLabel hasPending={hasPendingChange(field)} text={label} />
+				<div className="mb-3 flex flex-wrap gap-1">
+					<button
+						className="flex h-10 w-10 items-center justify-center rounded-full"
+						onClick={() =>
+							setActiveColorPicker(
+								activeColorPicker === FIELD_TO_PICKER[field]
+									? null
+									: FIELD_TO_PICKER[field]
+							)
+						}
+						style={{
+							background:
+								"conic-gradient(from 0deg, red, orange, yellow, green, cyan, blue, violet, red)",
+						}}
+						type="button"
 					>
-						{isSaving ? "Salvando..." : "Salvar Cor"}
-					</Button>
+						<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white">
+							<Plus className="h-4 w-4" />
+						</span>
+					</button>
+					{!isSolidColor && customColor && (
+						<button
+							className="h-10 w-10 rounded-full border-2 border-lime-700"
+							style={{ backgroundColor: customColor }}
+							type="button"
+						/>
+					)}
+					{SOLID_COLORS.map((color) => (
+						<button
+							className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
+								customColor === color
+									? "border-2 border-lime-700"
+									: "border-gray-200 hover:border-blue-500"
+							}`}
+							key={color}
+							onClick={() => handleChange(field, color)}
+							style={{ backgroundColor: color }}
+							type="button"
+						/>
+					))}
 				</div>
-			)}
-		</div>
-	);
+
+				{activeColorPicker === FIELD_TO_PICKER[field] && (
+					<div className="mt-3 w-min" ref={pickerRef}>
+						<HexColorPicker
+							color={customColor}
+							onChange={(color) => debouncedHandleChange(field, color)}
+						/>
+						<HexColorInput
+							className="mt-2 w-min rounded border border-gray-300 p-2 text-center"
+							color={customColor}
+							onChange={(color) => handleChange(field, color)}
+						/>
+					</div>
+				)}
+			</div>
+		);
+	};
 
 	return (
 		<div className="mt-8">
@@ -231,7 +253,7 @@ export default function CustomizationPanel({
 					hasPending={hasPendingChange("customBackgroundGradient")}
 					text="Gradiente de Fundo"
 				/>
-				<div className="flex gap-1">
+				<div className="flex flex-wrap gap-1">
 					{GRADIENTS.map((gradient) => (
 						<button
 							className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
@@ -323,9 +345,6 @@ export default function CustomizationPanel({
 			{/* Salvar e Cancelar pendências */}
 			{Object.keys(pendingChanges).length > 0 && (
 				<div className="mb-12 flex items-center gap-2">
-					<BaseButton loading={isSaving} onClick={handleSavePending} size="sm">
-						Salvar
-					</BaseButton>
 					<BaseButton
 						loading={isSaving}
 						onClick={handleCancel}
@@ -333,6 +352,9 @@ export default function CustomizationPanel({
 						variant="white"
 					>
 						Cancelar
+					</BaseButton>
+					<BaseButton loading={isSaving} onClick={handleSavePending} size="sm">
+						Salvar
 					</BaseButton>
 				</div>
 			)}
