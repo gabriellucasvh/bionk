@@ -87,7 +87,7 @@ export default function TemplateSettings({
 			<div className="mb-10 flex flex-wrap gap-2">
 				{Object.keys(CATEGORIES).map((category) => (
 					<Button
-						className={`rounded-lg border-2 px-6 py-3 font-medium text-sm transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white md:py-5 ${
+						className={`rounded-lg border-2 px-6 py-3 font-medium text-sm capitalize transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white md:py-5 ${
 							selectedCategory === category
 								? "border-lime-500 bg-green-950 text-white"
 								: ""
@@ -96,7 +96,7 @@ export default function TemplateSettings({
 						onClick={() => setSelectedCategory(category)}
 						variant="ghost"
 					>
-						{category.replace(/-/g, " ").toUpperCase()}
+						{category.replace(/-/g, " ")}
 					</Button>
 				))}
 			</div>
@@ -161,9 +161,9 @@ export default function TemplateSettings({
 		<div>
 			{currentTemplate && (
 				<div className="mb-6 md:inline-block">
-					<span className="rounded-full bg-green-100 px-4 py-2 font-medium text-green-800 text-sm">
+					<span className="rounded-full bg-green-100 px-4 py-2 font-medium text-green-800 text-sm capitalize">
 						Tema atual:{" "}
-						{currentTemplate.templateCategory.charAt(0).toUpperCase() +
+						{currentTemplate.templateCategory.charAt(0) +
 							currentTemplate.templateCategory.slice(1)}{" "}
 						-{" "}
 						{CATEGORIES[
