@@ -77,12 +77,17 @@ function UserHeader({
 				<div
 					className={`relative mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 ${classNames?.image || ""}`}
 				>
+					{/* Bloco de Código Alterado */}
 					<Image
 						alt={user.name || user.username}
 						className="object-cover"
 						fill
+						priority // Pede ao Next.js para carregar esta imagem primeiro
+						quality={100} // Define a qualidade de compressão para o máximo
+						sizes="112px" // Informa o tamanho real que a imagem terá no ecrã
 						src={user.image}
 					/>
+					{/* Fim do Bloco de Código Alterado */}
 				</div>
 			)}
 			<h1
@@ -198,8 +203,7 @@ function LinksList({
 			{Object.entries(groupedLinks).map(([sectionTitle, links]) => (
 				<section className="space-y-4" key={sectionTitle}>
 					{/* Mostra o título da seção se não for a padrão ou se for a única */}
-					{(sectionTitle !== "" ||
-						Object.keys(groupedLinks).length === 1) && (
+					{(sectionTitle !== "" || Object.keys(groupedLinks).length === 1) && (
 						<h2 className="font-bold text-xl" style={textStyle}>
 							{sectionTitle}
 						</h2>

@@ -30,14 +30,17 @@ export const authOptions: NextAuthOptions = {
 			picture?: string;
 		}) => {
 			const username = await generateUniqueUsername(data.name ?? "user");
+			// CORREÇÃO: A imagem já virá em alta resolução do 'profile'
+			const imageUrl =
+				data.picture ??
+				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png";
+
 			return prisma.user.create({
 				data: {
 					email: data.email,
 					name: data.name,
 					username,
-					image:
-						data.picture ??
-						"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png",
+					image: imageUrl,
 					googleId: (data as any).sub ?? null,
 					provider: "google",
 					emailVerified: new Date(),
@@ -68,12 +71,15 @@ export const authOptions: NextAuthOptions = {
 			clientId,
 			clientSecret,
 			profile(profile) {
+				// NOVO: Altera a URL da imagem para obter alta resolução (400px)
+				const highResImage = profile.picture?.replace(/=s\d+-c$/, "=s512-c");
+
 				return {
 					...profile,
 					id: profile.sub,
 					name: profile.name,
 					email: profile.email,
-					image: profile.picture,
+					image: highResImage, // Utiliza a nova URL de alta resolução
 					googleId: profile.sub,
 				};
 			},
@@ -121,7 +127,6 @@ export const authOptions: NextAuthOptions = {
 	session: { strategy: "jwt" },
 	secret: process.env.NEXTAUTH_SECRET,
 	callbacks: {
-		// --- CORREÇÃO: Removido 'async' pois não há 'await' ---
 		jwt({ token, user, account, trigger, session: updateSessionData }) {
 			const u = user as ExtendedUser;
 
@@ -148,7 +153,6 @@ export const authOptions: NextAuthOptions = {
 
 			return token;
 		},
-		// --- CORREÇÃO: Removido 'async' pois não há 'await' ---
 		session({ session, token }) {
 			session.user = {
 				...session.user,
