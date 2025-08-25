@@ -15,7 +15,7 @@ export default function Perfil() {
 			<Sidebar />
 			<main className="ml-0 flex md:ml-64 ">
 				<PersonalizarClient />
-				<div className="hidden lg:block">
+				<div className="hidden xl:block">
 					<IframePreview />
 				</div>
 			</main>
