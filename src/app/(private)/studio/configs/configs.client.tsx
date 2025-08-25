@@ -242,7 +242,7 @@ export default function ConfigsClient() {
 	}
 
 	return (
-		<main className="container max-w-4xl space-y-8 p-5">
+		<main className="container mx-auto min-h-dvh max-w-1/2 space-y-8 p-5">
 			<header>
 				<h1 className="font-bold text-3xl">Configurações</h1>
 				<p className="mt-1 text-muted-foreground">
@@ -250,12 +250,10 @@ export default function ConfigsClient() {
 				</p>
 			</header>
 
-			{/* --- LÓGICA DE RENDERIZAÇÃO SIMPLIFICADA E CORRIGIDA --- */}
 			<article>
 				<SubscriptionManagement subscription={subscription} />
 			</article>
 
-			{/* O restante dos seus cards de configuração */}
 			<article>
 				<Card>
 					<CardHeader>
@@ -302,62 +300,44 @@ export default function ConfigsClient() {
 					</CardContent>
 				</Card>
 			</article>
-			<article>
-				<Card>
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							<Mail className="h-5 w-5" />
-							Alterar E-mail
-						</CardTitle>
-						<CardDescription>
-							Atualize o e-mail associado à sua conta
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						{isCredentialsUser ? (
-							<Link href="/profile/change-email" passHref>
+			{isCredentialsUser && (
+				<article>
+					<Card>
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2">
+								<Mail className="h-5 w-5" />
+								Alterar E-mail
+							</CardTitle>
+							<CardDescription>
+								Atualize o e-mail associado à sua conta
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<Link href="/profile/change-email">
 								<Button variant="outline">Alterar E-mail</Button>
 							</Link>
-						) : (
-							<Button disabled variant="outline">
-								Alterar E-mail
-							</Button>
-						)}
-						{!isCredentialsUser && (
-							<p className="mt-2 text-muted-foreground text-sm">
-								Opção indisponível para login via provedor externo.
-							</p>
-						)}
-					</CardContent>
-				</Card>
-			</article>
-			<article>
-				<Card>
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							<Lock className="h-5 w-5" />
-							Alterar Senha
-						</CardTitle>
-						<CardDescription>Atualize sua senha de acesso</CardDescription>
-					</CardHeader>
-					<CardContent>
-						{isCredentialsUser ? (
-							<Link href="/profile/change-password" passHref>
+						</CardContent>
+					</Card>
+				</article>
+			)}
+			{isCredentialsUser && (
+				<article>
+					<Card>
+						<CardHeader>
+							<CardTitle className="flex items-center gap-2">
+								<Lock className="h-5 w-5" />
+								Alterar Senha
+							</CardTitle>
+							<CardDescription>Atualize sua senha de acesso</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<Link href="/profile/change-password">
 								<Button variant="outline">Alterar Senha</Button>
 							</Link>
-						) : (
-							<Button disabled variant="outline">
-								Alterar Senha
-							</Button>
-						)}
-						{!isCredentialsUser && (
-							<p className="mt-2 text-muted-foreground text-sm">
-								Opção indisponível para login via provedor externo.
-							</p>
-						)}
-					</CardContent>
-				</Card>
-			</article>
+						</CardContent>
+					</Card>
+				</article>
+			)}
 			<article>
 				<Card>
 					<CardHeader>
@@ -397,28 +377,26 @@ export default function ConfigsClient() {
 				</Card>
 			</article>
 			<Separator />
-			<section className="grid gap-6 md:grid-cols-2">
-				<article>
-					<Card>
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2">
-								<HelpCircle className="h-5 w-5" />
-								Central de Ajuda
-							</CardTitle>
-							<CardDescription>
-								Acesse nossa documentação e perguntas frequentes
-							</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<Link href="/ajuda" passHref>
-								<Button className="w-full" variant="outline">
-									Acessar Central de Ajuda
-								</Button>
-							</Link>
-						</CardContent>
-					</Card>
-				</article>
-			</section>
+			<article>
+				<Card>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							<HelpCircle className="h-5 w-5" />
+							Central de Ajuda
+						</CardTitle>
+						<CardDescription>
+							Acesse nossa documentação e perguntas frequentes
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
+						<Link href="/ajuda" passHref>
+							<Button className="w-full" variant="outline">
+								Acessar Central de Ajuda
+							</Button>
+						</Link>
+					</CardContent>
+				</Card>
+			</article>
 
 			<ArchivedLinksModal
 				isOpen={isArchivedModalOpen}
