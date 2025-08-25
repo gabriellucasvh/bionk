@@ -237,6 +237,7 @@ export default function CustomizationPanel({
 							className="mt-2 w-min rounded border border-gray-300 p-2 text-center"
 							color={customColor}
 							onChange={(color) => handleChange(field, color)}
+							placeholder="#000000"
 						/>
 					</div>
 				)}
