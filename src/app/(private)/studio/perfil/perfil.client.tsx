@@ -1,5 +1,10 @@
 "use client";
 
+import { Edit, Loader2 } from "lucide-react";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
+import type { ChangeEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
@@ -12,11 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Edit, Loader2 } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import type { ChangeEvent } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
 
 interface User {
 	name: string;
@@ -260,7 +260,7 @@ const PerfilClient = () => {
 	}
 
 	return (
-		<section className="w-full space-y-4 p-4 lg:w-1/2">
+		<section className="mx-auto min-h-dvh w-full space-y-4 p-4 lg:w-1/2">
 			<header>
 				<h2 className="font-bold text-2xl">Perfil</h2>
 			</header>

@@ -49,7 +49,7 @@ const UnifiedLinksManager = () => {
 	}
 
 	return (
-		<section className="w-full max-w-4xl touch-manipulation">
+		<section className="mx-auto min-h-dvh w-full max-w-4xl touch-manipulation">
 			<Tabs className="w-full" defaultValue="links">
 				<Card className="border-none shadow-none">
 					<CardHeader className="flex flex-col items-start justify-between px-2 sm:px-6 lg:flex-row lg:items-center">
