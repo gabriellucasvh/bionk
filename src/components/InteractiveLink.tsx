@@ -1,23 +1,25 @@
 "use client";
 
-import { Eye } from "lucide-react";
+import LinkOptionsModal from "@/components/LinkOptionsModal";
+import type { UserLink } from "@/types/user-profile";
+import { Eye, MoreVertical } from "lucide-react";
 import Link from "next/link";
-import type React from "react";
+import type { FC, MouseEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface InteractiveLinkProps {
 	href: string;
-	linkId: number;
-	children: React.ReactNode;
+	link: UserLink;
+	children: ReactNode;
 	sensitive?: boolean;
 	className?: string;
 	style?: React.CSSProperties;
 }
 
-const InteractiveLink: React.FC<InteractiveLinkProps> = ({
+const InteractiveLink: FC<InteractiveLinkProps> = ({
 	href,
-	linkId,
+	link,
 	children,
 	sensitive,
 	className = "",
@@ -25,6 +27,7 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
 }) => {
 	const [unblurred, setUnblurred] = useState(false);
 	const [isTouch, setIsTouch] = useState(false);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	useEffect(() => {
 		const handleTouchStart = () => setIsTouch(true);
@@ -32,7 +35,7 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
 		return () => window.removeEventListener("touchstart", handleTouchStart);
 	}, []);
 
-	const handleClick = (e: React.MouseEvent) => {
+	const handleLinkClick = (e: MouseEvent) => {
 		if (sensitive && isTouch && !unblurred) {
 			e.preventDefault();
 			setUnblurred(true);
@@ -40,7 +43,7 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
 		}
 
 		const url = "/api/link-click";
-		const data = JSON.stringify({ linkId });
+		const data = JSON.stringify({ linkId: link.id });
 
 		if (navigator.sendBeacon) {
 			navigator.sendBeacon(url, data);
@@ -49,50 +52,73 @@ const InteractiveLink: React.FC<InteractiveLinkProps> = ({
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: data,
+				keepalive: true,
 			});
 		}
 	};
 
-	return (
-		<Link
-			className={twMerge(
-				`relative flex w-full items-center justify-center text-start ${
-					sensitive ? "group overflow-hidden border-red-200" : ""
-				} ${className}`
-			)}
-			href={href}
-			onClick={handleClick}
-			rel="noopener noreferrer"
-			style={style}
-			target="_blank"
-		>
-			{sensitive && (
-				<div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center transition-all duration-300">
-					<div
-						className={twMerge(
-							"absolute inset-0 rounded-lg bg-black/20 backdrop-blur-md transition-all duration-300",
-							(!isTouch &&
-								"group-hover:bg-transparent group-hover:backdrop-blur-none") ||
-								(isTouch && unblurred && "bg-transparent backdrop-blur-none")
-						)}
-					/>
-					<span
-						className={twMerge(
-							"z-30 flex items-center gap-2 rounded-md bg-black/60 px-3 py-1 font-semibold text-sm text-white transition-opacity duration-300",
-							(!isTouch && "group-hover:opacity-0") ||
-								(isTouch && unblurred && "opacity-0")
-						)}
-					>
-						<Eye size={16} />
-						Conteúdo sensível
-					</span>
-				</div>
-			)}
+	const handleOptionsClick = (e: MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setIsModalOpen(true);
+	};
 
-			<span className="relative z-10 w-full whitespace-pre-wrap break-words">
-				{children}
-			</span>
-		</Link>
+	return (
+		<>
+			<div
+				className={twMerge("group relative w-full", className)}
+				style={style}
+			>
+				<Link
+					aria-label={link.title}
+					className="z-10 w-full"
+					href={href}
+					onClick={handleLinkClick}
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					{children}
+				</Link>
+
+				<button
+					aria-label="Mais opções"
+					className="-translate-y-1/2 absolute top-1/2 right-2 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
+					onClick={handleOptionsClick}
+					type="button"
+				>
+					<MoreVertical className="size-5" />
+				</button>
+
+				{sensitive && (
+					<div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center transition-all duration-300">
+						<div
+							className={twMerge(
+								"absolute inset-0 rounded-lg bg-black/20 backdrop-blur-md transition-all duration-300",
+								(!isTouch &&
+									"group-hover:bg-transparent group-hover:backdrop-blur-none") ||
+									(isTouch && unblurred && "bg-transparent backdrop-blur-none")
+							)}
+						/>
+						<span
+							className={twMerge(
+								"z-30 flex items-center gap-2 rounded-md bg-black/60 px-3 py-1 font-semibold text-sm text-white transition-opacity duration-300",
+								(!isTouch && "group-hover:opacity-0") ||
+									(isTouch && unblurred && "opacity-0")
+							)}
+						>
+							<Eye size={16} />
+							Conteúdo sensível
+						</span>
+					</div>
+				)}
+			</div>
+
+			<LinkOptionsModal
+				isOpen={isModalOpen}
+				link={link}
+				onClose={() => setIsModalOpen(false)}
+			/>
+		</>
 	);
 };
 

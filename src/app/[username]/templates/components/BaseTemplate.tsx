@@ -77,17 +77,15 @@ function UserHeader({
 				<div
 					className={`relative mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 ${classNames?.image || ""}`}
 				>
-					{/* Bloco de Código Alterado */}
 					<Image
 						alt={user.name || user.username}
 						className="object-cover"
 						fill
-						priority // Pede ao Next.js para carregar esta imagem primeiro
-						quality={100} // Define a qualidade de compressão para o máximo
-						sizes="112px" // Informa o tamanho real que a imagem terá no ecrã
+						priority
+						quality={100}
+						sizes="112px"
 						src={user.image}
 					/>
-					{/* Fim do Bloco de Código Alterado */}
 				</div>
 			)}
 			<h1
@@ -171,7 +169,7 @@ function PasswordProtectedLink({
 	);
 }
 
-// --- Lista de Links (COMPLETAMENTE REFEITA) ---
+// --- Lista de Links ---
 function LinksList({
 	user,
 	classNames,
@@ -183,7 +181,6 @@ function LinksList({
 	buttonStyle?: React.CSSProperties;
 	textStyle?: React.CSSProperties;
 }) {
-	// Agrupa os links por sectionTitle
 	const groupedLinks = useMemo(() => {
 		return user.Link.reduce(
 			(acc, link) => {
@@ -202,7 +199,6 @@ function LinksList({
 		<div className="space-y-6">
 			{Object.entries(groupedLinks).map(([sectionTitle, links]) => (
 				<section className="space-y-4" key={sectionTitle}>
-					{/* Mostra o título da seção se não for a padrão ou se for a única */}
 					{(sectionTitle !== "" || Object.keys(groupedLinks).length === 1) && (
 						<h2 className="font-bold text-xl" style={textStyle}>
 							{sectionTitle}
@@ -210,15 +206,8 @@ function LinksList({
 					)}
 					<ul className="space-y-4">
 						{links.map((link) => {
-							// Renderiza o conteúdo visual do link (seja produto ou normal)
 							const linkContent = link.isProduct ? (
-								<div
-									className={cn(
-										"w-full overflow-hidden text-left transition-all duration-200",
-										classNames?.cardLink
-									)}
-									style={buttonStyle}
-								>
+								<div className="w-full overflow-hidden text-left">
 									{link.productImageUrl && (
 										<div className="relative h-48 w-full">
 											<Image
@@ -232,7 +221,9 @@ function LinksList({
 									<div className="p-4">
 										<div className="flex items-center justify-between gap-2">
 											<h4 className="font-bold" style={textStyle}>
-												{link.title}
+												{link.title.length > 64
+													? `${link.title.substring(0, 64)}...`
+													: link.title}
 											</h4>
 											{link.badge && (
 												<Badge className="flex-shrink-0" variant="secondary">
@@ -246,16 +237,12 @@ function LinksList({
 									</div>
 								</div>
 							) : (
-								<div
-									className={cn(
-										"w-full p-4 text-center transition-all duration-200",
-										classNames?.cardLink
-									)}
-									style={buttonStyle}
-								>
-									<div className="flex items-center justify-center gap-2">
+								<div className="w-full p-4 text-center">
+									<div className="flex items-center justify-center gap-2 px-10">
 										<h4 className="font-semibold" style={textStyle}>
-											{link.title}
+											{link.title.length > 64
+												? `${link.title.substring(0, 64)}...`
+												: link.title}
 										</h4>
 										{link.badge && (
 											<Badge variant="secondary">{link.badge}</Badge>
@@ -264,13 +251,19 @@ function LinksList({
 								</div>
 							);
 
-							// Renderiza o link com a lógica de proteção por senha ou como um InteractiveLink normal
 							return (
 								<li className="w-full" key={link.id}>
 									{link.password ? (
 										<PasswordProtectedLink link={link}>
-											<button className="group relative w-full" type="button">
-												<div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+											<button
+												className={cn(
+													"group relative w-full",
+													classNames?.cardLink
+												)}
+												style={buttonStyle}
+												type="button"
+											>
+												<div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50 backdrop-blur-sm transition-opacity">
 													<Lock className="h-8 w-8 text-white" />
 												</div>
 												{linkContent}
@@ -278,9 +271,11 @@ function LinksList({
 										</PasswordProtectedLink>
 									) : (
 										<InteractiveLink
+											className={classNames?.cardLink}
 											href={link.url}
-											linkId={link.id}
+											link={link}
 											sensitive={link.sensitive}
+											style={buttonStyle}
 										>
 											{linkContent}
 										</InteractiveLink>
