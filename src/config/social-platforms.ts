@@ -1,150 +1,145 @@
+// src/config/social-platforms.ts
 import { SocialPlatform } from '@/types/social';
 
 export const SOCIAL_PLATFORMS: SocialPlatform[] = [
   {
     "key": "instagram",
     "name": "Instagram",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-preto",
-    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/instagram-branco",
+    "icon": "/icons/instagram.svg",
     "baseUrl": "https://instagram.com/",
     "placeholder": "seu.usuario"
   },
   {
     "key": "x",
     "name": "X (Twitter)",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-preto",
-    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/x-branco",
+    "icon": "/icons/x.svg",
     "baseUrl": "https://x.com/",
     "placeholder": "seuUsuario"
   },
   {
     "key": "tiktok",
     "name": "TikTok",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/tiktok.svg",
+    "icon": "/icons/tiktok.svg",
     "baseUrl": "https://tiktok.com/@",
     "placeholder": "seu.usuario"
   },
   {
     "key": "youtube",
     "name": "YouTube",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665282/bionk/icons/youtube.svg",
+    "icon": "/icons/youtube.svg",
     "baseUrl": "https://youtube.com/",
     "placeholder": "@seuCanal"
   },
   {
     "key": "facebook",
     "name": "Facebook",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/facebook",
+    "icon": "/icons/facebook.svg",
     "baseUrl": "https://facebook.com/",
     "placeholder": "seu.perfil"
   },
   {
     "key": "linkedin",
     "name": "LinkedIn",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/linkedin",
+    "icon": "/icons/linkedin.svg",
     "baseUrl": "https://linkedin.com/in/",
     "placeholder": "seu-perfil-linkedin"
   },
   {
     "key": "github",
     "name": "GitHub",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-preto",
-    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/github-branco",
+    "icon": "/icons/github.svg",
     "baseUrl": "https://github.com/",
     "placeholder": "seu-usuario"
   },
   {
     "key": "pinterest",
     "name": "Pinterest",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/pinterest",
+    "icon": "/icons/pinterest.svg",
     "baseUrl": "https://pinterest.com/",
     "placeholder": "seuusuario"
   },
   {
     "key": "discord",
     "name": "Discord",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/discord.svg",
+    "icon": "/icons/discord.svg",
     "baseUrl": "https://discord.gg/",
     "placeholder": "codigoConvite"
   },
   {
     "key": "twitch",
     "name": "Twitch",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665281/bionk/icons/twitch.svg",
+    "icon": "/icons/twitch.svg",
     "baseUrl": "https://twitch.tv/",
     "placeholder": "seuCanal"
   },
   {
     "key": "spotify",
     "name": "Spotify",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/spotify",
+    "icon": "/icons/spotify.svg",
     "baseUrl": "https://open.spotify.com/user/",
     "placeholder": "seuUsuarioId"
   },
   {
     "key": "telegram",
     "name": "Telegram",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/telegram",
+    "icon": "/icons/telegram.svg",
     "baseUrl": "https://t.me/",
     "placeholder": "seuUsuario"
   },
   {
     "key": "reddit",
     "name": "Reddit",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/reddit",
+    "icon": "/icons/reddit.svg",
     "baseUrl": "https://reddit.com/u/",
     "placeholder": "seuUsuario"
   },
   {
     "key": "snapchat",
     "name": "Snapchat",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/snapchat",
+    "icon": "/icons/snapchat.svg",
     "baseUrl": "https://snapchat.com/add/",
     "placeholder": "seu.usuario"
   },
   {
     "key": "soundcloud",
     "name": "SoundCloud",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/soundcloud-logo-preto.svg",
-    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/soundcloud-logo-branco.svg",
+    "icon": "/icons/soundcloud.svg",
     "baseUrl": "https://soundcloud.com/",
     "placeholder": "seuUsuario"
   },
   {
     "key": "steam",
     "name": "Steam",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/steam",
+    "icon": "/icons/steam.svg",
     "baseUrl": "https://steamcommunity.com/id/",
     "placeholder": "seuUsuario"
   },
   {
     "key": "buymeacoffee",
     "name": "Buy Me a Coffee",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665283/bionk/icons/bmc.svg",
+    "icon": "/icons/buymeacoffee.svg",
     "baseUrl": "https://buymeacoffee.com/",
     "placeholder": "seuUsuario"
   },
   {
     "key": "patreon",
     "name": "Patreon",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665279/bionk/icons/patreon-preto.svg",
-    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/patreon-branco",
+    "icon": "/icons/patreon.svg",
     "baseUrl": "https://patreon.com/",
     "placeholder": "seuUsuario"
   },
   {
     "key": "paypal",
     "name": "PayPal",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/f_auto,q_auto/v1/bionk/icons/paypal",
+    "icon": "/icons/paypal.svg",
     "baseUrl": "https://paypal.me/",
     "placeholder": "seuUsuario"
   },
   {
-    "key": "gmail",
-    "name": "Gmail",
-    "icon": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665277/bionk/icons/mail-preto.svg",
-    "iconDark": "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746665278/bionk/icons/mail-branco",
+    "key": "email",
+    "name": "Email",
+    "icon": "/icons/mail.svg",
     "baseUrl": "",
-    "placeholder": "seu.email@gmail.com"
+    "placeholder": "seu.email@email.com"
   }
 ];

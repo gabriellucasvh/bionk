@@ -16,13 +16,11 @@ export default function NeonTemplate({ user }: TemplateComponentProps) {
 					"block w-full p-4 bg-transparent rounded-lg border-2 border-pink-400 shadow-[0_0_20px_rgba(255,0,255,0.8)] hover:shadow-[0_0_25px_rgba(255,0,255,1)] active:translate-y-1 transition-all relative overflow-hidden",
 				link: "text-gray-300 hover:text-pink-400 transition-colors duration-200",
 				footer:
-					"animate-pulse inline-block px-3 py-1 bg-pink-500 rounded-full text-white shadow-lg shadow-pink-400 drop-shadow-[0_0_20px_rgba(255,0,255,1)]",
+					"w-min animate-pulse inline-block px-3 py-1 bg-pink-500 rounded-full text-white shadow-lg shadow-pink-400 drop-shadow-[0_0_20px_rgba(255,0,255,1)]",
 			}}
 			customPresets={user.CustomPresets || undefined}
 			user={user}
 		>
-			{/* Overlay neon como children extra */}
-			<div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle,rgba(255,0,255,0.2)_0%,rgba(0,0,0,0)_80%)]" />
 		</BaseTemplate>
 	);
 }
