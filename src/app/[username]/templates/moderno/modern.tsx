@@ -7,14 +7,14 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
 			classNames={{
 				theme: "dark",
 				wrapper: "bg-neutral-950 text-white",
-				image: "rounded-2xl border border-neutral-800 shadow-sm",
+				image: "border border-neutral-800",
 				name: "text-white",
 				bio: "text-neutral-400",
 				cardLink:
-					"block w-full p-4 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-2xl transition-colors duration-200 shadow-sm hover:shadow-md",
+					"bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition-colors duration-200",
 				link: "text-blue-400",
 				footer:
-					"text-blue-500 text-sm font-bold border-t border-white pt-4 w-full text-center",
+					"text-blue-500",
 			}}
 			customPresets={user.CustomPresets || undefined}
 			user={user}

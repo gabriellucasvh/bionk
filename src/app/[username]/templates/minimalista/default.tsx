@@ -7,10 +7,10 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
 			classNames={{
 				theme: "light",
 				wrapper: "bg-gradient-to-b from-gray-50 to-gray-100",
-				cardLink: "text-black hover:scale-105 transition-all duration-200 bg-white rounded-xl shadow-md",
+				cardLink: "text-black border hover:scale-105 transition-all duration-200 bg-white",
 				link: "text-gray-500",
 				footer:
-					"max-w-md mx-auto mt-10 text-green-800 text-sm font-bold border-t border-green-600 pt-4 w-full text-center",
+					"text-green-800",
 			}}
 			customPresets={user.CustomPresets || undefined}
 			user={user}

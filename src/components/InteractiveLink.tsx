@@ -66,7 +66,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 	return (
 		<>
 			<div
-				className={twMerge("group relative w-full", className)}
+				className={twMerge("group relative w-full rounded-xl shadow-md", className)}
 				style={style}
 			>
 				<Link

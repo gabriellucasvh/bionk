@@ -75,7 +75,7 @@ function UserHeader({
 		<header className={`mb-8 w-full text-center ${classNames?.header || ""}`}>
 			{user.image && (
 				<div
-					className={`relative mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full border-2 ${classNames?.image || ""}`}
+					className={`relative mx-auto mb-4 h-32 w-32 overflow-hidden rounded-full border-2 ${classNames?.image || ""}`}
 				>
 					<Image
 						alt={user.name || user.username}
@@ -105,8 +105,8 @@ function UserHeader({
 			{Array.isArray(user.SocialLink) && user.SocialLink.length > 0 && (
 				<div className="mt-4 flex items-center justify-center">
 					<UserProfileSocialIcons
-						className="space-x-3 sm:space-x-4"
-						iconSize={22}
+						className="space-x-4"
+						iconSize={26}
 						socialLinks={user.SocialLink}
 						theme={classNames?.theme}
 					/>
@@ -200,11 +200,11 @@ function LinksList({
 			{Object.entries(groupedLinks).map(([sectionTitle, links]) => (
 				<section className="space-y-4" key={sectionTitle}>
 					{(sectionTitle !== "" || Object.keys(groupedLinks).length === 1) && (
-						<h2 className="font-bold text-xl" style={textStyle}>
+						<h2 className="font-bold text-xl text-center" style={textStyle}>
 							{sectionTitle}
 						</h2>
 					)}
-					<ul className="space-y-4">
+					<ul className="space-y-3">
 						{links.map((link) => {
 							const linkContent = link.isProduct ? (
 								<div className="w-full overflow-hidden text-left">
@@ -263,7 +263,7 @@ function LinksList({
 												style={buttonStyle}
 												type="button"
 											>
-												<div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/50 backdrop-blur-sm transition-opacity">
+												<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity" >
 													<Lock className="h-8 w-8 text-white" />
 												</div>
 												{linkContent}
@@ -352,7 +352,7 @@ export default function BaseTemplate({
 					</section>
 				</main>
 				<footer
-					className={`mt-10 w-full max-w-md text-center font-bold text-sm ${classNames?.footer || ""}`}
+					className={`${classNames?.footer || ""}`}
 					style={textStyle}
 				>
 					<JoinBionkModal>{user.username}</JoinBionkModal>

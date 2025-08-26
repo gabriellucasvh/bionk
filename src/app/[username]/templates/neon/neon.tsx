@@ -7,16 +7,16 @@ export default function NeonTemplate({ user }: TemplateComponentProps) {
 			classNames={{
 				theme: "dark",
 				wrapper:
-					"bg-gradient-to-br from-indigo-950 via-purple-800 to-pink-900 text-white relative overflow-hidden",
+					"bg-gradient-to-br from-indigo-950 via-purple-800 to-pink-900 text-white",
 				name: "text-white",
 				bio: "text-white",
 				header:
-					"text-white drop-shadow-[0_0_15px_rgba(255,255,255,1)] animate-none",
+					"text-white drop-shadow-[0_0_15px_rgba(255,255,255,1)]",
 				cardLink:
-					"block w-full p-4 bg-transparent rounded-lg border-2 border-pink-400 shadow-[0_0_20px_rgba(255,0,255,0.8)] hover:shadow-[0_0_25px_rgba(255,0,255,1)] active:translate-y-1 transition-all relative overflow-hidden",
-				link: "text-gray-300 hover:text-pink-400 transition-colors duration-200",
+					"bg-transparent border-2 border-pink-400 shadow-[0_0_20px_rgba(255,0,255,0.8)] hover:shadow-[0_0_25px_rgba(255,0,255,1)] active:translate-y-1 transition-all",
+				link: "text-gray-300",
 				footer:
-					"w-min animate-pulse inline-block px-3 py-1 bg-pink-500 rounded-full text-white shadow-lg shadow-pink-400 drop-shadow-[0_0_20px_rgba(255,0,255,1)]",
+					"text-white",
 			}}
 			customPresets={user.CustomPresets || undefined}
 			user={user}

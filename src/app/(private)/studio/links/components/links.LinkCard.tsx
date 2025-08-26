@@ -149,7 +149,8 @@ const LinkContent = ({
 			rel="noopener noreferrer"
 			target="_blank"
 		>
-			{link.url}
+
+			{link.url.length > 30 ? `${link.url.slice(0, 30)}...` : link.url}
 		</Link>
 	);
 };

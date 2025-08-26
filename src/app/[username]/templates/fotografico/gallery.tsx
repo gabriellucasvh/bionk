@@ -7,17 +7,17 @@ export default function SoftNeutralTemplate({ user }: TemplateComponentProps) {
 			classNames={{
 				theme: "light",
 				wrapper:
-					"bg-[#f9f9f7] text-neutral-900 py-12 px-4 font-sans flex flex-col",
-				header: "text-center mb-10",
+					"bg-[#f9f9f7] text-neutral-900",
+				header: "",
 				image:
-					"mx-auto mb-6 relative w-28 h-28 border-[6px] border-white shadow-lg",
-				name: "text-3xl font-bold tracking-tight",
-				bio: "mt-2 text-neutral-600",
+					"border-[3px] border-white shadow-lg",
+				name: "text-black",
+				bio: "text-neutral-600",
 				cardLink:
-					"block w-full p-5 bg-white border border-neutral-300 shadow-sm hover:shadow-md transition duration-200",
-				link: "block text-sm text-neutral-500",
+					"bg-white border border-neutral-300 shadow-sm hover:shadow-md transition duration-200",
+				link: "text-neutral-500",
 				footer:
-					"max-w-md mx-auto mt-10 text-neutral-600 text-sm font-bold border-t border-neutral-300 pt-4 w-full text-center",
+					"text-neutral-600",
 			}}
 			customPresets={user.CustomPresets || undefined}
 			user={user}
