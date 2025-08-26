@@ -37,28 +37,30 @@ const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
 
 	return (
 		<Dialog onOpenChange={onOpenChange} open={isOpen}>
-			<DialogContent className="w-full max-w-[90vw] rounded-2xl border bg-background p-0 shadow-xl sm:max-w-lg">
-				<div className="flex justify-center p-6 pb-2">
+			{/* CHANGED: padding movido do conteúdo para o DialogContent e classes padronizadas */}
+			<DialogContent className="w-full max-w-[90vw] rounded-2xl border bg-background p-6 shadow-xl sm:max-w-lg">
+				{/* CHANGED: Tamanho do logo ajustado para consistência */}
+				<div className="flex justify-center pb-2">
 					<Image
 						alt="Bionk Logo"
-						className="mx-auto h-auto w-full px-40"
-						height={100}
+						className="mx-auto h-auto w-24" // Ajustado
+						height={50}
 						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
 						width={100}
 					/>
 				</div>
 
-				<DialogHeader className="px-4 pt-2 sm:px-6">
-					<DialogTitle className="text-center font-bold text-xl sm:text-2xl">
+				<DialogHeader className="pt-2 text-center">
+					<DialogTitle className="font-bold text-xl sm:text-2xl">
 						Junte-se ao Bionk
 					</DialogTitle>
-					<DialogDescription className="text-center text-sm sm:text-base">
+					<DialogDescription className="text-sm sm:text-base">
 						Crie sua página, compartilhe seus links e conecte-se com o mundo.
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="px-4 py-4 sm:px-6">
-					<Separator className="my-2" />
+				<div>
+					<Separator className="my-4" />
 
 					<div className="grid grid-cols-1 gap-4 py-4">
 						{[
@@ -105,9 +107,9 @@ const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
 					</p>
 				</div>
 
-				<DialogFooter className="flex flex-col p-4 pt-2 sm:p-6">
+				<DialogFooter className="pt-2">
 					<Link
-						className="inline-flex w-full items-center justify-center rounded-md bg-gradient-to-r from-lime-500 to-emerald-600 px-3 py-2 text-center font-medium text-white transition-colors duration-300 hover:from-green-600 hover:to-green-700"
+						className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-lime-400 px-4 py-2 text-center font-medium text-black transition-colors duration-300 hover:bg-lime-500"
 						href="https://www.bionk.me/registro"
 						rel="noopener noreferrer"
 						target="_blank"

@@ -46,7 +46,7 @@ interface BaseTemplateProps extends TemplateComponentProps {
 	};
 }
 
-// --- Subcomponentes ---
+// --- Subcomponentes (sem alterações) ---
 function ShareButton({ onClick }: { onClick: () => void }) {
 	return (
 		<div className="mb-4 flex w-full justify-end">
@@ -169,7 +169,7 @@ function PasswordProtectedLink({
 	);
 }
 
-// --- Lista de Links ---
+// --- Lista de Links (sem alterações) ---
 function LinksList({
 	user,
 	classNames,
@@ -358,9 +358,12 @@ export default function BaseTemplate({
 					<JoinBionkModal>{user.username}</JoinBionkModal>
 				</footer>
 			</div>
-			{isShareModalOpen && (
-				<ShareModal onClose={() => setShareModalOpen(false)} user={user} />
-			)}
+
+			<ShareModal
+				isOpen={isShareModalOpen}
+				onOpenChange={setShareModalOpen}
+				user={user}
+			/>
 		</>
 	);
 }

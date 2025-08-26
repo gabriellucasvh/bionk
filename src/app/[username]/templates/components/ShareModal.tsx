@@ -1,18 +1,28 @@
+// src/components/ShareModal.tsx (Corrigido)
+
 "use client";
-import { Check, Copy, Facebook, Send, Twitter, X } from "lucide-react";
+import { BaseButton } from "@/components/buttons/BaseButton";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog"; 
+import type { TemplateComponentProps } from "@/types/user-profile";
+import { Check, Copy, Facebook, Send, Twitter } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import QRCode from "qrcode";
 import { type FC, useEffect, useState } from "react";
-import { BaseButton } from "@/components/buttons/BaseButton";
-import type { TemplateComponentProps } from "@/types/user-profile";
 
 interface ShareModalProps {
 	user: TemplateComponentProps["user"];
-	onClose: () => void;
+	isOpen: boolean;
+	onOpenChange: (isOpen: boolean) => void;
 }
 
-const ShareModal: FC<ShareModalProps> = ({ user, onClose }) => {
+const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 	const [copied, setCopied] = useState(false);
 	const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
@@ -20,7 +30,9 @@ const ShareModal: FC<ShareModalProps> = ({ user, onClose }) => {
 	const shareText = "Confira meu perfil na Bionk:";
 
 	useEffect(() => {
-		if (!user.username) return;
+		if (!(isOpen && user.username)) {
+			return;
+		}
 
 		QRCode.toDataURL(profileUrl, {
 			width: 240,
@@ -30,7 +42,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, onClose }) => {
 				light: "#ffffff",
 			},
 		}).then(setQrCodeUrl);
-	}, [profileUrl, user.username]);
+	}, [isOpen, profileUrl, user.username]);
 
 	const handleCopyLink = () => {
 		navigator.clipboard.writeText(profileUrl).then(() => {
@@ -47,118 +59,108 @@ const ShareModal: FC<ShareModalProps> = ({ user, onClose }) => {
 	};
 
 	return (
-		<div
-			className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-			onClick={onClose}
-			role="none"
-		>
-			<div
-				className="relative max-w-sm w-full bg-white  rounded-2xl shadow-xl p-6 m-4 flex flex-col gap-4 text-center"
-				onClick={(e) => e.stopPropagation()}
-				role="none"
-			>
-				<button
-					type="button"
-					onClick={onClose}
-					className="absolute top-3 right-3 p-1 rounded-full text-black hover:text-lime-500 bg-gray-100 transition-colors"
-					aria-label="Fechar modal"
-				>
-					<X className="size-5" />
-				</button>
-
-				<h2 className="text-2xl font-bold text-black">
-					Compartilhar Perfil
-				</h2>
-
-				{qrCodeUrl && (
-					<div className="flex justify-center bg-gray-100 rounded-lg">
-						<Image
-							src={qrCodeUrl}
-							alt="QR Code do perfil"
-							className="w-60 h-60 mx-auto rounded-md border"
-							width={70}
-							height={70}
-						/>
-					</div>
-				)}
-
-				<div className="flex justify-center items-center gap-4 py-2">
-					<Link
-						href={socialShareLinks.whatsapp}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="p-3 bg-green-500 text-white rounded-full hover:opacity-90 transition-opacity"
-					>
-						<Send className="size-5" />
-					</Link>
-					<Link
-						href={socialShareLinks.twitter}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="p-3 bg-sky-500 text-white rounded-full hover:opacity-90 transition-opacity"
-					>
-						<Twitter className="size-5" />
-					</Link>
-					<Link
-						href={socialShareLinks.facebook}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="p-3 bg-blue-700 text-white rounded-full hover:opacity-90 transition-opacity"
-					>
-						<Facebook className="size-5" />
-					</Link>
-					<Link
-						href={socialShareLinks.telegram}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="p-3 bg-sky-600 text-white rounded-full hover:opacity-90 transition-opacity"
-					>
-						<Send className="size-5" />
-					</Link>
-				</div>
-
-				<div className="flex items-center w-full bg-white border rounded-lg p-1">
-					<input
-						type="text"
-						readOnly
-						value={profileUrl}
-						className="flex-grow bg-transparent text-sm text-black px-3 truncate focus:outline-none"
+		<Dialog onOpenChange={onOpenChange} open={isOpen}>
+			<DialogContent className="w-full max-w-[90vw] rounded-2xl border bg-background p-6 text-center shadow-xl sm:max-w-lg">
+				<div className="flex justify-center pb-2">
+					<Image
+						alt="Bionk Logo"
+						className="mx-auto h-auto w-20"
+						height={40}
+						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
+						width={80}
 					/>
-					<button
-						type="button"
-						onClick={handleCopyLink}
-						className={`flex items-center gap-2 text-sm font-semibold px-3 py-2 rounded-md transition-all duration-200 ${copied
-								? "bg-green-100 text-green-700"
-								: "bg-gray-100 text-gray-800 hover:bg-gray-200"
-							}`}
-					>
-						{copied ? (
-							<Check className="size-4" />
-						) : (
-							<Copy className="size-4" />
-						)}
-						{copied ? "Copiado!" : "Copiar"}
-					</button>
 				</div>
-				<p className="text-sm font-light text-start text-black mt-1">
-					O único link na bio que une tudo o que importa — usado por criadores,
-					marcas e profissionais que querem ir além.
-				</p>
 
-				<div className="flex flex-col w-full gap-3 mt-4">
-					<BaseButton asChild className="w-full">
-						<Link href="/registro" rel="noopener noreferrer" target="_blank">
-							Criar o seu Bionk
+				<DialogHeader>
+					<DialogTitle className="text-center font-bold text-2xl text-black">
+						Compartilhar Perfil
+					</DialogTitle>
+					<DialogDescription className="pt-2 text-center text-muted-foreground text-sm">
+						Compartilhe seu perfil Bionk com o mundo através de um link, QR code
+						ou redes sociais.
+					</DialogDescription>
+				</DialogHeader>
+
+				<div className="mt-4 flex flex-col gap-4">
+					{qrCodeUrl && (
+						<div className="flex justify-center rounded-lg bg-gray-100 p-2">
+							<Image
+								alt="QR Code do perfil"
+								className="h-48 w-48 rounded-md"
+								height={192}
+								src={qrCodeUrl}
+								width={192}
+							/>
+						</div>
+					)}
+
+					<div className="flex items-center justify-center gap-4 py-2">
+						<Link
+							className="rounded-full bg-green-500 p-3 text-white transition-opacity hover:opacity-90"
+							href={socialShareLinks.whatsapp}
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							<Send className="size-5" />
 						</Link>
-					</BaseButton>
-					<BaseButton asChild variant="white" className="w-full">
-						<Link href="/descubra" rel="noopener noreferrer" target="_blank">
-							Saiba mais
+						<Link
+							className="rounded-full bg-sky-500 p-3 text-white transition-opacity hover:opacity-90"
+							href={socialShareLinks.twitter}
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							<Twitter className="size-5" />
 						</Link>
-					</BaseButton>
+						<Link
+							className="rounded-full bg-blue-700 p-3 text-white transition-opacity hover:opacity-90"
+							href={socialShareLinks.facebook}
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							<Facebook className="size-5" />
+						</Link>
+						<Link
+							className="rounded-full bg-sky-600 p-3 text-white transition-opacity hover:opacity-90"
+							href={socialShareLinks.telegram}
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							<Send className="size-5" />
+						</Link>
+					</div>
+
+					<div className="flex w-full items-center rounded-lg border bg-white p-1">
+						{/* ... (input de copiar link sem alteração) ... */}
+						<input
+							className="flex-grow truncate bg-transparent px-3 text-black text-sm focus:outline-none"
+							readOnly
+							type="text"
+							value={profileUrl}
+						/>
+						<button
+							className={`flex items-center gap-2 rounded-md px-3 py-2 font-semibold text-sm transition-all duration-200 ${copied ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-800 hover:bg-gray-200"}`}
+							onClick={handleCopyLink}
+							type="button"
+						>
+							{copied ? (
+								<Check className="size-4" />
+							) : (
+								<Copy className="size-4" />
+							)}
+							{copied ? "Copiado!" : "Copiar"}
+						</button>
+					</div>
+
+					<div className="mt-4 flex w-full flex-col gap-3">
+						<BaseButton asChild className="w-full">
+							<Link href="/registro" rel="noopener noreferrer" target="_blank">
+								Criar o seu Bionk
+							</Link>
+						</BaseButton>
+					</div>
 				</div>
-			</div>
-		</div>
+			</DialogContent>
+		</Dialog>
 	);
 };
 

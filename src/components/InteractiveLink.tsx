@@ -114,9 +114,8 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 			</div>
 
 			<LinkOptionsModal
-				isOpen={isModalOpen}
-				link={link}
-				onClose={() => setIsModalOpen(false)}
+				link={isModalOpen ? link : null}
+				onOpenChange={setIsModalOpen}
 			/>
 		</>
 	);
