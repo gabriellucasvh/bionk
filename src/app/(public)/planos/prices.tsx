@@ -78,7 +78,7 @@ const pricingPlans = [
 
 // 🔥 Lifetime separado
 const customPlan = {
-	name: "Pesonalizado",
+	name: "Personalizado",
 	monthlyPrice: 888,
 	description: "Entre em contato e monte um plano sob medida.",
 	label: "Falar conosco",
