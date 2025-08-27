@@ -1,7 +1,6 @@
 // app/studio/links/page.tsx
 
 import type { Metadata } from "next";
-import Sidebar from "../Sidebar";
 import UnifiedLinksManager from "./components/links.UnifiedLinksManager";
 
 export const metadata: Metadata = {
@@ -12,11 +11,8 @@ export const metadata: Metadata = {
 
 export default function LinksPage() {
 	return (
-		<>
-			<Sidebar />
-			<main className="ml-0 flex justify-start p-4 sm:p-6 md:ml-64 md:p-8">
-				<UnifiedLinksManager />
-			</main>
-		</>
+		<div className="p-4 sm:p-6 md:p-8">
+			<UnifiedLinksManager />
+		</div>
 	);
 }

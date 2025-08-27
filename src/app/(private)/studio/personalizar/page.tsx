@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Sidebar from "../Sidebar";
 import IframePreview from "./components/personalizar.IFramePreview";
 import PersonalizarClient from "./personalizar.client";
 
@@ -11,14 +10,11 @@ export const metadata: Metadata = {
 
 export default function Perfil() {
 	return (
-		<>
-			<Sidebar />
-			<main className="ml-0 flex md:ml-64 ">
+			<>
 				<PersonalizarClient />
 				<div className="hidden xl:block">
 					<IframePreview />
 				</div>
-			</main>
-		</>
+			</>
 	);
 }

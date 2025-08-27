@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Sidebar from "../Sidebar";
 import PerfilClient from "./perfil.client";
 
 export const metadata: Metadata = {
@@ -9,12 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function Perfil() {
-	return (
-		<>
-			<Sidebar />
-			<main className="mb-14 ml-0 flex h-screen overflow-y-auto md:mb-0 md:ml-64">
-				<PerfilClient />
-			</main>
-		</>
-	);
+	return <PerfilClient />;
 }

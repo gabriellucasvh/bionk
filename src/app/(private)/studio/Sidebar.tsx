@@ -72,9 +72,6 @@ const Sidebar = () => {
 	const pathname = usePathname();
 	const router = useRouter();
 	const { data: session } = useSession();
-	const [disabledButtons, setDisabledButtons] = useState<Set<string>>(
-		() => new Set()
-	);
 	const [profileUrl, setProfileUrl] = useState("#");
 	const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
 
@@ -107,11 +104,8 @@ const Sidebar = () => {
 	}, [session?.user?.id]);
 
 	const handleNavClick = useCallback(
-		(href: string, key: string, isActive: boolean) => {
-			if (!isActive) {
-				setDisabledButtons((prev) => new Set(prev).add(key));
-				router.push(href);
-			}
+		(href: string) => {
+			router.push(href);
 		},
 		[router]
 	);
@@ -127,9 +121,8 @@ const Sidebar = () => {
 								? "bg-gray-200 text-green-700 shadow-sm"
 								: "text-gray-700 hover:bg-gray-100"
 						}`}
-						disabled={disabledButtons.has(link.key)}
 						key={link.key}
-						onClick={() => handleNavClick(link.href, link.key, isActive)}
+						onClick={() => !isActive && handleNavClick(link.href)}
 						variant="ghost"
 					>
 						<span className="mr-3">{link.icon}</span>
@@ -137,7 +130,7 @@ const Sidebar = () => {
 					</Button>
 				);
 			}),
-		[pathname, disabledButtons, handleNavClick]
+		[pathname, handleNavClick]
 	);
 
 	return (
@@ -233,8 +226,7 @@ const Sidebar = () => {
 									className={`flex flex-col items-center gap-1 px-1 text-[10px] sm:text-xs ${
 										isActive ? "text-green-600" : "text-gray-500"
 									}`}
-									disabled={disabledButtons.has(link.key)}
-									onClick={() => handleNavClick(link.href, link.key, isActive)}
+									onClick={() => !isActive && handleNavClick(link.href)}
 									variant="ghost"
 								>
 									{link.icon}

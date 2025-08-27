@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Sidebar from "../Sidebar";
 import ConfigsClient from "./configs.client";
 
 export const metadata: Metadata = {
@@ -9,12 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function links() {
-	return (
-		<>
-			<Sidebar />
-			<main className="mb-20 ml-0 h-screen overflow-y-auto md:mb-0 md:ml-64">
-				<ConfigsClient />
-			</main>
-		</>
-	);
+	return <ConfigsClient />;
 }
