@@ -1,5 +1,5 @@
 // src/config/social-platforms.ts
-import { SocialPlatform } from '@/types/social';
+import type { SocialPlatform } from '@/types/social';
 
 export const SOCIAL_PLATFORMS: SocialPlatform[] = [
   {

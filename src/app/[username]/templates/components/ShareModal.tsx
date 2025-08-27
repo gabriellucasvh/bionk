@@ -1,16 +1,16 @@
-// src/components/ShareModal.tsx (Corrigido)
+// src/app/[username]/templates/components/ShareModal.tsx
 
 "use client";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import ShareSheet from "@/components/ShareSheet"; // Importe o novo componente
 import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-} from "@/components/ui/dialog"; 
+} from "@/components/ui/dialog";
 import type { TemplateComponentProps } from "@/types/user-profile";
-import { Check, Copy, Facebook, Send, Twitter } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import QRCode from "qrcode";
@@ -23,11 +23,12 @@ interface ShareModalProps {
 }
 
 const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
-	const [copied, setCopied] = useState(false);
 	const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
-	const profileUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "https://bionk.me"}/${user.username}`;
-	const shareText = "Confira meu perfil na Bionk:";
+	const profileUrl = `${
+		process.env.NEXT_PUBLIC_BASE_URL || "https://bionk.me"
+	}/${user.username}`;
+	const shareText = `Confira meu perfil na Bionk: ${user.name || user.username}`;
 
 	useEffect(() => {
 		if (!(isOpen && user.username)) {
@@ -43,20 +44,6 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 			},
 		}).then(setQrCodeUrl);
 	}, [isOpen, profileUrl, user.username]);
-
-	const handleCopyLink = () => {
-		navigator.clipboard.writeText(profileUrl).then(() => {
-			setCopied(true);
-			setTimeout(() => setCopied(false), 2000);
-		});
-	};
-
-	const socialShareLinks = {
-		whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText} ${profileUrl}`)}`,
-		twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(profileUrl)}&text=${encodeURIComponent(shareText)}`,
-		facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(profileUrl)}`,
-		telegram: `https://t.me/share/url?url=${encodeURIComponent(profileUrl)}&text=${encodeURIComponent(shareText)}`,
-	};
 
 	return (
 		<Dialog onOpenChange={onOpenChange} open={isOpen}>
@@ -81,7 +68,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="mt-4 flex flex-col gap-4">
+				<div className="mt-4 flex min-w-0 flex-col gap-4">
 					{qrCodeUrl && (
 						<div className="flex justify-center rounded-lg bg-gray-100 p-2">
 							<Image
@@ -94,62 +81,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 						</div>
 					)}
 
-					<div className="flex items-center justify-center gap-4 py-2">
-						<Link
-							className="rounded-full bg-green-500 p-3 text-white transition-opacity hover:opacity-90"
-							href={socialShareLinks.whatsapp}
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							<Send className="size-5" />
-						</Link>
-						<Link
-							className="rounded-full bg-sky-500 p-3 text-white transition-opacity hover:opacity-90"
-							href={socialShareLinks.twitter}
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							<Twitter className="size-5" />
-						</Link>
-						<Link
-							className="rounded-full bg-blue-700 p-3 text-white transition-opacity hover:opacity-90"
-							href={socialShareLinks.facebook}
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							<Facebook className="size-5" />
-						</Link>
-						<Link
-							className="rounded-full bg-sky-600 p-3 text-white transition-opacity hover:opacity-90"
-							href={socialShareLinks.telegram}
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							<Send className="size-5" />
-						</Link>
-					</div>
-
-					<div className="flex w-full items-center rounded-lg border bg-white p-1">
-						{/* ... (input de copiar link sem alteração) ... */}
-						<input
-							className="flex-grow truncate bg-transparent px-3 text-black text-sm focus:outline-none"
-							readOnly
-							type="text"
-							value={profileUrl}
-						/>
-						<button
-							className={`flex items-center gap-2 rounded-md px-3 py-2 font-semibold text-sm transition-all duration-200 ${copied ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-800 hover:bg-gray-200"}`}
-							onClick={handleCopyLink}
-							type="button"
-						>
-							{copied ? (
-								<Check className="size-4" />
-							) : (
-								<Copy className="size-4" />
-							)}
-							{copied ? "Copiado!" : "Copiar"}
-						</button>
-					</div>
+					<ShareSheet title={shareText} url={profileUrl} />
 
 					<div className="mt-4 flex w-full flex-col gap-3">
 						<BaseButton asChild className="w-full">
