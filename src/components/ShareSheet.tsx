@@ -4,9 +4,15 @@
 
 import { SHARING_PLATFORMS } from "@/config/sharing-platforms";
 import { cn } from "@/lib/utils";
-import { Check, Link, MoreHorizontal } from "lucide-react";
+import {
+	Check,
+	ChevronLeft,
+	ChevronRight,
+	Link,
+	MoreHorizontal,
+} from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface ShareSheetProps {
 	url: string;
@@ -15,7 +21,66 @@ interface ShareSheetProps {
 
 const ShareSheet = ({ url, title }: ShareSheetProps) => {
 	const [copied, setCopied] = useState(false);
+	// Ref para aceder ao elemento da lista de scroll
+	const scrollRef = useRef<HTMLUListElement>(null);
+	// Estado para controlar a visibilidade dos botões de navegação
+	const [scrollState, setScrollState] = useState({
+		canScrollLeft: false,
+		canScrollRight: false,
+	});
 
+	// Efeito para verificar a posição do scroll sempre que o componente for atualizado
+	useEffect(() => {
+		const listElement = scrollRef.current;
+
+		const checkScrollability = () => {
+			if (!listElement) {
+				return;
+			}
+
+			// Verifica se o conteúdo é maior que a área visível
+			const hasOverflow = listElement.scrollWidth > listElement.clientWidth;
+			// Verifica a posição do scroll
+			const isAtStart = listElement.scrollLeft === 0;
+			const isAtEnd =
+				Math.ceil(listElement.scrollLeft + listElement.clientWidth) >=
+				listElement.scrollWidth;
+
+			setScrollState({
+				canScrollLeft: hasOverflow && !isAtStart,
+				canScrollRight: hasOverflow && !isAtEnd,
+			});
+		};
+
+		// Verificação inicial
+		checkScrollability();
+
+		// Adiciona listeners para o scroll e para o redimensionamento da janela
+		listElement?.addEventListener("scroll", checkScrollability);
+		window.addEventListener("resize", checkScrollability);
+
+		// Função de limpeza para remover os listeners
+		return () => {
+			listElement?.removeEventListener("scroll", checkScrollability);
+			window.removeEventListener("resize", checkScrollability);
+		};
+	}, []); // O array vazio assegura que este efeito corre apenas uma vez (montagem/desmontagem)
+
+	const handleScroll = (direction: "left" | "right") => {
+		if (!scrollRef.current) {
+			return;
+		}
+		const { current: list } = scrollRef;
+		// Calcula o valor do scroll (75% da largura visível)
+		const scrollAmount = list.clientWidth * 0.75;
+
+		list.scrollBy({
+			left: direction === "right" ? scrollAmount : -scrollAmount,
+			behavior: "smooth", // Efeito de scroll suave
+		});
+	};
+
+	// ... (Restante da lógica como handleCopyLink, etc., permanece a mesma)
 	const handleCopyLink = () => {
 		navigator.clipboard.writeText(url).then(() => {
 			setCopied(true);
@@ -36,17 +101,14 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 		if (!platform) {
 			return;
 		}
-
 		const encodedUrl = encodeURIComponent(url);
 		const encodedTitle = encodeURIComponent(title);
 		const shareUrl = platform.urlTemplate
 			.replace("{url}", encodedUrl)
 			.replace("{title}", encodedTitle);
-
 		window.open(shareUrl, "_blank", "noopener,noreferrer");
 	};
 
-	// Botões de ação definidos individualmente
 	const copyButton = {
 		key: "copy",
 		name: copied ? "Copiado!" : "Copiar Link",
@@ -68,11 +130,31 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 	};
 
 	return (
-		<div>
+		<div className="relative">
 			<h3 className="mb-3 text-left font-medium text-gray-700 text-sm">
 				Compartilhar
 			</h3>
-			<ul className="flex w-full items-center gap-3 overflow-x-auto px-1 pb-3">
+
+			{/* Botão de scroll para a ESQUERDA */}
+			<button
+				className={cn(
+					"-translate-y-1/2 absolute top-1/2 left-0 z-10 ml-2 rounded-full bg-white p-2 shadow-md disabled:pointer-events-none disabled:opacity-0",
+					{
+						"opacity-100": scrollState.canScrollLeft,
+						"opacity-0": !scrollState.canScrollLeft,
+					}
+				)}
+				disabled={!scrollState.canScrollLeft}
+				onClick={() => handleScroll("left")}
+				type="button"
+			>
+				<ChevronLeft className="size-6" />
+			</button>
+
+			<ul
+				className="flex w-full items-center gap-3 overflow-x-auto px-1 pb-3"
+				ref={scrollRef}
+			>
 				<li className="flex-shrink-0">
 					<button
 						aria-label={copyButton.name}
@@ -126,6 +208,22 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 					</button>
 				</li>
 			</ul>
+
+			{/* Botão de scroll para a DIREITA */}
+			<button
+				className={cn(
+					"-translate-y-1/2 absolute top-1/2 right-0 z-10 mr-2 rounded-full bg-white p-2 shadow-md disabled:pointer-events-none disabled:opacity-0",
+					{
+						"opacity-100": scrollState.canScrollRight,
+						"opacity-0": !scrollState.canScrollRight,
+					}
+				)}
+				disabled={!scrollState.canScrollRight}
+				onClick={() => handleScroll("right")}
+				type="button"
+			>
+				<ChevronRight className="size-6" />
+			</button>
 		</div>
 	);
 };
