@@ -1,3 +1,4 @@
+// api/links/[id]/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
@@ -13,14 +14,18 @@ export async function PUT(
 	try {
 		const body = await request.json();
 
-		// Removemos campos que não devem ser atualizados diretamente ou são undefined
-		const cleanBody = Object.fromEntries(
+		const dataToUpdate: { [key: string]: any } = Object.fromEntries(
 			Object.entries(body).filter(([, value]) => value !== undefined)
 		);
 
+		// Se o link estiver sendo arquivado, desative-o também.
+		if (dataToUpdate.archived === true) {
+			dataToUpdate.active = false;
+		}
+
 		const updatedLink = await prisma.link.update({
 			where: { id: Number(id) },
-			data: cleanBody,
+			data: dataToUpdate,
 		});
 
 		return NextResponse.json(updatedLink);

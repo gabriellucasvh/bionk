@@ -47,19 +47,14 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 				</div>
 
 				<DialogHeader className="text-center">
-					<DialogTitle className="mb-2 line-clamp-2 px-6 font-bold text-gray-900 text-xl">
+					<DialogTitle className="mb-2 line-clamp-2 font-bold text-gray-900 text-xl">
 						{link.title}
 					</DialogTitle>
-					<DialogDescription className="mb-4 line-clamp-2 break-words text-gray-600 text-sm">
+					<DialogDescription className="mb-4 line-clamp-2 max-w-md truncate text-gray-600 text-sm">
 						{link.url}
 					</DialogDescription>
 				</DialogHeader>
 
-				{/*
-          CORREÇÃO AQUI: Adicione a classe `min-w-0` a este div.
-          Este é o "grid item" que contém o ShareSheet e precisa
-          da permissão para encolher.
-        */}
 				<div className="flex min-w-0 flex-col gap-4">
 					<BaseButton
 						className="justify-center"

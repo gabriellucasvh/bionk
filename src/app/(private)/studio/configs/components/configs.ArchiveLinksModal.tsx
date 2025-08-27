@@ -1,3 +1,4 @@
+// configs.ArchiveLinksModal.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 		const res = await fetch(`/api/links/${id}`, {
 			method: "PUT",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ archived: false }),
+			body: JSON.stringify({ archived: false, active: true }), // Reativa o link ao restaurar
 		});
 		if (res.ok) {
 			setArchivedLinks(archivedLinks.filter((link) => link.id !== id));
@@ -65,12 +66,12 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 									className="flex items-center justify-between rounded border p-2"
 									key={link.id}
 								>
-									<div>
-										<p className="font-medium">{link.title}</p>
-										<p className="text-blue-500 text-sm">{link.url}</p>
+									<div className="overflow-hidden">
+										<p className="truncate font-medium">{link.title}</p>
+										<p className="truncate text-blue-500 text-sm">{link.url}</p>
 									</div>
 									<Button
-										className="bg-green-500 hover:bg-green-600"
+										className="ml-4 flex-shrink-0 bg-green-500 hover:bg-green-600"
 										onClick={() => restoreLink(link.id)}
 									>
 										Restaurar

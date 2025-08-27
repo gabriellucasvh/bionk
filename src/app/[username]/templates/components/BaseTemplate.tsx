@@ -46,7 +46,6 @@ interface BaseTemplateProps extends TemplateComponentProps {
 	};
 }
 
-// --- Subcomponentes (sem alterações) ---
 function ShareButton({ onClick }: { onClick: () => void }) {
 	return (
 		<div className="mb-4 flex w-full justify-end">
@@ -169,7 +168,6 @@ function PasswordProtectedLink({
 	);
 }
 
-// --- Lista de Links (sem alterações) ---
 function LinksList({
 	user,
 	classNames,
@@ -200,7 +198,7 @@ function LinksList({
 			{Object.entries(groupedLinks).map(([sectionTitle, links]) => (
 				<section className="space-y-4" key={sectionTitle}>
 					{(sectionTitle !== "" || Object.keys(groupedLinks).length === 1) && (
-						<h2 className="font-bold text-xl text-center" style={textStyle}>
+						<h2 className="text-center font-bold text-xl" style={textStyle}>
 							{sectionTitle}
 						</h2>
 					)}
@@ -219,11 +217,12 @@ function LinksList({
 										</div>
 									)}
 									<div className="p-4">
-										<div className="flex items-center justify-between gap-2">
-											<h4 className="font-bold" style={textStyle}>
-												{link.title.length > 64
-													? `${link.title.substring(0, 64)}...`
-													: link.title}
+										<div className="flex h-10 items-center justify-between gap-2">
+											<h4
+												className="line-clamp-2 font-semibold"
+												style={textStyle}
+											>
+												{link.title}
 											</h4>
 											{link.badge && (
 												<Badge className="flex-shrink-0" variant="secondary">
@@ -238,11 +237,12 @@ function LinksList({
 								</div>
 							) : (
 								<div className="w-full p-4 text-center">
-									<div className="flex items-center justify-center gap-2 px-10">
-										<h4 className="font-semibold" style={textStyle}>
-											{link.title.length > 64
-												? `${link.title.substring(0, 64)}...`
-												: link.title}
+									<div className="flex h-10 items-center justify-center gap-2 px-10">
+										<h4
+											className="line-clamp-2 font-semibold"
+											style={textStyle}
+										>
+											{link.title}
 										</h4>
 										{link.badge && (
 											<Badge variant="secondary">{link.badge}</Badge>
@@ -263,7 +263,7 @@ function LinksList({
 												style={buttonStyle}
 												type="button"
 											>
-												<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity" >
+												<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
 													<Lock className="h-8 w-8 text-white" />
 												</div>
 												{linkContent}
@@ -290,7 +290,6 @@ function LinksList({
 	);
 }
 
-// --- Componente Principal ---
 export default function BaseTemplate({
 	user,
 	classNames,
@@ -351,10 +350,7 @@ export default function BaseTemplate({
 						)}
 					</section>
 				</main>
-				<footer
-					className={`${classNames?.footer || ""}`}
-					style={textStyle}
-				>
+				<footer className={`${classNames?.footer || ""}`} style={textStyle}>
 					<JoinBionkModal>{user.username}</JoinBionkModal>
 				</footer>
 			</div>
