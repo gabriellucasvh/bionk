@@ -27,7 +27,6 @@ import {
 	Trash2,
 	X,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import type { LinkItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
@@ -131,13 +130,6 @@ const LinkContent = ({
 	isLinkLocked: boolean;
 	onClickLink: (id: number) => void;
 }) => {
-	if (link.isProduct) {
-		return (
-			<p className="font-bold text-lg text-primary">
-				R$ {link.price?.toFixed(2).replace(".", ",")}
-			</p>
-		);
-	}
 	return (
 		<Link
 			className={cn(
@@ -149,7 +141,6 @@ const LinkContent = ({
 			rel="noopener noreferrer"
 			target="_blank"
 		>
-
 			{link.url.length > 30 ? `${link.url.slice(0, 30)}...` : link.url}
 		</Link>
 	);
@@ -168,7 +159,6 @@ const DisplayView = (props: LinkCardProps) => {
 		onClickLink,
 	} = props;
 
-	// --- Estados temporais ---
 	const isLaunching = !!(
 		link.launchesAt && new Date(link.launchesAt) > new Date()
 	);
@@ -181,8 +171,7 @@ const DisplayView = (props: LinkCardProps) => {
 		<article
 			className={cn(
 				"flex flex-col gap-3 rounded-lg border p-3 transition-all sm:p-4",
-				link.sensitive && "border-rose-400",
-				link.isProduct && "border-blue-400"
+				link.sensitive && "border-rose-400"
 			)}
 		>
 			<div className="flex items-start gap-2 sm:gap-4">
@@ -193,15 +182,6 @@ const DisplayView = (props: LinkCardProps) => {
 				>
 					<Grip className="h-5 w-5 text-muted-foreground" />
 				</div>
-				{link.isProduct && link.productImageUrl && (
-					<Image
-						alt={link.title}
-						className="hidden rounded-md object-cover sm:block"
-						height={64}
-						src={link.productImageUrl}
-						width={64}
-					/>
-				)}
 				<div className="flex-1 space-y-2">
 					<header className="flex flex-wrap items-center gap-2">
 						<h3 className="font-medium">{link.title}</h3>

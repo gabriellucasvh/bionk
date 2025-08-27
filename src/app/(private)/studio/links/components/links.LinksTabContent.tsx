@@ -34,9 +34,6 @@ type LinkFormData = {
 	expiresAt?: Date;
 	deleteOnClicks?: number;
 	launchesAt?: Date;
-	isProduct: boolean;
-	price?: number;
-	productImageFile?: File;
 };
 
 const initialFormData: LinkFormData = {
@@ -48,9 +45,6 @@ const initialFormData: LinkFormData = {
 	deleteOnClicks: undefined,
 	expiresAt: undefined,
 	launchesAt: undefined,
-	isProduct: false,
-	price: undefined,
-	productImageFile: undefined,
 };
 
 interface LinksTabContentProps {
@@ -125,25 +119,11 @@ const LinksTabContent = ({
 				expiresAt: formData.expiresAt?.toISOString(),
 				launchesAt: formData.launchesAt?.toISOString(),
 				deleteOnClicks: formData.deleteOnClicks,
-				isProduct: formData.isProduct,
-				price: formData.price
-					? Number.parseFloat(String(formData.price))
-					: null,
 			}),
 		});
 
 		if (!res.ok) {
 			return;
-		}
-		const newLink = await res.json();
-
-		if (formData.productImageFile && newLink.id) {
-			const imageFormData = new FormData();
-			imageFormData.append("file", formData.productImageFile);
-			await fetch(`/api/links/${newLink.id}/upload-product-image`, {
-				method: "POST",
-				body: imageFormData,
-			});
 		}
 
 		await mutateLinks();
@@ -190,7 +170,9 @@ const LinksTabContent = ({
 
 	const cancelEditing = (id: number) => {
 		const originalLink = initialLinks.find((l) => l.id === id);
-		if (!originalLink) {return}; // Verificação de segurança adicionada
+		if (!originalLink) {
+			return;
+		} // Verificação de segurança adicionada
 		setLinks((prev) =>
 			prev.map((link) =>
 				link.id === id ? { ...originalLink, isEditing: false } : link
@@ -240,7 +222,9 @@ const LinksTabContent = ({
 		if (active.id !== over?.id) {
 			const oldIndex = links.findIndex((l) => l.id === active.id);
 			const newIndex = links.findIndex((l) => l.id === over?.id);
-			if (oldIndex === -1 || newIndex === -1) {return};
+			if (oldIndex === -1 || newIndex === -1) {
+				return;
+			}
 			const newOrder = arrayMove(links, oldIndex, newIndex);
 			setLinks(newOrder);
 			await fetch("/api/links/reorder", {

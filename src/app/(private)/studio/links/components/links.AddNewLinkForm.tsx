@@ -17,7 +17,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import {
@@ -25,13 +24,11 @@ import {
 	Check,
 	ChevronsUpDown,
 	Clock,
-	Image as ImageIcon,
 	Lock,
-	ShoppingCart,
 	Tags,
 	Type,
 } from "lucide-react";
-import { type ChangeEvent, useRef, useState } from "react";
+import { useState } from "react";
 
 // Tipos e Interfaces
 type LinkFormData = {
@@ -43,9 +40,6 @@ type LinkFormData = {
 	expiresAt?: Date;
 	deleteOnClicks?: number;
 	launchesAt?: Date;
-	isProduct: boolean;
-	price?: number;
-	productImageFile?: File;
 };
 
 interface AddNewLinkFormProps {
@@ -57,7 +51,7 @@ interface AddNewLinkFormProps {
 	existingSections: string[];
 }
 
-type ActiveOption = "schedule" | "protect" | "badge" | "product" | "section";
+type ActiveOption = "schedule" | "protect" | "badge" | "section";
 type PanelProps = Omit<
 	AddNewLinkFormProps,
 	"onSave" | "onCancel" | "isSaveDisabled"
@@ -244,81 +238,6 @@ const BadgePanel = ({ formData, setFormData }: PanelProps) => (
 	</div>
 );
 
-const ProductPanel = ({ formData, setFormData }: PanelProps) => {
-	const imageInputRef = useRef<HTMLInputElement>(null);
-	const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (file) {
-			if (file.size > 2 * 1024 * 1024) {
-				alert("A imagem não pode exceder 2MB.");
-				return;
-			}
-			setFormData({ ...formData, productImageFile: file });
-		}
-	};
-	return (
-		<div className="space-y-3 rounded-md border bg-background/50 p-3">
-			<div className="flex items-center space-x-2">
-				<Switch
-					checked={formData.isProduct}
-					id="isProduct"
-					onCheckedChange={(checked) =>
-						setFormData({ ...formData, isProduct: checked })
-					}
-				/>
-				<Label htmlFor="isProduct">Ativar modo Produto (Link-Shop)</Label>
-			</div>
-			{formData.isProduct && (
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-					<div className="grid gap-2">
-						<Label htmlFor="price">Preço (R$)</Label>
-						<Input
-							id="price"
-							min={0}
-							onChange={(e) =>
-								setFormData({
-									...formData,
-									price:
-										Number(e.target.value) >= 0
-											? Number(e.target.value)
-											: undefined,
-								})
-							}
-							placeholder="Ex: 29.99"
-							type="number"
-							value={formData.price || ""}
-						/>
-					</div>
-					<div className="grid gap-2">
-						<Label htmlFor="productImage">
-							Imagem do Produto{" "}
-							<span className="text-gray-400 text-xs">Máx. 2MB</span>
-						</Label>
-						<Input
-							accept="image/jpeg, image/png, image/webp"
-							className="hidden"
-							id="productImage"
-							onChange={handleImageSelect}
-							ref={imageInputRef}
-							type="file"
-						/>
-						<Button
-							className="w-full justify-start text-left font-normal"
-							onClick={() => imageInputRef.current?.click()}
-							variant="outline"
-						>
-							<ImageIcon className="mr-2 h-4 w-4" />
-							{formData.productImageFile
-								? formData.productImageFile.name
-								: "Selecionar imagem"}
-						</Button>
-					</div>
-				</div>
-			)}
-		</div>
-	);
-};
-
 // --- Componente Principal ---
 const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 	const { formData, onSave, onCancel, isSaveDisabled } = props;
@@ -342,7 +261,6 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 		schedule: <SchedulePanel {...props} />,
 		protect: <ProtectPanel {...props} />,
 		badge: <BadgePanel {...props} />,
-		product: <ProductPanel {...props} />,
 	};
 
 	return (
@@ -375,7 +293,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 			</div>
 
 			{/* Botões de Opções Avançadas */}
-			<div className="grid grid-cols-5 gap-2 border-t pt-4">
+			<div className="grid grid-cols-4 gap-2 border-t pt-4">
 				<Button
 					className="flex h-16 flex-col"
 					onClick={() => toggleOption("section")}
@@ -407,14 +325,6 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 				>
 					<Tags className="mb-1 h-5 w-5" />{" "}
 					<span className="hidden text-xs md:block">Badge</span>
-				</Button>
-				<Button
-					className="flex h-16 flex-col"
-					onClick={() => toggleOption("product")}
-					variant={activeOption === "product" ? "secondary" : "outline"}
-				>
-					<ShoppingCart className="mb-1 h-5 w-5" />{" "}
-					<span className="hidden text-xs md:block">Produto</span>
 				</Button>
 			</div>
 

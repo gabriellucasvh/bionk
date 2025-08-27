@@ -3,7 +3,7 @@
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache"; // IMPORTADO
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -64,9 +64,6 @@ export async function POST(request: Request) {
 			expiresAt,
 			deleteOnClicks,
 			launchesAt,
-			isProduct,
-			price,
-			productImageUrl, // Manteremos o campo para receber a URL após o upload
 		} = body;
 
 		if (!(title && url)) {
@@ -76,8 +73,6 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// --- NOVA LÓGICA DE ORDENAÇÃO ---
-		// 1. "Empurra" todos os links existentes para baixo (incrementa a ordem)
 		await prisma.link.updateMany({
 			where: { userId: session.user.id },
 			data: {
@@ -87,13 +82,12 @@ export async function POST(request: Request) {
 			},
 		});
 
-		// 2. Cria o novo link na posição 0 (topo)
 		const newLink = await prisma.link.create({
 			data: {
 				userId: session.user.id,
 				title,
 				url,
-				order: 0, // Novo link sempre no topo
+				order: 0,
 				active: true,
 				sectionTitle,
 				badge: badge || null,
@@ -101,13 +95,9 @@ export async function POST(request: Request) {
 				expiresAt,
 				deleteOnClicks,
 				launchesAt,
-				isProduct,
-				price,
-				productImageUrl,
 			},
 		});
 
-		// NOVO: Força a revalidação da página do usuário
 		if (userExists.username) {
 			revalidatePath(`/${userExists.username}`);
 		}

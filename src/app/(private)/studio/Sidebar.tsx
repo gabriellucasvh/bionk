@@ -9,7 +9,6 @@ import {
 	Link2,
 	Paintbrush,
 	Settings,
-	ShoppingBag,
 	SwatchBook,
 	User,
 } from "lucide-react";
@@ -55,12 +54,6 @@ const mainLinks: SidebarLink[] = [
 ];
 
 const toolsLinks: SidebarLink[] = [
-	{
-		key: "shop",
-		href: "/studio/links-shop",
-		label: "Links Shop",
-		icon: <ShoppingBag className="h-4 w-4" />,
-	},
 	{
 		key: "creators",
 		href: "/studio/criadores",

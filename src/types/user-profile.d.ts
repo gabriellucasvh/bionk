@@ -9,9 +9,6 @@ export interface UserLink {
 
 	badge?: string | null;
 	password?: string | null;
-	isProduct?: boolean | null;
-	price?: number | null;
-	productImageUrl?: string | null;
 	sectionTitle?: string | null;
 	expiresAt?: string | null;
 	deleteOnClicks?: number | null;
@@ -33,11 +30,10 @@ export interface UserProfile {
 
 export interface SocialLink {
 	id: string;
-	platform: SocialPlatform; // continua tipado
+	platform: SocialPlatform; 
 	url: string;
 }
 
-// ✅ substituí o enum por um type union
 export type SocialPlatform =
 	| "instagram"
 	| "twitter"
