@@ -15,7 +15,18 @@ type UserProfileData = Prisma.UserGetPayload<{
 }>;
 
 interface PageProps {
-	params: Promise<{ username: string }>;
+	params: { username: string };
+}
+
+// Otimização 1: generateStaticParams para pré-renderizar páginas na build
+export async function generateStaticParams() {
+	const users = await prisma.user.findMany({
+		select: { username: true },
+	});
+
+	return users.map((user) => ({
+		username: user.username,
+	}));
 }
 
 export async function generateMetadata({
@@ -27,34 +38,25 @@ export async function generateMetadata({
 	};
 }
 
-// Para evitar que a página use um cache antigo, forçamos a revalidação.
-export const revalidate = 0;
+// Otimização 2: Revalidação Incremental (ISR) a cada 60 segundos
+export const revalidate = 60;
 
 export default async function UserPage({ params }: PageProps) {
-	const { username } = await params;
-	const now = new Date(); // Data e hora atual
+	const { username } = params;
+	const now = new Date();
 
 	const user = (await prisma.user.findUnique({
 		where: { username },
 		include: {
 			Link: {
-				// --- LÓGICA DE BUSCA DE LINKS CORRIGIDA E SIMPLIFICADA ---
 				where: {
 					active: true,
 					AND: [
 						{
-							// Condição de Lançamento:
-							OR: [
-								{ launchesAt: null }, // Ou não tem data de lançamento
-								{ launchesAt: { lte: now } }, // Ou a data de lançamento já passou
-							],
+							OR: [{ launchesAt: null }, { launchesAt: { lte: now } }],
 						},
 						{
-							// Condição de Expiração:
-							OR: [
-								{ expiresAt: null }, // Ou não tem data de expiração
-								{ expiresAt: { gte: now } }, // Ou a data de expiração ainda não chegou
-							],
+							OR: [{ expiresAt: null }, { expiresAt: { gte: now } }],
 						},
 					],
 				},

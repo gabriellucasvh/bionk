@@ -3,6 +3,7 @@
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 const VALID_TEMPLATES = [
@@ -35,28 +36,20 @@ export async function POST(req: Request) {
 			return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 		}
 
-		// Garantir que o email não seja null/undefined após a verificação
 		const userEmail = session.user.email;
 
 		const body: { template: string; templateCategory: string } =
 			await req.json();
 		const { template, templateCategory } = body;
 
-		if (!template) {
+		if (!(template && VALID_TEMPLATES.includes(template))) {
 			return NextResponse.json({ error: "Template inválido" }, { status: 400 });
 		}
 
-		if (!VALID_TEMPLATES.includes(template)) {
-			return NextResponse.json(
-				{ error: "Template não permitido" },
-				{ status: 400 }
-			);
-		}
-
-		// Buscar o usuário para pegar o ID
+		// Buscar o usuário para pegar o ID e o username
 		const user = await prisma.user.findUnique({
 			where: { email: userEmail },
-			select: { id: true },
+			select: { id: true, username: true },
 		});
 
 		if (!user) {
@@ -66,9 +59,7 @@ export async function POST(req: Request) {
 			);
 		}
 
-		// Usar transação para garantir que ambas operações sejam executadas
 		await prisma.$transaction(async (tx) => {
-			// 1. Atualizar o template do usuário
 			await tx.user.update({
 				where: { email: userEmail },
 				data: {
@@ -77,14 +68,11 @@ export async function POST(req: Request) {
 				},
 			});
 
-			// 2. Resetar todas as personalizações customizadas
-			// Primeiro, verificar se existe registro de personalizações
 			const existingPresets = await tx.customPresets.findUnique({
 				where: { userId: user.id },
 			});
 
 			if (existingPresets) {
-				// Se existir, resetar todos os campos
 				await tx.customPresets.update({
 					where: { userId: user.id },
 					data: {
@@ -98,9 +86,12 @@ export async function POST(req: Request) {
 					},
 				});
 			}
-			// Se não existir registro, não precisa fazer nada
-			// O template padrão será usado automaticamente
 		});
+
+		// Otimização: Revalide a página do usuário após a atualização
+		if (user.username) {
+			revalidatePath(`/${user.username}`);
+		}
 
 		return NextResponse.json({
 			message: "Template atualizado e personalizações resetadas com sucesso",

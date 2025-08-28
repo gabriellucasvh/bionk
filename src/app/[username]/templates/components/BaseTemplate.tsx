@@ -197,45 +197,14 @@ function LinksList({
 		<div className="space-y-6">
 			{Object.entries(groupedLinks).map(([sectionTitle, links]) => (
 				<section className="space-y-4" key={sectionTitle}>
-					{(sectionTitle !== "" || Object.keys(groupedLinks).length === 1) && (
+					{(sectionTitle !== "" || Object.keys(groupedLinks).length > 1) && (
 						<h2 className="text-center font-bold text-xl" style={textStyle}>
 							{sectionTitle}
 						</h2>
 					)}
 					<ul className="space-y-3">
 						{links.map((link) => {
-							const linkContent = link.isProduct ? (
-								<div className="w-full overflow-hidden text-left">
-									{link.productImageUrl && (
-										<div className="relative h-48 w-full">
-											<Image
-												alt={link.title}
-												className="object-cover"
-												fill
-												src={link.productImageUrl}
-											/>
-										</div>
-									)}
-									<div className="p-4">
-										<div className="flex h-10 items-center justify-between gap-2">
-											<h4
-												className="line-clamp-2 font-semibold"
-												style={textStyle}
-											>
-												{link.title}
-											</h4>
-											{link.badge && (
-												<Badge className="flex-shrink-0" variant="secondary">
-													{link.badge}
-												</Badge>
-											)}
-										</div>
-										<p className="mt-1 font-semibold text-lg" style={textStyle}>
-											R$ {link.price?.toFixed(2).replace(".", ",")}
-										</p>
-									</div>
-								</div>
-							) : (
+							const linkContent = (
 								<div className="w-full p-4 text-center">
 									<div className="flex h-10 items-center justify-center gap-2 px-10">
 										<h4
