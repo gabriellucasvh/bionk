@@ -1,5 +1,4 @@
-// app/studio/links/components/SocialLinksTabContent.tsx
-
+// src/app/(private)/studio/links/components/links.SocialLinksTabContent.tsx
 "use client";
 
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -10,7 +9,6 @@ import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 import type { SocialLinkItem, SocialPlatform } from "@/types/social";
 import { Edit, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import type { Session } from "next-auth";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 interface SocialLinksTabContentProps {
@@ -117,6 +115,20 @@ const SocialLinksTabContent = ({
 		setEditingLinkId(null);
 	};
 
+	const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const currentValue = e.target.value;
+		if (selectedPlatform?.key === "whatsapp") {
+			const numbers = currentValue.replace(/[^\d]/g, "");
+			if (currentValue.startsWith("+")) {
+				setUsernameInput(`+${numbers}`);
+			} else {
+				setUsernameInput(numbers);
+			}
+		} else {
+			setUsernameInput(currentValue);
+		}
+	};
+
 	return (
 		<div className="space-y-6 pb-10">
 			{!selectedPlatform && (
@@ -149,12 +161,15 @@ const SocialLinksTabContent = ({
 									}
 									variant="outline"
 								>
-									<Image
-										alt={platform.name}
+									<div
 										className="mb-1 h-7 w-7 sm:mb-1.5"
-										height={28}
-										src={platform.icon}
-										width={28}
+										style={{
+											backgroundColor: platform.color,
+											maskImage: `url(${platform.icon})`,
+											maskSize: "contain",
+											maskRepeat: "no-repeat",
+											maskPosition: "center",
+										}}
 									/>
 									<span className="w-full truncate text-center text-xs">
 										{platform.name}
@@ -169,11 +184,15 @@ const SocialLinksTabContent = ({
 			{selectedPlatform && (
 				<div className="space-y-4 rounded-lg border bg-muted/20 p-4">
 					<div className="flex items-center gap-3">
-						<Image
-							alt={selectedPlatform.name}
-							height={32}
-							src={selectedPlatform.icon}
-							width={32}
+						<div
+							className="h-8 w-8"
+							style={{
+								backgroundColor: selectedPlatform.color,
+								maskImage: `url(${selectedPlatform.icon})`,
+								maskSize: "contain",
+								maskRepeat: "no-repeat",
+								maskPosition: "center",
+							}}
 						/>
 						<h3 className="font-semibold text-lg sm:text-xl">
 							{selectedPlatform.name}
@@ -194,9 +213,9 @@ const SocialLinksTabContent = ({
 								autoFocus
 								className="flex-grow text-sm sm:text-base"
 								id="usernameInput"
-								onChange={(e) => setUsernameInput(e.target.value)}
+								onChange={handleUsernameChange}
 								placeholder={selectedPlatform.placeholder}
-								type="text"
+								type={selectedPlatform.key === "whatsapp" ? "tel" : "text"}
 								value={usernameInput}
 							/>
 						</div>
@@ -247,12 +266,15 @@ const SocialLinksTabContent = ({
 								>
 									<div className="flex min-w-0 flex-grow items-center gap-2 sm:gap-3">
 										{platform && (
-											<Image
-												alt={platform.name}
+											<div
 												className="h-6 w-6"
-												height={24}
-												src={platform.icon}
-												width={24}
+												style={{
+													backgroundColor: platform.color,
+													maskImage: `url(${platform.icon})`,
+													maskSize: "contain",
+													maskRepeat: "no-repeat",
+													maskPosition: "center",
+												}}
 											/>
 										)}
 										<div className="flex min-w-0 flex-col">

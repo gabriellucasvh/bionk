@@ -1,145 +1,197 @@
 // src/config/social-platforms.ts
-import type { SocialPlatform } from '@/types/social';
+import type { SocialPlatform } from "@/types/social";
 
 export const SOCIAL_PLATFORMS: SocialPlatform[] = [
-  {
-    "key": "instagram",
-    "name": "Instagram",
-    "icon": "/icons/instagram.svg",
-    "baseUrl": "https://instagram.com/",
-    "placeholder": "seu.usuario"
-  },
-  {
-    "key": "x",
-    "name": "X (Twitter)",
-    "icon": "/icons/x.svg",
-    "baseUrl": "https://x.com/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "tiktok",
-    "name": "TikTok",
-    "icon": "/icons/tiktok.svg",
-    "baseUrl": "https://tiktok.com/@",
-    "placeholder": "seu.usuario"
-  },
-  {
-    "key": "youtube",
-    "name": "YouTube",
-    "icon": "/icons/youtube.svg",
-    "baseUrl": "https://youtube.com/",
-    "placeholder": "@seuCanal"
-  },
-  {
-    "key": "facebook",
-    "name": "Facebook",
-    "icon": "/icons/facebook.svg",
-    "baseUrl": "https://facebook.com/",
-    "placeholder": "seu.perfil"
-  },
-  {
-    "key": "linkedin",
-    "name": "LinkedIn",
-    "icon": "/icons/linkedin.svg",
-    "baseUrl": "https://linkedin.com/in/",
-    "placeholder": "seu-perfil-linkedin"
-  },
-  {
-    "key": "github",
-    "name": "GitHub",
-    "icon": "/icons/github.svg",
-    "baseUrl": "https://github.com/",
-    "placeholder": "seu-usuario"
-  },
-  {
-    "key": "pinterest",
-    "name": "Pinterest",
-    "icon": "/icons/pinterest.svg",
-    "baseUrl": "https://pinterest.com/",
-    "placeholder": "seuusuario"
-  },
-  {
-    "key": "discord",
-    "name": "Discord",
-    "icon": "/icons/discord.svg",
-    "baseUrl": "https://discord.gg/",
-    "placeholder": "codigoConvite"
-  },
-  {
-    "key": "twitch",
-    "name": "Twitch",
-    "icon": "/icons/twitch.svg",
-    "baseUrl": "https://twitch.tv/",
-    "placeholder": "seuCanal"
-  },
-  {
-    "key": "spotify",
-    "name": "Spotify",
-    "icon": "/icons/spotify.svg",
-    "baseUrl": "https://open.spotify.com/user/",
-    "placeholder": "seuUsuarioId"
-  },
-  {
-    "key": "telegram",
-    "name": "Telegram",
-    "icon": "/icons/telegram.svg",
-    "baseUrl": "https://t.me/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "reddit",
-    "name": "Reddit",
-    "icon": "/icons/reddit.svg",
-    "baseUrl": "https://reddit.com/u/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "snapchat",
-    "name": "Snapchat",
-    "icon": "/icons/snapchat.svg",
-    "baseUrl": "https://snapchat.com/add/",
-    "placeholder": "seu.usuario"
-  },
-  {
-    "key": "soundcloud",
-    "name": "SoundCloud",
-    "icon": "/icons/soundcloud.svg",
-    "baseUrl": "https://soundcloud.com/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "steam",
-    "name": "Steam",
-    "icon": "/icons/steam.svg",
-    "baseUrl": "https://steamcommunity.com/id/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "buymeacoffee",
-    "name": "Buy Me a Coffee",
-    "icon": "/icons/buymeacoffee.svg",
-    "baseUrl": "https://buymeacoffee.com/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "patreon",
-    "name": "Patreon",
-    "icon": "/icons/patreon.svg",
-    "baseUrl": "https://patreon.com/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "paypal",
-    "name": "PayPal",
-    "icon": "/icons/paypal.svg",
-    "baseUrl": "https://paypal.me/",
-    "placeholder": "seuUsuario"
-  },
-  {
-    "key": "email",
-    "name": "Email",
-    "icon": "/icons/mail.svg",
-    "baseUrl": "",
-    "placeholder": "seu.email@email.com"
-  }
+	{
+		key: "instagram",
+		name: "Instagram",
+		icon: "/icons/instagram.svg",
+		baseUrl: "https://instagram.com/",
+		placeholder: "seu.usuario",
+		color: "#E4405F",
+	},
+	{
+		key: "threads",
+		name: "Threads",
+		icon: "/icons/threads.svg",
+		baseUrl: "https://www.threads.net/@",
+		placeholder: "seu.usuario",
+		color: "#000000",
+	},
+	{
+		key: "x",
+		name: "X (Twitter)",
+		icon: "/icons/x.svg",
+		baseUrl: "https://x.com/",
+		placeholder: "seuUsuario",
+		color: "#000000",
+	},
+	{
+		key: "tiktok",
+		name: "TikTok",
+		icon: "/icons/tiktok.svg",
+		baseUrl: "https://tiktok.com/@",
+		placeholder: "seu.usuario",
+		color: "#000000",
+	},
+	{
+		key: "bluesky",
+		name: "Bluesky",
+		icon: "/icons/bluesky.svg",
+		baseUrl: "https://bsky.app/profile/",
+		placeholder: "usuario.bsky.social",
+		color: "#0085FF",
+	},
+	{
+		key: "youtube",
+		name: "YouTube",
+		icon: "/icons/youtube.svg",
+		baseUrl: "https://youtube.com/",
+		placeholder: "@seuCanal",
+		color: "#FF0000",
+	},
+	{
+		key: "facebook",
+		name: "Facebook",
+		icon: "/icons/facebook.svg",
+		baseUrl: "https://facebook.com/",
+		placeholder: "seu.perfil",
+		color: "#1877F2",
+	},
+	{
+		key: "whatsapp",
+		name: "WhatsApp",
+		icon: "/icons/whatsapp.svg",
+		baseUrl: "https://wa.me/",
+		placeholder: "+5511999999999",
+		color: "#25D366",
+	},
+	{
+		key: "linkedin",
+		name: "LinkedIn",
+		icon: "/icons/linkedin.svg",
+		baseUrl: "https://linkedin.com/in/",
+		placeholder: "seu-perfil-linkedin",
+		color: "#0A66C2",
+	},
+	{
+		key: "github",
+		name: "GitHub",
+		icon: "/icons/github.svg",
+		baseUrl: "https://github.com/",
+		placeholder: "seu-usuario",
+		color: "#181717",
+	},
+	{
+		key: "pinterest",
+		name: "Pinterest",
+		icon: "/icons/pinterest.svg",
+		baseUrl: "https://pinterest.com/",
+		placeholder: "seuusuario",
+		color: "#E60023",
+	},
+	{
+		key: "discord",
+		name: "Discord",
+		icon: "/icons/discord.svg",
+		baseUrl: "https://discord.gg/",
+		placeholder: "codigoConvite",
+		color: "#5865F2",
+	},
+	{
+		key: "kick",
+		name: "Kick",
+		icon: "/icons/kick.svg",
+		baseUrl: "https://kick.com/",
+		placeholder: "seuCanal",
+		color: "#53FC18",
+	},
+	{
+		key: "twitch",
+		name: "Twitch",
+		icon: "/icons/twitch.svg",
+		baseUrl: "https://twitch.tv/",
+		placeholder: "seuCanal",
+		color: "#9146FF",
+	},
+	{
+		key: "spotify",
+		name: "Spotify",
+		icon: "/icons/spotify.svg",
+		baseUrl: "https://open.spotify.com/user/",
+		placeholder: "seuUsuarioId",
+		color: "#1DB954",
+	},
+	{
+		key: "telegram",
+		name: "Telegram",
+		icon: "/icons/telegram.svg",
+		baseUrl: "https://t.me/",
+		placeholder: "seuUsuario",
+		color: "#26A5E4",
+	},
+	{
+		key: "reddit",
+		name: "Reddit",
+		icon: "/icons/reddit.svg",
+		baseUrl: "https://reddit.com/u/",
+		placeholder: "seuUsuario",
+		color: "#FF4500",
+	},
+	{
+		key: "snapchat",
+		name: "Snapchat",
+		icon: "/icons/snapchat.svg",
+		baseUrl: "https://snapchat.com/add/",
+		placeholder: "seu.usuario",
+		color: "#FFFC00",
+	},
+	{
+		key: "soundcloud",
+		name: "SoundCloud",
+		icon: "/icons/soundcloud.svg",
+		baseUrl: "https://soundcloud.com/",
+		placeholder: "seuUsuario",
+		color: "#FF5500",
+	},
+	{
+		key: "steam",
+		name: "Steam",
+		icon: "/icons/steam.svg",
+		baseUrl: "https://steamcommunity.com/id/",
+		placeholder: "seuUsuario",
+		color: "#000000",
+	},
+	{
+		key: "buymeacoffee",
+		name: "Buy Me a Coffee",
+		icon: "/icons/buymeacoffee.svg",
+		baseUrl: "https://buymeacoffee.com/",
+		placeholder: "seuUsuario",
+		color: "#FFDD00",
+	},
+	{
+		key: "patreon",
+		name: "Patreon",
+		icon: "/icons/patreon.svg",
+		baseUrl: "https://patreon.com/",
+		placeholder: "seuUsuario",
+		color: "#F96854",
+	},
+	{
+		key: "paypal",
+		name: "PayPal",
+		icon: "/icons/paypal.svg",
+		baseUrl: "https://paypal.me/",
+		placeholder: "seuUsuario",
+		color: "#00457C",
+	},
+	{
+		key: "email",
+		name: "Email",
+		icon: "/icons/mail.svg",
+		baseUrl: "mailto:",
+		placeholder: "seu.email@email.com",
+		color: "#7D7D7D",
+	},
 ];
