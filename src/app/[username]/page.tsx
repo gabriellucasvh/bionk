@@ -32,9 +32,17 @@ export async function generateStaticParams() {
 export async function generateMetadata({
 	params,
 }: PageProps): Promise<Metadata> {
-	const { username } = await params;
+	const user = await prisma.user.findUnique({
+		where: { username: params.username },
+		select: { name: true, username: true },
+	});
+
+	if (!user) {
+		return { title: "Usuário não encontrado | Bionk" };
+	}
+
 	return {
-		title: `@${username} | Bionk`,
+		title: `${user.name ?? user.username} | Bionk`,
 	};
 }
 
