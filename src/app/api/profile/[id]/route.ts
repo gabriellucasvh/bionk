@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       });
 
       if (existingUsers.length > 0) {
-        return NextResponse.json({ error: "Nome de usuário já está em uso" }, { status: 400 });
+        return NextResponse.json({ error: "Nome de usuário indisponível" }, { status: 400 });
       }
     }
 
