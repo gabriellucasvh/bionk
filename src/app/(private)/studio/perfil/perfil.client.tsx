@@ -1,10 +1,5 @@
 "use client";
 
-import { Edit, Loader2 } from "lucide-react";
-import Image from "next/image";
-import { useSession } from "next-auth/react";
-import type { ChangeEvent } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
@@ -17,6 +12,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Edit, Loader2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Image from "next/image";
+import type { ChangeEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 
 interface User {
 	name: string;
@@ -48,7 +49,9 @@ const PerfilClient = () => {
 	const profileInputRef = useRef<HTMLInputElement>(null);
 	const [originalProfileImageUrl, setOriginalProfileImageUrl] =
 		useState<string>("");
-	const [usernameError, setUsernameError] = useState<string>("");
+
+	// 2. ADICIONAR ESTADO PARA O ERRO DE VALIDAÇÃO
+	const [validationError, setValidationError] = useState<string>("");
 
 	useEffect(() => {
 		if (!session?.user?.id) {
@@ -88,6 +91,20 @@ const PerfilClient = () => {
 		profile.username !== originalProfile.username ||
 		profile.bio !== originalProfile.bio;
 	const hasChanges = textChanged || profileImageChanged;
+
+	// 3. CRIAR A FUNÇÃO DE VALIDAÇÃO
+	const validateUsername = (username: string): boolean => {
+		if (!username.trim()) {
+			setValidationError("O campo de nome de usuário não pode ficar vazio.");
+			return false;
+		}
+		if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
+			setValidationError("Este nome de usuário não está disponível.");
+			return false;
+		}
+		setValidationError(""); // Limpa o erro se for válido
+		return true;
+	};
 
 	const uploadImage = async (file: File): Promise<string | null> => {
 		if (!session?.user?.id) {
@@ -133,6 +150,13 @@ const PerfilClient = () => {
 			});
 			const data = await res.json();
 			if (!res.ok) {
+				// Se o erro for de username indisponível, mostramos no campo
+				if (
+					res.status === 400 &&
+					data.error === "Nome de usuário indisponível"
+				) {
+					setValidationError(data.error);
+				}
 				throw new Error(data.error || "Falha ao atualizar");
 			}
 			return data.user as User;
@@ -177,7 +201,7 @@ const PerfilClient = () => {
 			setSelectedProfileFile(null);
 			setProfileImageChanged(false);
 		}
-		setUsernameError("");
+		setValidationError("");
 	};
 
 	const handleSaveProfile = async () => {
@@ -185,11 +209,8 @@ const PerfilClient = () => {
 			return;
 		}
 
-		// Validação de username
-		if (profile.username.trim()) {
-			setUsernameError("");
-		} else {
-			setUsernameError("O campo de nome de usuário não pode ficar vazio.");
+		// 4. USAR A VALIDAÇÃO ANTES DE SALVAR
+		if (!validateUsername(profile.username)) {
 			return;
 		}
 
@@ -207,6 +228,8 @@ const PerfilClient = () => {
 
 		const updatedUserData = await updateProfileText();
 
+		// Se `updateProfileText` falhou (ex: username duplicado), `updatedUserData` será `null`
+		// e a mensagem de erro já terá sido definida no `setValidationError`
 		if (newImageUrl || updatedUserData) {
 			await applyUpdatedProfile(
 				session,
@@ -225,7 +248,7 @@ const PerfilClient = () => {
 		setProfilePreview(originalProfileImageUrl);
 		setSelectedProfileFile(null);
 		setProfileImageChanged(false);
-		setUsernameError("");
+		setValidationError("");
 	};
 
 	const handleProfileFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
@@ -319,7 +342,7 @@ const PerfilClient = () => {
 									<span className="text-muted-foreground">bionk.me/</span>
 									<Input
 										className={
-											usernameError ? "border-red-500" : "text-neutral-700"
+											validationError ? "border-red-500" : "text-neutral-700"
 										}
 										disabled={loading || isUploadingImage}
 										id="username"
@@ -329,18 +352,15 @@ const PerfilClient = () => {
 												.toLowerCase();
 											setProfile({ ...profile, username: sanitizedUsername });
 
-											// Atualiza o erro em tempo real
-											if (usernameError && sanitizedUsername.trim() !== "") {
-												setUsernameError("");
-											}
+											// ATUALIZAR A VALIDAÇÃO EM TEMPO REAL
+											validateUsername(sanitizedUsername);
 										}}
 										placeholder="username"
 										value={profile.username}
 									/>
 								</div>
-								{/* Mantém espaço para a mensagem de erro */}
 								<p className="min-h-[1.25rem] text-red-500 text-sm">
-									{usernameError || " "}
+									{validationError || " "}
 								</p>
 							</div>
 						</div>
@@ -368,6 +388,7 @@ const PerfilClient = () => {
 								Cancelar
 							</BaseButton>
 							<BaseButton
+								disabled={loading || isUploadingImage || !!validationError}
 								loading={loading || isUploadingImage}
 								onClick={handleSaveProfile}
 							>
