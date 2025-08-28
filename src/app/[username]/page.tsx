@@ -15,42 +15,24 @@ type UserProfileData = Prisma.UserGetPayload<{
 }>;
 
 interface PageProps {
-	params: { username: string };
-}
-
-// Otimização 1: generateStaticParams para pré-renderizar páginas na build
-export async function generateStaticParams() {
-	const users = await prisma.user.findMany({
-		select: { username: true },
-	});
-
-	return users.map((user) => ({
-		username: user.username,
-	}));
+	params: Promise<{ username: string }>;
 }
 
 export async function generateMetadata({
 	params,
 }: PageProps): Promise<Metadata> {
-	const user = await prisma.user.findUnique({
-		where: { username: params.username },
-		select: { name: true, username: true },
-	});
-
-	if (!user) {
-		return { title: "Usuário não encontrado | Bionk" };
-	}
-
+	const { username } = await params;
 	return {
-		title: `${user.name ?? user.username} | Bionk`,
+		title: `${username} | Bionk`,
 	};
 }
 
-// Otimização 2: Revalidação Incremental (ISR) a cada 60 segundos
-export const revalidate = 60;
+// Para evitar que a página use um cache antigo, forçamos a revalidação.
+export const revalidate = 0;
 
 export default async function UserPage({ params }: PageProps) {
-	const { username } = params;
+	// CORREÇÃO: Adicionado 'await' para resolver a Promise.
+	const { username } = await params;
 	const now = new Date();
 
 	const user = (await prisma.user.findUnique({
@@ -61,10 +43,18 @@ export default async function UserPage({ params }: PageProps) {
 					active: true,
 					AND: [
 						{
-							OR: [{ launchesAt: null }, { launchesAt: { lte: now } }],
+							// Condição de Lançamento:
+							OR: [
+								{ launchesAt: null }, // Ou não tem data de lançamento
+								{ launchesAt: { lte: now } }, // Ou a data de lançamento já passou
+							],
 						},
 						{
-							OR: [{ expiresAt: null }, { expiresAt: { gte: now } }],
+							// Condição de Expiração:
+							OR: [
+								{ expiresAt: null }, // Ou não tem data de expiração
+								{ expiresAt: { gte: now } }, // Ou a data de expiração ainda não chegou
+							],
 						},
 					],
 				},
