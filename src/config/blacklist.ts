@@ -64,6 +64,17 @@ const APP_ROUTES: string[] = [
 	"templates",
 	"termos",
 	"verify-email",
+	"carreira",
+	"talentos",
+	"precos",
+	"assinar",
+	"assinaturas",
+	"comprar",
+	"oficial",
+	"official",
+	"official",
+	"site",
+	"cobranca",
 ];
 
 // Combina as duas listas, adiciona variantes com _ e remove duplicados
