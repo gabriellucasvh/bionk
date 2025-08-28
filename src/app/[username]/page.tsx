@@ -61,7 +61,12 @@ export default async function UserPage({ params }: PageProps) {
 				orderBy: { order: "asc" },
 			},
 			SocialLink: {
-				orderBy: { platform: "asc" },
+				where: {
+					active: true,
+				},
+				orderBy: {
+					order: "asc", // Adicionado para ordenar os ícones sociais
+				},
 			},
 			CustomPresets: true,
 		},

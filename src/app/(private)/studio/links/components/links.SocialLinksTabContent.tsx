@@ -7,9 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 import type { SocialLinkItem, SocialPlatform } from "@/types/social";
+import { closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
+import {
+	arrayMove,
+	SortableContext,
+	verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { Edit, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
+import { SortableSocialLinkItem } from "./links.SortableSocialLinkItem";
 
 interface SocialLinksTabContentProps {
 	initialSocialLinks: SocialLinkItem[];
@@ -36,6 +43,34 @@ const SocialLinksTabContent = ({
 		);
 		setSocialLinks(sorted);
 	}, [initialSocialLinks]);
+
+	const handleDragEnd = async (event: DragEndEvent) => {
+		const { active, over } = event;
+
+		if (over && active.id !== over.id) {
+			const oldIndex = socialLinks.findIndex((link) => link.id === active.id);
+			const newIndex = socialLinks.findIndex((link) => link.id === over.id);
+
+			const newOrder = arrayMove(socialLinks, oldIndex, newIndex);
+			setSocialLinks(newOrder);
+
+			const orderedLinks = newOrder.map((link, index) => ({
+				id: link.id,
+				order: index,
+			}));
+
+			try {
+				await fetch("/api/social-links/reorder", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ orderedLinks }),
+				});
+				await mutateSocialLinks();
+			} catch {
+				setSocialLinks(socialLinks);
+			}
+		}
+	};
 
 	const handlePlatformSelect = (platform: SocialPlatform) => {
 		setSelectedPlatform(platform);
@@ -254,73 +289,82 @@ const SocialLinksTabContent = ({
 					<h4 className="font-medium text-sm sm:text-base">
 						Suas Redes Sociais Adicionadas:
 					</h4>
-					<ul className="space-y-2">
-						{socialLinks.map((link) => {
-							const platform = SOCIAL_PLATFORMS.find(
-								(p) => p.key === link.platform
-							);
-							return (
-								<li
-									className="flex items-center justify-between rounded-lg border bg-background p-2.5 transition-colors hover:bg-muted/30"
-									key={link.id}
-								>
-									<div className="flex min-w-0 flex-grow items-center gap-2 sm:gap-3">
-										{platform && (
-											<div
-												className="h-6 w-6"
-												style={{
-													backgroundColor: platform.color,
-													maskImage: `url(${platform.icon})`,
-													maskSize: "contain",
-													maskRepeat: "no-repeat",
-													maskPosition: "center",
-												}}
-											/>
-										)}
-										<div className="flex min-w-0 flex-col">
-											<span className="truncate font-medium text-sm">
-												{platform?.name || link.platform}
-											</span>
-											<a
-												className="truncate text-muted-foreground text-xs hover:underline"
-												href={link.url}
-												rel="noopener noreferrer"
-												target="_blank"
-											>
-												{link.username}
-											</a>
-										</div>
-									</div>
-									<div className="ml-2 flex flex-shrink-0 items-center gap-1 sm:gap-2">
-										<Button
-											className="h-8 w-8"
-											onClick={() => handleEditSocialLink(link)}
-											size="icon"
-											variant="ghost"
-										>
-											<Edit className="h-4 w-4" />
-										</Button>
-										<Button
-											className="h-8 w-8 text-destructive hover:text-destructive/80"
-											disabled={deletingLinkId === link.id}
-											onClick={() => handleDeleteSocialLink(link.id)}
-											size="icon"
-											variant="ghost"
-										>
-											{deletingLinkId === link.id ? (
-												<Loader2
-													aria-label="Deletando..."
-													className="h-4 w-4 animate-spin"
-												/>
-											) : (
-												<Trash2 className="h-4 w-4" />
-											)}
-										</Button>
-									</div>
-								</li>
-							);
-						})}
-					</ul>
+					<DndContext
+						collisionDetection={closestCenter}
+						onDragEnd={handleDragEnd}
+					>
+						<SortableContext
+							items={socialLinks.map((link) => link.id)}
+							strategy={verticalListSortingStrategy}
+						>
+							<ul className="space-y-2">
+								{socialLinks.map((link) => {
+									const platform = SOCIAL_PLATFORMS.find(
+										(p) => p.key === link.platform
+									);
+									return (
+										<SortableSocialLinkItem id={link.id} key={link.id}>
+											<li className="flex items-center justify-between rounded-lg border bg-background p-2.5 transition-colors hover:bg-muted/30">
+												<div className="flex min-w-0 flex-grow items-center gap-2 sm:gap-3">
+													{platform && (
+														<div
+															className="h-6 w-6"
+															style={{
+																backgroundColor: platform.color,
+																maskImage: `url(${platform.icon})`,
+																maskSize: "contain",
+																maskRepeat: "no-repeat",
+																maskPosition: "center",
+															}}
+														/>
+													)}
+													<div className="flex min-w-0 flex-col">
+														<span className="truncate font-medium text-sm">
+															{platform?.name || link.platform}
+														</span>
+														<a
+															className="truncate text-muted-foreground text-xs hover:underline"
+															href={link.url}
+															rel="noopener noreferrer"
+															target="_blank"
+														>
+															{link.username}
+														</a>
+													</div>
+												</div>
+												<div className="ml-2 flex flex-shrink-0 items-center gap-1 sm:gap-2">
+													<Button
+														className="h-8 w-8"
+														onClick={() => handleEditSocialLink(link)}
+														size="icon"
+														variant="ghost"
+													>
+														<Edit className="h-4 w-4" />
+													</Button>
+													<Button
+														className="h-8 w-8 text-destructive hover:text-destructive/80"
+														disabled={deletingLinkId === link.id}
+														onClick={() => handleDeleteSocialLink(link.id)}
+														size="icon"
+														variant="ghost"
+													>
+														{deletingLinkId === link.id ? (
+															<Loader2
+																aria-label="Deletando..."
+																className="h-4 w-4 animate-spin"
+															/>
+														) : (
+															<Trash2 className="h-4 w-4" />
+														)}
+													</Button>
+												</div>
+											</li>
+										</SortableSocialLinkItem>
+									);
+								})}
+							</ul>
+						</SortableContext>
+					</DndContext>
 				</div>
 			)}
 		</div>
