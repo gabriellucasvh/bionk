@@ -1,18 +1,10 @@
 // src/app/[username]/page.tsx
 
 import prisma from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
+import type { UserProfile as UserProfileData } from "@/types/user-profile";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ComponentType } from "react";
-
-type UserProfileData = Prisma.UserGetPayload<{
-	include: {
-		Link: { where: { active: true }; orderBy: { order: "asc" } };
-		SocialLink: { orderBy: { platform: "asc" } };
-		CustomPresets: true;
-	};
-}>;
 
 interface PageProps {
 	params: Promise<{ username: string }>;
@@ -27,45 +19,57 @@ export async function generateMetadata({
 	};
 }
 
-// Para evitar que a página use um cache antigo, forçamos a revalidação.
 export const revalidate = 0;
 
 export default async function UserPage({ params }: PageProps) {
-	// CORREÇÃO: Adicionado 'await' para resolver a Promise.
 	const { username } = await params;
 	const now = new Date();
 
 	const user = (await prisma.user.findUnique({
 		where: { username },
 		include: {
+			// CORREÇÃO: Revertido para 'Section' (maiúscula) conforme o erro do TypeScript
+			Section: {
+				orderBy: {
+					order: "asc",
+				},
+				include: {
+					links: {
+						where: {
+							active: true,
+							archived: false,
+							AND: [
+								{ OR: [{ launchesAt: null }, { launchesAt: { lte: now } }] },
+								{ OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] },
+							],
+						},
+						orderBy: {
+							order: "asc",
+						},
+					},
+				},
+			},
+			// CORREÇÃO: Revertido para 'Link' (maiúscula)
 			Link: {
 				where: {
 					active: true,
+					archived: false,
+					sectionId: null,
 					AND: [
-						{
-							// Condição de Lançamento:
-							OR: [
-								{ launchesAt: null }, // Ou não tem data de lançamento
-								{ launchesAt: { lte: now } }, // Ou a data de lançamento já passou
-							],
-						},
-						{
-							// Condição de Expiração:
-							OR: [
-								{ expiresAt: null }, // Ou não tem data de expiração
-								{ expiresAt: { gte: now } }, // Ou a data de expiração ainda não chegou
-							],
-						},
+						{ OR: [{ launchesAt: null }, { launchesAt: { lte: now } }] },
+						{ OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] },
 					],
 				},
-				orderBy: { order: "asc" },
+				orderBy: {
+					order: "asc",
+				},
 			},
 			SocialLink: {
 				where: {
 					active: true,
 				},
 				orderBy: {
-					order: "asc", // Adicionado para ordenar os ícones sociais
+					order: "asc",
 				},
 			},
 			CustomPresets: true,

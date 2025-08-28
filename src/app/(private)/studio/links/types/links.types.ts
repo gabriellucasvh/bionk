@@ -8,10 +8,19 @@ export type LinkItem = {
 	order: number;
 	isEditing?: boolean;
 	archived?: boolean;
-	sectionTitle?: string;
+	sectionId?: number | null;
+	sectionTitle?: string | null; // Permitir nulo para links gerais
 	badge?: "promovido" | "15% off" | "expirando" | null;
 	password?: string | null;
 	expiresAt?: string | null;
 	deleteOnClicks?: number | null;
 	launchesAt?: string | null;
+};
+
+export type SectionItem = {
+	id: string; // Ex: 'section-promocao'
+	title: string;
+	active: boolean;
+	order: number;
+	links: LinkItem[];
 };

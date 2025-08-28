@@ -1,4 +1,4 @@
-// api/links/route.ts
+// src/app/api/links/route.ts
 
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -73,8 +73,40 @@ export async function POST(request: Request) {
 			);
 		}
 
+		let sectionId: number | null = null;
+
+		// Se um título de seção for fornecido, encontre ou crie a seção
+		if (
+			sectionTitle &&
+			typeof sectionTitle === "string" &&
+			sectionTitle.trim() !== ""
+		) {
+			const lastSection = await prisma.section.findFirst({
+				where: { userId: session.user.id },
+				orderBy: { order: "desc" },
+			});
+
+			// Usamos 'upsert' para criar a seção se ela não existir, ou encontrá-la se já existir
+			const section = await prisma.section.upsert({
+				where: {
+					userId_title: {
+						// Assumindo que você tem uma constraint única para userId e title na sua tabela Section
+						userId: session.user.id,
+						title: sectionTitle.trim(),
+					},
+				},
+				update: {}, // Não é necessário atualizar nada se a seção já existir
+				create: {
+					userId: session.user.id,
+					title: sectionTitle.trim(),
+					order: lastSection ? lastSection.order + 1 : 0,
+				},
+			});
+			sectionId = section.id;
+		}
+
 		await prisma.link.updateMany({
-			where: { userId: session.user.id },
+			where: { userId: session.user.id, sectionId },
 			data: {
 				order: {
 					increment: 1,
@@ -89,6 +121,7 @@ export async function POST(request: Request) {
 				url,
 				order: 0,
 				active: true,
+				sectionId, // Associa o link com a seção correta
 				sectionTitle,
 				badge: badge || null,
 				password,

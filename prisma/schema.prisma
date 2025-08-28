@@ -42,13 +42,13 @@ model User {
   mercadopagoSubscriptionId     String?
   paymentMethodBrand            String?
   paymentMethodLastFour         String?
-  customizationOrder            String[]       @default([])
   accounts                      Account[]
   CustomPresets                 CustomPresets?
   Link                          Link[]
   ProfileView                   ProfileView[]
   sessions                      Session[]
   SocialLink                    SocialLink[]
+  Section                       Section[]
 
   @@index([subscriptionStatus])
   @@index([createdAt])
@@ -113,7 +113,10 @@ model Link {
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   LinkClick       LinkClick[]
   LinkView        LinkView[]
+  sectionId       Int?
+  section         Section?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
 
+  @@index([sectionId])
   @@index([userId])
   @@index([userId, order])
   @@index([expiresAt])
@@ -173,4 +176,19 @@ model CustomPresets {
   customButtonFill         String? @default("")
   customButtonCorners      String? @default("")
   user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Section {
+  id        Int      @id @default(autoincrement())
+  title     String
+  order     Int
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  links Link[]
+
+  @@unique([userId, title])
+  @@index([userId])
 }

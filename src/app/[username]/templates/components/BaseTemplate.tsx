@@ -1,3 +1,5 @@
+// src/app/[username]/templates/components/BaseTemplate.tsx
+
 "use client";
 
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -19,7 +21,7 @@ import { cn } from "@/lib/utils";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
 import { Lock, Share2 } from "lucide-react";
 import Image from "next/image";
-import { type FormEvent, useMemo, useState } from "react";
+import { type FormEvent, useState } from "react";
 import ShareModal from "./ShareModal";
 
 interface BaseTemplateProps extends TemplateComponentProps {
@@ -74,7 +76,9 @@ function UserHeader({
 		<header className={`mb-8 w-full text-center ${classNames?.header || ""}`}>
 			{user.image && (
 				<div
-					className={`relative mx-auto mb-4 h-32 w-32 overflow-hidden rounded-full border-2 ${classNames?.image || ""}`}
+					className={`relative mx-auto mb-4 h-32 w-32 overflow-hidden rounded-full border-2 ${
+						classNames?.image || ""
+					}`}
 				>
 					<Image
 						alt={user.name || user.username}
@@ -168,6 +172,7 @@ function PasswordProtectedLink({
 	);
 }
 
+// COMPONENTE LinksList ATUALIZADO
 function LinksList({
 	user,
 	classNames,
@@ -179,82 +184,69 @@ function LinksList({
 	buttonStyle?: React.CSSProperties;
 	textStyle?: React.CSSProperties;
 }) {
-	const groupedLinks = useMemo(() => {
-		return user.Link.reduce(
-			(acc, link) => {
-				const section = link.sectionTitle || "";
-				if (!acc[section]) {
-					acc[section] = [];
-				}
-				acc[section].push(link);
-				return acc;
-			},
-			{} as Record<string, UserLink[]>
+	const renderLink = (link: UserLink) => {
+		const linkContent = (
+			<div className="w-full p-4 text-center">
+				<div className="flex h-10 items-center justify-center gap-2 px-10">
+					<h4 className="line-clamp-2 font-semibold" style={textStyle}>
+						{link.title}
+					</h4>
+					{link.badge && <Badge variant="secondary">{link.badge}</Badge>}
+				</div>
+			</div>
 		);
-	}, [user.Link]);
+
+		return (
+			<li className="w-full" key={link.id}>
+				{link.password ? (
+					<PasswordProtectedLink link={link}>
+						<button
+							className={cn("group relative w-full", classNames?.cardLink)}
+							style={buttonStyle}
+							type="button"
+						>
+							<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
+								<Lock className="h-8 w-8 text-white" />
+							</div>
+							{linkContent}
+						</button>
+					</PasswordProtectedLink>
+				) : (
+					<InteractiveLink
+						className={classNames?.cardLink}
+						href={link.url}
+						link={link}
+						sensitive={link.sensitive}
+						style={buttonStyle}
+					>
+						{linkContent}
+					</InteractiveLink>
+				)}
+			</li>
+		);
+	};
 
 	return (
 		<div className="space-y-6">
-			{Object.entries(groupedLinks).map(([sectionTitle, links]) => (
-				<section className="space-y-4" key={sectionTitle}>
-					{(sectionTitle !== "" || Object.keys(groupedLinks).length > 1) && (
-						<h2 className="text-center font-bold text-xl" style={textStyle}>
-							{sectionTitle}
-						</h2>
-					)}
-					<ul className="space-y-3">
-						{links.map((link) => {
-							const linkContent = (
-								<div className="w-full p-4 text-center">
-									<div className="flex h-10 items-center justify-center gap-2 px-10">
-										<h4
-											className="line-clamp-2 font-semibold"
-											style={textStyle}
-										>
-											{link.title}
-										</h4>
-										{link.badge && (
-											<Badge variant="secondary">{link.badge}</Badge>
-										)}
-									</div>
-								</div>
-							);
+			{/* CORREÇÃO: Usando 'user.Section' (maiúscula) */}
+			{user.Section?.map(
+				(section) =>
+					section.links.length > 0 && (
+						<section className="space-y-4" key={section.id}>
+							<h2 className="text-center font-bold text-xl" style={textStyle}>
+								{section.title}
+							</h2>
+							<ul className="space-y-3">{section.links.map(renderLink)}</ul>
+						</section>
+					)
+			)}
 
-							return (
-								<li className="w-full" key={link.id}>
-									{link.password ? (
-										<PasswordProtectedLink link={link}>
-											<button
-												className={cn(
-													"group relative w-full",
-													classNames?.cardLink
-												)}
-												style={buttonStyle}
-												type="button"
-											>
-												<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
-													<Lock className="h-8 w-8 text-white" />
-												</div>
-												{linkContent}
-											</button>
-										</PasswordProtectedLink>
-									) : (
-										<InteractiveLink
-											className={classNames?.cardLink}
-											href={link.url}
-											link={link}
-											sensitive={link.sensitive}
-											style={buttonStyle}
-										>
-											{linkContent}
-										</InteractiveLink>
-									)}
-								</li>
-							);
-						})}
-					</ul>
+			{/* CORREÇÃO: Usando 'user.Link' (maiúscula) */}
+			{user.Link?.length > 0 && (
+				<section className="space-y-4">
+					<ul className="space-y-3">{user.Link.map(renderLink)}</ul>
 				</section>
-			))}
+			)}
 		</div>
 	);
 }
@@ -297,7 +289,9 @@ export default function BaseTemplate({
 	return (
 		<>
 			<div
-				className={`flex min-h-dvh flex-col items-center px-4 py-8 ${classNames?.wrapper || ""}`}
+				className={`flex min-h-dvh flex-col items-center px-4 py-8 ${
+					classNames?.wrapper || ""
+				}`}
 				style={wrapperStyle}
 			>
 				<ProfileViewTracker userId={user.id} />

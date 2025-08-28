@@ -1,12 +1,14 @@
-// src/types/user-profile.ts
-export interface UserLink {
-	id: number;
-	url: string;
-	title: string;
-	sensitive: boolean;
-	active: boolean;
-	order: number;
+// src/types/user-profile.d.ts
+import type {
+	CustomPresets as PrismaCustomPresets,
+	Link as PrismaLink,
+	Section as PrismaSection,
+	SocialLink as PrismaSocialLink,
+	User as PrismaUser,
+} from "@prisma/client";
 
+// --- Links e Seções ---
+export interface UserLink extends PrismaLink {
 	badge?: string | null;
 	password?: string | null;
 	sectionTitle?: string | null;
@@ -15,25 +17,11 @@ export interface UserLink {
 	launchesAt?: string | null;
 }
 
-export interface UserProfile {
-	id: string;
-	username: string;
-	name?: string;
-	image?: string;
-	bio?: string;
-	template?: string;
-	templateCategory?: string;
-	Link: UserLink[];
-	SocialLink?: SocialLink[];
-	CustomPresets?: CustomPresets;
-}
+export type UserSection = PrismaSection & {
+	links: UserLink[];
+};
 
-export interface SocialLink {
-	id: string;
-	platform: SocialPlatform; 
-	url: string;
-}
-
+// --- Redes Sociais ---
 export type SocialPlatform =
 	| "instagram"
 	| "twitter"
@@ -46,13 +34,12 @@ export type SocialPlatform =
 	| "discord"
 	| "website";
 
-export interface TemplateComponentProps {
-	user: UserProfile & {
-		CustomPresets?: CustomPresets;
-	};
+export interface SocialLink extends PrismaSocialLink {
+	platform: SocialPlatform;
 }
 
-export interface CustomPresets {
+// --- Customização ---
+export interface CustomPresets extends PrismaCustomPresets {
 	customBackgroundColor: string;
 	customBackgroundGradient: string;
 	customTextColor: string;
@@ -60,4 +47,21 @@ export interface CustomPresets {
 	customButton: string;
 	customButtonFill: string;
 	customButtonCorners: string;
+}
+
+// --- Perfil Principal ---
+export type UserProfile = PrismaUser & {
+	// CORREÇÃO: Revertido para 'Section' e 'Link' (maiúsculas) para corresponder ao seu schema Prisma
+	Section: UserSection[];
+	Link: UserLink[];
+	SocialLink: SocialLink[];
+	CustomPresets?: CustomPresets | null;
+
+	template?: string;
+	templateCategory?: string;
+};
+
+// --- Props para Templates ---
+export interface TemplateComponentProps {
+	user: UserProfile;
 }
