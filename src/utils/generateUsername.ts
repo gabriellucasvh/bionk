@@ -14,20 +14,33 @@ function sanitizeUsername(name: string): string {
 
 export async function generateUniqueUsername(name: string): Promise<string> {
 	let username = sanitizeUsername(name);
-	let i = 1;
 
-	// Verifica se o nome de usuário sanitizado está na blacklist
+	// Verifica se o nome de usuário está na blacklist
 	if (BLACKLISTED_USERNAMES.includes(username)) {
-		username = `${username}_`; // Adiciona um sufixo para torná-lo válido
+		username = `${username}_`;
 	}
 
-	let uniqueUsername = username;
+	// Busca todos os usernames que começam com o nome base
+	const existingUsers = await prisma.user.findMany({
+		where: {
+			username: {
+				startsWith: username,
+			},
+		},
+		select: { username: true },
+	});
 
-	while (
-		await prisma.user.findUnique({ where: { username: uniqueUsername } })
-	) {
-		uniqueUsername = `${username}${i}`;
+	const existingUsernames = new Set(existingUsers.map((u) => u.username));
+
+	if (!existingUsernames.has(username)) {
+		return username;
+	}
+
+	let i = 1;
+	let uniqueUsername = `${username}${i}`;
+	while (existingUsernames.has(uniqueUsername)) {
 		i++;
+		uniqueUsername = `${username}${i}`;
 	}
 
 	return uniqueUsername;

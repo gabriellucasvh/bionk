@@ -1,7 +1,7 @@
 // src/config/blacklist.ts
 
 // Nomes de usuário proibidos por questões de segurança ou reserva
-const FORBIDDEN_USERNAMES: string[] = [
+const BASE_FORBIDDEN_USERNAMES: string[] = [
 	"admin",
 	"suporte",
 	"contato",
@@ -15,7 +15,34 @@ const FORBIDDEN_USERNAMES: string[] = [
 	"api",
 	"v1",
 	"v2",
+	"bionk",
+	"bionkme",
+	"bionk_me",
+	"facebook",
+	"instagram",
+	"twitter",
+	"tiktok",
+	"youtube",
+	"linkedin",
+	"snapchat",
+	"pinterest",
+	"reddit",
+	"whatsapp",
+	"telegram",
+	"discord",
+	"medium",
+	"tumblr",
+	"twitch",
+	"flickr",
+	"vimeo",
+	"mastodon",
+	"wechat",
+	"line",
 ];
+
+// Função para adicionar a variante com _
+const withUnderscore = (list: string[]) =>
+	list.flatMap((name) => [name, `${name}_`]);
 
 // Rotas da aplicação que não podem ser nomes de usuário
 const APP_ROUTES: string[] = [
@@ -39,7 +66,10 @@ const APP_ROUTES: string[] = [
 	"verify-email",
 ];
 
-// Combina as duas listas e remove duplicados
+// Combina as duas listas, adiciona variantes com _ e remove duplicados
 export const BLACKLISTED_USERNAMES: string[] = [
-	...new Set([...FORBIDDEN_USERNAMES, ...APP_ROUTES]),
+	...new Set([
+		...withUnderscore(BASE_FORBIDDEN_USERNAMES),
+		...withUnderscore(APP_ROUTES),
+	]),
 ];
