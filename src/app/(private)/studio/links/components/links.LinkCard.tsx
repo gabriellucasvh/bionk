@@ -179,7 +179,7 @@ const DisplayView = (props: LinkCardProps) => {
 				<div
 					ref={setActivatorNodeRef}
 					{...listeners}
-					className="cursor-move touch-none pt-1"
+					className="cursor-grab touch-none pt-1"
 				>
 					<Grip className="h-5 w-5 text-muted-foreground" />
 				</div>
