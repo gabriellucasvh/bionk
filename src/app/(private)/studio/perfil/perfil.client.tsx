@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import type { ChangeEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import VerPerfilMobile from "../VerPerfilMobile";
 
 interface User {
 	name: string;
@@ -278,8 +279,9 @@ const PerfilClient = () => {
 
 	return (
 		<section className="mx-auto min-h-dvh w-full space-y-4 p-4 lg:w-1/2">
-			<header>
+			<header className="flex items-center justify-between">
 				<h2 className="font-bold text-2xl">Perfil</h2>
+				<VerPerfilMobile/>
 			</header>
 
 			<Card className="border-none shadow-none">
