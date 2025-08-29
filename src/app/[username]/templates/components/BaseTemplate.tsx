@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
-import { Lock, Share2 } from "lucide-react";
+import { Lock, SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 import { type FormEvent, useState } from "react";
 import ShareModal from "./ShareModal";
@@ -50,14 +50,14 @@ interface BaseTemplateProps extends TemplateComponentProps {
 
 function ShareButton({ onClick }: { onClick: () => void }) {
 	return (
-		<div className="mb-4 flex w-full justify-end">
+		<div className="relative mb-4 flex w-full justify-end">
 			<button
 				aria-label="Compartilhar perfil"
-				className="absolute flex items-center justify-center rounded-full border bg-white p-2 shadow transition-colors hover:bg-gray-100"
+				className="absolute z-50 flex items-center justify-center rounded-full border bg-white p-2 shadow transition-colors hover:bg-gray-100"
 				onClick={onClick}
 				type="button"
 			>
-				<Share2 className="size-6 text-gray-700" />
+				<SquareArrowOutUpRight className="size-6 text-gray-700" />
 			</button>
 		</div>
 	);
