@@ -21,15 +21,12 @@ interface ShareSheetProps {
 
 const ShareSheet = ({ url, title }: ShareSheetProps) => {
 	const [copied, setCopied] = useState(false);
-	// Ref para aceder ao elemento da lista de scroll
 	const scrollRef = useRef<HTMLUListElement>(null);
-	// Estado para controlar a visibilidade dos botões de navegação
 	const [scrollState, setScrollState] = useState({
 		canScrollLeft: false,
 		canScrollRight: false,
 	});
 
-	// Efeito para verificar a posição do scroll sempre que o componente for atualizado
 	useEffect(() => {
 		const listElement = scrollRef.current;
 
@@ -59,7 +56,6 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 		listElement?.addEventListener("scroll", checkScrollability);
 		window.addEventListener("resize", checkScrollability);
 
-		// Função de limpeza para remover os listeners
 		return () => {
 			listElement?.removeEventListener("scroll", checkScrollability);
 			window.removeEventListener("resize", checkScrollability);
@@ -80,7 +76,6 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 		});
 	};
 
-	// ... (Restante da lógica como handleCopyLink, etc., permanece a mesma)
 	const handleCopyLink = () => {
 		navigator.clipboard.writeText(url).then(() => {
 			setCopied(true);
@@ -138,7 +133,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 			{/* Botão de scroll para a ESQUERDA */}
 			<button
 				className={cn(
-					"-translate-y-1/2 absolute top-1/2 left-0 z-10 ml-2 rounded-full bg-white p-2 shadow-md disabled:pointer-events-none disabled:opacity-0",
+					"-translate-y-1/2 absolute top-1/2 left-0 z-10 mt-2 ml-1 rounded-full bg-white p-1 shadow-md disabled:pointer-events-none disabled:opacity-0",
 					{
 						"opacity-100": scrollState.canScrollLeft,
 						"opacity-0": !scrollState.canScrollLeft,
@@ -212,7 +207,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 			{/* Botão de scroll para a DIREITA */}
 			<button
 				className={cn(
-					"-translate-y-1/2 absolute top-1/2 right-0 z-10 mr-2 rounded-full bg-white p-2 shadow-md disabled:pointer-events-none disabled:opacity-0",
+					"-translate-y-1/2 absolute top-1/2 right-0 z-10 mt-2 mr-1 rounded-full bg-white p-1 shadow-md disabled:pointer-events-none disabled:opacity-0",
 					{
 						"opacity-100": scrollState.canScrollRight,
 						"opacity-0": !scrollState.canScrollRight,
