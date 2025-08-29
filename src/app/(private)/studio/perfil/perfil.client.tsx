@@ -12,12 +12,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import { Edit, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import type { ChangeEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 
 interface User {
 	name: string;
@@ -50,7 +50,6 @@ const PerfilClient = () => {
 	const [originalProfileImageUrl, setOriginalProfileImageUrl] =
 		useState<string>("");
 
-	// 2. ADICIONAR ESTADO PARA O ERRO DE VALIDAÇÃO
 	const [validationError, setValidationError] = useState<string>("");
 
 	useEffect(() => {
@@ -92,7 +91,6 @@ const PerfilClient = () => {
 		profile.bio !== originalProfile.bio;
 	const hasChanges = textChanged || profileImageChanged;
 
-	// 3. CRIAR A FUNÇÃO DE VALIDAÇÃO
 	const validateUsername = (username: string): boolean => {
 		if (!username.trim()) {
 			setValidationError("O campo de nome de usuário não pode ficar vazio.");
@@ -102,7 +100,7 @@ const PerfilClient = () => {
 			setValidationError("Este nome de usuário não está disponível.");
 			return false;
 		}
-		setValidationError(""); // Limpa o erro se for válido
+		setValidationError("");
 		return true;
 	};
 
@@ -150,7 +148,6 @@ const PerfilClient = () => {
 			});
 			const data = await res.json();
 			if (!res.ok) {
-				// Se o erro for de username indisponível, mostramos no campo
 				if (
 					res.status === 400 &&
 					data.error === "Nome de usuário indisponível"
@@ -209,7 +206,6 @@ const PerfilClient = () => {
 			return;
 		}
 
-		// 4. USAR A VALIDAÇÃO ANTES DE SALVAR
 		if (!validateUsername(profile.username)) {
 			return;
 		}
@@ -228,8 +224,6 @@ const PerfilClient = () => {
 
 		const updatedUserData = await updateProfileText();
 
-		// Se `updateProfileText` falhou (ex: username duplicado), `updatedUserData` será `null`
-		// e a mensagem de erro já terá sido definida no `setValidationError`
 		if (newImageUrl || updatedUserData) {
 			await applyUpdatedProfile(
 				session,
@@ -337,6 +331,19 @@ const PerfilClient = () => {
 						</div>
 						<div className="flex-1 space-y-4">
 							<div className="grid gap-1">
+								<Label htmlFor="name">Nome</Label>
+								<Input
+									className="text-neutral-700"
+									disabled={loading || isUploadingImage}
+									id="name"
+									onChange={(e) => {
+										setProfile({ ...profile, name: e.target.value });
+									}}
+									placeholder="Seu nome de exibição"
+									value={profile.name}
+								/>
+							</div>
+							<div className="grid gap-1">
 								<Label htmlFor="username">Nome de usuário</Label>
 								<div className="flex items-center gap-2">
 									<span className="text-muted-foreground">bionk.me/</span>
@@ -351,8 +358,6 @@ const PerfilClient = () => {
 												.replace(/[^a-zA-Z0-9_.]/g, "")
 												.toLowerCase();
 											setProfile({ ...profile, username: sanitizedUsername });
-
-											// ATUALIZAR A VALIDAÇÃO EM TEMPO REAL
 											validateUsername(sanitizedUsername);
 										}}
 										placeholder="username"
