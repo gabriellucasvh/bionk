@@ -1,3 +1,4 @@
+// src/app/(private)/studio/links/components/links.LinksTabContent.tsx
 "use client";
 
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -75,6 +76,7 @@ const LinksTabContent = ({
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [isAdding, setIsAdding] = useState(false);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
+	const [originalLink, setOriginalLink] = useState<LinkItem | null>(null);
 
 	useEffect(() => {
 		const sortedLinks = [...initialLinks].sort((a, b) => a.order - b.order);
@@ -279,9 +281,12 @@ const LinksTabContent = ({
 		});
 		await mutateLinks();
 	};
+
 	const saveEditing = (id: number, title: string, url: string) => {
-		return handleLinkUpdate(id, { title, url });
+		handleLinkUpdate(id, { title, url, isEditing: false });
+		setOriginalLink(null);
 	};
+
 	const handleDeleteLink = async (id: number) => {
 		const res = await fetch(`/api/links/${id}`, { method: "DELETE" });
 		if (res.ok) {
@@ -302,7 +307,34 @@ const LinksTabContent = ({
 			handleLinkUpdate(id, { sensitive: !link.sensitive });
 		}
 	};
+	// --- Novas Funções ---
+	const handleStartEditing = (id: number) => {
+		const linkToEdit = initialLinks.find((l) => l.id === id);
+		if (linkToEdit) {
+			setOriginalLink(linkToEdit); // Salva o estado original
+			handleLinkUpdate(id, { isEditing: true });
+		}
+	};
 
+	const handleCancelEditing = (id: number) => {
+		if (originalLink) {
+			// Restaura o link para o estado original
+			handleLinkUpdate(id, {
+				...originalLink,
+				isEditing: false,
+			});
+		} else {
+			// Caso geral, apenas desativa a edição
+			handleLinkUpdate(id, { isEditing: false });
+		}
+		setOriginalLink(null); // Limpa o estado original salvo
+	};
+	const handleLinkChange = (id: number, field: "title" | "url", value: string) => {
+		handleLinkUpdate(id, { [field]: value });
+	};
+	const handleClickLink = (id: number) => {
+		handleLinkUpdate(id, { clicks: initialLinks.find(l => l.id === id)!.clicks + 1 });
+	};
 	return (
 		<div className="space-y-4">
 			{!isAdding && (
@@ -350,15 +382,19 @@ const LinksTabContent = ({
 													className="touch-none"
 												>
 													<SectionCard
+														section={item.data as SectionItem}
+														onSectionUpdate={handleSectionUpdate}
+														onSectionDelete={handleSectionDelete}
+														onSectionUngroup={handleSectionUngroup}
 														onArchiveLink={handleArchiveLink}
 														onDeleteLink={handleDeleteLink}
 														onSaveEditing={saveEditing}
-														onSectionDelete={handleSectionDelete}
-														onSectionUngroup={handleSectionUngroup}
-														onSectionUpdate={handleSectionUpdate}
 														onToggleActive={toggleActive}
 														onToggleSensitive={toggleSensitive}
-														section={item.data as SectionItem}
+														onLinkChange={handleLinkChange}
+														onCancelEditing={handleCancelEditing}
+														onStartEditing={handleStartEditing}
+														onClickLink={handleClickLink}
 													/>
 												</div>
 											);
@@ -367,12 +403,16 @@ const LinksTabContent = ({
 											<LinkCard
 												link={item.data as LinkItem}
 												listeners={listeners}
-												onArchiveLink={handleArchiveLink}
-												onDeleteLink={handleDeleteLink}
+												setActivatorNodeRef={setActivatorNodeRef}
+												onLinkChange={handleLinkChange}
 												onSaveEditing={saveEditing}
+												onCancelEditing={handleCancelEditing}
+												onStartEditing={handleStartEditing}
 												onToggleActive={toggleActive}
 												onToggleSensitive={toggleSensitive}
-												setActivatorNodeRef={setActivatorNodeRef}
+												onArchiveLink={handleArchiveLink}
+												onDeleteLink={handleDeleteLink}
+												onClickLink={handleClickLink}
 											/>
 										);
 									}}

@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET(request: Request): Promise<NextResponse> {
 	const { searchParams } = new URL(request.url);
 	const userId = searchParams.get("userId");
 	const status = searchParams.get("status");
@@ -32,11 +32,11 @@ export async function GET(request: Request) {
 	}
 }
 
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<NextResponse> {
 	const session = await getServerSession(authOptions);
 
 	if (!session?.user?.id) {
-		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+		return NextResponse.json({ error: "Não autorizado - Faça login para criar links" }, { status: 401 });
 	}
 
 	const userExists = await prisma.user.findUnique({

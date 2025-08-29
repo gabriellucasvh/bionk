@@ -1,25 +1,50 @@
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(
-	_req: Request,
-	{ params }: { params: { id: string } }
+	_request: NextRequest, 
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const session = await getServerSession(authOptions);
 	if (!session?.user?.id) {
-		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 	}
 
-	await prisma.link.updateMany({
-		where: { sectionId: Number(params.id) },
-		data: { sectionId: null },
-	});
+	const { id } = await params;
+	if (!id) {
+		return NextResponse.json(
+			{ error: "ID da seção é obrigatório" },
+			{ status: 400 }
+		);
+	}
 
-	await prisma.section.delete({
-		where: { id: Number(params.id), userId: session.user.id },
-	});
+	try {
+		await prisma.section.update({
+			where: { id: Number.parseInt(id, 10) },
+			data: {
+				links: {
+					set: [],
+				},
+			},
+		});
 
-	return NextResponse.json({ message: "Section ungrouped" });
+		await prisma.section.delete({
+			where: { id: Number.parseInt(id, 10) },
+		});
+
+		revalidatePath("/studio/links");
+
+		return NextResponse.json({
+			message: "Links desagrupados e seção excluída com sucesso",
+		});
+	} catch (error) {
+		console.error("Erro ao desagrupar links:", error);
+		return NextResponse.json(
+			{ error: "Erro interno do servidor" },
+			{ status: 500 }
+		);
+	}
 }

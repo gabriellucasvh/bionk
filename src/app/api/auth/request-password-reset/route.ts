@@ -13,7 +13,7 @@ if (!resendApiKey) {
 }
 const resend = new Resend(resendApiKey);
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
 	// --- RATE LIMITER ---
 	const headersList = await headers();
 	const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";

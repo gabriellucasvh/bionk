@@ -1,25 +1,19 @@
-// src/app/api/social-links/[id]/route.ts
-
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 
-interface RouteParams {
-	params: Promise<{
-		id: string;
-	}>;
-}
-
-export async function PUT(request: NextRequest, context: RouteParams) {
+export async function PUT(
+	request: NextRequest,
+	{ params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
 	const session = await getServerSession(authOptions);
-	if (!(session?.user?.id)) {
+	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 	}
 
-	const params = await context.params;
-	const { id } = params;
+	const { id } = await params;
 	if (!id) {
 		return NextResponse.json(
 			{ error: "ID do link é obrigatório" },
@@ -29,74 +23,41 @@ export async function PUT(request: NextRequest, context: RouteParams) {
 
 	try {
 		const body = await request.json();
-		const { username, url, active, order } = body;
+		const { title, url, archived, launchesAt, expiresAt } = body;
 
-		const existingLink = await prisma.socialLink.findUnique({
-			where: { id },
-		});
-
-		if (!existingLink) {
-			return NextResponse.json(
-				{ error: "Link social não encontrado" },
-				{ status: 404 }
-			);
-		}
-
-		if (existingLink.userId !== session.user.id) {
-			return NextResponse.json(
-				{ error: "Não autorizado a modificar este link" },
-				{ status: 403 }
-			);
-		}
-
-		if (body.platform && body.platform !== existingLink.platform) {
-			const conflictingLink = await prisma.socialLink.findFirst({
-				where: {
-					userId: session.user.id,
-					platform: body.platform,
-					id: { not: id },
-				},
-			});
-			if (conflictingLink) {
-				return NextResponse.json(
-					{ error: "Já existe um link para esta plataforma." },
-					{ status: 409 }
-				);
-			}
-		}
-
-		const updatedSocialLink = await prisma.socialLink.update({
-			where: { id },
+		const updatedLink = await prisma.link.update({
+			where: { id: Number.parseInt(id, 10) },
 			data: {
-				username: username !== undefined ? username : existingLink.username,
-				url: url !== undefined ? url : existingLink.url,
-				active: active !== undefined ? active : existingLink.active,
-				order: order !== undefined ? order : existingLink.order,
+				title,
+				url,
+				archived,
+				launchesAt: launchesAt ? new Date(launchesAt) : null,
+				expiresAt: expiresAt ? new Date(expiresAt) : null,
 			},
 		});
 
-		// Otimização: Revalide a página do usuário
-		if (session.user.username) {
-			revalidatePath(`/${session.user.username}`);
-		}
+		revalidatePath("/studio/links");
 
-		return NextResponse.json(updatedSocialLink);
-	} catch {
+		return NextResponse.json(updatedLink);
+	} catch (error) {
+		console.error("Erro ao atualizar o link:", error);
 		return NextResponse.json(
-			{ error: "Erro ao atualizar link social" },
+			{ error: "Erro interno do servidor" },
 			{ status: 500 }
 		);
 	}
 }
 
-export async function DELETE(_request: NextRequest, context: RouteParams) {
+export async function DELETE(
+	_request: NextRequest,
+	{ params }: { params: Promise<{ id: string }> }
+): Promise<NextResponse> {
 	const session = await getServerSession(authOptions);
-	if (!(session?.user?.id)) {
+	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 	}
 
-	const params = await context.params;
-	const { id } = params;
+	const { id } = await params;
 	if (!id) {
 		return NextResponse.json(
 			{ error: "ID do link é obrigatório" },
@@ -105,40 +66,17 @@ export async function DELETE(_request: NextRequest, context: RouteParams) {
 	}
 
 	try {
-		const existingLink = await prisma.socialLink.findUnique({
-			where: { id },
+		await prisma.link.delete({
+			where: { id: Number.parseInt(id, 10) },
 		});
 
-		if (!existingLink) {
-			return NextResponse.json(
-				{ error: "Link social não encontrado" },
-				{ status: 404 }
-			);
-		}
+		revalidatePath("/studio/links");
 
-		if (existingLink.userId !== session.user.id) {
-			return NextResponse.json(
-				{ error: "Não autorizado a excluir este link" },
-				{ status: 403 }
-			);
-		}
-
-		await prisma.socialLink.delete({
-			where: { id },
-		});
-
-		// Otimização: Revalide a página do usuário
-		if (session.user.username) {
-			revalidatePath(`/${session.user.username}`);
-		}
-
+		return NextResponse.json({ message: "Link excluído com sucesso" });
+	} catch (error) {
+		console.error("Erro ao excluir o link:", error);
 		return NextResponse.json(
-			{ message: "Link social excluído com sucesso" },
-			{ status: 200 }
-		);
-	} catch  {
-		return NextResponse.json(
-			{ error: "Erro ao excluir link social" },
+			{ error: "Erro interno do servidor" },
 			{ status: 500 }
 		);
 	}

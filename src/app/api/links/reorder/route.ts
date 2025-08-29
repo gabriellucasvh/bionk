@@ -15,7 +15,7 @@ const reorderSchema = z.object({
 	),
 });
 
-export async function PUT(req: Request) {
+export async function PUT(req: Request): Promise<NextResponse> {
 	const session = await getServerSession(authOptions);
 	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });

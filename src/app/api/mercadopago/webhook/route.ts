@@ -64,7 +64,7 @@ async function processSubscriptionUpdate(subDetails: PreApprovalResponse) {
 /**
  * Rota principal que recebe os webhooks do Mercado Pago.
  */
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
 	try {
 		const body = await request.json();
 
