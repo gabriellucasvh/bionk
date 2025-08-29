@@ -26,6 +26,7 @@ const LinksTabContent = ({
 		isAdding,
 		formData,
 		existingSections,
+		activeId, // <<< Adicionado
 		setActiveId,
 		setIsAdding,
 		setFormData,
@@ -64,6 +65,7 @@ const LinksTabContent = ({
 			)}
 
 			<LinkList
+				activeId={activeId} // <<< Adicionado
 				items={unifiedItems}
 				onArchiveLink={handlers.handleArchiveLink}
 				onCancelEditing={handlers.handleCancelEditing}

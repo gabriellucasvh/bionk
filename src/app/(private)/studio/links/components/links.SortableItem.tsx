@@ -27,7 +27,8 @@ const SortableItem = ({ id, children }: SortableItemProps) => {
 	const style = {
 		transform: CSS.Transform.toString(transform),
 		transition,
-		opacity: isDragging ? 0.5 : 1,
+		// Alterado para 0 para ocultar o item original durante o arraste
+		opacity: isDragging ? 0 : 1,
 		zIndex: isDragging ? 10 : "auto",
 	};
 

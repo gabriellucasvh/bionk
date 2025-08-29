@@ -1,8 +1,9 @@
-// links/components/links.LinkList.tsx
+// src/app/(private)/studio/links/components/links.LinkList.tsx
 import {
 	closestCenter,
 	DndContext,
 	type DragEndEvent,
+	DragOverlay,
 	type DragStartEvent,
 	KeyboardSensor,
 	MouseSensor,
@@ -23,9 +24,9 @@ import SortableItem from "./links.SortableItem";
 
 interface LinkListProps {
 	items: UnifiedItem[];
+	activeId: string | null;
 	onDragStart: (event: DragStartEvent) => void;
 	onDragEnd: (event: DragEndEvent) => void;
-	// Props para os cards
 	onSectionUpdate: (id: number, payload: Partial<SectionItem>) => void;
 	onSectionDelete: (id: number) => void;
 	onSectionUngroup: (id: number) => void;
@@ -41,13 +42,22 @@ interface LinkListProps {
 }
 
 const LinkList = (props: LinkListProps) => {
-	const { items, onDragStart, onDragEnd, ...cardProps } = props;
+	const { items, onDragStart, onDragEnd, activeId, ...cardProps } = props;
 
 	const sensors = useSensors(
 		useSensor(MouseSensor),
 		useSensor(TouchSensor),
 		useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
 	);
+
+	const activeItem = activeId
+		? items.find((item) => item.id === activeId)
+		: null;
+
+	// Função No-op para satisfazer o linter e o TypeScript
+	const noop = () => {
+		/* A função do overlay não precisa de um ativador */
+	};
 
 	return (
 		<div className="space-y-6 border-t pt-6">
@@ -89,6 +99,28 @@ const LinkList = (props: LinkListProps) => {
 						))}
 					</div>
 				</SortableContext>
+
+				{/* Adicionado DragOverlay para corrigir a distorção */}
+				<DragOverlay>
+					{activeItem ? (
+						activeItem.type === "section" ? (
+							<SectionCard
+								isDragging
+								section={activeItem.data as SectionItem}
+								{...cardProps}
+								listeners={{}}
+								setActivatorNodeRef={noop}
+							/>
+						) : (
+							<LinkCard
+								link={activeItem.data as LinkItem}
+								{...cardProps}
+								listeners={{}}
+								setActivatorNodeRef={noop}
+							/>
+						)
+					) : null}
+				</DragOverlay>
 			</DndContext>
 		</div>
 	);
