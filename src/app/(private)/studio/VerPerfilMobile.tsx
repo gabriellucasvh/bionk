@@ -25,7 +25,7 @@ const VerPerfilMobile = () => {
 
 	const username = session?.user?.username;
 	const shareText = `Confira meu perfil na Bionk: ${
-		session?.user?.name || username
+		username || session?.user?.name
 	}`;
 	const logoUrl =
 		"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1756439858/bionk-logo-icon-pb_ueqomi.svg";
