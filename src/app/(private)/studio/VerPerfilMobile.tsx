@@ -27,8 +27,7 @@ const VerPerfilMobile = () => {
 	const shareText = `Confira meu perfil na Bionk: ${
 		username || session?.user?.name
 	}`;
-	const logoUrl =
-		"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1756439858/bionk-logo-icon-pb_ueqomi.svg";
+	const logoUrl = "/bionk-logo-quadrado-pb.svg";
 
 	useEffect(() => {
 		const baseUrl =

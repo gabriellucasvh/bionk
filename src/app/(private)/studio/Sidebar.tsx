@@ -1,14 +1,30 @@
+// src/app/(private)/studio/Sidebar.tsx
 "use client";
 
+import ShareSheet from "@/components/ShareSheet";
 import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	BarChart3,
 	Blocks,
+	Download,
 	ExternalLink,
 	Link2,
 	Paintbrush,
+	QrCode,
 	Settings,
+	Share2,
 	SwatchBook,
 	User,
 } from "lucide-react";
@@ -17,6 +33,95 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
+import { QRCode } from "react-qrcode-logo";
+
+const ProfileActionsDropdown = ({
+	profileUrl,
+	username,
+}: {
+	profileUrl: string;
+	username: string | null | undefined;
+}) => {
+	const [isQrOpen, setIsQrOpen] = useState(false);
+	const shareText = `Confira meu perfil na Bionk: ${username || ""}`;
+	const logoUrl = "/bionk-logo-quadrado-pb.svg";
+
+	const handleDownloadQrCode = useCallback(() => {
+		const canvas = document.getElementById(
+			"sidebar-qrcode"
+		) as HTMLCanvasElement;
+		if (canvas) {
+			const link = document.createElement("a");
+			link.href = canvas.toDataURL("image/png");
+			link.download = `${username}-bionk-qrcode.png`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		}
+	}, [username]);
+
+	return (
+		<DropdownMenuContent align="end" className="ml-3 grid w-xs gap-2 p-2">
+			<DropdownMenuLabel>Ações do Perfil</DropdownMenuLabel>
+			<DropdownMenuSeparator />
+			<DropdownMenuItem asChild>
+				<Link
+					className="flex items-center"
+					href={profileUrl}
+					rel="noopener noreferrer"
+					target="_blank"
+				>
+					<ExternalLink className="h-4 w-4" />
+					<span>Abrir </span>
+				</Link>
+			</DropdownMenuItem>
+
+			<DropdownMenuSub onOpenChange={setIsQrOpen}>
+				<DropdownMenuSubTrigger>
+					<QrCode className="mr-2 h-4 w-4" />
+					<span>QR Code</span>
+				</DropdownMenuSubTrigger>
+				<DropdownMenuSubContent className="p-4">
+					{isQrOpen && profileUrl !== "#" ? (
+						<div className="flex flex-col items-center gap-3">
+							<QRCode
+								id="sidebar-qrcode"
+								logoImage={logoUrl}
+								logoPadding={5}
+								logoWidth={30}
+								qrStyle="dots"
+								size={192}
+								value={profileUrl}
+							/>
+							<Button
+								className="w-full"
+								onClick={handleDownloadQrCode}
+								size="sm"
+							>
+								<Download className="mr-2 h-4 w-4" />
+								Baixar PNG
+							</Button>
+						</div>
+					) : (
+						<p className="text-center text-muted-foreground text-sm">
+							Abra para gerar o QR Code.
+						</p>
+					)}
+				</DropdownMenuSubContent>
+			</DropdownMenuSub>
+
+			<DropdownMenuSub>
+				<DropdownMenuSubTrigger>
+					<Share2 className="mr-2 h-4 w-4" />
+					<span>Compartilhar por...</span>
+				</DropdownMenuSubTrigger>
+				<DropdownMenuSubContent className="p-2 md:max-w-md lg:max-w-full">
+					<ShareSheet title={shareText} url={profileUrl} />
+				</DropdownMenuSubContent>
+			</DropdownMenuSub>
+		</DropdownMenuContent>
+	);
+};
 
 interface SidebarLink {
 	key: string;
@@ -150,22 +255,28 @@ const Sidebar = () => {
 				</header>
 
 				<div className="py-2">
-					<Link
-						className="flex h-12 w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 transition hover:bg-gray-200 hover:text-green-700"
-						href={profileUrl}
-						rel="noopener noreferrer"
-						target="_blank"
-					>
-						<div className="flex flex-col justify-center overflow-auto">
-							<p className="flex items-center gap-2 font-medium text-sm">
-								Ver meu perfil
-							</p>
-							<span className="truncate text-gray-500 text-xs">
-								bionk.me/{username}
-							</span>
-						</div>
-						<ExternalLink className="h-5 w-5 text-gray-400 transition group-hover:text-white" />
-					</Link>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button
+								className="flex h-12 w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 transition hover:bg-gray-200 hover:text-green-700"
+								variant="outline"
+							>
+								<div className="flex flex-col items-start justify-center overflow-auto text-left">
+									<p className="flex items-center gap-2 font-medium text-sm">
+										Compartilhar
+									</p>
+									<span className="truncate text-gray-500 text-xs">
+										bionk.me/{username}
+									</span>
+								</div>
+								<ExternalLink className="h-5 w-5 flex-shrink-0 text-gray-400" />
+							</Button>
+						</DropdownMenuTrigger>
+						<ProfileActionsDropdown
+							profileUrl={profileUrl}
+							username={username}
+						/>
+					</DropdownMenu>
 				</div>
 
 				<div>

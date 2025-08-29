@@ -31,8 +31,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 		process.env.NEXT_PUBLIC_BASE_URL || "https://bionk.me"
 	}/${user.username}`;
 	const shareText = `Confira meu perfil na Bionk: ${user.username || user.name}`;
-	const logoUrl =
-		"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1756439858/bionk-logo-icon-pb_ueqomi.svg";
+	const logoUrl = "/bionk-logo-quadrado-pb.svg";
 
 	return (
 		<Dialog onOpenChange={onOpenChange} open={isOpen}>
