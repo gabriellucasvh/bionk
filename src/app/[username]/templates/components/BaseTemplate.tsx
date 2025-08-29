@@ -108,7 +108,7 @@ function UserHeader({
 			{Array.isArray(user.SocialLink) && user.SocialLink.length > 0 && (
 				<div className="mt-4 flex items-center justify-center">
 					<UserProfileSocialIcons
-						className="space-x-4"
+						className="space-x-4 space-y-1"
 						iconSize={26}
 						socialLinks={user.SocialLink}
 						theme={classNames?.theme}
