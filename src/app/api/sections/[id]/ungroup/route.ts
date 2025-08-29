@@ -1,3 +1,5 @@
+// src/app/api/sections/[id]/ungroup/route.ts
+
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
@@ -5,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(
-	_request: NextRequest, 
+	_request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const session = await getServerSession(authOptions);
@@ -22,13 +24,9 @@ export async function POST(
 	}
 
 	try {
-		await prisma.section.update({
-			where: { id: Number.parseInt(id, 10) },
-			data: {
-				links: {
-					set: [],
-				},
-			},
+		await prisma.link.updateMany({
+			where: { sectionId: Number.parseInt(id, 10) },
+			data: { sectionId: null, sectionTitle: null },
 		});
 
 		await prisma.section.delete({
@@ -40,8 +38,7 @@ export async function POST(
 		return NextResponse.json({
 			message: "Links desagrupados e seção excluída com sucesso",
 		});
-	} catch (error) {
-		console.error("Erro ao desagrupar links:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }

@@ -28,8 +28,10 @@ export default async function UserPage({ params }: PageProps) {
 	const user = (await prisma.user.findUnique({
 		where: { username },
 		include: {
-			// CORREÇÃO: Revertido para 'Section' (maiúscula) conforme o erro do TypeScript
 			Section: {
+				where: {
+					active: true, // Adicionado: Filtra para buscar apenas seções ativas
+				},
 				orderBy: {
 					order: "asc",
 				},
@@ -49,7 +51,6 @@ export default async function UserPage({ params }: PageProps) {
 					},
 				},
 			},
-			// CORREÇÃO: Revertido para 'Link' (maiúscula)
 			Link: {
 				where: {
 					active: true,

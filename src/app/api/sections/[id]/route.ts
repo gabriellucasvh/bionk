@@ -1,3 +1,5 @@
+// src/app/api/sections/[id]/route.ts
+
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
@@ -14,34 +16,56 @@ export async function PUT(
 	}
 
 	const { id } = await params;
-	if (!id) {
+	const sectionId = Number.parseInt(id, 10);
+
+	if (!id || Number.isNaN(sectionId)) {
 		return NextResponse.json(
-			{ error: "ID da seção é obrigatório" },
+			{ error: "ID da seção é inválido ou obrigatório" },
 			{ status: 400 }
 		);
 	}
 
 	try {
 		const body = await request.json();
-		const { title, links } = body;
+		const { title, links, active } = body;
 
-		const updatedSection = await prisma.section.update({
-			where: { id: Number.parseInt(id, 10) },
-			data: {
-				title,
-				links: {
-					set: links.map((linkId: string) => ({
-						id: Number.parseInt(linkId, 10),
-					})),
+		// Inicia uma transação para garantir a consistência dos dados
+		const result = await prisma.$transaction(async (tx) => {
+			// Se o status 'active' está sendo atualizado, atualiza também todos os links associados
+			if (typeof active === "boolean") {
+				await tx.link.updateMany({
+					where: { sectionId },
+					data: { active },
+				});
+			}
+
+			// Atualiza a seção
+			const updatedSection = await tx.section.update({
+				where: { id: sectionId, userId: session.user.id },
+				data: {
+					title,
+					links: links
+						? {
+								set: links.map((linkId: string) => ({
+									id: Number.parseInt(linkId, 10),
+								})),
+							}
+						: undefined,
+					active,
 				},
-			},
+			});
+
+			return updatedSection;
 		});
 
+		// Revalida os caches para que as alterações apareçam imediatamente
 		revalidatePath("/studio/links");
+		if (session.user.username) {
+			revalidatePath(`/${session.user.username}`);
+		}
 
-		return NextResponse.json(updatedSection);
-	} catch (error) {
-		console.error("Erro ao atualizar a seção:", error);
+		return NextResponse.json(result);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }
@@ -67,6 +91,12 @@ export async function DELETE(
 	}
 
 	try {
+		// Arquiva os links antes de deletar a seção
+		await prisma.link.updateMany({
+			where: { sectionId: Number.parseInt(id, 10) },
+			data: { archived: true },
+		});
+
 		await prisma.section.delete({
 			where: { id: Number.parseInt(id, 10) },
 		});
@@ -74,8 +104,7 @@ export async function DELETE(
 		revalidatePath("/studio/links");
 
 		return NextResponse.json({ message: "Seção excluída com sucesso" });
-	} catch (error) {
-		console.error("Erro ao excluir a seção:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }

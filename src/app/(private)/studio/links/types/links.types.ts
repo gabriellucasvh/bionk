@@ -1,3 +1,4 @@
+// src/app/(private)/studio/links/types/links.types.ts
 export type LinkItem = {
 	id: number;
 	title: string;
@@ -19,6 +20,7 @@ export type LinkItem = {
 
 export type SectionItem = {
 	id: string; // Ex: 'section-promocao'
+	dbId: number; // O ID numérico real do banco de dados
 	title: string;
 	active: boolean;
 	order: number;

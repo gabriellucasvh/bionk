@@ -1,4 +1,3 @@
-// src/app/(private)/studio/links/components/links.LinksTabContent.tsx
 "use client";
 
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -22,7 +21,6 @@ import {
 import { Plus } from "lucide-react";
 import type { Session } from "next-auth";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 import type { LinkItem, SectionItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
 import AddNewLinkForm from "./links.AddNewLinkForm";
@@ -67,13 +65,62 @@ type UnifiedItem = {
 
 const urlRegex = /^https?:\/\//;
 
+// --- HELPERS ---
+const reorderItems = (
+	unifiedItems: UnifiedItem[],
+	activeId: string,
+	overId: string
+) => {
+	const oldIndex = unifiedItems.findIndex((item) => item.id === activeId);
+	const newIndex = unifiedItems.findIndex((item) => item.id === overId);
+
+	if (oldIndex === -1 || newIndex === -1) {
+		return unifiedItems;
+	}
+
+	return arrayMove(unifiedItems, oldIndex, newIndex);
+};
+
+const buildLinksPayload = (items: UnifiedItem[]) => {
+	const payload: { id: number; sectionTitle: string | null }[] = [];
+
+	for (const item of items) {
+		if (item.type === "section") {
+			const section = item.data as SectionItem;
+			for (const link of section.links) {
+				payload.push({ id: link.id, sectionTitle: section.title });
+			}
+		} else {
+			const link = item.data as LinkItem;
+			payload.push({ id: link.id, sectionTitle: null });
+		}
+	}
+
+	return payload;
+};
+
+const persistReorder = async (
+	items: UnifiedItem[],
+	mutateLinks: () => Promise<any>
+) => {
+	const linksPayload = buildLinksPayload(items);
+
+	await fetch("/api/links/reorder", {
+		method: "PUT",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ links: linksPayload }),
+	});
+
+	await mutateLinks();
+};
+
 // --- COMPONENTE PRINCIPAL ---
 const LinksTabContent = ({
 	initialLinks,
 	mutateLinks,
 }: LinksTabContentProps) => {
 	const [unifiedItems, setUnifiedItems] = useState<UnifiedItem[]>([]);
-	const [activeId, setActiveId] = useState<string | null>(null);
+	const [_activeId, setActiveId] = useState<string | null>(null);
 	const [isAdding, setIsAdding] = useState(false);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
 	const [originalLink, setOriginalLink] = useState<LinkItem | null>(null);
@@ -84,14 +131,15 @@ const LinksTabContent = ({
 		const generalLinks: LinkItem[] = [];
 
 		for (const link of sortedLinks) {
-			if (link.sectionTitle) {
+			if (link.sectionTitle && link.sectionId) {
 				const sectionId = `section-${link.sectionTitle.replace(/\s+/g, "-")}`;
 				if (!sections[sectionId]) {
 					sections[sectionId] = {
 						id: sectionId,
+						dbId: link.sectionId,
 						title: link.sectionTitle,
 						links: [],
-						active: true,
+						active: link.active,
 						order: link.order,
 					};
 				}
@@ -126,10 +174,11 @@ const LinksTabContent = ({
 		useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
 	);
 
-	// --- LÓGICA DE DRAG AND DROP ---
-
+	// --- DRAG HELPERS ---
 	const findContainerId = (itemId: string): string | null => {
-		if (itemId.startsWith("section-")) return itemId;
+		if (itemId.startsWith("section-")) {
+			return itemId;
+		}
 		for (const item of unifiedItems) {
 			if (item.type === "section") {
 				const section = item.data as SectionItem;
@@ -141,138 +190,141 @@ const LinksTabContent = ({
 		return null;
 	};
 
+	const moveLinkBetweenSections = (
+		activeId: string,
+		overId: string,
+		items: UnifiedItem[]
+	) => {
+		const activeContainerId = findContainerId(activeId);
+		const overContainerId = findContainerId(overId);
+
+		if (!(activeContainerId && overContainerId)) {
+			return items;
+		}
+		if (activeContainerId === overContainerId) {
+			return items;
+		}
+
+		const updated = [...items];
+		const activeSectionIndex = updated.findIndex(
+			(item) => item.id === activeContainerId
+		);
+		const overSectionIndex = updated.findIndex(
+			(item) => item.id === overContainerId
+		);
+
+		if (activeSectionIndex === -1 || overSectionIndex === -1) {
+			return items;
+		}
+
+		const activeSection = updated[activeSectionIndex].data as SectionItem;
+		const overSection = updated[overSectionIndex].data as SectionItem;
+
+		const linkIndex = activeSection.links.findIndex(
+			(link) => `link-${link.id}` === activeId
+		);
+
+		if (linkIndex === -1) {
+			return items;
+		}
+
+		const [movedLink] = activeSection.links.splice(linkIndex, 1);
+		overSection.links.push(movedLink);
+
+		return updated;
+	};
+
+	// --- HANDLERS ---
 	const handleDragStart = (event: DragStartEvent) => {
 		setActiveId(event.active.id.toString());
 	};
 
 	const handleDragOver = (event: DragOverEvent) => {
 		const { active, over } = event;
-		if (
-			!over ||
-			active.id === over.id ||
-			!active.id.toString().startsWith("link-")
-		)
+
+		if (!over) {
 			return;
-
-		const activeContainerId = findContainerId(active.id.toString());
-		const overContainerId = findContainerId(over.id.toString());
-
-		if (
-			!(activeContainerId && overContainerId) ||
-			activeContainerId === overContainerId
-		)
+		}
+		if (active.id === over.id) {
 			return;
+		}
+		if (!active.id.toString().startsWith("link-")) {
+			return;
+		}
 
-		setUnifiedItems((prev) => {
-			const activeSectionIndex = prev.findIndex(
-				(item) => item.id === activeContainerId
-			);
-			const overSectionIndex = prev.findIndex(
-				(item) => item.id === overContainerId
-			);
-			if (activeSectionIndex === -1 || overSectionIndex === -1) return prev;
-
-			const activeSection = prev[activeSectionIndex].data as SectionItem;
-			const overSection = prev[overSectionIndex].data as SectionItem;
-			const linkIndex = activeSection.links.findIndex(
-				(link) => `link-${link.id}` === active.id
-			);
-			const [movedLink] = activeSection.links.splice(linkIndex, 1);
-			overSection.links.push(movedLink);
-			return [...prev];
-		});
+		setUnifiedItems((prev) =>
+			moveLinkBetweenSections(active.id.toString(), over.id.toString(), prev)
+		);
 	};
 
 	const handleDragEnd = async (event: DragEndEvent) => {
 		const { active, over } = event;
 		setActiveId(null);
-		if (!over || active.id === over.id) return;
 
-		const oldIndex = unifiedItems.findIndex((item) => item.id === active.id);
-		const newIndex = unifiedItems.findIndex((item) => item.id === over.id);
-		if (oldIndex === -1 || newIndex === -1) return;
+		if (!over) {
+			return;
+		}
+		if (active.id === over.id) {
+			return;
+		}
 
-		const newOrderedItems = arrayMove(unifiedItems, oldIndex, newIndex);
+		const newOrderedItems = reorderItems(
+			unifiedItems,
+			active.id.toString(),
+			over.id.toString()
+		);
+
+		if (newOrderedItems === unifiedItems) {
+			return;
+		}
+
 		setUnifiedItems(newOrderedItems);
+		await persistReorder(newOrderedItems, mutateLinks);
+	};
 
-		const linksPayload: { id: number; sectionTitle: string | null }[] = [];
-		for (const item of newOrderedItems) {
-			if (item.type === "section") {
-				const section = item.data as SectionItem;
-				for (const link of section.links) {
-					linksPayload.push({
-						id: link.id,
-						sectionTitle: section.title,
-					});
-				}
-			} else {
-				const link = item.data as LinkItem;
-				linksPayload.push({
-					id: link.id,
-					sectionTitle: null,
-				});
-			}
-		}
-
-		console.log("Enviando para API de reordenação:", { links: linksPayload });
-
-		try {
-			const res = await fetch("/api/links/reorder", {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ links: linksPayload }),
-			});
-
-			if (res.ok) {
-				toast.success("Ordem salva com sucesso!");
-			} else {
-				// Se a resposta não for OK, tentamos ler o corpo do erro
-				const errorBody = await res.json();
-				console.error("Erro da API ao reordenar:", errorBody);
-				toast.error("Falha ao salvar: " + (errorBody.error || res.statusText));
-				setUnifiedItems(unifiedItems); // Reverte a mudança visual
-			}
-		} catch (error) {
-			console.error("Erro de rede ou JSON ao reordenar:", error);
-			toast.error("Erro de comunicação com o servidor.");
-			setUnifiedItems(unifiedItems); // Reverte a mudança visual
-		}
-
+	// --- Manipulação de Seções e Links ---
+	const handleSectionUpdate = async (
+		id: number,
+		payload: Partial<SectionItem>
+	) => {
+		await fetch(`/api/sections/${id}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
 		await mutateLinks();
 	};
 
-	// --- Funções de Manipulação ---
-	const handleSectionUpdate = (id: string, payload: Partial<SectionItem>) => {
-		toast.info(`Função (ainda não implementada): Atualizar seção ${id}`);
+	const handleSectionDelete = async (id: number) => {
+		await fetch(`/api/sections/${id}`, { method: "DELETE" });
+		await mutateLinks();
 	};
-	const handleSectionDelete = (id: string) => {
-		toast.info(`Função (ainda não implementada): Deletar seção ${id}`);
+
+	const handleSectionUngroup = async (id: number) => {
+		await fetch(`/api/sections/${id}/ungroup`, { method: "POST" });
+		await mutateLinks();
 	};
-	const handleSectionUngroup = (id: string) => {
-		toast.info(`Função (ainda não implementada): Desagrupar seção ${id}`);
-	};
+
 	const handleAddNewLink = async () => {
 		let formattedUrl = formData.url.trim();
 		if (!urlRegex.test(formattedUrl)) {
 			formattedUrl = `https://${formattedUrl}`;
 		}
-		if (!isValidUrl(formattedUrl)) return;
+		if (!isValidUrl(formattedUrl)) {
+			return;
+		}
 
-		const res = await fetch("/api/links", {
+		await fetch("/api/links", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ ...formData }),
 		});
 
-		if (res.ok) {
-			toast.success("Link adicionado com sucesso!");
-			await mutateLinks();
-			setFormData(initialFormData);
-			setIsAdding(false);
-		} else {
-			toast.error("Falha ao adicionar o link.");
-		}
+		await mutateLinks();
+		setFormData(initialFormData);
+		setIsAdding(false);
 	};
+
 	const handleLinkUpdate = async (id: number, payload: Partial<LinkItem>) => {
 		await fetch(`/api/links/${id}`, {
 			method: "PUT",
@@ -288,53 +340,61 @@ const LinksTabContent = ({
 	};
 
 	const handleDeleteLink = async (id: number) => {
-		const res = await fetch(`/api/links/${id}`, { method: "DELETE" });
-		if (res.ok) {
-			toast.success("Link deletado com sucesso.");
-			await mutateLinks();
-		}
+		await fetch(`/api/links/${id}`, { method: "DELETE" });
+		await mutateLinks();
 	};
+
 	const handleArchiveLink = (id: number) => {
 		handleLinkUpdate(id, { archived: true });
-		toast.success("Link arquivado.");
 	};
+
 	const toggleActive = (id: number, isActive: boolean) => {
 		return handleLinkUpdate(id, { active: isActive });
 	};
+
 	const toggleSensitive = (id: number) => {
 		const link = initialLinks.find((l) => l.id === id);
 		if (link) {
 			handleLinkUpdate(id, { sensitive: !link.sensitive });
 		}
 	};
-	// --- Novas Funções ---
+
 	const handleStartEditing = (id: number) => {
 		const linkToEdit = initialLinks.find((l) => l.id === id);
 		if (linkToEdit) {
-			setOriginalLink(linkToEdit); // Salva o estado original
+			setOriginalLink(linkToEdit);
 			handleLinkUpdate(id, { isEditing: true });
 		}
 	};
 
 	const handleCancelEditing = (id: number) => {
 		if (originalLink) {
-			// Restaura o link para o estado original
 			handleLinkUpdate(id, {
 				...originalLink,
 				isEditing: false,
 			});
 		} else {
-			// Caso geral, apenas desativa a edição
 			handleLinkUpdate(id, { isEditing: false });
 		}
-		setOriginalLink(null); // Limpa o estado original salvo
+		setOriginalLink(null);
 	};
-	const handleLinkChange = (id: number, field: "title" | "url", value: string) => {
+
+	const handleLinkChange = (
+		id: number,
+		field: "title" | "url",
+		value: string
+	) => {
 		handleLinkUpdate(id, { [field]: value });
 	};
+
 	const handleClickLink = (id: number) => {
-		handleLinkUpdate(id, { clicks: initialLinks.find(l => l.id === id)!.clicks + 1 });
+		const link = initialLinks.find((l) => l.id === id);
+		if (link) {
+			handleLinkUpdate(id, { clicks: link.clicks + 1 });
+		}
 	};
+
+	// --- RENDER ---
 	return (
 		<div className="space-y-4">
 			{!isAdding && (
@@ -347,6 +407,7 @@ const LinksTabContent = ({
 					</span>
 				</BaseButton>
 			)}
+
 			{isAdding && (
 				<AddNewLinkForm
 					existingSections={existingSections}
@@ -359,6 +420,7 @@ const LinksTabContent = ({
 					setFormData={setFormData}
 				/>
 			)}
+
 			<div className="space-y-6 border-t pt-6">
 				<DndContext
 					onDragEnd={handleDragEnd}
@@ -376,43 +438,39 @@ const LinksTabContent = ({
 									{({ listeners, setActivatorNodeRef }) => {
 										if (item.type === "section") {
 											return (
-												<div
-													ref={setActivatorNodeRef}
-													{...listeners}
-													className="touch-none"
-												>
-													<SectionCard
-														section={item.data as SectionItem}
-														onSectionUpdate={handleSectionUpdate}
-														onSectionDelete={handleSectionDelete}
-														onSectionUngroup={handleSectionUngroup}
-														onArchiveLink={handleArchiveLink}
-														onDeleteLink={handleDeleteLink}
-														onSaveEditing={saveEditing}
-														onToggleActive={toggleActive}
-														onToggleSensitive={toggleSensitive}
-														onLinkChange={handleLinkChange}
-														onCancelEditing={handleCancelEditing}
-														onStartEditing={handleStartEditing}
-														onClickLink={handleClickLink}
-													/>
-												</div>
+												<SectionCard
+													listeners={listeners}
+													onArchiveLink={handleArchiveLink}
+													onCancelEditing={handleCancelEditing}
+													onClickLink={handleClickLink}
+													onDeleteLink={handleDeleteLink}
+													onLinkChange={handleLinkChange}
+													onSaveEditing={saveEditing}
+													onSectionDelete={handleSectionDelete}
+													onSectionUngroup={handleSectionUngroup}
+													onSectionUpdate={handleSectionUpdate}
+													onStartEditing={handleStartEditing}
+													onToggleActive={toggleActive}
+													onToggleSensitive={toggleSensitive}
+													section={item.data as SectionItem}
+													setActivatorNodeRef={setActivatorNodeRef}
+												/>
 											);
 										}
 										return (
 											<LinkCard
 												link={item.data as LinkItem}
 												listeners={listeners}
-												setActivatorNodeRef={setActivatorNodeRef}
+												onArchiveLink={handleArchiveLink}
+												onCancelEditing={handleCancelEditing}
+												onClickLink={handleClickLink}
+												onDeleteLink={handleDeleteLink}
 												onLinkChange={handleLinkChange}
 												onSaveEditing={saveEditing}
-												onCancelEditing={handleCancelEditing}
 												onStartEditing={handleStartEditing}
 												onToggleActive={toggleActive}
 												onToggleSensitive={toggleSensitive}
-												onArchiveLink={handleArchiveLink}
-												onDeleteLink={handleDeleteLink}
-												onClickLink={handleClickLink}
+												setActivatorNodeRef={setActivatorNodeRef}
 											/>
 										);
 									}}
