@@ -8,10 +8,10 @@ import { type NextRequest, NextResponse } from "next/server";
 // FUNÇÃO GET ADICIONADA
 export async function GET(
 	_request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const session = await getServerSession(authOptions);
-	const { id } = params;
+	const { id } = await params;
 
 	if (session?.user?.id !== id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
@@ -47,7 +47,7 @@ export async function GET(
 
 export async function PUT(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const session = await getServerSession(authOptions);
 	const { id } = await params;
