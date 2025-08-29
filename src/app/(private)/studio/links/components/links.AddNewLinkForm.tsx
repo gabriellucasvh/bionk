@@ -75,7 +75,9 @@ const SectionPanel = ({
 						className="w-full justify-between"
 						variant="outline"
 					>
-						{formData.sectionTitle || "Selecionar ou criar seção..."}
+						<p className="flex max-w-full truncate break-words">
+							{formData.sectionTitle || "Selecionar ou criar seção..."}
+						</p>
 						<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 					</Button>
 				</PopoverTrigger>
@@ -85,9 +87,11 @@ const SectionPanel = ({
 							onValueChange={(value) =>
 								setFormData({ ...formData, sectionTitle: value })
 							}
-							placeholder="Buscar ou digitar nova seção..."
+							placeholder="Buscar ou criar nova seção..."
 						/>
-						<CommandEmpty>Nenhuma seção encontrada.</CommandEmpty>
+						<CommandEmpty className="flex max-w-md flex-col break-all p-4 text-sm">
+							<span>Deseja criar "{formData.sectionTitle}"?</span>
+						</CommandEmpty>
 						<CommandGroup>
 							{existingSections.map((section) => (
 								<CommandItem

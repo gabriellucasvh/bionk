@@ -63,7 +63,8 @@ type UnifiedItem = {
 	data: SectionItem | LinkItem;
 };
 
-const urlRegex = /^https?:\/\//;
+// Regex para verificar se a URL já começa com http:// ou https://
+const urlProtocolRegex = /^(https?:\/\/)/;
 
 // --- HELPERS ---
 const reorderItems = (
@@ -307,7 +308,8 @@ const LinksTabContent = ({
 
 	const handleAddNewLink = async () => {
 		let formattedUrl = formData.url.trim();
-		if (!urlRegex.test(formattedUrl)) {
+		// Usa o regex do top-level
+		if (!urlProtocolRegex.test(formattedUrl)) {
 			formattedUrl = `https://${formattedUrl}`;
 		}
 		if (!isValidUrl(formattedUrl)) {
@@ -317,7 +319,7 @@ const LinksTabContent = ({
 		await fetch("/api/links", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ ...formData }),
+			body: JSON.stringify({ ...formData, url: formattedUrl }),
 		});
 
 		await mutateLinks();
@@ -335,7 +337,12 @@ const LinksTabContent = ({
 	};
 
 	const saveEditing = (id: number, title: string, url: string) => {
-		handleLinkUpdate(id, { title, url, isEditing: false });
+		let formattedUrl = url.trim();
+		// Usa o regex do top-level
+		if (!urlProtocolRegex.test(formattedUrl)) {
+			formattedUrl = `https://${formattedUrl}`;
+		}
+		handleLinkUpdate(id, { title, url: formattedUrl, isEditing: false });
 		setOriginalLink(null);
 	};
 
