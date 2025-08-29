@@ -349,7 +349,10 @@ const LinksTabContent = ({
 	};
 
 	const toggleActive = (id: number, isActive: boolean) => {
-		return handleLinkUpdate(id, { active: isActive });
+		const link = initialLinks.find((l) => l.id === id);
+		if (link) {
+			handleLinkUpdate(id, { active: isActive });
+		}
 	};
 
 	const toggleSensitive = (id: number) => {
@@ -363,18 +366,50 @@ const LinksTabContent = ({
 		const linkToEdit = initialLinks.find((l) => l.id === id);
 		if (linkToEdit) {
 			setOriginalLink(linkToEdit);
-			handleLinkUpdate(id, { isEditing: true });
+			setUnifiedItems((items) =>
+				items.map((item) => {
+					if (item.type === "link" && item.data.id === id) {
+						return { ...item, data: { ...item.data, isEditing: true } };
+					}
+					if (item.type === "section") {
+						const sectionData = item.data as SectionItem;
+						const newLinks = sectionData.links.map((link) => {
+							if (link.id === id) {
+								return { ...link, isEditing: true };
+							}
+							return link;
+						});
+						return { ...item, data: { ...sectionData, links: newLinks } };
+					}
+					return item;
+				})
+			);
 		}
 	};
 
 	const handleCancelEditing = (id: number) => {
 		if (originalLink) {
-			handleLinkUpdate(id, {
-				...originalLink,
-				isEditing: false,
-			});
-		} else {
-			handleLinkUpdate(id, { isEditing: false });
+			const linkToRestore = initialLinks.find((l) => l.id === id);
+			if (linkToRestore) {
+				setUnifiedItems((items) =>
+					items.map((item) => {
+						if (item.type === "link" && item.data.id === id) {
+							return { ...item, data: { ...linkToRestore, isEditing: false } };
+						}
+						if (item.type === "section") {
+							const sectionData = item.data as SectionItem;
+							const newLinks = sectionData.links.map((link) => {
+								if (link.id === id) {
+									return { ...linkToRestore, isEditing: false };
+								}
+								return link;
+							});
+							return { ...item, data: { ...sectionData, links: newLinks } };
+						}
+						return item;
+					})
+				);
+			}
 		}
 		setOriginalLink(null);
 	};
@@ -384,7 +419,24 @@ const LinksTabContent = ({
 		field: "title" | "url",
 		value: string
 	) => {
-		handleLinkUpdate(id, { [field]: value });
+		setUnifiedItems((items) =>
+			items.map((item) => {
+				if (item.type === "link" && item.data.id === id) {
+					return { ...item, data: { ...item.data, [field]: value } };
+				}
+				if (item.type === "section") {
+					const sectionData = item.data as SectionItem;
+					const newLinks = sectionData.links.map((link) => {
+						if (link.id === id) {
+							return { ...link, [field]: value };
+						}
+						return link;
+					});
+					return { ...item, data: { ...sectionData, links: newLinks } };
+				}
+				return item;
+			})
+		);
 	};
 
 	const handleClickLink = (id: number) => {

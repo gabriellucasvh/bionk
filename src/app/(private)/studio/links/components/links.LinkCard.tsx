@@ -1,5 +1,6 @@
 "use client";
 
+import { BaseButton } from "@/components/buttons/BaseButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -102,13 +103,13 @@ const EditingView = ({
 				/>
 			</div>
 			<div className="flex flex-col gap-2">
-				<Button
+				<BaseButton
 					disabled={!(isValidUrl(link.url) && link.title)}
 					onClick={() => onSaveEditing(link.id, link.title, link.url)}
 					size="icon"
 				>
 					<Save className="h-4 w-4" />
-				</Button>
+				</BaseButton>
 				<Button
 					onClick={() => onCancelEditing(link.id)}
 					size="icon"

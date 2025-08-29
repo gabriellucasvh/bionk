@@ -23,13 +23,17 @@ export async function PUT(
 
 	try {
 		const body = await request.json();
-		const { title, url, archived, launchesAt, expiresAt } = body;
+		// Permite que qualquer campo do link seja atualizado
+		const { title, url, active, sensitive, archived, launchesAt, expiresAt } =
+			body;
 
 		const updatedLink = await prisma.link.update({
 			where: { id: Number.parseInt(id, 10) },
 			data: {
 				title,
 				url,
+				active,
+				sensitive,
 				archived,
 				launchesAt: launchesAt ? new Date(launchesAt) : null,
 				expiresAt: expiresAt ? new Date(expiresAt) : null,
@@ -39,8 +43,7 @@ export async function PUT(
 		revalidatePath("/studio/links");
 
 		return NextResponse.json(updatedLink);
-	} catch (error) {
-		console.error("Erro ao atualizar o link:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }
@@ -73,8 +76,7 @@ export async function DELETE(
 		revalidatePath("/studio/links");
 
 		return NextResponse.json({ message: "Link excluído com sucesso" });
-	} catch (error) {
-		console.error("Erro ao excluir o link:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }
