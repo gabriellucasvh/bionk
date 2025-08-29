@@ -1,4 +1,4 @@
-// src/app/(private)/studio/links/components/links.LinkList.tsx
+// links/components/links.LinkList.tsx
 import {
 	closestCenter,
 	DndContext,
@@ -64,10 +64,11 @@ const LinkList = (props: LinkListProps) => {
 					<div className="space-y-3">
 						{items.map((item) => (
 							<SortableItem id={item.id} key={item.id}>
-								{({ listeners, setActivatorNodeRef }) => {
+								{({ listeners, setActivatorNodeRef, isDragging }) => {
 									if (item.type === "section") {
 										return (
 											<SectionCard
+												isDragging={isDragging}
 												listeners={listeners}
 												section={item.data as SectionItem}
 												setActivatorNodeRef={setActivatorNodeRef}

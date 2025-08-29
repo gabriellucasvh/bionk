@@ -1,4 +1,4 @@
-// src/app/(private)/studio/links/components/links.SectionCard.tsx
+// links/components/links.SectionCard.tsx
 "use client";
 
 import {
@@ -34,6 +34,7 @@ interface SectionCardProps {
 	onClickLink: (id: number) => void;
 	listeners: any;
 	setActivatorNodeRef: (element: HTMLElement | null) => void;
+	isDragging: boolean;
 }
 
 const SectionCard = ({
@@ -43,6 +44,7 @@ const SectionCard = ({
 	onSectionUngroup,
 	listeners,
 	setActivatorNodeRef,
+	isDragging,
 	...linkCardProps
 }: SectionCardProps) => {
 	return (
@@ -95,28 +97,30 @@ const SectionCard = ({
 				</div>
 			</div>
 
-			<SortableContext
-				items={section.links.map((l) => `link-${l.id}`)}
-				strategy={verticalListSortingStrategy}
-			>
-				<div className="space-y-3">
-					{section.links.map((linkItem) => (
-						<SortableItem id={`link-${linkItem.id}`} key={linkItem.id}>
-							{({
-								listeners: linkListeners,
-								setActivatorNodeRef: linkSetActivatorNodeRef,
-							}) => (
-								<LinkCard
-									link={linkItem}
-									listeners={linkListeners}
-									setActivatorNodeRef={linkSetActivatorNodeRef}
-									{...linkCardProps}
-								/>
-							)}
-						</SortableItem>
-					))}
-				</div>
-			</SortableContext>
+			{!isDragging && (
+				<SortableContext
+					items={section.links.map((l) => `link-${l.id}`)}
+					strategy={verticalListSortingStrategy}
+				>
+					<div className="space-y-3">
+						{section.links.map((linkItem) => (
+							<SortableItem id={`link-${linkItem.id}`} key={linkItem.id}>
+								{({
+									listeners: linkListeners,
+									setActivatorNodeRef: linkSetActivatorNodeRef,
+								}) => (
+									<LinkCard
+										link={linkItem}
+										listeners={linkListeners}
+										setActivatorNodeRef={linkSetActivatorNodeRef}
+										{...linkCardProps}
+									/>
+								)}
+							</SortableItem>
+						))}
+					</div>
+				</SortableContext>
+			)}
 		</section>
 	);
 };

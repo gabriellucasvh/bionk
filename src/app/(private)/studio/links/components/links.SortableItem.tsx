@@ -1,3 +1,4 @@
+// links/components/links.SortableItem.tsx
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type React from "react";
@@ -8,6 +9,7 @@ interface SortableItemProps {
 	children: (props: {
 		setActivatorNodeRef: (element: HTMLElement | null) => void;
 		listeners: ReturnType<typeof useSortable>["listeners"];
+		isDragging: boolean;
 	}) => React.ReactNode;
 }
 
@@ -31,7 +33,7 @@ const SortableItem = ({ id, children }: SortableItemProps) => {
 
 	return (
 		<div ref={setNodeRef} style={style} {...attributes}>
-			{children({ listeners, setActivatorNodeRef })}
+			{children({ listeners, setActivatorNodeRef, isDragging })}
 		</div>
 	);
 };
