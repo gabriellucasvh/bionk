@@ -1,10 +1,11 @@
+// src/app/(private)/studio/links/components/links.LinksTabContent.tsx
 "use client";
 
 import { BaseButton } from "@/components/buttons/BaseButton";
 import {
+	closestCenter,
 	DndContext,
 	type DragEndEvent,
-	type DragOverEvent,
 	type DragStartEvent,
 	KeyboardSensor,
 	MouseSensor,
@@ -67,24 +68,9 @@ type UnifiedItem = {
 const urlProtocolRegex = /^(https?:\/\/)/;
 
 // --- HELPERS ---
-const reorderItems = (
-	unifiedItems: UnifiedItem[],
-	activeId: string,
-	overId: string
-) => {
-	const oldIndex = unifiedItems.findIndex((item) => item.id === activeId);
-	const newIndex = unifiedItems.findIndex((item) => item.id === overId);
-
-	if (oldIndex === -1 || newIndex === -1) {
-		return unifiedItems;
-	}
-
-	return arrayMove(unifiedItems, oldIndex, newIndex);
-};
-
 const buildLinksPayload = (items: UnifiedItem[]) => {
 	const payload: { id: number; sectionTitle: string | null }[] = [];
-
+	const _order = 0;
 	for (const item of items) {
 		if (item.type === "section") {
 			const section = item.data as SectionItem;
@@ -175,112 +161,155 @@ const LinksTabContent = ({
 		useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
 	);
 
-	// --- DRAG HELPERS ---
-	const findContainerId = (itemId: string): string | null => {
+	const findContainerId = (
+		itemId: string,
+		items: UnifiedItem[]
+	): string | undefined => {
 		if (itemId.startsWith("section-")) {
 			return itemId;
 		}
-		for (const item of unifiedItems) {
+
+		for (const item of items) {
 			if (item.type === "section") {
 				const section = item.data as SectionItem;
 				if (section.links.some((link) => `link-${link.id}` === itemId)) {
-					return section.id;
+					return item.id;
 				}
 			}
 		}
-		return null;
+		return "root"; // It's a root-level item if not in any section
 	};
 
-	const moveLinkBetweenSections = (
-		activeId: string,
-		overId: string,
-		items: UnifiedItem[]
-	) => {
-		const activeContainerId = findContainerId(activeId);
-		const overContainerId = findContainerId(overId);
-
-		if (!(activeContainerId && overContainerId)) {
-			return items;
-		}
-		if (activeContainerId === overContainerId) {
-			return items;
-		}
-
-		const updated = [...items];
-		const activeSectionIndex = updated.findIndex(
-			(item) => item.id === activeContainerId
-		);
-		const overSectionIndex = updated.findIndex(
-			(item) => item.id === overContainerId
-		);
-
-		if (activeSectionIndex === -1 || overSectionIndex === -1) {
-			return items;
-		}
-
-		const activeSection = updated[activeSectionIndex].data as SectionItem;
-		const overSection = updated[overSectionIndex].data as SectionItem;
-
-		const linkIndex = activeSection.links.findIndex(
-			(link) => `link-${link.id}` === activeId
-		);
-
-		if (linkIndex === -1) {
-			return items;
-		}
-
-		const [movedLink] = activeSection.links.splice(linkIndex, 1);
-		overSection.links.push(movedLink);
-
-		return updated;
-	};
-
-	// --- HANDLERS ---
 	const handleDragStart = (event: DragStartEvent) => {
 		setActiveId(event.active.id.toString());
 	};
 
-	const handleDragOver = (event: DragOverEvent) => {
+	const handleDragEnd = (event: DragEndEvent) => {
 		const { active, over } = event;
 
-		if (!over) {
-			return;
-		}
-		if (active.id === over.id) {
-			return;
-		}
-		if (!active.id.toString().startsWith("link-")) {
+		if (!over || active.id === over.id) {
+			setActiveId(null);
 			return;
 		}
 
-		setUnifiedItems((prev) =>
-			moveLinkBetweenSections(active.id.toString(), over.id.toString(), prev)
-		);
-	};
+		const activeId = active.id.toString();
+		const overId = over.id.toString();
 
-	const handleDragEnd = async (event: DragEndEvent) => {
-		const { active, over } = event;
+		setUnifiedItems((items) => {
+			const activeContainerId = findContainerId(activeId, items);
+			const overContainerId = findContainerId(over?.id.toString(), items);
+			const overIsASectionContainer = overId.startsWith("section-");
+
+			if (!(activeContainerId && overContainerId)) {
+				return items;
+			}
+
+			let newItems = JSON.parse(JSON.stringify(items));
+
+			if (activeContainerId === overContainerId) {
+				// Reordering within the same container
+				if (activeContainerId === "root") {
+					// Reordering root items
+					const activeIndex = newItems.findIndex(
+						(item: UnifiedItem) => item.id === activeId
+					);
+					const overIndex = newItems.findIndex(
+						(item: UnifiedItem) => item.id === overId
+					);
+					if (activeIndex !== -1 && overIndex !== -1) {
+						newItems = arrayMove(newItems, activeIndex, overIndex);
+					}
+				} else {
+					// Reordering links within a section
+					const sectionIndex = newItems.findIndex(
+						(item: UnifiedItem) => item.id === activeContainerId
+					);
+					if (sectionIndex !== -1) {
+						const section = newItems[sectionIndex].data as SectionItem;
+						const activeIndex = section.links.findIndex(
+							(l) => `link-${l.id}` === activeId
+						);
+						const overIndex = section.links.findIndex(
+							(l) => `link-${l.id}` === overId
+						);
+
+						if (activeIndex !== -1 && overIndex !== -1) {
+							section.links = arrayMove(section.links, activeIndex, overIndex);
+						}
+					}
+				}
+			} else {
+				// Moving between containers
+				let activeLinkData: LinkItem | undefined;
+
+				// 1. Find and remove the link from its source
+				if (activeContainerId === "root") {
+					const activeIndex = newItems.findIndex(
+						(item: UnifiedItem) => item.id === activeId
+					);
+					if (activeIndex !== -1) {
+						activeLinkData = newItems[activeIndex].data as LinkItem;
+						newItems.splice(activeIndex, 1);
+					}
+				} else {
+					const sectionIndex = newItems.findIndex(
+						(item: UnifiedItem) => item.id === activeContainerId
+					);
+					if (sectionIndex !== -1) {
+						const section = newItems[sectionIndex].data as SectionItem;
+						const linkIndex = section.links.findIndex(
+							(l: LinkItem) => `link-${l.id}` === activeId
+						);
+						if (linkIndex !== -1) {
+							[activeLinkData] = section.links.splice(linkIndex, 1);
+						}
+					}
+				}
+
+				if (!activeLinkData) {
+					return items;
+				}
+
+				const targetContainerId = overIsASectionContainer
+					? overId
+					: overContainerId;
+
+				if (targetContainerId === "root") {
+					const overIndex = newItems.findIndex(
+						(item: UnifiedItem) => item.id === overId
+					);
+					if (overIndex !== -1) {
+						newItems.splice(overIndex, 0, {
+							id: activeId,
+							type: "link",
+							data: activeLinkData,
+						});
+					} else {
+						newItems.push({ id: activeId, type: "link", data: activeLinkData });
+					}
+				} else {
+					const sectionIndex = newItems.findIndex(
+						(item: UnifiedItem) => item.id === targetContainerId
+					);
+					if (sectionIndex !== -1) {
+						const section = newItems[sectionIndex].data as SectionItem;
+						const overIndex = section.links.findIndex(
+							(l: LinkItem) => `link-${l.id}` === overId
+						);
+
+						if (overIndex !== -1) {
+							section.links.splice(overIndex, 0, activeLinkData);
+						} else {
+							section.links.push(activeLinkData);
+						}
+					}
+				}
+			}
+			persistReorder(newItems, mutateLinks);
+			return newItems;
+		});
+
 		setActiveId(null);
-
-		if (!over) {
-			return;
-		}
-		if (active.id === over.id) {
-			return;
-		}
-
-		const newOrderedItems = reorderItems(
-			unifiedItems,
-			active.id.toString(),
-			over.id.toString()
-		);
-
-		if (newOrderedItems === unifiedItems) {
-			return;
-		}
-
-		setUnifiedItems(newOrderedItems);
-		await persistReorder(newOrderedItems, mutateLinks);
 	};
 
 	// --- Manipulação de Seções e Links ---
@@ -482,8 +511,8 @@ const LinksTabContent = ({
 
 			<div className="space-y-6 border-t pt-6">
 				<DndContext
+					collisionDetection={closestCenter}
 					onDragEnd={handleDragEnd}
-					onDragOver={handleDragOver}
 					onDragStart={handleDragStart}
 					sensors={sensors}
 				>
