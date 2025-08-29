@@ -1,8 +1,9 @@
 // src/app/[username]/templates/components/ShareModal.tsx
 
 "use client";
+
 import { BaseButton } from "@/components/buttons/BaseButton";
-import ShareSheet from "@/components/ShareSheet"; // Importe o novo componente
+import ShareSheet from "@/components/ShareSheet";
 import {
 	Dialog,
 	DialogContent,
@@ -11,10 +12,11 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import type { TemplateComponentProps } from "@/types/user-profile";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import QRCode from "qrcode";
-import { type FC, useEffect, useState } from "react";
+import type { FC } from "react";
+import { QRCode } from "react-qrcode-logo";
 
 interface ShareModalProps {
 	user: TemplateComponentProps["user"];
@@ -23,27 +25,14 @@ interface ShareModalProps {
 }
 
 const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
-	const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-
+	const { data: session } = useSession();
+	const username = session?.user?.username;
 	const profileUrl = `${
 		process.env.NEXT_PUBLIC_BASE_URL || "https://bionk.me"
 	}/${user.username}`;
 	const shareText = `Confira meu perfil na Bionk: ${user.name || user.username}`;
-
-	useEffect(() => {
-		if (!(isOpen && user.username)) {
-			return;
-		}
-
-		QRCode.toDataURL(profileUrl, {
-			width: 240,
-			margin: 2,
-			color: {
-				dark: "#000000",
-				light: "#ffffff",
-			},
-		}).then(setQrCodeUrl);
-	}, [isOpen, profileUrl, user.username]);
+	const logoUrl =
+		"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1756439858/bionk-logo-icon-pb_ueqomi.svg";
 
 	return (
 		<Dialog onOpenChange={onOpenChange} open={isOpen}>
@@ -63,21 +52,24 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 						Compartilhar Perfil
 					</DialogTitle>
 					<DialogDescription className="pt-2 text-center text-muted-foreground text-sm">
-						Compartilhe seu perfil Bionk com o mundo através de um link, QR code
-						ou redes sociais.
+						Divulgue seu perfil Bionk usando link, QR code ou redes sociais.
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="mt-4 flex min-w-0 flex-col gap-4">
-					{qrCodeUrl && (
-						<div className="flex justify-center rounded-lg bg-gray-100 p-2">
-							<Image
-								alt="QR Code do perfil"
-								className="h-48 w-48 rounded-md"
-								height={192}
-								src={qrCodeUrl}
-								width={192}
+				<div className="flex min-w-0 flex-col gap-4">
+					{isOpen && user.username && (
+						<div className="flex flex-col items-center justify-center rounded-lg bg-gray-100 p-2">
+							<QRCode
+								logoImage={logoUrl}
+								logoPadding={5}
+								logoWidth={30}
+								qrStyle="dots"
+								size={192}
+								value={profileUrl}
 							/>
+							<span className="mt-px break-all text-xs">
+								bionk.me/{username}
+							</span>
 						</div>
 					)}
 
@@ -86,7 +78,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 					<div className="mt-4 flex w-full flex-col gap-3">
 						<BaseButton asChild className="w-full">
 							<Link href="/registro" rel="noopener noreferrer" target="_blank">
-								Criar o seu Bionk
+								Criar sua conta Bionk
 							</Link>
 						</BaseButton>
 					</div>

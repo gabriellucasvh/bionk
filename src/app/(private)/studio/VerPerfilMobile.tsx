@@ -13,22 +13,22 @@ import {
 } from "@/components/ui/dialog";
 import { Download, ExternalLink } from "lucide-react";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
-import QRCode from "qrcode";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { QRCode } from "react-qrcode-logo";
 
 const VerPerfilMobile = () => {
 	const { data: session } = useSession();
 	const [profileUrl, setProfileUrl] = useState<string>("#");
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-	const qrCodeRef = useRef<HTMLImageElement>(null);
+	const qrCodeRef = useRef<HTMLDivElement>(null);
 
 	const username = session?.user?.username;
 	const shareText = `Confira meu perfil na Bionk: ${
 		session?.user?.name || username
 	}`;
+	const logoUrl =
+		"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1756439858/bionk-logo-icon-pb_ueqomi.svg";
 
 	useEffect(() => {
 		const baseUrl =
@@ -40,29 +40,18 @@ const VerPerfilMobile = () => {
 		}
 	}, [username]);
 
-	useEffect(() => {
-		if (isModalOpen && profileUrl !== "#" && !qrCodeUrl) {
-			QRCode.toDataURL(profileUrl, {
-				width: 240,
-				margin: 2,
-				color: {
-					dark: "#000000",
-					light: "#ffffff",
-				},
-			}).then(setQrCodeUrl);
-		}
-	}, [isModalOpen, profileUrl, qrCodeUrl]);
-
 	const handleDownloadQrCode = useCallback(() => {
-		if (qrCodeUrl) {
+		const canvas =
+			qrCodeRef.current?.querySelector<HTMLCanvasElement>("canvas");
+		if (canvas) {
 			const link = document.createElement("a");
-			link.href = qrCodeUrl;
-			link.download = `${username}-bionk.png`;
+			link.href = canvas.toDataURL("image/png");
+			link.download = `${username}-bionk-qrcode.png`;
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
 		}
-	}, [qrCodeUrl, username]);
+	}, [username]);
 
 	return (
 		<Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
@@ -91,16 +80,18 @@ const VerPerfilMobile = () => {
 				</DialogHeader>
 
 				<div className="mt-4 flex min-w-0 flex-col gap-4">
-					{qrCodeUrl && (
+					{isModalOpen && profileUrl !== "#" && (
 						<div className="flex flex-col items-center justify-center gap-4 rounded-lg bg-gray-100 p-4">
-							<Image
-								alt="QR Code do perfil"
-								className="h-48 w-48 rounded-md"
-								height={192}
-								ref={qrCodeRef}
-								src={qrCodeUrl}
-								width={192}
-							/>
+							<div ref={qrCodeRef}>
+								<QRCode
+									logoImage={logoUrl}
+									logoPadding={5}
+									logoWidth={30}
+									qrStyle="dots"
+									size={192}
+									value={profileUrl}
+								/>
+							</div>
 							<BaseButton
 								className="w-full"
 								onClick={handleDownloadQrCode}
