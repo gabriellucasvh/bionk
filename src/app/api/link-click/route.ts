@@ -3,45 +3,63 @@ import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getCountryFromIP, getClientIP } from "@/utils/geolocation";
 import { type NextRequest, NextResponse } from "next/server";
 
-// Função para detectar origem do tráfego pelo User-Agent
-function detectTrafficSourceFromUserAgent(userAgent: string | null): string | null {
-	if (!userAgent) return null;
+// Função híbrida para detectar origem do tráfego combinando User-Agent e Referrer
+function detectTrafficSourceHybrid(
+	userAgent: string | null, 
+	referrer: string | null, 
+	trafficSource: string | null
+): string | null {
+	if (!userAgent && !referrer && !trafficSource) return null;
 	
-	const ua = userAgent.toLowerCase();
-	
-	// Instagram app
-	if (ua.includes('instagram')) {
-		return 'Instagram';
+	// 1. Prioridade máxima: User-Agent (apps nativos)
+	if (userAgent) {
+		const ua = userAgent.toLowerCase();
+		
+		// Instagram app
+		if (ua.includes('instagram')) {
+			return 'Instagram';
+		}
+		
+		// WhatsApp
+		if (ua.includes('whatsapp')) {
+			return 'WhatsApp';
+		}
+		
+		// TikTok
+		if (ua.includes('tiktok') || ua.includes('musical_ly')) {
+			return 'TikTok';
+		}
+		
+		// Facebook app (FBAN = Facebook App, FBAV = Facebook App Version)
+		if (ua.includes('fban') || ua.includes('fbav')) {
+			return 'Facebook';
+		}
+		
+		// Twitter/X
+		if (ua.includes('twitter') || ua.includes('twitterandroid')) {
+			return 'Twitter/X';
+		}
+		
+		// LinkedIn
+		if (ua.includes('linkedin')) {
+			return 'LinkedIn';
+		}
+		
+		// Telegram
+		if (ua.includes('telegram')) {
+			return 'Telegram';
+		}
 	}
 	
-	// WhatsApp
-	if (ua.includes('whatsapp')) {
-		return 'WhatsApp';
+	// 2. Segunda prioridade: trafficSource do frontend (parâmetros de URL)
+	if (trafficSource && trafficSource !== 'null' && trafficSource.trim() !== '') {
+		return trafficSource;
 	}
 	
-	// TikTok
-	if (ua.includes('tiktok') || ua.includes('musical_ly')) {
-		return 'TikTok';
-	}
-	
-	// Facebook app (FBAN = Facebook App, FBAV = Facebook App Version)
-	if (ua.includes('fban') || ua.includes('fbav')) {
-		return 'Facebook';
-	}
-	
-	// Twitter/X
-	if (ua.includes('twitter') || ua.includes('twitterandroid')) {
-		return 'Twitter/X';
-	}
-	
-	// LinkedIn
-	if (ua.includes('linkedin')) {
-		return 'LinkedIn';
-	}
-	
-	// Telegram
-	if (ua.includes('telegram')) {
-		return 'Telegram';
+	// 3. Terceira prioridade: Referrer normalizado (navegadores web)
+	const normalizedReferrer = normalizeReferrer(referrer);
+	if (normalizedReferrer && normalizedReferrer !== 'direct' && normalizedReferrer !== 'unknown') {
+		return normalizedReferrer;
 	}
 	
 	return null;
@@ -170,11 +188,9 @@ export async function POST(req: NextRequest) {
 		console.log('Link Click - User Agent:', userAgent);
 		console.log('Link Click - Traffic Source detectado (frontend):', trafficSource);
 		
-		// Prioridade: 1) User-Agent, 2) trafficSource do frontend, 3) referrer normalizado
-		const userAgentSource = detectTrafficSourceFromUserAgent(userAgent);
-		const normalizedReferrer = userAgentSource || trafficSource || normalizeReferrer(referrerHeader);
-		console.log('Link Click - User-Agent Source:', userAgentSource);
-		console.log('Link Click - Referrer final:', normalizedReferrer);
+		// Usar detecção híbrida que combina User-Agent + Referrer + Parâmetros URL
+		const normalizedReferrer = detectTrafficSourceHybrid(userAgent, referrerHeader, trafficSource) || 'direct';
+		console.log('Link Click - Referrer final (híbrido):', normalizedReferrer);
 
 		const [, updatedLink] = await prisma.$transaction([
 			prisma.linkClick.create({

@@ -1,16 +1,17 @@
 // utils/traffic-source.ts
 
 /**
- * Detecta a origem do tráfego baseada em parâmetros de URL e User-Agent
- * Útil para identificar de onde o usuário veio quando o referrer HTTP não é confiável
+ * Detecta a origem do tráfego baseada em User-Agent, parâmetros de URL e referrer
+ * Útil para identificar de onde o usuário veio com máxima precisão
  */
 export function detectTrafficSource(): string | null {
   if (typeof window === 'undefined') return null;
   
   const urlParams = new URLSearchParams(window.location.search);
   const userAgent = navigator.userAgent.toLowerCase();
+  const referrer = document.referrer;
   
-  // Detectar pelo User-Agent primeiro (mais confiável para apps nativos)
+  // 1. Detectar pelo User-Agent primeiro (mais confiável para apps nativos)
   if (userAgent.includes('instagram')) {
     return 'Instagram';
   }
@@ -31,6 +32,15 @@ export function detectTrafficSource(): string | null {
     return 'Twitter/X';
   }
   
+  if (userAgent.includes('linkedin')) {
+    return 'LinkedIn';
+  }
+  
+  if (userAgent.includes('telegram')) {
+    return 'Telegram';
+  }
+  
+  // 2. Detectar por parâmetros de URL
   // Facebook/Instagram - fbclid parameter
   if (urlParams.has('fbclid')) {
     // Se já não foi detectado pelo user agent, assumir Facebook
@@ -75,7 +85,99 @@ export function detectTrafficSource(): string | null {
   if (urlParams.has('tt_from')) return 'TikTok';
   if (urlParams.has('si') && window.location.href.includes('youtube')) return 'YouTube';
   
+  // 3. Detectar por referrer (para navegadores web)
+  if (referrer) {
+    const referrerSource = detectReferrerSource(referrer);
+    if (referrerSource) return referrerSource;
+  }
+  
   return null;
+}
+
+/**
+ * Detecta a origem do tráfego baseada no referrer (para navegadores web)
+ */
+function detectReferrerSource(referrer: string): string | null {
+  try {
+    const url = new URL(referrer);
+    const hostname = url.hostname.toLowerCase();
+    
+    // Instagram - incluindo todos os subdomínios e redirecionamentos
+    if (hostname.includes('instagram.com') || hostname === 'l.instagram.com' || 
+        hostname === 'help.instagram.com' || hostname === 'business.instagram.com' ||
+        hostname === 'about.instagram.com' || hostname.endsWith('.instagram.com')) {
+      return 'Instagram';
+    }
+    
+    // TikTok - incluindo domínios móveis e regionais
+    if (hostname.includes('tiktok.com') || hostname === 'vm.tiktok.com' || 
+        hostname === 'm.tiktok.com' || hostname === 'ads.tiktok.com' ||
+        hostname === 'www.tiktok.com' || hostname.endsWith('.tiktok.com')) {
+      return 'TikTok';
+    }
+    
+    // WhatsApp - incluindo todos os domínios e redirecionamentos
+    if (hostname.includes('whatsapp.com') || hostname === 'wa.me' || 
+        hostname === 'web.whatsapp.com' || hostname === 'business.whatsapp.com' ||
+        hostname === 'faq.whatsapp.com' || hostname === 'chat.whatsapp.com' ||
+        hostname.endsWith('.whatsapp.com')) {
+      return 'WhatsApp';
+    }
+    
+    // Facebook - incluindo Meta e todos os subdomínios
+    if (hostname.includes('facebook.com') || hostname === 'fb.me' || 
+        hostname === 'm.facebook.com' || hostname === 'l.facebook.com' ||
+        hostname === 'business.facebook.com' || hostname === 'developers.facebook.com' ||
+        hostname === 'lm.facebook.com' || hostname.endsWith('.facebook.com')) {
+      return 'Facebook';
+    }
+    
+    // Mapear domínios conhecidos restantes
+    const platformMap: Record<string, string> = {
+      'twitter.com': 'Twitter/X',
+      'www.twitter.com': 'Twitter/X',
+      'x.com': 'Twitter/X',
+      'www.x.com': 'Twitter/X',
+      't.co': 'Twitter/X',
+      'youtube.com': 'YouTube',
+      'www.youtube.com': 'YouTube',
+      'm.youtube.com': 'YouTube',
+      'youtu.be': 'YouTube',
+      'linkedin.com': 'LinkedIn',
+      'www.linkedin.com': 'LinkedIn',
+      'lnkd.in': 'LinkedIn',
+      'telegram.org': 'Telegram',
+      'web.telegram.org': 'Telegram',
+      't.me': 'Telegram',
+      'discord.com': 'Discord',
+      'discord.gg': 'Discord',
+      'reddit.com': 'Reddit',
+      'www.reddit.com': 'Reddit',
+      'redd.it': 'Reddit',
+      'pinterest.com': 'Pinterest',
+      'www.pinterest.com': 'Pinterest',
+      'pin.it': 'Pinterest',
+      'google.com': 'Google',
+      'www.google.com': 'Google',
+      'google.com.br': 'Google',
+      'bing.com': 'Bing',
+      'www.bing.com': 'Bing',
+      'duckduckgo.com': 'DuckDuckGo',
+      'yahoo.com': 'Yahoo',
+      'www.yahoo.com': 'Yahoo'
+    };
+    
+    // Verificar se é uma plataforma conhecida
+    for (const [domain, platform] of Object.entries(platformMap)) {
+      if (hostname === domain || hostname.endsWith(`.${domain}`)) {
+        return platform;
+      }
+    }
+    
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 /**
