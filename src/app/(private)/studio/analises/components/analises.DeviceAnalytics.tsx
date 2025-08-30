@@ -1,6 +1,16 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Smartphone, Monitor, Tablet, HelpCircle, PictureInPicture2 } from 'lucide-react';
 
@@ -11,7 +21,7 @@ interface DeviceAnalytics {
   totalInteractions: number;
 }
 
-interface DeviceChartProps {
+interface DeviceAnalyticsProps {
   data: DeviceAnalytics[];
   isLoading?: boolean;
 }
@@ -48,6 +58,19 @@ const getDeviceLabel = (device: string) => {
       return 'Desconhecido';
     default:
       return device;
+  }
+};
+
+const getDeviceBadgeVariant = (device: string) => {
+  switch (device.toLowerCase()) {
+    case 'mobile':
+      return 'default';
+    case 'desktop':
+      return 'secondary';
+    case 'tablet':
+      return 'outline';
+    default:
+      return 'destructive';
   }
 };
 
@@ -103,12 +126,15 @@ const CustomLegend = ({ payload }: any) => {
   );
 };
 
-export default function DeviceChart({ data, isLoading }: DeviceChartProps) {
+export default function DeviceAnalytics({ data, isLoading }: DeviceAnalyticsProps) {
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Distribuição por Dispositivo</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <PictureInPicture2 className="h-5 w-5" />
+            Analytics por Dispositivo
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-80">
@@ -122,6 +148,8 @@ export default function DeviceChart({ data, isLoading }: DeviceChartProps) {
   // Filtrar dados com interações > 0 e calcular porcentagens
   const filteredData = data.filter(item => item.totalInteractions > 0);
   const totalInteractions = filteredData.reduce((sum, item) => sum + item.totalInteractions, 0);
+  const totalViews = data.reduce((sum, item) => sum + item.views, 0);
+  const totalClicks = data.reduce((sum, item) => sum + item.clicks, 0);
 
   const chartData = filteredData.map(item => ({
     ...item,
@@ -135,7 +163,7 @@ export default function DeviceChart({ data, isLoading }: DeviceChartProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <PictureInPicture2 className="h-5 w-5" />
-            Distribuição por Dispositivo
+            Analytics por Dispositivo
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -154,13 +182,14 @@ export default function DeviceChart({ data, isLoading }: DeviceChartProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <PictureInPicture2 className="h-5 w-5" />
-          Distribuição por Dispositivo
+          Analytics por Dispositivo
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           Distribuição de visualizações e cliques por tipo de dispositivo
         </p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
+        {/* Gráfico */}
         <div className="h-64 sm:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -187,31 +216,87 @@ export default function DeviceChart({ data, isLoading }: DeviceChartProps) {
           </ResponsiveContainer>
         </div>
 
+        {/* Tabela */}
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="min-w-[120px]">Dispositivo</TableHead>
+                <TableHead className="text-right min-w-[80px] hidden sm:table-cell">Visualizações</TableHead>
+                <TableHead className="text-right min-w-[80px] hidden sm:table-cell">Cliques</TableHead>
+                <TableHead className="text-right min-w-[80px]">Total</TableHead>
+                <TableHead className="text-right min-w-[80px] hidden md:table-cell">% do Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.map((item) => {
+                const percentage = totalViews + totalClicks > 0
+                  ? ((item.totalInteractions / (totalViews + totalClicks)) * 100).toFixed(1)
+                  : '0.0';
+
+                return (
+                  <TableRow key={item.device}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {getDeviceIcon(item.device)}
+                        <span>{getDeviceLabel(item.device)}</span>
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{
+                            backgroundColor: DEVICE_COLORS[item.device as keyof typeof DEVICE_COLORS] || DEVICE_COLORS.unknown
+                          }}
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right hidden sm:table-cell">
+                      <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                        {item.views.toLocaleString()}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right hidden sm:table-cell">
+                      <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
+                        {item.clicks.toLocaleString()}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {item.totalInteractions.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right text-muted-foreground hidden md:table-cell">
+                      {percentage}%
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+
         {/* Resumo estatístico */}
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t">
+        <div className="text-center p-2">
+            <div className="text-lg sm:text-2xl font-bold text-amber-600">
+              {chartData.length}
+            </div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Tipos de Dispositivo</div>
+          </div>
+
+          <div className="text-center p-2">
+            <div className="text-lg sm:text-2xl font-bold text-blue-600">
+              {totalViews.toLocaleString()}
+            </div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Visualizações</div>
+          </div>
+          <div className="text-center p-2">
+            <div className="text-lg sm:text-2xl font-bold text-green-600">
+              {totalClicks.toLocaleString()}
+            </div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Cliques</div>
+          </div>
           <div className="text-center p-2">
             <div className="text-lg sm:text-2xl font-bold text-primary">
               {totalInteractions.toLocaleString()}
             </div>
             <div className="text-xs sm:text-sm text-muted-foreground">Total de Interações</div>
-          </div>
-          <div className="text-center p-2">
-            <div className="text-lg sm:text-2xl font-bold text-black">
-              {data.reduce((sum, item) => sum + item.views, 0).toLocaleString()}
-            </div>
-            <div className="text-xs sm:text-sm text-muted-foreground">Visualizações</div>
-          </div>
-          <div className="text-center p-2">
-            <div className="text-lg sm:text-2xl font-bold text-black">
-              {data.reduce((sum, item) => sum + item.clicks, 0).toLocaleString()}
-            </div>
-            <div className="text-xs sm:text-sm text-muted-foreground">Cliques</div>
-          </div>
-          <div className="text-center p-2">
-            <div className="text-lg sm:text-2xl font-bold text-amber-600">
-              {chartData.length}
-            </div>
-            <div className="text-xs sm:text-sm text-muted-foreground">Tipos de Dispositivo</div>
           </div>
         </div>
       </CardContent>

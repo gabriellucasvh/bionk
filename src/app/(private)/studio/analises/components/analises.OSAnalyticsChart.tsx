@@ -177,12 +177,13 @@ export default function OSAnalyticsChart({ data, isLoading }: OSAnalyticsChartPr
 
         {/* Resumo estatístico */}
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t">
-          <div className="text-center p-2">
-            <div className="text-lg sm:text-2xl font-bold text-primary">
-              {totalInteractions.toLocaleString()}
+        <div className="text-center p-2">
+            <div className="text-lg sm:text-2xl font-bold text-amber-600">
+              {chartData.length}
             </div>
-            <div className="text-xs sm:text-sm text-muted-foreground">Total de Interações</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Sistemas Operacionais</div>
           </div>
+
           <div className="text-center p-2">
             <div className="text-lg sm:text-2xl font-bold text-blue-600">
               {data.reduce((sum, item) => sum + item.views, 0).toLocaleString()}
@@ -196,10 +197,10 @@ export default function OSAnalyticsChart({ data, isLoading }: OSAnalyticsChartPr
             <div className="text-xs sm:text-sm text-muted-foreground">Cliques</div>
           </div>
           <div className="text-center p-2">
-            <div className="text-lg sm:text-2xl font-bold text-amber-600">
-              {chartData.length}
+            <div className="text-lg sm:text-2xl font-bold text-primary">
+              {totalInteractions.toLocaleString()}
             </div>
-            <div className="text-xs sm:text-sm text-muted-foreground">Sistemas Operacionais</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Total de Interações</div>
           </div>
         </div>
       </CardContent>

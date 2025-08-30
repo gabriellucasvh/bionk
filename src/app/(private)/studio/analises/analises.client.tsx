@@ -42,16 +42,8 @@ const TopLinksTable = dynamic(
 		),
 	}
 );
-const DeviceAnalyticsTable = dynamic(
-	() => import("./components/analises.DeviceAnalyticsTable"),
-	{
-		loading: () => (
-			<div className="h-[300px] w-full animate-pulse rounded-md bg-muted" />
-		),
-	}
-);
-const DeviceChart = dynamic(
-	() => import("./components/analises.DeviceChart"),
+const DeviceAnalytics = dynamic(
+	() => import("./components/analises.DeviceAnalytics"),
 	{
 		loading: () => (
 			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
@@ -66,27 +58,19 @@ const OSAnalyticsChart = dynamic(
 		),
 	}
 );
-const WorldMapD3 = dynamic(
-	() => import("../../../../components/analises/WorldMapD3"),
+const WorldMapAnalytics = dynamic(
+	() => import("./components/analises.WorldMapAnalytics"),
 	{
 		loading: () => (
 			<div className="h-[500px] w-full animate-pulse rounded-md bg-muted" />
 		),
 	}
 );
-const ReferrerChart = dynamic(
-	() => import("./components/analises.ReferrerChart"),
+const ReferrerAnalytics = dynamic(
+	() => import("./components/analises.ReferrerAnalytics"),
 	{
 		loading: () => (
 			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
-		),
-	}
-);
-const ReferrerTable = dynamic(
-	() => import("./components/analises.ReferrerTable"),
-	{
-		loading: () => (
-			<div className="h-[300px] w-full animate-pulse rounded-md bg-muted" />
 		),
 	}
 );
@@ -260,19 +244,11 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 				)}
 
 				{/* Seção de Analytics por Dispositivo */}
-				<div className="space-y-6 xl:grid xl:gap-6 xl:grid-cols-2 xl:space-y-0">
-					{isLoading || !data ? (
-						<div className="h-[300px] sm:h-[400px] w-full animate-pulse rounded-md bg-muted" />
-					) : (
-						<DeviceChart data={data.deviceAnalytics || []} isLoading={isLoading} />
-					)}
-
-					{isLoading || !data ? (
-						<div className="h-[300px] w-full animate-pulse rounded-md bg-muted" />
-					) : (
-						<DeviceAnalyticsTable data={data.deviceAnalytics || []} isLoading={isLoading} />
-					)}
-				</div>
+				{isLoading || !data ? (
+					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+				) : (
+					<DeviceAnalytics data={data.deviceAnalytics || []} isLoading={isLoading} />
+				)}
 
 				{/* Seção de Analytics por Sistema Operacional */}
 				{isLoading || !data ? (
@@ -285,23 +261,15 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 				{isLoading || !data ? (
 					<div className="h-[500px] w-full animate-pulse rounded-md bg-muted" />
 				) : (
-					<WorldMapD3 data={data.countryAnalytics || []} width={800} height={500} />
+					<WorldMapAnalytics data={data.countryAnalytics || []} isLoading={isLoading} width={800} height={500} />
 				)}
 
 				{/* Seção de Analytics por Origem do Tráfego */}
-				<div className="space-y-6 xl:grid xl:gap-6 xl:grid-cols-2 xl:space-y-0">
-					{isLoading || !data ? (
-						<div className="h-[300px] sm:h-[400px] w-full animate-pulse rounded-md bg-muted" />
-					) : (
-						<ReferrerChart data={data.referrerAnalytics || []} isLoading={isLoading} />
-					)}
-
-					{isLoading || !data ? (
-						<div className="h-[300px] w-full animate-pulse rounded-md bg-muted" />
-					) : (
-						<ReferrerTable data={data.referrerAnalytics || []} isLoading={isLoading} />
-					)}
-				</div>
+				{isLoading || !data ? (
+					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+				) : (
+					<ReferrerAnalytics data={data.referrerAnalytics || []} isLoading={isLoading} />
+				)}
 			</main>
 		</section>
 	);
