@@ -193,8 +193,8 @@ export async function GET(request: Request) {
 		.filter(item => item.totalInteractions > 0)
 		.sort((a, b) => b.totalInteractions - a.totalInteractions);
 
-	// Agrupar dados por sistema operacional
-	const [clicksByOS, viewsByOS] = await Promise.all([
+	// Agrupar dados por sistema operacional e país
+	const [clicksByOS, viewsByOS, clicksByCountry, viewsByCountry] = await Promise.all([
 		prisma.linkClick.findMany({
 			where: {
 				linkId: { in: linkIds },
@@ -208,6 +208,20 @@ export async function GET(request: Request) {
 				createdAt: { gte: last30Days },
 			},
 			select: { userAgent: true },
+		}),
+		prisma.linkClick.findMany({
+			where: {
+				linkId: { in: linkIds },
+				createdAt: { gte: last30Days },
+			},
+			select: { country: true },
+		}),
+		prisma.profileView.findMany({
+			where: {
+				userId,
+				createdAt: { gte: last30Days },
+			},
+			select: { country: true },
 		}),
 	]);
 
@@ -247,6 +261,38 @@ export async function GET(request: Request) {
 		.filter(item => item.totalInteractions > 0)
 		.sort((a, b) => b.totalInteractions - a.totalInteractions);
 
+	// Processar dados por país
+	const countryData = new Map<string, { clicks: number; views: number }>();
+
+	// Processar cliques por país
+	for (const click of clicksByCountry) {
+		if (click.country) {
+			const existing = countryData.get(click.country) || { clicks: 0, views: 0 };
+			existing.clicks += 1;
+			countryData.set(click.country, existing);
+		}
+	}
+
+	// Processar views por país
+	for (const view of viewsByCountry) {
+		if (view.country) {
+			const existing = countryData.get(view.country) || { clicks: 0, views: 0 };
+			existing.views += 1;
+			countryData.set(view.country, existing);
+		}
+	}
+
+	// Converter para array
+	const countryAnalytics = Array.from(countryData.entries())
+		.map(([country, data]) => ({
+			country: country,
+			clicks: data.clicks || 0,
+			views: data.views || 0,
+			totalInteractions: (data.clicks || 0) + (data.views || 0)
+		}))
+		.filter(item => item.totalInteractions > 0)
+		.sort((a, b) => b.totalInteractions - a.totalInteractions);
+
 	// Associar cliques com os links
 	const topLinks = links
 		.map((link) => {
@@ -268,5 +314,6 @@ export async function GET(request: Request) {
 		topLinks,
 		deviceAnalytics,
 		osAnalytics,
+		countryAnalytics,
 	});
 }

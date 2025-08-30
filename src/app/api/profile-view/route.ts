@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
+import { getCountryFromIP, getClientIP } from "@/utils/geolocation";
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
@@ -14,11 +15,16 @@ export async function POST(request: Request): Promise<NextResponse> {
     const userAgent = getUserAgent(request);
     const deviceType = detectDeviceType(userAgent);
     
+    // Obter país baseado no IP (sem rastrear usuário individualmente)
+		const clientIP = getClientIP(request);
+		const country = await getCountryFromIP(clientIP || '127.0.0.1');
+
     await prisma.profileView.create({
       data: { 
         userId,
         device: deviceType,
-        userAgent: userAgent
+        userAgent: userAgent,
+        country: country
       },
     });
     return NextResponse.json({ message: "Profile view recorded" });

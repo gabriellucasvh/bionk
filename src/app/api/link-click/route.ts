@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
+import { getCountryFromIP, getClientIP } from "@/utils/geolocation";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -19,12 +20,17 @@ export async function POST(req: NextRequest) {
 		const userAgent = getUserAgent(req);
 		const deviceType = detectDeviceType(userAgent);
 
+		// Obter país baseado no IP (sem rastrear usuário individualmente)
+		const clientIP = getClientIP(req);
+		const country = await getCountryFromIP(clientIP || '127.0.0.1');
+
 		const [, updatedLink] = await prisma.$transaction([
 			prisma.linkClick.create({
-				data: { 
+				data: {
 					linkId: Number(linkId),
 					device: deviceType,
-					userAgent: userAgent
+					userAgent: userAgent,
+					country: country
 				},
 			}),
 			prisma.link.update({

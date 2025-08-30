@@ -66,6 +66,14 @@ const OSAnalyticsChart = dynamic(
 		),
 	}
 );
+const WorldMapD3 = dynamic(
+	() => import("../../../../components/analises/WorldMapD3"),
+	{
+		loading: () => (
+			<div className="h-[500px] w-full animate-pulse rounded-md bg-muted" />
+		),
+	}
+);
 
 interface TopLink {
 	id: string;
@@ -88,6 +96,13 @@ interface OSAnalytics {
 	totalInteractions: number;
 }
 
+interface CountryAnalytics {
+	country: string;
+	views: number;
+	clicks: number;
+	totalInteractions: number;
+}
+
 interface ChartDataItem {
 	day: string;
 	clicks: number;
@@ -102,6 +117,7 @@ interface AnalyticsData {
 	topLinks: TopLink[];
 	deviceAnalytics: DeviceAnalytics[];
 	osAnalytics: OSAnalytics[];
+	countryAnalytics: CountryAnalytics[];
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -239,6 +255,13 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
 				) : (
 					<OSAnalyticsChart data={data.osAnalytics || []} isLoading={isLoading} />
+				)}
+
+				{/* Seção de Analytics por País/Região */}
+				{isLoading || !data ? (
+					<div className="h-[500px] w-full animate-pulse rounded-md bg-muted" />
+				) : (
+					<WorldMapD3 data={data.countryAnalytics || []} width={800} height={500} />
 				)}
 			</main>
 		</section>

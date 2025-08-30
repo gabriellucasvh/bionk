@@ -143,7 +143,6 @@ export default function DeviceChart({ data, isLoading }: DeviceChartProps) {
             <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium mb-2">Nenhum dado disponível</p>
             <p className="text-sm">Os dados aparecerão conforme as interações forem registradas.</p>
-            <p className="text-xs mt-2 opacity-75">Dados anonimizados conforme LGPD</p>
           </div>
         </CardContent>
       </Card>

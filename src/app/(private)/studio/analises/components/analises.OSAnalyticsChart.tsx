@@ -118,7 +118,6 @@ export default function OSAnalyticsChart({ data, isLoading }: OSAnalyticsChartPr
             <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium mb-2">Nenhum dado disponível</p>
             <p className="text-sm">Os dados aparecerão conforme as interações forem registradas.</p>
-            <p className="text-xs mt-2 opacity-75">Dados anonimizados conforme LGPD</p>
           </div>
         </CardContent>
       </Card>
@@ -149,27 +148,27 @@ export default function OSAnalyticsChart({ data, isLoading }: OSAnalyticsChartPr
               }}
             >
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="name" 
+              <XAxis
+                dataKey="name"
                 className="text-xs"
                 tick={{ fontSize: 12 }}
               />
-              <YAxis 
+              <YAxis
                 className="text-xs"
                 tick={{ fontSize: 12 }}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Bar 
-                dataKey="views" 
+              <Bar
+                dataKey="views"
                 name="Visualizações"
-                fill="#3b82f6" 
+                fill="#3b82f6"
                 radius={[2, 2, 0, 0]}
               />
-              <Bar 
-                dataKey="clicks" 
+              <Bar
+                dataKey="clicks"
                 name="Cliques"
-                fill="#10b981" 
+                fill="#10b981"
                 radius={[2, 2, 0, 0]}
               />
             </BarChart>
