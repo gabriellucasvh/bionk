@@ -51,10 +51,28 @@ const GRADIENTS = [
 	"linear-gradient(90deg, #FECACA 0%, #FCA5A5 100%)",
 ];
 const FONT_OPTIONS = [
-	{ value: "sans-serif", label: "Sans Serif" },
-	{ value: "serif", label: "Serif" },
-	{ value: "monospace", label: "Monospace" },
-	{ value: "cursive", label: "Cursive" },
+	{ value: "font-sans", label: "Satoshi", fontFamily: "var(--font-sans)" },
+	{ value: "font-inter", label: "Inter", fontFamily: "var(--font-inter)" },
+	{ value: "font-montserrat", label: "Montserrat", fontFamily: "var(--font-montserrat)" },
+	{ value: "font-poppins", label: "Poppins", fontFamily: "var(--font-poppins)" },
+	{ value: "font-nunito", label: "Nunito", fontFamily: "var(--font-nunito)" },
+	{ value: "font-playfair-display", label: "Playfair Display", fontFamily: "var(--font-playfair-display)" },
+	{ value: "font-merriweather", label: "Merriweather", fontFamily: "var(--font-merriweather)" },
+	{ value: "font-dancing-script", label: "Dancing Script", fontFamily: "var(--font-dancing-script)" },
+	{ value: "font-dm-serif-display", label: "DM Serif Display", fontFamily: "var(--font-dm-serif-display)" },
+	{ value: "font-orbitron", label: "Orbitron", fontFamily: "var(--font-orbitron)" },
+	{ value: "font-plus-jakarta-sans", label: "Plus Jakarta Sans", fontFamily: "var(--font-plus-jakarta-sans)" },
+	{ value: "font-outfit", label: "Outfit", fontFamily: "var(--font-outfit)" },
+	{ value: "font-space-grotesk", label: "Space Grotesk", fontFamily: "var(--font-space-grotesk)" },
+	{ value: "font-libre-baskerville", label: "Libre Baskerville", fontFamily: "var(--font-libre-baskerville)" },
+	{ value: "font-alegreya", label: "Alegreya", fontFamily: "var(--font-alegreya)" },
+	{ value: "font-spectral", label: "Spectral", fontFamily: "var(--font-spectral)" },
+	{ value: "font-urbanist", label: "Urbanist", fontFamily: "var(--font-urbanist)" },
+	{ value: "font-karla", label: "Karla", fontFamily: "var(--font-karla)" },
+	{ value: "font-public-sans", label: "Public Sans", fontFamily: "var(--font-public-sans)" },
+	{ value: "font-atkinson-hyperlegible", label: "Atkinson Hyperlegible", fontFamily: "var(--font-atkinson-hyperlegible)" },
+	{ value: "font-fira-sans", label: "Fira Sans", fontFamily: "var(--font-fira-sans)" },
+	{ value: "font-mulish", label: "Mulish", fontFamily: "var(--font-mulish)" },
 ];
 const BUTTON_STYLES = [
 	{ value: "solid", label: "Sólido" },
@@ -317,19 +335,20 @@ export default function CustomizationPanel({
 			{/* Fonte */}
 			<div className="mb-8">
 				<RenderLabel hasPending={hasPendingChange("customFont")} text="Fonte" />
-				<div className="mt-2 flex flex-wrap gap-2">
+				<div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
 					{FONT_OPTIONS.map((font) => (
 						<button
-							className={`whitespace-nowrap rounded border px-4 py-2 transition-colors ${
+							className={`h-16 w-full rounded border px-2 py-1 text-xs transition-colors flex items-center justify-center text-center leading-tight ${
 								customizations.customFont === font.value
 									? "border-gray-300 bg-neutral-200"
 									: "border-gray-200 hover:bg-neutral-200"
 							}`}
 							key={font.value}
 							onClick={() => handleChange("customFont", font.value)}
+							style={{ fontFamily: font.fontFamily }}
 							type="button"
 						>
-							{font.label}
+							<span className="break-words">{font.label}</span>
 						</button>
 					))}
 				</div>
@@ -341,10 +360,10 @@ export default function CustomizationPanel({
 					hasPending={hasPendingChange("customButton")}
 					text="Estilo do Botão"
 				/>
-				<div className="mt-2 flex flex-wrap gap-2">
+				<div className="mt-2 grid grid-cols-3 gap-2">
 					{BUTTON_STYLES.map((style) => (
 						<button
-							className={`whitespace-nowrap rounded border px-4 py-2 transition-colors ${
+							className={`h-12 w-full rounded border px-2 py-1 text-sm transition-colors flex items-center justify-center text-center ${
 								customizations.customButton === style.value
 									? "border-gray-300 bg-neutral-200"
 									: "border-gray-200 hover:bg-neutral-200"

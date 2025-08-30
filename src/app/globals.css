@@ -9,6 +9,27 @@
 @theme {
 	--font-sans: var(--font-satoshi);
 	--font-geist: var(--font-geist);
+	--font-inter: var(--font-inter);
+		--font-montserrat: var(--font-montserrat);
+		--font-poppins: var(--font-poppins);
+		--font-nunito: var(--font-nunito);
+		--font-playfair-display: var(--font-playfair-display);
+		--font-merriweather: var(--font-merriweather);
+		--font-dancing-script: var(--font-dancing-script);
+		--font-dm-serif-display: var(--font-dm-serif-display);
+		--font-orbitron: var(--font-orbitron);
+		--font-plus-jakarta-sans: var(--font-plus-jakarta-sans);
+		--font-outfit: var(--font-outfit);
+		--font-space-grotesk: var(--font-space-grotesk);
+		--font-libre-baskerville: var(--font-libre-baskerville);
+		--font-alegreya: var(--font-alegreya);
+		--font-spectral: var(--font-spectral);
+		--font-urbanist: var(--font-urbanist);
+		--font-karla: var(--font-karla);
+		--font-public-sans: var(--font-public-sans);
+		--font-atkinson-hyperlegible: var(--font-atkinson-hyperlegible);
+		--font-fira-sans: var(--font-fira-sans);
+		--font-mulish: var(--font-mulish);
 	--color-rose: #ff527a;
 }
 

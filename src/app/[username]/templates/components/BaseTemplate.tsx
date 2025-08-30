@@ -270,11 +270,17 @@ export default function BaseTemplate({
 		...(customPresets?.customTextColor && {
 			color: customPresets.customTextColor,
 		}),
+		...(customPresets?.customFont && {
+			fontFamily: `var(--${customPresets.customFont})`,
+		}),
 	};
 
 	const textStyle = {
 		...(customPresets?.customTextColor && {
 			color: customPresets.customTextColor,
+		}),
+		...(customPresets?.customFont && {
+			fontFamily: `var(--${customPresets.customFont})`,
 		}),
 	};
 	const buttonStyle = {
@@ -283,6 +289,10 @@ export default function BaseTemplate({
 		}),
 		...(customPresets?.customButtonCorners && {
 			borderRadius: `${customPresets.customButtonCorners}px`,
+		}),
+		...(customPresets?.customButton && {
+			border: customPresets.customButton === 'outline' ? '2px solid currentColor' : 'none',
+			backgroundColor: customPresets.customButton === 'outline' ? 'transparent' : (customPresets?.customButtonFill || undefined),
 		}),
 	};
 

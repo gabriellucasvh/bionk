@@ -84,10 +84,10 @@ export default function TemplateSettings({
 
 	const renderContent = () => (
 		<>
-			<div className="mb-10 flex flex-wrap gap-2">
+			<div className="mb-10 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
 				{Object.keys(CATEGORIES).map((category) => (
 					<Button
-						className={`rounded-lg border-2 px-6 py-3 font-medium text-sm capitalize transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white md:py-5 ${
+						className={`h-12 w-full rounded-lg border-2 px-2 py-1 font-medium text-xs capitalize transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white flex items-center justify-center text-center ${
 							selectedCategory === category
 								? "border-lime-500 bg-green-950 text-white"
 								: ""
@@ -96,7 +96,7 @@ export default function TemplateSettings({
 						onClick={() => setSelectedCategory(category)}
 						variant="ghost"
 					>
-						{category.replace(/-/g, " ")}
+						<span className="break-words">{category.replace(/-/g, " ")}</span>
 					</Button>
 				))}
 			</div>
