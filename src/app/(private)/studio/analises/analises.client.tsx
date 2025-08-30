@@ -74,6 +74,22 @@ const WorldMapD3 = dynamic(
 		),
 	}
 );
+const ReferrerChart = dynamic(
+	() => import("./components/analises.ReferrerChart"),
+	{
+		loading: () => (
+			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+		),
+	}
+);
+const ReferrerTable = dynamic(
+	() => import("./components/analises.ReferrerTable"),
+	{
+		loading: () => (
+			<div className="h-[300px] w-full animate-pulse rounded-md bg-muted" />
+		),
+	}
+);
 
 interface TopLink {
 	id: string;
@@ -103,6 +119,13 @@ interface CountryAnalytics {
 	totalInteractions: number;
 }
 
+interface ReferrerAnalytics {
+	referrer: string;
+	views: number;
+	clicks: number;
+	totalInteractions: number;
+}
+
 interface ChartDataItem {
 	day: string;
 	clicks: number;
@@ -118,6 +141,7 @@ interface AnalyticsData {
 	deviceAnalytics: DeviceAnalytics[];
 	osAnalytics: OSAnalytics[];
 	countryAnalytics: CountryAnalytics[];
+	referrerAnalytics: ReferrerAnalytics[];
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -263,6 +287,21 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 				) : (
 					<WorldMapD3 data={data.countryAnalytics || []} width={800} height={500} />
 				)}
+
+				{/* Seção de Analytics por Origem do Tráfego */}
+				<div className="space-y-6 xl:grid xl:gap-6 xl:grid-cols-2 xl:space-y-0">
+					{isLoading || !data ? (
+						<div className="h-[300px] sm:h-[400px] w-full animate-pulse rounded-md bg-muted" />
+					) : (
+						<ReferrerChart data={data.referrerAnalytics || []} isLoading={isLoading} />
+					)}
+
+					{isLoading || !data ? (
+						<div className="h-[300px] w-full animate-pulse rounded-md bg-muted" />
+					) : (
+						<ReferrerTable data={data.referrerAnalytics || []} isLoading={isLoading} />
+					)}
+				</div>
 			</main>
 		</section>
 	);

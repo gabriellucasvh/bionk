@@ -193,8 +193,8 @@ export async function GET(request: Request) {
 		.filter(item => item.totalInteractions > 0)
 		.sort((a, b) => b.totalInteractions - a.totalInteractions);
 
-	// Agrupar dados por sistema operacional e país
-	const [clicksByOS, viewsByOS, clicksByCountry, viewsByCountry] = await Promise.all([
+	// Agrupar dados por sistema operacional, país e referrer
+	const [clicksByOS, viewsByOS, clicksByCountry, viewsByCountry, clicksByReferrer, viewsByReferrer] = await Promise.all([
 		prisma.linkClick.findMany({
 			where: {
 				linkId: { in: linkIds },
@@ -222,6 +222,20 @@ export async function GET(request: Request) {
 				createdAt: { gte: last30Days },
 			},
 			select: { country: true },
+		}),
+		prisma.linkClick.findMany({
+			where: {
+				linkId: { in: linkIds },
+				createdAt: { gte: last30Days },
+			},
+			select: { referrer: true },
+		}),
+		prisma.profileView.findMany({
+			where: {
+				userId,
+				createdAt: { gte: last30Days },
+			},
+			select: { referrer: true },
 		}),
 	]);
 
@@ -293,6 +307,38 @@ export async function GET(request: Request) {
 		.filter(item => item.totalInteractions > 0)
 		.sort((a, b) => b.totalInteractions - a.totalInteractions);
 
+	// Processar dados por referrer
+	const referrerData = new Map<string, { clicks: number; views: number }>();
+
+	// Processar cliques por referrer
+	for (const click of clicksByReferrer) {
+		if (click.referrer) {
+			const existing = referrerData.get(click.referrer) || { clicks: 0, views: 0 };
+			existing.clicks += 1;
+			referrerData.set(click.referrer, existing);
+		}
+	}
+
+	// Processar views por referrer
+	for (const view of viewsByReferrer) {
+		if (view.referrer) {
+			const existing = referrerData.get(view.referrer) || { clicks: 0, views: 0 };
+			existing.views += 1;
+			referrerData.set(view.referrer, existing);
+		}
+	}
+
+	// Converter para array
+	const referrerAnalytics = Array.from(referrerData.entries())
+		.map(([referrer, data]) => ({
+			referrer: referrer,
+			clicks: data.clicks || 0,
+			views: data.views || 0,
+			totalInteractions: (data.clicks || 0) + (data.views || 0)
+		}))
+		.filter(item => item.totalInteractions > 0)
+		.sort((a, b) => b.totalInteractions - a.totalInteractions);
+
 	// Associar cliques com os links
 	const topLinks = links
 		.map((link) => {
@@ -315,5 +361,6 @@ export async function GET(request: Request) {
 		deviceAnalytics,
 		osAnalytics,
 		countryAnalytics,
+		referrerAnalytics,
 	});
 }

@@ -130,10 +130,12 @@ model LinkClick {
   device    String?  @default("unknown")
   userAgent String?
   country   String?
+  referrer  String?
   link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
 
   @@index([linkId, createdAt])
   @@index([device])
+  @@index([referrer])
 }
 
 model LinkView {
@@ -168,10 +170,12 @@ model ProfileView {
   device    String?  @default("unknown")
   userAgent String?
   country   String?
+  referrer  String?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([device])
+  @@index([referrer])
 }
 
 model CustomPresets {
