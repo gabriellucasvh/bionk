@@ -102,33 +102,39 @@ function detectReferrerSource(referrer: string): string | null {
     const url = new URL(referrer);
     const hostname = url.hostname.toLowerCase();
     
-    // Instagram - incluindo todos os subdomínios e redirecionamentos
+    // Instagram - incluindo todos os subdomínios, redirecionamentos e variações
     if (hostname.includes('instagram.com') || hostname === 'l.instagram.com' || 
         hostname === 'help.instagram.com' || hostname === 'business.instagram.com' ||
-        hostname === 'about.instagram.com' || hostname.endsWith('.instagram.com')) {
+        hostname === 'about.instagram.com' || hostname === 'www.instagram.com' ||
+        hostname === 'ig.me' || hostname === 'instagr.am' ||
+        hostname.endsWith('.instagram.com')) {
       return 'Instagram';
     }
     
-    // TikTok - incluindo domínios móveis e regionais
+    // TikTok - incluindo domínios móveis, regionais e redirecionamentos
     if (hostname.includes('tiktok.com') || hostname === 'vm.tiktok.com' || 
         hostname === 'm.tiktok.com' || hostname === 'ads.tiktok.com' ||
-        hostname === 'www.tiktok.com' || hostname.endsWith('.tiktok.com')) {
+        hostname === 'www.tiktok.com' || hostname === 'vt.tiktok.com' ||
+        hostname.endsWith('.tiktok.com') || hostname.includes('bytedance.com')) {
       return 'TikTok';
     }
     
-    // WhatsApp - incluindo todos os domínios e redirecionamentos
+    // WhatsApp - incluindo todos os domínios, redirecionamentos e variações
     if (hostname.includes('whatsapp.com') || hostname === 'wa.me' || 
         hostname === 'web.whatsapp.com' || hostname === 'business.whatsapp.com' ||
         hostname === 'faq.whatsapp.com' || hostname === 'chat.whatsapp.com' ||
+        hostname === 'www.whatsapp.com' || hostname === 'api.whatsapp.com' ||
         hostname.endsWith('.whatsapp.com')) {
       return 'WhatsApp';
     }
     
-    // Facebook - incluindo Meta e todos os subdomínios
+    // Facebook - incluindo Meta, todos os subdomínios e redirecionamentos
     if (hostname.includes('facebook.com') || hostname === 'fb.me' || 
         hostname === 'm.facebook.com' || hostname === 'l.facebook.com' ||
         hostname === 'business.facebook.com' || hostname === 'developers.facebook.com' ||
-        hostname === 'lm.facebook.com' || hostname.endsWith('.facebook.com')) {
+        hostname === 'lm.facebook.com' || hostname === 'www.facebook.com' ||
+        hostname === 'touch.facebook.com' || hostname === 'mbasic.facebook.com' ||
+        hostname.endsWith('.facebook.com') || hostname.includes('meta.com')) {
       return 'Facebook';
     }
     

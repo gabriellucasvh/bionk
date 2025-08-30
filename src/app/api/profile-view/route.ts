@@ -12,43 +12,53 @@ function detectTrafficSourceHybrid(
 ): string | null {
 	if (!userAgent && !referrer && !trafficSource) return null;
 	
-	// 1. Prioridade máxima: User-Agent (apps nativos)
+	// 1. Prioridade máxima: User-Agent (apps nativos e webviews)
 	if (userAgent) {
 		const ua = userAgent.toLowerCase();
 		
-		// Instagram app
-		if (ua.includes('instagram')) {
+		// Instagram app e webview (incluindo navegadores in-app)
+		if (ua.includes('instagram') || ua.includes('igab/') || ua.includes('instagramapp')) {
 			return 'Instagram';
 		}
 		
-		// WhatsApp
-		if (ua.includes('whatsapp')) {
+		// WhatsApp (app nativo e web)
+		if (ua.includes('whatsapp') || ua.includes('wachat') || ua.includes('whatsappweb')) {
 			return 'WhatsApp';
 		}
 		
-		// TikTok
-		if (ua.includes('tiktok') || ua.includes('musical_ly')) {
+		// TikTok (incluindo variações regionais)
+		if (ua.includes('tiktok') || ua.includes('musical_ly') || ua.includes('tiktokapp') || ua.includes('bytedance')) {
 			return 'TikTok';
 		}
 		
-		// Facebook app (FBAN = Facebook App, FBAV = Facebook App Version)
-		if (ua.includes('fban') || ua.includes('fbav')) {
+		// Facebook app e webview (FBAN = Facebook App, FBAV = Facebook App Version, FBSV = Facebook App Session Version)
+		if (ua.includes('fban') || ua.includes('fbav') || ua.includes('fbsv') || ua.includes('facebookapp') || ua.includes('fb_iab')) {
 			return 'Facebook';
 		}
 		
-		// Twitter/X
-		if (ua.includes('twitter') || ua.includes('twitterandroid')) {
+		// Twitter/X (incluindo webview)
+		if (ua.includes('twitter') || ua.includes('twitterandroid') || ua.includes('twitteriphone') || ua.includes('twitterapp')) {
 			return 'Twitter/X';
 		}
 		
-		// LinkedIn
-		if (ua.includes('linkedin')) {
+		// LinkedIn (incluindo app e webview)
+		if (ua.includes('linkedin') || ua.includes('linkedinapp')) {
 			return 'LinkedIn';
 		}
 		
-		// Telegram
-		if (ua.includes('telegram')) {
+		// Telegram (incluindo webview)
+		if (ua.includes('telegram') || ua.includes('telegramapp')) {
 			return 'Telegram';
+		}
+		
+		// Discord
+		if (ua.includes('discord') || ua.includes('discordapp')) {
+			return 'Discord';
+		}
+		
+		// YouTube app
+		if (ua.includes('youtubeapp') || (ua.includes('youtube') && ua.includes('mobile'))) {
+			return 'YouTube';
 		}
 	}
 	
@@ -75,33 +85,39 @@ function normalizeReferrer(referrer: string | null): string | null {
 		const hostname = url.hostname.toLowerCase();
 		
 		// Verificar padrões de domínio para cada plataforma
-		// Instagram - incluindo todos os subdomínios e redirecionamentos
+		// Instagram - incluindo todos os subdomínios, redirecionamentos e variações
 		if (hostname.includes('instagram.com') || hostname === 'l.instagram.com' || 
 				hostname === 'help.instagram.com' || hostname === 'business.instagram.com' ||
-				hostname === 'about.instagram.com' || hostname.endsWith('.instagram.com')) {
+				hostname === 'about.instagram.com' || hostname === 'www.instagram.com' ||
+				hostname === 'ig.me' || hostname === 'instagr.am' ||
+				hostname.endsWith('.instagram.com')) {
 			return 'Instagram';
 		}
 		
-		// TikTok - incluindo domínios móveis e regionais
+		// TikTok - incluindo domínios móveis, regionais e redirecionamentos
 		if (hostname.includes('tiktok.com') || hostname === 'vm.tiktok.com' || 
 				hostname === 'm.tiktok.com' || hostname === 'ads.tiktok.com' ||
-				hostname === 'www.tiktok.com' || hostname.endsWith('.tiktok.com')) {
+				hostname === 'www.tiktok.com' || hostname === 'vt.tiktok.com' ||
+				hostname.endsWith('.tiktok.com') || hostname.includes('bytedance.com')) {
 			return 'TikTok';
 		}
 		
-		// WhatsApp - incluindo todos os domínios e redirecionamentos
+		// WhatsApp - incluindo todos os domínios, redirecionamentos e variações
 		if (hostname.includes('whatsapp.com') || hostname === 'wa.me' || 
 				hostname === 'web.whatsapp.com' || hostname === 'business.whatsapp.com' ||
 				hostname === 'faq.whatsapp.com' || hostname === 'chat.whatsapp.com' ||
+				hostname === 'www.whatsapp.com' || hostname === 'api.whatsapp.com' ||
 				hostname.endsWith('.whatsapp.com')) {
 			return 'WhatsApp';
 		}
 		
-		// Facebook - incluindo Meta e todos os subdomínios
+		// Facebook - incluindo Meta, todos os subdomínios e redirecionamentos
 		if (hostname.includes('facebook.com') || hostname === 'fb.me' || 
 				hostname === 'm.facebook.com' || hostname === 'l.facebook.com' ||
 				hostname === 'business.facebook.com' || hostname === 'developers.facebook.com' ||
-				hostname === 'lm.facebook.com' || hostname.endsWith('.facebook.com')) {
+				hostname === 'lm.facebook.com' || hostname === 'www.facebook.com' ||
+				hostname === 'touch.facebook.com' || hostname === 'mbasic.facebook.com' ||
+				hostname.endsWith('.facebook.com') || hostname.includes('meta.com')) {
 			return 'Facebook';
 		}
 		
