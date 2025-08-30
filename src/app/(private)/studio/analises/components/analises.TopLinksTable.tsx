@@ -7,9 +7,10 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { LinkIcon, MousePointerClick } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { LinkIcon, MousePointerClick, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 
 interface TopLinkData {
 	id: string;
@@ -24,18 +25,22 @@ interface TopLinksTableProps {
 
 const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 	({ topLinks }) => {
+		const [isExpanded, setIsExpanded] = useState(false);
+		const displayedLinks = isExpanded ? topLinks.slice(0, 10) : topLinks.slice(0, 3);
+		const hasMoreLinks = topLinks.length > 3;
+
 		return (
 			<article>
 				<Card>
 					<CardHeader>
 						<CardTitle>Links com Melhor Desempenho</CardTitle>
 						<CardDescription>
-							Top 10 links mais clicados nos últimos 30 dias.
+							{isExpanded ? 'Top 10' : 'Top 3'} links mais clicados nos últimos 30 dias.
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<div className="space-y-4">
-							{topLinks.slice(0, 10).map((link, index) => (
+							{displayedLinks.map((link, index) => (
 								<div
 									className="flex flex-col items-start justify-between border-b pb-3 last:border-0 last:pb-0 sm:flex-row sm:items-center"
 									key={link.id}
@@ -75,6 +80,29 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 								</div>
 							))}
 						</div>
+						
+						{hasMoreLinks && (
+							<div className="flex justify-center pt-4 border-t">
+								<Button
+									variant="ghost"
+									size="sm"
+									onClick={() => setIsExpanded(!isExpanded)}
+									className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+								>
+									{isExpanded ? (
+										<>
+											<ChevronUp className="h-4 w-4" />
+											Mostrar menos
+										</>
+									) : (
+										<>
+											<ChevronDown className="h-4 w-4" />
+											Ver mais ({topLinks.length - 3} restantes)
+										</>
+									)}
+								</Button>
+							</div>
+						)}
 					</CardContent>
 				</Card>
 			</article>
