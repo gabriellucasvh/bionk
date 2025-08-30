@@ -4,6 +4,50 @@ import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getCountryFromIP, getClientIP } from "@/utils/geolocation";
 
+// Função para detectar origem do tráfego pelo User-Agent
+function detectTrafficSourceFromUserAgent(userAgent: string | null): string | null {
+	if (!userAgent) return null;
+	
+	const ua = userAgent.toLowerCase();
+	
+	// Instagram app
+	if (ua.includes('instagram')) {
+		return 'Instagram';
+	}
+	
+	// WhatsApp
+	if (ua.includes('whatsapp')) {
+		return 'WhatsApp';
+	}
+	
+	// TikTok
+	if (ua.includes('tiktok') || ua.includes('musical_ly')) {
+		return 'TikTok';
+	}
+	
+	// Facebook app (FBAN = Facebook App, FBAV = Facebook App Version)
+	if (ua.includes('fban') || ua.includes('fbav')) {
+		return 'Facebook';
+	}
+	
+	// Twitter/X
+	if (ua.includes('twitter') || ua.includes('twitterandroid')) {
+		return 'Twitter/X';
+	}
+	
+	// LinkedIn
+	if (ua.includes('linkedin')) {
+		return 'LinkedIn';
+	}
+	
+	// Telegram
+	if (ua.includes('telegram')) {
+		return 'Telegram';
+	}
+	
+	return null;
+}
+
 // Função para normalizar e anonimizar referrers
 function normalizeReferrer(referrer: string | null): string | null {
 	if (!referrer) return 'direct';
@@ -119,10 +163,12 @@ export async function POST(request: Request): Promise<NextResponse> {
 		// Log para debug em produção
 		console.log('[PROFILE-VIEW DEBUG] Referrer bruto:', referrerHeader);
 		console.log('[PROFILE-VIEW DEBUG] User Agent:', userAgent);
-		console.log('[PROFILE-VIEW DEBUG] Traffic Source detectado:', trafficSource);
+		console.log('[PROFILE-VIEW DEBUG] Traffic Source detectado (frontend):', trafficSource);
 		
-		// Usar trafficSource se disponível, senão usar referrer normalizado
-		const referrer = trafficSource || normalizeReferrer(referrerHeader);
+		// Prioridade: 1) User-Agent, 2) trafficSource do frontend, 3) referrer normalizado
+		const userAgentSource = detectTrafficSourceFromUserAgent(userAgent);
+		const referrer = userAgentSource || trafficSource || normalizeReferrer(referrerHeader);
+		console.log('[PROFILE-VIEW DEBUG] User-Agent Source:', userAgentSource);
 		console.log('[PROFILE-VIEW DEBUG] Referrer final:', referrer);
 
     await prisma.profileView.create({

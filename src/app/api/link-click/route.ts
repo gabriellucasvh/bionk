@@ -3,6 +3,50 @@ import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getCountryFromIP, getClientIP } from "@/utils/geolocation";
 import { type NextRequest, NextResponse } from "next/server";
 
+// Função para detectar origem do tráfego pelo User-Agent
+function detectTrafficSourceFromUserAgent(userAgent: string | null): string | null {
+	if (!userAgent) return null;
+	
+	const ua = userAgent.toLowerCase();
+	
+	// Instagram app
+	if (ua.includes('instagram')) {
+		return 'Instagram';
+	}
+	
+	// WhatsApp
+	if (ua.includes('whatsapp')) {
+		return 'WhatsApp';
+	}
+	
+	// TikTok
+	if (ua.includes('tiktok') || ua.includes('musical_ly')) {
+		return 'TikTok';
+	}
+	
+	// Facebook app (FBAN = Facebook App, FBAV = Facebook App Version)
+	if (ua.includes('fban') || ua.includes('fbav')) {
+		return 'Facebook';
+	}
+	
+	// Twitter/X
+	if (ua.includes('twitter') || ua.includes('twitterandroid')) {
+		return 'Twitter/X';
+	}
+	
+	// LinkedIn
+	if (ua.includes('linkedin')) {
+		return 'LinkedIn';
+	}
+	
+	// Telegram
+	if (ua.includes('telegram')) {
+		return 'Telegram';
+	}
+	
+	return null;
+}
+
 // Função para normalizar e anonimizar referrers
 function normalizeReferrer(referrer: string | null): string | null {
 	if (!referrer) return 'direct';
@@ -124,10 +168,12 @@ export async function POST(req: NextRequest) {
 		// Log para debug em produção
 		console.log('Link Click - Raw referrer:', referrerHeader);
 		console.log('Link Click - User Agent:', userAgent);
-		console.log('Link Click - Traffic Source detectado:', trafficSource);
+		console.log('Link Click - Traffic Source detectado (frontend):', trafficSource);
 		
-		// Usar trafficSource se disponível, senão usar referrer normalizado
-		const normalizedReferrer = trafficSource || normalizeReferrer(referrerHeader);
+		// Prioridade: 1) User-Agent, 2) trafficSource do frontend, 3) referrer normalizado
+		const userAgentSource = detectTrafficSourceFromUserAgent(userAgent);
+		const normalizedReferrer = userAgentSource || trafficSource || normalizeReferrer(referrerHeader);
+		console.log('Link Click - User-Agent Source:', userAgentSource);
 		console.log('Link Click - Referrer final:', normalizedReferrer);
 
 		const [, updatedLink] = await prisma.$transaction([
