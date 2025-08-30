@@ -117,7 +117,7 @@ export const metadata: Metadata = {
 		siteName: "Bionk",
 		images: [
 			{
-				url: "https://www.bionk.me/graph-logo.png",
+				url: "https://www.bionk.me/bionk-opengraph.png",
 				width: 500,
 				height: 500,
 				alt: "Bionk",
