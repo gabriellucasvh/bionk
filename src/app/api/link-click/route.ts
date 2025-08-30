@@ -11,23 +11,44 @@ function normalizeReferrer(referrer: string | null): string | null {
 		const url = new URL(referrer);
 		const hostname = url.hostname.toLowerCase();
 		
-		// Mapear domínios conhecidos para plataformas
+		// Verificar padrões de domínio para cada plataforma
+		// Instagram - incluindo todos os subdomínios e redirecionamentos
+		if (hostname.includes('instagram.com') || hostname === 'l.instagram.com' || 
+				hostname === 'help.instagram.com' || hostname === 'business.instagram.com' ||
+				hostname === 'about.instagram.com' || hostname.endsWith('.instagram.com')) {
+			return 'Instagram';
+		}
+		
+		// TikTok - incluindo domínios móveis e regionais
+		if (hostname.includes('tiktok.com') || hostname === 'vm.tiktok.com' || 
+				hostname === 'm.tiktok.com' || hostname === 'ads.tiktok.com' ||
+				hostname === 'www.tiktok.com' || hostname.endsWith('.tiktok.com')) {
+			return 'TikTok';
+		}
+		
+		// WhatsApp - incluindo todos os domínios e redirecionamentos
+		if (hostname.includes('whatsapp.com') || hostname === 'wa.me' || 
+				hostname === 'web.whatsapp.com' || hostname === 'business.whatsapp.com' ||
+				hostname === 'faq.whatsapp.com' || hostname === 'chat.whatsapp.com' ||
+				hostname.endsWith('.whatsapp.com')) {
+			return 'WhatsApp';
+		}
+		
+		// Facebook - incluindo Meta e todos os subdomínios
+		if (hostname.includes('facebook.com') || hostname === 'fb.me' || 
+				hostname === 'm.facebook.com' || hostname === 'l.facebook.com' ||
+				hostname === 'business.facebook.com' || hostname === 'developers.facebook.com' ||
+				hostname === 'lm.facebook.com' || hostname.endsWith('.facebook.com')) {
+			return 'Facebook';
+		}
+		
+		// Mapear domínios conhecidos restantes
 		const platformMap: Record<string, string> = {
-			'instagram.com': 'Instagram',
-			'www.instagram.com': 'Instagram',
-			'l.instagram.com': 'Instagram',
-			'tiktok.com': 'TikTok',
-			'www.tiktok.com': 'TikTok',
-			'vm.tiktok.com': 'TikTok',
 			'twitter.com': 'Twitter/X',
 			'www.twitter.com': 'Twitter/X',
 			'x.com': 'Twitter/X',
 			'www.x.com': 'Twitter/X',
 			't.co': 'Twitter/X',
-			'facebook.com': 'Facebook',
-			'www.facebook.com': 'Facebook',
-			'm.facebook.com': 'Facebook',
-			'fb.me': 'Facebook',
 			'youtube.com': 'YouTube',
 			'www.youtube.com': 'YouTube',
 			'm.youtube.com': 'YouTube',
@@ -35,9 +56,6 @@ function normalizeReferrer(referrer: string | null): string | null {
 			'linkedin.com': 'LinkedIn',
 			'www.linkedin.com': 'LinkedIn',
 			'lnkd.in': 'LinkedIn',
-			'whatsapp.com': 'WhatsApp',
-			'web.whatsapp.com': 'WhatsApp',
-			'wa.me': 'WhatsApp',
 			'telegram.org': 'Telegram',
 			'web.telegram.org': 'Telegram',
 			't.me': 'Telegram',

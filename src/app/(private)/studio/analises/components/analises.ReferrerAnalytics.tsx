@@ -227,10 +227,6 @@ export default function ReferrerAnalytics({ data, isLoading }: ReferrerAnalytics
             <Radar className="h-5 w-5" />
             Analytics de Origem do Tráfego
           </div>
-          <div className="text-right">
-            <p className="text-lg font-bold">{data.length}</p>
-            <p className="text-xs text-muted-foreground">Fontes</p>
-          </div>
         </CardTitle>
         <p className="text-sm text-muted-foreground">
           De onde seus visitantes estão vindo - análise completa por origem
