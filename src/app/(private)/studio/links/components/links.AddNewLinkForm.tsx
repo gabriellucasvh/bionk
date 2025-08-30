@@ -3,13 +3,6 @@
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import {
-	Command,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-	CommandItem,
-} from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -19,15 +12,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import {
-	Calendar as CalendarIcon,
-	Check,
-	ChevronsUpDown,
-	Clock,
-	Lock,
-	Tags,
-	Type,
-} from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Lock, Tags } from "lucide-react";
 import { useState } from "react";
 
 // Tipos e Interfaces
@@ -43,88 +28,29 @@ type LinkFormData = {
 };
 
 interface AddNewLinkFormProps {
-	formData: LinkFormData;
-	setFormData: (data: LinkFormData) => void;
-	onSave: () => void;
-	onCancel: () => void;
-	isSaveDisabled: boolean;
-	existingSections: string[];
+	formData?: LinkFormData;
+	setFormData?: (data: LinkFormData) => void;
+	onSave?: () => void;
+	onCancel?: () => void;
+	isSaveDisabled?: boolean;
+	existingSections?: string[];
+	linksManager?: {
+		isAdding: boolean;
+		formData: LinkFormData;
+		setIsAdding: (isAdding: boolean) => void;
+		setFormData: (data: LinkFormData) => void;
+		existingSections: string[];
+		handleAddNewLink: () => void;
+	};
 }
 
-type ActiveOption = "schedule" | "protect" | "badge" | "section";
-type PanelProps = Omit<
-	AddNewLinkFormProps,
-	"onSave" | "onCancel" | "isSaveDisabled"
->;
+type ActiveOption = "schedule" | "protect" | "badge";
+type PanelProps = {
+	formData: LinkFormData;
+	setFormData: (data: LinkFormData) => void;
+};
 
 // --- Subcomponentes para cada painel de opção ---
-
-const SectionPanel = ({
-	formData,
-	setFormData,
-	existingSections,
-}: PanelProps) => {
-	const [comboboxOpen, setComboboxOpen] = useState(false);
-	return (
-		<div className="rounded-md border bg-background/50 p-3">
-			<Label className="mb-2">Título da Seção (Opcional)</Label>
-			<Popover onOpenChange={setComboboxOpen} open={comboboxOpen}>
-				<PopoverTrigger asChild>
-					<Button
-						aria-expanded={comboboxOpen}
-						className="w-full justify-between"
-						variant="outline"
-					>
-						<p className="flex max-w-full truncate break-words">
-							{formData.sectionTitle || "Selecionar ou criar seção..."}
-						</p>
-						<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-					</Button>
-				</PopoverTrigger>
-				<PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-					<Command>
-						<CommandInput
-							onValueChange={(value) =>
-								setFormData({ ...formData, sectionTitle: value })
-							}
-							placeholder="Buscar ou criar nova seção..."
-						/>
-						<CommandEmpty className="flex max-w-md flex-col break-all p-4 text-sm">
-							<span>Deseja criar "{formData.sectionTitle}"?</span>
-						</CommandEmpty>
-						<CommandGroup>
-							{existingSections.map((section) => (
-								<CommandItem
-									key={section}
-									onSelect={(currentValue) => {
-										setFormData({
-											...formData,
-											sectionTitle:
-												currentValue === formData.sectionTitle
-													? ""
-													: currentValue,
-										});
-										setComboboxOpen(false);
-									}}
-								>
-									<Check
-										className={cn(
-											"mr-2 h-4 w-4",
-											formData.sectionTitle === section
-												? "opacity-100"
-												: "opacity-0"
-										)}
-									/>
-									{section}
-								</CommandItem>
-							))}
-						</CommandGroup>
-					</Command>
-				</PopoverContent>
-			</Popover>
-		</div>
-	);
-};
 
 const SchedulePanel = ({ formData, setFormData }: PanelProps) => {
 	const handleDateChange = (field: "expiresAt" | "launchesAt", date?: Date) => {
@@ -244,9 +170,43 @@ const BadgePanel = ({ formData, setFormData }: PanelProps) => (
 
 // --- Componente Principal ---
 const AddNewLinkForm = (props: AddNewLinkFormProps) => {
-	const { formData, onSave, onCancel, isSaveDisabled } = props;
+	// Use linksManager props if available, otherwise use direct props
+	const formData = props.linksManager?.formData || props.formData || {
+		title: "",
+		url: "",
+		sectionTitle: "",
+		badge: ""
+	};
+	const setFormData = props.linksManager?.setFormData || props.setFormData || (() => null);
+	const onSave = props.linksManager?.handleAddNewLink || props.onSave || (() => Promise.resolve());
+	const originalOnCancel = props.linksManager
+		? () => props.linksManager?.setIsAdding(false)
+		: props.onCancel || (() => null);
+	const isSaveDisabled = props.isSaveDisabled ?? false;
+
 	const [isLoading, setIsLoading] = useState(false);
 	const [activeOption, setActiveOption] = useState<ActiveOption | null>(null);
+
+	// Função para limpar os dados do formulário
+	const clearFormData = () => {
+		setFormData({
+			title: "",
+			url: "",
+			sectionTitle: "",
+			badge: "",
+			password: "",
+			deleteOnClicks: undefined,
+			expiresAt: undefined,
+			launchesAt: undefined,
+		});
+		setActiveOption(null);
+	};
+
+	// Função de cancelar que limpa os dados e executa a ação original
+	const onCancel = () => {
+		clearFormData();
+		originalOnCancel();
+	};
 
 	const handleSave = async () => {
 		setIsLoading(true);
@@ -261,10 +221,9 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 		setActiveOption(activeOption === option ? null : option);
 
 	const optionPanels: Record<ActiveOption, React.ReactNode> = {
-		section: <SectionPanel {...props} />,
-		schedule: <SchedulePanel {...props} />,
-		protect: <ProtectPanel {...props} />,
-		badge: <BadgePanel {...props} />,
+		schedule: <SchedulePanel formData={formData} setFormData={setFormData} />,
+		protect: <ProtectPanel formData={formData} setFormData={setFormData} />,
+		badge: <BadgePanel formData={formData} setFormData={setFormData} />,
 	};
 
 	return (
@@ -276,7 +235,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					<Input
 						id="title"
 						onChange={(e) =>
-							props.setFormData({ ...formData, title: e.target.value })
+							setFormData({ ...formData, title: e.target.value })
 						}
 						placeholder="Ex: Meu Portfólio"
 						value={formData.title}
@@ -286,9 +245,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					<Label htmlFor="url">URL</Label>
 					<Input
 						id="url"
-						onChange={(e) =>
-							props.setFormData({ ...formData, url: e.target.value })
-						}
+						onChange={(e) => setFormData({ ...formData, url: e.target.value })}
 						placeholder="https://exemplo.com"
 						type="url"
 						value={formData.url}
@@ -297,15 +254,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 			</div>
 
 			{/* Botões de Opções Avançadas */}
-			<div className="grid grid-cols-4 gap-2 border-t pt-4">
-				<Button
-					className="flex h-16 flex-col"
-					onClick={() => toggleOption("section")}
-					variant={activeOption === "section" ? "secondary" : "outline"}
-				>
-					<Type className="mb-1 h-5 w-5" />{" "}
-					<span className="hidden text-xs md:block">Seção</span>
-				</Button>
+			<div className="grid grid-cols-3 gap-2 border-t pt-4">
 				<Button
 					className="flex h-16 flex-col"
 					onClick={() => toggleOption("schedule")}

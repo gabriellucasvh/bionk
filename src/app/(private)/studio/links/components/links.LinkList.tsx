@@ -39,10 +39,13 @@ interface LinkListProps {
 	onCancelEditing: (id: number) => void;
 	onStartEditing: (id: number) => void;
 	onClickLink: (id: number) => void;
+	// Novas props para criação de link na seção
+	onAddLinkToSection?: (sectionTitle: string) => void;
+	linksManager?: any;
 }
 
 const LinkList = (props: LinkListProps) => {
-	const { items, onDragStart, onDragEnd, activeId, ...cardProps } = props;
+	const { items, onDragStart, onDragEnd, activeId, onAddLinkToSection, linksManager, ...cardProps } = props;
 
 	const sensors = useSensors(
 		useSensor(MouseSensor),
@@ -76,15 +79,17 @@ const LinkList = (props: LinkListProps) => {
 							<SortableItem id={item.id} key={item.id}>
 								{({ listeners, setActivatorNodeRef, isDragging }) => {
 									if (item.type === "section") {
-										return (
-											<SectionCard
-												isDragging={isDragging}
-												listeners={listeners}
-												section={item.data as SectionItem}
-												setActivatorNodeRef={setActivatorNodeRef}
-												{...cardProps}
-											/>
-										);
+							return (
+								<SectionCard
+									isDragging={isDragging}
+									listeners={listeners}
+									section={item.data as SectionItem}
+									setActivatorNodeRef={setActivatorNodeRef}
+									onAddLinkToSection={onAddLinkToSection}
+									linksManager={linksManager}
+									{...cardProps}
+								/>
+							);
 									}
 									return (
 										<LinkCard
@@ -104,13 +109,15 @@ const LinkList = (props: LinkListProps) => {
 				<DragOverlay>
 					{activeItem ? (
 						activeItem.type === "section" ? (
-							<SectionCard
-								isDragging
-								section={activeItem.data as SectionItem}
-								{...cardProps}
-								listeners={{}}
-								setActivatorNodeRef={noop}
-							/>
+						<SectionCard
+							isDragging
+							section={activeItem.data as SectionItem}
+							onAddLinkToSection={onAddLinkToSection}
+							linksManager={linksManager}
+							{...cardProps}
+							listeners={{}}
+							setActivatorNodeRef={noop}
+						/>
 						) : (
 							<LinkCard
 								link={activeItem.data as LinkItem}

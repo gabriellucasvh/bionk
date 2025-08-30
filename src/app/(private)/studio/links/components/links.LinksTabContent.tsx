@@ -6,20 +6,25 @@ import type { DragStartEvent } from "@dnd-kit/core";
 import { Plus } from "lucide-react";
 import type { Session } from "next-auth";
 import { useLinksManager } from "../hooks/useLinksManager";
-import type { LinkItem } from "../types/links.types";
+import type { LinkItem, SectionItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
 import AddNewLinkForm from "./links.AddNewLinkForm";
+import AddNewSectionForm from "./links.AddNewSectionForm";
 import LinkList from "./links.LinkList";
 
 interface LinksTabContentProps {
 	initialLinks: LinkItem[];
+	initialSections: SectionItem[];
 	mutateLinks: () => Promise<any>;
+	mutateSections: () => Promise<any>;
 	session: Session | null;
 }
 
 const LinksTabContent = ({
 	initialLinks,
+	initialSections,
 	mutateLinks,
+	mutateSections,
 }: LinksTabContentProps) => {
 	const {
 		unifiedItems,
@@ -32,7 +37,12 @@ const LinksTabContent = ({
 		setFormData,
 		handleDragEnd,
 		...handlers
-	} = useLinksManager(initialLinks, mutateLinks);
+	} = useLinksManager(
+		initialLinks,
+		initialSections,
+		mutateLinks,
+		mutateSections
+	);
 
 	const handleDragStart = (event: DragStartEvent) => {
 		setActiveId(event.active.id.toString());
@@ -40,15 +50,27 @@ const LinksTabContent = ({
 
 	return (
 		<div className="space-y-4">
-			{!isAdding && (
-				<BaseButton
-					className="w-full sm:w-auto"
-					onClick={() => setIsAdding(true)}
-				>
-					<span className="flex items-center justify-center">
-						<Plus className="mr-1 h-4 w-4" /> Adicionar novo link
-					</span>
-				</BaseButton>
+			{!(isAdding || handlers.isAddingSection) && (
+				<div className="flex gap-2">
+					<BaseButton
+						className="w-full sm:w-auto"
+						onClick={() => setIsAdding(true)}
+					>
+						<span className="flex items-center justify-center">
+							<Plus className="mr-1 h-4 w-4" /> Adicionar link
+						</span>
+					</BaseButton>
+
+					<BaseButton
+						className="w-full sm:w-auto"
+						onClick={() => handlers.setIsAddingSection(true)}
+						variant="white"
+					>
+						<span className="flex items-center justify-center">
+							<Plus className="mr-1 h-4 w-4" /> Criar seção
+						</span>
+					</BaseButton>
+				</div>
 			)}
 
 			{isAdding && (
@@ -64,9 +86,29 @@ const LinksTabContent = ({
 				/>
 			)}
 
+			{handlers.isAddingSection && (
+				<AddNewSectionForm
+					existingSections={existingSections}
+					formData={handlers.sectionFormData}
+					isSaveDisabled={handlers.sectionFormData.title.trim().length === 0}
+					onCancel={() => handlers.setIsAddingSection(false)}
+					onSave={handlers.handleAddNewSection}
+					setFormData={handlers.setSectionFormData}
+				/>
+			)}
+
 			<LinkList
 				activeId={activeId} // <<< Adicionado
 				items={unifiedItems}
+				linksManager={{
+					isAdding,
+					formData,
+					setIsAdding,
+					setFormData,
+					existingSections,
+					handleAddNewLink: handlers.handleAddNewLink,
+				}}
+				onAddLinkToSection={handlers.handleAddLinkToSection}
 				onArchiveLink={handlers.handleArchiveLink}
 				onCancelEditing={handlers.handleCancelEditing}
 				onClickLink={handlers.handleClickLink}

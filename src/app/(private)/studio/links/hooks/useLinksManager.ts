@@ -18,6 +18,10 @@ export type LinkFormData = {
 	launchesAt?: Date;
 };
 
+export type SectionFormData = {
+	title: string;
+};
+
 export type UnifiedItem = {
 	id: string;
 	type: "section" | "link";
@@ -33,6 +37,10 @@ const initialFormData: LinkFormData = {
 	deleteOnClicks: undefined,
 	expiresAt: undefined,
 	launchesAt: undefined,
+};
+
+const initialSectionFormData: SectionFormData = {
+	title: "",
 };
 
 const urlProtocolRegex = /^(https?:\/\/)/;
@@ -180,13 +188,19 @@ const moveBetweenContainers = (
 // --- HOOK ---
 export const useLinksManager = (
 	initialLinks: LinkItem[],
-	mutateLinks: () => Promise<any>
+	initialSections: SectionItem[],
+	mutateLinks: () => Promise<any>,
+	mutateSections: () => Promise<any>
 ) => {
 	// ... (useState, useEffect, useMemo, findContainerId, etc. continuam iguais)
 	const [unifiedItems, setUnifiedItems] = useState<UnifiedItem[]>([]);
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [isAdding, setIsAdding] = useState(false);
+	const [isAddingSection, setIsAddingSection] = useState(false);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
+	const [sectionFormData, setSectionFormData] = useState<SectionFormData>(
+		initialSectionFormData
+	);
 	const [_originalLink, setOriginalLink] = useState<LinkItem | null>(null);
 
 	useEffect(() => {
@@ -194,6 +208,7 @@ export const useLinksManager = (
 		const sections: Record<string, SectionItem> = {};
 		const generalLinks: LinkItem[] = [];
 
+		// Primeiro, criar seções a partir dos links
 		for (const link of sortedLinks) {
 			if (link.sectionTitle && link.sectionId) {
 				const sectionId = `section-${link.sectionTitle.replace(/\s+/g, "-")}`;
@@ -213,6 +228,21 @@ export const useLinksManager = (
 			}
 		}
 
+		// Depois, adicionar seções vazias que não têm links
+		for (const section of initialSections) {
+			const sectionId = `section-${section.title.replace(/\s+/g, "-")}`;
+			if (!sections[sectionId]) {
+				sections[sectionId] = {
+					id: sectionId,
+					dbId: Number(section.id),
+					title: section.title,
+					links: [],
+					active: section.active,
+					order: section.order,
+				};
+			}
+		}
+
 		const newUnifiedItems: UnifiedItem[] = [
 			...Object.values(sections).map(
 				(s) => ({ id: s.id, type: "section", data: s }) as UnifiedItem
@@ -224,7 +254,7 @@ export const useLinksManager = (
 
 		newUnifiedItems.sort((a, b) => a.data.order - b.data.order);
 		setUnifiedItems(newUnifiedItems);
-	}, [initialLinks]);
+	}, [initialLinks, initialSections]);
 
 	const existingSections = useMemo(() => {
 		return unifiedItems
@@ -273,6 +303,7 @@ export const useLinksManager = (
 			body: JSON.stringify({ links: linksPayload }),
 		});
 		await mutateLinks();
+		await mutateSections();
 	};
 
 	const handleDragEnd = (event: DragEndEvent) => {
@@ -356,6 +387,43 @@ export const useLinksManager = (
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ ...formData, url: formattedUrl }),
+		});
+
+		await mutateLinks();
+		setFormData(initialFormData);
+		setIsAdding(false);
+	};
+
+	const handleAddNewSection = async () => {
+		if (!sectionFormData.title.trim()) {
+			return;
+		}
+
+		await fetch("/api/sections", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ title: sectionFormData.title.trim() }),
+		});
+
+		await mutateLinks();
+		await mutateSections();
+		setSectionFormData(initialSectionFormData);
+		setIsAddingSection(false);
+	};
+
+	const handleAddLinkToSection = async (sectionTitle: string) => {
+		let formattedUrl = formData.url.trim();
+		if (!urlProtocolRegex.test(formattedUrl)) {
+			formattedUrl = `https://${formattedUrl}`;
+		}
+		if (!isValidUrl(formattedUrl)) {
+			return;
+		}
+
+		await fetch("/api/links", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ ...formData, url: formattedUrl, sectionTitle }),
 		});
 
 		await mutateLinks();
@@ -495,16 +563,22 @@ export const useLinksManager = (
 		unifiedItems,
 		activeId,
 		isAdding,
+		isAddingSection,
 		formData,
+		sectionFormData,
 		existingSections,
 		setActiveId,
 		setIsAdding,
+		setIsAddingSection,
 		setFormData,
+		setSectionFormData,
 		handleDragEnd,
 		handleSectionUpdate,
 		handleSectionDelete,
 		handleSectionUngroup,
 		handleAddNewLink,
+		handleAddNewSection,
+		handleAddLinkToSection,
 		saveEditing,
 		handleDeleteLink,
 		handleArchiveLink,

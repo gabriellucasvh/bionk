@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { SocialLinkItem } from "@/types/social";
 import { useSession } from "next-auth/react";
 import useSWR from "swr";
-import type { LinkItem } from "../types/links.types";
+import type { LinkItem, SectionItem } from "../types/links.types";
 import { fetcher } from "../utils/links.helpers";
 
 import LinksTabContent from "./links.LinksTabContent";
@@ -44,7 +44,17 @@ const UnifiedLinksManager = () => {
 		fetcher
 	);
 
-	if (status === "loading" || isLoadingLinks || isLoadingSocialLinks) {
+	// Hook SWR para seções
+	const {
+		data: sectionsData,
+		mutate: mutateSections,
+		isLoading: isLoadingSections,
+	} = useSWR<SectionItem[]>(
+		userId ? "/api/sections" : null,
+		fetcher
+	);
+
+	if (status === "loading" || isLoadingLinks || isLoadingSocialLinks || isLoadingSections) {
 		return <LoadingPage />;
 	}
 
@@ -69,12 +79,12 @@ const UnifiedLinksManager = () => {
 					<CardContent className="space-y-4 p-2 sm:p-6">
 						<TabsContent className="mt-0" value="links">
 							<LinksTabContent
-								initialLinks={linksData?.links || []}
-								mutateLinks={async () => {
-									await mutateLinks();
-								}}
-								session={session}
-							/>
+						initialLinks={linksData?.links || []}
+						initialSections={sectionsData || []}
+						mutateLinks={mutateLinks}
+						mutateSections={mutateSections}
+						session={session}
+					/>
 						</TabsContent>
 
 						<TabsContent className="mt-0" value="socials">

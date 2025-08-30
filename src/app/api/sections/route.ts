@@ -25,15 +25,28 @@ export async function POST(req: Request): Promise<NextResponse> {
 	}
 
 	const { title } = await req.json();
-	const lastSection = await prisma.section.findFirst({
-		where: { userId: session.user.id },
-		orderBy: { order: "desc" },
-	});
-
+	
+	// Buscar o menor order entre links e seções para colocar a nova seção no topo
+	const [minLink, minSection] = await Promise.all([
+		prisma.link.findFirst({
+			where: { userId: session.user.id },
+			orderBy: { order: "asc" },
+		}),
+		prisma.section.findFirst({
+			where: { userId: session.user.id },
+			orderBy: { order: "asc" },
+		})
+	]);
+	
+	const minOrder = Math.min(
+		minLink?.order ?? 0,
+		minSection?.order ?? 0
+	);
+	
 	const newSection = await prisma.section.create({
 		data: {
 			title,
-			order: lastSection ? lastSection.order + 1 : 0,
+			order: minOrder - 1,
 			userId: session.user.id,
 		},
 	});

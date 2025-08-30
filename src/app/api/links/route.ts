@@ -22,8 +22,27 @@ export async function GET(request: Request): Promise<NextResponse> {
 		const links = await prisma.link.findMany({
 			where: { userId, archived: status === "archived" },
 			orderBy: { order: "asc" },
+			include: {
+				section: {
+					select: {
+						id: true,
+						title: true,
+						active: true,
+						order: true,
+					},
+				},
+			},
 		});
-		return NextResponse.json({ links });
+		
+		// Transform the data to include section information directly in the link
+		const transformedLinks = links.map(link => ({
+			...link,
+			sectionId: link.section?.id || null,
+			sectionTitle: link.section?.title || null,
+			section: undefined, // Remove the nested section object
+		}));
+		
+		return NextResponse.json({ links: transformedLinks });
 	} catch {
 		return NextResponse.json(
 			{ error: "Falha ao buscar links." },
