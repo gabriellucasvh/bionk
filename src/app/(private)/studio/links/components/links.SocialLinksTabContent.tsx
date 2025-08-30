@@ -160,7 +160,8 @@ const SocialLinksTabContent = ({
 				setUsernameInput(numbers);
 			}
 		} else {
-			setUsernameInput(currentValue);
+			// Remove espaços de todos os inputs de redes sociais
+			setUsernameInput(currentValue.replace(/\s/g, ""));
 		}
 	};
 
@@ -254,6 +255,11 @@ const SocialLinksTabContent = ({
 								value={usernameInput}
 							/>
 						</div>
+						{selectedPlatform.key === "whatsapp" && (
+							<p className="mt-2 text-xs text-muted-foreground">
+								💡 Lembre-se de incluir o código do país antes do DDD (ex: +55)
+							</p>
+						)}
 					</div>
 					<div className="flex flex-col gap-2 pt-2 sm:flex-row">
 						<BaseButton

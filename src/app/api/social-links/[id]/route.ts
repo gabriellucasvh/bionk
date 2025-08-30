@@ -23,12 +23,13 @@ export async function PUT(
 
 	try {
 		const body = await request.json();
-		const { url } = body;
+		const { url, username } = body;
 
 		const updatedLink = await prisma.socialLink.update({
 			where: { id },
 			data: {
 				url,
+				username,
 			},
 		});
 
