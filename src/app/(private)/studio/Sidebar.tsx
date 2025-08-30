@@ -179,6 +179,7 @@ const Sidebar = () => {
 	const { data: session } = useSession();
 	const [profileUrl, setProfileUrl] = useState("#");
 	const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
+	const [imageKey, setImageKey] = useState(Date.now());
 
 	const username = session?.user?.username;
 	const isLoading = !(session?.user && username);
@@ -207,6 +208,13 @@ const Sidebar = () => {
 		};
 		fetchPlan();
 	}, [session?.user?.id]);
+
+	// Atualiza a chave da imagem quando a sessão muda
+	useEffect(() => {
+		if (session?.user?.image) {
+			setImageKey(Date.now());
+		}
+	}, [session?.user?.image]);
 
 	const handleNavClick = useCallback(
 		(href: string) => {
@@ -307,7 +315,7 @@ const Sidebar = () => {
 								alt="Avatar"
 								className="rounded-full"
 								height={42}
-								src={session?.user?.image || "/default-avatar.png"}
+								src={session?.user?.image ? `${session.user.image}?t=${imageKey}` : "/default-avatar.png"}
 								width={42}
 							/>
 							<div className="flex flex-1 flex-col truncate">
@@ -360,7 +368,7 @@ const Sidebar = () => {
 									alt="Avatar"
 									className="rounded-full"
 									height={24}
-									src={session?.user?.image || "/default-avatar.png"}
+									src={session?.user?.image ? `${session.user.image}?t=${imageKey}` : "/default-avatar.png"}
 									width={24}
 								/>
 							)}
