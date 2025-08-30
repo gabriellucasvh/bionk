@@ -17,11 +17,11 @@ export default async function StudioLayout({ children }: StudioLayoutProps) {
 	}
 
 	return (
-		<section>
-			<Sidebar />
-			<main className="mb-20 ml-0 h-screen overflow-y-auto md:mb-0 md:ml-64">
-				{children}
-			</main>
-		</section>
-	);
+			<section>
+				<Sidebar />
+				<main className="mb-20 ml-0 min-h-screen md:mb-0 md:ml-64">
+					{children}
+				</main>
+			</section>
+		);
 }

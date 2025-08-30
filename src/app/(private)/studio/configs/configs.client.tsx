@@ -243,7 +243,7 @@ export default function ConfigsClient() {
 	}
 
 	return (
-		<main className="container mx-auto min-h-dvh max-w-4xl space-y-6 p-4 sm:p-6 lg:space-y-8">
+		<div className="container mx-auto max-w-4xl space-y-6 p-4 pb-20 sm:p-6 sm:pb-8 lg:space-y-8">
 			<header className="space-y-2">
 				<h1 className="font-bold text-2xl sm:text-3xl">Configurações</h1>
 				<p className="text-muted-foreground text-sm sm:text-base">
@@ -406,6 +406,6 @@ export default function ConfigsClient() {
 				isOpen={isArchivedModalOpen}
 				onClose={() => setIsArchivedModalOpen(false)}
 			/>
-		</main>
+		</div>
 	);
 }
