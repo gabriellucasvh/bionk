@@ -118,8 +118,8 @@ export const metadata: Metadata = {
 		images: [
 			{
 				url: "https://www.bionk.me/bionk-opengraph.png",
-				width: 500,
-				height: 500,
+				width: 1200,
+				height: 630,
 				alt: "Bionk",
 			},
 		],
