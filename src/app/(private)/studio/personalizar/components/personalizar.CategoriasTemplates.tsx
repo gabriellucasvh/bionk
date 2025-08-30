@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { CATEGORIES } from "../data/personalizar.data";
+import CategoryDropdown from "@/components/ui/CategoryDropdown";
 
 interface TemplateSettingsProps {
 	onTemplateChange?: () => void; // Callback para notificar mudança de template
@@ -84,7 +85,16 @@ export default function TemplateSettings({
 
 	const renderContent = () => (
 		<>
-			<div className="mb-10 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+			{/* Mobile: Dropdown */}
+			<div className="mb-10 block sm:hidden">
+				<CategoryDropdown
+					categories={Object.keys(CATEGORIES)}
+					selectedCategory={selectedCategory}
+					onCategorySelect={setSelectedCategory}
+				/>
+			</div>
+			{/* Desktop: Grid */}
+			<div className="mb-10 hidden sm:grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
 				{Object.keys(CATEGORIES).map((category) => (
 					<Button
 						className={`h-12 w-full rounded-lg border-2 px-2 py-1 font-medium text-xs capitalize transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white flex items-center justify-center text-center ${

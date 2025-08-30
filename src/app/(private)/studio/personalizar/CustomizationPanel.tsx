@@ -2,10 +2,12 @@
 
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Slider } from "@/components/ui/slider"; // Importar o Slider do shadcn/ui
-import { Plus } from "lucide-react";
+import { Plus, Type } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { RenderLabel } from "./components/personalizar.RenderLabel";
+import FontSelectionModal from "@/components/modals/FontSelectionModal";
+import { Button } from "@/components/ui/button";
 
 // Interface atualizada
 interface CustomizationPanelProps {
@@ -123,6 +125,7 @@ export default function CustomizationPanel({
 	const [activeColorPicker, setActiveColorPicker] = useState<
 		"background" | "text" | "button" | null
 	>(null);
+	const [isFontModalOpen, setIsFontModalOpen] = useState(false);
 	const [pendingChanges, setPendingChanges] = useState<
 		Partial<typeof customizations>
 	>({});
@@ -334,18 +337,34 @@ export default function CustomizationPanel({
 
 			{/* Fonte */}
 			<div className="mb-8">
-				<RenderLabel hasPending={hasPendingChange("customFont")} text="Fonte" />
-				<div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+				<RenderLabel
+					icon={<Type className="h-4 w-4" />}
+					text="Fonte"
+				/>
+				{/* Mobile: Button to open modal */}
+				<div className="mt-2 block sm:hidden">
+					<Button
+						variant="outline"
+						className="w-full justify-between h-12 px-4 py-2 text-left"
+						onClick={() => setIsFontModalOpen(true)}
+					>
+						<span className="truncate">
+							{FONT_OPTIONS.find(f => f.value === customizations.customFont)?.label || "Inter"}
+						</span>
+						<Type className="h-4 w-4" />
+					</Button>
+				</div>
+				{/* Desktop: Grid layout */}
+				<div className="mt-2 hidden sm:grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5">
 					{FONT_OPTIONS.map((font) => (
 						<button
-							className={`h-16 w-full rounded border px-2 py-1 text-xs transition-colors flex items-center justify-center text-center leading-tight ${
+							className={`h-16 w-full rounded border px-2 py-1 text-xs leading-tight transition-colors flex items-center justify-center text-center ${
 								customizations.customFont === font.value
 									? "border-gray-300 bg-neutral-200"
 									: "border-gray-200 hover:bg-neutral-200"
 							}`}
 							key={font.value}
 							onClick={() => handleChange("customFont", font.value)}
-							style={{ fontFamily: font.fontFamily }}
 							type="button"
 						>
 							<span className="break-words">{font.label}</span>
@@ -419,6 +438,18 @@ export default function CustomizationPanel({
 					</BaseButton>
 				</div>
 			)}
+			{/* Font Selection Modal for Mobile */}
+			<FontSelectionModal
+				isOpen={isFontModalOpen}
+				onClose={() => setIsFontModalOpen(false)}
+				fontOptions={FONT_OPTIONS.map(font => ({
+					label: font.label,
+					value: font.value,
+					fontFamily: font.fontFamily
+				}))}
+				selectedFont={customizations.customFont}
+				onFontSelect={(fontValue) => handleChange("customFont", fontValue)}
+			/>
 		</div>
 	);
 }
