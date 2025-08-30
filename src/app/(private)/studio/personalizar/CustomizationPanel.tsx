@@ -365,6 +365,7 @@ export default function CustomizationPanel({
 							key={font.value}
 							onClick={() => handleChange("customFont", font.value)}
 							type="button"
+							style={{ fontFamily: font.fontFamily || 'inherit' }}
 						>
 							<span className="break-words">{font.label}</span>
 						</button>
