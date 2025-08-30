@@ -8,7 +8,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LinkIcon, MousePointerClick, ChevronDown, ChevronUp } from "lucide-react";
+import { LinkIcon, MousePointerClick, ChevronDown, ChevronUp, ChartBarDecreasing } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 
@@ -33,7 +33,10 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 			<article>
 				<Card>
 					<CardHeader>
-						<CardTitle>Links com Melhor Desempenho</CardTitle>
+						<CardTitle className="flex items-center gap-2">
+							<ChartBarDecreasing className="h-5 w-5" />
+							Links com Melhor Desempenho
+						</CardTitle>
 						<CardDescription>
 							{isExpanded ? 'Top 10' : 'Top 3'} links mais clicados nos últimos 30 dias.
 						</CardDescription>

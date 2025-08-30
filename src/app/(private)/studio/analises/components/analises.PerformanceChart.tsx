@@ -13,6 +13,7 @@ import {
 	ChartTooltipContent,
 } from "@/components/ui/chart";
 import { formatDate } from "@/lib/utils";
+import { ChartPie } from "lucide-react";
 import React from "react";
 import {
 	CartesianGrid,
@@ -39,7 +40,10 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 			<article>
 				<Card>
 					<CardHeader>
-						<CardTitle>Visão Geral de Desempenho</CardTitle>
+						<CardTitle className="flex items-center gap-2">
+							<ChartPie className="h-5 w-5" />
+							Visão Geral de Desempenho
+						</CardTitle>
 						<CardDescription>
 							Visualize os cliques e as visualizações diárias dos últimos 30
 							dias.

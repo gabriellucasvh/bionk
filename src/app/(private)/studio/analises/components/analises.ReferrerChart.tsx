@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { Globe, Instagram, Twitter, Facebook, Youtube, Linkedin, MessageCircle, Search, HelpCircle, ExternalLink } from 'lucide-react';
+import { Globe, Instagram, Twitter, Facebook, Youtube, Linkedin, MessageCircle, Search, HelpCircle, ExternalLink, Radar } from 'lucide-react';
 
 interface ReferrerAnalytics {
   referrer: string;
@@ -116,8 +116,8 @@ const CustomLegend = ({ payload }: any) => {
     <div className="flex flex-wrap justify-center gap-4 mt-4">
       {payload?.map((entry: any, index: number) => (
         <div key={index} className="flex items-center gap-2">
-          <div 
-            className="w-3 h-3 rounded-full" 
+          <div
+            className="w-3 h-3 rounded-full"
             style={{ backgroundColor: entry.color }}
           />
           <div className="flex items-center gap-1">
@@ -138,14 +138,14 @@ export default function ReferrerChart({ data, isLoading }: ReferrerChartProps) {
       <Card className="col-span-1">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5" />
+            <Radar className="h-5 w-5" />
             Origem do Tráfego
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-80 flex items-center justify-center">
             <div className="animate-pulse">
-              <Globe className="h-16 w-16 mx-auto mb-4 opacity-50" />
+              <Radar className="h-16 w-16 mx-auto mb-4 opacity-50" />
               <p className="text-center text-muted-foreground">Carregando dados...</p>
             </div>
           </div>
@@ -159,14 +159,14 @@ export default function ReferrerChart({ data, isLoading }: ReferrerChartProps) {
       <Card className="col-span-1">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5" />
+            <Radar className="h-5 w-5" />
             Origem do Tráfego
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-80 flex items-center justify-center">
             <div className="text-center">
-              <Globe className="h-16 w-16 mx-auto mb-4 opacity-50" />
+              <Radar className="h-16 w-16 mx-auto mb-4 opacity-50" />
               <p className="text-muted-foreground">Nenhum dado disponível</p>
               <p className="text-sm text-muted-foreground mt-2">
                 Os dados de origem aparecerão aqui quando houver interações
@@ -194,7 +194,7 @@ export default function ReferrerChart({ data, isLoading }: ReferrerChartProps) {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Globe className="h-5 w-5" />
+            <Radar className="h-5 w-5" />
             Origem do Tráfego
           </div>
           <div className="text-right">
@@ -212,8 +212,8 @@ export default function ReferrerChart({ data, isLoading }: ReferrerChartProps) {
             {useBarChart ? (
               <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                <XAxis 
-                  dataKey="name" 
+                <XAxis
+                  dataKey="name"
                   tick={{ fontSize: 12 }}
                   angle={-45}
                   textAnchor="end"
@@ -221,8 +221,8 @@ export default function ReferrerChart({ data, isLoading }: ReferrerChartProps) {
                 />
                 <YAxis tick={{ fontSize: 12 }} />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar 
-                  dataKey="totalInteractions" 
+                <Bar
+                  dataKey="totalInteractions"
                   radius={[4, 4, 0, 0]}
                 >
                   {chartData.map((entry, index) => (

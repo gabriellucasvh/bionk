@@ -10,7 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Globe, Instagram, Twitter, Facebook, Youtube, Linkedin, MessageCircle, Search, HelpCircle, ExternalLink, TrendingUp } from 'lucide-react';
+import { Globe, Instagram, Twitter, Facebook, Youtube, Linkedin, MessageCircle, Search, HelpCircle, ExternalLink, WalletCards, TrendingUp } from 'lucide-react';
 
 interface ReferrerAnalytics {
   referrer: string;
@@ -90,7 +90,7 @@ export default function ReferrerTable({ data, isLoading }: ReferrerTableProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+            <WalletCards className="h-5 w-5" />
             Detalhes por Origem
           </CardTitle>
         </CardHeader>
@@ -120,7 +120,7 @@ export default function ReferrerTable({ data, isLoading }: ReferrerTableProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+            <WalletCards className="h-5 w-5" />
             Detalhes por Origem
           </CardTitle>
         </CardHeader>
@@ -169,10 +169,10 @@ export default function ReferrerTable({ data, isLoading }: ReferrerTableProps) {
           </TableHeader>
           <TableBody>
             {sortedData.map((item, index) => {
-              const percentage = totalInteractions > 0 
+              const percentage = totalInteractions > 0
                 ? ((item.totalInteractions / totalInteractions) * 100).toFixed(1)
                 : '0.0';
-              
+
               return (
                 <TableRow key={`${item.referrer}-${index}`}>
                   <TableCell>
@@ -182,12 +182,12 @@ export default function ReferrerTable({ data, isLoading }: ReferrerTableProps) {
                       </div>
                       <div>
                         <div className="font-medium">{getReferrerLabel(item.referrer)}</div>
-                        <Badge 
+                        <Badge
                           variant={getReferrerBadgeVariant(item.referrer)}
                           className="text-xs mt-1"
                         >
-                          {item.referrer === 'direct' ? 'Direto' : 
-                           item.referrer === 'unknown' ? 'Desconhecido' : 
+                          {item.referrer === 'direct' ? 'Direto' :
+                           item.referrer === 'unknown' ? 'Desconhecido' :
                            item.referrer.includes('Google') || item.referrer.includes('Bing') ? 'Busca' :
                            item.referrer.includes('Instagram') || item.referrer.includes('TikTok') || item.referrer.includes('Facebook') ? 'Social' :
                            'Outros'}
@@ -208,7 +208,7 @@ export default function ReferrerTable({ data, isLoading }: ReferrerTableProps) {
                     <div className="flex items-center justify-end gap-2">
                       <span className="font-medium">{percentage}%</span>
                       <div className="w-12 h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-primary rounded-full transition-all duration-300"
                           style={{ width: `${Math.min(parseFloat(percentage), 100)}%` }}
                         />

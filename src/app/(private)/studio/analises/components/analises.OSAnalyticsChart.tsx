@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Smartphone, Monitor, Tablet } from 'lucide-react';
+import { Smartphone, Monitor, Tablet, SendToBack } from 'lucide-react';
 
 interface OSAnalytics {
   os: string;
@@ -109,13 +109,13 @@ export default function OSAnalyticsChart({ data, isLoading }: OSAnalyticsChartPr
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Monitor className="h-5 w-5" />
+            <SendToBack className="h-5 w-5" />
             Distribuição por Sistema Operacional
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12 text-muted-foreground">
-            <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
+            <SendToBack className="h-16 w-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium mb-2">Nenhum dado disponível</p>
             <p className="text-sm">Os dados aparecerão conforme as interações forem registradas.</p>
           </div>
@@ -128,7 +128,7 @@ export default function OSAnalyticsChart({ data, isLoading }: OSAnalyticsChartPr
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Monitor className="h-5 w-5" />
+          <SendToBack className="h-5 w-5" />
           Distribuição por Sistema Operacional
         </CardTitle>
         <p className="text-sm text-muted-foreground">

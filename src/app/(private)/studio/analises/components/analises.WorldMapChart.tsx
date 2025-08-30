@@ -1,13 +1,9 @@
 "use client";
 
-import React from "react";
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-} from "react-simple-maps";
+import React, { useEffect, useRef } from "react";
+import * as d3 from "d3";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Globe, Users, MousePointer } from "lucide-react";
+import { Earth, Users, MousePointer } from "lucide-react";
 
 // URL do arquivo de topologia mundial (Natural Earth)
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -25,6 +21,8 @@ interface WorldMapChartProps {
 }
 
 export default function WorldMapChart({ data, isLoading = false }: WorldMapChartProps) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  
   // Calcular valores máximos para normalização das cores
   const maxTotal = Math.max(...data.map(d => d.totalInteractions), 1);
   
@@ -77,6 +75,68 @@ export default function WorldMapChart({ data, isLoading = false }: WorldMapChart
     .slice(0, 5)
     .filter(country => country.totalInteractions > 0);
 
+  useEffect(() => {
+    if (!svgRef.current) return;
+
+    const svg = d3.select(svgRef.current);
+    svg.selectAll("*").remove();
+
+    const width = 800;
+    const height = 400;
+
+    const projection = d3.geoMercator()
+      .scale(120)
+      .center([0, 20])
+      .translate([width / 2, height / 2]);
+
+    const path = d3.geoPath().projection(projection);
+
+    // Carregar dados geográficos
+    d3.json(geoUrl).then((world: any) => {
+      const countries = world.features;
+
+      svg.selectAll(".country")
+         .data(countries)
+         .enter()
+         .append("path")
+         .attr("class", "country")
+         .attr("d", (d: any) => path(d))
+         .attr("fill", (d: any) => getColorIntensity(d.properties.NAME))
+        .attr("stroke", "#FFFFFF")
+        .attr("stroke-width", 0.5)
+        .style("cursor", "pointer")
+        .on("mouseover", function(event, d: any) {
+          d3.select(this).attr("fill", "#2563eb");
+          
+          const countryName = d.properties.NAME;
+          const normalizedName = normalizeCountryName(countryName);
+          const countryData = countryMap.get(normalizedName);
+          
+          const tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("position", "absolute")
+            .style("background", "rgba(0, 0, 0, 0.8)")
+            .style("color", "white")
+            .style("padding", "8px")
+            .style("border-radius", "4px")
+            .style("font-size", "12px")
+            .style("pointer-events", "none")
+            .style("z-index", "1000")
+            .html(
+              countryData
+                ? `${countryName}<br/>Cliques: ${countryData.clicks}<br/>Visualizações: ${countryData.views}<br/>Total: ${countryData.totalInteractions}`
+                : `${countryName}<br/>Sem dados`
+            )
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 10) + "px");
+        })
+        .on("mouseout", function(event, d: any) {
+          d3.select(this).attr("fill", getColorIntensity(d.properties.NAME));
+          d3.selectAll(".tooltip").remove();
+        });
+    });
+  }, [data, countryMap, getColorIntensity]);
+
   return (
     <div className="space-y-6">
       {/* Mapa Mundial e Tabela */}
@@ -84,64 +144,22 @@ export default function WorldMapChart({ data, isLoading = false }: WorldMapChart
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Globe className="h-5 w-5" />
+              <Earth className="h-5 w-5" />
               Distribuição Geográfica
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="w-full" style={{ height: '400px' }}>
-              <ComposableMap
-                projection="geoMercator"
-                projectionConfig={{
-                  scale: 120,
-                  center: [0, 20]
-                }}
-                width={800}
-                height={400}
+              <svg
+                ref={svgRef}
+                width="100%"
+                height="100%"
+                viewBox="0 0 800 400"
                 style={{
                   width: "100%",
                   height: "100%"
                 }}
-              >
-                <Geographies geography={geoUrl}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => {
-                      const countryName = geo.properties.NAME;
-                      const normalizedName = normalizeCountryName(countryName);
-                      const countryData = countryMap.get(normalizedName);
-                      
-                      return (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          fill={getColorIntensity(countryName)}
-                          stroke="#FFFFFF"
-                          strokeWidth={0.5}
-                          style={{
-                            default: {
-                              outline: "none",
-                            },
-                            hover: {
-                              fill: "#2563eb",
-                              outline: "none",
-                              cursor: "pointer",
-                            },
-                            pressed: {
-                              fill: "#1d4ed8",
-                              outline: "none",
-                            },
-                          }}
-                          title={
-                            countryData
-                              ? `${countryName}\nCliques: ${countryData.clicks}\nVisualizações: ${countryData.views}\nTotal: ${countryData.totalInteractions}`
-                              : `${countryName}\nSem dados`
-                          }
-                        />
-                      );
-                    })
-                  }
-                </Geographies>
-              </ComposableMap>
+              />
             </div>
             
             {/* Legenda */}
@@ -195,7 +213,7 @@ export default function WorldMapChart({ data, isLoading = false }: WorldMapChart
                   ) : (
                     <tr>
                       <td colSpan={3} className="text-center py-8 text-gray-500">
-                        <Globe className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                        <Earth className="mx-auto h-8 w-8 text-gray-400 mb-2" />
                         Nenhum dado disponível
                       </td>
                     </tr>

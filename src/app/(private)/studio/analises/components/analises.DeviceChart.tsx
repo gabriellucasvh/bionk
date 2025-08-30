@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Smartphone, Monitor, Tablet, HelpCircle } from 'lucide-react';
+import { Smartphone, Monitor, Tablet, HelpCircle, PictureInPicture2 } from 'lucide-react';
 
 interface DeviceAnalytics {
   device: string;
@@ -134,13 +134,13 @@ export default function DeviceChart({ data, isLoading }: DeviceChartProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Monitor className="h-5 w-5" />
+            <PictureInPicture2 className="h-5 w-5" />
             Distribuição por Dispositivo
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12 text-muted-foreground">
-            <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
+            <PictureInPicture2 className="h-16 w-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium mb-2">Nenhum dado disponível</p>
             <p className="text-sm">Os dados aparecerão conforme as interações forem registradas.</p>
           </div>
@@ -153,7 +153,7 @@ export default function DeviceChart({ data, isLoading }: DeviceChartProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Monitor className="h-5 w-5" />
+          <PictureInPicture2 className="h-5 w-5" />
           Distribuição por Dispositivo
         </CardTitle>
         <p className="text-sm text-muted-foreground">
@@ -196,13 +196,13 @@ export default function DeviceChart({ data, isLoading }: DeviceChartProps) {
             <div className="text-xs sm:text-sm text-muted-foreground">Total de Interações</div>
           </div>
           <div className="text-center p-2">
-            <div className="text-lg sm:text-2xl font-bold text-blue-600">
+            <div className="text-lg sm:text-2xl font-bold text-black">
               {data.reduce((sum, item) => sum + item.views, 0).toLocaleString()}
             </div>
             <div className="text-xs sm:text-sm text-muted-foreground">Visualizações</div>
           </div>
           <div className="text-center p-2">
-            <div className="text-lg sm:text-2xl font-bold text-green-600">
+            <div className="text-lg sm:text-2xl font-bold text-black">
               {data.reduce((sum, item) => sum + item.clicks, 0).toLocaleString()}
             </div>
             <div className="text-xs sm:text-sm text-muted-foreground">Cliques</div>
