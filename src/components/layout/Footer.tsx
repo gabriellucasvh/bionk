@@ -1,4 +1,4 @@
-import { Facebook, Instagram, type LucideProps, Twitter } from "lucide-react";
+// Removido import dos ícones do Lucide - usando ícones SVG locais
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -18,17 +18,17 @@ const navigation = {
 		{
 			name: "Twitter",
 			href: "#",
-			icon: (props: LucideProps) => <Twitter {...props} />,
+			icon: "/icons/x.svg",
 		},
 		{
 			name: "Instagram",
 			href: "#",
-			icon: (props: LucideProps) => <Instagram {...props} />,
+			icon: "/icons/instagram.svg",
 		},
 		{
 			name: "Facebook",
 			href: "#",
-			icon: (props: LucideProps) => <Facebook {...props} />,
+			icon: "/icons/facebook.svg",
 		},
 	],
 };
@@ -101,15 +101,21 @@ const Footer = () => {
 				<div className="mt-16 border-slate-800 border-t pt-8 sm:flex sm:items-center sm:justify-between">
 					<div className="flex space-x-6 sm:order-2">
 						{navigation.social.map((item) => (
-							<Link
-								className="text-slate-500 transition-colors duration-300 hover:text-green-400"
-								href={item.href}
-								key={item.name}
-							>
-								<span className="sr-only">{item.name}</span>
-								<item.icon aria-hidden="true" className="h-5 w-5" />
-							</Link>
-						))}
+						<Link
+							className="text-slate-500 transition-colors duration-300 hover:text-green-400"
+							href={item.href}
+							key={item.name}
+						>
+							<span className="sr-only">{item.name}</span>
+							<Image
+								src={item.icon}
+								alt={item.name}
+								width={20}
+								height={20}
+								className="h-5 w-5 filter brightness-0 invert opacity-60 hover:opacity-100 transition-opacity duration-300"
+							/>
+						</Link>
+					))}
 					</div>
 					<p className="mt-6 text-slate-500 text-xs leading-5 sm:order-1 sm:mt-0">
 						&copy; {new Date().getFullYear()} Bionk. Todos os direitos

@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { Globe, Instagram, Twitter, Facebook, Youtube, Linkedin, MessageCircle, Search, HelpCircle, ExternalLink, Radar, TrendingUp } from 'lucide-react';
+import { Globe, MessageCircle, Search, HelpCircle, ExternalLink, Radar, TrendingUp } from 'lucide-react';
+import Image from 'next/image';
 
 interface ReferrerAnalytics {
   referrer: string;
@@ -50,19 +51,27 @@ const REFERRER_COLORS = {
 const getReferrerIcon = (referrer: string) => {
   switch (referrer) {
     case 'Instagram':
-      return <Instagram className="h-4 w-4" />;
+      return <Image src="/icons/instagram.svg" alt="Instagram" width={16} height={16} className="h-4 w-4" />;
     case 'Twitter/X':
-      return <Twitter className="h-4 w-4" />;
+      return <Image src="/icons/x.svg" alt="X (Twitter)" width={16} height={16} className="h-4 w-4" />;
     case 'Facebook':
-      return <Facebook className="h-4 w-4" />;
+      return <Image src="/icons/facebook.svg" alt="Facebook" width={16} height={16} className="h-4 w-4" />;
     case 'YouTube':
-      return <Youtube className="h-4 w-4" />;
+      return <Image src="/icons/youtube.svg" alt="YouTube" width={16} height={16} className="h-4 w-4" />;
     case 'LinkedIn':
-      return <Linkedin className="h-4 w-4" />;
+      return <Image src="/icons/linkedin.svg" alt="LinkedIn" width={16} height={16} className="h-4 w-4" />;
     case 'WhatsApp':
+      return <Image src="/icons/whatsapp.svg" alt="WhatsApp" width={16} height={16} className="h-4 w-4" />;
     case 'Telegram':
+      return <Image src="/icons/telegram.svg" alt="Telegram" width={16} height={16} className="h-4 w-4" />;
     case 'Discord':
-      return <MessageCircle className="h-4 w-4" />;
+      return <Image src="/icons/discord.svg" alt="Discord" width={16} height={16} className="h-4 w-4" />;
+    case 'TikTok':
+      return <Image src="/icons/tiktok.svg" alt="TikTok" width={16} height={16} className="h-4 w-4" />;
+    case 'Reddit':
+      return <Image src="/icons/reddit.svg" alt="Reddit" width={16} height={16} className="h-4 w-4" />;
+    case 'Pinterest':
+      return <Image src="/icons/pinterest.svg" alt="Pinterest" width={16} height={16} className="h-4 w-4" />;
     case 'Google':
     case 'Bing':
     case 'DuckDuckGo':
