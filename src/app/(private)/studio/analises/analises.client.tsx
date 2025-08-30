@@ -265,10 +265,10 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 				)}
 
 				{/* Seção de Analytics por Origem do Tráfego */}
-				{isLoading || !data ? (
+				{isLoading ? (
 					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
 				) : (
-					<ReferrerAnalytics data={data.referrerAnalytics || []} isLoading={isLoading} />
+					<ReferrerAnalytics data={data?.referrerAnalytics || []} isLoading={false} />
 				)}
 			</main>
 		</section>

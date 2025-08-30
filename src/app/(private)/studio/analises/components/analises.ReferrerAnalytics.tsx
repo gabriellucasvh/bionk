@@ -194,6 +194,9 @@ export default function ReferrerAnalytics({ data, isLoading }: ReferrerAnalytics
             <Radar className="h-16 w-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium mb-2">Nenhum dado disponível</p>
             <p className="text-sm">Os dados de origem aparecerão aqui quando houver interações</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Debug: Data = {JSON.stringify(data)}
+            </p>
           </div>
         </CardContent>
       </Card>
