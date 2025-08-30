@@ -42,12 +42,35 @@ const TopLinksTable = dynamic(
 		),
 	}
 );
+const DeviceAnalyticsTable = dynamic(
+	() => import("./components/analises.DeviceAnalyticsTable"),
+	{
+		loading: () => (
+			<div className="h-[300px] w-full animate-pulse rounded-md bg-muted" />
+		),
+	}
+);
+const DeviceChart = dynamic(
+	() => import("./components/analises.DeviceChart"),
+	{
+		loading: () => (
+			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+		),
+	}
+);
 
 interface TopLink {
 	id: string;
 	title: string;
 	clicks: number;
 	url: string;
+}
+
+interface DeviceAnalytics {
+	device: string;
+	views: number;
+	clicks: number;
+	totalInteractions: number;
 }
 
 interface ChartDataItem {
@@ -62,6 +85,7 @@ interface AnalyticsData {
 	performanceRate: string;
 	chartData: ChartDataItem[];
 	topLinks: TopLink[];
+	deviceAnalytics: DeviceAnalytics[];
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -178,6 +202,21 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 				) : (
 					<TopLinksTable topLinks={memoizedTopLinks} />
 				)}
+
+				{/* Seção de Analytics por Dispositivo */}
+				<div className="space-y-6 xl:grid xl:gap-6 xl:grid-cols-2 xl:space-y-0">
+					{isLoading || !data ? (
+						<div className="h-[300px] sm:h-[400px] w-full animate-pulse rounded-md bg-muted" />
+					) : (
+						<DeviceChart data={data.deviceAnalytics || []} isLoading={isLoading} />
+					)}
+
+					{isLoading || !data ? (
+						<div className="h-[300px] w-full animate-pulse rounded-md bg-muted" />
+					) : (
+						<DeviceAnalyticsTable data={data.deviceAnalytics || []} isLoading={isLoading} />
+					)}
+				</div>
 			</main>
 		</section>
 	);

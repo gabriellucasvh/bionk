@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -14,9 +15,16 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
+		// Detectar tipo de dispositivo de forma anônima (LGPD compliant)
+		const userAgent = getUserAgent(req);
+		const deviceType = detectDeviceType(userAgent);
+
 		const [, updatedLink] = await prisma.$transaction([
 			prisma.linkClick.create({
-				data: { linkId: Number(linkId) },
+				data: { 
+					linkId: Number(linkId),
+					device: deviceType
+				},
 			}),
 			prisma.link.update({
 				where: { id: Number(linkId) },

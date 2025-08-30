@@ -127,9 +127,11 @@ model LinkClick {
   id        Int      @id @default(autoincrement())
   linkId    Int
   createdAt DateTime @default(now())
+  device    String?  @default("unknown")
   link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
 
   @@index([linkId, createdAt])
+  @@index([device])
 }
 
 model LinkView {
@@ -161,9 +163,11 @@ model ProfileView {
   id        Int      @id @default(autoincrement())
   userId    String
   createdAt DateTime @default(now())
+  device    String?  @default("unknown")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+  @@index([device])
 }
 
 model CustomPresets {

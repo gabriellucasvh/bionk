@@ -103,6 +103,62 @@ export async function GET(request: Request) {
 		},
 	});
 
+	// Agrupar dados por dispositivo
+	const [clicksByDevice, viewsByDevice] = await Promise.all([
+		prisma.linkClick.groupBy({
+			by: ["device"],
+			_count: true,
+			where: {
+				linkId: { in: linkIds },
+				createdAt: { gte: last30Days },
+			},
+		}),
+		prisma.profileView.groupBy({
+			by: ["device"],
+			_count: true,
+			where: {
+				userId,
+				createdAt: { gte: last30Days },
+			},
+		}),
+	]);
+
+	// Normalizar dados de dispositivos
+	const deviceData = new Map<string, { clicks: number; views: number }>();
+	
+	// Inicializar com dispositivos padrão
+	const defaultDevices = ["mobile", "desktop", "tablet", "unknown"];
+	for (const device of defaultDevices) {
+		deviceData.set(device, { clicks: 0, views: 0 });
+	}
+
+	// Preencher cliques por dispositivo
+	for (const entry of clicksByDevice) {
+		const device = entry.device || "unknown";
+		const existing = deviceData.get(device) || { clicks: 0, views: 0 };
+		existing.clicks = entry._count;
+		deviceData.set(device, existing);
+	}
+
+	// Preencher views por dispositivo
+	for (const entry of viewsByDevice) {
+		const device = entry.device || "unknown";
+		const existing = deviceData.get(device) || { clicks: 0, views: 0 };
+		existing.views = entry._count;
+		deviceData.set(device, existing);
+	}
+
+	// Converter para array
+	const deviceAnalytics = Array.from(deviceData.entries())
+		.map(([device, data]) => ({
+			device: device === "unknown" ? "unknown" : device,
+			clicks: data.clicks || 0,
+			views: data.views || 0,
+			totalInteractions: (data.clicks || 0) + (data.views || 0)
+		}))
+		.filter(item => item.totalInteractions > 0)
+		.sort((a, b) => b.totalInteractions - a.totalInteractions);
+
 	// Associar cliques com os links
 	const topLinks = links
 		.map((link) => {
@@ -122,5 +178,6 @@ export async function GET(request: Request) {
 		performanceRate: performanceRate.toFixed(1),
 		chartData,
 		topLinks,
+		deviceAnalytics,
 	});
 }
