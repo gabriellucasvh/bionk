@@ -46,6 +46,32 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 		}
 	};
 
+	const restoreAllLinks = async () => {
+		const promises = archivedLinks.map((link) =>
+			fetch(`/api/links/${link.id}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ archived: false, active: true }),
+			})
+		);
+		const results = await Promise.all(promises);
+		if (results.every((res) => res.ok)) {
+			setArchivedLinks([]);
+		}
+	};
+
+	const deleteAllLinks = async () => {
+		const promises = archivedLinks.map((link) =>
+			fetch(`/api/links/${link.id}`, {
+				method: "DELETE",
+			})
+		);
+		const results = await Promise.all(promises);
+		if (results.every((res) => res.ok)) {
+			setArchivedLinks([]);
+		}
+	};
+
 	if (!isOpen) {
 		return null;
 	}
@@ -82,7 +108,25 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 					)}
 				</main>
 				<footer className="flex justify-end border-t px-4 py-2">
+					<div className="flex gap-2">
+						<Button
+							variant="outline"
+							className="bg-green-500 text-white hover:text-white hover:bg-green-600"
+							onClick={restoreAllLinks}
+							disabled={archivedLinks.length === 0}
+						>
+							Rest. Todos
+						</Button>
+						<Button
+							variant="outline"
+							className="bg-red-500 text-white hover:text-white hover:bg-red-600"
+							onClick={deleteAllLinks}
+							disabled={archivedLinks.length === 0}
+						>
+							Apagar Todos
+						</Button>
 					<Button onClick={onClose}>Fechar</Button>
+					</div>
 				</footer>
 			</section>
 		</div>
