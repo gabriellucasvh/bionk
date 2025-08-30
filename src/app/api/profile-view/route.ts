@@ -17,7 +17,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     await prisma.profileView.create({
       data: { 
         userId,
-        device: deviceType
+        device: deviceType,
+        userAgent: userAgent
       },
     });
     return NextResponse.json({ message: "Profile view recorded" });

@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
 			prisma.linkClick.create({
 				data: { 
 					linkId: Number(linkId),
-					device: deviceType
+					device: deviceType,
+					userAgent: userAgent
 				},
 			}),
 			prisma.link.update({

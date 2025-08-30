@@ -58,6 +58,14 @@ const DeviceChart = dynamic(
 		),
 	}
 );
+const OSAnalyticsChart = dynamic(
+	() => import("./components/analises.OSAnalyticsChart"),
+	{
+		loading: () => (
+			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+		),
+	}
+);
 
 interface TopLink {
 	id: string;
@@ -68,6 +76,13 @@ interface TopLink {
 
 interface DeviceAnalytics {
 	device: string;
+	views: number;
+	clicks: number;
+	totalInteractions: number;
+}
+
+interface OSAnalytics {
+	os: string;
 	views: number;
 	clicks: number;
 	totalInteractions: number;
@@ -86,6 +101,7 @@ interface AnalyticsData {
 	chartData: ChartDataItem[];
 	topLinks: TopLink[];
 	deviceAnalytics: DeviceAnalytics[];
+	osAnalytics: OSAnalytics[];
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -217,6 +233,13 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 						<DeviceAnalyticsTable data={data.deviceAnalytics || []} isLoading={isLoading} />
 					)}
 				</div>
+
+				{/* Seção de Analytics por Sistema Operacional */}
+				{isLoading || !data ? (
+					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+				) : (
+					<OSAnalyticsChart data={data.osAnalytics || []} isLoading={isLoading} />
+				)}
 			</main>
 		</section>
 	);

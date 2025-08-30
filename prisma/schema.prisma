@@ -128,6 +128,7 @@ model LinkClick {
   linkId    Int
   createdAt DateTime @default(now())
   device    String?  @default("unknown")
+  userAgent String?
   link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
 
   @@index([linkId, createdAt])
@@ -164,6 +165,7 @@ model ProfileView {
   userId    String
   createdAt DateTime @default(now())
   device    String?  @default("unknown")
+  userAgent String?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])

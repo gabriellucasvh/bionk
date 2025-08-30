@@ -1,6 +1,40 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+// Função para detectar sistema operacional baseado no user-agent
+function detectOS(userAgent: string): string {
+	if (!userAgent) return "unknown";
+	
+	const ua = userAgent.toLowerCase();
+	
+	// iOS (iPhone, iPad, iPod)
+	if (ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod') || (ua.includes('mac os x') && ua.includes('mobile'))) {
+		return 'ios';
+	}
+	
+	// Android
+	if (ua.includes('android')) {
+		return 'android';
+	}
+	
+	// Windows
+	if (ua.includes('windows nt') || ua.includes('win32') || ua.includes('win64') || ua.includes('windows')) {
+		return 'windows';
+	}
+	
+	// macOS (desktop)
+	if (ua.includes('macintosh') || ua.includes('mac os x')) {
+		return 'macos';
+	}
+	
+	// Linux
+	if (ua.includes('linux') || ua.includes('x11')) {
+		return 'linux';
+	}
+	
+	return 'unknown';
+}
+
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
 	const userId = searchParams.get("userId");
@@ -159,6 +193,60 @@ export async function GET(request: Request) {
 		.filter(item => item.totalInteractions > 0)
 		.sort((a, b) => b.totalInteractions - a.totalInteractions);
 
+	// Agrupar dados por sistema operacional
+	const [clicksByOS, viewsByOS] = await Promise.all([
+		prisma.linkClick.findMany({
+			where: {
+				linkId: { in: linkIds },
+				createdAt: { gte: last30Days },
+			},
+			select: { userAgent: true },
+		}),
+		prisma.profileView.findMany({
+			where: {
+				userId,
+				createdAt: { gte: last30Days },
+			},
+			select: { userAgent: true },
+		}),
+	]);
+
+	// Processar dados de OS
+	const osData = new Map<string, { clicks: number; views: number }>();
+	
+	// Inicializar com sistemas operacionais padrão
+		const defaultOS = ["ios", "android", "windows", "macos", "linux", "unknown"];
+		for (const os of defaultOS) {
+			osData.set(os, { clicks: 0, views: 0 });
+		}
+
+	// Processar cliques por OS
+	for (const click of clicksByOS) {
+		const os = detectOS(click.userAgent || "");
+		const existing = osData.get(os) || { clicks: 0, views: 0 };
+		existing.clicks += 1;
+		osData.set(os, existing);
+	}
+
+	// Processar views por OS
+	for (const view of viewsByOS) {
+		const os = detectOS(view.userAgent || "");
+		const existing = osData.get(os) || { clicks: 0, views: 0 };
+		existing.views += 1;
+		osData.set(os, existing);
+	}
+
+	// Converter para array
+	const osAnalytics = Array.from(osData.entries())
+		.map(([os, data]) => ({
+			os: os,
+			clicks: data.clicks || 0,
+			views: data.views || 0,
+			totalInteractions: (data.clicks || 0) + (data.views || 0)
+		}))
+		.filter(item => item.totalInteractions > 0)
+		.sort((a, b) => b.totalInteractions - a.totalInteractions);
+
 	// Associar cliques com os links
 	const topLinks = links
 		.map((link) => {
@@ -179,5 +267,6 @@ export async function GET(request: Request) {
 		chartData,
 		topLinks,
 		deviceAnalytics,
+		osAnalytics,
 	});
 }
