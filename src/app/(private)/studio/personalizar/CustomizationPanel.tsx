@@ -338,7 +338,6 @@ export default function CustomizationPanel({
 			{/* Fonte */}
 			<div className="mb-8">
 				<RenderLabel
-					icon={<Type className="h-4 w-4" />}
 					text="Fonte"
 				/>
 				{/* Mobile: Button to open modal */}
@@ -349,7 +348,7 @@ export default function CustomizationPanel({
 						onClick={() => setIsFontModalOpen(true)}
 					>
 						<span className="truncate">
-							{FONT_OPTIONS.find(f => f.value === customizations.customFont)?.label || "Inter"}
+							{FONT_OPTIONS.find(f => f.value === customizations.customFont)?.label || "Satoshi"}
 						</span>
 						<Type className="h-4 w-4" />
 					</Button>
