@@ -82,7 +82,7 @@ const getReferrerLabel = (referrer: string) => {
     case 'direct':
       return 'Acesso Direto';
     case 'unknown':
-      return 'Desconhecido';
+      return 'Outros';
     default:
       return referrer;
   }
@@ -315,7 +315,7 @@ export default function ReferrerAnalytics({ data, isLoading }: ReferrerAnalytics
                             className="text-xs mt-1"
                           >
                             {item.referrer === 'direct' ? 'Direto' :
-                             item.referrer === 'unknown' ? 'Desconhecido' :
+                             item.referrer === 'unknown' ? 'Outros' :
                              item.referrer.includes('Google') || item.referrer.includes('Bing') ? 'Busca' :
                              item.referrer.includes('Instagram') || item.referrer.includes('TikTok') || item.referrer.includes('Facebook') ? 'Social' :
                              'Outros'}

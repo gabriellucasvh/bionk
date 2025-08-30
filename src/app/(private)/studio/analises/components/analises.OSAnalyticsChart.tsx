@@ -46,7 +46,7 @@ const getOSLabel = (os: string) => {
     case 'linux':
       return 'Linux';
     default:
-      return 'Desconhecido';
+      return 'Outros';
   }
 };
 

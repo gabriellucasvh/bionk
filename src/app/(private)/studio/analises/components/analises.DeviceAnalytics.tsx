@@ -55,7 +55,7 @@ const getDeviceLabel = (device: string) => {
     case 'tablet':
       return 'Tablet';
     case 'unknown':
-      return 'Desconhecido';
+      return 'Outros';
     default:
       return device;
   }
