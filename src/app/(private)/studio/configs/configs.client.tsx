@@ -86,6 +86,7 @@ function CancelSubscriptionButton() {
 				onClick={handleCancel}
 				size="sm"
 				variant="destructive"
+				className="w-full sm:w-auto"
 			>
 				<XOctagon className="mr-2 h-4 w-4" />
 				{isLoading ? "Cancelando..." : "Cancelar Assinatura"}
@@ -111,7 +112,7 @@ function UpgradeSubscriptionCard() {
 			</CardHeader>
 			<CardContent>
 				<Link href="/planos" passHref>
-					<Button className="w-full bg-green-600 hover:bg-green-700">
+					<Button className="w-full bg-green-600 hover:bg-green-700 text-sm sm:text-base">
 						Ver Planos
 					</Button>
 				</Link>
@@ -147,14 +148,14 @@ function SubscriptionManagement({
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
-					<div className="flex flex-col items-start justify-between space-y-2 md:flex-row md:items-center">
-						<div>
+					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+						<div className="space-y-1">
 							<p className="font-medium text-sm">Plano Atual</p>
 							<p className="text-muted-foreground text-sm capitalize">
 								{subscription.plan}
 							</p>
 						</div>
-						<div>
+						<div className="space-y-1">
 							<p className="font-medium text-sm">Próxima Cobrança</p>
 							<p className="text-muted-foreground text-sm">
 								{subscription.renewsOn
@@ -186,7 +187,7 @@ function SubscriptionManagement({
 			</CardHeader>
 			<CardContent>
 				<Link href="/planos" passHref>
-					<Button variant="outline">Ver Planos</Button>
+					<Button variant="outline" className="w-full sm:w-auto">Ver Planos</Button>
 				</Link>
 			</CardContent>
 		</Card>
@@ -242,10 +243,10 @@ export default function ConfigsClient() {
 	}
 
 	return (
-		<main className="container mx-auto min-h-dvh max-w-1/2 space-y-8 p-5">
-			<header>
-				<h1 className="font-bold text-3xl">Configurações</h1>
-				<p className="mt-1 text-muted-foreground">
+		<main className="container mx-auto min-h-dvh max-w-4xl space-y-6 p-4 sm:p-6 lg:space-y-8">
+			<header className="space-y-2">
+				<h1 className="font-bold text-2xl sm:text-3xl">Configurações</h1>
+				<p className="text-muted-foreground text-sm sm:text-base">
 					Gerencie sua conta e preferências
 				</p>
 			</header>
@@ -266,16 +267,18 @@ export default function ConfigsClient() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-4">
-						<div className="flex flex-col items-start justify-between space-y-2 md:flex-row md:items-center">
-							<div className="space-y-1">
-								<p className="font-medium text-sm">Email</p>
-								<p className="text-muted-foreground text-sm">{profile.email}</p>
-							</div>
-							<Button onClick={handleLogout} size="sm" variant="outline">
+						<div className="space-y-4">
+						<div className="space-y-1">
+							<p className="font-medium text-sm">Email</p>
+							<p className="text-muted-foreground text-sm break-all">{profile.email}</p>
+						</div>
+						<div className="flex justify-start">
+							<Button onClick={handleLogout} size="sm" variant="outline" className="w-full sm:w-auto">
 								<LogOut className="mr-2 h-4 w-4" />
 								Sair
 							</Button>
 						</div>
+					</div>
 					</CardContent>
 				</Card>
 			</article>
@@ -291,13 +294,14 @@ export default function ConfigsClient() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<Button
-							onClick={() => setIsArchivedModalOpen(true)}
-							variant="outline"
-						>
-							Ver Links Arquivados
-						</Button>
-					</CardContent>
+				<Button
+					onClick={() => setIsArchivedModalOpen(true)}
+					variant="outline"
+					className="w-full sm:w-auto"
+				>
+					Ver Links Arquivados
+				</Button>
+			</CardContent>
 				</Card>
 			</article>
 			{isCredentialsUser && (
@@ -313,10 +317,10 @@ export default function ConfigsClient() {
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<Link href="/profile/change-email">
-								<Button variant="outline">Alterar E-mail</Button>
-							</Link>
-						</CardContent>
+					<Link href="/profile/change-email">
+						<Button variant="outline" className="w-full sm:w-auto">Alterar E-mail</Button>
+					</Link>
+				</CardContent>
 					</Card>
 				</article>
 			)}
@@ -331,10 +335,10 @@ export default function ConfigsClient() {
 							<CardDescription>Atualize sua senha de acesso</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<Link href="/profile/change-password">
-								<Button variant="outline">Alterar Senha</Button>
-							</Link>
-						</CardContent>
+					<Link href="/profile/change-password">
+						<Button variant="outline" className="w-full sm:w-auto">Alterar Senha</Button>
+					</Link>
+				</CardContent>
 					</Card>
 				</article>
 			)}
@@ -350,22 +354,22 @@ export default function ConfigsClient() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<AlertDialog>
-							<AlertDialogTrigger asChild>
-								<Button variant="destructive">Excluir Conta</Button>
-							</AlertDialogTrigger>
-							<AlertDialogContent>
+					<AlertDialog>
+						<AlertDialogTrigger asChild>
+							<Button variant="destructive" className="w-full sm:w-auto">Excluir Conta</Button>
+						</AlertDialogTrigger>
+							<AlertDialogContent className="mx-4 max-w-md">
 								<AlertDialogHeader>
-									<AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-									<AlertDialogDescription>
+									<AlertDialogTitle className="text-lg">Tem certeza?</AlertDialogTitle>
+									<AlertDialogDescription className="text-sm">
 										Esta ação não pode ser desfeita. Sua conta e dados serão
 										removidos permanentemente.
 									</AlertDialogDescription>
 								</AlertDialogHeader>
-								<AlertDialogFooter>
-									<AlertDialogCancel>Cancelar</AlertDialogCancel>
+								<AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+									<AlertDialogCancel className="w-full sm:w-auto">Cancelar</AlertDialogCancel>
 									<AlertDialogAction
-										className="bg-destructive text-red-100"
+										className="bg-destructive text-red-100 w-full sm:w-auto"
 										onClick={handleDeleteAccount}
 									>
 										Sim, excluir minha conta
@@ -389,12 +393,12 @@ export default function ConfigsClient() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<Link href="/ajuda" passHref>
-							<Button className="w-full" variant="outline">
-								Acessar Central de Ajuda
-							</Button>
-						</Link>
-					</CardContent>
+				<Link href="/ajuda" passHref>
+					<Button className="w-full text-sm sm:text-base" variant="outline">
+						Acessar Central de Ajuda
+					</Button>
+				</Link>
+			</CardContent>
 				</Card>
 			</article>
 
