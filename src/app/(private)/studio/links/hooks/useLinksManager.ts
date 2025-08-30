@@ -362,16 +362,19 @@ export const useLinksManager = (
 			body: JSON.stringify(payload),
 		});
 		await mutateLinks();
+		await mutateSections();
 	};
 
 	const handleSectionDelete = async (id: number) => {
 		await fetch(`/api/sections/${id}`, { method: "DELETE" });
 		await mutateLinks();
+		await mutateSections();
 	};
 
 	const handleSectionUngroup = async (id: number) => {
 		await fetch(`/api/sections/${id}/ungroup`, { method: "POST" });
 		await mutateLinks();
+		await mutateSections();
 	};
 
 	const handleAddNewLink = async () => {
