@@ -35,19 +35,19 @@ interface TooltipState {
   content: string;
 }
 
-export default function WorldMapAnalytics({ 
-  data, 
-  isLoading = false, 
-  width = 800, 
-  height = 400 
+export default function WorldMapAnalytics({
+  data,
+  isLoading = false,
+  width = 800,
+  height = 400
 }: WorldMapAnalyticsProps) {
   // Normalizar nomes de países para correspondência
   const normalizeCountryName = (name: string): string => {
     if (!name) return '';
-    
+
     // Primeiro, normalizar o nome removendo acentos e convertendo para lowercase
     const normalized = name.toLowerCase().trim();
-    
+
     // Mapeamento bidirecional para correspondência entre dados e TopoJSON
     const countryMapping: { [key: string]: string } = {
       // Mapeamento dos dados para TopoJSON
@@ -210,15 +210,15 @@ export default function WorldMapAnalytics({
       'nauru': 'Nauru',
       'tuvalu': 'Tuvalu'
     };
-    
+
     // Tentar encontrar correspondência direta
     const directMatch = countryMapping[normalized];
     if (directMatch) {
       return directMatch;
     }
-    
+
     // Se não encontrar correspondência direta, retornar o nome original capitalizado
-    return name.split(' ').map(word => 
+    return name.split(' ').map(word =>
       word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
     ).join(' ');
   };
@@ -238,13 +238,13 @@ export default function WorldMapAnalytics({
     console.log(`Mapeando: ${d.country} -> ${normalizedName}`, d);
     return [normalizedName, d];
   }));
-  
+
   console.log('CountryMap criado:', Array.from(countryMap.entries()));
-  
+
   // Verificar especificamente o Brasil
   console.log('Brasil no countryMap:', countryMap.get('Brazil'));
   console.log('Brazil no countryMap:', countryMap.get('Brazil'));
-  
+
   // Calcular valores máximos para normalização das cores
   const maxTotal = Math.max(...data.map(d => d.totalInteractions), 1);
   console.log('Max interactions:', maxTotal);
@@ -253,13 +253,13 @@ export default function WorldMapAnalytics({
   const getColorIntensity = (countryName: string): string => {
     const normalizedName = normalizeCountryName(countryName);
     const countryData = countryMap.get(normalizedName);
-    
 
-    
+
+
     if (!countryData || countryData.totalInteractions === 0) {
       return '#f3f4f6'; // Cinza claro para países sem dados
     }
-    
+
     const intensity = countryData.totalInteractions / maxTotal;
     const blueIntensity = Math.max(0.2, intensity); // Mínimo de 20% de intensidade
     return `rgba(59, 130, 246, ${blueIntensity})`; // Azul com transparência baseada na intensidade
@@ -307,11 +307,11 @@ export default function WorldMapAnalytics({
         const countryName = d.properties?.name || d.properties?.NAME || '';
         const normalizedName = normalizeCountryName(countryName);
         const countryData = countryMap.get(normalizedName);
-        
+
         d3.select(this).attr('stroke-width', 2);
-        
+
         const [mouseX, mouseY] = d3.pointer(event, svgRef.current);
-        
+
         let content = `<strong>${countryName}</strong><br/>`;
         if (countryData) {
           content += `Cliques: ${countryData.clicks}<br/>`;
@@ -320,7 +320,7 @@ export default function WorldMapAnalytics({
         } else {
           content += 'Sem dados disponíveis';
         }
-        
+
         setTooltip({
           visible: true,
           x: mouseX,
@@ -370,7 +370,7 @@ export default function WorldMapAnalytics({
             viewBox={`0 0 ${width} ${height}`}
             preserveAspectRatio="xMidYMid meet"
           />
-          
+
           {/* Tooltip */}
           {tooltip.visible && (
             <div
@@ -383,24 +383,47 @@ export default function WorldMapAnalytics({
               dangerouslySetInnerHTML={{ __html: tooltip.content }}
             />
           )}
-          
+
           {/* Legenda */}
-          <div className="mt-4 flex items-center justify-center space-x-4 text-sm text-gray-600">
-            <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 bg-gray-200 rounded"></div>
-              <span>Sem dados</span>
+          <div className="mt-4">
+            {/* Desktop: Layout horizontal */}
+            <div className="hidden sm:flex items-center justify-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                <span>Sem dados</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-blue-200 rounded"></div>
+                <span>Baixa atividade</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                <span>Média atividade</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-blue-800 rounded"></div>
+                <span>Alta atividade</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 bg-blue-200 rounded"></div>
-              <span>Baixa atividade</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 bg-blue-500 rounded"></div>
-              <span>Média atividade</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 bg-blue-800 rounded"></div>
-              <span>Alta atividade</span>
+            
+            {/* Mobile: Layout 2x2 */}
+            <div className="grid grid-cols-2 gap-2 sm:hidden text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-gray-200 rounded flex-shrink-0"></div>
+                <span className="truncate">Sem dados</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-blue-200 rounded flex-shrink-0"></div>
+                <span className="truncate">Baixa atividade</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-blue-500 rounded flex-shrink-0"></div>
+                <span className="truncate">Média atividade</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-blue-800 rounded flex-shrink-0"></div>
+                <span className="truncate">Alta atividade</span>
+              </div>
             </div>
           </div>
         </div>
