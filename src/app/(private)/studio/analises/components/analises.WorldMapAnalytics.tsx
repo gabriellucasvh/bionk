@@ -289,7 +289,7 @@ export default function WorldMapAnalytics({
 
     const path = d3.geoPath().projection(projection);
 
-    const countries = topojson.feature(worldData, worldData.objects.countries);
+    const countries = topojson.feature(worldData, worldData.objects.countries) as any;
 
     svg.selectAll('path')
       .data(countries.features)
