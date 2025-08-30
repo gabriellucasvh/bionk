@@ -30,18 +30,29 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 					<CardHeader>
 						<CardTitle>Links com Melhor Desempenho</CardTitle>
 						<CardDescription>
-							Ranking dos links mais clicados nos últimos 30 dias.
+							Top 10 links mais clicados nos últimos 30 dias.
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<div className="space-y-4">
-							{topLinks.map((link) => (
+							{topLinks.slice(0, 10).map((link, index) => (
 								<div
 									className="flex flex-col items-start justify-between border-b pb-3 last:border-0 last:pb-0 sm:flex-row sm:items-center"
 									key={link.id}
 								>
 									<div className="flex flex-1 flex-col space-y-1">
-										<span className="font-medium">{link.title}</span>
+										<span className="font-medium">
+											<span 
+												className={`font-bold ${
+													index === 0 ? 'text-green-500' : 
+													index === 1 ? 'text-green-600' : 
+													index === 2 ? 'text-green-700' : 'text-gray-600'
+												}`}
+											>
+												{index + 1}.
+											</span>
+											{' '}{link.title}
+										</span>
 										<Link
 											className="flex max-w-md items-center gap-1 whitespace-normal break-words break-all text-blue-500 text-sm"
 											href={link.url}
