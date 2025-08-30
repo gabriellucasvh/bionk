@@ -2,6 +2,7 @@
 
 import LinkOptionsModal from "@/components/LinkOptionsModal";
 import type { UserLink } from "@/types/user-profile";
+import { detectTrafficSource } from "@/utils/traffic-source";
 import { Eye, MoreVertical } from "lucide-react";
 import Link from "next/link";
 import type { FC, MouseEvent, ReactNode } from "react";
@@ -43,7 +44,11 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		}
 
 		const url = "/api/link-click";
-		const data = JSON.stringify({ linkId: link.id });
+		const trafficSource = detectTrafficSource();
+		const data = JSON.stringify({ 
+			linkId: link.id,
+			trafficSource // Incluir a origem detectada
+		});
 
 		if (navigator.sendBeacon) {
 			navigator.sendBeacon(url, data);

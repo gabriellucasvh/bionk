@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
 	try {
 		// Lida tanto com JSON quanto com texto plano do sendBeacon
 		const body = await req.text();
-		const { linkId } = JSON.parse(body);
+		const { linkId, trafficSource } = JSON.parse(body);
 
 		if (!linkId || Number.isNaN(Number(linkId))) {
 			return NextResponse.json(
@@ -119,8 +119,16 @@ export async function POST(req: NextRequest) {
 		const country = await getCountryFromIP(clientIP || '127.0.0.1');
 
 		// Capturar referrer de forma anonimizada
-		const referrer = req.headers.get('referer') || req.headers.get('referrer') || null;
-		const normalizedReferrer = normalizeReferrer(referrer);
+		const referrerHeader = req.headers.get('referer') || req.headers.get('referrer') || null;
+		
+		// Log para debug em produção
+		console.log('Link Click - Raw referrer:', referrerHeader);
+		console.log('Link Click - User Agent:', userAgent);
+		console.log('Link Click - Traffic Source detectado:', trafficSource);
+		
+		// Usar trafficSource se disponível, senão usar referrer normalizado
+		const normalizedReferrer = trafficSource || normalizeReferrer(referrerHeader);
+		console.log('Link Click - Referrer final:', normalizedReferrer);
 
 		const [, updatedLink] = await prisma.$transaction([
 			prisma.linkClick.create({

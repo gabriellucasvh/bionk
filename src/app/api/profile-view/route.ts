@@ -100,7 +100,7 @@ function normalizeReferrer(referrer: string | null): string | null {
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const { userId } = await request.json();
+    const { userId, trafficSource } = await request.json();
     if (!userId) {
       return NextResponse.json({ error: "UserId is required" }, { status: 400 });
     }
@@ -114,8 +114,16 @@ export async function POST(request: Request): Promise<NextResponse> {
 		const country = await getCountryFromIP(clientIP || '127.0.0.1');
 
 		// Capturar referrer de forma anonimizada
-		const referrer = request.headers.get('referer') || request.headers.get('referrer') || null;
-		const normalizedReferrer = normalizeReferrer(referrer);
+		const referrerHeader = request.headers.get('referer') || request.headers.get('referrer') || null;
+		
+		// Log para debug em produção
+		console.log('[PROFILE-VIEW DEBUG] Referrer bruto:', referrerHeader);
+		console.log('[PROFILE-VIEW DEBUG] User Agent:', userAgent);
+		console.log('[PROFILE-VIEW DEBUG] Traffic Source detectado:', trafficSource);
+		
+		// Usar trafficSource se disponível, senão usar referrer normalizado
+		const referrer = trafficSource || normalizeReferrer(referrerHeader);
+		console.log('[PROFILE-VIEW DEBUG] Referrer final:', referrer);
 
     await prisma.profileView.create({
       data: { 
@@ -123,7 +131,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         device: deviceType,
         userAgent: userAgent,
         country: country,
-        referrer: normalizedReferrer
+        referrer: referrer
       },
     });
     return NextResponse.json({ message: "Profile view recorded" });
