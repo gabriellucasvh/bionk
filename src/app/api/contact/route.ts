@@ -7,7 +7,6 @@ import { z } from "zod";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Regex patterns moved to top level for performance
-const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,30}$/;
 const SUSPICIOUS_PATTERNS = [
 	/\b(viagra|casino|poker|loan|credit|debt)\b/i,
 	/\b(click here|free money|make money fast)\b/i,
@@ -16,33 +15,30 @@ const SUSPICIOUS_PATTERNS = [
 ];
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Schema de validação
-const customPlanSchema = z.object({
+// Schema de validação para formulário de contato
+const contactSchema = z.object({
 	fullName: z
 		.string()
 		.min(2, "Nome deve ter pelo menos 2 caracteres")
 		.max(100, "Nome muito longo"),
 	email: z.string().email("Email inválido").max(255, "Email muito longo"),
-	bionkUsername: z
+	subject: z.enum(
+		[
+			"suporte-tecnico",
+			"planos-assinaturas",
+			"parcerias-colaboracoes",
+			"feedback-sugestoes",
+			"reportar-problema",
+			"outros",
+		],
+		{
+			errorMap: () => ({ message: "Selecione um assunto válido" }),
+		}
+	),
+	message: z
 		.string()
-		.optional()
-		.refine((val) => {
-			if (!val) {
-				return true;
-			}
-			return USERNAME_REGEX.test(val);
-		}, "Username deve conter apenas letras, números, _ ou - e ter entre 3-30 caracteres"),
-	companyName: z
-		.string()
-		.min(2, "Nome da empresa deve ter pelo menos 2 caracteres")
-		.max(100, "Nome da empresa muito longo"),
-	companySize: z.enum(["1", "2-10", "11-50", "51-100", "101+"], {
-		errorMap: () => ({ message: "Selecione o tamanho da empresa" }),
-	}),
-	helpDescription: z
-		.string()
-		.min(10, "Descrição deve ter pelo menos 10 caracteres")
-		.max(1000, "Descrição muito longa"),
+		.min(10, "Mensagem deve ter pelo menos 10 caracteres")
+		.max(2000, "Mensagem muito longa"),
 	// Honeypot field (campo oculto para detectar bots)
 	website: z.string().optional(),
 });
@@ -55,53 +51,19 @@ function getContactRateLimiter() {
 		const { Ratelimit } = require("@upstash/ratelimit");
 		const { Redis } = require("@upstash/redis");
 
-		const url = process.env.UPSTASH_REDIS_REST_URL;
-		const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-		if (!(url && token)) {
-			throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
-		}
-
-		const redis = new Redis({ url, token });
+		const redis = new Redis({
+			url: process.env.UPSTASH_REDIS_REST_URL,
+			token: process.env.UPSTASH_REDIS_REST_TOKEN,
+		});
 
 		_contactRateLimiter = new Ratelimit({
 			redis,
-			limiter: Ratelimit.slidingWindow(3, "60 s"), // 3 requests por minuto
+			limiter: Ratelimit.slidingWindow(3, "10 m"), // 3 tentativas por 10 minutos
 			analytics: true,
-			prefix: "ratelimit_contact",
+			prefix: "contact_form",
 		});
 	}
-
 	return _contactRateLimiter;
-}
-
-// Função para sanitizar strings
-function sanitizeString(str: string): string {
-	return str
-		.replace(/<script[^>]*>.*?<\/script>/gi, "") // Remove scripts
-		.replace(/<[^>]*>/g, "") // Remove HTML tags
-		.replace(/javascript:/gi, "") // Remove javascript: URLs
-		.replace(/on\w+\s*=/gi, "") // Remove event handlers
-		.trim();
-}
-
-// Função para detectar conteúdo suspeito
-function detectSuspiciousContent(data: any): boolean {
-	const textFields = [
-		data.fullName,
-		data.companyName,
-		data.helpDescription,
-		data.bionkUsername || "",
-	];
-
-	return textFields.some((field) =>
-		SUSPICIOUS_PATTERNS.some((pattern) => pattern.test(field))
-	);
-}
-
-// Função para gerar token CSRF simples
-function generateCSRFToken(): string {
-	return crypto.randomBytes(32).toString("hex");
 }
 
 // Função auxiliar para extrair e normalizar IP
@@ -113,6 +75,24 @@ function getClientIP(headersList: Headers): string {
 
 	// Normalizar IP para exibição (converter IPv6 localhost para IPv4)
 	return rawIp === "::1" || rawIp === "::ffff:127.0.0.1" ? "127.0.0.1" : rawIp;
+}
+
+function sanitizeString(str: string): string {
+	return str
+		.replace(/<[^>]*>/g, "") // Remove HTML tags
+		.replace(/[<>"'&]/g, "") // Remove caracteres perigosos
+		.trim();
+}
+
+function detectSuspiciousContent(data: any): boolean {
+	const textFields = [data.fullName, data.message];
+	return textFields.some((field) =>
+		SUSPICIOUS_PATTERNS.some((pattern) => pattern.test(field))
+	);
+}
+
+function generateCSRFToken(): string {
+	return crypto.randomBytes(32).toString("hex");
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -159,7 +139,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 		const body = await req.json();
 
 		// Validação com Zod
-		const validationResult = customPlanSchema.safeParse(body);
+		const validationResult = contactSchema.safeParse(body);
 		if (!validationResult.success) {
 			return NextResponse.json(
 				{
@@ -172,16 +152,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 		const data = validationResult.data;
 
+		// Verificação de honeypot
+		if (data.website) {
+			return NextResponse.json({ error: "Spam detectado" }, { status: 400 });
+		}
+
 		// Sanitização dos dados
 		const sanitizedData = {
 			fullName: sanitizeString(data.fullName),
 			email: data.email.toLowerCase().trim(),
-			bionkUsername: data.bionkUsername
-				? sanitizeString(data.bionkUsername)
-				: undefined,
-			companyName: sanitizeString(data.companyName),
-			companySize: data.companySize,
-			helpDescription: sanitizeString(data.helpDescription),
+			subject: data.subject,
+			message: sanitizeString(data.message),
 		};
 
 		// Detecção de conteúdo suspeito
@@ -201,26 +182,26 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 		}
 
 		// Preparar conteúdo do email
-		const companySizeLabels: Record<string, string> = {
-			"1": "Individual/Empreendedor",
-			"2-10": "2-10 pessoas",
-			"11-50": "11-50 pessoas",
-			"51-100": "51-100 pessoas",
-			"101+": "Mais de 100 pessoas",
+		const subjectLabels: Record<string, string> = {
+			"suporte-tecnico": "Suporte Técnico (problemas de acesso, bugs)",
+			"planos-assinaturas":
+				"Planos e Assinaturas (dúvidas sobre upgrade, pagamento, cancelamento)",
+			"parcerias-colaboracoes": "Parcerias e Colaborações",
+			"feedback-sugestoes": "Feedback e Sugestões",
+			"reportar-problema": "Reportar Problema (abuso, links indevidos)",
+			outros: "Outros",
 		};
 
 		const emailContent = `
-      <h2>Nova Solicitação de Plano Personalizado</h2>
-      <p><strong>Nome Completo:</strong> ${sanitizedData.fullName}</p>
-      <p><strong>Email:</strong> ${sanitizedData.email}</p>
-      ${sanitizedData.bionkUsername ? `<p><strong>Username Bionk:</strong> ${sanitizedData.bionkUsername}</p>` : ""}
-      <p><strong>Nome da Empresa:</strong> ${sanitizedData.companyName}</p>
-      <p><strong>Tamanho da Empresa:</strong> ${companySizeLabels[sanitizedData.companySize]}</p>
-      <p><strong>Como podemos ajudar:</strong></p>
-      <p>${sanitizedData.helpDescription.replace(/\n/g, "<br>")}</p>
-      <hr>
-      <p><small>IP: ${ip} | User-Agent: ${userAgent}</small></p>
-    `;
+			<h2>Nova Mensagem de Contato</h2>
+			<p><strong>Nome:</strong> ${sanitizedData.fullName}</p>
+			<p><strong>Email:</strong> ${sanitizedData.email}</p>
+			<p><strong>Assunto:</strong> ${subjectLabels[sanitizedData.subject]}</p>
+			<p><strong>Mensagem:</strong></p>
+			<p>${sanitizedData.message.replace(/\n/g, "<br>")}</p>
+			<hr>
+			<p><small>IP: ${ip} | User-Agent: ${userAgent}</small></p>
+		`;
 
 		// Enviar email
 		try {
@@ -228,7 +209,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 				from: process.env.RESEND_FROM_EMAIL || "contato@bionk.me",
 				to: ["contato@bionk.me"], // Email da empresa
 				replyTo: sanitizedData.email,
-				subject: `Nova Solicitação de Plano Personalizado - ${sanitizedData.companyName}`,
+				subject: `Contato: ${subjectLabels[sanitizedData.subject]} - ${sanitizedData.fullName}`,
 				html: emailContent,
 			});
 
@@ -236,20 +217,19 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 			await resend.emails.send({
 				from: process.env.RESEND_FROM_EMAIL || "contato@bionk.me",
 				to: [sanitizedData.email],
-				subject: "Recebemos sua solicitação - Bionk",
+				subject: "Recebemos sua mensagem - Bionk",
 				html: `
-          <h2>Obrigado pelo seu interesse!</h2>
-          <p>Olá ${sanitizedData.fullName},</p>
-          <p>Recebemos sua solicitação de plano personalizado para <strong>${sanitizedData.companyName}</strong>.</p>
-          <p>Nossa equipe analisará suas necessidades e entrará em contato em até 2 dias úteis.</p>
-          <p>Atenciosamente,<br>Equipe Bionk</p>
-        `,
+					<h2>Obrigado por entrar em contato!</h2>
+					<p>Olá ${sanitizedData.fullName},</p>
+					<p>Recebemos sua mensagem sobre <strong>${subjectLabels[sanitizedData.subject]}</strong>.</p>
+					<p>Nossa equipe analisará sua solicitação e responderá em até 2 dias úteis.</p>
+					<p>Atenciosamente,<br>Equipe Bionk</p>
+				`,
 			});
 
 			return NextResponse.json(
 				{
-					message:
-						"Solicitação enviada com sucesso! Entraremos em contato em breve.",
+					message: "Mensagem enviada com sucesso! Responderemos em breve.",
 					success: true,
 				},
 				{ status: 200 }
@@ -268,8 +248,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 	}
 }
 
-// Endpoint para obter token CSRF (opcional)
 export function GET(): NextResponse {
-	const token = generateCSRFToken();
-	return NextResponse.json({ csrfToken: token });
+	return NextResponse.json(
+		{ message: "Endpoint de contato ativo", csrf: generateCSRFToken() },
+		{ status: 200 }
+	);
 }

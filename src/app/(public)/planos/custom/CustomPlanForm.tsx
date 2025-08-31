@@ -78,7 +78,7 @@ function SuccessState() {
 							<div className=" bg-white p-4">
 								<ul className="space-y-1 text-left text-normal">
 									<li>• Nossa equipe analisará sua solicitação</li>
-									<li>• Entraremos em contato em até 3 dias úteis</li>
+									<li>• Entraremos em contato em até 2 dias úteis</li>
 									<li>• Criaremos uma proposta personalizada para você</li>
 									<li>
 										• Agendaremos uma demonstração{" "}

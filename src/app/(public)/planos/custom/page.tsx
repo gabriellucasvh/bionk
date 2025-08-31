@@ -20,10 +20,10 @@ export default function CustomPlanPage() {
 				<section className="px-4 py-16 pt-32">
 					<div className="mx-auto max-w-2xl">
 						<div className="text-center">
-							<h2 className="mb-6 font-bold text-4xl text-green-800">
+							<h2 className="mb-6 font-bold text-4xl text-black">
 								Vamos conversar sobre seu projeto
 							</h2>
-							<p className="text-gray-600 text-lg">
+							<p className="font-medium text-gray-600 text-lg">
 								Pensado para negócios que precisam de algo além do comum, o
 								Plano Customizado oferece soluções exclusivas, com design,
 								performance e estratégias alinhadas às necessidades da sua
