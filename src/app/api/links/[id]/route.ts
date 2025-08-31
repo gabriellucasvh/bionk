@@ -40,7 +40,17 @@ export async function PUT(
 			},
 		});
 
+		// Revalida tanto o studio quanto a página do perfil
 		revalidatePath("/studio/links");
+		
+		// Busca o username do usuário para revalidar sua página
+		const user = await prisma.user.findUnique({
+			where: { id: session.user.id },
+			select: { username: true }
+		});
+		if (user?.username) {
+			revalidatePath(`/${user.username}`);
+		}
 
 		return NextResponse.json(updatedLink);
 	} catch {
@@ -73,7 +83,17 @@ export async function DELETE(
 			where: { id: Number.parseInt(id, 10) },
 		});
 
+		// Revalida tanto o studio quanto a página do perfil
 		revalidatePath("/studio/links");
+		
+		// Busca o username do usuário para revalidar sua página
+		const user = await prisma.user.findUnique({
+			where: { id: session.user.id },
+			select: { username: true }
+		});
+		if (user?.username) {
+			revalidatePath(`/${user.username}`);
+		}
 
 		return NextResponse.json({ message: "Link excluído com sucesso" });
 	} catch {

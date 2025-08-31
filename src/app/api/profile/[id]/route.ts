@@ -2,7 +2,8 @@
 
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 
 // FUNÇÃO GET ADICIONADA
@@ -68,6 +69,11 @@ export async function PUT(
 				bannerUrl,
 			},
 		});
+
+		// Revalida a página do perfil do usuário
+		if (updatedUser.username) {
+			revalidatePath(`/${updatedUser.username}`);
+		}
 
 		return NextResponse.json(updatedUser);
 	} catch {

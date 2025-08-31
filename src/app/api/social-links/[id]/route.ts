@@ -33,11 +33,20 @@ export async function PUT(
 			},
 		});
 
+		// Revalida tanto o studio quanto a página do perfil
 		revalidatePath("/studio/links");
 
+		// Busca o username do usuário para revalidar sua página
+		const user = await prisma.user.findUnique({
+			where: { id: session.user.id },
+			select: { username: true }
+		});
+		if (user?.username) {
+			revalidatePath(`/${user.username}`);
+		}
+
 		return NextResponse.json(updatedLink);
-	} catch (error) {
-		console.error("Erro ao atualizar o link social:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }
@@ -67,11 +76,20 @@ export async function DELETE(
 			where: { id },
 		});
 
+		// Revalida tanto o studio quanto a página do perfil
 		revalidatePath("/studio/links");
 
+		// Busca o username do usuário para revalidar sua página
+		const user = await prisma.user.findUnique({
+			where: { id: session.user.id },
+			select: { username: true }
+		});
+		if (user?.username) {
+			revalidatePath(`/${user.username}`);
+		}
+
 		return NextResponse.json({ message: "Link social excluído com sucesso" });
-	} catch (error) {
-		console.error("Erro ao excluir o link social:", error);
+	} catch  {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }

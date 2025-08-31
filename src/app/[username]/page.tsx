@@ -19,34 +19,44 @@ export async function generateMetadata({
 	};
 }
 
-export const revalidate = 0;
+export const revalidate = false; // ISR estático - páginas servidas da CDN até revalidação manual
 
 export default async function UserPage({ params }: PageProps) {
 	const { username } = await params;
 	const now = new Date();
 
+	// Otimização: Query mais eficiente com select específico
 	const user = (await prisma.user.findUnique({
 		where: { username },
-		include: {
+		select: {
+			id: true,
+			username: true,
+			name: true,
+			bio: true,
+			image: true,
+			template: true,
+			templateCategory: true,
 			Section: {
-				where: {
-					active: true, // Adicionado: Filtra para buscar apenas seções ativas
-				},
-				orderBy: {
-					order: "asc",
-				},
-				include: {
+				where: { active: true },
+				orderBy: { order: "asc" },
+				select: {
+					id: true,
+					title: true,
+					order: true,
 					links: {
 						where: {
 							active: true,
 							archived: false,
-							AND: [
-								{ OR: [{ launchesAt: null }, { launchesAt: { lte: now } }] },
-								{ OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] },
-							],
+							OR: [{ launchesAt: null }, { launchesAt: { lte: now } }],
+							AND: [{ OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] }],
 						},
-						orderBy: {
-							order: "asc",
+						orderBy: { order: "asc" },
+						select: {
+							id: true,
+							title: true,
+							url: true,
+							order: true,
+							clicks: true,
 						},
 					},
 				},
@@ -56,24 +66,40 @@ export default async function UserPage({ params }: PageProps) {
 					active: true,
 					archived: false,
 					sectionId: null,
-					AND: [
-						{ OR: [{ launchesAt: null }, { launchesAt: { lte: now } }] },
-						{ OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] },
-					],
+					OR: [{ launchesAt: null }, { launchesAt: { lte: now } }],
+					AND: [{ OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] }],
 				},
-				orderBy: {
-					order: "asc",
+				orderBy: { order: "asc" },
+				select: {
+					id: true,
+					title: true,
+					url: true,
+					order: true,
+					clicks: true,
 				},
 			},
 			SocialLink: {
-				where: {
-					active: true,
-				},
-				orderBy: {
-					order: "asc",
+				where: { active: true },
+				orderBy: { order: "asc" },
+				select: {
+					id: true,
+					platform: true,
+					url: true,
+					order: true,
 				},
 			},
-			CustomPresets: true,
+			CustomPresets: {
+				select: {
+					id: true,
+					customBackgroundColor: true,
+					customBackgroundGradient: true,
+					customTextColor: true,
+					customButton: true,
+					customButtonFill: true,
+					customButtonCorners: true,
+					customFont: true,
+				},
+			},
 		},
 	})) as UserProfileData | null;
 
@@ -84,20 +110,19 @@ export default async function UserPage({ params }: PageProps) {
 	const category = user.templateCategory ?? "minimalista";
 	const name = user.template ?? "default";
 
+	// Otimização: Import mais eficiente com fallback
 	let TemplateComponent: ComponentType<{ user: UserProfileData }>;
 
 	try {
-		const mod = await import(
+		// Tenta carregar o template específico
+		TemplateComponent = (await import(
 			`@/app/[username]/templates/${category}/${name}.tsx`
-		);
-		TemplateComponent = mod.default as ComponentType<{
-			user: UserProfileData;
-		}>;
+		)).default;
 	} catch {
-		const mod = await import("@/app/[username]/templates/minimalista/default");
-		TemplateComponent = mod.default as ComponentType<{
-			user: UserProfileData;
-		}>;
+		// Fallback para template padrão
+		TemplateComponent = (await import(
+			"@/app/[username]/templates/minimalista/default"
+		)).default;
 	}
 
 	return (

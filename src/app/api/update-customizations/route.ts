@@ -2,6 +2,7 @@
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -33,6 +34,15 @@ export async function POST(request: Request) {
 				data: cleanedCustomizations, // Apenas os campos que mudaram
 			});
 
+			// Revalida a página do perfil do usuário
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true }
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+			}
+
 			return NextResponse.json(updated);
 		}
 		// 5. Se não existe registro, cria um novo apenas com os campos enviados
@@ -44,6 +54,15 @@ export async function POST(request: Request) {
 		const created = await prisma.customPresets.create({
 			data: dataToCreate,
 		});
+
+		// Revalida a página do perfil do usuário
+		const user = await prisma.user.findUnique({
+			where: { id: session.user.id },
+			select: { username: true }
+		});
+		if (user?.username) {
+			revalidatePath(`/${user.username}`);
+		}
 
 		return NextResponse.json(created);
 	} catch {
