@@ -1,12 +1,12 @@
 // src/app/(private)/studio/personalizar/CategoriasTemplates.tsx
 "use client";
 
-import { BaseButton } from "@/components/buttons/BaseButton";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { CATEGORIES } from "../data/personalizar.data";
+import { BaseButton } from "@/components/buttons/BaseButton";
+import { Button } from "@/components/ui/button";
 import CategoryDropdown from "@/components/ui/CategoryDropdown";
+import { CATEGORIES } from "../data/personalizar.data";
 
 interface TemplateSettingsProps {
 	onTemplateChange?: () => void; // Callback para notificar mudança de template
@@ -69,9 +69,6 @@ export default function TemplateSettings({
 				if (onTemplateChange) {
 					onTemplateChange();
 				}
-
-				// Recarregar a página para refletir as mudanças
-				window.location.reload();
 			}
 		} finally {
 			const elapsedTime = Date.now() - startTime;
@@ -89,15 +86,15 @@ export default function TemplateSettings({
 			<div className="mb-10 block sm:hidden">
 				<CategoryDropdown
 					categories={Object.keys(CATEGORIES)}
-					selectedCategory={selectedCategory}
 					onCategorySelect={setSelectedCategory}
+					selectedCategory={selectedCategory}
 				/>
 			</div>
 			{/* Desktop: Grid */}
-			<div className="mb-10 hidden sm:grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+			<div className="mb-10 hidden grid-cols-2 gap-2 sm:grid sm:grid-cols-3 md:grid-cols-4">
 				{Object.keys(CATEGORIES).map((category) => (
 					<Button
-						className={`h-12 w-full rounded-lg border-2 px-2 py-1 font-medium text-xs capitalize transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white flex items-center justify-center text-center ${
+						className={`flex h-12 w-full items-center justify-center rounded-lg border-2 px-2 py-1 text-center font-medium text-xs capitalize transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white ${
 							selectedCategory === category
 								? "border-lime-500 bg-green-950 text-white"
 								: ""

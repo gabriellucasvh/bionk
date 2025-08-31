@@ -54,6 +54,9 @@ const PersonalizarClient = () => {
 		};
 
 		setUserCustomizations(resetCustomizations);
+
+		// Disparar evento personalizado para recarregar o iframe quando o template mudar
+		window.dispatchEvent(new CustomEvent('reloadIframePreview'));
 	};
 
 	// Função atualizada para aceitar personalizações parciais
@@ -74,6 +77,9 @@ const PersonalizarClient = () => {
 				...prev,
 				...partialCustomizations,
 			}));
+
+			// Disparar evento personalizado para recarregar o iframe
+			window.dispatchEvent(new CustomEvent('reloadIframePreview'));
 		}
 	};
 
