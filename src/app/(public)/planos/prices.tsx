@@ -82,7 +82,7 @@ const customPlan = {
 	name: "Personalizado",
 	description: "Entre em contato e monte um plano sob medida.",
 	label: "Falar conosco",
-	link: "/contato",
+	link: "/planos/custom",
 	features: [
 		"Soluções sob medida",
 		"Funcionalidades exclusivas",
