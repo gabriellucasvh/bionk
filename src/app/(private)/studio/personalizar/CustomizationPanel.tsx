@@ -42,15 +42,16 @@ const SOLID_COLORS = [
 	"#EF4444",
 ];
 const GRADIENTS = [
-	"linear-gradient(90deg, #FF9A9E 0%, #FAD0C4 100%)",
-	"linear-gradient(90deg, #A1C4FD 0%, #C2E9FB 100%)",
-	"linear-gradient(90deg, #84FAB0 0%, #8FD3F4 100%)",
-	"linear-gradient(90deg, #A6C1EE 0%, #FBC2EB 100%)",
-	"linear-gradient(90deg, #FFC3A0 0%, #FFAFBD 100%)",
-	"linear-gradient(90deg, #6A11CB 0%, #2575FC 100%)",
-	"linear-gradient(90deg, #FDE68A 0%, #FCA5A5 100%)",
-	"linear-gradient(90deg, #D1FAE5 0%, #A5B4FC 100%)",
-	"linear-gradient(90deg, #FECACA 0%, #FCA5A5 100%)",
+	// Gradientes Claros Profissionais
+	"linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+	"linear-gradient(135deg, #ffecd2 0%, #fcb69f 25%, #ff8a80 75%, #ff5722 100%)",
+	"linear-gradient(135deg, #a8edea 0%, #fed6e3 25%, #d299c2 75%, #fef9d7 100%)",
+	"linear-gradient(135deg, #d9a7c7 0%, #fffcdc 25%, #c2e9fb 50%, #a1c4fd 100%)",
+	// Gradientes Escuros Sofisticados
+	"linear-gradient(135deg, #0c0c0c 0%, #2c3e50 25%, #34495e 75%, #1a252f 100%)",
+	"linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 100%)",
+	"linear-gradient(135deg, #8360c3 0%, #2ebf91 25%, #8360c3 50%, #2ebf91 100%)",
+	"linear-gradient(135deg, #0f0c29 0%, #302b63 25%, #24243e 50%, #0f0c29 100%)",
 ];
 const FONT_OPTIONS = [
 	{ value: "font-sans", label: "Satoshi", fontFamily: "var(--font-sans)" },
