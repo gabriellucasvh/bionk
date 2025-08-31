@@ -283,18 +283,79 @@ export default function BaseTemplate({
 			fontFamily: `var(--${customPresets.customFont})`,
 		}),
 	};
-	const buttonStyle = {
-		...(customPresets?.customButtonFill && {
-			backgroundColor: customPresets.customButtonFill,
-		}),
-		...(customPresets?.customButtonCorners && {
-			borderRadius: `${customPresets.customButtonCorners}px`,
-		}),
-		...(customPresets?.customButton && {
-			border: customPresets.customButton === 'outline' ? '2px solid currentColor' : 'none',
-			backgroundColor: customPresets.customButton === 'outline' ? 'transparent' : (customPresets?.customButtonFill || undefined),
-		}),
+	const getButtonStyleByType = (buttonType: string) => {
+		const baseStyle = {
+			...(customPresets?.customButtonFill && {
+				backgroundColor: customPresets.customButtonFill,
+			}),
+			...(customPresets?.customButtonCorners && {
+				borderRadius: `${customPresets.customButtonCorners}px`,
+			}),
+		};
+
+		switch (buttonType) {
+			case 'solid':
+				return {
+					...baseStyle,
+					border: 'none',
+				};
+			case 'outline':
+				return {
+					...baseStyle,
+					border: '2px solid currentColor',
+				};
+			case 'soft':
+				return {
+					...baseStyle,
+					border: '1px solid rgba(0,0,0,0.1)',
+					filter: 'opacity(0.8)',
+				};
+			case 'shadow':
+				return {
+					...baseStyle,
+					border: '1px solid rgba(0,0,0,0.1)',
+					boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+				};
+			case 'neon':
+				return {
+					...baseStyle,
+					border: '2px solid currentColor',
+					boxShadow: '0 0 10px currentColor, inset 0 0 10px rgba(255,255,255,0.1)',
+				};
+			case 'dashed':
+				return {
+					...baseStyle,
+					border: '2px dashed currentColor',
+				};
+			case 'double':
+				return {
+					...baseStyle,
+					border: '4px double currentColor',
+				};
+			case 'raised':
+				return {
+					...baseStyle,
+					borderTop: '2px solid rgba(255,255,255,0.8)',
+					borderLeft: '2px solid rgba(255,255,255,0.8)',
+					borderRight: '1px solid rgba(0,0,0,0.2)',
+					borderBottom: '1px solid rgba(0,0,0,0.2)',
+					boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5)',
+				};
+			case 'inset':
+				return {
+					...baseStyle,
+					borderTop: '1px solid rgba(0,0,0,0.2)',
+					borderLeft: '1px solid rgba(0,0,0,0.2)',
+					borderRight: '2px solid rgba(255,255,255,0.8)',
+					borderBottom: '2px solid rgba(255,255,255,0.8)',
+					boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.2)',
+				};
+			default:
+				return baseStyle;
+		}
 	};
+
+	const buttonStyle = getButtonStyleByType(customPresets?.customButton || 'solid');
 
 	return (
 		<>

@@ -1,13 +1,13 @@
 "use client";
 
-import { BaseButton } from "@/components/buttons/BaseButton";
-import { Slider } from "@/components/ui/slider"; // Importar o Slider do shadcn/ui
 import { Plus, Type } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
-import { RenderLabel } from "./components/personalizar.RenderLabel";
+import { BaseButton } from "@/components/buttons/BaseButton";
 import FontSelectionModal from "@/components/modals/FontSelectionModal";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider"; // Importar o Slider do shadcn/ui
+import { RenderLabel } from "./components/personalizar.RenderLabel";
 
 // Interface atualizada
 interface CustomizationPanelProps {
@@ -55,31 +55,141 @@ const GRADIENTS = [
 const FONT_OPTIONS = [
 	{ value: "font-sans", label: "Satoshi", fontFamily: "var(--font-sans)" },
 	{ value: "font-inter", label: "Inter", fontFamily: "var(--font-inter)" },
-	{ value: "font-montserrat", label: "Montserrat", fontFamily: "var(--font-montserrat)" },
-	{ value: "font-poppins", label: "Poppins", fontFamily: "var(--font-poppins)" },
+	{
+		value: "font-montserrat",
+		label: "Montserrat",
+		fontFamily: "var(--font-montserrat)",
+	},
+	{
+		value: "font-poppins",
+		label: "Poppins",
+		fontFamily: "var(--font-poppins)",
+	},
 	{ value: "font-nunito", label: "Nunito", fontFamily: "var(--font-nunito)" },
-	{ value: "font-playfair-display", label: "Playfair Display", fontFamily: "var(--font-playfair-display)" },
-	{ value: "font-merriweather", label: "Merriweather", fontFamily: "var(--font-merriweather)" },
-	{ value: "font-dancing-script", label: "Dancing Script", fontFamily: "var(--font-dancing-script)" },
-	{ value: "font-dm-serif-display", label: "DM Serif Display", fontFamily: "var(--font-dm-serif-display)" },
-	{ value: "font-orbitron", label: "Orbitron", fontFamily: "var(--font-orbitron)" },
-	{ value: "font-plus-jakarta-sans", label: "Plus Jakarta Sans", fontFamily: "var(--font-plus-jakarta-sans)" },
+	{
+		value: "font-playfair-display",
+		label: "Playfair Display",
+		fontFamily: "var(--font-playfair-display)",
+	},
+	{
+		value: "font-merriweather",
+		label: "Merriweather",
+		fontFamily: "var(--font-merriweather)",
+	},
+	{
+		value: "font-dancing-script",
+		label: "Dancing Script",
+		fontFamily: "var(--font-dancing-script)",
+	},
+	{
+		value: "font-dm-serif-display",
+		label: "DM Serif Display",
+		fontFamily: "var(--font-dm-serif-display)",
+	},
+	{
+		value: "font-orbitron",
+		label: "Orbitron",
+		fontFamily: "var(--font-orbitron)",
+	},
+	{
+		value: "font-plus-jakarta-sans",
+		label: "Plus Jakarta Sans",
+		fontFamily: "var(--font-plus-jakarta-sans)",
+	},
 	{ value: "font-outfit", label: "Outfit", fontFamily: "var(--font-outfit)" },
-	{ value: "font-space-grotesk", label: "Space Grotesk", fontFamily: "var(--font-space-grotesk)" },
-	{ value: "font-libre-baskerville", label: "Libre Baskerville", fontFamily: "var(--font-libre-baskerville)" },
-	{ value: "font-alegreya", label: "Alegreya", fontFamily: "var(--font-alegreya)" },
-	{ value: "font-spectral", label: "Spectral", fontFamily: "var(--font-spectral)" },
-	{ value: "font-urbanist", label: "Urbanist", fontFamily: "var(--font-urbanist)" },
+	{
+		value: "font-space-grotesk",
+		label: "Space Grotesk",
+		fontFamily: "var(--font-space-grotesk)",
+	},
+	{
+		value: "font-libre-baskerville",
+		label: "Libre Baskerville",
+		fontFamily: "var(--font-libre-baskerville)",
+	},
+	{
+		value: "font-alegreya",
+		label: "Alegreya",
+		fontFamily: "var(--font-alegreya)",
+	},
+	{
+		value: "font-spectral",
+		label: "Spectral",
+		fontFamily: "var(--font-spectral)",
+	},
+	{
+		value: "font-urbanist",
+		label: "Urbanist",
+		fontFamily: "var(--font-urbanist)",
+	},
 	{ value: "font-karla", label: "Karla", fontFamily: "var(--font-karla)" },
-	{ value: "font-public-sans", label: "Public Sans", fontFamily: "var(--font-public-sans)" },
-	{ value: "font-atkinson-hyperlegible", label: "Atkinson Hyperlegible", fontFamily: "var(--font-atkinson-hyperlegible)" },
-	{ value: "font-fira-sans", label: "Fira Sans", fontFamily: "var(--font-fira-sans)" },
+	{
+		value: "font-public-sans",
+		label: "Public Sans",
+		fontFamily: "var(--font-public-sans)",
+	},
+	{
+		value: "font-atkinson-hyperlegible",
+		label: "Atkinson Hyperlegible",
+		fontFamily: "var(--font-atkinson-hyperlegible)",
+	},
+	{
+		value: "font-fira-sans",
+		label: "Fira Sans",
+		fontFamily: "var(--font-fira-sans)",
+	},
 	{ value: "font-mulish", label: "Mulish", fontFamily: "var(--font-mulish)" },
 ];
 const BUTTON_STYLES = [
-	{ value: "solid", label: "Sólido" },
-	{ value: "outline", label: "Contorno" },
-	{ value: "soft", label: "Suave" },
+	{
+		value: "solid",
+		label: "Sólido",
+		preview: "bg-gray-500 text-white border-none",
+	},
+	{
+		value: "outline",
+		label: "Contorno",
+		preview: "bg-transparent text-gray-700 border-gray-500 border-2",
+	},
+	{
+		value: "soft",
+		label: "Suave",
+		preview: "bg-gray-100 text-gray-700 border-gray-200",
+	},
+	{
+		value: "shadow",
+		label: "Sombra",
+		preview: "bg-gray-100 text-gray-700 border-gray-300 shadow-lg",
+	},
+	{
+		value: "neon",
+		label: "Neon",
+		preview:
+			"bg-transparent text-gray-700 border-gray-500 border-2 shadow-[0_0_8px_rgba(0,0,0,0.3)]",
+	},
+	{
+		value: "dashed",
+		label: "Tracejado",
+		preview:
+			"bg-transparent text-gray-700 border-gray-500 border-2 border-dashed",
+	},
+	{
+		value: "double",
+		label: "Dupla",
+		preview: "bg-transparent text-gray-700 border-gray-600 border-4 border-double",
+	},
+	{
+		value: "raised",
+		label: "Elevado",
+		preview:
+			"bg-gray-200 text-gray-700 border-gray-400 border-t-2 border-l-2 border-r border-b shadow-inner",
+	},
+	{
+		value: "inset",
+		label: "Interno",
+		preview:
+			"bg-gray-200 text-gray-700 border-gray-400 border-b-2 border-r-2 border-t border-l shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]",
+	},
 ];
 
 const FIELD_TO_PICKER: Record<string, "background" | "text" | "button"> = {
@@ -337,35 +447,34 @@ export default function CustomizationPanel({
 
 			{/* Fonte */}
 			<div className="mb-8">
-				<RenderLabel
-					text="Fonte"
-				/>
+				<RenderLabel text="Fonte" />
 				{/* Mobile: Button to open modal */}
 				<div className="mt-2 block sm:hidden">
 					<Button
-						variant="outline"
-						className="w-full justify-between h-12 px-4 py-2 text-left"
+						className="h-12 w-full justify-between px-4 py-2 text-left"
 						onClick={() => setIsFontModalOpen(true)}
+						variant="outline"
 					>
 						<span className="truncate">
-							{FONT_OPTIONS.find(f => f.value === customizations.customFont)?.label || "Satoshi"}
+							{FONT_OPTIONS.find((f) => f.value === customizations.customFont)
+								?.label || "Satoshi"}
 						</span>
 						<Type className="h-4 w-4" />
 					</Button>
 				</div>
 				{/* Desktop: Grid layout */}
-				<div className="mt-2 hidden sm:grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5">
+				<div className="mt-2 hidden grid-cols-3 gap-2 sm:grid sm:grid-cols-4 lg:grid-cols-5">
 					{FONT_OPTIONS.map((font) => (
 						<button
-							className={`h-16 w-full rounded border px-2 py-1 text-xs leading-tight transition-colors flex items-center justify-center text-center ${
+							className={`flex h-16 w-full items-center justify-center rounded border px-2 py-1 text-center text-xs leading-tight transition-colors ${
 								customizations.customFont === font.value
 									? "border-gray-300 bg-neutral-200"
 									: "border-gray-200 hover:bg-neutral-200"
 							}`}
 							key={font.value}
 							onClick={() => handleChange("customFont", font.value)}
+							style={{ fontFamily: font.fontFamily || "inherit" }}
 							type="button"
-							style={{ fontFamily: font.fontFamily || 'inherit' }}
 						>
 							<span className="break-words">{font.label}</span>
 						</button>
@@ -379,13 +488,15 @@ export default function CustomizationPanel({
 					hasPending={hasPendingChange("customButton")}
 					text="Estilo do Botão"
 				/>
-				<div className="mt-2 grid grid-cols-3 gap-2">
+				<div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-3 md:grid-cols-3">
 					{BUTTON_STYLES.map((style) => (
 						<button
-							className={`h-12 w-full rounded border px-2 py-1 text-sm transition-colors flex items-center justify-center text-center ${
+							className={`flex h-12 w-full items-center justify-center rounded px-2 py-1 text-center text-sm transition-all duration-200 ${
+								style.preview
+							} ${
 								customizations.customButton === style.value
-									? "border-gray-300 bg-neutral-200"
-									: "border-gray-200 hover:bg-neutral-200"
+									? "ring-1 ring-green-500 ring-offset-2"
+									: ""
 							}`}
 							key={style.value}
 							onClick={() => handleChange("customButton", style.value)}
@@ -440,15 +551,15 @@ export default function CustomizationPanel({
 			)}
 			{/* Font Selection Modal for Mobile */}
 			<FontSelectionModal
-				isOpen={isFontModalOpen}
-				onClose={() => setIsFontModalOpen(false)}
-				fontOptions={FONT_OPTIONS.map(font => ({
+				fontOptions={FONT_OPTIONS.map((font) => ({
 					label: font.label,
 					value: font.value,
-					fontFamily: font.fontFamily
+					fontFamily: font.fontFamily,
 				}))}
-				selectedFont={customizations.customFont}
+				isOpen={isFontModalOpen}
+				onClose={() => setIsFontModalOpen(false)}
 				onFontSelect={(fontValue) => handleChange("customFont", fontValue)}
+				selectedFont={customizations.customFont}
 			/>
 		</div>
 	);
