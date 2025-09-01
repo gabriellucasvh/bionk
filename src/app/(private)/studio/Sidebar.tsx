@@ -19,7 +19,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import React, { useCallback, useEffect, useState } from "react";
-import { useSubscription } from "@/providers/subscriptionProvider";
 import { QRCode } from "react-qrcode-logo";
 import ShareSheet from "@/components/ShareSheet";
 import { Button } from "@/components/ui/button";
@@ -35,6 +34,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSubscription } from "@/providers/subscriptionProvider";
 
 const ProfileActionsDropdown = ({
 	profileUrl,
@@ -193,8 +193,6 @@ const Sidebar = () => {
 		setProfileUrl(username ? `${baseUrl}/${username}` : "#");
 	}, [username]);
 
-
-
 	// Atualiza a chave da imagem quando a sessão muda
 	useEffect(() => {
 		if (session?.user?.image) {
@@ -217,8 +215,8 @@ const Sidebar = () => {
 					<Button
 						className={`h-10 w-full justify-start rounded-lg px-3 font-medium text-sm transition-all ${
 							isActive
-								? "bg-gray-200 text-green-700 shadow-sm"
-								: "text-gray-700 hover:bg-gray-100"
+								? "bg-neutral-200 text-black shadow-sm"
+								: "text-neutral-700 hover:bg-neutral-200"
 						}`}
 						key={link.key}
 						onClick={() => !isActive && handleNavClick(link.href)}
@@ -235,7 +233,7 @@ const Sidebar = () => {
 	return (
 		<>
 			{/* Sidebar desktop */}
-			<aside className="hidden px-3 md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-r md:bg-white/70 md:backdrop-blur-lg">
+			<aside className="hidden px-3 md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-r md:bg-neutral-50/70 md:backdrop-blur-lg">
 				<header className="flex h-16 items-center border-b pl-2">
 					<Link className="flex items-center gap-2 font-semibold" href="/">
 						<Image
@@ -252,7 +250,7 @@ const Sidebar = () => {
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button
-								className="flex h-12 w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-4 transition hover:bg-gray-200 hover:text-green-700"
+								className="flex h-12 w-full items-center justify-between rounded-lg border border-gray-200 bg-neutral-100 px-4 transition hover:bg-neutral-200"
 								variant="outline"
 							>
 								<div className="flex flex-col items-start justify-center overflow-auto text-left">
@@ -314,22 +312,20 @@ const Sidebar = () => {
 								</h2>
 								{subscriptionPlan && (
 									<span
-										className={`mt-1 inline-block w-fit rounded-md px-2 py-0.5 font-medium text-[10px] capitalize ${
-											(() => {
-												switch (subscriptionPlan) {
-													case "free":
-														return "bg-green-100 text-green-600";
-													case "basic":
-														return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
-													case "pro":
-														return "bg-radial-[at_50%_75%] from-yellow-500 via-purple-500 to-blue-500 text-white";
-													case "premium":
-														return "bg-gradient-to-r from-blue-600 to-blue-500 text-white";
-													default:
-														return "bg-green-100 text-green-600";
-												}
-											})()
-										}`}
+										className={`mt-1 inline-block w-fit rounded-md px-2 py-0.5 font-medium text-[10px] capitalize ${(() => {
+											switch (subscriptionPlan) {
+												case "free":
+													return "bg-green-100 text-green-600";
+												case "basic":
+													return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
+												case "pro":
+													return "bg-radial-[at_50%_75%] from-yellow-500 via-purple-500 to-blue-500 text-white";
+												case "premium":
+													return "bg-gradient-to-r from-blue-600 to-blue-500 text-white";
+												default:
+													return "bg-green-100 text-green-600";
+											}
+										})()}`}
 									>
 										{subscriptionPlan}
 									</span>
