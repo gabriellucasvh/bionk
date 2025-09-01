@@ -1,4 +1,5 @@
 import NextAuthSessionProvider from "@/providers/sessionProvider";
+import { SubscriptionProvider } from "@/providers/subscriptionProvider";
 import type { Metadata } from "next";
 import { Geist, Inter, Montserrat, Poppins, Nunito, Playfair_Display, Merriweather, Dancing_Script, DM_Serif_Display, Orbitron, Plus_Jakarta_Sans, Outfit, Space_Grotesk, Libre_Baskerville, Alegreya, Spectral, Urbanist, Karla, Public_Sans, Atkinson_Hyperlegible, Fira_Sans, Mulish } from "next/font/google";
 import localFont from "next/font/local";
@@ -138,7 +139,9 @@ export default function RootLayout({
 				lang="pt-BR"
 			>
 			<body>
-				<NextAuthSessionProvider>{children}</NextAuthSessionProvider>
+				<NextAuthSessionProvider>
+					<SubscriptionProvider>{children}</SubscriptionProvider>
+				</NextAuthSessionProvider>
 			</body>
 		</html>
 	);

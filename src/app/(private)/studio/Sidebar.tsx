@@ -1,6 +1,26 @@
 // src/app/(private)/studio/Sidebar.tsx
 "use client";
 
+import {
+	BarChart3,
+	Blocks,
+	Download,
+	ExternalLink,
+	Link2,
+	Paintbrush,
+	QrCode,
+	Settings,
+	Share2,
+	SwatchBook,
+	User,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useSubscription } from "@/providers/subscriptionProvider";
+import { QRCode } from "react-qrcode-logo";
 import ShareSheet from "@/components/ShareSheet";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,25 +35,6 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-	BarChart3,
-	Blocks,
-	Download,
-	ExternalLink,
-	Link2,
-	Paintbrush,
-	QrCode,
-	Settings,
-	Share2,
-	SwatchBook,
-	User,
-} from "lucide-react";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
-import { QRCode } from "react-qrcode-logo";
 
 const ProfileActionsDropdown = ({
 	profileUrl,
@@ -177,8 +178,8 @@ const Sidebar = () => {
 	const pathname = usePathname();
 	const router = useRouter();
 	const { data: session } = useSession();
+	const { subscriptionPlan } = useSubscription();
 	const [profileUrl, setProfileUrl] = useState("#");
-	const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
 	const [imageKey, setImageKey] = useState(Date.now());
 
 	const username = session?.user?.username;
@@ -192,22 +193,7 @@ const Sidebar = () => {
 		setProfileUrl(username ? `${baseUrl}/${username}` : "#");
 	}, [username]);
 
-	useEffect(() => {
-		const fetchPlan = async () => {
-			if (session?.user?.id) {
-				try {
-					const res = await fetch("/api/user-plan");
-					if (res.ok) {
-						const data = await res.json();
-						setSubscriptionPlan(data.subscriptionPlan);
-					}
-				} catch {
-					setSubscriptionPlan("");
-				}
-			}
-		};
-		fetchPlan();
-	}, [session?.user?.id]);
+
 
 	// Atualiza a chave da imagem quando a sessão muda
 	useEffect(() => {
@@ -315,7 +301,11 @@ const Sidebar = () => {
 								alt="Avatar"
 								className="rounded-full"
 								height={42}
-								src={session?.user?.image ? `${session.user.image}?t=${imageKey}` : "/default-avatar.png"}
+								src={
+									session?.user?.image
+										? `${session.user.image}?t=${imageKey}`
+										: "/default-avatar.png"
+								}
 								width={42}
 							/>
 							<div className="flex flex-1 flex-col truncate">
@@ -323,7 +313,24 @@ const Sidebar = () => {
 									{session?.user?.name}
 								</h2>
 								{subscriptionPlan && (
-									<span className="mt-1 inline-block w-fit rounded-md bg-green-100 px-2 py-0.5 font-medium text-[10px] text-green-600 capitalize">
+									<span
+										className={`mt-1 inline-block w-fit rounded-md px-2 py-0.5 font-medium text-[10px] capitalize ${
+											(() => {
+												switch (subscriptionPlan) {
+													case "free":
+														return "bg-green-100 text-green-600";
+													case "basic":
+														return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
+													case "pro":
+														return "bg-radial-[at_50%_75%] from-yellow-500 via-purple-500 to-blue-500 text-white";
+													case "premium":
+														return "bg-gradient-to-r from-blue-600 to-blue-500 text-white";
+													default:
+														return "bg-green-100 text-green-600";
+												}
+											})()
+										}`}
+									>
 										{subscriptionPlan}
 									</span>
 								)}
@@ -368,7 +375,11 @@ const Sidebar = () => {
 									alt="Avatar"
 									className="rounded-full"
 									height={24}
-									src={session?.user?.image ? `${session.user.image}?t=${imageKey}` : "/default-avatar.png"}
+									src={
+										session?.user?.image
+											? `${session.user.image}?t=${imageKey}`
+											: "/default-avatar.png"
+									}
 									width={24}
 								/>
 							)}

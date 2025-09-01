@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useSubscription } from "@/providers/subscriptionProvider";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
 	AlertDialog,
@@ -52,6 +53,8 @@ function CancelSubscriptionButton() {
 	const [error, setError] = useState("");
 	const [showCancelDialog, setShowCancelDialog] = useState(false);
 
+	const { refreshSubscriptionPlan } = useSubscription();
+
 	const handleCancelConfirm = async () => {
 		setIsLoading(true);
 		setError("");
@@ -66,6 +69,8 @@ function CancelSubscriptionButton() {
 				throw new Error(data.details || "Falha ao cancelar.");
 			}
 			setMessage(data.message);
+			// Atualiza o subscription plan no contexto
+			await refreshSubscriptionPlan();
 			setTimeout(() => window.location.reload(), 2000);
 		} catch (err: any) {
 			setError(err.message);

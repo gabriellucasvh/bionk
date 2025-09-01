@@ -3,7 +3,9 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 import Sidebar from "./Sidebar";
+import { SubscriptionSuccessHandler } from "@/components/SubscriptionSuccessHandler";
 
 interface StudioLayoutProps {
 	children: ReactNode;
@@ -18,6 +20,9 @@ export default async function StudioLayout({ children }: StudioLayoutProps) {
 
 	return (
 			<section>
+				<Suspense fallback={null}>
+					<SubscriptionSuccessHandler />
+				</Suspense>
 				<Sidebar />
 				<main className="mb-20 ml-0 min-h-screen md:mb-0 md:ml-64">
 					{children}
