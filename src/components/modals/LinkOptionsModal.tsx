@@ -2,6 +2,9 @@
 
 "use client";
 
+import { ExternalLink, Flag } from "lucide-react";
+import Image from "next/image";
+import type { FC } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -10,11 +13,8 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import type { UserLink } from "@/types/user-profile";
-import { ExternalLink, Flag } from "lucide-react";
-import Image from "next/image";
-import type { FC } from "react";
-import { BaseButton } from "./buttons/BaseButton";
-import ShareSheet from "./ShareSheet";
+import { BaseButton } from "../buttons/BaseButton";
+import ShareSheet from "../ShareSheet";
 
 interface LinkOptionsModalProps {
 	link: UserLink | null;

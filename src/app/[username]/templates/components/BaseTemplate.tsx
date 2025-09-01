@@ -4,7 +4,7 @@
 
 import { BaseButton } from "@/components/buttons/BaseButton";
 import InteractiveLink from "@/components/InteractiveLink";
-import JoinBionkModal from "@/components/JoinBionkModal";
+import JoinBionkModal from "@/components/modals/JoinBionkModal";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
 import { Badge } from "@/components/ui/badge";

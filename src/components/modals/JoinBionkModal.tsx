@@ -1,5 +1,9 @@
 "use client";
 
+import { ArrowRight, Globe, LinkIcon, Share2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -10,12 +14,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { ArrowRight, Globe, LinkIcon, Share2 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import type { ReactNode } from "react";
-import { useState } from "react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 interface JoinBionkModalProps {
 	children: string;
@@ -28,11 +27,12 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 		<Dialog onOpenChange={setOpen} open={open}>
 			<DialogTrigger asChild>
 				<Button
-					className="inline-block max-w-full break-words text-center text-sm sm:text-base mt-5"
+					className="mt-5 inline-block max-w-full break-words text-center text-sm sm:text-base"
 					onClick={() => setOpen(true)}
 					variant="ghost"
 				>
-					  @{children.length > 30 ? `${children.slice(0, 30)}...` : children} | Bionk
+					@{children.length > 30 ? `${children.slice(0, 30)}...` : children} |
+					Bionk
 				</Button>
 			</DialogTrigger>
 

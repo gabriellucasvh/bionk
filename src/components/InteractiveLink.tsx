@@ -1,13 +1,13 @@
 "use client";
 
-import LinkOptionsModal from "@/components/LinkOptionsModal";
-import type { UserLink } from "@/types/user-profile";
-import { detectTrafficSource } from "@/utils/traffic-source";
 import { Eye, MoreVertical } from "lucide-react";
 import Link from "next/link";
 import type { FC, MouseEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+import LinkOptionsModal from "@/components/modals/LinkOptionsModal";
+import type { UserLink } from "@/types/user-profile";
+import { detectTrafficSource } from "@/utils/traffic-source";
 
 interface InteractiveLinkProps {
 	href: string;
@@ -45,9 +45,9 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 
 		const url = "/api/link-click";
 		const trafficSource = detectTrafficSource();
-		const data = JSON.stringify({ 
+		const data = JSON.stringify({
 			linkId: link.id,
-			trafficSource // Incluir a origem detectada
+			trafficSource, // Incluir a origem detectada
 		});
 
 		if (navigator.sendBeacon) {
@@ -71,7 +71,10 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 	return (
 		<>
 			<div
-				className={twMerge("group relative w-full rounded-xl shadow-md", className)}
+				className={twMerge(
+					"group relative w-full rounded-xl shadow-md",
+					className
+				)}
 				style={style}
 			>
 				<Link
