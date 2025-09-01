@@ -288,9 +288,26 @@ export default function CustomPlanForm() {
 						)}
 					</div>
 
-					<p className="text-start text-gray-500 text-xs">
+					<p className="text-start text-gray-500 text-sm">
 						Ao enviar este formulário, você concorda que nossa equipe entre em
-						contato para discutir sua solicitação.
+						contato para discutir sua solicitação e aceita nossos{" "}
+						<Link
+							className="text-blue-600 underline"
+							href={"/termos"}
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							Termos de Uso
+						</Link>{" "}
+						e{" "}
+						<Link
+							className="text-blue-600 underline"
+							href={"/privacidade"}
+							rel="noopener noreferrer"
+							target="_blank"
+						>
+							Política de Privacidade
+						</Link>
 					</p>
 					<Button
 						className="w-min bg-green-600 py-3 font-medium text-lg text-white hover:bg-green-700"
