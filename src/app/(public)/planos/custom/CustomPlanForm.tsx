@@ -150,8 +150,8 @@ export default function CustomPlanForm() {
 	}
 
 	return (
-		<Card className="mx-auto w-11/12 border-none shadow-none">
-			<CardContent className="pt-6">
+		<Card className="mx-auto max-w-2xl border-none shadow-none">
+			<CardContent className="px-0 pt-6">
 				{error && (
 					<div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
 						<p className="text-red-700 text-sm">{error}</p>

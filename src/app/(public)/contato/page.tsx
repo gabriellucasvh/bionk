@@ -18,11 +18,9 @@ export default function ContactPage() {
 			<HeaderMobile />
 			<div className="container mx-auto px-4 py-12 pt-32">
 				{/* Título Principal */}
-				<div className="text-center">
-					<h1 className="mb-4 font-bold text-4xl text-black">
-						Fale Conosco
-					</h1>
-					<p className="mx-auto max-w-3xl font-medium text-gray-700 text-lg">
+				<div className="text-start md:text-center">
+					<h1 className="mb-4 font-bold text-4xl text-black">Fale Conosco</h1>
+					<p className="mx-auto max-w-3xl pb-7 font-medium text-gray-700 md:text-lg">
 						Tem alguma dúvida, sugestão ou precisa de ajuda? Nossa equipe está
 						aqui para ajudar você.
 						<br />
