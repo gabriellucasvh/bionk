@@ -1,5 +1,19 @@
 "use client";
 
+import {
+	Archive,
+	CreditCard,
+	HelpCircle,
+	Lock,
+	LogOut,
+	Mail,
+	Trash2,
+	User,
+	XOctagon,
+} from "lucide-react";
+import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
 	AlertDialog,
@@ -21,21 +35,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-	Archive,
-	CreditCard,
-	HelpCircle,
-	Lock,
-	LogOut,
-	Mail,
-	Star,
-	Trash2,
-	User,
-	XOctagon,
-} from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
 import ArchivedLinksModal from "./components/configs.ArchiveLinksModal";
 
 type Profile = { email: string };
@@ -51,18 +50,13 @@ function CancelSubscriptionButton() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [message, setMessage] = useState("");
 	const [error, setError] = useState("");
-	const handleCancel = async () => {
+	const [showCancelDialog, setShowCancelDialog] = useState(false);
+
+	const handleCancelConfirm = async () => {
 		setIsLoading(true);
 		setError("");
 		setMessage("");
-		if (
-			!confirm(
-				"Você tem certeza? Sua assinatura será cancelada e seus benefícios removidos no final do ciclo atual."
-			)
-		) {
-			setIsLoading(false);
-			return;
-		}
+		setShowCancelDialog(false);
 		try {
 			const response = await fetch("/api/mercadopago/cancel-subscription", {
 				method: "POST",
@@ -81,16 +75,38 @@ function CancelSubscriptionButton() {
 	};
 	return (
 		<div className="mt-4">
-			<Button
-				disabled={isLoading}
-				onClick={handleCancel}
-				size="sm"
-				variant="destructive"
-				className="w-full sm:w-auto"
-			>
-				<XOctagon className="mr-2 h-4 w-4" />
-				{isLoading ? "Cancelando..." : "Cancelar Assinatura"}
-			</Button>
+			<AlertDialog onOpenChange={setShowCancelDialog} open={showCancelDialog}>
+				<AlertDialogTrigger asChild>
+					<Button
+						className="w-full text-red-800 hover:text-red-600 sm:w-auto"
+						disabled={isLoading}
+						size="sm"
+						variant="outline"
+					>
+						<XOctagon className="mr-2 h-4 w-4" />
+						{isLoading ? "Cancelando..." : "Cancelar Assinatura"}
+					</Button>
+				</AlertDialogTrigger>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Cancelar Assinatura</AlertDialogTitle>
+						<AlertDialogDescription>
+							Você tem certeza? Sua assinatura será cancelada e seus benefícios
+							removidos no final do ciclo atual.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Manter Assinatura</AlertDialogCancel>
+						<AlertDialogAction
+							className="bg-red-600 hover:bg-red-700"
+							disabled={isLoading}
+							onClick={handleCancelConfirm}
+						>
+							{isLoading ? "Cancelando..." : "Sim, Cancelar"}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 			{message && <p className="mt-2 text-green-600 text-sm">{message}</p>}
 			{error && <p className="mt-2 text-red-600 text-sm">{error}</p>}
 		</div>
@@ -99,25 +115,40 @@ function CancelSubscriptionButton() {
 
 function UpgradeSubscriptionCard() {
 	return (
-		<Card className="border-green-500 bg-green-50/50">
-			<CardHeader>
-				<CardTitle className="flex items-center gap-2 text-green-800">
-					<Star className="h-5 w-5" />
-					Faça um Upgrade no seu Plano!
-				</CardTitle>
-				<CardDescription>
-					Você está no plano Free. Desbloqueie recursos avançados e leve sua
-					página para o próximo nível.
-				</CardDescription>
-			</CardHeader>
-			<CardContent>
-				<Link href="/planos" passHref>
-					<Button className="w-full bg-green-600 hover:bg-green-700 text-sm sm:text-base">
-						Ver Planos
-					</Button>
-				</Link>
-			</CardContent>
-		</Card>
+		<div>
+			<Card className="relative animate-gradient-x overflow-hidden border-0 bg-gradient-to-br from-yellow-500 via-purple-500 to-blue-500 shadow-2xl">
+				{/* shimmer */}
+				<div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+				{/* gradiente preto para transparente */}
+				<div className="absolute inset-0 z-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+				<CardHeader className="relative z-10">
+					<CardTitle className="flex items-center gap-3 font-bold text-white text-xl">
+						Desbloqueie o Poder Premium!
+					</CardTitle>
+					<CardDescription className="text-base text-green-50/90 leading-relaxed">
+						Você está a um passo da{" "}
+						<span className="font-semibold text-white">
+							experiência completa
+						</span>
+						. Junte-se aos criadores de elite e transforme sua presença digital.
+					</CardDescription>
+				</CardHeader>
+
+				<CardContent className="relative z-10 mb-2">
+					<Link
+						className="group relative w-full transform overflow-hidden rounded-xl bg-lime-400 px-8 py-3 font-medium text-base text-green-800 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-lime-500 hover:shadow-xl"
+						href="/planos"
+						passHref
+					>
+						Fazer Upgrade
+					</Link>
+				</CardContent>
+			</Card>
+
+			<Separator className="my-4" />
+		</div>
 	);
 }
 
@@ -187,7 +218,9 @@ function SubscriptionManagement({
 			</CardHeader>
 			<CardContent>
 				<Link href="/planos" passHref>
-					<Button variant="outline" className="w-full sm:w-auto">Ver Planos</Button>
+					<Button className="w-full sm:w-auto" variant="outline">
+						Ver Planos
+					</Button>
 				</Link>
 			</CardContent>
 		</Card>
@@ -268,17 +301,24 @@ export default function ConfigsClient() {
 					</CardHeader>
 					<CardContent className="space-y-4">
 						<div className="space-y-4">
-						<div className="space-y-1">
-							<p className="font-medium text-sm">Email</p>
-							<p className="text-muted-foreground text-sm break-all">{profile.email}</p>
+							<div className="space-y-1">
+								<p className="font-medium text-sm">Email</p>
+								<p className="break-all text-muted-foreground text-sm">
+									{profile.email}
+								</p>
+							</div>
+							<div className="flex justify-start">
+								<Button
+									className="w-full sm:w-auto"
+									onClick={handleLogout}
+									size="sm"
+									variant="outline"
+								>
+									<LogOut className="mr-2 h-4 w-4" />
+									Sair
+								</Button>
+							</div>
 						</div>
-						<div className="flex justify-start">
-							<Button onClick={handleLogout} size="sm" variant="outline" className="w-full sm:w-auto">
-								<LogOut className="mr-2 h-4 w-4" />
-								Sair
-							</Button>
-						</div>
-					</div>
 					</CardContent>
 				</Card>
 			</article>
@@ -294,14 +334,14 @@ export default function ConfigsClient() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-				<Button
-					onClick={() => setIsArchivedModalOpen(true)}
-					variant="outline"
-					className="w-full sm:w-auto"
-				>
-					Ver Links Arquivados
-				</Button>
-			</CardContent>
+						<Button
+							className="w-full sm:w-auto"
+							onClick={() => setIsArchivedModalOpen(true)}
+							variant="outline"
+						>
+							Ver Links Arquivados
+						</Button>
+					</CardContent>
 				</Card>
 			</article>
 			{isCredentialsUser && (
@@ -317,10 +357,12 @@ export default function ConfigsClient() {
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-					<Link href="/profile/change-email">
-						<Button variant="outline" className="w-full sm:w-auto">Alterar E-mail</Button>
-					</Link>
-				</CardContent>
+							<Link href="/profile/change-email">
+								<Button className="w-full sm:w-auto" variant="outline">
+									Alterar E-mail
+								</Button>
+							</Link>
+						</CardContent>
 					</Card>
 				</article>
 			)}
@@ -335,10 +377,12 @@ export default function ConfigsClient() {
 							<CardDescription>Atualize sua senha de acesso</CardDescription>
 						</CardHeader>
 						<CardContent>
-					<Link href="/profile/change-password">
-						<Button variant="outline" className="w-full sm:w-auto">Alterar Senha</Button>
-					</Link>
-				</CardContent>
+							<Link href="/profile/change-password">
+								<Button className="w-full sm:w-auto" variant="outline">
+									Alterar Senha
+								</Button>
+							</Link>
+						</CardContent>
 					</Card>
 				</article>
 			)}
@@ -354,22 +398,28 @@ export default function ConfigsClient() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-					<AlertDialog>
-						<AlertDialogTrigger asChild>
-							<Button variant="destructive" className="w-full sm:w-auto">Excluir Conta</Button>
-						</AlertDialogTrigger>
+						<AlertDialog>
+							<AlertDialogTrigger asChild>
+								<Button className="w-full sm:w-auto" variant="destructive">
+									Excluir Conta
+								</Button>
+							</AlertDialogTrigger>
 							<AlertDialogContent className="mx-4 max-w-md">
 								<AlertDialogHeader>
-									<AlertDialogTitle className="text-lg">Tem certeza?</AlertDialogTitle>
+									<AlertDialogTitle className="text-lg">
+										Tem certeza?
+									</AlertDialogTitle>
 									<AlertDialogDescription className="text-sm">
 										Esta ação não pode ser desfeita. Sua conta e dados serão
 										removidos permanentemente.
 									</AlertDialogDescription>
 								</AlertDialogHeader>
 								<AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-									<AlertDialogCancel className="w-full sm:w-auto">Cancelar</AlertDialogCancel>
+									<AlertDialogCancel className="w-full sm:w-auto">
+										Cancelar
+									</AlertDialogCancel>
 									<AlertDialogAction
-										className="bg-destructive text-red-100 w-full sm:w-auto"
+										className="w-full bg-destructive text-red-100 sm:w-auto"
 										onClick={handleDeleteAccount}
 									>
 										Sim, excluir minha conta
@@ -393,12 +443,12 @@ export default function ConfigsClient() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-				<Link href="/ajuda" passHref>
-					<Button className="w-full text-sm sm:text-base" variant="outline">
-						Acessar Central de Ajuda
-					</Button>
-				</Link>
-			</CardContent>
+						<Link href="/ajuda" passHref>
+							<Button className="w-full text-sm sm:text-base" variant="outline">
+								Acessar Central de Ajuda
+							</Button>
+						</Link>
+					</CardContent>
 				</Card>
 			</article>
 

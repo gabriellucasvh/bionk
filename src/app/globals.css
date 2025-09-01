@@ -10,26 +10,26 @@
 	--font-sans: var(--font-satoshi);
 	--font-geist: var(--font-geist);
 	--font-inter: var(--font-inter);
-		--font-montserrat: var(--font-montserrat);
-		--font-poppins: var(--font-poppins);
-		--font-nunito: var(--font-nunito);
-		--font-playfair-display: var(--font-playfair-display);
-		--font-merriweather: var(--font-merriweather);
-		--font-dancing-script: var(--font-dancing-script);
-		--font-dm-serif-display: var(--font-dm-serif-display);
-		--font-orbitron: var(--font-orbitron);
-		--font-plus-jakarta-sans: var(--font-plus-jakarta-sans);
-		--font-outfit: var(--font-outfit);
-		--font-space-grotesk: var(--font-space-grotesk);
-		--font-libre-baskerville: var(--font-libre-baskerville);
-		--font-alegreya: var(--font-alegreya);
-		--font-spectral: var(--font-spectral);
-		--font-urbanist: var(--font-urbanist);
-		--font-karla: var(--font-karla);
-		--font-public-sans: var(--font-public-sans);
-		--font-atkinson-hyperlegible: var(--font-atkinson-hyperlegible);
-		--font-fira-sans: var(--font-fira-sans);
-		--font-mulish: var(--font-mulish);
+	--font-montserrat: var(--font-montserrat);
+	--font-poppins: var(--font-poppins);
+	--font-nunito: var(--font-nunito);
+	--font-playfair-display: var(--font-playfair-display);
+	--font-merriweather: var(--font-merriweather);
+	--font-dancing-script: var(--font-dancing-script);
+	--font-dm-serif-display: var(--font-dm-serif-display);
+	--font-orbitron: var(--font-orbitron);
+	--font-plus-jakarta-sans: var(--font-plus-jakarta-sans);
+	--font-outfit: var(--font-outfit);
+	--font-space-grotesk: var(--font-space-grotesk);
+	--font-libre-baskerville: var(--font-libre-baskerville);
+	--font-alegreya: var(--font-alegreya);
+	--font-spectral: var(--font-spectral);
+	--font-urbanist: var(--font-urbanist);
+	--font-karla: var(--font-karla);
+	--font-public-sans: var(--font-public-sans);
+	--font-atkinson-hyperlegible: var(--font-atkinson-hyperlegible);
+	--font-fira-sans: var(--font-fira-sans);
+	--font-mulish: var(--font-mulish);
 	--color-rose: #ff527a;
 }
 
@@ -142,6 +142,27 @@
 	--animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite
 		alternate;
 	--animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+	@keyframes shimmer-slide {
+		to {
+			transform: translate(calc(100cqw - 100%), 0);
+		}
+	}
+	@keyframes spin-around {
+		0% {
+			transform: translateZ(0) rotate(0);
+		}
+		15%,
+		35% {
+			transform: translateZ(0) rotate(90deg);
+		}
+		65%,
+		85% {
+			transform: translateZ(0) rotate(270deg);
+		}
+		100% {
+			transform: translateZ(0) rotate(360deg);
+		}
+	}
 	@keyframes shimmer-slide {
 		to {
 			transform: translate(calc(100cqw - 100%), 0);
@@ -364,4 +385,44 @@ button {
 	bottom: 15%;
 	right: 0%;
 	animation-delay: 3.5s;
+}
+
+/*---break--- */
+
+/* Animações personalizadas para o card premium */
+@keyframes gradient-x {
+	0%,
+	100% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+}
+
+@keyframes shimmer {
+	0% {
+		transform: translateX(-100%);
+	}
+	100% {
+		transform: translateX(100%);
+	}
+}
+
+.animate-gradient-x {
+	background-size: 400% 400%;
+	animation: gradient-x 4s ease infinite;
+}
+
+.animate-shimmer {
+	animation: shimmer 2s ease-in-out infinite;
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
 }
