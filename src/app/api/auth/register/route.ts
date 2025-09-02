@@ -1,18 +1,23 @@
-import OtpEmail from "@/emails/OtpEmail";
-import prisma from "@/lib/prisma";
-import { getAuthRateLimiter } from "@/lib/rate-limiter";
-import { generateUniqueUsername } from "@/utils/generateUsername";
-import { discordWebhook } from "@/lib/discord-webhook";
+import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import crypto from "node:crypto";
 import { Resend } from "resend";
+import OtpEmail from "@/emails/OtpEmail";
+import { discordWebhook } from "@/lib/discord-webhook";
+import prisma from "@/lib/prisma";
+import { getAuthRateLimiter } from "@/lib/rate-limiter";
+import { generateUniqueUsername } from "@/utils/generateUsername";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const OTP_EXPIRY_MINUTES = 5;
-const _MAX_OTP_ATTEMPTS = 3;
-const _OTP_BLOCK_DURATION_MINUTES = 1;
+const OTP_EXPIRY_MINUTES = 2;
+const MAX_OTP_ATTEMPTS = 5;
+const BASE_BLOCK_DURATION_MINUTES = 10;
+
+// Função para calcular o tempo de bloqueio exponencial
+function calculateBlockDuration(attemptCount: number): number {
+	return BASE_BLOCK_DURATION_MINUTES * 2 ** Math.min(attemptCount - 1, 2); // 10min → 20min → 40min
+}
 
 function generateOtp(): string {
 	return crypto.randomInt(100_000, 999_999).toString();
@@ -71,6 +76,22 @@ async function handleOtpRequest(email: string) {
 		);
 	}
 
+	// Verificar se o usuário está bloqueado
+	if (
+		user?.registrationOtpBlockedUntil &&
+		user.registrationOtpBlockedUntil > new Date()
+	) {
+		const remainingTime = Math.ceil(
+			(user.registrationOtpBlockedUntil.getTime() - Date.now()) / (1000 * 60)
+		);
+		return NextResponse.json(
+			{
+				error: `Você está temporariamente bloqueado. Tente novamente em ${remainingTime} minutos.`,
+			},
+			{ status: 429 }
+		);
+	}
+
 	const registrationOtp = generateOtp();
 	const registrationOtpExpiry = new Date(
 		Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000
@@ -81,8 +102,16 @@ async function handleOtpRequest(email: string) {
 		update: {
 			registrationOtp,
 			registrationOtpExpiry,
-			registrationOtpAttempts: 0,
-			registrationOtpBlockedUntil: null,
+			// Resetar tentativas apenas se não estiver bloqueado
+			registrationOtpAttempts: user?.registrationOtpBlockedUntil
+				? user.registrationOtpAttempts
+				: 0,
+			// Manter bloqueio se ainda estiver ativo
+			registrationOtpBlockedUntil:
+				user?.registrationOtpBlockedUntil &&
+				user.registrationOtpBlockedUntil > new Date()
+					? user.registrationOtpBlockedUntil
+					: null,
 		},
 		create: {
 			email,
@@ -101,7 +130,7 @@ async function handleOtpRequest(email: string) {
 			subject: "Seu código de verificação Bionk",
 			react: OtpEmail({
 				otp: registrationOtp,
-				expiryMinutes: OTP_EXPIRY_MINUTES,
+				expiryMinutes: 2,
 			}) as React.ReactElement,
 		});
 		return NextResponse.json(
@@ -132,25 +161,85 @@ async function handleOtpVerification(email: string, otp: string) {
 		);
 	}
 
-	if (user.registrationOtp !== otp) {
-		await prisma.user.update({
-			where: { email },
-			data: {
-				registrationOtpAttempts: (user.registrationOtpAttempts ?? 0) + 1,
-			},
-		});
+	// Verificar se o usuário está bloqueado
+	if (
+		user.registrationOtpBlockedUntil &&
+		user.registrationOtpBlockedUntil > new Date()
+	) {
+		const remainingTime = Math.ceil(
+			(user.registrationOtpBlockedUntil.getTime() - Date.now()) / (1000 * 60)
+		);
 		return NextResponse.json(
-			{ error: "Código OTP inválido." },
+			{
+				error: `Muitas tentativas incorretas. Tente novamente em ${remainingTime} minutos.`,
+			},
+			{ status: 429 }
+		);
+	}
+
+	// Verificar se o OTP expirou
+	if (!user.registrationOtpExpiry || user.registrationOtpExpiry < new Date()) {
+		return NextResponse.json(
+			{ error: "Código OTP expirado. Solicite um novo código." },
 			{ status: 400 }
 		);
 	}
 
+	// Verificar se o OTP está correto
+	if (user.registrationOtp !== otp) {
+		const newAttemptCount = (user.registrationOtpAttempts ?? 0) + 1;
+
+		// Se atingiu o limite de tentativas, bloquear o usuário
+		if (newAttemptCount >= MAX_OTP_ATTEMPTS) {
+			const blockDuration = calculateBlockDuration(
+				Math.floor(newAttemptCount / MAX_OTP_ATTEMPTS)
+			);
+			const blockedUntil = new Date(Date.now() + blockDuration * 60 * 1000);
+
+			await prisma.user.update({
+				where: { email },
+				data: {
+					registrationOtpAttempts: newAttemptCount,
+					registrationOtpBlockedUntil: blockedUntil,
+					// Invalidar o OTP atual para forçar solicitação de novo código
+					registrationOtp: null,
+					registrationOtpExpiry: null,
+				},
+			});
+
+			return NextResponse.json(
+				{
+					error: `Muitas tentativas incorretas. Você foi bloqueado por ${blockDuration} minutos.`,
+				},
+				{ status: 429 }
+			);
+		}
+		// Incrementar contador de tentativas
+		await prisma.user.update({
+			where: { email },
+			data: {
+				registrationOtpAttempts: newAttemptCount,
+			},
+		});
+
+		const remainingAttempts = MAX_OTP_ATTEMPTS - newAttemptCount;
+		return NextResponse.json(
+			{
+				error: `Código OTP inválido. Você tem ${remainingAttempts} tentativa(s) restante(s).`,
+			},
+			{ status: 400 }
+		);
+	}
+
+	// OTP correto - limpar dados de tentativas e verificar email
 	await prisma.user.update({
 		where: { email },
 		data: {
 			emailVerified: new Date(),
 			registrationOtp: null,
 			registrationOtpExpiry: null,
+			registrationOtpAttempts: 0,
+			registrationOtpBlockedUntil: null,
 		},
 	});
 	return NextResponse.json(
@@ -186,8 +275,8 @@ async function handleUserCreation(email: string, password: string) {
 			metadata: {
 				userId: updatedUser.id,
 				timestamp: new Date().toISOString(),
-				registrationMethod: "email_verification"
-			}
+				registrationMethod: "email_verification",
+			},
 		});
 	} catch {
 		// Não falha o registro se a notificação Discord falhar

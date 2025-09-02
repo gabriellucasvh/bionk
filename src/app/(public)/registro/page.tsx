@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import FormularioRegistro from "./formulario-registro";
+import { getServerSession } from "next-auth";
 
 export const metadata: Metadata = {
 	title: "Bionk | Cadastro",
@@ -15,5 +14,7 @@ export default async function registro() {
 	if (session) {
 		return redirect("/studio");
 	}
-	return <FormularioRegistro />;
+	
+	// Redirecionar para a primeira etapa do registro
+	return redirect("/registro/email");
 }

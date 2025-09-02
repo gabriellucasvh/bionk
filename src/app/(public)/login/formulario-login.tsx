@@ -1,5 +1,14 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { GoogleBtn } from "@/components/buttons/button-google";
 import LoadingPage from "@/components/layout/LoadingPage";
@@ -7,14 +16,6 @@ import { ForgotPasswordModal } from "@/components/modals/ForgotPasswordModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
-import { signIn, useSession } from "next-auth/react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 const schema = z.object({
 	email: z.string().email("E-mail inválido"),
@@ -81,9 +82,8 @@ function Login() {
 			} else {
 				router.replace("/");
 			}
-		} catch (error) {
+		} catch {
 			setMessage("Ocorreu um erro durante o login");
-			console.error("Login error:", error);
 		} finally {
 			setLoading(false);
 		}
@@ -92,88 +92,145 @@ function Login() {
 	const closeForgotPasswordModal = () => setIsForgotPasswordModalOpen(false);
 
 	return (
-		<div className="relative flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
-			<form
-				className="relative z-10 w-full max-w-md rounded-lg border-lime-500 bg-white p-8 md:border"
-				onSubmit={handleSubmit(onSubmit)}
-			>
-				<div className="mb-8 space-y-2 text-center">
-					<h2 className="text-center font-bold text-2xl text-black">
-						Seja bem-vindo de volta!
-					</h2>
-					<p className="text-muted-foreground">
-						Acesse sua conta no Bionk e gerencie seus com facilidade.
-					</p>
-				</div>
-
-				<div className="space-y-6">
-					<div>
-						<Label className="block text-base text-black">Seu email</Label>
-						<Input
-							className="w-full rounded-md px-4 py-3 focus-visible:border-lime-500"
-							placeholder="Digite seu e-mail"
-							type="email"
-							{...register("email")}
-						/>
-						{errors.email && (
-							<p className="mt-3 text-red-600 text-sm">
-								{errors.email.message}
+		<div className="flex min-h-screen">
+			{/* Lado esquerdo - Formulário */}
+			<div className="flex flex-1 items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
+				<div className="w-full max-w-lg">
+					<form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
+						<div className="space-y-4 text-center">
+							<h1 className="font-bold text-4xl text-black">
+								Seja bem-vindo de volta!
+							</h1>
+							<p className="text-lg text-muted-foreground">
+								Acesse sua conta no Bionk e gerencie seus links com facilidade.
 							</p>
-						)}
-					</div>
-
-					<div>
-						<Label className="block text-base text-black">Sua senha</Label>
-						<div className="relative">
-							<Input
-								className="w-full rounded-md px-4 py-3 focus-visible:border-lime-500"
-								placeholder="Digite sua senha"
-								type={showPassword ? "text" : "password"}
-								{...register("password")}
-							/>
-							<button
-								className="absolute inset-y-0 right-0 px-4"
-								onClick={() => setShowPassword(!showPassword)}
-								type="button"
-							>
-								{showPassword ? <EyeOff /> : <Eye />}
-							</button>
+							{message && (
+								<p className="rounded-md bg-red-50 p-3 text-red-600 text-sm">
+									{message}
+								</p>
+							)}
 						</div>
-						{errors.password && (
-							<p className="mt-3 text-red-600 text-sm">
-								{errors.password.message}
-							</p>
-						)}
-					</div>
-					<div className="-mt-5 text-left">
-						<Button
-							className="h-auto p-0 text-blue-500 text-sm hover:underline"
-							onClick={openForgotPasswordModal}
-							type="button"
-							variant="link"
-						>
-							Esqueceu a senha?
-						</Button>
-					</div>
-					<div className="flex flex-col items-center justify-center space-y-4">
-						<span className="flex h-px w-full items-center justify-center bg-gray-300">
-							<span className="bg-white px-4">ou</span>
-						</span>
-						<GoogleBtn />
-					</div>
-					<div>
-						<BaseButton fullWidth loading={loading} type="submit">
-							Entrar
-						</BaseButton>
-					</div>
-					<span className="text-sm">
-						Não possui uma conta?{" "}
-						<Link className="text-blue-500 hover:underline" href={"/registro"}>
-							Crie gratuitamente!
-						</Link>
-					</span>
+
+						<div className="space-y-6">
+							<div>
+								<Label className="mb-2 block text-base text-black">
+									Seu email
+								</Label>
+								<Input
+									className="w-full rounded-md px-4 py-4 text-base focus-visible:border-lime-500"
+									placeholder="Digite seu e-mail"
+									type="email"
+									{...register("email")}
+								/>
+								{errors.email && (
+									<p className="mt-2 text-red-600 text-sm">
+										{errors.email.message}
+									</p>
+								)}
+							</div>
+
+							<div>
+								<Label className="mb-2 block text-base text-black">
+									Sua senha
+								</Label>
+								<div className="relative">
+									<Input
+										className="w-full rounded-md px-4 py-4 text-base focus-visible:border-lime-500"
+										placeholder="Digite sua senha"
+										type={showPassword ? "text" : "password"}
+										{...register("password")}
+									/>
+									<button
+										className="absolute inset-y-0 right-0 px-4 text-gray-500 hover:text-gray-700"
+										onClick={() => setShowPassword(!showPassword)}
+										type="button"
+									>
+										{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+									</button>
+								</div>
+								{errors.password && (
+									<p className="mt-2 text-red-600 text-sm">
+										{errors.password.message}
+									</p>
+								)}
+							</div>
+
+							<div className="text-left">
+								<Button
+									className="h-auto p-0 text-blue-500 text-sm hover:underline"
+									onClick={openForgotPasswordModal}
+									type="button"
+									variant="link"
+								>
+									Esqueceu a senha?
+								</Button>
+							</div>
+
+							<div className="space-y-4">
+								<BaseButton
+									className="py-4 text-base"
+									fullWidth
+									loading={loading}
+									type="submit"
+								>
+									Entrar
+								</BaseButton>
+							</div>
+
+							<div className="flex items-center justify-center space-x-4">
+								<div className="h-px flex-1 bg-gray-300" />
+								<span className="text-gray-500 text-sm">ou</span>
+								<div className="h-px flex-1 bg-gray-300" />
+							</div>
+
+							<div>
+								<GoogleBtn />
+							</div>
+
+							<div className="text-center">
+								<span className="text-gray-600">
+									Não possui uma conta?{" "}
+									<Link
+										className="font-medium text-blue-500 hover:underline"
+										href={"/registro"}
+									>
+										Crie gratuitamente!
+									</Link>
+								</span>
+							</div>
+						</div>
+					</form>
 				</div>
-			</form>
+			</div>
+
+			{/* Lado direito - Imagem */}
+			<div className="relative hidden flex-1 bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 lg:flex">
+				<div className="absolute inset-0 bg-black/20" />
+				<Image
+					alt="Cosmic Background"
+					className="object-cover"
+					fill
+					priority
+					src="/abstract-wave-image.png"
+				/>
+				<div className="absolute inset-0 flex items-center justify-center">
+					<div className="flex flex-col items-center justify-center gap-4 p-8 text-center text-white">
+						<Image
+							alt="Cosmic Background"
+							className="object-contain"
+							height={200}
+							priority
+							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755640991/bionk-logo-white_ld4dzs.svg"
+							width={200}
+						/>
+						<p className="max-w-md text-lg opacity-90">
+							Sua plataforma completa para gerenciar e personalizar seus links,
+							criar páginas exclusivas, destacar o essencial e aumentar sua
+							presença digital de forma profissional.
+						</p>
+					</div>
+				</div>
+			</div>
 
 			<ForgotPasswordModal
 				isOpen={isForgotPasswordModalOpen}
