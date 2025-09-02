@@ -42,7 +42,7 @@ export const authOptions: NextAuthOptions = {
 			const newUser = await prisma.user.create({
 				data: {
 					email: data.email,
-					name: data.name,
+					name: data.name || "Usuário",
 					username,
 					image: imageUrl,
 					googleId: (data as any).sub ?? null,

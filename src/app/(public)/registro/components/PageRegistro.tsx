@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { GoogleBtn } from "@/components/buttons/button-google";
 import LoadingPage from "@/components/layout/LoadingPage";
-import { EmailForm } from "../components/EmailForm";
+import { EmailForm } from "./EmailForm";
 
 const emailSchema = z.object({
 	email: z.string().email("E-mail inválido"),
@@ -28,7 +28,7 @@ const emailSchema = z.object({
 
 type EmailFormData = z.infer<typeof emailSchema>;
 
-export default function EmailRegistrationPage() {
+export default function PageRegistro() {
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState<{
 		type: "success" | "error";

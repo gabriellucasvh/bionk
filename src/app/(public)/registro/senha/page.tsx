@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -37,7 +37,7 @@ const passwordSchema = z
 
 type PasswordFormData = z.infer<typeof passwordSchema>;
 
-export default function PasswordRegistrationPage() {
+function PasswordRegistrationPageContent() {
 	const [loading, setLoading] = useState(false);
 	const [validatingToken, setValidatingToken] = useState(true);
 	const [tokenValid, setTokenValid] = useState(false);
@@ -233,5 +233,13 @@ export default function PasswordRegistrationPage() {
 				</div>
 			</div>
 		</div>
+	);
+}
+
+export default function PasswordRegistrationPage() {
+	return (
+		<Suspense fallback={<LoadingPage />}>
+			<PasswordRegistrationPageContent />
+		</Suspense>
 	);
 }

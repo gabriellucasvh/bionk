@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -27,7 +27,7 @@ const OTP_COOLDOWN_MINUTES = 1;
 const MINUTES_REGEX = /(\d+) minutos/;
 const ATTEMPTS_REGEX = /(\d+) tentativas? restantes?/;
 
-export default function OtpRegistrationPage() {
+function OtpRegistrationPageContent() {
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState<{
 		type: "success" | "error";
@@ -381,5 +381,13 @@ export default function OtpRegistrationPage() {
 				</div>
 			</div>
 		</div>
+	);
+}
+
+export default function OtpRegistrationPage() {
+	return (
+		<Suspense fallback={<LoadingPage />}>
+			<OtpRegistrationPageContent />
+		</Suspense>
 	);
 }

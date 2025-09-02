@@ -18,6 +18,7 @@ import { PasswordForm } from "./components/PasswordForm";
 
 const emailSchema = z.object({
 	email: z.string().email("E-mail inválido"),
+	username: z.string().min(3, "Username deve ter pelo menos 3 caracteres"),
 });
 
 const otpSchema = z.object({
@@ -29,6 +30,7 @@ const otpSchema = z.object({
 
 const passwordSchema = z
 	.object({
+		name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
 		password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
 		confirmPassword: z.string(),
 	})
@@ -104,6 +106,7 @@ const getStageDescription = (stage: Stage, email: string) => {
 function Register() {
 	const [stage, setStage] = useState<Stage>("email");
 	const [email, setEmail] = useState<string>("");
+	const [username, setUsername] = useState<string>("");
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState<{
 		type: "success" | "error";
@@ -128,6 +131,10 @@ function Register() {
 
 	const emailForm = useForm<EmailFormData>({
 		resolver: zodResolver(emailSchema),
+		defaultValues: {
+			email: "",
+			username: "",
+		},
 	});
 
 	const otpForm = useForm<OtpFormData>({
@@ -136,6 +143,11 @@ function Register() {
 
 	const passwordForm = useForm<PasswordFormData>({
 		resolver: zodResolver(passwordSchema),
+		defaultValues: {
+			name: "",
+			password: "",
+			confirmPassword: "",
+		},
 	});
 
 	useEffect(() => {
@@ -198,6 +210,7 @@ function Register() {
 				stage: "request-otp",
 			});
 			setEmail(data.email);
+			setUsername(data.username);
 			setStage("otp");
 			startOtpTimer();
 			setOtpCooldownTimer(0);
@@ -221,8 +234,8 @@ function Register() {
 	};
 
 	const handleResendOtp = async () => {
-		if (email) {
-			await _submitEmailLogic({ email }, true);
+		if (email && username) {
+			await _submitEmailLogic({ email, username }, true);
 		}
 	};
 
