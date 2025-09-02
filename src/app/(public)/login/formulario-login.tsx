@@ -98,11 +98,11 @@ function Login() {
 				<div className="w-full max-w-lg">
 					<form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
 						<div className="space-y-4 text-center">
-							<h1 className="font-bold text-4xl text-black">
-								Seja bem-vindo de volta!
+							<h1 className="font-bold text-3xl text-black">
+								Bem-vindo de volta!
 							</h1>
-							<p className="text-lg text-muted-foreground">
-								Acesse sua conta no Bionk e gerencie seus links com facilidade.
+							<p className="text-base text-muted-foreground">
+								Acesse sua conta na Bionk.
 							</p>
 							{message && (
 								<p className="rounded-md bg-red-50 p-3 text-red-600 text-sm">
@@ -111,7 +111,7 @@ function Login() {
 							)}
 						</div>
 
-						<div className="space-y-6">
+						<div className="space-y-5">
 							<div>
 								<Label className="mb-2 block text-base text-black">
 									Seu email
@@ -122,11 +122,14 @@ function Login() {
 									type="email"
 									{...register("email")}
 								/>
-								{errors.email && (
-									<p className="mt-2 text-red-600 text-sm">
-										{errors.email.message}
-									</p>
-								)}
+								{/* Espaço reservado para mensagem de erro do email */}
+								<div className="mt-2 flex h-2 items-center">
+									{errors.email && (
+										<p className="text-red-600 text-sm transition-opacity duration-200">
+											{errors.email.message}
+										</p>
+									)}
+								</div>
 							</div>
 
 							<div>
@@ -148,11 +151,14 @@ function Login() {
 										{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
 									</button>
 								</div>
-								{errors.password && (
-									<p className="mt-2 text-red-600 text-sm">
-										{errors.password.message}
-									</p>
-								)}
+								{/* Espaço reservado para mensagem de erro da senha */}
+								<div className="-mb-4 mt-2 flex h-5 items-center">
+									{errors.password && (
+										<p className="text-red-600 text-sm transition-opacity duration-200">
+											{errors.password.message}
+										</p>
+									)}
+								</div>
 							</div>
 
 							<div className="text-left">

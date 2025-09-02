@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface PasswordFormData {
+	name: string;
 	password: string;
 	confirmPassword: string;
 }
@@ -28,6 +29,25 @@ export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {
 			className="space-y-4"
 			onSubmit={form.handleSubmit(onSubmit)}
 		>
+			<div>
+				<Label className="block font-semibold text-base text-black">
+					Seu nome
+				</Label>
+				<div className="mt-1">
+					<Input
+						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
+						placeholder="Digite seu nome completo"
+						type="text"
+						{...form.register("name")}
+						disabled={loading}
+					/>
+				</div>
+				{form.formState.errors.name && (
+					<p className="text-red-600 text-sm">
+						{form.formState.errors.name.message}
+					</p>
+				)}
+			</div>
 			<div>
 				<Label className="block font-semibold text-base text-black">
 					Sua senha

@@ -15,6 +15,12 @@ import { PasswordForm } from "../components/PasswordForm";
 
 const passwordSchema = z
 	.object({
+		name: z
+			.string()
+			.min(1, "Nome é obrigatório")
+			.min(2, "Nome deve ter pelo menos 2 caracteres")
+			.max(50, "Nome deve ter no máximo 50 caracteres")
+			.regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Nome deve conter apenas letras e espaços"),
 		password: z
 			.string()
 			.min(8, "A senha deve ter pelo menos 8 caracteres")
@@ -96,6 +102,7 @@ export default function PasswordRegistrationPage() {
 		try {
 			await axios.post("/api/auth/register", {
 				token,
+				name: data.name,
 				password: data.password,
 				stage: "create-user",
 			});
@@ -104,7 +111,7 @@ export default function PasswordRegistrationPage() {
 				text: "Conta criada com sucesso! Redirecionando...",
 			});
 			setTimeout(() => {
-				router.push("/login");
+				router.push("/studio");
 			}, 2000);
 		} catch (error) {
 			if (error instanceof AxiosError) {

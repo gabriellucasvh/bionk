@@ -11,7 +11,7 @@ datasource db {
 
 model User {
   id                            String         @id @default(uuid())
-  name                          String?
+  name                          String
   username                      String         @unique
   email                         String         @unique
   bio                           String?
@@ -38,6 +38,8 @@ model User {
   otpTokenExpiry                DateTime?
   verificationToken             String?        @unique
   verificationTokenExpiry       DateTime?
+  usernameReservedAt            DateTime?
+  usernameReservationExpiry     DateTime?
   googleId                      String?
   subscriptionPlan              String?
   subscriptionStatus            String?

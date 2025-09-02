@@ -2,20 +2,28 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { GoogleBtn } from "@/components/buttons/button-google";
 import LoadingPage from "@/components/layout/LoadingPage";
 import { EmailForm } from "../components/EmailForm";
-import { GoogleBtn } from "@/components/buttons/button-google";
-import Image from "next/image";
-import Link from "next/link";
 
 const emailSchema = z.object({
 	email: z.string().email("E-mail inválido"),
+	username: z
+		.string()
+		.min(3, "Username deve ter pelo menos 3 caracteres")
+		.max(30, "Username deve ter no máximo 30 caracteres")
+		.regex(
+			/^[a-z0-9._-]+$/,
+			"Username deve conter apenas letras minúsculas, números, pontos, hífens e underscores"
+		),
 });
 
 type EmailFormData = z.infer<typeof emailSchema>;
@@ -41,6 +49,7 @@ export default function EmailRegistrationPage() {
 		resolver: zodResolver(emailSchema),
 		defaultValues: {
 			email: searchParams.get("email") || "",
+			username: "",
 		},
 	});
 
@@ -50,6 +59,7 @@ export default function EmailRegistrationPage() {
 		try {
 			const response = await axios.post("/api/auth/register", {
 				email: data.email,
+				username: data.username,
 				stage: "request-otp",
 			});
 			// Redirecionar para a página de OTP com o token temporário
@@ -80,24 +90,22 @@ export default function EmailRegistrationPage() {
 				<div className="w-full max-w-lg">
 					<div className="space-y-8">
 						<div className="space-y-4 text-center">
-							<h1 className="font-bold text-4xl text-black">
+							<h1 className="font-bold text-3xl text-black">
 								Crie sua conta Bionk
 							</h1>
-							<p className="text-lg text-muted-foreground">
-								Digite seu e-mail para começar o processo de registro.
+							<p className="text-base text-muted-foreground">
+								Comece grátis e personalize seus links em segundos.
 							</p>
 							{message && (
-								<p className="rounded-md bg-red-50 p-3 text-red-600 text-sm">
-									{message.text}
-								</p>
+								<p className=" text-red-600 text-sm">{message.text}</p>
 							)}
 						</div>
 
-						<div className="space-y-6">
+						<div className="space-y-4">
 							<EmailForm
 								form={emailForm}
-								onSubmit={handleEmailSubmit}
 								loading={loading}
+								onSubmit={handleEmailSubmit}
 							/>
 
 							<div className="flex items-center justify-center space-x-4">

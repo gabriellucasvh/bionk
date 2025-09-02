@@ -7,7 +7,6 @@ import OtpEmail from "@/emails/OtpEmail";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
-import { generateUniqueUsername } from "@/utils/generateUsername";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const OTP_EXPIRY_MINUTES = 2;
@@ -15,6 +14,8 @@ const MAX_OTP_ATTEMPTS = 5;
 const BASE_BLOCK_DURATION_MINUTES = 10;
 const PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES = 5;
 const OTP_TOKEN_EXPIRY_MINUTES = 10;
+const USERNAME_RESERVATION_EXPIRY_MINUTES = 15;
+const USERNAME_REGEX = /^[a-z0-9._-]{3,30}$/;
 
 // Função para calcular o tempo de bloqueio exponencial
 function calculateBlockDuration(attemptCount: number): number {
@@ -33,15 +34,43 @@ function generateOtpToken(): string {
 	return crypto.randomUUID();
 }
 
+// Função para limpar usernames reservados expirados
+async function cleanupExpiredUsernameReservations() {
+	try {
+		const now = new Date();
+		// Deletar usuários não verificados com reserva de username expirada
+		await prisma.user.deleteMany({
+			where: {
+				emailVerified: null,
+				usernameReservationExpiry: {
+					lt: now,
+				},
+			},
+		});
+	} catch {
+		//
+	}
+}
+
 export async function POST(req: Request) {
 	try {
-		const { email, stage, otp, password, token } = await req.json();
+		// Executar limpeza de reservas expiradas
+		await cleanupExpiredUsernameReservations();
+
+		const { email, username, stage, otp, password, token, name } =
+			await req.json();
 
 		switch (stage) {
 			case "request-otp": {
 				if (!email || typeof email !== "string") {
 					return NextResponse.json(
 						{ error: "E-mail inválido" },
+						{ status: 400 }
+					);
+				}
+				if (!username || typeof username !== "string") {
+					return NextResponse.json(
+						{ error: "Username é obrigatório" },
 						{ status: 400 }
 					);
 				}
@@ -55,7 +84,7 @@ export async function POST(req: Request) {
 						{ status: 429 }
 					);
 				}
-				return await handleOtpRequest(email);
+				return await handleOtpRequest(email, username);
 			}
 
 			case "verify-otp":
@@ -74,7 +103,7 @@ export async function POST(req: Request) {
 						{ status: 400 }
 					);
 				}
-				return await handleUserCreation(token, password);
+				return await handleUserCreation(token, password, name);
 
 			default:
 				return NextResponse.json(
@@ -91,7 +120,38 @@ export async function POST(req: Request) {
 }
 
 // Função para lidar com a solicitação do OTP
-async function handleOtpRequest(email: string) {
+async function handleOtpRequest(email: string, username: string) {
+	// Validar formato do username
+	if (!USERNAME_REGEX.test(username)) {
+		return NextResponse.json(
+			{
+				error:
+					"Username deve conter apenas letras minúsculas, números, pontos, hífens e underscores (3-30 caracteres)",
+			},
+			{ status: 400 }
+		);
+	}
+
+	// Verificar se Username indisponível ou reservado
+	const existingUsername = await prisma.user.findUnique({
+		where: { username },
+	});
+	// Se o username está sendo usado pelo mesmo email, permitir (renovar reserva)
+	// Verificar se username está em uso por outro email e se está reservado ou verificado
+	if (
+		existingUsername &&
+		existingUsername.email !== email &&
+		(existingUsername.emailVerified ||
+			(existingUsername.usernameReservationExpiry &&
+				existingUsername.usernameReservationExpiry > new Date()))
+	) {
+		const errorMessage = existingUsername.emailVerified
+			? "Username indisponível"
+			: "Username temporariamente reservado por outro usuário";
+
+		return NextResponse.json({ error: errorMessage }, { status: 409 });
+	}
+
 	const user = await prisma.user.findUnique({ where: { email } });
 	if (user?.emailVerified) {
 		return NextResponse.json(
@@ -124,14 +184,20 @@ async function handleOtpRequest(email: string) {
 	const otpTokenExpiry = new Date(
 		Date.now() + OTP_TOKEN_EXPIRY_MINUTES * 60 * 1000
 	);
+	const usernameReservationExpiry = new Date(
+		Date.now() + USERNAME_RESERVATION_EXPIRY_MINUTES * 60 * 1000
+	);
 
 	await prisma.user.upsert({
 		where: { email },
 		update: {
+			username, // Atualizar com o username escolhido
 			registrationOtp,
 			registrationOtpExpiry,
 			otpToken,
 			otpTokenExpiry,
+			usernameReservedAt: new Date(),
+			usernameReservationExpiry,
 			// Resetar tentativas apenas se não estiver bloqueado
 			registrationOtpAttempts: user?.registrationOtpBlockedUntil
 				? user.registrationOtpAttempts
@@ -145,13 +211,16 @@ async function handleOtpRequest(email: string) {
 		},
 		create: {
 			email,
-			username: `user_${Date.now()}`,
+			username, // Usar o username escolhido pelo usuário
 			registrationOtp,
 			registrationOtpExpiry,
 			otpToken,
 			otpTokenExpiry,
+			usernameReservedAt: new Date(),
+			usernameReservationExpiry,
 			emailVerified: null,
 			registrationOtpAttempts: 0,
+			name: "Usuário", // Valor padrão temporário
 		},
 	});
 
@@ -292,7 +361,16 @@ async function handleOtpVerification(email: string, otp: string) {
 }
 
 // Função para criar o usuário usando token temporário
-async function handleUserCreation(token: string, password: string) {
+async function handleUserCreation(
+	token: string,
+	password: string,
+	name: string
+) {
+	// Validar se name foi fornecido
+	if (!name || typeof name !== "string" || name.trim().length === 0) {
+		return NextResponse.json({ error: "Nome é obrigatório" }, { status: 400 });
+	}
+
 	// Buscar usuário pelo token
 	const user = await prisma.user.findUnique({
 		where: { passwordSetupToken: token },
@@ -330,15 +408,16 @@ async function handleUserCreation(token: string, password: string) {
 	}
 
 	const hashedPassword = await bcrypt.hash(password, 10);
-	const username = await generateUniqueUsername(user.email.split("@")[0]);
 
 	const updatedUser = await prisma.user.update({
 		where: { id: user.id },
 		data: {
+			name: name.trim(),
 			hashedPassword,
-			username,
 			passwordSetupToken: null,
 			passwordSetupTokenExpiry: null,
+			usernameReservedAt: null,
+			usernameReservationExpiry: null,
 			subscriptionPlan: "free",
 			subscriptionStatus: "active",
 		},
@@ -347,7 +426,7 @@ async function handleUserCreation(token: string, password: string) {
 	// Notificar Discord sobre novo registro
 	try {
 		await discordWebhook.notifyRegistration({
-			username: updatedUser.username || username,
+			username: updatedUser.username,
 			email: updatedUser.email,
 			name: updatedUser.name || undefined,
 			source: "website",
