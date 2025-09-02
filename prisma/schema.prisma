@@ -32,6 +32,10 @@ model User {
   registrationOtpAttempts       Int            @default(0)
   registrationOtpBlockedUntil   DateTime?
   registrationOtpExpiry         DateTime?
+  passwordSetupToken            String?        @unique
+  passwordSetupTokenExpiry      DateTime?
+  otpToken                      String?        @unique
+  otpTokenExpiry                DateTime?
   verificationToken             String?        @unique
   verificationTokenExpiry       DateTime?
   googleId                      String?

@@ -13,6 +13,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const OTP_EXPIRY_MINUTES = 2;
 const MAX_OTP_ATTEMPTS = 5;
 const BASE_BLOCK_DURATION_MINUTES = 10;
+const PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES = 5;
+const OTP_TOKEN_EXPIRY_MINUTES = 10;
 
 // Função para calcular o tempo de bloqueio exponencial
 function calculateBlockDuration(attemptCount: number): number {
@@ -23,16 +25,26 @@ function generateOtp(): string {
 	return crypto.randomInt(100_000, 999_999).toString();
 }
 
+function generatePasswordSetupToken(): string {
+	return crypto.randomUUID();
+}
+
+function generateOtpToken(): string {
+	return crypto.randomUUID();
+}
+
 export async function POST(req: Request) {
 	try {
-		const { email, stage, otp, password } = await req.json();
-
-		if (!email || typeof email !== "string") {
-			return NextResponse.json({ error: "E-mail inválido" }, { status: 400 });
-		}
+		const { email, stage, otp, password, token } = await req.json();
 
 		switch (stage) {
 			case "request-otp": {
+				if (!email || typeof email !== "string") {
+					return NextResponse.json(
+						{ error: "E-mail inválido" },
+						{ status: 400 }
+					);
+				}
 				// --- RATE LIMITER ---
 				const headersList = await headers();
 				const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
@@ -47,10 +59,22 @@ export async function POST(req: Request) {
 			}
 
 			case "verify-otp":
+				if (!email || typeof email !== "string") {
+					return NextResponse.json(
+						{ error: "E-mail inválido" },
+						{ status: 400 }
+					);
+				}
 				return await handleOtpVerification(email, otp);
 
 			case "create-user":
-				return await handleUserCreation(email, password);
+				if (!token || typeof token !== "string") {
+					return NextResponse.json(
+						{ error: "Token inválido" },
+						{ status: 400 }
+					);
+				}
+				return await handleUserCreation(token, password);
 
 			default:
 				return NextResponse.json(
@@ -96,12 +120,18 @@ async function handleOtpRequest(email: string) {
 	const registrationOtpExpiry = new Date(
 		Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000
 	);
+	const otpToken = generateOtpToken();
+	const otpTokenExpiry = new Date(
+		Date.now() + OTP_TOKEN_EXPIRY_MINUTES * 60 * 1000
+	);
 
 	await prisma.user.upsert({
 		where: { email },
 		update: {
 			registrationOtp,
 			registrationOtpExpiry,
+			otpToken,
+			otpTokenExpiry,
 			// Resetar tentativas apenas se não estiver bloqueado
 			registrationOtpAttempts: user?.registrationOtpBlockedUntil
 				? user.registrationOtpAttempts
@@ -118,6 +148,8 @@ async function handleOtpRequest(email: string) {
 			username: `user_${Date.now()}`,
 			registrationOtp,
 			registrationOtpExpiry,
+			otpToken,
+			otpTokenExpiry,
 			emailVerified: null,
 			registrationOtpAttempts: 0,
 		},
@@ -134,7 +166,7 @@ async function handleOtpRequest(email: string) {
 			}) as React.ReactElement,
 		});
 		return NextResponse.json(
-			{ message: "Código de verificação enviado." },
+			{ message: "Código de verificação enviado.", otpToken },
 			{ status: 200 }
 		);
 	} catch {
@@ -231,7 +263,12 @@ async function handleOtpVerification(email: string, otp: string) {
 		);
 	}
 
-	// OTP correto - limpar dados de tentativas e verificar email
+	// OTP correto - gerar token temporário para definição de senha
+	const passwordSetupToken = generatePasswordSetupToken();
+	const passwordSetupTokenExpiry = new Date(
+		Date.now() + PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES * 60 * 1000
+	);
+
 	await prisma.user.update({
 		where: { email },
 		data: {
@@ -240,25 +277,68 @@ async function handleOtpVerification(email: string, otp: string) {
 			registrationOtpExpiry: null,
 			registrationOtpAttempts: 0,
 			registrationOtpBlockedUntil: null,
+			passwordSetupToken,
+			passwordSetupTokenExpiry,
 		},
 	});
+
 	return NextResponse.json(
-		{ message: "Código OTP verificado com sucesso." },
+		{
+			message: "Código OTP verificado com sucesso.",
+			passwordSetupToken,
+		},
 		{ status: 200 }
 	);
 }
 
-// Função para criar o usuário
-async function handleUserCreation(email: string, password: string) {
+// Função para criar o usuário usando token temporário
+async function handleUserCreation(token: string, password: string) {
+	// Buscar usuário pelo token
+	const user = await prisma.user.findUnique({
+		where: { passwordSetupToken: token },
+	});
+
+	if (!user) {
+		return NextResponse.json({ error: "Token inválido." }, { status: 400 });
+	}
+
+	// Verificar se o token expirou
+	if (
+		!user.passwordSetupTokenExpiry ||
+		user.passwordSetupTokenExpiry < new Date()
+	) {
+		return NextResponse.json(
+			{ error: "Token expirado. Solicite um novo código OTP." },
+			{ status: 400 }
+		);
+	}
+
+	// Verificar se o email foi verificado
+	if (!user.emailVerified) {
+		return NextResponse.json(
+			{ error: "Email não verificado." },
+			{ status: 400 }
+		);
+	}
+
+	// Verificar se já tem senha definida
+	if (user.hashedPassword) {
+		return NextResponse.json(
+			{ error: "Usuário já possui senha definida." },
+			{ status: 400 }
+		);
+	}
+
 	const hashedPassword = await bcrypt.hash(password, 10);
-	const username = await generateUniqueUsername(email.split("@")[0]);
+	const username = await generateUniqueUsername(user.email.split("@")[0]);
 
 	const updatedUser = await prisma.user.update({
-		where: { email },
+		where: { id: user.id },
 		data: {
 			hashedPassword,
 			username,
-			emailVerified: new Date(),
+			passwordSetupToken: null,
+			passwordSetupTokenExpiry: null,
 			subscriptionPlan: "free",
 			subscriptionStatus: "active",
 		},

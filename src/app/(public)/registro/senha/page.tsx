@@ -33,6 +33,9 @@ type PasswordFormData = z.infer<typeof passwordSchema>;
 
 export default function PasswordRegistrationPage() {
 	const [loading, setLoading] = useState(false);
+	const [validatingToken, setValidatingToken] = useState(true);
+	const [tokenValid, setTokenValid] = useState(false);
+	const [userEmail, setUserEmail] = useState<string | null>(null);
 	const [message, setMessage] = useState<{
 		type: "success" | "error";
 		text: string;
@@ -41,7 +44,7 @@ export default function PasswordRegistrationPage() {
 	const { data: _session, status } = useSession();
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const email = searchParams.get("email");
+	const token = searchParams.get("token");
 
 	useEffect(() => {
 		if (status === "authenticated") {
@@ -49,12 +52,37 @@ export default function PasswordRegistrationPage() {
 		}
 	}, [status, router]);
 
-	// Redirecionar se não houver email
+	// Validar token ao carregar a página
 	useEffect(() => {
-		if (!email) {
-			router.replace("/registro/email");
-		}
-	}, [email, router]);
+		const validateToken = async () => {
+			if (!token) {
+				router.replace("/registro/email");
+				return;
+			}
+
+			try {
+				const response = await axios.post("/api/auth/validate-password-token", {
+					token,
+				});
+				setTokenValid(true);
+				setUserEmail(response.data.email);
+			} catch (error) {
+				if (error instanceof AxiosError) {
+					setMessage({
+						type: "error",
+						text: error.response?.data?.error || "Token inválido ou expirado.",
+					});
+				}
+				setTimeout(() => {
+					router.replace("/registro/email");
+				}, 3000);
+			} finally {
+				setValidatingToken(false);
+			}
+		};
+
+		validateToken();
+	}, [token, router]);
 
 	const passwordForm = useForm<PasswordFormData>({
 		resolver: zodResolver(passwordSchema),
@@ -67,7 +95,7 @@ export default function PasswordRegistrationPage() {
 		setMessage(null);
 		try {
 			await axios.post("/api/auth/register", {
-				email,
+				token,
 				password: data.password,
 				stage: "create-user",
 			});
@@ -93,14 +121,32 @@ export default function PasswordRegistrationPage() {
 	};
 
 	const handleBackToOtp = () => {
-		router.push(`/registro/otp?email=${encodeURIComponent(email || "")}`);
+		router.push(`/registro/otp?email=${encodeURIComponent(userEmail || "")}`);
 	};
 
-	if (status === "loading") {
+	if (status === "loading" || validatingToken) {
 		return <LoadingPage />;
 	}
 
-	if (!email) {
+	if (!tokenValid) {
+		return (
+			<div className="flex min-h-screen items-center justify-center bg-gray-50">
+				<div className="text-center">
+					<h1 className="mb-4 font-bold text-2xl text-red-600">
+						Acesso Negado
+					</h1>
+					<p className="mb-4 text-gray-600">
+						{message?.text || "Token inválido ou expirado."}
+					</p>
+					<p className="text-gray-500 text-sm">
+						Redirecionando para o início do registro...
+					</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (!userEmail) {
 		return null; // Será redirecionado pelo useEffect
 	}
 

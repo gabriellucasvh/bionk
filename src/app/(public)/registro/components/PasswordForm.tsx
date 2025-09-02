@@ -16,6 +16,7 @@ interface PasswordFormProps {
 	form: UseFormReturn<PasswordFormData>;
 	onSubmit: (data: PasswordFormData) => void;
 	loading: boolean;
+	onBackToOtp?: () => void;
 }
 
 export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {

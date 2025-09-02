@@ -48,12 +48,13 @@ export default function EmailRegistrationPage() {
 		setLoading(true);
 		setMessage(null);
 		try {
-			await axios.post("/api/auth/register", {
+			const response = await axios.post("/api/auth/register", {
 				email: data.email,
 				stage: "request-otp",
 			});
-			// Redirecionar para a página de OTP com o email
-			router.push(`/registro/otp?email=${encodeURIComponent(data.email)}`);
+			// Redirecionar para a página de OTP com o token temporário
+			const { otpToken } = response.data;
+			router.push(`/registro/otp?token=${otpToken}`);
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				setMessage({

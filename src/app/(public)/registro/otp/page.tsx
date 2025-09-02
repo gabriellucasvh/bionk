@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,6 +25,7 @@ type OtpFormData = z.infer<typeof otpSchema>;
 const OTP_EXPIRY_MINUTES = 2;
 const OTP_COOLDOWN_MINUTES = 1;
 const MINUTES_REGEX = /(\d+) minutos/;
+const ATTEMPTS_REGEX = /(\d+) tentativas? restantes?/;
 
 export default function OtpRegistrationPage() {
 	const [loading, setLoading] = useState(false);
@@ -38,6 +39,9 @@ export default function OtpRegistrationPage() {
 	const [remainingAttempts, setRemainingAttempts] = useState<
 		number | undefined
 	>(undefined);
+	const [validatingToken, setValidatingToken] = useState(true);
+	const [tokenValid, setTokenValid] = useState(false);
+	const [userEmail, setUserEmail] = useState<string>("");
 
 	const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 	const cooldownTimerIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -45,7 +49,7 @@ export default function OtpRegistrationPage() {
 	const { data: _session, status } = useSession();
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const email = searchParams.get("email");
+	const token = searchParams.get("token");
 
 	useEffect(() => {
 		if (status === "authenticated") {
@@ -53,36 +57,58 @@ export default function OtpRegistrationPage() {
 		}
 	}, [status, router]);
 
-	// Redirecionar se não houver email
-	useEffect(() => {
-		if (!email) {
-			router.replace("/registro/email");
+	const validateToken = useCallback(async () => {
+		if (!token) {
 			return;
 		}
 
-		// Buscar status do OTP e sincronizar timers
-		fetchOtpStatus();
+		try {
+			const response = await axios.post("/api/auth/validate-otp-token", {
+				token,
+			});
+			setUserEmail(response.data.userEmail);
+			setTokenValid(true);
+		} catch {
+			setTokenValid(false);
+			router.replace("/registro/email");
+		} finally {
+			setValidatingToken(false);
+		}
+	}, [token, router]);
 
-		return () => {
-			if (timerIntervalRef.current) {
-				clearInterval(timerIntervalRef.current);
-			}
-			if (cooldownTimerIntervalRef.current) {
-				clearInterval(cooldownTimerIntervalRef.current);
-			}
-		};
-	}, [email, router]);
+	// Iniciar timer do OTP
+	const startOtpTimer = useCallback((initialTime?: number) => {
+		const timeInSeconds = initialTime ?? OTP_EXPIRY_MINUTES * 60;
+		setOtpTimer(timeInSeconds);
+		setIsOtpInputDisabled(false);
 
-	const otpForm = useForm<OtpFormData>({
-		resolver: zodResolver(otpSchema),
-	});
+		if (timerIntervalRef.current) {
+			clearInterval(timerIntervalRef.current);
+		}
 
-	const fetchOtpStatus = async () => {
-		if (!email) return;
+		timerIntervalRef.current = setInterval(() => {
+			setOtpTimer((prev) => {
+				if (prev <= 1) {
+					setIsOtpInputDisabled(true);
+					if (timerIntervalRef.current) {
+						clearInterval(timerIntervalRef.current);
+						timerIntervalRef.current = null;
+					}
+					return 0;
+				}
+				return prev - 1;
+			});
+		}, 1000);
+	}, []);
+
+	const fetchOtpStatus = useCallback(async () => {
+		if (!userEmail) {
+			return;
+		}
 
 		try {
 			const response = await axios.get(
-				`/api/auth/otp-status?email=${encodeURIComponent(email)}`
+				`/api/auth/otp-status?email=${encodeURIComponent(userEmail)}`
 			);
 			const data = response.data;
 
@@ -109,37 +135,41 @@ export default function OtpRegistrationPage() {
 				setIsOtpInputDisabled(false);
 				startOtpTimer(data.otpTimeRemaining);
 			}
-		} catch (error) {
-			console.error("Erro ao buscar status do OTP:", error);
+		} catch {
 			// Em caso de erro, usar comportamento padrão
 			startOtpTimer(OTP_EXPIRY_MINUTES * 60);
 		}
-	};
+	}, [userEmail, startOtpTimer]);
 
-	// Iniciar timer do OTP
-	const startOtpTimer = (initialTime?: number) => {
-		const timeInSeconds = initialTime ?? OTP_EXPIRY_MINUTES * 60;
-		setOtpTimer(timeInSeconds);
-		setIsOtpInputDisabled(false);
-
-		if (timerIntervalRef.current) {
-			clearInterval(timerIntervalRef.current);
+	// Validar token ao carregar a página
+	useEffect(() => {
+		if (!token) {
+			router.replace("/registro/email");
+			return;
 		}
 
-		timerIntervalRef.current = setInterval(() => {
-			setOtpTimer((prev) => {
-				if (prev <= 1) {
-					setIsOtpInputDisabled(true);
-					if (timerIntervalRef.current) {
-						clearInterval(timerIntervalRef.current);
-						timerIntervalRef.current = null;
-					}
-					return 0;
-				}
-				return prev - 1;
-			});
-		}, 1000);
-	};
+		validateToken();
+
+		return () => {
+			if (timerIntervalRef.current) {
+				clearInterval(timerIntervalRef.current);
+			}
+			if (cooldownTimerIntervalRef.current) {
+				clearInterval(cooldownTimerIntervalRef.current);
+			}
+		};
+	}, [token, router, validateToken]);
+
+	// Buscar status do OTP após validar o token
+	useEffect(() => {
+		if (tokenValid && userEmail) {
+			fetchOtpStatus();
+		}
+	}, [tokenValid, userEmail, fetchOtpStatus]);
+
+	const otpForm = useForm<OtpFormData>({
+		resolver: zodResolver(otpSchema),
+	});
 
 	// Iniciar timer de cooldown
 	const startOtpCooldownTimer = (minutes: number) => {
@@ -163,53 +193,67 @@ export default function OtpRegistrationPage() {
 		}, 1000);
 	};
 
+	// Função auxiliar para extrair tentativas restantes
+	const extractRemainingAttempts = (errorText: string) => {
+		const attemptsMatch = errorText.match(ATTEMPTS_REGEX);
+		if (attemptsMatch) {
+			setRemainingAttempts(Number.parseInt(attemptsMatch[1], 10));
+		}
+	};
+
+	// Função auxiliar para lidar com erro de rate limit
+	const handleRateLimitError = (errorText: string) => {
+		const match = errorText.match(MINUTES_REGEX);
+		const cooldownMinutes = match
+			? Number.parseInt(match[1], 10)
+			: OTP_COOLDOWN_MINUTES;
+		startOtpCooldownTimer(cooldownMinutes);
+		setRemainingAttempts(0);
+	};
+
+	// Função auxiliar para lidar com erros de OTP
+	const handleOtpError = (error: unknown) => {
+		if (error instanceof AxiosError) {
+			const errorText =
+				error.response?.data?.error || "Erro ao verificar código.";
+			setMessage({ type: "error", text: errorText });
+			extractRemainingAttempts(errorText);
+
+			if (error.response?.status === 429) {
+				handleRateLimitError(errorText);
+			}
+		} else {
+			setMessage({ type: "error", text: "Erro ao verificar código." });
+		}
+	};
+
 	const handleOtpSubmit: SubmitHandler<OtpFormData> = async (data) => {
 		setLoading(true);
 		setMessage(null);
 		try {
-			await axios.post("/api/auth/register", {
-				email,
+			const response = await axios.post("/api/auth/register", {
+				email: userEmail,
 				otp: data.otp,
 				stage: "verify-otp",
 			});
-			// Redirecionar para a página de senha
-			router.push(`/registro/senha?email=${encodeURIComponent(email!)}`);
+			// Redirecionar para a página de senha com o token temporário
+			const { passwordSetupToken } = response.data;
+			router.push(`/registro/senha?token=${passwordSetupToken}`);
 		} catch (error) {
-			if (error instanceof AxiosError) {
-				const errorText =
-					error.response?.data?.error || "Erro ao verificar código.";
-				setMessage({ type: "error", text: errorText });
-
-				// Extrair tentativas restantes da mensagem de erro
-				const attemptsMatch = errorText.match(/(\d+) tentativas? restantes?/);
-				if (attemptsMatch) {
-					setRemainingAttempts(Number.parseInt(attemptsMatch[1], 10));
-				}
-
-				if (error.response?.status === 429) {
-					const match = errorText.match(MINUTES_REGEX);
-					const cooldownMinutes = match
-						? Number.parseInt(match[1], 10)
-						: OTP_COOLDOWN_MINUTES;
-					startOtpCooldownTimer(cooldownMinutes);
-					setRemainingAttempts(0); // Sem tentativas restantes quando bloqueado
-				}
-			} else {
-				setMessage({ type: "error", text: "Erro ao verificar código." });
-			}
+			handleOtpError(error);
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	const handleResendOtp = async () => {
-		if (email) {
+		if (userEmail) {
 			setLoading(true);
 			setMessage(null);
 			otpForm.reset();
 			try {
 				await axios.post("/api/auth/register", {
-					email,
+					email: userEmail,
 					stage: "request-otp",
 				});
 				startOtpTimer(OTP_EXPIRY_MINUTES * 60);
@@ -236,15 +280,22 @@ export default function OtpRegistrationPage() {
 	};
 
 	const handleBackToEmail = () => {
-		router.push(`/registro/email?email=${encodeURIComponent(email || "")}`);
+		router.push(`/registro/email?email=${encodeURIComponent(userEmail || "")}`);
 	};
 
-	if (status === "loading") {
+	if (status === "loading" || validatingToken) {
 		return <LoadingPage />;
 	}
 
-	if (!email) {
-		return null; // Será redirecionado pelo useEffect
+	if (!tokenValid) {
+		return (
+			<div className="flex min-h-screen items-center justify-center">
+				<div className="text-center">
+					<h1 className="font-bold text-2xl text-red-600">Acesso Negado</h1>
+					<p className="mt-2 text-gray-600">Token inválido ou expirado.</p>
+				</div>
+			</div>
+		);
 	}
 
 	return (
@@ -258,7 +309,7 @@ export default function OtpRegistrationPage() {
 								Verifique seu E-mail
 							</h1>
 							<p className="text-lg text-muted-foreground">
-								Enviamos um código de 6 dígitos para {email}. Verifique sua
+								Enviamos um código de 6 dígitos para {userEmail}. Verifique sua
 								caixa de entrada (e spam).
 							</p>
 							{message && (
