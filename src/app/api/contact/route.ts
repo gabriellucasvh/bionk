@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
+import { discordWebhook } from "@/lib/discord-webhook";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -226,6 +227,26 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 					<p>Atenciosamente,<br>Equipe Bionk</p>
 				`,
 			});
+
+			// Enviar notificação para o Discord
+			try {
+				await discordWebhook.notifyFormSubmission({
+					type: "contact",
+					name: sanitizedData.fullName,
+					email: sanitizedData.email,
+					subject: subjectLabels[sanitizedData.subject],
+					message: sanitizedData.message,
+					source: "website",
+					metadata: {
+						ip,
+						userAgent,
+						timestamp: new Date().toISOString(),
+					},
+				});
+			} catch {
+
+				// Não falha a requisição se o Discord falhar
+			}
 
 			return NextResponse.json(
 				{

@@ -1,13 +1,17 @@
-import prisma from "@/lib/prisma";
-import { generateUniqueUsername } from "@/utils/generateUsername";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import type { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { discordWebhook } from "@/lib/discord-webhook";
+import prisma from "@/lib/prisma";
+import { generateUniqueUsername } from "@/utils/generateUsername";
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+// Regex para substituir parâmetros de tamanho de imagem do Google
+const GOOGLE_IMAGE_SIZE_REGEX = /=s\d+-c$/;
 
 if (!(clientId && clientSecret)) {
 	throw new Error("Missing Google OAuth environment variables");
@@ -35,7 +39,7 @@ export const authOptions: NextAuthOptions = {
 				data.picture ??
 				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png";
 
-			return prisma.user.create({
+			const newUser = await prisma.user.create({
 				data: {
 					email: data.email,
 					name: data.name,
@@ -48,6 +52,27 @@ export const authOptions: NextAuthOptions = {
 					subscriptionStatus: "active",
 				},
 			});
+
+			// Notificar Discord sobre novo registro via Google OAuth
+			try {
+				await discordWebhook.notifyRegistration({
+					username: newUser.username || username,
+					email: newUser.email,
+					name: newUser.name || undefined,
+					source: "google_oauth",
+					plan: "free",
+					metadata: {
+						userId: newUser.id,
+						timestamp: new Date().toISOString(),
+						registrationMethod: "google_oauth",
+						googleId: (data as any).sub ?? null,
+					},
+				});
+			} catch  {
+				// Não falha o registro se a notificação Discord falhar
+			}
+
+			return newUser;
 		},
 	},
 
@@ -72,7 +97,7 @@ export const authOptions: NextAuthOptions = {
 			clientSecret,
 			profile(profile) {
 				// NOVO: Altera a URL da imagem para obter alta resolução (400px)
-				const highResImage = profile.picture?.replace(/=s\d+-c$/, "=s512-c");
+				const highResImage = profile.picture?.replace(GOOGLE_IMAGE_SIZE_REGEX, "=s512-c");
 
 				return {
 					...profile,

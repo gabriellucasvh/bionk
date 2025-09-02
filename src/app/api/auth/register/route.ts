@@ -2,6 +2,7 @@ import OtpEmail from "@/emails/OtpEmail";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
 import { generateUniqueUsername } from "@/utils/generateUsername";
+import { discordWebhook } from "@/lib/discord-webhook";
 import bcrypt from "bcryptjs";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -163,7 +164,7 @@ async function handleUserCreation(email: string, password: string) {
 	const hashedPassword = await bcrypt.hash(password, 10);
 	const username = await generateUniqueUsername(email.split("@")[0]);
 
-	await prisma.user.update({
+	const updatedUser = await prisma.user.update({
 		where: { email },
 		data: {
 			hashedPassword,
@@ -173,6 +174,24 @@ async function handleUserCreation(email: string, password: string) {
 			subscriptionStatus: "active",
 		},
 	});
+
+	// Notificar Discord sobre novo registro
+	try {
+		await discordWebhook.notifyRegistration({
+			username: updatedUser.username || username,
+			email: updatedUser.email,
+			name: updatedUser.name || undefined,
+			source: "website",
+			plan: "free",
+			metadata: {
+				userId: updatedUser.id,
+				timestamp: new Date().toISOString(),
+				registrationMethod: "email_verification"
+			}
+		});
+	} catch {
+		// Não falha o registro se a notificação Discord falhar
+	}
 
 	return NextResponse.json(
 		{ message: "Usuário registrado com sucesso!" },

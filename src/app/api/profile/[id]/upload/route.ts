@@ -1,6 +1,6 @@
+import { type NextRequest, NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
-import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(
 	req: NextRequest,
@@ -31,13 +31,12 @@ export async function POST(
 		});
 
 		await prisma.user.update({
-			where: { id: id },
+			where: { id },
 			data: { image: result.secure_url },
 		});
 
 		return NextResponse.json({ success: true, url: result.secure_url });
-	} catch (error) {
-		console.error("Erro ao fazer upload da imagem:", error);
+	} catch {
 		return NextResponse.json(
 			{ success: false, error: "Erro ao fazer upload da imagem" },
 			{ status: 500 }

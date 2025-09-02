@@ -34,15 +34,14 @@ export async function GET(req: Request) {
       where: { id: user.id },
       data: {
         emailVerified: new Date(),
-        verificationToken: null, 
-        verificationTokenExpiry: null, 
+        verificationToken: null,
+        verificationTokenExpiry: null,
       },
     });
 
     return NextResponse.json({ message: 'E-mail verificado com sucesso!' }, { status: 200 });
 
-  } catch (error) {
-    console.error('Erro ao verificar e-mail:', error);
+  } catch {
     return NextResponse.json({ error: 'Erro interno ao verificar o e-mail.' }, { status: 500 });
   }
 }
