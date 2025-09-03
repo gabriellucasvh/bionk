@@ -287,9 +287,9 @@ function Register() {
 			setStage("success");
 			setMessage({
 				type: "success",
-				text: "Conta criada com sucesso! Você será redirecionado para o login.",
+				text: "Conta criada com sucesso! Você será redirecionado para o studio.",
 			});
-			setTimeout(() => router.push("/login"), 3000);
+			setTimeout(() => router.push("/studio/perfil"), 3000);
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				setMessage({

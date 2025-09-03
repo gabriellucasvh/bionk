@@ -120,7 +120,7 @@ export default function PageRegistro() {
 
 							<div className="text-center">
 								<span className="text-gray-600">
-									Já tem uma conta?{" "}
+									Já possui uma conta?{" "}
 									<Link
 										className="font-medium text-blue-500 hover:underline"
 										href="/login"

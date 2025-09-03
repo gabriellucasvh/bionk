@@ -36,7 +36,7 @@ export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {
 				<div className="mt-1">
 					<Input
 						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
-						placeholder="Digite seu nome completo"
+						placeholder="Digite seu nome de exibição"
 						type="text"
 						{...form.register("name")}
 						disabled={loading}

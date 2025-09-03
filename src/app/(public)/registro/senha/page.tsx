@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect, useState, Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -62,7 +62,7 @@ function PasswordRegistrationPageContent() {
 	useEffect(() => {
 		const validateToken = async () => {
 			if (!token) {
-				router.replace("/registro/email");
+				router.replace("/registro");
 				return;
 			}
 
@@ -80,7 +80,7 @@ function PasswordRegistrationPageContent() {
 					});
 				}
 				setTimeout(() => {
-					router.replace("/registro/email");
+					router.replace("/registro");
 				}, 3000);
 			} finally {
 				setValidatingToken(false);
@@ -190,7 +190,7 @@ function PasswordRegistrationPageContent() {
 
 							<div className="text-center">
 								<span className="text-gray-600">
-									Já tem uma conta?{" "}
+									Já possui uma conta?{" "}
 									<Link
 										className="font-medium text-blue-500 hover:underline"
 										href="/login"

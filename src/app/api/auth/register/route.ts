@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import OtpEmail from "@/emails/OtpEmail";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
@@ -121,8 +122,11 @@ export async function POST(req: Request) {
 
 // Função para lidar com a solicitação do OTP
 async function handleOtpRequest(email: string, username: string) {
+	// Normalizar username para lowercase
+	const normalizedUsername = username.toLowerCase().trim();
+
 	// Validar formato do username
-	if (!USERNAME_REGEX.test(username)) {
+	if (!USERNAME_REGEX.test(normalizedUsername)) {
 		return NextResponse.json(
 			{
 				error:
@@ -132,9 +136,17 @@ async function handleOtpRequest(email: string, username: string) {
 		);
 	}
 
+	// Verificar se username está na blacklist
+	if (BLACKLISTED_USERNAMES.includes(normalizedUsername)) {
+		return NextResponse.json(
+			{ error: "Username não está disponível" },
+			{ status: 400 }
+		);
+	}
+
 	// Verificar se Username indisponível ou reservado
 	const existingUsername = await prisma.user.findUnique({
-		where: { username },
+		where: { username: normalizedUsername },
 	});
 	// Se o username está sendo usado pelo mesmo email, permitir (renovar reserva)
 	// Verificar se username está em uso por outro email e se está reservado ou verificado
@@ -191,7 +203,7 @@ async function handleOtpRequest(email: string, username: string) {
 	await prisma.user.upsert({
 		where: { email },
 		update: {
-			username, // Atualizar com o username escolhido
+			username: normalizedUsername, // Atualizar com o username normalizado
 			registrationOtp,
 			registrationOtpExpiry,
 			otpToken,
@@ -211,7 +223,7 @@ async function handleOtpRequest(email: string, username: string) {
 		},
 		create: {
 			email,
-			username, // Usar o username escolhido pelo usuário
+			username: normalizedUsername, // Usar o username normalizado
 			registrationOtp,
 			registrationOtpExpiry,
 			otpToken,

@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useRef, useState, Suspense } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -70,7 +70,7 @@ function OtpRegistrationPageContent() {
 			setTokenValid(true);
 		} catch {
 			setTokenValid(false);
-			router.replace("/registro/email");
+			router.replace("/registro");
 		} finally {
 			setValidatingToken(false);
 		}
@@ -144,7 +144,7 @@ function OtpRegistrationPageContent() {
 	// Validar token ao carregar a página
 	useEffect(() => {
 		if (!token) {
-			router.replace("/registro/email");
+			router.replace("/registro");
 			return;
 		}
 
@@ -280,7 +280,7 @@ function OtpRegistrationPageContent() {
 	};
 
 	const handleBackToEmail = () => {
-		router.push(`/registro/email?email=${encodeURIComponent(userEmail || "")}`);
+		router.push(`/registro?email=${encodeURIComponent(userEmail || "")}`);
 	};
 
 	if (status === "loading" || validatingToken) {
@@ -338,7 +338,7 @@ function OtpRegistrationPageContent() {
 
 							<div className="text-center">
 								<span className="text-gray-600">
-									Já tem uma conta?{" "}
+									Já possui uma conta?{" "}
 									<Link
 										className="font-medium text-blue-500 hover:underline"
 										href="/login"

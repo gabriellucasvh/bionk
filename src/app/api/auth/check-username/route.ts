@@ -3,7 +3,7 @@ import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
 
-const USERNAMEREJEX = /^[a-z0-9._-]{3,30}$/;
+const USERNAME_REGEX = /^[a-z0-9._-]{3,30}$/;
 // Função para limpar usernames reservados expirados
 async function cleanupExpiredUsernameReservations() {
 	try {
@@ -51,8 +51,11 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
+		// Normalizar username para lowercase
+		const normalizedUsername = username.toLowerCase().trim();
+
 		// Validar formato do username
-		if (!USERNAMEREJEX.test(username)) {
+		if (!USERNAME_REGEX.test(normalizedUsername)) {
 			return NextResponse.json(
 				{
 					available: false,
@@ -64,26 +67,27 @@ export async function GET(request: NextRequest) {
 		}
 
 		// Verificar se username está na blacklist
-		if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
+		if (BLACKLISTED_USERNAMES.includes(normalizedUsername)) {
 			return NextResponse.json({
 				available: false,
-				username,
+				username: normalizedUsername,
 				message: "Username não está disponível",
 			});
 		}
 
 		// Verificar se username já existe ou está reservado
 		const existingUser = await prisma.user.findUnique({
-			where: { username },
+			where: { username: normalizedUsername },
 			select: {
 				id: true,
 				emailVerified: true,
 				usernameReservationExpiry: true,
+				email: true,
 			},
 		});
 
 		let available = true;
-		let message = "";
+		let message = "Username disponível";
 
 		if (existingUser) {
 			// Se o usuário está verificado, username não está disponível
@@ -99,12 +103,13 @@ export async function GET(request: NextRequest) {
 				available = false;
 				message = "Username temporariamente reservado";
 			}
-			// Se a reserva expirou, username está disponível
+			// Se a reserva expirou, o username fica disponível novamente
+			// (a limpeza automática removerá o registro posteriormente)
 		}
 
 		return NextResponse.json({
 			available,
-			username,
+			username: normalizedUsername,
 			message,
 		});
 	} catch {
