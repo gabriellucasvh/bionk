@@ -236,6 +236,53 @@ async function validateUserExists(
 	return null;
 }
 
+// Função para criar plano de assinatura no Mercado Pago
+async function createPreapprovalPlan(
+	plan: string,
+	billingCycle: string,
+	transactionAmount: number
+) {
+	const client = new MercadoPagoConfig({
+		accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN || "",
+	});
+
+	try {
+		const planData = {
+			reason: `Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)} (${billingCycle === "monthly" ? "Mensal" : "Anual"})`,
+			auto_recurring: {
+				frequency: billingCycle === "monthly" ? 1 : 12,
+				frequency_type: "months",
+				transaction_amount: transactionAmount / 100,
+				currency_id: "BRL",
+			},
+			back_url: "https://www.mercadopago.com.br",
+		};
+
+		logInfo("Creating preapproval plan", { planData });
+
+		const response = await fetch('https://api.mercadopago.com/preapproval_plan', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
+			},
+			body: JSON.stringify(planData),
+		});
+
+		if (!response.ok) {
+			const errorData = await response.text();
+			throw new Error(`Failed to create plan: ${response.status} - ${errorData}`);
+		}
+
+		const planResult = await response.json();
+		logInfo("Preapproval plan created successfully", { planId: planResult.id });
+		return planResult.id;
+	} catch (error) {
+		logError("Failed to create preapproval plan", error);
+		throw error;
+	}
+}
+
 // Função para criar preapproval no Mercado Pago
 async function createPreapproval(
 	plan: string,
@@ -259,8 +306,23 @@ async function createPreapproval(
 	const endDate = new Date(startDate);
 	endDate.setFullYear(endDate.getFullYear() + 10);
 
+	// Detectar se estamos em ambiente de teste
+	const isTestEnvironment = process.env.MERCADO_PAGO_ACCESS_TOKEN?.startsWith('TEST-') || process.env.NODE_ENV === 'development';
+
+	// Criar plano de assinatura primeiro (necessário para usar card_token_id com status authorized)
+	let preapprovalPlanId: string | undefined;
+	if (!isTestEnvironment && cardTokenId) {
+		try {
+			preapprovalPlanId = await createPreapprovalPlan(plan, billingCycle, transactionAmount);
+			logInfo("Preapproval plan created for production", { preapprovalPlanId });
+		} catch (planError) {
+			logError("Failed to create preapproval plan, proceeding without it", planError);
+			// Continue sem o plano se falhar
+		}
+	}
+
 	// Dados da assinatura
-	const preapprovalData = {
+	const preapprovalData: any = {
 		payer_email: email,
 		reason: `Assinatura Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)} (${billingCycle === "monthly" ? "Mensal" : "Anual"})`,
 		auto_recurring: {
@@ -273,10 +335,32 @@ async function createPreapproval(
 		},
 		back_url: "https://www.mercadopago.com.br",
 		external_reference: userId,
-		status: "authorized",
+		// Em ambiente de teste, usar 'pending' devido ao bug do MP com card_token_id
+		status: isTestEnvironment ? "pending" : "authorized",
 		notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.bionk.me'}/api/mercadopago/webhook`,
-		card_token_id: cardTokenId,
 	};
+
+	// Adicionar preapproval_plan_id se foi criado com sucesso
+	if (preapprovalPlanId) {
+		preapprovalData.preapproval_plan_id = preapprovalPlanId;
+	}
+
+	// Só adicionar card_token_id em produção para evitar erro CC_VAL_433 em teste
+	if (!isTestEnvironment && cardTokenId) {
+		preapprovalData.card_token_id = cardTokenId;
+	}
+
+	if (isTestEnvironment) {
+		logInfo("Test environment detected - card_token_id omitted to avoid CC_VAL_433 error", {
+			environment: process.env.NODE_ENV,
+			accessTokenType: process.env.MERCADO_PAGO_ACCESS_TOKEN?.substring(0, 5),
+		});
+	} else if (preapprovalPlanId) {
+		logInfo("Production environment - using preapproval_plan_id with card_token_id", {
+			preapprovalPlanId,
+			hasCardToken: !!cardTokenId,
+		});
+	}
 
 	logInfo("Creating preapproval", {
 		preapprovalData,
