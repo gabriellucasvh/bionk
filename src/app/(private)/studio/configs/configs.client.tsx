@@ -61,18 +61,31 @@ function CancelSubscriptionButton() {
 		setMessage("");
 		setShowCancelDialog(false);
 		try {
+			console.log('Iniciando cancelamento da assinatura...');
+			
 			const response = await fetch("/api/mercadopago/cancel-subscription", {
 				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
 			});
+			
+			console.log('Response status:', response.status);
+			console.log('Response URL:', response.url);
+			
 			const data = await response.json();
+			console.log('Response data:', data);
+			
 			if (!response.ok) {
-				throw new Error(data.details || "Falha ao cancelar.");
+				throw new Error(data.details || data.error || "Falha ao cancelar.");
 			}
+			
 			setMessage(data.message);
 			// Atualiza o subscription plan no contexto
 			await refreshSubscriptionPlan();
 			setTimeout(() => window.location.reload(), 2000);
 		} catch (err: any) {
+			console.error('Erro ao cancelar assinatura:', err);
 			setError(err.message);
 		} finally {
 			setIsLoading(false);
