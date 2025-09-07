@@ -353,7 +353,7 @@ function OtpRegistrationPageContent() {
 			</div>
 
 			{/* Lado direito - Imagem */}
-			<div className="relative hidden flex-1 bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 lg:flex">
+			<div className="relative hidden flex-1 bg-black lg:flex">
 				<div className="absolute inset-0 bg-black/20" />
 				<Image
 					alt="Cosmic Background"

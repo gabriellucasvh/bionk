@@ -1,1 +1,0 @@
--- empty migration to sync history with DB
