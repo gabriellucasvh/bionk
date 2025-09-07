@@ -265,6 +265,7 @@ async function createPreapproval(
 		back_url: "https://www.mercadopago.com.br",
 		external_reference: userId,
 		status: "pending",
+		notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://bionk.vercel.app')}/api/mercadopago/webhook`,
 	};
 
 	logInfo("Creating preapproval", {
@@ -272,6 +273,7 @@ async function createPreapproval(
 		transactionAmount: transactionAmount / 100,
 		startDate: startDate.toISOString(),
 		endDate: endDate.toISOString(),
+		notificationUrl: preapprovalData.notification_url,
 	});
 
 	const result = await preapproval.create({ body: preapprovalData });
