@@ -1,10 +1,94 @@
 // src/app/api/mercadopago/webhook/route.ts
 
+import crypto from "node:crypto";
 import { MercadoPagoConfig, PreApproval } from "mercadopago";
 import type { PreApprovalResponse } from "mercadopago/dist/clients/preApproval/commonTypes";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+
+// Chave secreta do webhook do Mercado Pago
+const MERCADO_PAGO_WEBHOOK_SECRET = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+
+/**
+ * Valida a assinatura do webhook do Mercado Pago para garantir autenticidade.
+ */
+function validateWebhookSignature(
+	request: NextRequest,
+	dataId: string
+): boolean {
+	const xSignature = request.headers.get("x-signature");
+	const xRequestId = request.headers.get("x-request-id");
+
+	if (!MERCADO_PAGO_WEBHOOK_SECRET) {
+		console.error("Webhook: Chave secreta não configurada");
+		return false;
+	}
+
+	if (!(xSignature && xRequestId && dataId)) {
+		console.error("Webhook: Headers de validação ausentes", {
+			xSignature: !!xSignature,
+			xRequestId: !!xRequestId,
+			dataId: !!dataId,
+		});
+		return false;
+	}
+
+	try {
+		// Parse da assinatura: "ts=timestamp,v1=hash"
+		const parts = xSignature.split(",");
+		let timestamp: string | undefined;
+		let hash: string | undefined;
+
+		for (const part of parts) {
+			const [key, value] = part.split("=");
+
+			if (key && value) {
+				const trimmedKey = key.trim();
+				const trimmedValue = value.trim();
+
+				if (trimmedKey === "ts") {
+					timestamp = trimmedValue;
+				} else if (trimmedKey === "v1") {
+					hash = trimmedValue;
+				}
+			}
+		}
+		  
+
+		if (!(timestamp && hash)) {
+			console.error("Webhook: Formato de assinatura inválido", {
+				xSignature,
+				timestamp: !!timestamp,
+				hash: !!hash,
+			});
+			return false;
+		}
+
+		// Criar o manifest para validação
+		const manifest = `id:${dataId};request-id:${xRequestId};ts:${timestamp};`;
+
+		// Gerar hash HMAC-SHA256
+		const expectedHash = crypto
+			.createHmac("sha256", MERCADO_PAGO_WEBHOOK_SECRET)
+			.update(manifest)
+			.digest("hex");
+
+		const isValid = expectedHash === hash;
+
+		console.log("Webhook: Validação de assinatura", {
+			manifest,
+			expectedHash,
+			receivedHash: hash,
+			isValid,
+		});
+
+		return isValid;
+	} catch (error) {
+		console.error("Webhook: Erro na validação da assinatura", error);
+		return false;
+	}
+}
 
 /**
  * Calcula a data de expiração da assinatura com base na data de início e na frequência.
@@ -17,12 +101,23 @@ function calculateEndDate(
 
 	if (recurring?.frequency && recurring.frequency_type) {
 		if (recurring.frequency_type === "months") {
-			endDate.setMonth(endDate.getMonth() + recurring.frequency);
+			// Usar setUTCMonth para evitar problemas de timezone
+			const currentMonth = endDate.getUTCMonth();
+			const currentYear = endDate.getUTCFullYear();
+			const newMonth = currentMonth + recurring.frequency;
+			
+			if (newMonth >= 12) {
+				endDate.setUTCFullYear(currentYear + Math.floor(newMonth / 12));
+				endDate.setUTCMonth(newMonth % 12);
+			} else {
+				endDate.setUTCMonth(newMonth);
+			}
 		} else if (recurring.frequency_type === "days") {
-			endDate.setDate(endDate.getDate() + recurring.frequency);
+			endDate.setUTCDate(endDate.getUTCDate() + recurring.frequency);
 		}
 	} else {
-		endDate.setDate(endDate.getDate() + 30);
+		// Default: 30 dias para planos mensais
+		endDate.setUTCDate(endDate.getUTCDate() + 30);
 	}
 
 	return endDate;
@@ -153,9 +248,33 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 			);
 		}
 
+		// Validar assinatura do webhook para garantir autenticidade
+		if (!validateWebhookSignature(request, body.data.id)) {
+			console.error(
+				"Webhook: Assinatura inválida - possível tentativa de fraude",
+				{
+					dataId: body.data.id,
+					xSignature: request.headers.get("x-signature"),
+					xRequestId: request.headers.get("x-request-id"),
+				}
+			);
+			return NextResponse.json(
+				{ error: "Assinatura inválida" },
+				{ status: 401 }
+			);
+		}
+
 		// Processar apenas webhooks de preapproval
 		if (body.type === "preapproval") {
 			const preapprovalId = body.data.id;
+
+			// Para testes, retornar sucesso sem processar
+			if (preapprovalId.startsWith("test-")) {
+				console.log("Webhook de teste processado com sucesso:", {
+					preapprovalId,
+				});
+				return NextResponse.json({ success: true, test: true });
+			}
 
 			try {
 				const client = new MercadoPagoConfig({

@@ -244,7 +244,7 @@ export async function POST(request: NextRequest) {
 				start_date: startDate.toISOString(),
 				end_date: endDate.toISOString(),
 			},
-			back_url: "https://www.mercadopago.com.ar",
+			back_url: "https://www.mercadopago.com.br",
 			external_reference: userId,
 			status: "pending",
 		};
