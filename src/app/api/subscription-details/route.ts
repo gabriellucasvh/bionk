@@ -1,9 +1,9 @@
 // src/app/api/subscription-details/route.ts
 
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
 
 export async function GET() {
 	try {
@@ -18,6 +18,7 @@ export async function GET() {
 				subscriptionPlan: true,
 				subscriptionStatus: true,
 				subscriptionEndDate: true,
+				mercadopagoSubscriptionId: true,
 				paymentMethodBrand: true,
 				paymentMethodLastFour: true,
 			},
@@ -35,6 +36,61 @@ export async function GET() {
 			});
 		}
 
+		// Para planos pagos, validar se realmente está ativo
+		const isPaidPlan = ["basic", "pro", "premium"].includes(
+			user.subscriptionPlan
+		);
+
+		if (isPaidPlan) {
+			// Verificar se tem mercadopagoSubscriptionId válido
+			if (!user.mercadopagoSubscriptionId) {
+				console.log(
+					"User with paid plan but no mercadopagoSubscriptionId, showing as free",
+					{
+						userId: session.user.id,
+						plan: user.subscriptionPlan,
+						status: user.subscriptionStatus,
+					}
+				);
+				return NextResponse.json({
+					isSubscribed: true,
+					plan: "free",
+					status: "active",
+				});
+			}
+
+			// Verificar se o status é ativo
+			if (user.subscriptionStatus !== "active") {
+				console.log(
+					"User with paid plan but inactive status, showing as free",
+					{
+						userId: session.user.id,
+						plan: user.subscriptionPlan,
+						status: user.subscriptionStatus,
+					}
+				);
+				return NextResponse.json({
+					isSubscribed: true,
+					plan: "free",
+					status: "active",
+				});
+			}
+
+			// Verificar se a assinatura não expirou
+			if (user.subscriptionEndDate && user.subscriptionEndDate < new Date()) {
+				console.log("User with expired subscription, showing as free", {
+					userId: session.user.id,
+					plan: user.subscriptionPlan,
+					endDate: user.subscriptionEndDate,
+				});
+				return NextResponse.json({
+					isSubscribed: true,
+					plan: "free",
+					status: "active",
+				});
+			}
+		}
+
 		const response = {
 			isSubscribed: true,
 			plan: user.subscriptionPlan,
@@ -47,7 +103,8 @@ export async function GET() {
 		};
 
 		return NextResponse.json(response);
-	} catch {
+	} catch (error) {
+		console.error("Error in subscription-details API:", error);
 		return NextResponse.json(
 			{ error: "Erro ao buscar detalhes da assinatura." },
 			{ status: 500 }

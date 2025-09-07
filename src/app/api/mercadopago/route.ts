@@ -298,29 +298,44 @@ async function handlePostCreation(
 		return;
 	}
 
-	// Salvar dados no banco
+	// Salvar apenas dados temporários no banco - NÃO alterar o plano ainda
+	// O plano só será alterado quando o webhook confirmar o pagamento
 	try {
-		const startDate = new Date();
-		startDate.setDate(startDate.getDate() + 1);
-		const endDate = new Date(startDate);
-		endDate.setFullYear(endDate.getFullYear() + 10);
+		// Buscar o plano atual do usuário para manter
+		const currentUser = await prisma.user.findUnique({
+			where: { id: userId },
+			select: { subscriptionPlan: true }
+		});
 
+		const currentPlan = currentUser?.subscriptionPlan || "free";
+
+		// Salvar apenas informações de controle, mantendo o plano atual
 		await prisma.user.update({
 			where: { id: userId },
 			data: {
-				subscriptionPlan: plan,
+				// Manter o plano atual - não alterar até confirmação
+				subscriptionPlan: currentPlan,
+				// Salvar o plano solicitado em campo temporário
+				pendingSubscriptionPlan: plan,
+				// Salvar status como pending para controle
 				subscriptionStatus: "pending",
+				// Salvar dados do plano solicitado
 				billingCycle,
-				subscriptionStartDate: startDate,
-				subscriptionEndDate: endDate,
+				// Não definir datas até confirmação do pagamento
+				subscriptionStartDate: null,
+				subscriptionEndDate: null,
+				// Não salvar mercadopagoSubscriptionId até confirmação
+				mercadopagoSubscriptionId: null,
 			},
 		});
 
-		logInfo("User subscription data saved", {
+		logInfo("User subscription request saved (plan unchanged until confirmation)", {
 			userId,
 			subscriptionId: result.id,
-			plan,
+			requestedPlan: plan,
+			currentPlan,
 			billingCycle,
+			status: "pending"
 		});
 	} catch (dbError) {
 		logError("Database save failed", dbError, {
@@ -334,7 +349,7 @@ async function handlePostCreation(
 		await discordWebhook.notifyPurchase({
 			user: { email },
 			amount: transactionAmount / 100,
-			plan: `${plan} (${billingCycle})`,
+			plan: `${plan} (${billingCycle}) - PENDING CONFIRMATION`,
 			id: result.id,
 			paymentMethod: "Mercado Pago",
 			currency: "BRL",

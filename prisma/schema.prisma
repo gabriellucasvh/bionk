@@ -47,6 +47,7 @@ model User {
   subscriptionEndDate           DateTime?
   subscriptionStartDate         DateTime?
   mercadopagoSubscriptionId     String?
+  pendingSubscriptionPlan       String?        // Plano solicitado aguardando confirmação
   paymentMethodBrand            String?
   paymentMethodLastFour         String?
   accounts                      Account[]
