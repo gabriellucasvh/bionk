@@ -256,6 +256,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 		console.log("Webhook recebido:", {
 			type: body.type,
 			dataId: body.data?.id,
+			timestamp: new Date().toISOString(),
+			headers: {
+				xSignature: request.headers.get("x-signature"),
+				xRequestId: request.headers.get("x-request-id"),
+				userAgent: request.headers.get("user-agent"),
+			},
+			body: JSON.stringify(body, null, 2),
 		});
 
 		// Validar estrutura do webhook
@@ -317,6 +324,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 					id: subDetails.id,
 					status: subDetails.status,
 					externalReference: subDetails.external_reference,
+					reason: subDetails.reason,
+					dateCreated: subDetails.date_created,
+					autoRecurring: subDetails.auto_recurring,
+					payerEmail: subDetails.payer_email,
+					fullDetails: JSON.stringify(subDetails, null, 2),
 				});
 
 				if (subDetails.status === "authorized") {

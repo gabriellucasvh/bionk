@@ -104,7 +104,7 @@ async function parseRequestBody(request: NextRequest): Promise<any> {
 
 // Função para validar campos obrigatórios
 function validateRequestFields(body: any): NextResponse | null {
-	const { plan, billingCycle, email, userId } = body;
+	const { plan, billingCycle, email, userId, card_token_id } = body;
 
 	if (!plan || typeof plan !== "string" || plan.trim().length === 0) {
 		logError("Campo 'plan' inválido", { plan });
@@ -136,6 +136,14 @@ function validateRequestFields(body: any): NextResponse | null {
 		logError("Campo 'userId' inválido", { userId });
 		return NextResponse.json(
 			{ error: "Campo 'userId' é obrigatório e deve ser uma string válida" },
+			{ status: 400 }
+		);
+	}
+
+	if (!card_token_id || typeof card_token_id !== "string" || card_token_id.trim().length === 0) {
+		logError("Campo 'card_token_id' inválido", { card_token_id });
+		return NextResponse.json(
+			{ error: "Token do cartão é obrigatório" },
 			{ status: 400 }
 		);
 	}
@@ -234,7 +242,8 @@ async function createPreapproval(
 	billingCycle: string,
 	email: string,
 	userId: string,
-	transactionAmount: number
+	transactionAmount: number,
+	cardTokenId: string
 ) {
 	const client = new MercadoPagoConfig({
 		accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN || "",
@@ -264,8 +273,9 @@ async function createPreapproval(
 		},
 		back_url: "https://www.mercadopago.com.br",
 		external_reference: userId,
-		status: "pending",
-		notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://bionk.vercel.app')}/api/mercadopago/webhook`,
+		status: "authorized",
+		notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.bionk.me'}/api/mercadopago/webhook`,
+		card_token_id: cardTokenId,
 	};
 
 	logInfo("Creating preapproval", {
@@ -500,7 +510,8 @@ export async function POST(request: NextRequest) {
 			billingCycle,
 			email,
 			userId,
-			transactionAmount
+			transactionAmount,
+			body.card_token_id
 		);
 
 		// Salvar dados no banco e notificar
