@@ -10,16 +10,37 @@ import prisma from "@/lib/prisma";
 // Chave secreta do webhook do Mercado Pago
 const MERCADO_PAGO_WEBHOOK_SECRET = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
 
-/**
- * Valida a assinatura do webhook do Mercado Pago para garantir autenticidade.
- */
-function validateWebhookSignature(
-	request: NextRequest,
+function parseSignatureParts(xSignature: string): {
+	timestamp?: string;
+	hash?: string;
+} {
+	const parts = xSignature.split(",");
+	let timestamp: string | undefined;
+	let hash: string | undefined;
+
+	for (const part of parts) {
+		const [key, value] = part.split("=");
+
+		if (key && value) {
+			const trimmedKey = key.trim();
+			const trimmedValue = value.trim();
+
+			if (trimmedKey === "ts") {
+				timestamp = trimmedValue;
+			} else if (trimmedKey === "v1") {
+				hash = trimmedValue;
+			}
+		}
+	}
+
+	return { timestamp, hash };
+}
+
+function validateSignatureHeaders(
+	xSignature: string | null,
+	xRequestId: string | null,
 	dataId: string
 ): boolean {
-	const xSignature = request.headers.get("x-signature");
-	const xRequestId = request.headers.get("x-request-id");
-
 	if (!MERCADO_PAGO_WEBHOOK_SECRET) {
 		console.error("Webhook: Chave secreta não configurada");
 		return false;
@@ -34,26 +55,29 @@ function validateWebhookSignature(
 		return false;
 	}
 
+	return true;
+}
+
+/**
+ * Valida a assinatura do webhook do Mercado Pago para garantir autenticidade.
+ */
+function validateWebhookSignature(
+	request: NextRequest,
+	dataId: string
+): boolean {
+	const xSignature = request.headers.get("x-signature");
+	const xRequestId = request.headers.get("x-request-id");
+
+	if (!validateSignatureHeaders(xSignature, xRequestId, dataId)) {
+		return false;
+	}
+
 	try {
 		// Parse da assinatura: "ts=timestamp,v1=hash"
-		const parts = xSignature.split(",");
-		let timestamp: string | undefined;
-		let hash: string | undefined;
-
-		for (const part of parts) {
-			const [key, value] = part.split("=");
-
-			if (key && value) {
-				const trimmedKey = key.trim();
-				const trimmedValue = value.trim();
-
-				if (trimmedKey === "ts") {
-					timestamp = trimmedValue;
-				} else if (trimmedKey === "v1") {
-					hash = trimmedValue;
-				}
-			}
+		if (!xSignature) {
+			return false;
 		}
+		const { timestamp, hash } = parseSignatureParts(xSignature);
 
 		if (!(timestamp && hash)) {
 			console.error("Webhook: Formato de assinatura inválido", {
@@ -68,6 +92,9 @@ function validateWebhookSignature(
 		const manifest = `id:${dataId};request-id:${xRequestId};ts:${timestamp};`;
 
 		// Gerar hash HMAC-SHA256
+		if (!MERCADO_PAGO_WEBHOOK_SECRET) {
+			return false;
+		}
 		const expectedHash = crypto
 			.createHmac("sha256", MERCADO_PAGO_WEBHOOK_SECRET)
 			.update(manifest)
@@ -221,28 +248,183 @@ async function processSubscriptionUpdate(subDetails: PreApprovalResponse) {
 	}
 }
 
+async function processPreapprovalWebhook(
+	body: any
+): Promise<NextResponse | null> {
+	const preapprovalId = body.data.id;
+
+	// Para testes, retornar sucesso sem processar
+	if (preapprovalId.startsWith("test-")) {
+		console.log("Webhook de teste processado com sucesso:", {
+			preapprovalId,
+		});
+		return NextResponse.json({ success: true, test: true });
+	}
+
+	try {
+		if (!process.env.MERCADO_PAGO_ACCESS_TOKEN) {
+			throw new Error("MERCADO_PAGO_ACCESS_TOKEN not configured");
+		}
+		const client = new MercadoPagoConfig({
+			accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
+		});
+		const preapproval = new PreApproval(client);
+		const subDetails = await preapproval.get({ id: preapprovalId });
+
+		console.log("Detalhes da preapproval:", {
+			id: subDetails.id,
+			status: subDetails.status,
+			externalReference: subDetails.external_reference,
+			reason: subDetails.reason,
+			dateCreated: subDetails.date_created,
+			autoRecurring: subDetails.auto_recurring,
+			payerEmail: subDetails.payer_email,
+			fullDetails: JSON.stringify(subDetails, null, 2),
+		});
+
+		if (subDetails.status === "authorized") {
+			await processSubscriptionUpdate(subDetails);
+			console.log("Assinatura processada com sucesso:", {
+				id: preapprovalId,
+			});
+		} else {
+			console.log("Preapproval não autorizada, ignorando:", {
+				id: preapprovalId,
+				status: subDetails.status,
+			});
+		}
+	} catch (mpError) {
+		console.error("Erro ao buscar preapproval no Mercado Pago:", mpError);
+		return NextResponse.json(
+			{ error: "Erro ao processar webhook" },
+			{ status: 500 }
+		);
+	}
+
+	return null;
+}
+
+async function processPaymentWebhook(body: any): Promise<NextResponse | null> {
+	const paymentId = body.data.id;
+	console.log("Processando webhook de payment:", { paymentId });
+
+	try {
+		// Buscar todas as preapprovals ativas para encontrar a relacionada
+		const activeSubscriptions = await prisma.user.findMany({
+			where: {
+				mercadopagoSubscriptionId: { not: null },
+				subscriptionStatus: "pending",
+			},
+			select: {
+				id: true,
+				mercadopagoSubscriptionId: true,
+				pendingSubscriptionPlan: true,
+			},
+		});
+
+		console.log("Assinaturas pendentes encontradas:", {
+			count: activeSubscriptions.length,
+			subscriptions: activeSubscriptions.map((s) => ({
+				userId: s.id,
+				subscriptionId: s.mercadopagoSubscriptionId,
+				plan: s.pendingSubscriptionPlan,
+			})),
+		});
+
+		// Para cada assinatura pendente, verificar se o pagamento foi processado
+		for (const subscription of activeSubscriptions) {
+			if (subscription.mercadopagoSubscriptionId) {
+				try {
+					if (!process.env.MERCADO_PAGO_ACCESS_TOKEN) {
+						throw new Error("MERCADO_PAGO_ACCESS_TOKEN not configured");
+					}
+					const client = new MercadoPagoConfig({
+						accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
+					});
+					const preapproval = new PreApproval(client);
+					// biome-ignore lint/nursery/noAwaitInLoop: Sequential processing required for webhook validation
+					const subDetails = await preapproval.get({
+						id: subscription.mercadopagoSubscriptionId,
+					});
+
+					console.log("Verificando status da preapproval:", {
+						preapprovalId: subscription.mercadopagoSubscriptionId,
+						status: subDetails.status,
+						userId: subscription.id,
+					});
+
+					// Se a preapproval foi autorizada, processar a atualização
+					if (subDetails.status === "authorized") {
+						await processSubscriptionUpdate(subDetails);
+						console.log("Assinatura ativada via webhook de payment:", {
+							preapprovalId: subscription.mercadopagoSubscriptionId,
+							userId: subscription.id,
+							paymentId,
+						});
+					}
+				} catch (preapprovalError) {
+					console.error("Erro ao verificar preapproval:", {
+						preapprovalId: subscription.mercadopagoSubscriptionId,
+						error: preapprovalError,
+					});
+				}
+			}
+		}
+	} catch (error) {
+		console.error("Erro ao processar webhook de payment:", error);
+		return NextResponse.json(
+			{ error: "Erro ao processar webhook de payment" },
+			{ status: 500 }
+		);
+	}
+
+	return null;
+}
+
+function validateWebhookRequest(request: NextRequest): NextResponse | null {
+	// Validação do Content-Type
+	const contentType = request.headers.get("content-type");
+	if (!contentType?.includes("application/json")) {
+		console.error("Webhook: Content-Type inválido", { contentType });
+		return NextResponse.json(
+			{ error: "Content-Type deve ser application/json" },
+			{ status: 400 }
+		);
+	}
+
+	// Verificar configuração do Mercado Pago
+	if (!process.env.MERCADO_PAGO_ACCESS_TOKEN) {
+		console.error("Webhook: Token de acesso não configurado");
+		return NextResponse.json(
+			{ error: "Configuração inválida" },
+			{ status: 503 }
+		);
+	}
+
+	return null;
+}
+
+function validateWebhookBody(body: any): NextResponse | null {
+	// Validar estrutura do webhook
+	if (!(body.type && body.data?.id)) {
+		console.error("Webhook: Estrutura inválida", { body });
+		return NextResponse.json(
+			{ error: "Estrutura de webhook inválida" },
+			{ status: 400 }
+		);
+	}
+	return null;
+}
+
 /**
  * Rota principal que recebe os webhooks do Mercado Pago.
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
 	try {
-		// Validação do Content-Type
-		const contentType = request.headers.get("content-type");
-		if (!contentType?.includes("application/json")) {
-			console.error("Webhook: Content-Type inválido", { contentType });
-			return NextResponse.json(
-				{ error: "Content-Type deve ser application/json" },
-				{ status: 400 }
-			);
-		}
-
-		// Verificar configuração do Mercado Pago
-		if (!process.env.MERCADO_PAGO_ACCESS_TOKEN) {
-			console.error("Webhook: Token de acesso não configurado");
-			return NextResponse.json(
-				{ error: "Configuração inválida" },
-				{ status: 503 }
-			);
+		// Validação da requisição
+		const requestError = validateWebhookRequest(request);
+		if (requestError) {
+			return requestError;
 		}
 
 		let body: any;
@@ -265,13 +447,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 			body: JSON.stringify(body, null, 2),
 		});
 
-		// Validar estrutura do webhook
-		if (!(body.type && body.data?.id)) {
-			console.error("Webhook: Estrutura inválida", { body });
-			return NextResponse.json(
-				{ error: "Estrutura de webhook inválida" },
-				{ status: 400 }
-			);
+		// Validação da estrutura do webhook
+		const bodyError = validateWebhookBody(body);
+		if (bodyError) {
+			return bodyError;
 		}
 
 		// Validar assinatura do webhook para garantir autenticidade
@@ -301,53 +480,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 		// 	);
 		// }
 
-		// Processar apenas webhooks de preapproval
+		// Processar webhooks de preapproval e payment
 		if (body.type === "preapproval") {
-			const preapprovalId = body.data.id;
-
-			// Para testes, retornar sucesso sem processar
-			if (preapprovalId.startsWith("test-")) {
-				console.log("Webhook de teste processado com sucesso:", {
-					preapprovalId,
-				});
-				return NextResponse.json({ success: true, test: true });
+			const result = await processPreapprovalWebhook(body);
+			if (result) {
+				return result;
 			}
-
-			try {
-				const client = new MercadoPagoConfig({
-					accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
-				});
-				const preapproval = new PreApproval(client);
-				const subDetails = await preapproval.get({ id: preapprovalId });
-
-				console.log("Detalhes da preapproval:", {
-					id: subDetails.id,
-					status: subDetails.status,
-					externalReference: subDetails.external_reference,
-					reason: subDetails.reason,
-					dateCreated: subDetails.date_created,
-					autoRecurring: subDetails.auto_recurring,
-					payerEmail: subDetails.payer_email,
-					fullDetails: JSON.stringify(subDetails, null, 2),
-				});
-
-				if (subDetails.status === "authorized") {
-					await processSubscriptionUpdate(subDetails);
-					console.log("Assinatura processada com sucesso:", {
-						id: preapprovalId,
-					});
-				} else {
-					console.log("Preapproval não autorizada, ignorando:", {
-						id: preapprovalId,
-						status: subDetails.status,
-					});
-				}
-			} catch (mpError) {
-				console.error("Erro ao buscar preapproval no Mercado Pago:", mpError);
-				return NextResponse.json(
-					{ error: "Erro ao processar webhook" },
-					{ status: 500 }
-				);
+		} else if (body.type === "payment") {
+			const result = await processPaymentWebhook(body);
+			if (result) {
+				return result;
 			}
 		} else {
 			console.log("Tipo de webhook ignorado:", { type: body.type });
