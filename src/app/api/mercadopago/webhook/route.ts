@@ -283,10 +283,71 @@ async function processPreapprovalWebhook(
 		});
 
 		if (subDetails.status === "authorized") {
-			await processSubscriptionUpdate(subDetails);
-			console.log("Assinatura processada com sucesso:", {
-				id: preapprovalId,
-			});
+			// Verificar se há pagamentos processados para esta preapproval
+			try {
+				const paymentsResponse = await fetch(
+					`https://api.mercadopago.com/v1/payments/search?preapproval_id=${preapprovalId}`,
+					{
+						headers: {
+							Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
+						},
+					}
+				);
+
+				if (paymentsResponse.ok) {
+					const paymentsData = await paymentsResponse.json();
+					const approvedPayments =
+						paymentsData.results?.filter(
+							(payment: any) => payment.status === "approved"
+						) || [];
+
+					console.log("Pagamentos encontrados para preapproval:", {
+						preapprovalId,
+						totalPayments: paymentsData.results?.length || 0,
+						approvedPayments: approvedPayments.length,
+						payments:
+							paymentsData.results?.map((p: any) => ({
+								id: p.id,
+								status: p.status,
+								amount: p.transaction_amount,
+								date: p.date_created,
+							})) || [],
+					});
+
+					if (approvedPayments.length > 0) {
+						await processSubscriptionUpdate(subDetails);
+						console.log(
+							"Assinatura processada com sucesso (pagamento confirmado):",
+							{
+								id: preapprovalId,
+								approvedPayments: approvedPayments.length,
+							}
+						);
+					} else {
+						console.log(
+							"Preapproval autorizada mas sem pagamentos aprovados, aguardando:",
+							{
+								id: preapprovalId,
+								status: subDetails.status,
+								totalPayments: paymentsData.results?.length || 0,
+							}
+						);
+					}
+				} else {
+					console.error("Erro ao buscar pagamentos da preapproval:", {
+						preapprovalId,
+						status: paymentsResponse.status,
+						statusText: paymentsResponse.statusText,
+					});
+					// Em caso de erro na busca de pagamentos, não processar a assinatura
+				}
+			} catch (paymentError) {
+				console.error("Erro ao verificar pagamentos da preapproval:", {
+					preapprovalId,
+					error: paymentError,
+				});
+				// Em caso de erro, não processar a assinatura
+			}
 		} else {
 			console.log("Preapproval não autorizada, ignorando:", {
 				id: preapprovalId,

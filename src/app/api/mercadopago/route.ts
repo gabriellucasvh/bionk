@@ -398,8 +398,6 @@ function buildPreapprovalData(
 		},
 		back_url: "https://www.mercadopago.com.br",
 		external_reference: userId,
-		// Em ambiente de teste, usar 'pending' devido ao bug do MP com card_token_id
-		status: testEnv ? "pending" : "authorized",
 		notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://www.bionk.me"}/api/mercadopago/webhook`,
 	};
 
