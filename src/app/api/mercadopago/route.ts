@@ -140,7 +140,11 @@ function validateRequestFields(body: any): NextResponse | null {
 		);
 	}
 
-	if (!card_token_id || typeof card_token_id !== "string" || card_token_id.trim().length === 0) {
+	if (
+		!card_token_id ||
+		typeof card_token_id !== "string" ||
+		card_token_id.trim().length === 0
+	) {
 		logError("Campo 'card_token_id' inválido", { card_token_id });
 		return NextResponse.json(
 			{ error: "Token do cartão é obrigatório" },
@@ -260,18 +264,23 @@ async function createPreapprovalPlan(
 
 		logInfo("Creating preapproval plan", { planData });
 
-		const response = await fetch('https://api.mercadopago.com/preapproval_plan', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
-			},
-			body: JSON.stringify(planData),
-		});
+		const response = await fetch(
+			"https://api.mercadopago.com/preapproval_plan",
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
+				},
+				body: JSON.stringify(planData),
+			}
+		);
 
 		if (!response.ok) {
 			const errorData = await response.text();
-			throw new Error(`Failed to create plan: ${response.status} - ${errorData}`);
+			throw new Error(
+				`Failed to create plan: ${response.status} - ${errorData}`
+			);
 		}
 
 		const planResult = await response.json();
@@ -307,16 +316,29 @@ async function createPreapproval(
 	endDate.setFullYear(endDate.getFullYear() + 10);
 
 	// Detectar se estamos em ambiente de teste
-	const isTestEnvironment = process.env.MERCADO_PAGO_ACCESS_TOKEN?.startsWith('TEST-') || process.env.NODE_ENV === 'development';
+	const isTestEnvironment =
+		process.env.MERCADO_PAGO_ACCESS_TOKEN?.startsWith("TEST-") ||
+		process.env.NODE_ENV === "development";
 
 	// Criar plano de assinatura primeiro (necessário para usar card_token_id com status authorized)
 	let preapprovalPlanId: string | undefined;
 	if (!isTestEnvironment && cardTokenId) {
 		try {
-			preapprovalPlanId = await createPreapprovalPlan(plan, billingCycle, transactionAmount);
+			preapprovalPlanId = await createPreapprovalPlan(
+				plan,
+				billingCycle,
+				transactionAmount
+			);
 			logInfo("Preapproval plan created for production", { preapprovalPlanId });
+
+			// Aguardar um pouco para o plano ser ativado no MP
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+			logInfo("Waited for plan activation", { preapprovalPlanId });
 		} catch (planError) {
-			logError("Failed to create preapproval plan, proceeding without it", planError);
+			logError(
+				"Failed to create preapproval plan, proceeding without it",
+				planError
+			);
 			// Continue sem o plano se falhar
 		}
 	}
@@ -337,7 +359,7 @@ async function createPreapproval(
 		external_reference: userId,
 		// Em ambiente de teste, usar 'pending' devido ao bug do MP com card_token_id
 		status: isTestEnvironment ? "pending" : "authorized",
-		notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.bionk.me'}/api/mercadopago/webhook`,
+		notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://www.bionk.me"}/api/mercadopago/webhook`,
 	};
 
 	// Adicionar preapproval_plan_id se foi criado com sucesso
@@ -351,15 +373,21 @@ async function createPreapproval(
 	}
 
 	if (isTestEnvironment) {
-		logInfo("Test environment detected - card_token_id omitted to avoid CC_VAL_433 error", {
-			environment: process.env.NODE_ENV,
-			accessTokenType: process.env.MERCADO_PAGO_ACCESS_TOKEN?.substring(0, 5),
-		});
+		logInfo(
+			"Test environment detected - card_token_id omitted to avoid CC_VAL_433 error",
+			{
+				environment: process.env.NODE_ENV,
+				accessTokenType: process.env.MERCADO_PAGO_ACCESS_TOKEN?.substring(0, 5),
+			}
+		);
 	} else if (preapprovalPlanId) {
-		logInfo("Production environment - using preapproval_plan_id with card_token_id", {
-			preapprovalPlanId,
-			hasCardToken: !!cardTokenId,
-		});
+		logInfo(
+			"Production environment - using preapproval_plan_id with card_token_id",
+			{
+				preapprovalPlanId,
+				hasCardToken: !!cardTokenId,
+			}
+		);
 	}
 
 	logInfo("Creating preapproval", {
@@ -370,7 +398,36 @@ async function createPreapproval(
 		notificationUrl: preapprovalData.notification_url,
 	});
 
-	const result = await preapproval.create({ body: preapprovalData });
+	// Tentar criar preapproval com retry se o plano não estiver disponível
+	let result: any;
+	let retryCount = 0;
+	const maxRetries = 3;
+
+	while (retryCount < maxRetries) {
+		try {
+			result = preapproval.create({ body: preapprovalData });
+			break; // Sucesso, sair do loop
+		} catch (error: any) {
+			if (
+				error.message?.includes("does not exist") &&
+				retryCount < maxRetries - 1
+			) {
+				retryCount++;
+				logInfo(`Plan not found, retrying (${retryCount}/${maxRetries})`, {
+					preapprovalPlanId,
+					error: error.message,
+				});
+				// Aguardar mais tempo antes do retry
+				await new Promise((resolve) => setTimeout(resolve, 2000));
+			} else {
+				throw error; // Re-throw se não for erro de plano não encontrado ou se esgotaram os retries
+			}
+		}
+	}
+
+	if (!result) {
+		throw new Error("Failed to create preapproval after all retries");
+	}
 
 	logInfo("Preapproval created successfully", {
 		preapprovalId: result.id,
@@ -400,7 +457,7 @@ async function handlePostCreation(
 		// Buscar o plano atual do usuário para manter
 		const currentUser = await prisma.user.findUnique({
 			where: { id: userId },
-			select: { subscriptionPlan: true }
+			select: { subscriptionPlan: true },
 		});
 
 		const currentPlan = currentUser?.subscriptionPlan || "free";
@@ -425,14 +482,17 @@ async function handlePostCreation(
 			},
 		});
 
-		logInfo("User subscription request saved (plan unchanged until confirmation)", {
-			userId,
-			subscriptionId: result.id,
-			requestedPlan: plan,
-			currentPlan,
-			billingCycle,
-			status: "pending"
-		});
+		logInfo(
+			"User subscription request saved (plan unchanged until confirmation)",
+			{
+				userId,
+				subscriptionId: result.id,
+				requestedPlan: plan,
+				currentPlan,
+				billingCycle,
+				status: "pending",
+			}
+		);
 	} catch (dbError) {
 		logError("Database save failed", dbError, {
 			userId,
