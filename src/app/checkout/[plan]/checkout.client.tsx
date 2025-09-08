@@ -1,17 +1,17 @@
 "use client";
 
+import { ArrowLeft, CircleAlert, Loader2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound, useParams, useRouter } from "next/navigation";
+import Script from "next/script";
+import { useSession } from "next-auth/react";
+import { useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, CircleAlert, Loader2 } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import Link from "next/link";
-import { notFound, useParams, useRouter } from "next/navigation";
-import Script from "next/script";
-import { useEffect, useRef, useState } from "react";
 
 const pricingPlans = [
 	{
