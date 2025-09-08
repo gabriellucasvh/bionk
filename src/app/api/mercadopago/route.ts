@@ -246,7 +246,7 @@ async function createPreapprovalPlan(
 	billingCycle: string,
 	transactionAmount: number
 ) {
-	const client = new MercadoPagoConfig({
+	new MercadoPagoConfig({
 		accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN || "",
 	});
 
@@ -292,6 +292,130 @@ async function createPreapprovalPlan(
 	}
 }
 
+// Função para criar preapproval com retry mechanism
+async function createPreapprovalWithRetry(
+	preapproval: any,
+	preapprovalData: any,
+	preapprovalPlanId?: string
+): Promise<any> {
+	const maxRetries = 3;
+
+	for (let retryCount = 0; retryCount < maxRetries; retryCount++) {
+		try {
+			// biome-ignore lint/nursery/noAwaitInLoop: Sequential retry is intentional
+			return await preapproval.create({ body: preapprovalData });
+		} catch (error: any) {
+			if (
+				error.message?.includes("does not exist") &&
+				retryCount < maxRetries - 1
+			) {
+				logInfo(`Plan not found, retrying (${retryCount + 1}/${maxRetries})`, {
+					preapprovalPlanId,
+					error: error.message,
+				});
+				// Aguardar mais tempo antes do retry
+				await new Promise((resolve) => setTimeout(resolve, 2000));
+			} else {
+				throw error;
+			}
+		}
+	}
+
+	throw new Error("Failed to create preapproval after all retries");
+}
+
+// Função para detectar ambiente de teste
+function isTestEnvironment(): boolean {
+	return (
+		process.env.MERCADO_PAGO_ACCESS_TOKEN?.startsWith("TEST-") ||
+		process.env.NODE_ENV === "development"
+	);
+}
+
+// Função para configurar datas da assinatura
+function setupSubscriptionDates() {
+	const startDate = new Date();
+	startDate.setDate(startDate.getDate() + 1);
+	const endDate = new Date(startDate);
+	endDate.setFullYear(endDate.getFullYear() + 10);
+	return { startDate, endDate };
+}
+
+// Função para criar plano se necessário
+async function createPlanIfNeeded(
+	plan: string,
+	billingCycle: string,
+	transactionAmount: number,
+	cardTokenId: string
+): Promise<string | undefined> {
+	if (!isTestEnvironment() && cardTokenId) {
+		try {
+			const preapprovalPlanId = await createPreapprovalPlan(
+				plan,
+				billingCycle,
+				transactionAmount
+			);
+			logInfo("Preapproval plan created for production", { preapprovalPlanId });
+
+			// Aguardar um pouco para o plano ser ativado no MP
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+			logInfo("Waited for plan activation", { preapprovalPlanId });
+			return preapprovalPlanId;
+		} catch (planError) {
+			logError(
+				"Failed to create preapproval plan, proceeding without it",
+				planError
+			);
+		}
+	}
+	return;
+}
+
+// Função para construir dados do preapproval
+function buildPreapprovalData(
+	email: string,
+	plan: string,
+	billingCycle: string,
+	userId: string,
+	transactionAmount: number,
+	cardTokenId: string,
+	preapprovalPlanId: string | undefined,
+	startDate: Date,
+	endDate: Date
+) {
+	const testEnv = isTestEnvironment();
+
+	const preapprovalData: any = {
+		payer_email: email,
+		reason: `Assinatura Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)} (${billingCycle === "monthly" ? "Mensal" : "Anual"})`,
+		auto_recurring: {
+			frequency: billingCycle === "monthly" ? 1 : 12,
+			frequency_type: "months",
+			transaction_amount: transactionAmount / 100,
+			currency_id: "BRL",
+			start_date: startDate.toISOString(),
+			end_date: endDate.toISOString(),
+		},
+		back_url: "https://www.mercadopago.com.br",
+		external_reference: userId,
+		// Em ambiente de teste, usar 'pending' devido ao bug do MP com card_token_id
+		status: testEnv ? "pending" : "authorized",
+		notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://www.bionk.me"}/api/mercadopago/webhook`,
+	};
+
+	// Adicionar preapproval_plan_id se foi criado com sucesso
+	if (preapprovalPlanId) {
+		preapprovalData.preapproval_plan_id = preapprovalPlanId;
+	}
+
+	// Só adicionar card_token_id em produção para evitar erro CC_VAL_433 em teste
+	if (!testEnv && cardTokenId) {
+		preapprovalData.card_token_id = cardTokenId;
+	}
+
+	return preapprovalData;
+}
+
 // Função para criar preapproval no Mercado Pago
 async function createPreapproval(
 	plan: string,
@@ -309,70 +433,32 @@ async function createPreapproval(
 		hasAccessToken: !!process.env.MERCADO_PAGO_ACCESS_TOKEN,
 	});
 
-	// Configuração de datas
-	const startDate = new Date();
-	startDate.setDate(startDate.getDate() + 1);
-	const endDate = new Date(startDate);
-	endDate.setFullYear(endDate.getFullYear() + 10);
+	// Configurar datas
+	const { startDate, endDate } = setupSubscriptionDates();
 
-	// Detectar se estamos em ambiente de teste
-	const isTestEnvironment =
-		process.env.MERCADO_PAGO_ACCESS_TOKEN?.startsWith("TEST-") ||
-		process.env.NODE_ENV === "development";
+	// Criar plano se necessário
+	const preapprovalPlanId = await createPlanIfNeeded(
+		plan,
+		billingCycle,
+		transactionAmount,
+		cardTokenId
+	);
 
-	// Criar plano de assinatura primeiro (necessário para usar card_token_id com status authorized)
-	let preapprovalPlanId: string | undefined;
-	if (!isTestEnvironment && cardTokenId) {
-		try {
-			preapprovalPlanId = await createPreapprovalPlan(
-				plan,
-				billingCycle,
-				transactionAmount
-			);
-			logInfo("Preapproval plan created for production", { preapprovalPlanId });
+	// Construir dados do preapproval
+	const preapprovalData = buildPreapprovalData(
+		email,
+		plan,
+		billingCycle,
+		userId,
+		transactionAmount,
+		cardTokenId,
+		preapprovalPlanId,
+		startDate,
+		endDate
+	);
 
-			// Aguardar um pouco para o plano ser ativado no MP
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-			logInfo("Waited for plan activation", { preapprovalPlanId });
-		} catch (planError) {
-			logError(
-				"Failed to create preapproval plan, proceeding without it",
-				planError
-			);
-			// Continue sem o plano se falhar
-		}
-	}
-
-	// Dados da assinatura
-	const preapprovalData: any = {
-		payer_email: email,
-		reason: `Assinatura Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)} (${billingCycle === "monthly" ? "Mensal" : "Anual"})`,
-		auto_recurring: {
-			frequency: billingCycle === "monthly" ? 1 : 12,
-			frequency_type: "months",
-			transaction_amount: transactionAmount / 100,
-			currency_id: "BRL",
-			start_date: startDate.toISOString(),
-			end_date: endDate.toISOString(),
-		},
-		back_url: "https://www.mercadopago.com.br",
-		external_reference: userId,
-		// Em ambiente de teste, usar 'pending' devido ao bug do MP com card_token_id
-		status: isTestEnvironment ? "pending" : "authorized",
-		notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://www.bionk.me"}/api/mercadopago/webhook`,
-	};
-
-	// Adicionar preapproval_plan_id se foi criado com sucesso
-	if (preapprovalPlanId) {
-		preapprovalData.preapproval_plan_id = preapprovalPlanId;
-	}
-
-	// Só adicionar card_token_id em produção para evitar erro CC_VAL_433 em teste
-	if (!isTestEnvironment && cardTokenId) {
-		preapprovalData.card_token_id = cardTokenId;
-	}
-
-	if (isTestEnvironment) {
+	const testEnv = isTestEnvironment();
+	if (testEnv) {
 		logInfo(
 			"Test environment detected - card_token_id omitted to avoid CC_VAL_433 error",
 			{
@@ -399,35 +485,11 @@ async function createPreapproval(
 	});
 
 	// Tentar criar preapproval com retry se o plano não estiver disponível
-	let result: any;
-	let retryCount = 0;
-	const maxRetries = 3;
-
-	while (retryCount < maxRetries) {
-		try {
-			result = preapproval.create({ body: preapprovalData });
-			break; // Sucesso, sair do loop
-		} catch (error: any) {
-			if (
-				error.message?.includes("does not exist") &&
-				retryCount < maxRetries - 1
-			) {
-				retryCount++;
-				logInfo(`Plan not found, retrying (${retryCount}/${maxRetries})`, {
-					preapprovalPlanId,
-					error: error.message,
-				});
-				// Aguardar mais tempo antes do retry
-				await new Promise((resolve) => setTimeout(resolve, 2000));
-			} else {
-				throw error; // Re-throw se não for erro de plano não encontrado ou se esgotaram os retries
-			}
-		}
-	}
-
-	if (!result) {
-		throw new Error("Failed to create preapproval after all retries");
-	}
+	const result = await createPreapprovalWithRetry(
+		preapproval,
+		preapprovalData,
+		preapprovalPlanId
+	);
 
 	logInfo("Preapproval created successfully", {
 		preapprovalId: result.id,
