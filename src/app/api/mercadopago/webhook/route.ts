@@ -481,7 +481,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 		// }
 
 		// Processar webhooks de preapproval e payment
-		if (body.type === "preapproval") {
+		if (
+			body.type === "preapproval" ||
+			body.type === "subscription_preapproval"
+		) {
 			const result = await processPreapprovalWebhook(body);
 			if (result) {
 				return result;
