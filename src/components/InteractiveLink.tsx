@@ -1,6 +1,7 @@
 "use client";
 
 import { Eye, MoreVertical } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { FC, MouseEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
@@ -29,6 +30,19 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 	const [unblurred, setUnblurred] = useState(false);
 	const [isTouch, setIsTouch] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [faviconError, setFaviconError] = useState(false);
+
+	// Função para extrair o favicon da URL
+	const getFaviconUrl = (url: string) => {
+		try {
+			const urlObj = new URL(url);
+			return `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=32`;
+		} catch {
+			return null;
+		}
+	};
+
+	const faviconUrl = getFaviconUrl(link.url);
 
 	useEffect(() => {
 		const handleTouchStart = () => setIsTouch(true);
@@ -77,9 +91,23 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 				)}
 				style={style}
 			>
+				{/* Favicon do site na borda esquerda */}
+				{faviconUrl && !faviconError && (
+					<div className="-translate-y-1/2 absolute top-1/2 left-2 z-20">
+						<Image
+							alt={`Favicon de ${link.title}`}
+							className="ml-3 size-6 rounded-sm"
+							height={32}
+							onError={() => setFaviconError(true)}
+							src={faviconUrl}
+							width={32}
+						/>
+					</div>
+				)}
+
 				<Link
 					aria-label={link.title}
-					className="z-10 w-full"
+					className={twMerge("z-10 w-full", faviconUrl)}
 					href={href}
 					onClick={handleLinkClick}
 					rel="noopener noreferrer"
