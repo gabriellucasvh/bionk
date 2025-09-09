@@ -10,7 +10,7 @@ const AnalyticsHeader = dynamic(
 	() => import("./components/analises.AnalyticsHeader"),
 	{
 		loading: () => (
-			<div className="h-16 w-full animate-pulse rounded-md bg-muted" />
+			<div className="h-16 w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 		),
 	}
 );
@@ -19,9 +19,9 @@ const AnalyticsStatsCards = dynamic(
 	{
 		loading: () => (
 			<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-				<div className="h-full w-full animate-pulse rounded-md bg-muted" />
-				<div className="h-full w-full animate-pulse rounded-md bg-muted" />
-				<div className="h-full w-full animate-pulse rounded-md bg-muted" />
+				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
+				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
+				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 			</div>
 		),
 	}
@@ -30,7 +30,7 @@ const PerformanceChart = dynamic(
 	() => import("./components/analises.PerformanceChart"),
 	{
 		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 		),
 	}
 );
@@ -38,7 +38,7 @@ const TopLinksTable = dynamic(
 	() => import("./components/analises.TopLinksTable"),
 	{
 		loading: () => (
-			<div className="h-[200px] w-full animate-pulse rounded-md bg-muted" />
+			<div className="h-[200px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 		),
 	}
 );
@@ -46,7 +46,7 @@ const DeviceAnalytics = dynamic(
 	() => import("./components/analises.DeviceAnalytics"),
 	{
 		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 		),
 	}
 );
@@ -200,7 +200,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 
 	if (error) {
 		return (
-			<section className="p-4 text-center text-red-600">
+			<section className="p-4 text-center text-red-600 dark:text-red-400">
 				<p>
 					Ocorreu um erro ao carregar os dados das análises.
 					<br />
@@ -211,7 +211,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 	}
 
 	return (
-		<section className="w-full p-4">
+		<section className="w-full p-4 dark:text-white">
 			<AnalyticsHeader
 				onExportToExcel={exportToExcel}
 				onExportToPDF={exportToPDF}
@@ -219,9 +219,9 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 			<main className="space-y-6">
 				{isLoading || !data ? (
 					<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-						<div className="h-full w-full animate-pulse rounded-md bg-muted" />
-						<div className="h-full w-full animate-pulse rounded-md bg-muted" />
-						<div className="h-full w-full animate-pulse rounded-md bg-muted" />
+						<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
+						<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
+						<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 					</div>
 				) : (
 					<AnalyticsStatsCards
@@ -232,43 +232,57 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 				)}
 
 				{isLoading || !data ? (
-					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 				) : (
 					<PerformanceChart chartData={memoizedChartData} />
 				)}
 
 				{isLoading || !data ? (
-					<div className="h-[200px] w-full animate-pulse rounded-md bg-muted" />
+					<div className="h-[200px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 				) : (
 					<TopLinksTable topLinks={memoizedTopLinks} />
 				)}
 
 				{/* Seção de Analytics por Dispositivo */}
 				{isLoading || !data ? (
-					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 				) : (
-					<DeviceAnalytics data={data.deviceAnalytics || []} isLoading={isLoading} />
+					<DeviceAnalytics
+						data={data.deviceAnalytics || []}
+						isLoading={isLoading}
+					/>
 				)}
 
 				{/* Seção de Analytics por Sistema Operacional */}
 				{isLoading || !data ? (
-					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 				) : (
-					<OSAnalyticsChart data={data.osAnalytics || []} isLoading={isLoading} />
+					<OSAnalyticsChart
+						data={data.osAnalytics || []}
+						isLoading={isLoading}
+					/>
 				)}
 
 				{/* Seção de Analytics por País/Região */}
 				{isLoading || !data ? (
-					<div className="h-[500px] w-full animate-pulse rounded-md bg-muted" />
+					<div className="h-[500px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 				) : (
-					<WorldMapAnalytics data={data.countryAnalytics || []} isLoading={isLoading} width={800} height={500} />
+					<WorldMapAnalytics
+						data={data.countryAnalytics || []}
+						height={500}
+						isLoading={isLoading}
+						width={800}
+					/>
 				)}
 
 				{/* Seção de Analytics por Origem do Tráfego */}
 				{isLoading ? (
-					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
+					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
 				) : (
-					<ReferrerAnalytics data={data?.referrerAnalytics || []} isLoading={false} />
+					<ReferrerAnalytics
+						data={data?.referrerAnalytics || []}
+						isLoading={false}
+					/>
 				)}
 			</main>
 		</section>

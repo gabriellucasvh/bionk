@@ -150,7 +150,7 @@ const BUTTON_STYLES = [
 	{
 		value: "outline",
 		label: "Contorno",
-		preview: "bg-transparent text-gray-700 border-gray-500 border-2",
+		preview: "bg-transparent text-gray-700 dark:text-white border-gray-500 border-2",
 	},
 	{
 		value: "soft",
@@ -160,24 +160,25 @@ const BUTTON_STYLES = [
 	{
 		value: "shadow",
 		label: "Sombra",
-		preview: "bg-gray-100 text-gray-700 border-gray-300 shadow-lg",
+		preview: "bg-gray-100 text-gray-700 border-gray-300 shadow-lg dark:shadow-white/20",
 	},
 	{
 		value: "neon",
 		label: "Neon",
 		preview:
-			"bg-transparent text-gray-700 border-gray-500 border-2 shadow-[0_0_8px_rgba(0,0,0,0.3)]",
+			"bg-transparent text-gray-700 dark:text-white border-gray-500 border-2 shadow-[0_0_8px_rgba(0,0,0,0.3)]",
 	},
 	{
 		value: "dashed",
 		label: "Tracejado",
 		preview:
-			"bg-transparent text-gray-700 border-gray-500 border-2 border-dashed",
+			"bg-transparent text-gray-700 dark:text-white border-gray-500 border-2 border-dashed",
 	},
 	{
 		value: "double",
 		label: "Dupla",
-		preview: "bg-transparent text-gray-700 border-gray-600 border-4 border-double",
+		preview:
+			"bg-transparent text-gray-700 dark:text-white border-gray-600 border-4 border-double",
 	},
 	{
 		value: "raised",
@@ -389,7 +390,7 @@ export default function CustomizationPanel({
 							className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
 								customColor === color
 									? "border-2 border-lime-700"
-									: "border-2 border-gray-200 hover:border-blue-500"
+									: "border-2 border-gray-200 hover:border-blue-500 dark:border-gray-600 dark:hover:border-blue-400"
 							}`}
 							key={color}
 							onClick={() => handleChange(field, color)}
@@ -406,7 +407,7 @@ export default function CustomizationPanel({
 							onChange={(color) => debouncedHandleChange(field, color)}
 						/>
 						<HexColorInput
-							className="mt-2 w-full rounded border border-gray-300 p-2 text-center"
+							className="mt-2 w-full rounded border border-gray-300 p-2 text-center dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
 							color={customColor}
 							onChange={(color) => handleChange(field, color)}
 							placeholder="#000000"
@@ -432,7 +433,7 @@ export default function CustomizationPanel({
 							className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
 								customizations.customBackgroundGradient === gradient
 									? "border-blue-500"
-									: "border-gray-200 hover:border-blue-500"
+									: "border-gray-200 hover:border-blue-500 dark:border-gray-600 dark:hover:border-blue-400"
 							}`}
 							key={gradient}
 							onClick={() => handleChange("customBackgroundGradient", gradient)}
@@ -469,8 +470,8 @@ export default function CustomizationPanel({
 						<button
 							className={`flex h-16 w-full items-center justify-center rounded border px-2 py-1 text-center text-xs leading-tight transition-colors ${
 								customizations.customFont === font.value
-									? "border-gray-300 bg-neutral-200"
-									: "border-gray-200 hover:bg-neutral-200"
+									? "border-gray-300 bg-neutral-200 dark:border-gray-600 dark:bg-neutral-700"
+									: "border-gray-200 hover:bg-neutral-200 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
 							}`}
 							key={font.value}
 							onClick={() => handleChange("customFont", font.value)}
@@ -528,7 +529,7 @@ export default function CustomizationPanel({
 							Number.parseInt(customizations.customButtonCorners || "0", 10),
 						]}
 					/>
-					<span className="w-12 text-center font-semibold text-gray-700">
+					<span className="w-12 text-center font-semibold text-gray-700 dark:text-gray-300">
 						{customizations.customButtonCorners || "0"}px
 					</span>
 				</div>

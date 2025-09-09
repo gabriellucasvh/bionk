@@ -1,5 +1,15 @@
 "use client";
 
+import { ChartPie } from "lucide-react";
+import React from "react";
+import {
+	CartesianGrid,
+	Line,
+	LineChart,
+	ResponsiveContainer,
+	XAxis,
+	YAxis,
+} from "recharts";
 import {
 	Card,
 	CardContent,
@@ -13,16 +23,6 @@ import {
 	ChartTooltipContent,
 } from "@/components/ui/chart";
 import { formatDate } from "@/lib/utils";
-import { ChartPie } from "lucide-react";
-import React from "react";
-import {
-	CartesianGrid,
-	Line,
-	LineChart,
-	ResponsiveContainer,
-	XAxis,
-	YAxis,
-} from "recharts";
 
 interface ChartDataPoint {
 	day: string;
@@ -38,13 +38,13 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 	({ chartData }) => {
 		return (
 			<article>
-				<Card>
+				<Card className="dark:border-gray-700 dark:bg-neutral-800">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
+						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<ChartPie className="h-5 w-5" />
 							Visão Geral de Desempenho
 						</CardTitle>
-						<CardDescription>
+						<CardDescription className="dark:text-gray-400">
 							Visualize os cliques e as visualizações diárias dos últimos 30
 							dias.
 						</CardDescription>
@@ -70,19 +70,19 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 										margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
 									>
 										<CartesianGrid
-											className="stroke-muted"
+											className="stroke-muted dark:stroke-gray-600"
 											strokeDasharray="3 3"
 										/>
 										<XAxis
 											axisLine={false}
-											className="text-xs"
+											className="text-xs dark:text-gray-300"
 											dataKey="day"
 											tickFormatter={(tick) => formatDate(tick, "dd/MM")}
 											tickLine={false}
 										/>
 										<YAxis
 											axisLine={false}
-											className="text-xs"
+											className="text-xs dark:text-gray-300"
 											tickFormatter={(tick) => tick.toString()}
 											tickLine={false}
 										/>

@@ -1,5 +1,10 @@
 "use client";
 
+import { Edit, Loader2 } from "lucide-react";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
+import type { ChangeEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
@@ -13,11 +18,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
-import { Edit, Loader2 } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import type { ChangeEvent } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
 import VerPerfilMobile from "../VerPerfilMobile";
 
 interface User {
@@ -280,14 +280,16 @@ const PerfilClient = () => {
 	return (
 		<section className="mx-auto min-h-dvh w-full space-y-4 p-4 lg:w-1/2">
 			<header className="flex items-center justify-between">
-				<h2 className="font-bold text-2xl">Perfil</h2>
-				<VerPerfilMobile/>
+				<h2 className="font-bold text-2xl dark:text-white">Perfil</h2>
+				<VerPerfilMobile />
 			</header>
 
-			<Card className="border-none shadow-none">
+			<Card className="border-none shadow-none dark:bg-neutral-800">
 				<CardHeader>
-					<CardTitle>Informações do perfil</CardTitle>
-					<CardDescription>
+					<CardTitle className="dark:text-white">
+						Informações do perfil
+					</CardTitle>
+					<CardDescription className="dark:text-gray-400">
 						Atualize as informações do seu perfil e personalize sua página.
 					</CardDescription>
 				</CardHeader>
@@ -333,9 +335,11 @@ const PerfilClient = () => {
 						</div>
 						<div className="flex-1 space-y-4">
 							<div className="grid gap-1">
-								<Label htmlFor="name">Nome</Label>
+								<Label className="dark:text-white" htmlFor="name">
+									Nome
+								</Label>
 								<Input
-									className="text-neutral-700"
+									className="text-neutral-700 dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
 									disabled={loading || isUploadingImage}
 									id="name"
 									onChange={(e) => {
@@ -346,12 +350,18 @@ const PerfilClient = () => {
 								/>
 							</div>
 							<div className="grid gap-1">
-								<Label htmlFor="username">Nome de usuário</Label>
+								<Label className="dark:text-white" htmlFor="username">
+									Nome de usuário
+								</Label>
 								<div className="flex items-center gap-2">
-									<span className="text-muted-foreground">bionk.me/</span>
+									<span className="text-muted-foreground dark:text-gray-400">
+										bionk.me/
+									</span>
 									<Input
 										className={
-											validationError ? "border-red-500" : "text-neutral-700"
+											validationError
+												? "border-red-500 dark:border-red-400"
+												: "text-neutral-700 dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
 										}
 										disabled={loading || isUploadingImage}
 										id="username"
@@ -373,9 +383,11 @@ const PerfilClient = () => {
 						</div>
 					</article>
 					<div className="grid gap-2">
-						<Label htmlFor="bio">Biografia</Label>
+						<Label className="dark:text-white" htmlFor="bio">
+							Biografia
+						</Label>
 						<Textarea
-							className="min-h-32 text-neutral-700"
+							className="min-h-32 text-neutral-700 dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
 							disabled={loading || isUploadingImage}
 							id="bio"
 							onChange={(e) => {

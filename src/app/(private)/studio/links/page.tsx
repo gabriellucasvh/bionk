@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function LinksPage() {
-	return (
-		<div className="p-4 sm:p-6 md:p-8">
-			<UnifiedLinksManager />
-		</div>
-	);
-}
+		return (
+			<div className="p-4 sm:p-6 md:p-8 dark:text-white">
+				<UnifiedLinksManager />
+			</div>
+		);
+	}

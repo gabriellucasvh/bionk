@@ -56,7 +56,7 @@ const PersonalizarClient = () => {
 		setUserCustomizations(resetCustomizations);
 
 		// Disparar evento personalizado para recarregar o iframe quando o template mudar
-		window.dispatchEvent(new CustomEvent('reloadIframePreview'));
+		window.dispatchEvent(new CustomEvent("reloadIframePreview"));
 	};
 
 	// Função atualizada para aceitar personalizações parciais
@@ -79,24 +79,24 @@ const PersonalizarClient = () => {
 			}));
 
 			// Disparar evento personalizado para recarregar o iframe
-			window.dispatchEvent(new CustomEvent('reloadIframePreview'));
+			window.dispatchEvent(new CustomEvent("reloadIframePreview"));
 		}
 	};
 
 	return (
-		<div className="min-h-screen w-full bg-white text-black lg:w-7/12">
+		<div className="min-h-screen w-full bg-white text-black transition-colors lg:w-7/12 dark:bg-neutral-900 dark:text-white">
 			<section className="flex min-h-screen flex-col gap-6 px-6 py-8">
 				{/* Seção de Templates */}
 				<section className="">
-					<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block">
+					<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
 						Templates:
 					</h2>
 					<CategoriasTemplates onTemplateChange={handleTemplateChange} />
 				</section>
 
 				{/* Seção de Personalização */}
-				<section className="mt-6 border-t pt-6">
-					<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block">
+				<section className="mt-6 border-t pt-6 dark:border-gray-700">
+					<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
 						Personalização:
 					</h2>
 

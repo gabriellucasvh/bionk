@@ -209,10 +209,10 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 		<Dialog onOpenChange={isProcessing ? undefined : handleClose} open={isOpen}>
 			<DialogContent className="w-full max-w-[90vw] rounded-2xl border bg-background p-6 shadow-xl sm:max-w-lg">
 				<DialogHeader>
-					<DialogTitle className="text-center font-bold text-gray-900 text-xl">
+					<DialogTitle className="text-center font-bold text-gray-900 text-xl dark:text-white">
 						Personalizar Ícone do Link
 					</DialogTitle>
-					<DialogDescription className="text-center text-gray-600">
+					<DialogDescription className="text-center text-gray-600 dark:text-white/80">
 						Ajuste a imagem para criar o ícone perfeito.
 					</DialogDescription>
 				</DialogHeader>
@@ -283,10 +283,10 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 							role="none"
 						>
 							<Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-							<p className="mb-2 font-medium text-gray-700">
+							<p className="mb-2 font-medium text-gray-700 dark:text-white">
 								Arraste uma imagem ou clique para selecionar
 							</p>
-							<p className="text-gray-500 text-sm">
+							<p className="text-gray-500 text-sm dark:text-white/80">
 								Formatos: JPG, PNG, GIF, SVG, WebP, etc.
 							</p>
 							<input

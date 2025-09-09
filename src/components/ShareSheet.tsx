@@ -2,8 +2,6 @@
 
 "use client";
 
-import { SHARING_PLATFORMS } from "@/config/sharing-platforms";
-import { cn } from "@/lib/utils";
 import {
 	Check,
 	ChevronLeft,
@@ -13,6 +11,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { SHARING_PLATFORMS } from "@/config/sharing-platforms";
+import { cn } from "@/lib/utils";
 
 interface ShareSheetProps {
 	url: string;
@@ -113,7 +113,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 			<Link className="size-5" />
 		),
 		action: handleCopyLink,
-		color: copied ? "bg-green-100" : "bg-gray-100 hover:bg-gray-200",
+		color: copied ? "bg-green-100" : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600",
 	};
 
 	const moreButton = {
@@ -121,12 +121,12 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 		name: "Compartilhar via...",
 		icon: <MoreHorizontal className="size-5" />,
 		action: handleNativeShare,
-		color: "bg-gray-100 hover:bg-gray-200",
+		color: "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600",
 	};
 
 	return (
 		<div className="relative">
-			<h3 className="mb-3 text-left font-medium text-gray-700 text-sm">
+			<h3 className="mb-3 text-left font-medium text-gray-700 text-sm dark:text-white">
 				Compartilhar
 			</h3>
 

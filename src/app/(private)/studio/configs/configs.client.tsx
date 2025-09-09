@@ -7,6 +7,10 @@ import {
 	Lock,
 	LogOut,
 	Mail,
+	Monitor,
+	Moon,
+	Sun,
+	SunMoon,
 	Trash2,
 	User,
 	XOctagon,
@@ -14,7 +18,6 @@ import {
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { useSubscription } from "@/providers/subscriptionProvider";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
 	AlertDialog,
@@ -36,6 +39,8 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useSubscription } from "@/providers/subscriptionProvider";
+import { useTheme } from "@/providers/themeProvider";
 import ArchivedLinksModal from "./components/configs.ArchiveLinksModal";
 
 type Profile = { email: string };
@@ -61,31 +66,31 @@ function CancelSubscriptionButton() {
 		setMessage("");
 		setShowCancelDialog(false);
 		try {
-			console.log('Iniciando cancelamento da assinatura...');
-			
+			console.log("Iniciando cancelamento da assinatura...");
+
 			const response = await fetch("/api/mercadopago/cancel-subscription", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 			});
-			
-			console.log('Response status:', response.status);
-			console.log('Response URL:', response.url);
-			
+
+			console.log("Response status:", response.status);
+			console.log("Response URL:", response.url);
+
 			const data = await response.json();
-			console.log('Response data:', data);
-			
+			console.log("Response data:", data);
+
 			if (!response.ok) {
 				throw new Error(data.details || data.error || "Falha ao cancelar.");
 			}
-			
+
 			setMessage(data.message);
 			// Atualiza o subscription plan no contexto
 			await refreshSubscriptionPlan();
 			setTimeout(() => window.location.reload(), 2000);
 		} catch (err: any) {
-			console.error('Erro ao cancelar assinatura:', err);
+			console.error("Erro ao cancelar assinatura:", err);
 			setError(err.message);
 		} finally {
 			setIsLoading(false);
@@ -96,7 +101,7 @@ function CancelSubscriptionButton() {
 			<AlertDialog onOpenChange={setShowCancelDialog} open={showCancelDialog}>
 				<AlertDialogTrigger asChild>
 					<Button
-						className="w-full text-red-800 hover:text-red-600 sm:w-auto"
+						className="w-full text-red-800 hover:text-red-600 sm:w-auto dark:border-neutral-600 dark:text-red-400 dark:hover:text-red-300"
 						disabled={isLoading}
 						size="sm"
 						variant="outline"
@@ -105,10 +110,12 @@ function CancelSubscriptionButton() {
 						{isLoading ? "Cancelando..." : "Cancelar Assinatura"}
 					</Button>
 				</AlertDialogTrigger>
-				<AlertDialogContent>
+				<AlertDialogContent className="dark:border-neutral-700 dark:bg-neutral-800">
 					<AlertDialogHeader>
-						<AlertDialogTitle>Cancelar Assinatura</AlertDialogTitle>
-						<AlertDialogDescription>
+						<AlertDialogTitle className="dark:text-white">
+							Cancelar Assinatura
+						</AlertDialogTitle>
+						<AlertDialogDescription className="dark:text-neutral-400">
 							Você tem certeza? Sua assinatura será cancelada e seus benefícios
 							removidos no final do ciclo atual.
 						</AlertDialogDescription>
@@ -125,8 +132,14 @@ function CancelSubscriptionButton() {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
-			{message && <p className="mt-2 text-green-600 text-sm">{message}</p>}
-			{error && <p className="mt-2 text-red-600 text-sm">{error}</p>}
+			{message && (
+				<p className="mt-2 text-green-600 text-sm dark:text-green-400">
+					{message}
+				</p>
+			)}
+			{error && (
+				<p className="mt-2 text-red-600 text-sm dark:text-red-400">{error}</p>
+			)}
 		</div>
 	);
 }
@@ -186,27 +199,29 @@ function SubscriptionManagement({
 
 	if (subscription.status === "active") {
 		return (
-			<Card>
+			<Card className="dark:border-neutral-700 dark:bg-neutral-800">
 				<CardHeader>
-					<CardTitle className="flex items-center gap-2">
+					<CardTitle className="flex items-center gap-2 dark:text-white">
 						<CreditCard className="h-5 w-5" />
 						Gerenciar Assinatura
 					</CardTitle>
-					<CardDescription>
+					<CardDescription className="dark:text-neutral-400">
 						Visualize os detalhes do seu plano e forma de pagamento.
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
 						<div className="space-y-1">
-							<p className="font-medium text-sm">Plano Atual</p>
-							<p className="text-muted-foreground text-sm capitalize">
+							<p className="font-medium text-sm dark:text-white">Plano Atual</p>
+							<p className="text-muted-foreground text-sm capitalize dark:text-neutral-400">
 								{subscription.plan}
 							</p>
 						</div>
 						<div className="space-y-1">
-							<p className="font-medium text-sm">Próxima Cobrança</p>
-							<p className="text-muted-foreground text-sm">
+							<p className="font-medium text-sm dark:text-white">
+								Próxima Cobrança
+							</p>
+							<p className="text-muted-foreground text-sm dark:text-neutral-400">
 								{subscription.renewsOn
 									? new Date(subscription.renewsOn).toLocaleDateString("pt-BR")
 									: "-"}
@@ -223,13 +238,13 @@ function SubscriptionManagement({
 
 	// Default para status 'cancelled' ou outros
 	return (
-		<Card>
+		<Card className="dark:border-neutral-700 dark:bg-neutral-800">
 			<CardHeader>
-				<CardTitle className="flex items-center gap-2 text-destructive">
+				<CardTitle className="flex items-center gap-2 text-destructive dark:text-red-400">
 					<XOctagon className="h-5 w-5" />
 					Assinatura Cancelada
 				</CardTitle>
-				<CardDescription>
+				<CardDescription className="dark:text-neutral-400">
 					Sua assinatura não está mais ativa. Para reativar, escolha um novo
 					plano.
 				</CardDescription>
@@ -247,6 +262,7 @@ function SubscriptionManagement({
 
 export default function ConfigsClient() {
 	const { data: session } = useSession();
+	const { theme, setTheme, isAutoMode, setAutoMode } = useTheme();
 	const isCredentialsUser = session?.user?.isCredentialsUser === true;
 	const [profile, setProfile] = useState<Profile>({ email: "" });
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
@@ -294,10 +310,12 @@ export default function ConfigsClient() {
 	}
 
 	return (
-		<div className="container mx-auto max-w-4xl space-y-6 p-4 pb-20 sm:p-6 sm:pb-8 lg:space-y-8">
+		<div className="container mx-auto max-w-4xl space-y-6 p-4 pb-20 sm:p-6 sm:pb-8 lg:space-y-8 dark:text-white">
 			<header className="space-y-2">
-				<h1 className="font-bold text-2xl sm:text-3xl">Configurações</h1>
-				<p className="text-muted-foreground text-sm sm:text-base">
+				<h1 className="font-bold text-2xl sm:text-3xl dark:text-white">
+					Configurações
+				</h1>
+				<p className="text-muted-foreground text-sm sm:text-base dark:text-neutral-400">
 					Gerencie sua conta e preferências
 				</p>
 			</header>
@@ -307,21 +325,76 @@ export default function ConfigsClient() {
 			</article>
 
 			<article>
-				<Card>
+				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
+						<CardTitle className="flex items-center gap-2 dark:text-white">
+							<SunMoon className="h-5 w-5" />
+							Tema da Interface
+						</CardTitle>
+						<CardDescription className="dark:text-neutral-400">
+							Escolha entre modo claro, escuro ou automático
+						</CardDescription>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+							<Button
+								className={`flex h-12 items-center gap-2 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
+									theme === "light" ? "border-green-500" : ""
+								}
+								${isAutoMode ? "border-input" : ""}
+								`}
+								onClick={() => setTheme("light")}
+								variant={"outline"}
+							>
+								<Sun className="h-4 w-4" />
+								Modo Claro
+							</Button>
+							<Button
+								className={`flex h-12 items-center gap-2 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
+									theme === "dark" ? "dark:border-green-500" : ""
+								}
+								${isAutoMode ? "dark:border-neutral-600" : ""}
+								`}
+								onClick={() => setTheme("dark")}
+								variant={"outline"}
+							>
+								<Moon className="h-4 w-4" />
+								Modo Escuro
+							</Button>
+							<Button
+								className={`flex h-12 items-center gap-2 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
+									isAutoMode ? "border-green-500 dark:border-green-500" : ""
+								}`}
+								onClick={() => setAutoMode()}
+								variant={"outline"}
+							>
+								<Monitor className="h-4 w-4" />
+								Automático
+							</Button>
+						</div>
+						<p className="text-muted-foreground text-sm dark:text-neutral-400">
+							O modo automático segue a preferência do seu sistema operacional.
+						</p>
+					</CardContent>
+				</Card>
+			</article>
+
+			<article>
+				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<User className="h-5 w-5" />
 							Informações da Conta
 						</CardTitle>
-						<CardDescription>
+						<CardDescription className="dark:text-neutral-400">
 							Gerencie suas informações de conta e opções de login
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-4">
 						<div className="space-y-4">
 							<div className="space-y-1">
-								<p className="font-medium text-sm">Email</p>
-								<p className="break-all text-muted-foreground text-sm">
+								<p className="font-medium text-sm dark:text-white">Email</p>
+								<p className="break-all text-muted-foreground text-sm dark:text-neutral-400">
 									{profile.email}
 								</p>
 							</div>
@@ -341,13 +414,13 @@ export default function ConfigsClient() {
 				</Card>
 			</article>
 			<article>
-				<Card>
+				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
+						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<Archive className="h-5 w-5" />
 							Links Arquivados
 						</CardTitle>
-						<CardDescription>
+						<CardDescription className="dark:text-neutral-400">
 							Visualize e restaure links que você arquivou
 						</CardDescription>
 					</CardHeader>
@@ -364,13 +437,13 @@ export default function ConfigsClient() {
 			</article>
 			{isCredentialsUser && (
 				<article>
-					<Card>
+					<Card className="dark:border-neutral-700 dark:bg-neutral-800">
 						<CardHeader>
-							<CardTitle className="flex items-center gap-2">
+							<CardTitle className="flex items-center gap-2 dark:text-white">
 								<Mail className="h-5 w-5" />
 								Alterar E-mail
 							</CardTitle>
-							<CardDescription>
+							<CardDescription className="dark:text-neutral-400">
 								Atualize o e-mail associado à sua conta
 							</CardDescription>
 						</CardHeader>
@@ -386,13 +459,15 @@ export default function ConfigsClient() {
 			)}
 			{isCredentialsUser && (
 				<article>
-					<Card>
+					<Card className="dark:border-neutral-700 dark:bg-neutral-800">
 						<CardHeader>
-							<CardTitle className="flex items-center gap-2">
+							<CardTitle className="flex items-center gap-2 dark:text-white">
 								<Lock className="h-5 w-5" />
 								Alterar Senha
 							</CardTitle>
-							<CardDescription>Atualize sua senha de acesso</CardDescription>
+							<CardDescription className="dark:text-neutral-400">
+								Atualize sua senha de acesso
+							</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<Link href="/profile/change-password">
@@ -405,29 +480,32 @@ export default function ConfigsClient() {
 				</article>
 			)}
 			<article>
-				<Card>
+				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2 text-destructive">
+						<CardTitle className="flex items-center gap-2 text-destructive dark:text-red-500">
 							<Trash2 className="h-5 w-5" />
 							Excluir Conta
 						</CardTitle>
-						<CardDescription>
+						<CardDescription className="dark:text-neutral-400">
 							Exclua permanentemente sua conta e todos os seus dados
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
-								<Button className="w-full sm:w-auto" variant="destructive">
+								<Button
+									className="w-full sm:w-auto dark:bg-red-500"
+									variant="destructive"
+								>
 									Excluir Conta
 								</Button>
 							</AlertDialogTrigger>
-							<AlertDialogContent className="mx-4 max-w-md">
+							<AlertDialogContent className="mx-4 max-w-md dark:border-neutral-700 dark:bg-neutral-800">
 								<AlertDialogHeader>
-									<AlertDialogTitle className="text-lg">
+									<AlertDialogTitle className="text-lg dark:text-white">
 										Tem certeza?
 									</AlertDialogTitle>
-									<AlertDialogDescription className="text-sm">
+									<AlertDialogDescription className="text-sm dark:text-neutral-400">
 										Esta ação não pode ser desfeita. Sua conta e dados serão
 										removidos permanentemente.
 									</AlertDialogDescription>
@@ -437,7 +515,7 @@ export default function ConfigsClient() {
 										Cancelar
 									</AlertDialogCancel>
 									<AlertDialogAction
-										className="w-full bg-destructive text-red-100 sm:w-auto"
+										className="w-full bg-destructive text-red-100 sm:w-auto dark:hover:bg-red-500"
 										onClick={handleDeleteAccount}
 									>
 										Sim, excluir minha conta
@@ -450,13 +528,13 @@ export default function ConfigsClient() {
 			</article>
 			<Separator />
 			<article>
-				<Card>
+				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
+						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<HelpCircle className="h-5 w-5" />
 							Central de Ajuda
 						</CardTitle>
-						<CardDescription>
+						<CardDescription className="dark:text-neutral-400">
 							Acesse nossa documentação e perguntas frequentes
 						</CardDescription>
 					</CardHeader>

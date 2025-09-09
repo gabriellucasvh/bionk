@@ -180,7 +180,7 @@ const DisplayView = (props: LinkCardProps) => {
 	return (
 		<article
 			className={cn(
-				"flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4",
+				"flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-800",
 				link.sensitive && "border-rose-400"
 			)}
 		>
