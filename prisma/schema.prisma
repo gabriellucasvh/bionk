@@ -118,6 +118,7 @@ model Link {
   isProduct       Boolean?    @default(false)
   price           Float?
   productImageUrl String?
+  customImageUrl  String?
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   LinkClick       LinkClick[]
   LinkView        LinkView[]

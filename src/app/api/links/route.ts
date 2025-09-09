@@ -1,10 +1,10 @@
 // src/app/api/links/route.ts
 
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
 export async function GET(request: Request): Promise<NextResponse> {
 	const { searchParams } = new URL(request.url);
@@ -33,15 +33,15 @@ export async function GET(request: Request): Promise<NextResponse> {
 				},
 			},
 		});
-		
+
 		// Transform the data to include section information directly in the link
-		const transformedLinks = links.map(link => ({
+		const transformedLinks = links.map((link) => ({
 			...link,
-			sectionId: link.section?.id || null,
+			sectionId: link.section?.id || link.sectionId,
 			sectionTitle: link.section?.title || null,
 			section: undefined, // Remove the nested section object
 		}));
-		
+
 		return NextResponse.json({ links: transformedLinks });
 	} catch {
 		return NextResponse.json(
@@ -55,7 +55,10 @@ export async function POST(request: Request): Promise<NextResponse> {
 	const session = await getServerSession(authOptions);
 
 	if (!session?.user?.id) {
-		return NextResponse.json({ error: "Não autorizado - Faça login para criar links" }, { status: 401 });
+		return NextResponse.json(
+			{ error: "Não autorizado - Faça login para criar links" },
+			{ status: 401 }
+		);
 	}
 
 	const userExists = await prisma.user.findUnique({

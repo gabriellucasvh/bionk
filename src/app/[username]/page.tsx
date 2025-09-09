@@ -57,6 +57,8 @@ export default async function UserPage({ params }: PageProps) {
 							url: true,
 							order: true,
 							clicks: true,
+							customImageUrl: true,
+							sensitive: true,
 						},
 					},
 				},
@@ -76,6 +78,8 @@ export default async function UserPage({ params }: PageProps) {
 					url: true,
 					order: true,
 					clicks: true,
+					customImageUrl: true,
+					sensitive: true,
 				},
 			},
 			SocialLink: {

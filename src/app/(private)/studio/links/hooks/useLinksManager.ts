@@ -474,6 +474,17 @@ export const useLinksManager = (
 		}
 	};
 
+	const handleUpdateCustomImage = async (id: number, imageUrl: string) => {
+		try {
+			// A imagem já foi salva na API, agora só precisamos atualizar o estado local
+			handleLinkUpdate(id, { customImageUrl: imageUrl });
+			// Revalidar os dados para garantir sincronização
+			await mutateLinks();
+		} catch (error) {
+			console.error("Erro ao atualizar imagem personalizada:", error);
+		}
+	};
+
 	const handleStartEditing = (id: number) => {
 		const linkToEdit = initialLinks.find((l) => l.id === id);
 		if (linkToEdit) {
@@ -591,5 +602,6 @@ export const useLinksManager = (
 		handleCancelEditing,
 		handleLinkChange,
 		handleClickLink,
+		handleUpdateCustomImage,
 	};
 };

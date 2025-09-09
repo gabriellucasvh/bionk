@@ -121,9 +121,10 @@ const LinksTabContent = ({
 				onSectionUngroup={handlers.handleSectionUngroup}
 				onSectionUpdate={handlers.handleSectionUpdate}
 				onStartEditing={handlers.handleStartEditing}
-				onToggleActive={handlers.toggleActive}
-				onToggleSensitive={handlers.toggleSensitive}
-			/>
+			onToggleActive={handlers.toggleActive}
+			onToggleSensitive={handlers.toggleSensitive}
+			onUpdateCustomImage={handlers.handleUpdateCustomImage}
+		/>
 		</div>
 	);
 };

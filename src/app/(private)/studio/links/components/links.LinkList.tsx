@@ -42,6 +42,7 @@ interface LinkListProps {
 	// Novas props para criação de link na seção
 	onAddLinkToSection?: (sectionTitle: string) => void;
 	linksManager?: any;
+	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
 }
 
 const LinkList = (props: LinkListProps) => {

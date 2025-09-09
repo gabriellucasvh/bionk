@@ -1,6 +1,24 @@
 "use client";
 
+import {
+	Archive as ArchiveBox,
+	Clock,
+	Edit,
+	Eye,
+	EyeOff,
+	Grip,
+	Image,
+	Lock,
+	MoreVertical,
+	MousePointerClick,
+	Save,
+	Trash2,
+	X,
+} from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import ImageCropModal from "@/components/modals/ImageCropModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,21 +32,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import {
-	Archive as ArchiveBox,
-	Clock,
-	Edit,
-	Eye,
-	EyeOff,
-	Grip,
-	Lock,
-	MoreVertical,
-	MousePointerClick,
-	Save,
-	Trash2,
-	X,
-} from "lucide-react";
-import Link from "next/link";
 import type { LinkItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
 import { useCountdown } from "../utils/useCountdown";
@@ -47,6 +50,8 @@ interface LinkCardProps {
 	onArchiveLink: (id: number) => void;
 	onDeleteLink: (id: number) => void;
 	onClickLink: (id: number) => void;
+	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
+	borderRadius?: number;
 }
 
 // --- Subcomponentes ---
@@ -158,7 +163,11 @@ const DisplayView = (props: LinkCardProps) => {
 		onArchiveLink,
 		onDeleteLink,
 		onClickLink,
+		onUpdateCustomImage,
+		borderRadius = 0,
 	} = props;
+
+	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
 	const isLaunching = !!(
 		link.launchesAt && new Date(link.launchesAt) > new Date()
@@ -214,55 +223,80 @@ const DisplayView = (props: LinkCardProps) => {
 					)}
 				</div>
 			</div>
-			<div className="flex items-center justify-end gap-2 border-t pt-3 sm:gap-4">
-				<Badge className="flex items-center gap-1" variant="outline">
-					<MousePointerClick className="h-3 w-3" />
-					{link.clicks.toLocaleString()}
-				</Badge>
-				<div className="flex items-center space-x-2">
-					<Switch
-						checked={link.active}
-						id={`switch-${link.id}`}
-						onCheckedChange={(checked) => onToggleActive(link.id, checked)}
-					/>
-					<Label
-						className="cursor-pointer text-sm"
-						htmlFor={`switch-${link.id}`}
+			<div className="flex items-center justify-between border-t pt-3">
+				<div className="flex items-center gap-2">
+					<Button
+						className="h-8 px-2 text-muted-foreground hover:text-foreground"
+						onClick={() => setIsImageModalOpen(true)}
+						size="sm"
+						title="Personalizar ícone do link"
+						variant="ghost"
 					>
-						{link.active ? "Ativo" : "Inativo"}
-					</Label>
+						<Image className="h-4 w-4" />
+					</Button>
+					<Badge className="flex items-center gap-1" variant="outline">
+						<MousePointerClick className="h-3 w-3" />
+						{link.clicks.toLocaleString()}
+					</Badge>
 				</div>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button className="h-8 w-8" size="icon" variant="ghost">
-							<MoreVertical className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={() => onStartEditing(link.id)}>
-							<Edit className="mr-2 h-4 w-4" /> Editar
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={() => onToggleSensitive(link.id)}>
-							{link.sensitive ? (
-								<Eye className="mr-2 h-4 w-4" />
-							) : (
-								<EyeOff className="mr-2 h-4 w-4" />
-							)}
-							{link.sensitive ? "Marcar como normal" : "Conteúdo Sensível"}
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={() => onArchiveLink(link.id)}>
-							<ArchiveBox className="mr-2 h-4 w-4" /> Arquivar
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							className="text-destructive"
-							onClick={() => onDeleteLink(link.id)}
+				<div className="flex items-center gap-2 sm:gap-4">
+					<div className="flex items-center space-x-2">
+						<Switch
+							checked={link.active}
+							id={`switch-${link.id}`}
+							onCheckedChange={(checked) => onToggleActive(link.id, checked)}
+						/>
+						<Label
+							className="cursor-pointer text-sm"
+							htmlFor={`switch-${link.id}`}
 						>
-							<Trash2 className="mr-2 h-4 w-4" /> Deletar
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+							{link.active ? "Ativo" : "Inativo"}
+						</Label>
+					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button className="h-8 w-8" size="icon" variant="ghost">
+								<MoreVertical className="h-4 w-4" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuItem onClick={() => onStartEditing(link.id)}>
+								<Edit className="mr-2 h-4 w-4" /> Editar
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => onToggleSensitive(link.id)}>
+								{link.sensitive ? (
+									<Eye className="mr-2 h-4 w-4" />
+								) : (
+									<EyeOff className="mr-2 h-4 w-4" />
+								)}
+								{link.sensitive ? "Marcar como normal" : "Conteúdo Sensível"}
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem onClick={() => onArchiveLink(link.id)}>
+								<ArchiveBox className="mr-2 h-4 w-4" /> Arquivar
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								className="text-destructive"
+								onClick={() => onDeleteLink(link.id)}
+							>
+								<Trash2 className="mr-2 h-4 w-4" /> Deletar
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			</div>
+
+			{/* Modal de upload de imagem */}
+			<ImageCropModal
+				borderRadius={borderRadius}
+				isOpen={isImageModalOpen}
+				linkId={link.id}
+				onClose={() => setIsImageModalOpen(false)}
+				onImageSave={(imageUrl) => {
+					onUpdateCustomImage?.(link.id, imageUrl);
+					setIsImageModalOpen(false);
+				}}
+			/>
 		</article>
 	);
 };
