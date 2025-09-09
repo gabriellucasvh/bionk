@@ -6,6 +6,7 @@ import type { PreApprovalResponse } from "mercadopago/dist/clients/preApproval/c
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { invalidateUserSubscriptionCache } from "@/providers/subscriptionProvider";
 
 // Chave secreta do webhook do Mercado Pago
 const MERCADO_PAGO_WEBHOOK_SECRET = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
@@ -212,7 +213,10 @@ async function processSubscriptionUpdate(subDetails: PreApprovalResponse) {
 			},
 		});
 
-		console.log("Webhook: Usuário atualizado com sucesso");
+		// Invalida o cache do plano do usuário para forçar nova busca
+		invalidateUserSubscriptionCache(userId);
+
+		console.log("Webhook: Usuário atualizado com sucesso e cache invalidado");
 	} catch (dbError) {
 		console.error("Webhook: Erro ao atualizar usuário no banco de dados", {
 			userId,
