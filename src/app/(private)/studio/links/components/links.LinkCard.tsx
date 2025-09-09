@@ -194,7 +194,11 @@ const DisplayView = (props: LinkCardProps) => {
 				</div>
 				<div className="flex-1 space-y-2">
 					<header className="flex flex-wrap items-center gap-2">
-						<h3 className="font-medium">{link.title}</h3>
+						<h3 className="font-medium">
+							{link.title.length > 64
+								? `${link.title.slice(0, 64)}...`
+								: link.title}
+						</h3>
 						{link.badge && <Badge variant="secondary">{link.badge}</Badge>}
 						{link.password && (
 							<Lock className="h-3 w-3 text-muted-foreground" />
