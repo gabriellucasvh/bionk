@@ -150,7 +150,8 @@ const BUTTON_STYLES = [
 	{
 		value: "outline",
 		label: "Contorno",
-		preview: "bg-transparent text-gray-700 dark:text-white border-gray-500 border-2",
+		preview:
+			"bg-transparent text-gray-700 dark:text-white border-gray-500 border-2",
 	},
 	{
 		value: "soft",
@@ -160,7 +161,8 @@ const BUTTON_STYLES = [
 	{
 		value: "shadow",
 		label: "Sombra",
-		preview: "bg-gray-100 text-gray-700 border-gray-300 shadow-lg dark:shadow-white/20",
+		preview:
+			"bg-gray-100 text-gray-700 border-gray-300 shadow-lg dark:shadow-white/20",
 	},
 	{
 		value: "neon",
@@ -519,7 +521,7 @@ export default function CustomizationPanel({
 				<div className="mt-2 flex items-center gap-4">
 					<Slider
 						className="w-full"
-						max={24}
+						max={36}
 						min={0}
 						onValueChange={(value) =>
 							handleChange("customButtonCorners", value[0].toString())
@@ -529,8 +531,25 @@ export default function CustomizationPanel({
 							Number.parseInt(customizations.customButtonCorners || "0", 10),
 						]}
 					/>
-					<span className="w-12 text-center font-semibold text-gray-700 dark:text-gray-300">
-						{customizations.customButtonCorners || "0"}px
+					<span className="w-20 text-center font-semibold text-gray-700 dark:text-gray-300">
+						{(() => {
+							const value = Number.parseInt(
+								customizations.customButtonCorners || "0",
+								10
+							);
+							switch (value) {
+								case 0:
+									return "Reto";
+								case 12:
+									return "Suave";
+								case 24:
+									return "Médio";
+								case 36:
+									return "Arredondado";
+								default:
+									return `${value}px`;
+							}
+						})()}
 					</span>
 				</div>
 			</div>
