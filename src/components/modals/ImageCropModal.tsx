@@ -1,6 +1,14 @@
 "use client";
 
-import { Check, RotateCcw, Upload, ZoomIn, ZoomOut } from "lucide-react";
+import {
+	Check,
+	RotateCcw,
+	Trash2,
+	Upload,
+	ZoomIn,
+	ZoomOut,
+} from "lucide-react";
+import Image from "next/image";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
@@ -14,6 +22,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { BaseButton } from "../buttons/BaseButton";
+import { Button } from "../ui/button";
 
 // --- Interfaces e Constantes ---
 interface ImageCropModalProps {
@@ -21,6 +30,8 @@ interface ImageCropModalProps {
 	onClose: () => void;
 	onImageSave: (imageUrl: string) => void;
 	linkId?: string;
+	currentImageUrl?: string | null;
+	onImageRemove?: () => void;
 }
 
 // Lista de formatos de imagem expandida conforme solicitado
@@ -90,6 +101,8 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 	onClose,
 	onImageSave,
 	linkId,
+	currentImageUrl,
+	onImageRemove,
 }) => {
 	const [selectedImage, setSelectedImage] = useState<{
 		src: string;
@@ -112,9 +125,7 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 		// Validar tamanho do arquivo (máximo 5MB)
 		const maxFileSize = 5 * 1024 * 1024; // 5MB em bytes
 		if (file.size > maxFileSize) {
-			alert(
-				"Arquivo muito grande. O tamanho máximo permitido é 5MB."
-			);
+			alert("Arquivo muito grande. O tamanho máximo permitido é 5MB.");
 			return;
 		}
 
@@ -122,7 +133,7 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 		reader.onload = (e) =>
 			setSelectedImage({ src: e.target?.result as string, file });
 		reader.readAsDataURL(file);
-	}
+	};
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <Não será necessário atualizar as dependências>
 	const handleDrop = useCallback((e: React.DragEvent) => {
@@ -277,37 +288,82 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 							</div>
 						</div>
 					) : (
-						<div
-							className={`relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-10 text-center transition-colors ${
-								dragActive
-									? "border-blue-500 bg-blue-50"
-									: "border-gray-300 hover:border-gray-400"
-							}`}
-							onClick={() =>
-								document.getElementById("file-upload-input")?.click()
-							}
-							onDragEnter={handleDrag}
-							onDragLeave={handleDrag}
-							onDragOver={handleDrag}
-							onDrop={handleDrop}
-							role="none"
-						>
-							<Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-							<p className="mb-2 font-medium text-gray-700 dark:text-white">
-								Arraste uma imagem ou clique para selecionar
-							</p>
-							<p className="text-gray-500 text-sm dark:text-white/80">
-								Formatos: JPG, PNG, GIF, SVG, WebP, etc.
-							</p>
-							<input
-								accept={ACCEPTED_FORMATS.join(",")}
-								className="hidden"
-								id="file-upload-input"
-								onChange={(e) =>
-									e.target.files?.[0] && handleFileSelect(e.target.files[0])
+						<div className="space-y-4">
+							{currentImageUrl && (
+								<div className="text-center">
+									<p className="mb-3 font-medium text-gray-700 text-sm dark:text-white">
+										Imagem atual:
+									</p>
+									<div className="mb-4 flex justify-center">
+										<Image
+											alt="Imagem atual"
+											className="h-20 w-20 rounded-lg border object-cover"
+											height={100}
+											src={currentImageUrl}
+											width={100}
+										/>
+									</div>
+									{onImageRemove && (
+										<Button
+											className="mx-auto mb-4 flex w-min items-center justify-center gap-2 hover:text-red-500"
+											onClick={() => {
+												onImageRemove();
+												onClose();
+											}}
+											variant="ghost"
+										>
+											<Trash2 className="h-4 w-4" />
+											Remover Imagem
+										</Button>
+									)}
+									<div className="relative">
+										<div className="relative mb-2 text-center">
+											<div className="absolute inset-0 flex items-center">
+												<div className="w-full border-gray-300 border-t" />
+											</div>
+											<div className="relative flex justify-center text-sm">
+												<span className="bg-white px-2 text-gray-500 dark:bg-neutral-950 dark:text-white/80">
+													ou escolha uma nova
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							)}
+							<div
+								className={`relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-10 text-center transition-colors ${
+									dragActive
+										? "border-blue-500 bg-blue-50"
+										: "border-gray-300 hover:border-gray-400"
+								}`}
+								onClick={() =>
+									document.getElementById("file-upload-input")?.click()
 								}
-								type="file"
-							/>
+								onDragEnter={handleDrag}
+								onDragLeave={handleDrag}
+								onDragOver={handleDrag}
+								onDrop={handleDrop}
+								role="none"
+							>
+								<Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+								<p className="mb-2 font-medium text-gray-700 dark:text-white">
+									{currentImageUrl
+										? "Escolher nova imagem"
+										: "Arraste uma imagem ou clique para selecionar"}
+								</p>
+								<p className="text-gray-500 text-sm dark:text-white/80">
+									Formatos: JPG, PNG, GIF, SVG, WebP, etc.
+								</p>
+								<input
+									accept={ACCEPTED_FORMATS.join(",")}
+									className="hidden"
+									id="file-upload-input"
+									onChange={(e) =>
+										e.target.files?.[0] && handleFileSelect(e.target.files[0])
+									}
+									type="file"
+								/>
+							</div>
 						</div>
 					)}
 				</div>

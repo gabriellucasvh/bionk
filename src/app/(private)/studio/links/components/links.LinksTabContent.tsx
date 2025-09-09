@@ -124,6 +124,7 @@ const LinksTabContent = ({
 			onToggleActive={handlers.toggleActive}
 			onToggleSensitive={handlers.toggleSensitive}
 			onUpdateCustomImage={handlers.handleUpdateCustomImage}
+			onRemoveCustomImage={handlers.handleRemoveCustomImage}
 		/>
 		</div>
 	);

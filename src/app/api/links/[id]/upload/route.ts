@@ -162,7 +162,7 @@ export async function DELETE(
 					.split("/")
 					.slice(-2)
 					.join("/")
-					.replace(/\.[^/.]+$/, ""); 
+					.replace(/\.[^/.]+$/, "");
 
 				await cloudinary.uploader.destroy(publicId);
 			} catch (cloudinaryError) {

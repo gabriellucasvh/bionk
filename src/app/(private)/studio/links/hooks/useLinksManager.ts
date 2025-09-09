@@ -485,6 +485,26 @@ export const useLinksManager = (
 		}
 	};
 
+	const handleRemoveCustomImage = async (id: number) => {
+		try {
+			// Fazer a requisição DELETE para remover a imagem do servidor
+			const response = await fetch(`/api/links/${id}/upload`, {
+				method: "DELETE",
+			});
+
+			if (!response.ok) {
+				throw new Error("Erro ao remover imagem");
+			}
+
+			// Atualizar o estado local removendo a URL da imagem
+			handleLinkUpdate(id, { customImageUrl: null });
+			// Revalidar os dados para garantir sincronização
+			await mutateLinks();
+		} catch (error) {
+			console.error("Erro ao remover imagem personalizada:", error);
+		}
+	};
+
 	const handleStartEditing = (id: number) => {
 		const linkToEdit = initialLinks.find((l) => l.id === id);
 		if (linkToEdit) {
@@ -603,5 +623,6 @@ export const useLinksManager = (
 		handleLinkChange,
 		handleClickLink,
 		handleUpdateCustomImage,
+		handleRemoveCustomImage,
 	};
 };

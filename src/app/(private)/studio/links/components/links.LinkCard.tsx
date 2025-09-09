@@ -15,6 +15,7 @@ import {
 	Trash2,
 	X,
 } from "lucide-react";
+
 import Link from "next/link";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -51,6 +52,7 @@ interface LinkCardProps {
 	onDeleteLink: (id: number) => void;
 	onClickLink: (id: number) => void;
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
+	onRemoveCustomImage?: (id: number) => void;
 	borderRadius?: number;
 }
 
@@ -164,6 +166,7 @@ const DisplayView = (props: LinkCardProps) => {
 		onDeleteLink,
 		onClickLink,
 		onUpdateCustomImage,
+		onRemoveCustomImage,
 		borderRadius = 0,
 	} = props;
 
@@ -229,11 +232,21 @@ const DisplayView = (props: LinkCardProps) => {
 			</div>
 			<div className="flex items-center justify-between border-t pt-3">
 				<div className="flex items-center gap-2">
+					{/* Botão de imagem simples */}
 					<Button
-						className="h-8 px-2 text-muted-foreground hover:text-foreground"
+						className={cn(
+							"h-8 w-8",
+							link.customImageUrl
+								? "text-green-600 hover:text-green-700"
+								: "text-muted-foreground hover:text-foreground"
+						)}
 						onClick={() => setIsImageModalOpen(true)}
-						size="sm"
-						title="Personalizar ícone do link"
+						size="icon"
+						title={
+							link.customImageUrl
+								? "Alterar imagem personalizada"
+								: "Adicionar imagem personalizada"
+						}
 						variant="ghost"
 					>
 						<Image className="h-4 w-4" />
@@ -293,9 +306,11 @@ const DisplayView = (props: LinkCardProps) => {
 			{/* Modal de upload de imagem */}
 			<ImageCropModal
 				borderRadius={borderRadius}
+				currentImageUrl={link.customImageUrl}
 				isOpen={isImageModalOpen}
 				linkId={link.id}
 				onClose={() => setIsImageModalOpen(false)}
+				onImageRemove={() => onRemoveCustomImage?.(link.id)}
 				onImageSave={(imageUrl) => {
 					onUpdateCustomImage?.(link.id, imageUrl);
 					setIsImageModalOpen(false);

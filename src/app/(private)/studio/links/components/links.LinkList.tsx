@@ -43,10 +43,21 @@ interface LinkListProps {
 	onAddLinkToSection?: (sectionTitle: string) => void;
 	linksManager?: any;
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
+	onRemoveCustomImage?: (id: number) => void;
 }
 
 const LinkList = (props: LinkListProps) => {
-	const { items, onDragStart, onDragEnd, activeId, onAddLinkToSection, linksManager, ...cardProps } = props;
+	const {
+		items,
+		onDragStart,
+		onDragEnd,
+		activeId,
+		onAddLinkToSection,
+		linksManager,
+		onRemoveCustomImage,
+		onUpdateCustomImage,
+		...cardProps
+	} = props;
 
 	const sensors = useSensors(
 		useSensor(MouseSensor),
@@ -80,22 +91,26 @@ const LinkList = (props: LinkListProps) => {
 							<SortableItem id={item.id} key={item.id}>
 								{({ listeners, setActivatorNodeRef, isDragging }) => {
 									if (item.type === "section") {
-							return (
-								<SectionCard
-									isDragging={isDragging}
-									listeners={listeners}
-									section={item.data as SectionItem}
-									setActivatorNodeRef={setActivatorNodeRef}
-									onAddLinkToSection={onAddLinkToSection}
-									linksManager={linksManager}
-									{...cardProps}
-								/>
-							);
+										return (
+											<SectionCard
+												isDragging={isDragging}
+												linksManager={linksManager}
+												listeners={listeners}
+												onAddLinkToSection={onAddLinkToSection}
+												onRemoveCustomImage={onRemoveCustomImage}
+												onUpdateCustomImage={onUpdateCustomImage}
+												section={item.data as SectionItem}
+												setActivatorNodeRef={setActivatorNodeRef}
+												{...cardProps}
+											/>
+										);
 									}
 									return (
 										<LinkCard
 											link={item.data as LinkItem}
 											listeners={listeners}
+											onRemoveCustomImage={onRemoveCustomImage}
+											onUpdateCustomImage={onUpdateCustomImage}
 											setActivatorNodeRef={setActivatorNodeRef}
 											{...cardProps}
 										/>
@@ -110,15 +125,15 @@ const LinkList = (props: LinkListProps) => {
 				<DragOverlay>
 					{activeItem ? (
 						activeItem.type === "section" ? (
-						<SectionCard
-							isDragging
-							section={activeItem.data as SectionItem}
-							onAddLinkToSection={onAddLinkToSection}
-							linksManager={linksManager}
-							{...cardProps}
-							listeners={{}}
-							setActivatorNodeRef={noop}
-						/>
+							<SectionCard
+								isDragging
+								linksManager={linksManager}
+								onAddLinkToSection={onAddLinkToSection}
+								section={activeItem.data as SectionItem}
+								{...cardProps}
+								listeners={{}}
+								setActivatorNodeRef={noop}
+							/>
 						) : (
 							<LinkCard
 								link={activeItem.data as LinkItem}

@@ -16,7 +16,8 @@ export type LinkItem = {
 	expiresAt?: string | null;
 	deleteOnClicks?: number | null;
 	launchesAt?: string | null;
-};
+	customImageUrl?: string | null;
+}
 
 export type SectionItem = {
 	id: string; // Ex: 'section-promocao'

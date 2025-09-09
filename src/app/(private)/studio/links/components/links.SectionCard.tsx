@@ -43,6 +43,7 @@ interface SectionCardProps {
 	onAddLinkToSection?: (sectionTitle: string) => void;
 	linksManager?: any;
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
+	onRemoveCustomImage?: (id: number) => void;
 }
 
 const SectionCard = ({
