@@ -178,16 +178,18 @@ function LinksList({
 	classNames,
 	buttonStyle,
 	textStyle,
+	customPresets,
 }: {
 	user: TemplateComponentProps["user"];
 	classNames?: BaseTemplateProps["classNames"];
 	buttonStyle?: React.CSSProperties;
 	textStyle?: React.CSSProperties;
+	customPresets?: BaseTemplateProps["customPresets"];
 }) {
 	const renderLink = (link: UserLink) => {
 		const linkContent = (
-			<div className="w-full p-4 text-center">
-				<div className="flex h-10 items-center justify-center gap-2 px-10">
+			<div className="w-full p-3.5 text-center">
+				<div className="flex h-10 items-center justify-center gap-2 px-14">
 					<h4 className="line-clamp-2 font-semibold" style={textStyle}>
 						{link.title}
 					</h4>
@@ -214,6 +216,7 @@ function LinksList({
 				) : (
 					<InteractiveLink
 						className={classNames?.cardLink}
+						customPresets={customPresets}
 						href={link.url}
 						link={link}
 						sensitive={link.sensitive}
@@ -363,7 +366,7 @@ export default function BaseTemplate({
 	return (
 		<>
 			<div
-				className={`flex min-h-dvh flex-col items-center px-4 py-8 ${
+				className={`flex min-h-dvh flex-col items-center px-3.5 py-8 ${
 					classNames?.wrapper || ""
 				}`}
 				style={wrapperStyle}
@@ -381,6 +384,7 @@ export default function BaseTemplate({
 							<LinksList
 								buttonStyle={buttonStyle}
 								classNames={classNames}
+								customPresets={customPresets}
 								textStyle={textStyle}
 								user={user}
 							/>

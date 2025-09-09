@@ -18,6 +18,9 @@ interface InteractiveLinkProps {
 	className?: string;
 	style?: React.CSSProperties;
 	borderRadius?: number;
+	customPresets?: {
+		customButtonCorners?: string;
+	};
 }
 
 // Função auxiliar para extrair o favicon da URL
@@ -85,7 +88,7 @@ const ImageComponent: FC<ImageComponentProps> = ({
 		alt: link.customImageUrl
 			? `Ícone personalizado de ${link.title}`
 			: `Favicon de ${link.title}`,
-		className: "ml-1 size-10 object-cover",
+		className: "ml-1 size-13 object-cover",
 		height: 32,
 		onError: handleImageError,
 		src: imageUrl || "",
@@ -94,7 +97,7 @@ const ImageComponent: FC<ImageComponentProps> = ({
 	};
 
 	return (
-		<div className="-translate-y-1/2 absolute top-1/2 left-2 z-20">
+		<div className="-translate-y-1/2 absolute top-1/2 left-1 z-20">
 			<Image {...imageProps} />
 		</div>
 	);
@@ -148,12 +151,18 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 	className = "",
 	style = {},
 	borderRadius = 0,
+	customPresets,
 }) => {
 	const [unblurred, setUnblurred] = useState(false);
 	const [isTouch, setIsTouch] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [faviconError, setFaviconError] = useState(false);
 	const [customImageError, setCustomImageError] = useState(false);
+
+	// Calcular o borderRadius baseado no customButtonCorners ou usar padrão
+	const imageBorderRadius = customPresets?.customButtonCorners
+		? Number(customPresets.customButtonCorners)
+		: borderRadius || 12; // 12px é o padrão do rounded-xl
 
 	const faviconUrl = getFaviconUrl(link.url);
 	const imageUrl = getImageUrl(link, customImageError, faviconUrl);
@@ -224,7 +233,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 				{/* Imagem personalizada ou favicon do site na borda esquerda */}
 				{showImage && (
 					<ImageComponent
-						borderRadius={borderRadius}
+						borderRadius={imageBorderRadius}
 						imageUrl={imageUrl}
 						isGif={isGif}
 						link={link}
