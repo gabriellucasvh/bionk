@@ -26,6 +26,42 @@ export async function POST(
 		);
 	}
 
+	// Validar tamanho do arquivo (máximo 5MB)
+	const maxFileSize = 5 * 1024 * 1024; // 5MB em bytes
+	if (file.size > maxFileSize) {
+		return NextResponse.json(
+			{
+				success: false,
+				error: "Arquivo muito grande. O tamanho máximo permitido é 5MB.",
+			},
+			{ status: 400 }
+		);
+	}
+
+	// Validar tipo de arquivo (imagens, GIFs e outros formatos suportados)
+	const allowedTypes = [
+		"image/jpeg",
+		"image/jpg",
+		"image/png",
+		"image/gif",
+		"image/webp",
+		"image/avif",
+		"image/svg+xml",
+		"image/bmp",
+		"image/heic",
+		"image/heif",
+	];
+	if (!allowedTypes.includes(file.type)) {
+		return NextResponse.json(
+			{
+				success: false,
+				error:
+					"Formato de arquivo não suportado. Use JPEG, PNG, GIF, WebP, AVIF, SVG, BMP, HEIC ou HEIF.",
+			},
+			{ status: 400 }
+		);
+	}
+
 	// Verificar se o link existe e buscar imagem antiga
 	try {
 		const link = await prisma.link.findUnique({
@@ -54,7 +90,7 @@ export async function POST(
 					.split("/")
 					.slice(-2)
 					.join("/")
-					.replace(/\.[^/.]+$/, ""); // Remove extensão
+					.replace(/\.[^/.]+$/, "");
 
 				await cloudinary.uploader.destroy(oldPublicId);
 			} catch (cloudinaryError) {
@@ -126,7 +162,7 @@ export async function DELETE(
 					.split("/")
 					.slice(-2)
 					.join("/")
-					.replace(/\.[^/.]+$/, ""); // Remove extensão
+					.replace(/\.[^/.]+$/, ""); 
 
 				await cloudinary.uploader.destroy(publicId);
 			} catch (cloudinaryError) {

@@ -108,11 +108,21 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 			);
 			return;
 		}
+
+		// Validar tamanho do arquivo (máximo 5MB)
+		const maxFileSize = 5 * 1024 * 1024; // 5MB em bytes
+		if (file.size > maxFileSize) {
+			alert(
+				"Arquivo muito grande. O tamanho máximo permitido é 5MB."
+			);
+			return;
+		}
+
 		const reader = new FileReader();
 		reader.onload = (e) =>
 			setSelectedImage({ src: e.target?.result as string, file });
 		reader.readAsDataURL(file);
-	};
+	}
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <Não será necessário atualizar as dependências>
 	const handleDrop = useCallback((e: React.DragEvent) => {
