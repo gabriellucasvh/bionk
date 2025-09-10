@@ -167,7 +167,6 @@ const DisplayView = (props: LinkCardProps) => {
 		onClickLink,
 		onUpdateCustomImage,
 		onRemoveCustomImage,
-		borderRadius = 0,
 	} = props;
 
 	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -305,10 +304,9 @@ const DisplayView = (props: LinkCardProps) => {
 
 			{/* Modal de upload de imagem */}
 			<ImageCropModal
-				borderRadius={borderRadius}
 				currentImageUrl={link.customImageUrl}
 				isOpen={isImageModalOpen}
-				linkId={link.id}
+				linkId={link.id.toString()}
 				onClose={() => setIsImageModalOpen(false)}
 				onImageRemove={() => onRemoveCustomImage?.(link.id)}
 				onImageSave={(imageUrl) => {

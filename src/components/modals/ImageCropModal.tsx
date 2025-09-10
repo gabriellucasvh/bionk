@@ -8,7 +8,7 @@ import {
 	ZoomIn,
 	ZoomOut,
 } from "lucide-react";
-import Image from "next/image";
+import NextImage from "next/image";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
@@ -295,13 +295,13 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 										Imagem atual:
 									</p>
 									<div className="mb-4 flex justify-center">
-										<Image
-											alt="Imagem atual"
-											className="h-20 w-20 rounded-lg border object-cover"
-											height={100}
-											src={currentImageUrl}
-											width={100}
-										/>
+										<NextImage
+										alt="Imagem atual"
+										className="h-20 w-20 rounded-lg border object-cover"
+										height={100}
+										src={currentImageUrl}
+										width={100}
+									/>
 									</div>
 									{onImageRemove && (
 										<Button
