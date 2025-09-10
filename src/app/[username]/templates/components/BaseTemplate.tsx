@@ -80,15 +80,24 @@ function UserHeader({
 						classNames?.image || ""
 					}`}
 				>
-					<Image
-						alt={user.name || user.username}
-						className="object-cover"
-						fill
-						priority
-						quality={100}
-						sizes="112px"
-						src={user.image}
-					/>
+					{user.image.toLowerCase().endsWith(".gif") ? (
+						// biome-ignore lint/performance/noImgElement: <next/image não lida bem com gifs, <img> para segurança>
+						<img
+							alt={user.name || user.username}
+							className="h-full w-full object-cover"
+							src={user.image}
+						/>
+					) : (
+						<Image
+							alt={user.name || user.username}
+							className="object-cover"
+							fill
+							priority
+							quality={100}
+							sizes="112px"
+							src={user.image}
+						/>
+					)}
 				</div>
 			)}
 			<h1

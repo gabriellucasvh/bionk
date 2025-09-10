@@ -24,10 +24,19 @@ export async function POST(
 		const base64Data = Buffer.from(fileBuffer).toString("base64");
 		const fileUri = `data:${mimeType};${encoding},${base64Data}`;
 
+		// Detecta se é um GIF para preservar a animação
+		const isGif = mimeType === "image/gif";
+		
 		const result = await cloudinary.uploader.upload(fileUri, {
 			folder: "profile-pictures",
 			public_id: id,
 			overwrite: true,
+			// Preserva o formato original para GIFs
+			...(isGif && {
+				format: "gif",
+				flags: "preserve_transparency",
+				resource_type: "image"
+			})
 		});
 
 		await prisma.user.update({

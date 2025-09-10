@@ -3,10 +3,10 @@
 import { Edit, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import type { ChangeEvent } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingPage from "@/components/layout/LoadingPage";
+import ProfileImageCropModal from "@/components/modals/ProfileImageCropModal";
 import {
 	Card,
 	CardContent,
@@ -47,9 +47,9 @@ const PerfilClient = () => {
 		null
 	);
 	const [profileImageChanged, setProfileImageChanged] = useState(false);
-	const profileInputRef = useRef<HTMLInputElement>(null);
 	const [originalProfileImageUrl, setOriginalProfileImageUrl] =
 		useState<string>("");
+	const [isImageCropModalOpen, setIsImageCropModalOpen] = useState(false);
 
 	const [validationError, setValidationError] = useState<string>("");
 
@@ -246,31 +246,19 @@ const PerfilClient = () => {
 		setValidationError("");
 	};
 
-	const handleProfileFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
-		if (isUploadingImage) {
-			return;
-		}
-
-		const file = e.target.files?.[0];
-		if (!file) {
-			return;
-		}
-
-		if (file.size > 2 * 1024 * 1024) {
-			if (profileInputRef.current) {
-				profileInputRef.current.value = "";
-			}
-			return;
-		}
-
-		const previewUrl = URL.createObjectURL(file);
+	const handleProfileImageSave = (imageFile: File) => {
+		const previewUrl = URL.createObjectURL(imageFile);
 		setProfilePreview(previewUrl);
-		setSelectedProfileFile(file);
+		setSelectedProfileFile(imageFile);
 		setProfileImageChanged(true);
+	};
 
-		if (profileInputRef.current) {
-			profileInputRef.current.value = "";
-		}
+	const handleProfileImageRemove = () => {
+		setProfilePreview(
+			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png"
+		);
+		setSelectedProfileFile(null);
+		setProfileImageChanged(true);
 	};
 
 	if (isProfileLoading) {
@@ -318,20 +306,12 @@ const PerfilClient = () => {
 							<BaseButton
 								className="absolute right-0 bottom-0 rounded-full"
 								disabled={isUploadingImage}
-								onClick={() => profileInputRef.current?.click()}
+								onClick={() => setIsImageCropModalOpen(true)}
 								size="icon"
 								variant="white"
 							>
 								<Edit className="h-4 w-4" />
 							</BaseButton>
-							<input
-								accept="image/*"
-								className="hidden"
-								disabled={isUploadingImage}
-								onChange={handleProfileFileSelect}
-								ref={profileInputRef}
-								type="file"
-							/>
 						</div>
 						<div className="flex-1 space-y-4">
 							<div className="grid gap-1">
@@ -417,6 +397,14 @@ const PerfilClient = () => {
 					)}
 				</CardContent>
 			</Card>
+
+			<ProfileImageCropModal
+				currentImageUrl={profilePreview}
+				isOpen={isImageCropModalOpen}
+				onClose={() => setIsImageCropModalOpen(false)}
+				onImageRemove={handleProfileImageRemove}
+				onImageSave={handleProfileImageSave}
+			/>
 		</section>
 	);
 };
