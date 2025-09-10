@@ -37,7 +37,7 @@ export const authOptions: NextAuthOptions = {
 			// CORREÇÃO: A imagem já virá em alta resolução do 'profile'
 			const imageUrl =
 				data.picture ??
-				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png";
+				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 
 			const newUser = await prisma.user.create({
 				data: {
@@ -68,7 +68,7 @@ export const authOptions: NextAuthOptions = {
 						googleId: (data as any).sub ?? null,
 					},
 				});
-			} catch  {
+			} catch {
 				// Não falha o registro se a notificação Discord falhar
 			}
 
@@ -97,7 +97,10 @@ export const authOptions: NextAuthOptions = {
 			clientSecret,
 			profile(profile) {
 				// NOVO: Altera a URL da imagem para obter alta resolução (400px)
-				const highResImage = profile.picture?.replace(GOOGLE_IMAGE_SIZE_REGEX, "=s512-c");
+				const highResImage = profile.picture?.replace(
+					GOOGLE_IMAGE_SIZE_REGEX,
+					"=s512-c"
+				);
 
 				return {
 					...profile,

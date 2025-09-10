@@ -17,7 +17,7 @@ model User {
   bio                           String?
   provider                      String?
   emailVerified                 DateTime?
-  image                         String?        @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png")
+  image                         String?        @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png")
   bannerUrl                     String?
   hashedPassword                String?
   createdAt                     DateTime       @default(now())
@@ -47,7 +47,7 @@ model User {
   subscriptionEndDate           DateTime?
   subscriptionStartDate         DateTime?
   mercadopagoSubscriptionId     String?
-  pendingSubscriptionPlan       String?        // Plano solicitado aguardando confirmação
+  pendingSubscriptionPlan       String? // Plano solicitado aguardando confirmação
   paymentMethodBrand            String?
   paymentMethodLastFour         String?
   accounts                      Account[]

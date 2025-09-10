@@ -41,7 +41,7 @@ const PerfilClient = () => {
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
 	const [profilePreview, setProfilePreview] = useState<string>(
 		session?.user?.image ||
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png"
+			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 	);
 	const [selectedProfileFile, setSelectedProfileFile] = useState<File | null>(
 		null
@@ -66,7 +66,7 @@ const PerfilClient = () => {
 				const currentImage =
 					image ||
 					session?.user?.image ||
-					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png";
+					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 
 				setProfile({ name, username, bio: bio || "" });
 				setOriginalProfile({ name, username, bio: bio || "" });
@@ -75,7 +75,7 @@ const PerfilClient = () => {
 			} catch {
 				const fallbackUrl =
 					session?.user?.image ||
-					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png";
+					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 				setProfilePreview(fallbackUrl);
 				setOriginalProfileImageUrl(fallbackUrl);
 			} finally {
@@ -255,7 +255,7 @@ const PerfilClient = () => {
 
 	const handleProfileImageRemove = () => {
 		setProfilePreview(
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1746226087/bionk/defaults/profile.png"
+			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 		);
 		setSelectedProfileFile(null);
 		setProfileImageChanged(true);
