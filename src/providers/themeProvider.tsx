@@ -39,11 +39,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		) {
 			setThemeState(savedTheme);
 		} else {
-			// Detecta preferência do sistema
-			const systemPrefersDark = window.matchMedia(
-				"(prefers-color-scheme: dark)"
-			).matches;
-			setThemeState(systemPrefersDark ? "dark" : "light");
+			// Define modo claro como padrão
+			setThemeState("light");
 		}
 		setMounted(true);
 	}, []);
