@@ -285,7 +285,7 @@ const PerfilClient = () => {
 					<article className="flex flex-col gap-4 sm:flex-row sm:items-center">
 						<div className="relative flex items-center justify-center">
 							<div
-								className={`h-24 w-24 overflow-hidden rounded-full border-2 border-green-500 bg-muted shadow-black/20 shadow-md ${
+								className={`h-32 w-32 overflow-hidden rounded-full bg-muted shadow-black/20 shadow-md ${
 									isUploadingImage ? "opacity-50" : ""
 								}`}
 							>
