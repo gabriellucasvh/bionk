@@ -143,7 +143,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 				onClick={() => handleScroll("left")}
 				type="button"
 			>
-				<ChevronLeft className="size-6" />
+				<ChevronLeft className="size-6 text-black" />
 			</button>
 
 			<ul
@@ -217,7 +217,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 				onClick={() => handleScroll("right")}
 				type="button"
 			>
-				<ChevronRight className="size-6" />
+				<ChevronRight className="size-6 text-black" />
 			</button>
 		</div>
 	);

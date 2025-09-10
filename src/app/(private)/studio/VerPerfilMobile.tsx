@@ -69,12 +69,14 @@ const VerPerfilMobile = () => {
 			</DialogTrigger>
 			<DialogContent className="w-full max-w-[90vw] rounded-2xl border bg-background p-6 text-center shadow-xl sm:max-w-lg">
 				<DialogHeader>
-					<DialogTitle className="text-center font-bold text-2xl text-black">
+					<DialogTitle className="text-center font-bold text-2xl text-black dark:text-white">
 						Compartilhar Perfil
 					</DialogTitle>
-					<DialogDescription className="pt-2 text-center text-muted-foreground text-sm">
+					<DialogDescription className="pt-2 text-center text-muted-foreground text-sm dark:text-white/80">
 						<p>Compartilhe seu perfil Bionk com o mundo.</p>
-						<p className="break-all text-black text-sm">bionk.me/{username}</p>
+						<p className="break-all text-black text-sm dark:text-white">
+							bionk.me/{username}
+						</p>
 					</DialogDescription>
 				</DialogHeader>
 
