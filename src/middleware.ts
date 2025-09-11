@@ -5,20 +5,32 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(req: NextRequest) {
 	const { pathname } = req.nextUrl;
 
-	const protectedPaths = ["/studio","/checkout"]
+	const protectedPaths = ["/studio", "/checkout"];
 
-	if (protectedPaths.some(path => pathname.startsWith(path))) {
+	if (protectedPaths.some((path) => pathname.startsWith(path))) {
 		const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
 		if (!token) {
 			const registroUrl = new URL("/registro", req.url);
 			return NextResponse.redirect(registroUrl);
 		}
+
+		// Verificar se usuário tem status pending
+		if (token.status === "pending") {
+			// Permitir acesso apenas à página de onboarding
+			const onboardingUrl = new URL("/onboarding", req.url);
+			if (!pathname.startsWith("/onboarding")) {
+				return NextResponse.redirect(onboardingUrl);
+			}
+		}
 	}
 
-	return NextResponse.next();
+	// Adicionar pathname nos headers para o layout
+	const response = NextResponse.next();
+	response.headers.set("x-pathname", pathname);
+	return response;
 }
 
 export const config = {
-	matcher: ["/studio/:path*", "/checkout/:path*"],
+	matcher: ["/studio/:path*", "/checkout/:path*", "/onboarding/:path*"],
 };

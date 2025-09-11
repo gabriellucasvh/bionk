@@ -75,6 +75,7 @@ const APP_ROUTES: string[] = [
 	"official",
 	"site",
 	"cobranca",
+	"onboarding",
 ];
 
 // Combina as duas listas, adiciona variantes com _ e remove duplicados

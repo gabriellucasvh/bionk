@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import type { NextAuthOptions, User } from "next-auth";
@@ -5,7 +6,61 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
-import { generateUniqueUsername } from "@/utils/generateUsername";
+
+// Funções auxiliares para JWT
+function setupInitialToken(token: any, user: ExtendedUser, account: any) {
+	token.id = user.id;
+	token.email = user.email ?? undefined;
+	token.username = user.username;
+	token.name = user.name;
+	token.picture = user.image ?? undefined;
+	token.onboardingCompleted = user.onboardingCompleted;
+	token.status = user.status;
+
+	if (account?.provider === "google" && account.providerAccountId) {
+		token.googleId = account.providerAccountId;
+		token.provider = "google";
+	} else if (account?.provider === "credentials") {
+		token.provider = "credentials";
+	}
+}
+
+function setupAccountData(token: any, account: any) {
+	token.accessToken = account.access_token;
+	token.isCredentialsUser = account.provider === "credentials";
+}
+
+function shouldUpdateUserData(token: any): boolean {
+	return token.id && (token.status === "pending" || !token.onboardingCompleted);
+}
+
+async function updateTokenFromDatabase(token: any) {
+	try {
+		const dbUser = await prisma.user.findUnique({
+			where: { id: token.id as string },
+			select: { onboardingCompleted: true, image: true, status: true },
+		});
+
+		if (dbUser) {
+			token.onboardingCompleted = dbUser.onboardingCompleted;
+			token.status = dbUser.status;
+			// Só atualizar a imagem se o usuário já completou o onboarding
+			// Durante o onboarding, manter a imagem original do Google
+			if (dbUser.onboardingCompleted && dbUser.image) {
+				token.picture = dbUser.image;
+			}
+		}
+	} catch (error) {
+		console.error("Erro ao buscar dados do usuário:", error);
+	}
+}
+
+function updateTokenFromSession(token: any, sessionUser: any) {
+	token.name = sessionUser.name;
+	token.username = sessionUser.username;
+	token.picture = sessionUser.image;
+	token.onboardingCompleted = sessionUser.onboardingCompleted;
+}
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
@@ -22,6 +77,9 @@ interface ExtendedUser extends User {
 	username: string;
 	name?: string;
 	googleId?: string;
+	onboardingCompleted?: boolean;
+	provider?: string;
+	status?: string;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -32,22 +90,31 @@ export const authOptions: NextAuthOptions = {
 			email: string;
 			sub?: string;
 			picture?: string;
+			provider?: string;
 		}) => {
-			const username = await generateUniqueUsername(data.name ?? "user");
 			// CORREÇÃO: A imagem já virá em alta resolução do 'profile'
 			const imageUrl =
 				data.picture ??
 				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
+
+			// Determinar status e username baseado no provider
+			const isGoogleProvider = data.provider === "google" || (data as any).sub;
+			const status = isGoogleProvider ? "pending" : "active";
+			const username = isGoogleProvider
+				? `temp_${crypto.randomUUID().slice(0, 8)}`
+				: `user_${crypto.randomUUID().slice(0, 8)}`;
 
 			const newUser = await prisma.user.create({
 				data: {
 					email: data.email,
 					name: data.name || "Usuário",
 					username,
+					status,
 					image: imageUrl,
 					googleId: (data as any).sub ?? null,
 					provider: "google",
 					emailVerified: new Date(),
+					onboardingCompleted: false, // Usuários Google precisam completar onboarding
 					subscriptionPlan: "free",
 					subscriptionStatus: "active",
 				},
@@ -155,28 +222,25 @@ export const authOptions: NextAuthOptions = {
 	session: { strategy: "jwt" },
 	secret: process.env.NEXTAUTH_SECRET,
 	callbacks: {
-		jwt({ token, user, account, trigger, session: updateSessionData }) {
-			const u = user as ExtendedUser;
-
+		async jwt({ token, user, account, trigger, session: updateSessionData }) {
+			// Configurar token inicial com dados do usuário
 			if (user) {
-				token.id = user.id;
-				token.email = user.email ?? undefined;
-				token.username = u.username;
-				token.name = u.name;
-				token.picture = user.image ?? undefined;
-				if (account?.provider === "google" && account.providerAccountId) {
-					token.googleId = account.providerAccountId;
-				}
-			}
-			if (account) {
-				token.accessToken = account.access_token;
-				token.isCredentialsUser = account.provider === "credentials";
+				setupInitialToken(token, user as ExtendedUser, account);
 			}
 
+			// Configurar dados da conta
+			if (account) {
+				setupAccountData(token, account);
+			}
+
+			// Atualizar dados do usuário se necessário
+			if (shouldUpdateUserData(token)) {
+				await updateTokenFromDatabase(token);
+			}
+
+			// Processar atualizações de sessão
 			if (trigger === "update" && updateSessionData?.user) {
-				token.name = updateSessionData.user.name;
-				token.username = updateSessionData.user.username;
-				token.picture = updateSessionData.user.image;
+				updateTokenFromSession(token, updateSessionData.user);
 			}
 
 			return token;
@@ -191,6 +255,9 @@ export const authOptions: NextAuthOptions = {
 				image: token.picture ?? null,
 				isCredentialsUser: token.isCredentialsUser as boolean | undefined,
 				googleId: token.googleId ?? undefined,
+				onboardingCompleted: token.onboardingCompleted as boolean | undefined,
+				provider: token.provider as string | undefined,
+				status: token.status as string | undefined,
 			};
 			return session;
 		},
@@ -199,22 +266,25 @@ export const authOptions: NextAuthOptions = {
 				url.includes("/api/auth/error?error=OAuthAccountNotLinked") ||
 				url.includes("&error=OAuthAccountNotLinked")
 			) {
-				return `${baseUrl}/login?error=OAuthAccountNotLinked`;
+				return Promise.resolve(`${baseUrl}/login?error=OAuthAccountNotLinked`);
 			}
+
 			if (
 				url.startsWith(`${baseUrl}/registro`) ||
 				url.startsWith(`${baseUrl}/login`)
 			) {
 				const callbackUrl = new URL(url).searchParams.get("callbackUrl");
 				if (callbackUrl) {
-					return callbackUrl;
+					return Promise.resolve(callbackUrl);
 				}
-				return `${baseUrl}/studio/perfil`;
+				return Promise.resolve(`${baseUrl}/studio/perfil`);
 			}
+
 			if (new URL(url, baseUrl).searchParams.has("callbackUrl")) {
-				return url;
+				return Promise.resolve(url);
 			}
-			return `${baseUrl}/studio/perfil`;
+
+			return Promise.resolve(`${baseUrl}/studio/perfil`);
 		},
 	},
 };

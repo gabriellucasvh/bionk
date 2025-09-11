@@ -44,7 +44,7 @@ export function BaseButton({
 				fullWidth ? "w-full" : "w-fit",
 				"max-w-full overflow-hidden",
 				"relative inline-flex items-center justify-center",
-				"rounded-xl",
+				"rounded-full",
 				"text-sm md:text-base",
 				"font-medium transition-colors duration-300",
 				variantClasses[variant],

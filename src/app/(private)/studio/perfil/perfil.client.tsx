@@ -97,6 +97,10 @@ const PerfilClient = () => {
 			setValidationError("O campo de nome de usuário não pode ficar vazio.");
 			return false;
 		}
+		if (username.length > 30) {
+			setValidationError("Nome de usuário deve ter no máximo 30 caracteres.");
+			return false;
+		}
 		if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
 			setValidationError("Este nome de usuário não está disponível.");
 			return false;
@@ -322,6 +326,7 @@ const PerfilClient = () => {
 									className="text-neutral-700 dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
 									disabled={loading || isUploadingImage}
 									id="name"
+									maxLength={44}
 									onChange={(e) => {
 										setProfile({ ...profile, name: e.target.value });
 									}}
@@ -345,6 +350,7 @@ const PerfilClient = () => {
 										}
 										disabled={loading || isUploadingImage}
 										id="username"
+										maxLength={30}
 										onChange={(e) => {
 											const sanitizedUsername = e.target.value
 												.replace(/[^a-zA-Z0-9_.]/g, "")

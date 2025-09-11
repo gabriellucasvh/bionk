@@ -41,6 +41,8 @@ model User {
   usernameReservedAt            DateTime?
   usernameReservationExpiry     DateTime?
   googleId                      String?
+  status                        String         @default("pending")
+  onboardingCompleted           Boolean        @default(false)
   subscriptionPlan              String?
   subscriptionStatus            String?
   billingCycle                  String?

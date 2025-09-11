@@ -27,6 +27,6 @@ module.exports = {
 				pathname: "/**",
 			},
 		],
-		qualities: [25, 50, 75, 90, 100],
+		qualities: [25, 50, 75, 90, 95, 100],
 	},
 };

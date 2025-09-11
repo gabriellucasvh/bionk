@@ -1,35 +1,46 @@
 // app/(private)/studio/layout.tsx
 
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import type { ReactNode } from "react";
-import { Suspense } from "react";
-import { SubscriptionSuccessHandler } from "@/components/SubscriptionSuccessHandler";
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import LoadingPage from "@/components/layout/LoadingPage";
 import { ThemeProvider } from "@/providers/themeProvider";
 import Sidebar from "./Sidebar";
 
 interface StudioLayoutProps {
-	children: ReactNode;
+	children: React.ReactNode;
 }
 
-export default async function StudioLayout({ children }: StudioLayoutProps) {
-	const session = await getServerSession();
+export default function StudioLayout({ children }: StudioLayoutProps) {
+	const { data: session, status } = useSession();
+	const router = useRouter();
+	const pathname = usePathname();
+	const isOnboardingPage = pathname.includes("/onboarding");
+
+	useEffect(() => {
+		if (status === "unauthenticated") {
+			router.push("/registro");
+		}
+	}, [status, router]);
+
+	if (status === "loading") {
+		return <LoadingPage />;
+	}
 
 	if (!session) {
-		redirect("/login");
+		return null;
 	}
 
 	return (
 		<ThemeProvider>
-			<section className="min-h-screen bg-white transition-colors dark:bg-neutral-900">
-				<Suspense fallback={null}>
-					<SubscriptionSuccessHandler />
-				</Suspense>
-				<Sidebar />
-				<main className="mb-20 ml-0 min-h-screen bg-white transition-colors md:mb-0 md:ml-64 dark:bg-neutral-900">
+			<div className="flex min-h-screen bg-gray-50">
+				{!isOnboardingPage && <Sidebar />}
+				<main className={`flex-1 ${isOnboardingPage ? "" : "ml-64"}`}>
 					{children}
 				</main>
-			</section>
+			</div>
 		</ThemeProvider>
 	);
 }

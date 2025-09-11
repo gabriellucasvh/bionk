@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import LoadingPage from "@/components/layout/LoadingPage";
 
 function VerifyEmailContent() {
 	const searchParams = useSearchParams();
@@ -91,7 +92,7 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
 	return (
-		<Suspense fallback={<div>Carregando...</div>}>
+		<Suspense fallback={<LoadingPage />}>
 			<VerifyEmailContent />
 		</Suspense>
 	);

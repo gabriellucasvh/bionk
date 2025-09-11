@@ -30,7 +30,7 @@ const otpSchema = z.object({
 
 const passwordSchema = z
 	.object({
-		name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+		name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").max(44, "Nome deve ter no máximo 44 caracteres"),
 		password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
 		confirmPassword: z.string(),
 	})
