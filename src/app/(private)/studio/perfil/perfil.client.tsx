@@ -323,7 +323,7 @@ const PerfilClient = () => {
 									Nome
 								</Label>
 								<Input
-									className="text-neutral-700 dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+									className="text-neutral-700 dark:bg-neutral-700 dark:text-white"
 									disabled={loading || isUploadingImage}
 									id="name"
 									maxLength={44}
@@ -346,7 +346,7 @@ const PerfilClient = () => {
 										className={
 											validationError
 												? "border-red-500 dark:border-red-400"
-												: "text-neutral-700 dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+												: "text-neutral-700 dark:bg-neutral-700 dark:text-white"
 										}
 										disabled={loading || isUploadingImage}
 										id="username"
@@ -373,7 +373,7 @@ const PerfilClient = () => {
 							Biografia
 						</Label>
 						<Textarea
-							className="min-h-32 text-neutral-700 dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+							className="min-h-32 text-neutral-700 dark:bg-neutral-700 dark:text-white"
 							disabled={loading || isUploadingImage}
 							id="bio"
 							onChange={(e) => {

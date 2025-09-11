@@ -16,7 +16,7 @@ export default async function Analises() {
 	const userId = session?.user?.id;
 
 	return (
-		<>
+		<main className="bg-white dark:bg-neutral-800">
 			{userId ? (
 				<AnalisesClient userId={userId} />
 			) : (
@@ -26,6 +26,6 @@ export default async function Analises() {
 					</p>
 				</section>
 			)}
-		</>
+		</main>
 	);
 }

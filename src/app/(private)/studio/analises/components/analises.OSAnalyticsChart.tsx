@@ -101,7 +101,7 @@ export default function OSAnalyticsChart({
 }: OSAnalyticsChartProps) {
 	if (isLoading) {
 		return (
-			<Card>
+			<Card className="dark:border-white/40 dark:bg-neutral-900">
 				<CardHeader>
 					<CardTitle>Distribuição por Sistema Operacional</CardTitle>
 				</CardHeader>
@@ -132,7 +132,7 @@ export default function OSAnalyticsChart({
 
 	if (chartData.length === 0) {
 		return (
-			<Card>
+			<Card className="dark:border-white/40 dark:bg-neutral-900">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
 						<SendToBack className="h-5 w-5" />
@@ -153,7 +153,7 @@ export default function OSAnalyticsChart({
 	}
 
 	return (
-		<Card>
+		<Card className="dark:border-white/40 dark:bg-neutral-900">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
 					<SendToBack className="h-5 w-5" />

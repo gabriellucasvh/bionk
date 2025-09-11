@@ -133,7 +133,7 @@ export default function TemplateSettings({
 									className={`max-w-[150px] cursor-pointer rounded-lg border-2 p-2 transition-all ${
 										selectedTemplate === template.id
 											? "border-green-600 bg-green-50"
-											: "border-gray-300 hover:border-green-400 hover:bg-gray-50"
+											: "border-gray-300 hover:border-green-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-green-400 dark:hover:bg-gray-600"
 									}`}
 									key={template.id}
 								>

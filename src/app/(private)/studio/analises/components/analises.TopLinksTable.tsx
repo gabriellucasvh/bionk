@@ -1,16 +1,22 @@
 "use client";
 
 import {
+	ChartBarDecreasing,
+	ChevronDown,
+	ChevronUp,
+	LinkIcon,
+	MousePointerClick,
+} from "lucide-react";
+import Link from "next/link";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { LinkIcon, MousePointerClick, ChevronDown, ChevronUp, ChartBarDecreasing } from "lucide-react";
-import Link from "next/link";
-import React, { useState } from "react";
 
 interface TopLinkData {
 	id: string;
@@ -26,19 +32,22 @@ interface TopLinksTableProps {
 const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 	({ topLinks }) => {
 		const [isExpanded, setIsExpanded] = useState(false);
-		const displayedLinks = isExpanded ? topLinks.slice(0, 10) : topLinks.slice(0, 3);
+		const displayedLinks = isExpanded
+			? topLinks.slice(0, 10)
+			: topLinks.slice(0, 3);
 		const hasMoreLinks = topLinks.length > 3;
 
 		return (
 			<article>
-				<Card>
+				<Card className="dark:border-white/40 dark:bg-neutral-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
 							<ChartBarDecreasing className="h-5 w-5" />
 							Links com Melhor Desempenho
 						</CardTitle>
 						<CardDescription>
-							{isExpanded ? 'Top 10' : 'Top 3'} links mais clicados nos últimos 30 dias.
+							{isExpanded ? "Top 10" : "Top 3"} links mais clicados nos últimos
+							30 dias.
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -50,16 +59,20 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 								>
 									<div className="flex flex-1 flex-col space-y-1">
 										<span className="font-medium">
-											<span 
+											<span
 												className={`font-bold ${
-													index === 0 ? 'text-green-500' : 
-													index === 1 ? 'text-green-600' : 
-													index === 2 ? 'text-green-700' : 'text-gray-600'
+													index === 0
+														? "text-green-500"
+														: index === 1
+															? "text-green-600"
+															: index === 2
+																? "text-green-700"
+																: "text-gray-600"
 												}`}
 											>
 												{index + 1}.
-											</span>
-											{' '}{link.title}
+											</span>{" "}
+											{link.title}
 										</span>
 										<Link
 											className="flex max-w-md items-center gap-1 whitespace-normal break-words break-all text-blue-500 text-sm"
@@ -83,14 +96,14 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 								</div>
 							))}
 						</div>
-						
+
 						{hasMoreLinks && (
-							<div className="flex justify-center pt-4 border-t">
+							<div className="flex justify-center border-t pt-4">
 								<Button
-									variant="ghost"
-									size="sm"
-									onClick={() => setIsExpanded(!isExpanded)}
 									className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+									onClick={() => setIsExpanded(!isExpanded)}
+									size="sm"
+									variant="ghost"
 								>
 									{isExpanded ? (
 										<>

@@ -14,9 +14,9 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 	({ totalProfileViews, totalClicks, performanceRate }) => {
 		return (
 			<article className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-				<Card className="dark:border-gray-700 dark:bg-neutral-800">
+				<Card className="dark:border-white/40 dark:bg-neutral-900">
 					<CardHeader className="pb-2">
-						<CardTitle className="font-medium text-muted-foreground text-sm dark:text-gray-400">
+						<CardTitle className="font-medium text-muted-foreground text-sm dark:text-white">
 							Total de Visualizações do Perfil
 						</CardTitle>
 					</CardHeader>
@@ -35,9 +35,9 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 					</CardContent>
 				</Card>
 
-				<Card className="dark:border-gray-700 dark:bg-neutral-800">
+				<Card className="dark:border-white/40 dark:bg-neutral-900">
 					<CardHeader className="pb-2">
-						<CardTitle className="font-medium text-muted-foreground text-sm dark:text-gray-400">
+						<CardTitle className="font-medium text-muted-foreground text-sm dark:text-white">
 							Total de Cliques nos Links
 						</CardTitle>
 					</CardHeader>
@@ -56,9 +56,9 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 					</CardContent>
 				</Card>
 
-				<Card className="dark:border-gray-700 dark:bg-neutral-800">
+				<Card className="dark:border-white/40 dark:bg-neutral-900">
 					<CardHeader className="pb-2">
-						<CardTitle className="font-medium text-muted-foreground text-sm dark:text-gray-400">
+						<CardTitle className="font-medium text-muted-foreground text-sm dark:text-white">
 							Taxa de Performance
 						</CardTitle>
 					</CardHeader>

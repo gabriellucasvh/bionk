@@ -8,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function Perfil() {
-	return <PerfilClient />;
+	return (
+	<main className="container bg-white dark:bg-neutral-800">
+	<PerfilClient />
+	</main>
+
+	);
 }

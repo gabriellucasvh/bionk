@@ -6,10 +6,10 @@ import {
 	Blocks,
 	Download,
 	ExternalLink,
+	GalleryHorizontalEnd,
 	Link2,
 	Paintbrush,
 	QrCode,
-	Settings,
 	Share2,
 	SwatchBook,
 	User,
@@ -236,7 +236,7 @@ const Sidebar = () => {
 	return (
 		<>
 			{/* Sidebar desktop */}
-			<aside className="hidden px-3 transition-colors md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-r md:bg-neutral-50/70 md:backdrop-blur-lg dark:md:border-neutral-700 dark:md:bg-neutral-800/70">
+			<aside className="hidden px-3 transition-colors md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-r md:bg-neutral-50/70 md:backdrop-blur-lg dark:md:border-neutral-700 dark:md:bg-neutral-900">
 				<header className="flex h-16 items-center justify-between border-b pr-2 pl-2 dark:border-neutral-700">
 					<Link className="flex items-center gap-2 font-semibold" href="/">
 						<Image
@@ -295,7 +295,7 @@ const Sidebar = () => {
 
 				{/* Perfil */}
 				<div
-					className="mt-auto mb-3 flex cursor-pointer items-center gap-3 rounded-xl border bg-neutral-50 p-3 shadow-sm transition-colors hover:bg-neutral-100 dark:border-neutral-600 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+					className="mt-auto mb-3 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors duration-200 hover:bg-neutral-200 dark:hover:bg-neutral-600 "
 					onClick={() => router.push("/studio/configs")}
 					role="none"
 				>
@@ -323,7 +323,7 @@ const Sidebar = () => {
 										className={`mt-1 inline-block w-fit rounded-md px-2 py-0.5 font-medium text-[10px] capitalize ${(() => {
 											switch (subscriptionPlan) {
 												case "free":
-													return "bg-green-100 text-green-600";
+													return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";
 												case "basic":
 													return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
 												case "pro":
@@ -331,7 +331,7 @@ const Sidebar = () => {
 												case "premium":
 													return "bg-gradient-to-r from-blue-600 to-blue-500 text-white";
 												default:
-													return "bg-green-100 text-green-600";
+													return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";
 											}
 										})()}`}
 									>
@@ -339,7 +339,7 @@ const Sidebar = () => {
 									</span>
 								)}
 							</div>
-							<Settings className="h-5 w-5 text-neutral-500 dark:text-neutral-300" />
+							<GalleryHorizontalEnd className="h-5 w-5 text-neutral-500 dark:text-neutral-300" />
 						</>
 					)}
 				</div>
