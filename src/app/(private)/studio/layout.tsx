@@ -35,9 +35,9 @@ export default function StudioLayout({ children }: StudioLayoutProps) {
 
 	return (
 		<ThemeProvider>
-			<div className="flex min-h-screen bg-gray-50">
+			<div className="flex min-h-screen w-full bg-gray-50">
 				{!isOnboardingPage && <Sidebar />}
-				<main className={`flex-1 ${isOnboardingPage ? "" : "ml-64"}`}>
+				<main className={`flex-1 ${isOnboardingPage ? "" : "md:ml-64"}`}>
 					{children}
 				</main>
 			</div>

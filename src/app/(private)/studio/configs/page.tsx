@@ -8,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function links() {
-	return <ConfigsClient />;
+	return (
+		<main className="h-full w-full bg-white dark:bg-neutral-800">
+			<ConfigsClient />
+		</main>
+	);
 }

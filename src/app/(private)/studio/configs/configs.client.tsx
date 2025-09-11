@@ -340,12 +340,12 @@ export default function ConfigsClient() {
 	}
 
 	return (
-		<div className="container mx-auto max-w-4xl space-y-6 p-4 pb-20 sm:p-6 sm:pb-8 lg:space-y-8 dark:text-white">
-			<header className="space-y-2">
-				<h1 className="font-bold text-2xl sm:text-3xl dark:text-white">
+		<div className="container mx-auto max-w-4xl space-y-4 p-3 pb-20 sm:space-y-6 sm:p-6 sm:pb-8 lg:space-y-8 dark:text-white">
+			<header className="space-y-1 sm:space-y-2">
+				<h1 className="font-bold text-xl sm:text-2xl lg:text-3xl dark:text-white">
 					Configurações
 				</h1>
-				<p className="text-muted-foreground text-sm sm:text-base dark:text-neutral-400">
+				<p className="text-muted-foreground text-xs sm:text-sm lg:text-base dark:text-neutral-400">
 					Gerencie sua conta e preferências
 				</p>
 			</header>
@@ -365,10 +365,10 @@ export default function ConfigsClient() {
 							Escolha entre modo claro, escuro ou automático
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="space-y-4">
-						<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+					<CardContent className="space-y-3 sm:space-y-4">
+						<div className="grid grid-cols-3 gap-2 sm:gap-3">
 							<Button
-								className={`flex h-12 items-center gap-2 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
+								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
 									theme === "light" ? "border-green-500" : ""
 								}
 								${isAutoMode ? "border-input" : ""}
@@ -376,11 +376,11 @@ export default function ConfigsClient() {
 								onClick={() => setTheme("light")}
 								variant={"outline"}
 							>
-								<Sun className="h-4 w-4" />
-								Modo Claro
+								<Sun className="h-3 w-3 sm:h-4 sm:w-4" />
+								<span className="xs:inline hidden sm:inline">Modo </span>Claro
 							</Button>
 							<Button
-								className={`flex h-12 items-center gap-2 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
+								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
 									theme === "dark" ? "dark:border-green-500" : ""
 								}
 								${isAutoMode ? "dark:border-neutral-600" : ""}
@@ -388,18 +388,19 @@ export default function ConfigsClient() {
 								onClick={() => setTheme("dark")}
 								variant={"outline"}
 							>
-								<Moon className="h-4 w-4" />
-								Modo Escuro
+								<Moon className="h-3 w-3 sm:h-4 sm:w-4" />
+								<span className="xs:inline hidden sm:inline">Modo </span>Escuro
 							</Button>
 							<Button
-								className={`flex h-12 items-center gap-2 dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
+								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
 									isAutoMode ? "border-green-500 dark:border-green-500" : ""
 								}`}
 								onClick={() => setAutoMode()}
 								variant={"outline"}
 							>
-								<Monitor className="h-4 w-4" />
-								Automático
+								<Monitor className="h-3 w-3 sm:h-4 sm:w-4" />
+								<span className="xs:inline hidden sm:inline">Automático</span>
+								<span className="xs:hidden sm:hidden lg:hidden">Auto</span>
 							</Button>
 						</div>
 						<p className="text-muted-foreground text-sm dark:text-neutral-400">
@@ -430,7 +431,7 @@ export default function ConfigsClient() {
 							</div>
 							<div className="flex justify-start">
 								<Button
-									className="w-full sm:w-auto"
+									className="w-auto"
 									onClick={handleLogout}
 									size="sm"
 									variant="outline"
@@ -472,32 +473,22 @@ export default function ConfigsClient() {
 						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<EyeOff className="h-5 w-5" />
 							Perfil Sensível
-						</CardTitle>
-						<CardDescription className="dark:text-neutral-400">
-							Marque seu perfil como sensível para exibir um aviso aos
-							visitantes
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<div className="flex items-center justify-between">
-							<div className="space-y-1">
-								<p className="font-medium text-sm dark:text-white">
-									Conteúdo Sensível
-								</p>
-								<p className="text-muted-foreground text-sm dark:text-neutral-400">
-									Quando ativado, visitantes verão um aviso antes de acessar seu
-									perfil
-								</p>
-							</div>
 							<Switch
 								checked={sensitiveProfile}
+								className="ml-auto"
 								disabled={isSensitiveLoading}
 								onCheckedChange={handleSensitiveProfileToggle}
 							/>
-						</div>
+						</CardTitle>
+						<CardDescription className="mt-2 dark:text-neutral-400">
+							Se ativado, seu perfil exibirá um aviso antes que outros usuários
+							vejam seu conteúdo.
+						</CardDescription>
+					</CardHeader>
+					<CardContent>
 						<p className="text-muted-foreground text-xs dark:text-neutral-500">
-							Esta configuração substitui as opções individuais de conteúdo
-							sensível dos links.
+							Use esta opção apenas se você acredita que seu perfil pode não ser
+							apropriado para todos os públicos.
 						</p>
 					</CardContent>
 				</Card>
@@ -562,28 +553,28 @@ export default function ConfigsClient() {
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
 								<Button
-									className="w-full sm:w-auto dark:bg-red-500"
+									className="w-auto dark:bg-red-500"
 									variant="destructive"
 								>
 									Excluir Conta
 								</Button>
 							</AlertDialogTrigger>
-							<AlertDialogContent className="mx-4 max-w-md dark:border-neutral-700 dark:bg-neutral-800">
-								<AlertDialogHeader>
-									<AlertDialogTitle className="text-lg dark:text-white">
+							<AlertDialogContent className="mx-3 max-w-sm sm:mx-4 sm:max-w-md dark:border-neutral-700 dark:bg-neutral-800">
+								<AlertDialogHeader className="space-y-2">
+									<AlertDialogTitle className="text-base sm:text-lg dark:text-white">
 										Tem certeza?
 									</AlertDialogTitle>
-									<AlertDialogDescription className="text-sm dark:text-neutral-400">
+									<AlertDialogDescription className="text-xs sm:text-sm dark:text-neutral-400">
 										Esta ação não pode ser desfeita. Sua conta e dados serão
 										removidos permanentemente.
 									</AlertDialogDescription>
 								</AlertDialogHeader>
-								<AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-									<AlertDialogCancel className="w-full sm:w-auto">
+								<AlertDialogFooter className="flex-col gap-2 sm:flex-row sm:gap-3">
+									<AlertDialogCancel className="w-full text-xs sm:w-auto sm:text-sm">
 										Cancelar
 									</AlertDialogCancel>
 									<AlertDialogAction
-										className="w-full bg-destructive text-red-100 sm:w-auto dark:hover:bg-red-500"
+										className="w-full bg-destructive text-red-100 text-xs sm:w-auto sm:text-sm dark:hover:bg-red-500"
 										onClick={handleDeleteAccount}
 									>
 										Sim, excluir minha conta
@@ -608,7 +599,10 @@ export default function ConfigsClient() {
 					</CardHeader>
 					<CardContent>
 						<Link href="/ajuda" passHref>
-							<Button className="w-full text-sm sm:text-base" variant="outline">
+							<Button
+								className="w-full text-xs sm:text-sm lg:text-base"
+								variant="outline"
+							>
 								Acessar Central de Ajuda
 							</Button>
 						</Link>
