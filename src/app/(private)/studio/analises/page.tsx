@@ -20,7 +20,7 @@ export default async function Analises() {
 			{userId ? (
 				<AnalisesClient userId={userId} />
 			) : (
-				<section className="p-4">
+				<section className="p-4 pb-24">
 					<p className="text-center font-medium text-lg">
 						Você precisa estar autenticado para acessar esta página.
 					</p>

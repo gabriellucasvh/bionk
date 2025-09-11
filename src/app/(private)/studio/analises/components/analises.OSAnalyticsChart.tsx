@@ -165,7 +165,7 @@ export default function OSAnalyticsChart({
 				</p>
 			</CardHeader>
 			<CardContent>
-				<div className="h-64 sm:h-80">
+				<div className="h-64 w-full overflow-hidden sm:h-80">
 					<ResponsiveContainer height="100%" width="100%">
 						<BarChart
 							data={chartData}

@@ -138,13 +138,75 @@ interface AnalisesClientProps {
 	userId: string;
 }
 
-const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
+// Componente para renderizar seções com loading
+const LoadingSection: React.FC<{ className: string }> = ({ className }) => (
+	<div className={`animate-pulse rounded-md bg-muted dark:bg-neutral-700 ${className}`} />
+);
+
+// Componente para renderizar o conteúdo das análises
+interface AnalyticsContentProps {
+	isLoading: boolean;
+	data: AnalyticsData | undefined;
+	memoizedChartData: any[];
+	memoizedTopLinks: any[];
+}
+
+const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
+	isLoading,
+	data,
+	memoizedChartData,
+	memoizedTopLinks
+}) => {
+	if (isLoading || !data) {
+		return (
+			<main className="space-y-4 sm:space-y-6">
+				<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+					<LoadingSection className="h-full w-full" />
+					<LoadingSection className="h-full w-full" />
+					<LoadingSection className="h-full w-full" />
+				</div>
+				<LoadingSection className="h-[400px] w-full" />
+				<LoadingSection className="h-[200px] w-full" />
+				<LoadingSection className="h-[400px] w-full" />
+				<LoadingSection className="h-[400px] w-full" />
+				<LoadingSection className="h-[300px] w-full sm:h-[400px] lg:h-[500px]" />
+				<LoadingSection className="h-[400px] w-full" />
+			</main>
+		);
+	}
+
+	return (
+		<main className="space-y-4 sm:space-y-6">
+			<AnalyticsStatsCards
+				performanceRate={data.performanceRate}
+				totalClicks={data.totalClicks}
+				totalProfileViews={data.totalProfileViews}
+			/>
+			<PerformanceChart chartData={memoizedChartData} />
+			<TopLinksTable topLinks={memoizedTopLinks} />
+			<DeviceAnalytics data={data.deviceAnalytics || []} isLoading={false} />
+			<OSAnalyticsChart data={data.osAnalytics || []} isLoading={false} />
+			<div className="w-full overflow-hidden">
+				<WorldMapAnalytics
+					data={data.countryAnalytics || []}
+					height={300}
+					isLoading={false}
+					width={undefined}
+				/>
+			</div>
+			<ReferrerAnalytics data={data.referrerAnalytics || []} isLoading={false} />
+		</main>
+	);
+};
+
+// Hook customizado para lógica de dados
+const useAnalyticsData = (userId: string | null) => {
 	const { data, error, isLoading } = useSWR<AnalyticsData>(
 		userId ? `/api/analytics?userId=${userId}` : null,
 		fetcher,
 		{
-			revalidateOnFocus: false, // Otimização: Desabilitar refetch em foco
-			revalidateOnReconnect: false, // Otimização: Desabilitar refetch em reconexão
+			revalidateOnFocus: false,
+			revalidateOnReconnect: false,
 		}
 	);
 
@@ -156,6 +218,12 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 		() => data?.topLinks || [],
 		[data?.topLinks]
 	);
+
+	return { data, error, isLoading, memoizedChartData, memoizedTopLinks };
+};
+
+const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
+	const { data, error, isLoading, memoizedChartData, memoizedTopLinks } = useAnalyticsData(userId);
 
 	const exportToExcel = useCallback(async () => {
 		if (!data) {
@@ -211,82 +279,19 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 	}
 
 	return (
-		<section className="w-full p-4 dark:text-white">
-			<AnalyticsHeader
-				onExportToExcel={exportToExcel}
-				onExportToPDF={exportToPDF}
-			/>
-			<main className="space-y-6">
-				{isLoading || !data ? (
-					<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-						<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-						<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-						<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-					</div>
-				) : (
-					<AnalyticsStatsCards
-						performanceRate={data.performanceRate}
-						totalClicks={data.totalClicks}
-						totalProfileViews={data.totalProfileViews}
-					/>
-				)}
-
-				{isLoading || !data ? (
-					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-				) : (
-					<PerformanceChart chartData={memoizedChartData} />
-				)}
-
-				{isLoading || !data ? (
-					<div className="h-[200px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-				) : (
-					<TopLinksTable topLinks={memoizedTopLinks} />
-				)}
-
-				{/* Seção de Analytics por Dispositivo */}
-				{isLoading || !data ? (
-					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-				) : (
-					<DeviceAnalytics
-						data={data.deviceAnalytics || []}
-						isLoading={isLoading}
-					/>
-				)}
-
-				{/* Seção de Analytics por Sistema Operacional */}
-				{isLoading || !data ? (
-					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-				) : (
-					<OSAnalyticsChart
-						data={data.osAnalytics || []}
-						isLoading={isLoading}
-					/>
-				)}
-
-				{/* Seção de Analytics por País/Região */}
-				{isLoading || !data ? (
-					<div className="h-[500px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-				) : (
-					<WorldMapAnalytics
-						data={data.countryAnalytics || []}
-						height={500}
-						isLoading={isLoading}
-						width={800}
-					/>
-				)}
-
-				{/* Seção de Analytics por Origem do Tráfego */}
-				{isLoading ? (
-					<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-				) : (
-					<ReferrerAnalytics
-						data={data?.referrerAnalytics || []}
-						isLoading={false}
-					/>
-				)}
-			</main>
-		</section>
-	);
+			<section className="w-full max-w-full overflow-x-hidden p-3 pb-24 sm:p-4 sm:pb-8 lg:p-6 lg:pb-8 dark:text-white">
+				<AnalyticsHeader
+					onExportToExcel={exportToExcel}
+					onExportToPDF={exportToPDF}
+				/>
+				<AnalyticsContent 
+					isLoading={isLoading}
+					data={data}
+					memoizedChartData={memoizedChartData}
+					memoizedTopLinks={memoizedTopLinks}
+				/>
+			</section>
+		);
 };
 
 const MemoizedAnalisesClient = React.memo(AnalisesClient);

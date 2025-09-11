@@ -73,19 +73,6 @@ const getDeviceLabel = (device: string) => {
 	}
 };
 
-const getDeviceBadgeVariant = (device: string) => {
-	switch (device.toLowerCase()) {
-		case "mobile":
-			return "default";
-		case "desktop":
-			return "secondary";
-		case "tablet":
-			return "outline";
-		default:
-			return "destructive";
-	}
-};
-
 const CustomTooltip = ({ active, payload }: any) => {
 	if (active && payload && payload.length) {
 		const data = payload[0].payload;
@@ -217,7 +204,7 @@ export default function DeviceAnalytics({
 			</CardHeader>
 			<CardContent className="space-y-6">
 				{/* Gráfico */}
-				<div className="h-64 sm:h-80">
+				<div className="h-64 w-full overflow-hidden sm:h-80">
 					<ResponsiveContainer height="100%" width="100%">
 						<PieChart>
 							<Pie

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function LinksPage() {
 	return (
-		<div className="bg-white p-4 sm:p-6 md:p-8 dark:bg-neutral-800">
+			<div className="bg-white p-4 pb-24 sm:p-6 sm:pb-8 md:p-8 md:pb-8 dark:bg-neutral-800">
 			<UnifiedLinksManager />
 		</div>
 	);

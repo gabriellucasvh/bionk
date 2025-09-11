@@ -222,6 +222,26 @@ const getReferrerBadgeVariant = (referrer: string) => {
 	}
 };
 
+const getReferrerCategory = (referrer: string): string => {
+	if (referrer === "direct") {
+		return "Direto";
+	}
+	if (referrer === "unknown") {
+		return "Outros";
+	}
+	if (referrer.includes("Google") || referrer.includes("Bing")) {
+		return "Busca";
+	}
+	if (
+		referrer.includes("Instagram") ||
+		referrer.includes("TikTok") ||
+		referrer.includes("Facebook")
+	) {
+		return "Social";
+	}
+	return "Outros";
+};
+
 const CustomTooltip = ({ active, payload }: any) => {
 	if (active && payload && payload.length) {
 		const data = payload[0].payload;
@@ -360,7 +380,7 @@ export default function ReferrerAnalytics({
 			</CardHeader>
 			<CardContent className="space-y-6">
 				{/* Gráfico */}
-				<div className="h-80">
+				<div className="h-80 w-full overflow-hidden">
 					<ResponsiveContainer height="100%" width="100%">
 						{useBarChart ? (
 							<BarChart
@@ -442,18 +462,7 @@ export default function ReferrerAnalytics({
 														className="mt-1 text-xs"
 														variant={getReferrerBadgeVariant(item.referrer)}
 													>
-														{item.referrer === "direct"
-															? "Direto"
-															: item.referrer === "unknown"
-																? "Outros"
-																: item.referrer.includes("Google") ||
-																		item.referrer.includes("Bing")
-																	? "Busca"
-																	: item.referrer.includes("Instagram") ||
-																			item.referrer.includes("TikTok") ||
-																			item.referrer.includes("Facebook")
-																		? "Social"
-																		: "Outros"}
+														{getReferrerCategory(item.referrer)}
 													</Badge>
 												</div>
 											</div>

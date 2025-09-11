@@ -13,18 +13,18 @@ interface AnalyticsStatsCardsProps {
 const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 	({ totalProfileViews, totalClicks, performanceRate }) => {
 		return (
-			<article className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+			<article className="grid gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3">
 				<Card className="dark:border-white/40 dark:bg-neutral-900">
-					<CardHeader className="pb-2">
-						<CardTitle className="font-medium text-muted-foreground text-sm dark:text-white">
+					<CardHeader className="pb-1 sm:pb-2">
+						<CardTitle className="font-medium text-muted-foreground text-xs sm:text-sm dark:text-white">
 							Total de Visualizações do Perfil
 						</CardTitle>
 					</CardHeader>
-					<CardContent>
+					<CardContent className="pt-1 sm:pt-2">
 						<div className="flex items-baseline justify-between">
-							<span className="flex items-center gap-2 font-bold text-2xl dark:text-white">
-								<div className="rounded-full bg-green-50 p-2 text-green-500 dark:bg-green-900 dark:text-green-400">
-									<Eye />
+							<span className="flex items-center gap-1 font-bold text-lg sm:gap-2 sm:text-2xl dark:text-white">
+								<div className="rounded-full bg-green-50 p-1 text-green-500 sm:p-2 dark:bg-green-900 dark:text-green-400">
+									<Eye className="h-4 w-4 sm:h-5 sm:w-5" />
 								</div>
 								{totalProfileViews.toLocaleString()}
 							</span>
@@ -36,16 +36,16 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 				</Card>
 
 				<Card className="dark:border-white/40 dark:bg-neutral-900">
-					<CardHeader className="pb-2">
-						<CardTitle className="font-medium text-muted-foreground text-sm dark:text-white">
+					<CardHeader className="pb-1 sm:pb-2">
+						<CardTitle className="font-medium text-muted-foreground text-xs sm:text-sm dark:text-white">
 							Total de Cliques nos Links
 						</CardTitle>
 					</CardHeader>
-					<CardContent>
+					<CardContent className="pt-1 sm:pt-2">
 						<div className="flex items-baseline justify-between">
-							<span className="flex items-center gap-2 font-bold text-2xl dark:text-white">
-								<div className="rounded-full bg-green-50 p-2 text-green-500 dark:bg-green-900 dark:text-green-400">
-									<MousePointerClick />
+							<span className="flex items-center gap-1 font-bold text-lg sm:gap-2 sm:text-2xl dark:text-white">
+								<div className="rounded-full bg-green-50 p-1 text-green-500 sm:p-2 dark:bg-green-900 dark:text-green-400">
+									<MousePointerClick className="h-4 w-4 sm:h-5 sm:w-5" />
 								</div>
 								{totalClicks.toLocaleString()}
 							</span>
@@ -57,16 +57,16 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 				</Card>
 
 				<Card className="dark:border-white/40 dark:bg-neutral-900">
-					<CardHeader className="pb-2">
-						<CardTitle className="font-medium text-muted-foreground text-sm dark:text-white">
+					<CardHeader className="pb-1 sm:pb-2">
+						<CardTitle className="font-medium text-muted-foreground text-xs sm:text-sm dark:text-white">
 							Taxa de Performance
 						</CardTitle>
 					</CardHeader>
-					<CardContent>
+					<CardContent className="pt-1 sm:pt-2">
 						<div className="flex items-baseline justify-between">
-							<span className="flex items-center gap-2 font-bold text-2xl dark:text-white">
-								<div className="rounded-full bg-green-50 p-2 text-green-500 dark:bg-green-900 dark:text-green-400">
-									<Percent />
+							<span className="flex items-center gap-1 font-bold text-lg sm:gap-2 sm:text-2xl dark:text-white">
+								<div className="rounded-full bg-green-50 p-1 text-green-500 sm:p-2 dark:bg-green-900 dark:text-green-400">
+									<Percent className="h-4 w-4 sm:h-5 sm:w-5" />
 								</div>
 								{Number.parseFloat(performanceRate).toLocaleString("pt-BR", {
 									minimumFractionDigits: 0,

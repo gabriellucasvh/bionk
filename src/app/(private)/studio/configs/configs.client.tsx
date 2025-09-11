@@ -340,7 +340,7 @@ export default function ConfigsClient() {
 	}
 
 	return (
-		<div className="container mx-auto max-w-4xl space-y-4 p-3 pb-20 sm:space-y-6 sm:p-6 sm:pb-8 lg:space-y-8 dark:text-white">
+			<div className="container mx-auto max-w-4xl space-y-4 p-3 pb-24 sm:space-y-6 sm:p-6 sm:pb-8 lg:space-y-8 dark:text-white">
 			<header className="space-y-1 sm:space-y-2">
 				<h1 className="font-bold text-xl sm:text-2xl lg:text-3xl dark:text-white">
 					Configurações

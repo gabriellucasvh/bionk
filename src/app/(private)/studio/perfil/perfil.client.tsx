@@ -270,7 +270,7 @@ const PerfilClient = () => {
 	}
 
 	return (
-		<section className="mx-auto min-h-dvh w-full space-y-4 p-4 lg:w-1/2">
+		<section className="mx-auto min-h-dvh w-full space-y-4 p-4 pb-24 lg:w-1/2">
 			<header className="flex items-center justify-between">
 				<h2 className="font-bold text-2xl dark:text-white">Perfil</h2>
 				<VerPerfilMobile />

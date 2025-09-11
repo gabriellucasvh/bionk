@@ -22,31 +22,31 @@ interface AnalyticsHeaderProps {
 const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 	({ onExportToExcel, onExportToPDF }) => {
 		return (
-			<header className="mb-4 flex flex-col items-center justify-between gap-4 md:flex-row">
-				<h2 className="font-bold text-2xl">Análises</h2>
-				<div className="flex gap-2">
-					<Button variant="outline">Últimos 30 dias</Button>
+			<header className="mb-3 flex flex-col items-start justify-between gap-3 sm:mb-4 sm:flex-row sm:items-center sm:gap-4">
+				<h2 className="font-bold text-xl sm:text-2xl">Análises</h2>
+				<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+					<Button className="text-xs sm:text-sm" size="sm" variant="outline">Últimos 30 dias</Button>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button variant="outline">
-								<LayoutStudio className="mr-2 h-4 w-4" />
+							<Button className="text-xs sm:text-sm" size="sm" variant="outline">
+								<LayoutStudio className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
 								Exportar
 							</Button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="w-40">
+						<DropdownMenuContent align="end" className="w-36 sm:w-40">
 							<DropdownMenuItem
-								className="cursor-pointer"
+								className="cursor-pointer text-xs sm:text-sm"
 								onClick={onExportToExcel}
 							>
-								<FileSpreadsheet className="mr-2 h-4 w-4" />
-								Exportar para Excel
+								<FileSpreadsheet className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
+								<span className="hidden sm:inline">Exportar para </span>Excel
 							</DropdownMenuItem>
 							<DropdownMenuItem
-								className="cursor-pointer"
+								className="cursor-pointer text-xs sm:text-sm"
 								onClick={onExportToPDF}
 							>
-								<FileText className="mr-2 h-4 w-4" />
-								Exportar para PDF
+								<FileText className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
+								<span className="hidden sm:inline">Exportar para </span>PDF
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

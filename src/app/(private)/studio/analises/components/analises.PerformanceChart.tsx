@@ -50,7 +50,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<div className="h-[300px] sm:h-[350px] md:h-[400px]">
+						<div className="h-[300px] w-full overflow-hidden sm:h-[350px] md:h-[400px]">
 							<ChartContainer
 								className="h-full w-full"
 								config={{
