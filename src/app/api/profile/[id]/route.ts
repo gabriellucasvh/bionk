@@ -28,6 +28,7 @@ export async function GET(
 				bio: true,
 				image: true,
 				email: true,
+				sensitiveProfile: true,
 			},
 		});
 
@@ -39,6 +40,58 @@ export async function GET(
 		}
 
 		return NextResponse.json(user);
+	} catch {
+		return NextResponse.json(
+			{ error: "Erro interno do servidor" },
+			{ status: 500 }
+		);
+	}
+}
+
+export async function PATCH(
+	request: NextRequest,
+	{ params }: { params: Promise<{ id: string }> }
+) {
+	const session = await getServerSession(authOptions);
+	const { id } = await params;
+	
+	if (session?.user?.id !== id) {
+		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+	}
+
+	try {
+		const body = await request.json();
+		const { sensitiveProfile } = body;
+
+		// Valida se sensitiveProfile é um boolean
+		if (typeof sensitiveProfile !== 'boolean') {
+			return NextResponse.json(
+				{ error: "sensitiveProfile deve ser um valor booleano" },
+				{ status: 400 }
+			);
+		}
+
+		const updatedUser = await prisma.user.update({
+			where: { id },
+			data: {
+				sensitiveProfile,
+			},
+			select: {
+				id: true,
+				username: true,
+				sensitiveProfile: true,
+			},
+		});
+
+		// Revalida a página do perfil do usuário
+		if (updatedUser.username) {
+			revalidatePath(`/${updatedUser.username}`);
+		}
+
+		return NextResponse.json({
+			message: "Perfil atualizado com sucesso",
+			sensitiveProfile: updatedUser.sensitiveProfile,
+		});
 	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },

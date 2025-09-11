@@ -4,8 +4,6 @@ import {
 	Archive as ArchiveBox,
 	Clock,
 	Edit,
-	Eye,
-	EyeOff,
 	Grip,
 	Image,
 	Lock,
@@ -47,7 +45,6 @@ interface LinkCardProps {
 	onCancelEditing: (id: number) => void;
 	onStartEditing: (id: number) => void;
 	onToggleActive: (id: number, active: boolean) => void;
-	onToggleSensitive: (id: number) => void;
 	onArchiveLink: (id: number) => void;
 	onDeleteLink: (id: number) => void;
 	onClickLink: (id: number) => void;
@@ -90,7 +87,6 @@ const EditingView = ({
 	| "listeners"
 	| "setActivatorNodeRef"
 	| "onToggleActive"
-	| "onToggleSensitive"
 	| "onArchiveLink"
 	| "onDeleteLink"
 	| "onClickLink"
@@ -161,7 +157,6 @@ const DisplayView = (props: LinkCardProps) => {
 		setActivatorNodeRef,
 		onStartEditing,
 		onToggleActive,
-		onToggleSensitive,
 		onArchiveLink,
 		onDeleteLink,
 		onClickLink,
@@ -182,8 +177,7 @@ const DisplayView = (props: LinkCardProps) => {
 	return (
 		<article
 			className={cn(
-				"flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-800",
-				link.sensitive && "border-rose-400"
+				"flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-800"
 			)}
 		>
 			<div className="flex items-start gap-2 sm:gap-4">
@@ -278,14 +272,6 @@ const DisplayView = (props: LinkCardProps) => {
 						<DropdownMenuContent align="end">
 							<DropdownMenuItem onClick={() => onStartEditing(link.id)}>
 								<Edit className="mr-2 h-4 w-4" /> Editar
-							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => onToggleSensitive(link.id)}>
-								{link.sensitive ? (
-									<Eye className="mr-2 h-4 w-4" />
-								) : (
-									<EyeOff className="mr-2 h-4 w-4" />
-								)}
-								{link.sensitive ? "Marcar como normal" : "Conteúdo Sensível"}
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem onClick={() => onArchiveLink(link.id)}>

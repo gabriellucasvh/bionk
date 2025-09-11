@@ -3,6 +3,7 @@
 import {
 	Archive,
 	CreditCard,
+	EyeOff,
 	HelpCircle,
 	Lock,
 	LogOut,
@@ -39,6 +40,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { useSubscription } from "@/providers/subscriptionProvider";
 import { useTheme } from "@/providers/themeProvider";
 import ArchivedLinksModal from "./components/configs.ArchiveLinksModal";
@@ -270,6 +272,8 @@ export default function ConfigsClient() {
 	const [subscription, setSubscription] = useState<SubscriptionDetails | null>(
 		null
 	);
+	const [sensitiveProfile, setSensitiveProfile] = useState(false);
+	const [isSensitiveLoading, setIsSensitiveLoading] = useState(false);
 
 	useEffect(() => {
 		const fetchInitialData = async () => {
@@ -283,6 +287,7 @@ export default function ConfigsClient() {
 				]);
 				const profileData = await profileRes.json();
 				setProfile({ email: profileData.email || session.user.email || "" });
+				setSensitiveProfile(profileData.sensitiveProfile);
 				const subData = await subRes.json();
 				if (subRes.ok) {
 					setSubscription(subData);
@@ -303,6 +308,31 @@ export default function ConfigsClient() {
 		}
 		await fetch(`/api/profile/${session.user.id}`, { method: "DELETE" });
 		signOut();
+	};
+
+	const handleSensitiveProfileToggle = async (checked: boolean) => {
+		if (!session?.user?.id) {
+			return;
+		}
+
+		setIsSensitiveLoading(true);
+		try {
+			const response = await fetch(`/api/profile/${session.user.id}`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ sensitiveProfile: checked }),
+			});
+
+			if (response.ok) {
+				setSensitiveProfile(checked);
+			}
+		} catch (error) {
+			console.error("Erro ao atualizar perfil sensível:", error);
+		} finally {
+			setIsSensitiveLoading(false);
+		}
 	};
 
 	if (isProfileLoading) {
@@ -435,6 +465,44 @@ export default function ConfigsClient() {
 					</CardContent>
 				</Card>
 			</article>
+
+			<article>
+				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2 dark:text-white">
+							<EyeOff className="h-5 w-5" />
+							Perfil Sensível
+						</CardTitle>
+						<CardDescription className="dark:text-neutral-400">
+							Marque seu perfil como sensível para exibir um aviso aos
+							visitantes
+						</CardDescription>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<div className="flex items-center justify-between">
+							<div className="space-y-1">
+								<p className="font-medium text-sm dark:text-white">
+									Conteúdo Sensível
+								</p>
+								<p className="text-muted-foreground text-sm dark:text-neutral-400">
+									Quando ativado, visitantes verão um aviso antes de acessar seu
+									perfil
+								</p>
+							</div>
+							<Switch
+								checked={sensitiveProfile}
+								disabled={isSensitiveLoading}
+								onCheckedChange={handleSensitiveProfileToggle}
+							/>
+						</div>
+						<p className="text-muted-foreground text-xs dark:text-neutral-500">
+							Esta configuração substitui as opções individuais de conteúdo
+							sensível dos links.
+						</p>
+					</CardContent>
+				</Card>
+			</article>
+
 			{isCredentialsUser && (
 				<article>
 					<Card className="dark:border-neutral-700 dark:bg-neutral-800">

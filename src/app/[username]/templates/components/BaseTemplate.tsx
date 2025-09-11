@@ -228,7 +228,6 @@ function LinksList({
 						customPresets={customPresets}
 						href={link.url}
 						link={link}
-						sensitive={link.sensitive}
 						style={buttonStyle}
 					>
 						{linkContent}

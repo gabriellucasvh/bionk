@@ -1,6 +1,12 @@
 // links/components/links.SectionCard.tsx
 "use client";
 
+import {
+	SortableContext,
+	verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { Grip, MoreHorizontal, Plus, Trash2, Ungroup } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -10,12 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-	SortableContext,
-	verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { Grip, MoreHorizontal, Plus, Trash2, Ungroup } from "lucide-react";
-import { useState } from "react";
 import type { SectionItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
 import AddNewLinkForm from "./links.AddNewLinkForm";
@@ -31,7 +31,7 @@ interface SectionCardProps {
 	onDeleteLink: (id: number) => void;
 	onSaveEditing: (id: number, title: string, url: string) => void;
 	onToggleActive: (id: number, isActive: boolean) => void;
-	onToggleSensitive: (id: number) => void;
+
 	onLinkChange: (id: number, field: "title" | "url", value: string) => void;
 	onCancelEditing: (id: number) => void;
 	onStartEditing: (id: number) => void;

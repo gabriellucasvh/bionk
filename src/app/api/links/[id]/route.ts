@@ -5,6 +5,9 @@ import { authOptions } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 
+// Regex para remover extensão de arquivo
+const FILE_EXTENSION_REGEX = /\.[^/.]+$/;
+
 export async function PUT(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
@@ -25,8 +28,7 @@ export async function PUT(
 	try {
 		const body = await request.json();
 		// Permite que qualquer campo do link seja atualizado
-		const { title, url, active, sensitive, archived, launchesAt, expiresAt } =
-			body;
+		const { title, url, active, archived, launchesAt, expiresAt } = body;
 
 		const updatedLink = await prisma.link.update({
 			where: { id: Number.parseInt(id, 10) },
@@ -34,7 +36,6 @@ export async function PUT(
 				title,
 				url,
 				active,
-				sensitive,
 				archived,
 				launchesAt: launchesAt ? new Date(launchesAt) : null,
 				expiresAt: expiresAt ? new Date(expiresAt) : null,
@@ -103,7 +104,7 @@ export async function DELETE(
 					.split("/")
 					.slice(-2)
 					.join("/")
-					.replace(/\.[^/.]+$/, ""); // Remove extensão
+					.replace(FILE_EXTENSION_REGEX, "");
 
 				await cloudinary.uploader.destroy(publicId);
 			} catch (cloudinaryError) {

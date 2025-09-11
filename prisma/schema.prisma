@@ -43,6 +43,7 @@ model User {
   googleId                      String?
   status                        String         @default("pending")
   onboardingCompleted           Boolean        @default(false)
+  sensitiveProfile              Boolean        @default(false)
   subscriptionPlan              String?
   subscriptionStatus            String?
   billingCycle                  String?
@@ -106,7 +107,6 @@ model Link {
   title           String
   url             String
   active          Boolean     @default(true)
-  sensitive       Boolean     @default(false)
   clicks          Int         @default(0)
   order           Int         @default(0)
   userId          String

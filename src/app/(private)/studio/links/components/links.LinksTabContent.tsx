@@ -1,10 +1,10 @@
 // src/app/(private)/studio/links/components/links.LinksTabContent.tsx
 "use client";
 
-import { BaseButton } from "@/components/buttons/BaseButton";
 import type { DragStartEvent } from "@dnd-kit/core";
 import { Plus } from "lucide-react";
 import type { Session } from "next-auth";
+import { BaseButton } from "@/components/buttons/BaseButton";
 import { useLinksManager } from "../hooks/useLinksManager";
 import type { LinkItem, SectionItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
@@ -116,16 +116,15 @@ const LinksTabContent = ({
 				onDragEnd={handleDragEnd}
 				onDragStart={handleDragStart}
 				onLinkChange={handlers.handleLinkChange}
+				onRemoveCustomImage={handlers.handleRemoveCustomImage}
 				onSaveEditing={handlers.saveEditing}
 				onSectionDelete={handlers.handleSectionDelete}
 				onSectionUngroup={handlers.handleSectionUngroup}
 				onSectionUpdate={handlers.handleSectionUpdate}
 				onStartEditing={handlers.handleStartEditing}
-			onToggleActive={handlers.toggleActive}
-			onToggleSensitive={handlers.toggleSensitive}
-			onUpdateCustomImage={handlers.handleUpdateCustomImage}
-			onRemoveCustomImage={handlers.handleRemoveCustomImage}
-		/>
+				onToggleActive={handlers.toggleActive}
+				onUpdateCustomImage={handlers.handleUpdateCustomImage}
+			/>
 		</div>
 	);
 };

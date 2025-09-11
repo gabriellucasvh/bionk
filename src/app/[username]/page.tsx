@@ -1,10 +1,11 @@
 // src/app/[username]/page.tsx
 
-import prisma from "@/lib/prisma";
-import type { UserProfile as UserProfileData } from "@/types/user-profile";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ComponentType } from "react";
+import prisma from "@/lib/prisma";
+import type { UserProfile as UserProfileData } from "@/types/user-profile";
+import { UserProfileWrapper } from "./UserProfileWrapper";
 
 interface PageProps {
 	params: Promise<{ username: string }>;
@@ -36,6 +37,7 @@ export default async function UserPage({ params }: PageProps) {
 			image: true,
 			template: true,
 			templateCategory: true,
+			sensitiveProfile: true,
 			Section: {
 				where: { active: true },
 				orderBy: { order: "asc" },
@@ -58,7 +60,6 @@ export default async function UserPage({ params }: PageProps) {
 							order: true,
 							clicks: true,
 							customImageUrl: true,
-							sensitive: true,
 						},
 					},
 				},
@@ -79,7 +80,6 @@ export default async function UserPage({ params }: PageProps) {
 					order: true,
 					clicks: true,
 					customImageUrl: true,
-					sensitive: true,
 				},
 			},
 			SocialLink: {
@@ -119,19 +119,21 @@ export default async function UserPage({ params }: PageProps) {
 
 	try {
 		// Tenta carregar o template específico
-		TemplateComponent = (await import(
-			`@/app/[username]/templates/${category}/${name}.tsx`
-		)).default;
+		TemplateComponent = (
+			await import(`@/app/[username]/templates/${category}/${name}.tsx`)
+		).default;
 	} catch {
 		// Fallback para template padrão
-		TemplateComponent = (await import(
-			"@/app/[username]/templates/minimalista/default"
-		)).default;
+		TemplateComponent = (
+			await import("@/app/[username]/templates/minimalista/default")
+		).default;
 	}
 
 	return (
 		<main>
-			<TemplateComponent user={user} />
+			<UserProfileWrapper user={user}>
+				<TemplateComponent user={user} />
+			</UserProfileWrapper>
 		</main>
 	);
 }

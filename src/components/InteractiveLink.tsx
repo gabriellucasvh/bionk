@@ -1,10 +1,10 @@
 "use client";
 
-import { Eye, MoreVertical } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { FC, MouseEvent, ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import LinkOptionsModal from "@/components/modals/LinkOptionsModal";
 import type { UserLink } from "@/types/user-profile";
@@ -14,7 +14,6 @@ interface InteractiveLinkProps {
 	href: string;
 	link: UserLink;
 	children: ReactNode;
-	sensitive?: boolean;
 	className?: string;
 	style?: React.CSSProperties;
 	borderRadius?: number;
@@ -103,58 +102,17 @@ const ImageComponent: FC<ImageComponentProps> = ({
 	);
 };
 
-// Componente auxiliar para overlay de conteúdo sensível
-interface SensitiveOverlayProps {
-	isTouch: boolean;
-	unblurred: boolean;
-}
 
-const SensitiveOverlay: FC<SensitiveOverlayProps> = ({
-	isTouch,
-	unblurred,
-}) => {
-	const getOverlayClasses = () => {
-		const baseClasses =
-			"absolute inset-0 rounded-lg bg-black/20 backdrop-blur-md transition-all duration-300";
-		const hoverClasses = isTouch
-			? ""
-			: "group-hover:bg-transparent group-hover:backdrop-blur-none";
-		const touchClasses =
-			isTouch && unblurred ? "bg-transparent backdrop-blur-none" : "";
-		return twMerge(baseClasses, hoverClasses, touchClasses);
-	};
-
-	const getTextClasses = () => {
-		const baseClasses =
-			"z-30 flex items-center gap-2 rounded-md bg-black/60 px-3 py-1 font-semibold text-sm text-white transition-opacity duration-300";
-		const hoverClasses = isTouch ? "" : "group-hover:opacity-0";
-		const touchClasses = isTouch && unblurred ? "opacity-0" : "";
-		return twMerge(baseClasses, hoverClasses, touchClasses);
-	};
-
-	return (
-		<div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center transition-all duration-300">
-			<div className={getOverlayClasses()} />
-			<span className={getTextClasses()}>
-				<Eye size={16} />
-				Conteúdo sensível
-			</span>
-		</div>
-	);
-};
 
 const InteractiveLink: FC<InteractiveLinkProps> = ({
 	href,
 	link,
 	children,
-	sensitive,
 	className = "",
 	style = {},
 	borderRadius = 0,
 	customPresets,
 }) => {
-	const [unblurred, setUnblurred] = useState(false);
-	const [isTouch, setIsTouch] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [faviconError, setFaviconError] = useState(false);
 	const [customImageError, setCustomImageError] = useState(false);
@@ -174,17 +132,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 	);
 	const isGif = isGifImage(imageUrl);
 
-	useEffect(() => {
-		const handleTouchStart = () => setIsTouch(true);
-		window.addEventListener("touchstart", handleTouchStart, { once: true });
-		return () => window.removeEventListener("touchstart", handleTouchStart);
-	}, []);
 
-	// Função auxiliar para lidar com clique sensível
-	const handleSensitiveClick = (e: MouseEvent) => {
-		e.preventDefault();
-		setUnblurred(true);
-	};
 
 	// Função auxiliar para enviar dados de clique
 	const sendClickData = () => {
@@ -207,11 +155,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		}
 	};
 
-	const handleLinkClick = (e: MouseEvent) => {
-		if (sensitive && isTouch && !unblurred) {
-			return handleSensitiveClick(e);
-		}
-
+	const handleLinkClick = () => {
 		sendClickData();
 	};
 
@@ -262,9 +206,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 					<MoreVertical className="size-5" />
 				</button>
 
-				{sensitive && (
-					<SensitiveOverlay isTouch={isTouch} unblurred={unblurred} />
-				)}
+
 			</div>
 
 			<LinkOptionsModal

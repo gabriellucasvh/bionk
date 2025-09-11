@@ -467,12 +467,7 @@ export const useLinksManager = (
 		}
 	};
 
-	const toggleSensitive = (id: number) => {
-		const link = initialLinks.find((l) => l.id === id);
-		if (link) {
-			handleLinkUpdate(id, { sensitive: !link.sensitive });
-		}
-	};
+
 
 	const handleUpdateCustomImage = async (id: number, imageUrl: string) => {
 		try {
@@ -617,7 +612,6 @@ export const useLinksManager = (
 		handleDeleteLink,
 		handleArchiveLink,
 		toggleActive,
-		toggleSensitive,
 		handleStartEditing,
 		handleCancelEditing,
 		handleLinkChange,
