@@ -69,10 +69,6 @@ const SensitiveContentWarning: React.FC<SensitiveContentWarningProps> = ({
 						Voltar
 					</BaseButton>
 				</div>
-
-				<p className="text-gray-500 text-xs">
-					Esta configuração pode ser alterada pelo proprietário da página.
-				</p>
 			</div>
 		</div>
 	);
