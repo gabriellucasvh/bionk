@@ -2,6 +2,8 @@
 
 "use client";
 
+import { useSession } from "next-auth/react";
+import useSWR from "swr";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
 	Card,
@@ -12,8 +14,6 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { SocialLinkItem } from "@/types/social";
-import { useSession } from "next-auth/react";
-import useSWR from "swr";
 import type { LinkItem, SectionItem } from "../types/links.types";
 import { fetcher } from "../utils/links.helpers";
 
@@ -49,19 +49,21 @@ const UnifiedLinksManager = () => {
 		data: sectionsData,
 		mutate: mutateSections,
 		isLoading: isLoadingSections,
-	} = useSWR<SectionItem[]>(
-		userId ? "/api/sections" : null,
-		fetcher
-	);
+	} = useSWR<SectionItem[]>(userId ? "/api/sections" : null, fetcher);
 
-	if (status === "loading" || isLoadingLinks || isLoadingSocialLinks || isLoadingSections) {
+	if (
+		status === "loading" ||
+		isLoadingLinks ||
+		isLoadingSocialLinks ||
+		isLoadingSections
+	) {
 		return <LoadingPage />;
 	}
 
 	return (
 		<section className="mx-auto min-h-dvh w-full max-w-4xl touch-manipulation">
 			<Tabs className="w-full" defaultValue="links">
-				<Card className="border-none shadow-none">
+				<Card className="border-none px-4 shadow-none">
 					<CardHeader className="flex flex-col items-start justify-between px-2 sm:px-6 lg:flex-row lg:items-center">
 						<div className="mb-4 sm:mb-0">
 							<CardTitle className="text-xl sm:text-2xl">
@@ -79,12 +81,12 @@ const UnifiedLinksManager = () => {
 					<CardContent className="space-y-4 p-2 sm:p-6">
 						<TabsContent className="mt-0" value="links">
 							<LinksTabContent
-						initialLinks={linksData?.links || []}
-						initialSections={sectionsData || []}
-						mutateLinks={mutateLinks}
-						mutateSections={mutateSections}
-						session={session}
-					/>
+								initialLinks={linksData?.links || []}
+								initialSections={sectionsData || []}
+								mutateLinks={mutateLinks}
+								mutateSections={mutateSections}
+								session={session}
+							/>
 						</TabsContent>
 
 						<TabsContent className="mt-0" value="socials">

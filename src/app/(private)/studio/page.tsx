@@ -1,15 +1,24 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
+"use client";
 
-export default async function Studio() {
-	const session = await getServerSession();
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import LoadingPage from "@/components/layout/LoadingPage";
 
-	// Simula um pequeno delay para garantir que a sessão foi carregada
-	await new Promise((resolve) => setTimeout(resolve, 100));
+export default function Studio() {
+	const { data: session, status } = useSession();
+	const router = useRouter();
 
-	if (!session) {
-		redirect("/");
+	useEffect(() => {
+		if (status === "authenticated" && session) {
+			router.replace("/studio/perfil");
+		}
+	}, [status, session, router]);
+
+	if (status === "loading") {
+		return <LoadingPage />;
 	}
 
-	redirect("/studio/perfil");
+	// O layout já cuida do redirect para /registro se não autenticado
+	return <LoadingPage />;
 }

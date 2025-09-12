@@ -29,7 +29,6 @@ interface User {
 
 const PerfilClient = () => {
 	const { data: session, update: updateSession } = useSession();
-
 	const [profile, setProfile] = useState({ name: "", username: "", bio: "" });
 	const [originalProfile, setOriginalProfile] = useState({
 		name: "",
@@ -50,7 +49,6 @@ const PerfilClient = () => {
 	const [originalProfileImageUrl, setOriginalProfileImageUrl] =
 		useState<string>("");
 	const [isImageCropModalOpen, setIsImageCropModalOpen] = useState(false);
-
 	const [validationError, setValidationError] = useState<string>("");
 
 	useEffect(() => {
@@ -85,6 +83,43 @@ const PerfilClient = () => {
 
 		fetchProfile();
 	}, [session?.user?.id, session?.user?.image]);
+
+	const updateProfileText = useCallback(async (): Promise<User | null> => {
+		const textChanged =
+			profile.name !== originalProfile.name ||
+			profile.username !== originalProfile.username ||
+			profile.bio !== originalProfile.bio;
+
+		if (!(session?.user?.id && textChanged)) {
+			return null;
+		}
+
+		try {
+			const res = await fetch(`/api/profile/${session.user.id}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(profile),
+			});
+			const data = await res.json();
+			if (!res.ok) {
+				if (
+					res.status === 400 &&
+					data.error === "Nome de usuário indisponível"
+				) {
+					setValidationError(data.error);
+				}
+				throw new Error(data.error || "Falha ao atualizar");
+			}
+			return data.user as User;
+		} catch {
+			return null;
+		}
+	}, [session?.user?.id, profile, originalProfile]);
+
+	// Early return após todos os hooks
+	if (isProfileLoading) {
+		return <LoadingPage />;
+	}
 
 	const textChanged =
 		profile.name !== originalProfile.name ||
@@ -140,32 +175,6 @@ const PerfilClient = () => {
 		}
 	};
 
-	const updateProfileText = useCallback(async (): Promise<User | null> => {
-		if (!(session?.user?.id && textChanged)) {
-			return null;
-		}
-
-		try {
-			const res = await fetch(`/api/profile/${session.user.id}`, {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(profile),
-			});
-			const data = await res.json();
-			if (!res.ok) {
-				if (
-					res.status === 400 &&
-					data.error === "Nome de usuário indisponível"
-				) {
-					setValidationError(data.error);
-				}
-				throw new Error(data.error || "Falha ao atualizar");
-			}
-			return data.user as User;
-		} catch {
-			return null;
-		}
-	}, [session?.user?.id, profile, textChanged]);
 
 	const applyUpdatedProfile = async (
 		currentSession: any,
@@ -264,10 +273,6 @@ const PerfilClient = () => {
 		setSelectedProfileFile(null);
 		setProfileImageChanged(true);
 	};
-
-	if (isProfileLoading) {
-		return <LoadingPage />;
-	}
 
 	return (
 		<section className="mx-auto min-h-dvh w-full space-y-4 p-4 pb-24 lg:w-1/2">

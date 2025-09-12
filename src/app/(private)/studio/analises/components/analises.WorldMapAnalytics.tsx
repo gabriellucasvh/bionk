@@ -41,6 +41,16 @@ export default function WorldMapAnalytics({
 	width = 800,
 	height = 400,
 }: WorldMapAnalyticsProps) {
+	// Hooks devem ser chamados primeiro
+	const svgRef = useRef<SVGSVGElement>(null);
+	const [worldData, setWorldData] = useState<any>(null);
+	const [tooltip, setTooltip] = useState<TooltipState>({
+		visible: false,
+		x: 0,
+		y: 0,
+		content: "",
+	});
+
 	// Normalizar nomes de países para correspondência
 	const normalizeCountryName = (name: string): string => {
 		if (!name) {
@@ -225,15 +235,6 @@ export default function WorldMapAnalytics({
 			.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
 			.join(" ");
 	};
-
-	const svgRef = useRef<SVGSVGElement>(null);
-	const [worldData, setWorldData] = useState<any>(null);
-	const [tooltip, setTooltip] = useState<TooltipState>({
-		visible: false,
-		x: 0,
-		y: 0,
-		content: "",
-	});
 
 	// Criar mapa de países para lookup rápido
 	const countryMap = new Map(

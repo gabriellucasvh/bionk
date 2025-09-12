@@ -191,7 +191,6 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 					data={data.countryAnalytics || []}
 					height={300}
 					isLoading={false}
-					width={undefined}
 				/>
 			</div>
 			<ReferrerAnalytics data={data.referrerAnalytics || []} isLoading={false} />
