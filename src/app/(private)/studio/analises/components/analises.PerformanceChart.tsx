@@ -49,7 +49,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 							dias.
 						</CardDescription>
 					</CardHeader>
-					<CardContent>
+					<CardContent className="px-3">
 						<div className="h-[300px] w-full overflow-hidden sm:h-[350px] md:h-[400px]">
 							<ChartContainer
 								className="h-full w-full"
@@ -67,7 +67,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 								<ResponsiveContainer height="100%" width="100%">
 									<LineChart
 										data={chartData}
-										margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+										margin={{ top: 10, right: 10, left: 1, bottom: 10 }}
 									>
 										<CartesianGrid
 											className="stroke-muted dark:stroke-gray-600"
@@ -90,7 +90,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 										<Line
 											activeDot={{ r: 6 }}
 											dataKey="views"
-											dot={{ r: 4 }}
+											dot={true}
 											stroke="var(--color-views)"
 											strokeWidth={2}
 											type="monotone"
@@ -98,7 +98,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 										<Line
 											activeDot={{ r: 6 }}
 											dataKey="clicks"
-											dot={{ r: 4 }}
+											dot={true}
 											stroke="var(--color-clicks)"
 											strokeWidth={2}
 											type="monotone"
