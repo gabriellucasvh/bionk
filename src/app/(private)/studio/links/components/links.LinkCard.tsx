@@ -13,11 +13,9 @@ import {
 	Trash2,
 	X,
 } from "lucide-react";
-
-import ArchivingLoader from "@/components/animations/ArchivingLoader";
-
 import Link from "next/link";
 import { useState } from "react";
+import ArchivingLoader from "@/components/animations/ArchivingLoader";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import ImageCropModal from "@/components/modals/ImageCropModal";
 import { Badge } from "@/components/ui/badge";
@@ -105,13 +103,13 @@ const EditingView = ({
 				<Input
 					onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
 					placeholder="URL"
-					value={link.url}
+					value={link.url || ''}
 				/>
 			</div>
 			<div className="flex flex-col gap-2">
 				<BaseButton
-					disabled={!(isValidUrl(link.url) && link.title)}
-					onClick={() => onSaveEditing(link.id, link.title, link.url)}
+					disabled={!(isValidUrl(link.url || '') && link.title)}
+					onClick={() => onSaveEditing(link.id, link.title, link.url || '')}
 					size="icon"
 				>
 					<Save className="h-4 w-4" />
@@ -143,12 +141,12 @@ const LinkContent = ({
 				"max-w-[200px] truncate text-blue-500 text-sm hover:underline",
 				isLinkLocked && "cursor-not-allowed text-muted-foreground"
 			)}
-			href={isLinkLocked ? "#" : link.url}
+			href={isLinkLocked ? "#" : link.url || '#'}
 			onClick={() => !isLinkLocked && onClickLink(link.id)}
 			rel="noopener noreferrer"
 			target="_blank"
 		>
-			{link.url.length > 30 ? `${link.url.slice(0, 30)}...` : link.url}
+			{link.url && link.url.length > 30 ? `${link.url.slice(0, 30)}...` : link.url || ''}
 		</Link>
 	);
 };

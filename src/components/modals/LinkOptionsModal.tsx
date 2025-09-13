@@ -30,7 +30,9 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 	}
 
 	const handleOpenLink = () => {
-		window.open(link.url, "_blank", "noopener,noreferrer");
+		if (link.url) {
+			window.open(link.url, "_blank", "noopener,noreferrer");
+		}
 	};
 
 	return (
@@ -51,7 +53,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						{link.title}
 					</DialogTitle>
 					<DialogDescription className="mb-4 line-clamp-2 max-w-md truncate text-gray-600 text-sm">
-						{link.url}
+						{link.url || 'URL não disponível'}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -66,7 +68,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						Abrir Link
 					</BaseButton>
 
-					<ShareSheet title={link.title} url={link.url} />
+					<ShareSheet title={link.title} url={link.url || ''} />
 
 					<BaseButton
 						className="justify-center text-red-500 hover:bg-red-50 hover:text-red-600"

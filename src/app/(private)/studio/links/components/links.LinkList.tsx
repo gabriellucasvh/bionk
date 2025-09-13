@@ -17,7 +17,7 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import type { UnifiedItem } from "../hooks/useLinksManager";
-import type { LinkItem, SectionItem } from "../types/links.types";
+import type { SectionItem } from "../types/links.types";
 import LinkCard from "./links.LinkCard";
 import SectionCard from "./links.SectionCard";
 import SortableItem from "./links.SortableItem";
@@ -68,7 +68,7 @@ const LinkList = (props: LinkListProps) => {
 	);
 
 	const activeItem = activeId
-		? items.find((item) => item.id === activeId)
+		? items.find((item) => item.id.toString() === activeId)
 		: null;
 
 	// Função No-op para satisfazer o linter e o TypeScript
@@ -85,14 +85,28 @@ const LinkList = (props: LinkListProps) => {
 				sensors={sensors}
 			>
 				<SortableContext
-					items={items.map((item) => item.id)}
+					items={items.map((item) =>
+						item.isSection ? item.id.toString() : `link-${item.id}`
+					)}
 					strategy={verticalListSortingStrategy}
 				>
 					<div className="space-y-3">
 						{items.map((item) => (
-							<SortableItem id={item.id} key={item.id}>
+							<SortableItem
+								id={item.isSection ? item.id.toString() : `link-${item.id}`}
+								key={item.id}
+							>
 								{({ listeners, setActivatorNodeRef, isDragging }) => {
-									if (item.type === "section") {
+									if (item.isSection) {
+										// Converter UnifiedItem para SectionItem para compatibilidade
+										const sectionData: SectionItem = {
+											id: item.id.toString(),
+											dbId: item.dbId || 0,
+											title: item.title,
+											active: item.active,
+											order: item.order || 0,
+											links: item.children || [],
+										};
 										return (
 											<SectionCard
 												isDragging={isDragging}
@@ -101,23 +115,23 @@ const LinkList = (props: LinkListProps) => {
 												onAddLinkToSection={onAddLinkToSection}
 												onRemoveCustomImage={onRemoveCustomImage}
 												onUpdateCustomImage={onUpdateCustomImage}
-												section={item.data as SectionItem}
+												section={sectionData}
 												setActivatorNodeRef={setActivatorNodeRef}
 												{...cardProps}
 											/>
 										);
 									}
 									return (
-									<LinkCard
-										link={item.data as LinkItem}
-										listeners={listeners}
-										archivingLinkId={archivingLinkId}
-										onRemoveCustomImage={onRemoveCustomImage}
-										onUpdateCustomImage={onUpdateCustomImage}
-										setActivatorNodeRef={setActivatorNodeRef}
-										{...cardProps}
-									/>
-								);
+										<LinkCard
+											archivingLinkId={archivingLinkId}
+											link={item}
+											listeners={listeners}
+											onRemoveCustomImage={onRemoveCustomImage}
+											onUpdateCustomImage={onUpdateCustomImage}
+											setActivatorNodeRef={setActivatorNodeRef}
+											{...cardProps}
+										/>
+									);
 								}}
 							</SortableItem>
 						))}
@@ -127,24 +141,31 @@ const LinkList = (props: LinkListProps) => {
 				{/* Adicionado DragOverlay para corrigir a distorção */}
 				<DragOverlay>
 					{activeItem ? (
-						activeItem.type === "section" ? (
+						activeItem.isSection ? (
 							<SectionCard
 								isDragging
 								linksManager={linksManager}
 								onAddLinkToSection={onAddLinkToSection}
-								section={activeItem.data as SectionItem}
+								section={{
+									id: activeItem.id.toString(),
+									dbId: activeItem.dbId || 0,
+									title: activeItem.title,
+									active: activeItem.active,
+									order: activeItem.order || 0,
+									links: activeItem.children || [],
+								}}
 								{...cardProps}
 								listeners={{}}
 								setActivatorNodeRef={noop}
 							/>
 						) : (
-						<LinkCard
-							link={activeItem.data as LinkItem}
-							archivingLinkId={archivingLinkId}
-							{...cardProps}
-							listeners={{}}
-							setActivatorNodeRef={noop}
-						/>
+							<LinkCard
+								archivingLinkId={archivingLinkId}
+								link={activeItem}
+								{...cardProps}
+								listeners={{}}
+								setActivatorNodeRef={noop}
+							/>
 						)
 					) : null}
 				</DragOverlay>

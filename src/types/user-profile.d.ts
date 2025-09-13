@@ -12,6 +12,7 @@ export interface UserLink extends PrismaLink {
 	badge?: string | null;
 	password?: string | null;
 	sectionTitle?: string | null;
+	type?: 'link' | 'section' | null;
 	expiresAt?: string | null;
 	deleteOnClicks?: number | null;
 	launchesAt?: string | null;

@@ -1,16 +1,18 @@
 // src/app/api/links/reorder/route.ts
 
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
-import { z } from "zod";
 
 const reorderSchema = z.object({
-	links: z.array(
+	items: z.array(
 		z.object({
 			id: z.number(),
-			sectionTitle: z.string().nullable(),
+			order: z.number(),
+			type: z.enum(["link", "section"]),
+			sectionTitle: z.string().nullable().optional(),
 		})
 	),
 });
@@ -36,7 +38,11 @@ export async function PUT(req: Request): Promise<NextResponse> {
 			);
 		}
 
-		const { links } = validation.data;
+		const { items } = validation.data;
+
+		// Separar links e seções
+		const linkItems = items.filter((item) => item.type === "link");
+		const sectionItems = items.filter((item) => item.type === "section");
 
 		// Busca todas as seções do usuário de uma vez para otimizar
 		const userSections = await prisma.section.findMany({
@@ -46,28 +52,72 @@ export async function PUT(req: Request): Promise<NextResponse> {
 			userSections.map((s) => [s.title, s.id])
 		);
 
-		// CORREÇÃO: Removido o 'async' desnecessário
-		const updateTransactions = links.map((link, index) => {
+		const updateTransactions: any[] = [];
+
+		// Atualizar links normais
+		for (const item of linkItems) {
 			let sectionId: number | null = null;
-			if (link.sectionTitle) {
-				sectionId = sectionTitleToIdMap.get(link.sectionTitle) ?? null;
+			if (item.sectionTitle) {
+				sectionId = sectionTitleToIdMap.get(item.sectionTitle) ?? null;
 			}
 
-			// Retorna a promessa do Prisma, sem 'await'
-			return prisma.link.update({
-				where: {
-					id: link.id,
-					userId,
-				},
-				data: {
-					order: index,
-					sectionTitle: link.sectionTitle,
-					sectionId, // Atualiza o ID da seção
-				},
-			});
-		});
+			updateTransactions.push(
+				prisma.link.update({
+					where: {
+						id: item.id,
+						userId,
+					},
+					data: {
+						order: item.order,
+						sectionTitle: item.sectionTitle,
+						sectionId,
+					},
+				})
+			);
+		}
 
-		// CORREÇÃO: Passa o array de promessas diretamente para a transação
+		// Buscar todas as seções existentes como links primeiro
+		const existingLinks = await prisma.link.findMany({
+			where: {
+				id: { in: sectionItems.map(item => item.id) },
+				userId,
+				type: "section",
+			},
+			select: { id: true },
+		});
+		const existingLinkIds = new Set(existingLinks.map(link => link.id));
+
+		// Atualizar seções (tratadas como links especiais)
+		for (const item of sectionItems) {
+			if (existingLinkIds.has(item.id)) {
+				// Atualizar link existente que representa a seção
+				updateTransactions.push(
+					prisma.link.update({
+						where: {
+							id: item.id,
+							userId,
+						},
+						data: {
+							order: item.order,
+						},
+					})
+				);
+			} else {
+				// Atualizar a seção na tabela Section (manter compatibilidade)
+				updateTransactions.push(
+					prisma.section.update({
+						where: {
+							id: item.id,
+							userId,
+						},
+						data: {
+							order: item.order,
+						},
+					})
+				);
+			}
+		}
+
 		await prisma.$transaction(updateTransactions);
 
 		return NextResponse.json({ message: "Ordem atualizada com sucesso!" });

@@ -2,7 +2,7 @@
 "use client";
 
 import type { DragStartEvent } from "@dnd-kit/core";
-import { Plus } from "lucide-react";
+import { Layers2, Plus } from "lucide-react";
 import type { Session } from "next-auth";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { useLinksManager } from "../hooks/useLinksManager";
@@ -58,7 +58,7 @@ const LinksTabContent = ({
 						onClick={() => setIsAdding(true)}
 					>
 						<span className="flex items-center justify-center">
-							<Plus className="mr-1 h-4 w-4" /> Adicionar link
+							<Plus className="mr-2 h-4 w-4" /> Adicionar link
 						</span>
 					</BaseButton>
 
@@ -68,7 +68,7 @@ const LinksTabContent = ({
 						variant="white"
 					>
 						<span className="flex items-center justify-center">
-							<Plus className="mr-1 h-4 w-4" /> Criar seção
+							<Layers2 className="mr-2 h-4 w-4" /> Criar seção
 						</span>
 					</BaseButton>
 				</div>

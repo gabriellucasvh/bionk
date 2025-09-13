@@ -145,7 +145,9 @@ function PasswordProtectedLink({
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
 		if (passwordInput === link.password) {
-			window.open(link.url, "_blank");
+			if (link.url) {
+				window.open(link.url, "_blank");
+			}
 			setIsOpen(false);
 			setPasswordInput("");
 			setError("");
@@ -184,7 +186,7 @@ function PasswordProtectedLink({
 	);
 }
 
-// COMPONENTE LinksList ATUALIZADO
+// COMPONENTE LinksList UNIFICADO
 function LinksList({
 	user,
 	classNames,
@@ -198,22 +200,34 @@ function LinksList({
 	textStyle?: React.CSSProperties;
 	customPresets?: BaseTemplateProps["customPresets"];
 }) {
-	const renderLink = (link: UserLink) => {
+	const renderItem = (item: UserLink) => {
+		// Se for uma seção, renderiza como título
+		if (item.type === "section") {
+			return (
+				<div className="mt-8 mb-6 w-full first:mt-0" key={item.id}>
+					<h2 className="text-center font-bold text-xl" style={textStyle}>
+						{item.sectionTitle || item.title}
+					</h2>
+				</div>
+			);
+		}
+
+		// Se for um link, renderiza como botão
 		const linkContent = (
 			<div className="w-full p-3.5 text-center">
 				<div className="flex h-10 items-center justify-center gap-2 px-14">
 					<h4 className="line-clamp-2 font-semibold" style={textStyle}>
-						{link.title}
+						{item.title}
 					</h4>
-					{link.badge && <Badge variant="secondary">{link.badge}</Badge>}
+					{item.badge && <Badge variant="secondary">{item.badge}</Badge>}
 				</div>
 			</div>
 		);
 
 		return (
-			<li className="w-full" key={link.id}>
-				{link.password ? (
-					<PasswordProtectedLink link={link}>
+			<div className="mb-3 w-full" key={item.id}>
+				{item.password ? (
+					<PasswordProtectedLink link={item}>
 						<button
 							className={cn("group relative w-full", classNames?.cardLink)}
 							style={buttonStyle}
@@ -229,38 +243,20 @@ function LinksList({
 					<InteractiveLink
 						className={classNames?.cardLink}
 						customPresets={customPresets}
-						href={link.url}
-						link={link}
+						href={item.url || "#"}
+						link={item}
 						style={buttonStyle}
 					>
 						{linkContent}
 					</InteractiveLink>
 				)}
-			</li>
+			</div>
 		);
 	};
 
 	return (
-		<div className="space-y-6">
-			{/* CORREÇÃO: Usando 'user.Section' (maiúscula) */}
-			{user.Section?.map(
-				(section) =>
-					section.links.length > 0 && (
-						<section className="space-y-4" key={section.id}>
-							<h2 className="text-center font-bold text-xl" style={textStyle}>
-								{section.title}
-							</h2>
-							<ul className="space-y-3">{section.links.map(renderLink)}</ul>
-						</section>
-					)
-			)}
-
-			{/* CORREÇÃO: Usando 'user.Link' (maiúscula) */}
-			{user.Link?.length > 0 && (
-				<section className="space-y-4">
-					<ul className="space-y-3">{user.Link.map(renderLink)}</ul>
-				</section>
-			)}
+		<div className="space-y-0">
+			{user.Link?.length > 0 && <div>{user.Link.map(renderItem)}</div>}
 		</div>
 	);
 }

@@ -122,7 +122,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		? Number(customPresets.customButtonCorners)
 		: borderRadius || 12; // 12px é o padrão do rounded-xl
 
-	const faviconUrl = getFaviconUrl(link.url);
+	const faviconUrl = getFaviconUrl(link.url || '');
 	const imageUrl = getImageUrl(link, customImageError, faviconUrl);
 	const showImage = shouldShowImage(
 		imageUrl,

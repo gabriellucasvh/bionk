@@ -2,8 +2,12 @@
 
 import type { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { useEffect, useMemo, useState } from "react";
-import type { LinkItem, SectionItem } from "../types/links.types";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type {
+	LinkItem,
+	SectionItem,
+	UnifiedDragItem,
+} from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
 
 // --- TIPOS E CONSTANTES ---
@@ -22,11 +26,7 @@ export type SectionFormData = {
 	title: string;
 };
 
-export type UnifiedItem = {
-	id: string;
-	type: "section" | "link";
-	data: SectionItem | LinkItem;
-};
+export type UnifiedItem = UnifiedDragItem;
 
 const initialFormData: LinkFormData = {
 	title: "",
@@ -47,144 +47,6 @@ const urlProtocolRegex = /^(https?:\/\/)/;
 
 // --- FUNÇÕES AUXILIARES PARA DRAG AND DROP ---
 
-/**
- * Remove um item da sua posição original.
- * Retorna a lista de itens atualizada e os dados do item removido.
- */
-const findAndRemoveItem = (
-	items: UnifiedItem[],
-	itemId: string,
-	containerId: string
-): { updatedItems: UnifiedItem[]; removedItemData: LinkItem | null } => {
-	let removedItemData: LinkItem | null = null;
-	if (containerId === "root") {
-		const itemIndex = items.findIndex((item) => item.id === itemId);
-		if (itemIndex !== -1) {
-			removedItemData = items[itemIndex].data as LinkItem;
-			items.splice(itemIndex, 1);
-		}
-	} else {
-		const sectionIndex = items.findIndex((item) => item.id === containerId);
-		if (sectionIndex !== -1) {
-			const section = items[sectionIndex].data as SectionItem;
-			const linkIndex = section.links.findIndex(
-				(l) => `link-${l.id}` === itemId
-			);
-			if (linkIndex !== -1) {
-				[removedItemData] = section.links.splice(linkIndex, 1);
-			}
-		}
-	}
-	return { updatedItems: items, removedItemData };
-};
-
-/**
- * Adiciona um item de link à sua nova posição.
- */
-const findAndAddItem = (
-	items: UnifiedItem[],
-	itemData: LinkItem,
-	itemId: string,
-	overId: string,
-	containerId: string
-): UnifiedItem[] => {
-	const overIsASectionContainer = overId.startsWith("section-");
-	const targetContainerId = overIsASectionContainer ? overId : containerId;
-
-	if (targetContainerId === "root") {
-		const overIndex = items.findIndex((item) => item.id === overId);
-		const newItem = { id: itemId, type: "link", data: itemData } as UnifiedItem;
-		if (overIndex !== -1) {
-			items.splice(overIndex, 0, newItem);
-		} else {
-			items.push(newItem);
-		}
-	} else {
-		const sectionIndex = items.findIndex(
-			(item) => item.id === targetContainerId
-		);
-		if (sectionIndex !== -1) {
-			const section = items[sectionIndex].data as SectionItem;
-			const overIndex = section.links.findIndex(
-				(l) => `link-${l.id}` === overId
-			);
-			if (overIndex !== -1) {
-				section.links.splice(overIndex, 0, itemData);
-			} else {
-				section.links.push(itemData);
-			}
-		}
-	}
-	return items;
-};
-
-/**
- * Lida com a reordenação de um item dentro do mesmo container.
- */
-const reorderInSameContainer = (
-	items: UnifiedItem[],
-	activeId: string,
-	overId: string,
-	containerId: string
-): UnifiedItem[] => {
-	if (containerId === "root") {
-		const activeIndex = items.findIndex((item) => item.id === activeId);
-		const overIndex = items.findIndex((item) => item.id === overId);
-		if (activeIndex !== -1 && overIndex !== -1) {
-			return arrayMove(items, activeIndex, overIndex);
-		}
-	} else {
-		const sectionIndex = items.findIndex((item) => item.id === containerId);
-		if (sectionIndex !== -1) {
-			const section = items[sectionIndex].data as SectionItem;
-			const activeLinkIndex = section.links.findIndex(
-				(l) => `link-${l.id}` === activeId
-			);
-			const overLinkIndex = section.links.findIndex(
-				(l) => `link-${l.id}` === overId
-			);
-
-			if (activeLinkIndex !== -1 && overLinkIndex !== -1) {
-				section.links = arrayMove(
-					section.links,
-					activeLinkIndex,
-					overLinkIndex
-				);
-			}
-		}
-	}
-	return items;
-};
-
-/**
- * Lida com a movimentação de um item entre diferentes containers.
- */
-const moveBetweenContainers = (
-	items: UnifiedItem[],
-	activeId: string,
-	overId: string,
-	activeContainerId: string,
-	overContainerId: string
-): UnifiedItem[] => {
-	const { updatedItems, removedItemData } = findAndRemoveItem(
-		items,
-		activeId,
-		activeContainerId
-	);
-
-	if (!removedItemData) {
-		return items; // Retorna os itens originais se nada foi removido
-	}
-
-	return findAndAddItem(
-		updatedItems,
-		removedItemData,
-		activeId,
-		overId,
-		overContainerId
-	);
-};
-
 // --- HOOK ---
 export const useLinksManager = (
 	initialLinks: LinkItem[],
@@ -203,150 +65,136 @@ export const useLinksManager = (
 	);
 	const [_originalLink, setOriginalLink] = useState<LinkItem | null>(null);
 	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
+	// Flag para controlar chamadas simultâneas da API
+	const isReorderingRef = useRef(false);
 
 	useEffect(() => {
-		const sortedLinks = [...initialLinks].sort((a, b) => a.order - b.order);
-		const sections: Record<string, SectionItem> = {};
-		const generalLinks: LinkItem[] = [];
-
-		// Primeiro, criar seções a partir dos links
-		for (const link of sortedLinks) {
-			if (link.sectionTitle && link.sectionId) {
-				const sectionId = `section-${link.sectionTitle.replace(/\s+/g, "-")}`;
-				if (!sections[sectionId]) {
-					sections[sectionId] = {
-						id: sectionId,
-						dbId: link.sectionId,
-						title: link.sectionTitle,
-						links: [],
-						active: link.active,
-						order: link.order,
-					};
-				}
-				sections[sectionId].links.push(link);
-			} else {
-				generalLinks.push(link);
-			}
+		// Se estamos reordenando, não atualizar o estado para evitar conflitos visuais
+		if (isReorderingRef.current) {
+			return;
 		}
 
-		// Depois, adicionar seções vazias que não têm links
-		for (const section of initialSections) {
-			const sectionId = `section-${section.title.replace(/\s+/g, "-")}`;
-			if (!sections[sectionId]) {
-				sections[sectionId] = {
-					id: sectionId,
-					dbId: Number(section.id),
-					title: section.title,
-					links: [],
-					active: section.active,
-					order: section.order,
-				};
-			}
-		}
-
-		const newUnifiedItems: UnifiedItem[] = [
-			...Object.values(sections).map(
-				(s) => ({ id: s.id, type: "section", data: s }) as UnifiedItem
+		// Converter seções em LinkItems unificados
+		const sectionItems: UnifiedItem[] = initialSections.map((section) => ({
+			id: Number(section.id),
+			title: section.title,
+			url: "", // Seções não têm URL
+			active: section.active,
+			clicks: 0,
+			sensitive: false,
+			order: section.order,
+			isSection: true,
+			children: initialLinks.filter(
+				(link) => link.sectionTitle === section.title
 			),
-			...generalLinks.map(
-				(l) => ({ id: `link-${l.id}`, type: "link", data: l }) as UnifiedItem
-			),
-		];
+			dbId: Number(section.id),
+		}));
 
-		newUnifiedItems.sort((a, b) => a.data.order - b.data.order);
+		// Links gerais (sem seção)
+		const generalLinks: UnifiedItem[] = initialLinks
+			.filter((link) => !link.sectionTitle)
+			.map((link) => ({ ...link }));
+
+		// Combinar seções e links gerais
+		const newUnifiedItems: UnifiedItem[] = [...sectionItems, ...generalLinks];
+
+		newUnifiedItems.sort((a, b) => a.order - b.order);
 		setUnifiedItems(newUnifiedItems);
 	}, [initialLinks, initialSections]);
 
 	const existingSections = useMemo(() => {
 		return unifiedItems
-			.filter((item) => item.type === "section")
-			.map((item) => (item.data as SectionItem).title);
+			.filter((item) => item.isSection)
+			.map((item) => item.title);
 	}, [unifiedItems]);
 
-	const findContainerId = (itemId: string): string => {
-		if (itemId.startsWith("section-")) {
-			return itemId;
-		}
-		for (const item of unifiedItems) {
-			if (
-				item.type === "section" &&
-				(item.data as SectionItem).links.some(
-					(link) => `link-${link.id}` === itemId
-				)
-			) {
-				return item.id;
+	const persistReorder = useCallback(
+		async (items: UnifiedItem[]) => {
+			// Evitar chamadas simultâneas
+			if (isReorderingRef.current) {
+				return;
 			}
-		}
-		return "root";
-	};
 
-	const buildLinksPayload = (items: UnifiedItem[]) => {
-		const payload: { id: number; sectionTitle: string | null }[] = [];
-		for (const item of items) {
-			if (item.type === "section") {
-				const section = item.data as SectionItem;
-				for (const link of section.links) {
-					payload.push({ id: link.id, sectionTitle: section.title });
-				}
-			} else {
-				const link = item.data as LinkItem;
-				payload.push({ id: link.id, sectionTitle: null });
+			isReorderingRef.current = true;
+
+			try {
+				// Tratar tudo como links unificados - seções são links com type: 'section'
+				const unifiedPayload = items.map((item, index) => ({
+					id: item.id,
+					order: index,
+					type: item.isSection ? "section" : "link",
+					sectionTitle: item.isSection ? null : item.sectionTitle || null,
+				}));
+
+				// Usar apenas a API de links para tudo
+				await fetch("/api/links/reorder", {
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ items: unifiedPayload }),
+				});
+
+				// Atualizar o estado local imediatamente para refletir as mudanças
+				setUnifiedItems(
+					items.map((item, index) => ({
+						...item,
+						order: index,
+					}))
+				);
+
+				// Aguardar um pouco antes de atualizar os dados para evitar conflitos
+				setTimeout(async () => {
+					await mutateLinks();
+					// Não precisamos mais de mutateSections pois tudo é tratado como links
+					isReorderingRef.current = false;
+				}, 200);
+			} catch (error) {
+				console.error("Erro ao persistir reordenação:", error);
+				isReorderingRef.current = false;
 			}
-		}
-		return payload;
-	};
-
-	const persistReorder = async (items: UnifiedItem[]) => {
-		const linksPayload = buildLinksPayload(items);
-		await fetch("/api/links/reorder", {
-			method: "PUT",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ links: linksPayload }),
-		});
-		await mutateLinks();
-		await mutateSections();
-	};
+		},
+		[mutateLinks]
+	);
 
 	const handleDragEnd = (event: DragEndEvent) => {
 		const { active, over } = event;
-		if (!over || active.id === over.id) {
-			setActiveId(null);
+		if (!over) {
 			return;
 		}
 
-		const activeIdStr = active.id.toString();
-		const overIdStr = over.id.toString();
+		const draggedItemId = active.id.toString();
+		const overId = over.id.toString();
 
-		const activeContainerId = findContainerId(activeIdStr);
-		const overContainerId = findContainerId(overIdStr);
-
-		if (!(activeContainerId && overContainerId)) {
-			setActiveId(null);
+		if (draggedItemId === overId) {
 			return;
 		}
 
-		setUnifiedItems((currentItems) => {
-			const newItems = JSON.parse(JSON.stringify(currentItems));
-			let processedItems: UnifiedItem[];
+		setUnifiedItems((prevItems) => {
+			// Encontrar os índices dos itens
+			const activeIndex = prevItems.findIndex((item) => {
+				if (item.isSection) {
+					return item.id.toString() === draggedItemId;
+				}
+				return `link-${item.id}` === draggedItemId;
+			});
 
-			if (activeContainerId === overContainerId) {
-				processedItems = reorderInSameContainer(
-					newItems,
-					activeIdStr,
-					overIdStr,
-					activeContainerId
-				);
-			} else {
-				processedItems = moveBetweenContainers(
-					newItems,
-					activeIdStr,
-					overIdStr,
-					activeContainerId,
-					overContainerId
-				);
+			const overIndex = prevItems.findIndex((item) => {
+				if (item.isSection) {
+					return item.id.toString() === overId;
+				}
+				return `link-${item.id}` === overId;
+			});
+
+			if (activeIndex === -1 || overIndex === -1) {
+				return prevItems;
 			}
-			persistReorder(processedItems);
-			return processedItems;
+
+			// Usar arrayMove para reordenar
+			const newItems = arrayMove(prevItems, activeIndex, overIndex);
+
+			// Persistir as mudanças
+			persistReorder(newItems);
+
+			return newItems;
 		});
 
 		setActiveId(null);
@@ -474,8 +322,6 @@ export const useLinksManager = (
 		}
 	};
 
-
-
 	const handleUpdateCustomImage = async (id: number, imageUrl: string) => {
 		try {
 			// A imagem já foi salva na API, agora só precisamos atualizar o estado local
@@ -513,19 +359,15 @@ export const useLinksManager = (
 			setOriginalLink(linkToEdit);
 			const updateEditingStatus = (items: UnifiedItem[]) =>
 				items.map((item) => {
-					if (item.type === "link" && item.data.id === id) {
-						return { ...item, data: { ...item.data, isEditing: true } };
+					if (!item.isSection && item.id === id) {
+						return { ...item, isEditing: true };
 					}
-					if (item.type === "section") {
-						const sectionData = item.data as SectionItem;
+					if (item.isSection && item.children) {
 						return {
 							...item,
-							data: {
-								...sectionData,
-								links: sectionData.links.map((link) =>
-									link.id === id ? { ...link, isEditing: true } : link
-								),
-							},
+							children: item.children.map((link) =>
+								link.id === id ? { ...link, isEditing: true } : link
+							),
 						};
 					}
 					return item;
@@ -539,19 +381,15 @@ export const useLinksManager = (
 		if (linkToRestore) {
 			const updateItems = (items: UnifiedItem[]) =>
 				items.map((item) => {
-					if (item.type === "link" && item.data.id === id) {
-						return { ...item, data: { ...linkToRestore, isEditing: false } };
+					if (!item.isSection && item.id === id) {
+						return { ...linkToRestore, isEditing: false };
 					}
-					if (item.type === "section") {
-						const sectionData = item.data as SectionItem;
+					if (item.isSection && item.children) {
 						return {
 							...item,
-							data: {
-								...sectionData,
-								links: sectionData.links.map((link) =>
-									link.id === id ? { ...linkToRestore, isEditing: false } : link
-								),
-							},
+							children: item.children.map((link) =>
+								link.id === id ? { ...linkToRestore, isEditing: false } : link
+							),
 						};
 					}
 					return item;
@@ -568,19 +406,15 @@ export const useLinksManager = (
 	) => {
 		const updateItems = (items: UnifiedItem[]) =>
 			items.map((item) => {
-				if (item.type === "link" && item.data.id === id) {
-					return { ...item, data: { ...item.data, [field]: value } };
+				if (!item.isSection && item.id === id) {
+					return { ...item, [field]: value };
 				}
-				if (item.type === "section") {
-					const sectionData = item.data as SectionItem;
+				if (item.isSection && item.children) {
 					return {
 						...item,
-						data: {
-							...sectionData,
-							links: sectionData.links.map((link) =>
-								link.id === id ? { ...link, [field]: value } : link
-							),
-						},
+						children: item.children.map((link) =>
+							link.id === id ? { ...link, [field]: value } : link
+						),
 					};
 				}
 				return item;

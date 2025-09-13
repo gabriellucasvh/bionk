@@ -2,7 +2,7 @@
 export type LinkItem = {
 	id: number;
 	title: string;
-	url: string;
+	url: string | null;
 	active: boolean;
 	clicks: number;
 	sensitive: boolean;
@@ -17,7 +17,11 @@ export type LinkItem = {
 	deleteOnClicks?: number | null;
 	launchesAt?: string | null;
 	customImageUrl?: string | null;
-}
+	// Novas propriedades para unificação com seções
+	isSection?: boolean; // Indica se este item é uma seção
+	children?: LinkItem[]; // Links filhos quando é uma seção
+	dbId?: number; // ID do banco para seções
+};
 
 export type SectionItem = {
 	id: string; // Ex: 'section-promocao'
@@ -27,3 +31,6 @@ export type SectionItem = {
 	order: number;
 	links: LinkItem[];
 };
+
+// Tipo unificado para drag and drop
+export type UnifiedDragItem = LinkItem;

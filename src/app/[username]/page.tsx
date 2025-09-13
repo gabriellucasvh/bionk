@@ -26,7 +26,7 @@ export default async function UserPage({ params }: PageProps) {
 	const { username } = await params;
 	const now = new Date();
 
-	// Otimização: Query mais eficiente com select específico
+	// Query unificada para buscar todos os itens (links e seções) ordenados
 	const user = (await prisma.user.findUnique({
 		where: { username },
 		select: {
@@ -38,37 +38,11 @@ export default async function UserPage({ params }: PageProps) {
 			template: true,
 			templateCategory: true,
 			sensitiveProfile: true,
-			Section: {
-				where: { active: true },
-				orderBy: { order: "asc" },
-				select: {
-					id: true,
-					title: true,
-					order: true,
-					links: {
-						where: {
-							active: true,
-							archived: false,
-							OR: [{ launchesAt: null }, { launchesAt: { lte: now } }],
-							AND: [{ OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] }],
-						},
-						orderBy: { order: "asc" },
-						select: {
-							id: true,
-							title: true,
-							url: true,
-							order: true,
-							clicks: true,
-							customImageUrl: true,
-						},
-					},
-				},
-			},
+			// Busca todos os links (incluindo seções) de forma unificada
 			Link: {
 				where: {
 					active: true,
 					archived: false,
-					sectionId: null,
 					OR: [{ launchesAt: null }, { launchesAt: { lte: now } }],
 					AND: [{ OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] }],
 				},
@@ -78,8 +52,12 @@ export default async function UserPage({ params }: PageProps) {
 					title: true,
 					url: true,
 					order: true,
+					type: true,
+					sectionTitle: true,
 					clicks: true,
 					customImageUrl: true,
+					badge: true,
+					password: true,
 				},
 			},
 			SocialLink: {
