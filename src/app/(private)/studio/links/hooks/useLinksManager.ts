@@ -202,6 +202,7 @@ export const useLinksManager = (
 		initialSectionFormData
 	);
 	const [_originalLink, setOriginalLink] = useState<LinkItem | null>(null);
+	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
 
 	useEffect(() => {
 		const sortedLinks = [...initialLinks].sort((a, b) => a.order - b.order);
@@ -457,8 +458,14 @@ export const useLinksManager = (
 		await mutateLinks();
 	};
 
-	const handleArchiveLink = (id: number) =>
-		handleLinkUpdate(id, { archived: true });
+	const handleArchiveLink = async (id: number) => {
+		setArchivingLinkId(id);
+		try {
+			await handleLinkUpdate(id, { archived: true });
+		} finally {
+			setArchivingLinkId(null);
+		}
+	};
 
 	const toggleActive = (id: number, isActive: boolean) => {
 		const link = initialLinks.find((l) => l.id === id);
@@ -596,6 +603,7 @@ export const useLinksManager = (
 		formData,
 		sectionFormData,
 		existingSections,
+		archivingLinkId,
 		setActiveId,
 		setIsAdding,
 		setIsAddingSection,

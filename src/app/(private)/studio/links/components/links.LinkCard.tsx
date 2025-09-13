@@ -14,6 +14,8 @@ import {
 	X,
 } from "lucide-react";
 
+import ArchivingLoader from "@/components/animations/ArchivingLoader";
+
 import Link from "next/link";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -51,6 +53,7 @@ interface LinkCardProps {
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
 	onRemoveCustomImage?: (id: number) => void;
 	borderRadius?: number;
+	archivingLinkId?: number | null;
 }
 
 // --- Subcomponentes ---
@@ -162,9 +165,11 @@ const DisplayView = (props: LinkCardProps) => {
 		onClickLink,
 		onUpdateCustomImage,
 		onRemoveCustomImage,
+		archivingLinkId,
 	} = props;
 
 	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+	const isArchiving = archivingLinkId === link.id;
 
 	const isLaunching = !!(
 		link.launchesAt && new Date(link.launchesAt) > new Date()
@@ -177,9 +182,16 @@ const DisplayView = (props: LinkCardProps) => {
 	return (
 		<article
 			className={cn(
-				"flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-800"
+				"relative flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-800",
+				isArchiving && "pointer-events-none"
 			)}
 		>
+			{/* Overlay de loading durante arquivamento */}
+			{isArchiving && (
+				<div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/90 backdrop-blur-sm dark:bg-neutral-800/90">
+					<ArchivingLoader size="md" />
+				</div>
+			)}
 			<div className="flex items-start gap-2 sm:gap-4">
 				<div
 					ref={setActivatorNodeRef}

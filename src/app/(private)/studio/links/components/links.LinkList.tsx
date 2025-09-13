@@ -25,6 +25,7 @@ import SortableItem from "./links.SortableItem";
 interface LinkListProps {
 	items: UnifiedItem[];
 	activeId: string | null;
+	archivingLinkId?: number | null;
 	onDragStart: (event: DragStartEvent) => void;
 	onDragEnd: (event: DragEndEvent) => void;
 	onSectionUpdate: (id: number, payload: Partial<SectionItem>) => void;
@@ -52,6 +53,7 @@ const LinkList = (props: LinkListProps) => {
 		onDragStart,
 		onDragEnd,
 		activeId,
+		archivingLinkId,
 		onAddLinkToSection,
 		linksManager,
 		onRemoveCustomImage,
@@ -106,15 +108,16 @@ const LinkList = (props: LinkListProps) => {
 										);
 									}
 									return (
-										<LinkCard
-											link={item.data as LinkItem}
-											listeners={listeners}
-											onRemoveCustomImage={onRemoveCustomImage}
-											onUpdateCustomImage={onUpdateCustomImage}
-											setActivatorNodeRef={setActivatorNodeRef}
-											{...cardProps}
-										/>
-									);
+									<LinkCard
+										link={item.data as LinkItem}
+										listeners={listeners}
+										archivingLinkId={archivingLinkId}
+										onRemoveCustomImage={onRemoveCustomImage}
+										onUpdateCustomImage={onUpdateCustomImage}
+										setActivatorNodeRef={setActivatorNodeRef}
+										{...cardProps}
+									/>
+								);
 								}}
 							</SortableItem>
 						))}
@@ -135,12 +138,13 @@ const LinkList = (props: LinkListProps) => {
 								setActivatorNodeRef={noop}
 							/>
 						) : (
-							<LinkCard
-								link={activeItem.data as LinkItem}
-								{...cardProps}
-								listeners={{}}
-								setActivatorNodeRef={noop}
-							/>
+						<LinkCard
+							link={activeItem.data as LinkItem}
+							archivingLinkId={archivingLinkId}
+							{...cardProps}
+							listeners={{}}
+							setActivatorNodeRef={noop}
+						/>
 						)
 					) : null}
 				</DragOverlay>

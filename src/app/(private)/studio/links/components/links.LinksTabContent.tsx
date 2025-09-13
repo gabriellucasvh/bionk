@@ -31,7 +31,8 @@ const LinksTabContent = ({
 		isAdding,
 		formData,
 		existingSections,
-		activeId, // <<< Adicionado
+		activeId,
+		archivingLinkId,
 		setActiveId,
 		setIsAdding,
 		setFormData,
@@ -98,7 +99,8 @@ const LinksTabContent = ({
 			)}
 
 			<LinkList
-				activeId={activeId} // <<< Adicionado
+				activeId={activeId}
+				archivingLinkId={archivingLinkId}
 				items={unifiedItems}
 				linksManager={{
 					isAdding,
