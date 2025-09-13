@@ -11,7 +11,11 @@ import type {
 export interface UserLink extends PrismaLink {
 	badge?: string | null;
 	password?: string | null;
-	sectionTitle?: string | null;
+	sectionId?: number | null;
+	section?: {
+		id: number;
+		title: string;
+	} | null;
 	type?: 'link' | 'section' | null;
 	expiresAt?: string | null;
 	deleteOnClicks?: number | null;

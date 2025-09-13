@@ -9,8 +9,7 @@ export type LinkItem = {
 	order: number;
 	isEditing?: boolean;
 	archived?: boolean;
-	sectionId?: number | null;
-	sectionTitle?: string | null; // Permitir nulo para links gerais
+	sectionId?: number | null; // ID da seção à qual o link pertence
 	badge?: "promovido" | "15% off" | "expirando" | null;
 	password?: string | null;
 	expiresAt?: string | null;

@@ -38,8 +38,10 @@ export async function GET(request: Request): Promise<NextResponse> {
 		const transformedLinks = links.map((link) => ({
 			...link,
 			sectionId: link.section?.id || link.sectionId,
-			sectionTitle: link.section?.title || null,
-			section: undefined, // Remove the nested section object
+			section: link.section ? {
+				id: link.section.id,
+				title: link.section.title,
+			} : null,
 		}));
 
 		return NextResponse.json({ links: transformedLinks });
@@ -80,7 +82,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 		const {
 			title,
 			url,
-			sectionTitle,
+			sectionId,
 			badge,
 			password,
 			expiresAt,
@@ -95,36 +97,20 @@ export async function POST(request: Request): Promise<NextResponse> {
 			);
 		}
 
-		let sectionId: number | null = null;
-
-		// Se um título de seção for fornecido, encontre ou crie a seção
-		if (
-			sectionTitle &&
-			typeof sectionTitle === "string" &&
-			sectionTitle.trim() !== ""
-		) {
-			const lastSection = await prisma.section.findFirst({
-				where: { userId: session.user.id },
-				orderBy: { order: "desc" },
-			});
-
-			// Usamos 'upsert' para criar a seção se ela não existir, ou encontrá-la se já existir
-			const section = await prisma.section.upsert({
+		// Validar se sectionId existe se fornecido
+		if (sectionId) {
+			const section = await prisma.section.findFirst({
 				where: {
-					userId_title: {
-						// Assumindo que você tem uma constraint única para userId e title na sua tabela Section
-						userId: session.user.id,
-						title: sectionTitle.trim(),
-					},
-				},
-				update: {}, // Não é necessário atualizar nada se a seção já existir
-				create: {
+					id: sectionId,
 					userId: session.user.id,
-					title: sectionTitle.trim(),
-					order: lastSection ? lastSection.order + 1 : 0,
 				},
 			});
-			sectionId = section.id;
+			if (!section) {
+				return NextResponse.json(
+					{ error: "Seção não encontrada." },
+					{ status: 404 }
+				);
+			}
 		}
 
 		await prisma.link.updateMany({
@@ -143,8 +129,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 				url,
 				order: 0,
 				active: true,
-				sectionId, // Associa o link com a seção correta
-				sectionTitle,
+				sectionId: sectionId || null,
 				badge: badge || null,
 				password,
 				expiresAt,

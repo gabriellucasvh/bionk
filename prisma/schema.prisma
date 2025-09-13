@@ -1,4 +1,3 @@
-// schema.prisma
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
@@ -41,25 +40,25 @@ model User {
   usernameReservedAt            DateTime?
   usernameReservationExpiry     DateTime?
   googleId                      String?
-  status                        String         @default("pending")
-  onboardingCompleted           Boolean        @default(false)
-  sensitiveProfile              Boolean        @default(false)
   subscriptionPlan              String?
   subscriptionStatus            String?
   billingCycle                  String?
   subscriptionEndDate           DateTime?
   subscriptionStartDate         DateTime?
   mercadopagoSubscriptionId     String?
-  pendingSubscriptionPlan       String? // Plano solicitado aguardando confirmação
   paymentMethodBrand            String?
   paymentMethodLastFour         String?
+  pendingSubscriptionPlan       String?
+  onboardingCompleted           Boolean        @default(false)
+  status                        String         @default("pending")
+  sensitiveProfile              Boolean        @default(false)
   accounts                      Account[]
   CustomPresets                 CustomPresets?
   Link                          Link[]
   ProfileView                   ProfileView[]
+  Section                       Section[]
   sessions                      Session[]
   SocialLink                    SocialLink[]
-  Section                       Section[]
 
   @@index([subscriptionStatus])
   @@index([createdAt])
@@ -105,8 +104,7 @@ model VerificationToken {
 model Link {
   id              Int         @id @default(autoincrement())
   title           String
-  url             String? // URL é opcional para seções
-  type            String      @default("link") // "link" ou "section"
+  url             String?
   active          Boolean     @default(true)
   clicks          Int         @default(0)
   order           Int         @default(0)
@@ -117,16 +115,16 @@ model Link {
   expiresAt       DateTime?
   launchesAt      DateTime?
   password        String?
-  sectionTitle    String?
   isProduct       Boolean?    @default(false)
   price           Float?
   productImageUrl String?
+  sectionId       Int?
   customImageUrl  String?
+  type            String      @default("link")
+  section         Section?    @relation(fields: [sectionId], references: [id])
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   LinkClick       LinkClick[]
   LinkView        LinkView[]
-  sectionId       Int?
-  section         Section?    @relation(fields: [sectionId], references: [id], onDelete: SetNull)
 
   @@index([sectionId])
   @@index([userId])
@@ -211,8 +209,8 @@ model Section {
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   links     Link[]
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, title])
   @@index([userId])

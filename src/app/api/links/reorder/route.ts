@@ -12,7 +12,7 @@ const reorderSchema = z.object({
 			id: z.number(),
 			order: z.number(),
 			type: z.enum(["link", "section"]),
-			sectionTitle: z.string().nullable().optional(),
+			sectionId: z.number().nullable().optional(),
 		})
 	),
 });
@@ -44,23 +44,33 @@ export async function PUT(req: Request): Promise<NextResponse> {
 		const linkItems = items.filter((item) => item.type === "link");
 		const sectionItems = items.filter((item) => item.type === "section");
 
-		// Busca todas as seções do usuário de uma vez para otimizar
-		const userSections = await prisma.section.findMany({
-			where: { userId },
-		});
-		const sectionTitleToIdMap = new Map(
-			userSections.map((s) => [s.title, s.id])
-		);
+		// Validar se todas as seções referenciadas existem
+		const referencedSectionIds = linkItems
+			.map(item => item.sectionId)
+			.filter(id => id !== null && id !== undefined);
+		
+		if (referencedSectionIds.length > 0) {
+			const existingSections = await prisma.section.findMany({
+				where: {
+					id: { in: referencedSectionIds },
+					userId,
+				},
+			});
+			const existingSectionIds = new Set(existingSections.map(s => s.id));
+			const invalidSectionIds = referencedSectionIds.filter(id => !existingSectionIds.has(id));
+			
+			if (invalidSectionIds.length > 0) {
+				return NextResponse.json(
+					{ error: `Seções não encontradas: ${invalidSectionIds.join(', ')}` },
+					{ status: 404 }
+				);
+			}
+		}
 
 		const updateTransactions: any[] = [];
 
 		// Atualizar links normais
 		for (const item of linkItems) {
-			let sectionId: number | null = null;
-			if (item.sectionTitle) {
-				sectionId = sectionTitleToIdMap.get(item.sectionTitle) ?? null;
-			}
-
 			updateTransactions.push(
 				prisma.link.update({
 					where: {
@@ -69,8 +79,7 @@ export async function PUT(req: Request): Promise<NextResponse> {
 					},
 					data: {
 						order: item.order,
-						sectionTitle: item.sectionTitle,
-						sectionId,
+						sectionId: item.sectionId || null,
 					},
 				})
 			);

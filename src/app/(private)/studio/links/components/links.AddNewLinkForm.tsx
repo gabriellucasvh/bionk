@@ -19,7 +19,7 @@ import { useState } from "react";
 type LinkFormData = {
 	title: string;
 	url: string;
-	sectionTitle: string;
+	sectionId?: number | null;
 	badge: string;
 	password?: string;
 	expiresAt?: Date;
@@ -174,7 +174,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 	const formData = props.linksManager?.formData || props.formData || {
 		title: "",
 		url: "",
-		sectionTitle: "",
+		sectionId: null,
 		badge: ""
 	};
 	const setFormData = props.linksManager?.setFormData || props.setFormData || (() => null);
@@ -192,7 +192,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 		setFormData({
 			title: "",
 			url: "",
-			sectionTitle: "",
+			sectionId: null,
 			badge: "",
 			password: "",
 			deleteOnClicks: undefined,

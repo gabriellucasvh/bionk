@@ -42,10 +42,10 @@ const AddNewSectionForm = ({
 		<section className="space-y-4 rounded-lg border bg-muted/20 p-4">
 			{/* Campo Principal */}
 			<div className="grid gap-2">
-				<Label htmlFor="sectionTitle">Título da Seção</Label>
+				<Label htmlFor="sectionTitleInput">Título da Seção</Label>
 				<Input
 					autoFocus
-					id="sectionTitle"
+					id="sectionTitleInput"
 					onChange={(e) => setFormData({ ...formData, title: e.target.value })}
 					placeholder="Ex: Redes Sociais, Projetos, Contato"
 					value={formData.title}

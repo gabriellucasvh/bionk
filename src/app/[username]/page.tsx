@@ -53,11 +53,17 @@ export default async function UserPage({ params }: PageProps) {
 					url: true,
 					order: true,
 					type: true,
-					sectionTitle: true,
+					sectionId: true,
 					clicks: true,
 					customImageUrl: true,
 					badge: true,
 					password: true,
+					section: {
+						select: {
+							id: true,
+							title: true,
+						},
+					},
 				},
 			},
 			SocialLink: {

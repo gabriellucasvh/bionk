@@ -26,7 +26,7 @@ export async function POST(
 	try {
 		await prisma.link.updateMany({
 			where: { sectionId: Number.parseInt(id, 10) },
-			data: { sectionId: null, sectionTitle: null },
+			data: { sectionId: null },
 		});
 
 		await prisma.section.delete({

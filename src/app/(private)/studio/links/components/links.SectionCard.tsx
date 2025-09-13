@@ -40,7 +40,7 @@ interface SectionCardProps {
 	setActivatorNodeRef: (element: HTMLElement | null) => void;
 	isDragging: boolean;
 	// Novas props para criação de link na seção
-	onAddLinkToSection?: (sectionTitle: string) => void;
+	onAddLinkToSection?: (sectionId: number) => void;
 	linksManager?: any;
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
 	onRemoveCustomImage?: (id: number) => void;
@@ -141,11 +141,11 @@ const SectionCard = ({
 								linksManager={{
 									...linksManager,
 									handleAddNewLink: async () => {
-										if (onAddLinkToSection) {
-											await onAddLinkToSection(section.title);
-										}
-										setIsAddingLink(false);
-									},
+								if (onAddLinkToSection) {
+									await onAddLinkToSection(section.dbId);
+								}
+								setIsAddingLink(false);
+							},
 									setIsAdding: setIsAddingLink,
 									isAdding: isAddingLink,
 								}}

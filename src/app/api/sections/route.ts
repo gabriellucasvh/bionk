@@ -15,7 +15,14 @@ export async function GET(): Promise<NextResponse> {
 		include: { links: true },
 	});
 
-	return NextResponse.json(sections);
+	// Transformar para incluir dbId
+	const transformedSections = sections.map(section => ({
+		...section,
+		id: `section-${section.id}`,
+		dbId: section.id,
+	}));
+
+	return NextResponse.json(transformedSections);
 }
 
 export async function POST(req: Request): Promise<NextResponse> {

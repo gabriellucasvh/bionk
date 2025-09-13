@@ -14,7 +14,7 @@ import { isValidUrl } from "../utils/links.helpers";
 export type LinkFormData = {
 	title: string;
 	url: string;
-	sectionTitle: string;
+	sectionId?: number | null;
 	badge: string;
 	password?: string;
 	expiresAt?: Date;
@@ -31,7 +31,7 @@ export type UnifiedItem = UnifiedDragItem;
 const initialFormData: LinkFormData = {
 	title: "",
 	url: "",
-	sectionTitle: "",
+	sectionId: null,
 	badge: "",
 	password: "",
 	deleteOnClicks: undefined,
@@ -76,7 +76,7 @@ export const useLinksManager = (
 
 		// Converter seções em LinkItems unificados
 		const sectionItems: UnifiedItem[] = initialSections.map((section) => ({
-			id: Number(section.id),
+			id: section.dbId || Number(section.id),
 			title: section.title,
 			url: "", // Seções não têm URL
 			active: section.active,
@@ -85,14 +85,14 @@ export const useLinksManager = (
 			order: section.order,
 			isSection: true,
 			children: initialLinks.filter(
-				(link) => link.sectionTitle === section.title
+				(link) => link.sectionId === (section.dbId || Number(section.id))
 			),
-			dbId: Number(section.id),
+			dbId: section.dbId || Number(section.id),
 		}));
 
 		// Links gerais (sem seção)
 		const generalLinks: UnifiedItem[] = initialLinks
-			.filter((link) => !link.sectionTitle)
+			.filter((link) => !link.sectionId)
 			.map((link) => ({ ...link }));
 
 		// Combinar seções e links gerais
@@ -123,7 +123,7 @@ export const useLinksManager = (
 					id: item.id,
 					order: index,
 					type: item.isSection ? "section" : "link",
-					sectionTitle: item.isSection ? null : item.sectionTitle || null,
+					sectionId: item.isSection ? null : item.sectionId || null,
 				}));
 
 				// Usar apenas a API de links para tudo
@@ -263,7 +263,7 @@ export const useLinksManager = (
 		setIsAddingSection(false);
 	};
 
-	const handleAddLinkToSection = async (sectionTitle: string) => {
+	const handleAddLinkToSection = async (sectionId: number) => {
 		let formattedUrl = formData.url.trim();
 		if (!urlProtocolRegex.test(formattedUrl)) {
 			formattedUrl = `https://${formattedUrl}`;
@@ -275,7 +275,7 @@ export const useLinksManager = (
 		await fetch("/api/links", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ ...formData, url: formattedUrl, sectionTitle }),
+			body: JSON.stringify({ ...formData, url: formattedUrl, sectionId }),
 		});
 
 		await mutateLinks();

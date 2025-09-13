@@ -41,7 +41,7 @@ interface LinkListProps {
 	onStartEditing: (id: number) => void;
 	onClickLink: (id: number) => void;
 	// Novas props para criação de link na seção
-	onAddLinkToSection?: (sectionTitle: string) => void;
+	onAddLinkToSection?: (sectionId: number) => void;
 	linksManager?: any;
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
 	onRemoveCustomImage?: (id: number) => void;

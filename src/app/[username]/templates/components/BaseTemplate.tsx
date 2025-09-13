@@ -200,18 +200,7 @@ function LinksList({
 	textStyle?: React.CSSProperties;
 	customPresets?: BaseTemplateProps["customPresets"];
 }) {
-	const renderItem = (item: UserLink) => {
-		// Se for uma seção, renderiza como título
-		if (item.type === "section") {
-			return (
-				<div className="mt-8 mb-6 w-full first:mt-0" key={item.id}>
-					<h2 className="text-center font-bold text-xl" style={textStyle}>
-						{item.sectionTitle || item.title}
-					</h2>
-				</div>
-			);
-		}
-
+	const renderLink = (item: UserLink) => {
 		// Se for um link, renderiza como botão
 		const linkContent = (
 			<div className="w-full p-3.5 text-center">
@@ -254,11 +243,46 @@ function LinksList({
 		);
 	};
 
-	return (
-		<div className="space-y-0">
-			{user.Link?.length > 0 && <div>{user.Link.map(renderItem)}</div>}
-		</div>
-	);
+	// Renderizar conteúdo usando seções reais do banco de dados
+	const renderOrderedContent = () => {
+		if (!user.Link || user.Link.length === 0) {
+			return null;
+		}
+
+		const result: JSX.Element[] = [];
+		let currentSectionId: number | null = null;
+
+		// Percorrer os links na ordem original
+		user.Link.forEach((link, index) => {
+			const linkSectionId = link.sectionId || null;
+
+			// Se mudou de seção, renderizar o título da nova seção
+			if (linkSectionId !== currentSectionId) {
+				currentSectionId = linkSectionId;
+
+				// Renderizar título da seção se houver uma seção
+				if (linkSectionId && link.section) {
+					result.push(
+						<div
+							className="mt-8 mb-6 w-full first:mt-0"
+							key={`section-${linkSectionId}-${index}`}
+						>
+							<h2 className="text-center font-bold text-xl" style={textStyle}>
+								{link.section.title}
+							</h2>
+						</div>
+					);
+				}
+			}
+
+			// Renderizar o link
+			result.push(renderLink(link));
+		});
+
+		return result;
+	};
+
+	return <div className="space-y-0">{renderOrderedContent()}</div>;
 }
 
 export default function BaseTemplate({
