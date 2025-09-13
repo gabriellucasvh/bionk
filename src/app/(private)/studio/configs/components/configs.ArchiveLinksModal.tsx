@@ -1,9 +1,10 @@
 // configs.ArchiveLinksModal.tsx
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { RotateCcw, Trash2, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 type LinkItem = {
 	id: number;
@@ -78,9 +79,17 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
-			<section className="w-11/12 max-w-md rounded-lg bg-white shadow-lg">
-				<header className="border-b px-4 py-2">
+			<section className="w-11/12 max-w-md rounded-lg bg-white shadow-lg dark:bg-neutral-800">
+				<header className="flex items-center justify-between border-b px-4 py-2">
 					<h2 className="font-bold text-xl">Links Arquivados</h2>
+					<Button
+						className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-neutral-700"
+						onClick={onClose}
+						size="sm"
+						variant="ghost"
+					>
+						<X className="h-4 w-4" />
+					</Button>
 				</header>
 				<main className="max-h-80 space-y-4 overflow-y-auto p-4">
 					{archivedLinks.length === 0 ? (
@@ -110,22 +119,22 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 				<footer className="flex justify-end border-t px-4 py-2">
 					<div className="flex gap-2">
 						<Button
-							variant="outline"
-							className="bg-green-500 text-white hover:text-white hover:bg-green-600"
-							onClick={restoreAllLinks}
+							className=" text-green-600 hover:bg-green-100 hover:text-green-600"
 							disabled={archivedLinks.length === 0}
+							onClick={restoreAllLinks}
+							variant="outline"
 						>
-							Rest. Todos
+							<RotateCcw />
+							Todos
 						</Button>
 						<Button
-							variant="outline"
-							className="bg-red-500 text-white hover:text-white hover:bg-red-600"
-							onClick={deleteAllLinks}
+							className="text-red-600 hover:bg-red-100 hover:text-red-600"
 							disabled={archivedLinks.length === 0}
+							onClick={deleteAllLinks}
+							variant="outline"
 						>
-							Apagar Todos
+							<Trash2 /> Todos
 						</Button>
-					<Button onClick={onClose}>Fechar</Button>
 					</div>
 				</footer>
 			</section>
