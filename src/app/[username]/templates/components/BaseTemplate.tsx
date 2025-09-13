@@ -53,11 +53,14 @@ function ShareButton({ onClick }: { onClick: () => void }) {
 		<div className="relative mb-4 flex w-full justify-end">
 			<button
 				aria-label="Compartilhar perfil"
-				className="absolute z-50 flex items-center justify-center rounded-full border bg-white p-2 shadow transition-colors hover:bg-gray-100"
+				className="absolute z-50 flex items-center justify-center rounded-full border bg-white p-2 shadow shadow-black/5 transition-colors hover:bg-gray-100"
 				onClick={onClick}
 				type="button"
 			>
-				<SquareArrowOutUpRight className="size-6 text-gray-700" />
+				<SquareArrowOutUpRight
+					className="size-5 text-gray-700"
+					strokeWidth={1.5}
+				/>
 			</button>
 		</div>
 	);
