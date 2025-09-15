@@ -1,5 +1,6 @@
 // app/api/profile-view/route.ts
 import { NextResponse } from "next/server";
+import { getCookiePreferencesFromRequest } from "@/hooks/useCookieConsent";
 import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
@@ -217,7 +218,9 @@ function extractMainDomain(hostname: string): string {
 
 // Função para normalizar e anonimizar referrers
 function normalizeReferrer(referrer: string | null): string | null {
-	if (!referrer) {return "direct"};
+	if (!referrer) {
+		return "direct";
+	}
 
 	try {
 		const url = new URL(referrer);
@@ -225,7 +228,9 @@ function normalizeReferrer(referrer: string | null): string | null {
 
 		// Detectar plataforma conhecida
 		const platform = detectPlatformFromHostname(hostname);
-		if (platform) {return platform};
+		if (platform) {
+			return platform;
+		}
 
 		// Para outros domínios, retornar apenas o domínio principal
 		return extractMainDomain(hostname);
@@ -241,6 +246,19 @@ export async function POST(request: Request): Promise<NextResponse> {
 			return NextResponse.json(
 				{ error: "UserId is required" },
 				{ status: 400 }
+			);
+		}
+
+		// Verificar preferências de cookies
+		const cookiePreferences = getCookiePreferencesFromRequest(request);
+
+		// Se analytics não estão permitidos, não processar
+		if (!cookiePreferences.analytics) {
+			return NextResponse.json(
+				{
+					message: "Analytics tracking not allowed",
+				},
+				{ status: 200 }
 			);
 		}
 

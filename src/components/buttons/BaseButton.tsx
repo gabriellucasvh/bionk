@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	asChild?: boolean;
 	loading?: boolean;
-	variant?: "default" | "white" | "green" | "outline";
+	variant?: "default" | "white" | "green" | "outline" | "link";
 	children: ReactNode;
 	fullWidth?: boolean;
 	size?: "default" | "sm" | "lg" | "icon";
@@ -28,7 +28,9 @@ export function BaseButton({
 		default: "bg-lime-400 hover:bg-lime-500 text-black",
 		white: "bg-white hover:bg-neutral-200 text-black border border-gray-200",
 		green: "bg-green-500 hover:bg-green-600 text-white border border-green-500",
-		outline: "bg-transparent border border-black text-black dark:border-white dark:text-white",
+		outline:
+			"bg-transparent hover:bg-gray-100 border border-black text-black dark:border-white dark:text-white",
+		link: "bg-transparent hover:underline text-black dark:text-white",
 	};
 	const sizeClasses = {
 		default: "h-12 px-4 py-2 has-[>svg]:px-3 md:px-6 md:py-3 lg:px-8",

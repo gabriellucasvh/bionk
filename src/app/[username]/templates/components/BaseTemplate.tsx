@@ -6,6 +6,7 @@ import { Lock, SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 import { type FormEvent, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import CookieConsent from "@/components/CookieConsent";
 import InteractiveLink from "@/components/InteractiveLink";
 import JoinBionkModal from "@/components/modals/JoinBionkModal";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
@@ -432,6 +433,9 @@ export default function BaseTemplate({
 				onOpenChange={setShareModalOpen}
 				user={user}
 			/>
+
+			{/* Cookie Consent Popup */}
+			<CookieConsent userId={user.id} />
 		</>
 	);
 }

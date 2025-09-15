@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { getCookiePreferencesFromRequest } from "@/hooks/useCookieConsent";
 import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
@@ -216,6 +217,35 @@ export async function POST(req: NextRequest) {
 				{ error: "ID do link é obrigatório e deve ser um número" },
 				{ status: 400 }
 			);
+		}
+
+		// Verificar preferências de cookies
+		const cookiePreferences = getCookiePreferencesFromRequest(req);
+
+		// Se analytics não estão permitidos, não processar o tracking detalhado
+		if (!cookiePreferences.analytics) {
+			// Ainda incrementar o contador de cliques (funcionalidade essencial)
+			// mas sem coletar dados de tracking
+			const linkWithIncrementedClicks = await prisma.link.update({
+				where: { id: Number(linkId) },
+				data: { clicks: { increment: 1 } },
+			});
+
+			if (
+				linkWithIncrementedClicks.deleteOnClicks &&
+				linkWithIncrementedClicks.clicks >=
+					linkWithIncrementedClicks.deleteOnClicks
+			) {
+				await prisma.link.update({
+					where: { id: Number(linkId) },
+					data: { active: false },
+				});
+			}
+
+			return NextResponse.json({
+				message: "Click recorded without tracking",
+				clicks: linkWithIncrementedClicks.clicks,
+			});
 		}
 
 		// Detectar tipo de dispositivo de forma anônima (LGPD compliant)
