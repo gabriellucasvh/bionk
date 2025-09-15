@@ -2,12 +2,15 @@
 "use client";
 
 import type { DragStartEvent } from "@dnd-kit/core";
-import { Layers2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { Session } from "next-auth";
+import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { useLinksManager } from "../hooks/useLinksManager";
+import type { ContentFormData } from "../types/content.types";
 import type { LinkItem, SectionItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
+import AddContentModal from "./content/AddContentModal";
 import AddNewLinkForm from "./links.AddNewLinkForm";
 import AddNewSectionForm from "./links.AddNewSectionForm";
 import LinkList from "./links.LinkList";
@@ -26,6 +29,8 @@ const LinksTabContent = ({
 	mutateLinks,
 	mutateSections,
 }: LinksTabContentProps) => {
+	const [isModalOpen, setIsModalOpen] = useState(false);
+
 	const {
 		unifiedItems,
 		isAdding,
@@ -49,30 +54,44 @@ const LinksTabContent = ({
 		setActiveId(event.active.id.toString());
 	};
 
+	const handleContentSave = async (contentData: ContentFormData) => {
+		try {
+			// Convert to link format and save (assuming link content for now)
+			const linkData = {
+				title: contentData.title || "",
+				url: contentData.url || "",
+				section: contentData.sectionId || null,
+				scheduleDate: contentData.launchesAt,
+				protected: !!contentData.password,
+				badge: contentData.badge || "",
+			};
+			setFormData(linkData);
+			await handlers.handleAddNewLink();
+		} catch (error) {
+			console.error("Error saving content:", error);
+		}
+	};
+
 	return (
 		<div className="space-y-4">
 			{!(isAdding || handlers.isAddingSection) && (
 				<div className="flex gap-2">
 					<BaseButton
 						className="w-full sm:w-auto"
-						onClick={() => setIsAdding(true)}
+						onClick={() => setIsModalOpen(true)}
 					>
 						<span className="flex items-center justify-center">
-							<Plus className="mr-2 h-4 w-4" /> Adicionar link
-						</span>
-					</BaseButton>
-
-					<BaseButton
-						className="w-full sm:w-auto"
-						onClick={() => handlers.setIsAddingSection(true)}
-						variant="white"
-					>
-						<span className="flex items-center justify-center">
-							<Layers2 className="mr-2 h-4 w-4" /> Criar seção
+							<Plus className="mr-2 h-4 w-4" /> Adicionar
 						</span>
 					</BaseButton>
 				</div>
 			)}
+
+			<AddContentModal
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				onSave={handleContentSave}
+			/>
 
 			{isAdding && (
 				<AddNewLinkForm
