@@ -416,7 +416,6 @@ button {
 	animation: shimmer 2s ease-in-out infinite;
 }
 
-
 /* animação de loading de links sendo arquivados */
 @keyframes flyIn {
 	0% {
@@ -446,6 +445,38 @@ button {
 		opacity: 1;
 		scale: 1;
 	}
+}
+
+/* Animação sofisticada para destacar links */
+@keyframes linkHighlight {
+	/* Fase 1: Encolhimento (0-25%) = 0.5s de 2s total */
+	0% {
+		transform: scale(1) skew(0deg, 0deg);
+	}
+	25% {
+		transform: scale(0.95) skew(0deg, 0deg);
+	}
+	
+	/* Fase 2: Movimento dos cantos (25-100%) = 1.5s de 2s total */
+	40% {
+		transform: scale(1) skew(1deg, -0.5deg);
+	}
+	55% {
+		transform: scale(1) skew(-1deg, 0.5deg);
+	}
+	70% {
+		transform: scale(1) skew(0.5deg, -1deg);
+	}
+	85% {
+		transform: scale(1) skew(-0.5deg, 1deg);
+	}
+	100% {
+		transform: scale(1) skew(0deg, 0deg);
+	}
+}
+
+.animate-shake {
+	animation: linkHighlight 2s ease-in-out infinite;
 }
 
 @layer base {

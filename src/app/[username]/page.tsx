@@ -58,6 +58,7 @@ export default async function UserPage({ params }: PageProps) {
 					customImageUrl: true,
 					badge: true,
 					password: true,
+					animated: true,
 					section: {
 						select: {
 							id: true,

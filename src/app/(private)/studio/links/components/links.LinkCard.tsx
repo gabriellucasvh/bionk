@@ -12,12 +12,24 @@ import {
 	Save,
 	Trash2,
 	X,
+	Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import ArchivingLoader from "@/components/animations/ArchivingLoader";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import ImageCropModal from "@/components/modals/ImageCropModal";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +43,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { LinkItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
 import { useCountdown } from "../utils/useCountdown";
@@ -103,13 +116,13 @@ const EditingView = ({
 				<Input
 					onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
 					placeholder="URL"
-					value={link.url || ''}
+					value={link.url || ""}
 				/>
 			</div>
 			<div className="flex flex-col gap-2">
 				<BaseButton
-					disabled={!(isValidUrl(link.url || '') && link.title)}
-					onClick={() => onSaveEditing(link.id, link.title, link.url || '')}
+					disabled={!(isValidUrl(link.url || "") && link.title)}
+					onClick={() => onSaveEditing(link.id, link.title, link.url || "")}
 					size="icon"
 				>
 					<Save className="h-4 w-4" />
@@ -141,15 +154,116 @@ const LinkContent = ({
 				"max-w-[200px] truncate text-blue-500 text-sm hover:underline",
 				isLinkLocked && "cursor-not-allowed text-muted-foreground"
 			)}
-			href={isLinkLocked ? "#" : link.url || '#'}
+			href={isLinkLocked ? "#" : link.url || "#"}
 			onClick={() => !isLinkLocked && onClickLink(link.id)}
 			rel="noopener noreferrer"
 			target="_blank"
 		>
-			{link.url && link.url.length > 30 ? `${link.url.slice(0, 30)}...` : link.url || ''}
+			{link.url && link.url.length > 30
+				? `${link.url.slice(0, 30)}...`
+				: link.url || ""}
 		</Link>
 	);
 };
+
+// Função auxiliar para calcular estados do link
+const useLinkStates = (link: LinkItem, archivingLinkId?: number | null) => {
+	const { animatedLinks } = useLinkAnimation();
+	const isLinkAnimated = animatedLinks.has(link.id.toString());
+	const isArchiving = archivingLinkId === link.id;
+
+	const isLaunching = !!(
+		link.launchesAt && new Date(link.launchesAt) > new Date()
+	);
+	const isExpiring = !!(
+		link.expiresAt && new Date(link.expiresAt) > new Date()
+	);
+	const isLinkLocked = isLaunching;
+
+	return { isLinkAnimated, isArchiving, isLaunching, isExpiring, isLinkLocked };
+};
+
+// Componente para botões de ação
+const LinkActionButtons = ({
+	link,
+	isLinkAnimated,
+	setIsImageModalOpen,
+	toggleAnimation,
+}: {
+	link: LinkItem;
+	isLinkAnimated: boolean;
+	setIsImageModalOpen: (open: boolean) => void;
+	toggleAnimation: (id: number) => Promise<void>;
+}) => (
+	<div className="flex items-center gap-2">
+		{/* Botão de imagem simples */}
+		<Button
+			className={cn(
+				"h-8 w-8",
+				link.customImageUrl
+					? "text-green-600 hover:text-green-700"
+					: "text-muted-foreground hover:text-foreground"
+			)}
+			onClick={() => setIsImageModalOpen(true)}
+			size="icon"
+			title={
+				link.customImageUrl
+					? "Alterar imagem personalizada"
+					: "Adicionar imagem personalizada"
+			}
+			variant="ghost"
+		>
+			<Image className="h-4 w-4" />
+		</Button>
+		<AlertDialog>
+			<AlertDialogTrigger asChild>
+				<Button
+					className={cn(
+						"h-8 w-8",
+						isLinkAnimated
+							? "text-green-600 hover:text-green-700"
+							: "text-muted-foreground hover:text-foreground"
+					)}
+					size="icon"
+					title={
+						isLinkAnimated ? "Desativar animação" : "Ativar animação"
+					}
+					variant="ghost"
+				>
+					<Zap className="h-4 w-4" />
+				</Button>
+			</AlertDialogTrigger>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>
+						{isLinkAnimated ? "Desativar" : "Ativar"} Animação
+					</AlertDialogTitle>
+					<AlertDialogDescription>
+						{isLinkAnimated
+							? `Esta ação desativará a animação do link "${link.title || link.url}".`
+							: `Esta ação fará o link "${link.title || link.url}" dar uma tremidinha infinita na sua página para chamar atenção dos visitantes.`}
+						Deseja continuar?
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel>Cancelar</AlertDialogCancel>
+					<AlertDialogAction
+						className="bg-green-600 hover:bg-green-700"
+						onClick={async () => {
+							await toggleAnimation(link.id);
+						}}
+					>
+						{isLinkAnimated ? "Desativar" : "Ativar"} Animação
+					</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+		<Badge className="flex items-center gap-1" variant="outline">
+			<MousePointerClick className="h-3 w-3" />
+			{link.clicks.toLocaleString()}
+		</Badge>
+	</div>
+);
 
 const DisplayView = (props: LinkCardProps) => {
 	const {
@@ -167,15 +281,8 @@ const DisplayView = (props: LinkCardProps) => {
 	} = props;
 
 	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-	const isArchiving = archivingLinkId === link.id;
-
-	const isLaunching = !!(
-		link.launchesAt && new Date(link.launchesAt) > new Date()
-	);
-	const isExpiring = !!(
-		link.expiresAt && new Date(link.expiresAt) > new Date()
-	);
-	const isLinkLocked = isLaunching;
+	const { toggleAnimation } = useLinkAnimation();
+	const { isLinkAnimated, isArchiving, isLaunching, isExpiring, isLinkLocked } = useLinkStates(link, archivingLinkId);
 
 	return (
 		<article
@@ -234,31 +341,12 @@ const DisplayView = (props: LinkCardProps) => {
 				</div>
 			</div>
 			<div className="flex items-center justify-between border-t pt-3">
-				<div className="flex items-center gap-2">
-					{/* Botão de imagem simples */}
-					<Button
-						className={cn(
-							"h-8 w-8",
-							link.customImageUrl
-								? "text-green-600 hover:text-green-700"
-								: "text-muted-foreground hover:text-foreground"
-						)}
-						onClick={() => setIsImageModalOpen(true)}
-						size="icon"
-						title={
-							link.customImageUrl
-								? "Alterar imagem personalizada"
-								: "Adicionar imagem personalizada"
-						}
-						variant="ghost"
-					>
-						<Image className="h-4 w-4" />
-					</Button>
-					<Badge className="flex items-center gap-1" variant="outline">
-						<MousePointerClick className="h-3 w-3" />
-						{link.clicks.toLocaleString()}
-					</Badge>
-				</div>
+				<LinkActionButtons
+					link={link}
+					isLinkAnimated={isLinkAnimated}
+					setIsImageModalOpen={setIsImageModalOpen}
+					toggleAnimation={toggleAnimation}
+				/>
 				<div className="flex items-center gap-2 sm:gap-4">
 					<div className="flex items-center space-x-2">
 						<Switch

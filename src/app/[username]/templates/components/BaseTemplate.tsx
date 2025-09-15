@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
 import ShareModal from "./ShareModal";
 
@@ -201,7 +202,10 @@ function LinksList({
 	textStyle?: React.CSSProperties;
 	customPresets?: BaseTemplateProps["customPresets"];
 }) {
+	const { animatedLinks } = useLinkAnimation();
+
 	const renderLink = (item: UserLink) => {
+		const isAnimated = animatedLinks.has(item.id.toString());
 		// Se for um link, renderiza como botão
 		const linkContent = (
 			<div className="w-full p-3.5 text-center">
@@ -215,11 +219,18 @@ function LinksList({
 		);
 
 		return (
-			<div className="mb-3 w-full" key={item.id}>
+			<div
+				className={cn("mb-3 w-full")}
+				key={item.id}
+			>
 				{item.password ? (
 					<PasswordProtectedLink link={item}>
 						<button
-							className={cn("group relative w-full", classNames?.cardLink)}
+							className={cn(
+								"group relative w-full",
+								classNames?.cardLink,
+								isAnimated && "animate-pulse"
+							)}
 							style={buttonStyle}
 							type="button"
 						>
@@ -231,7 +242,7 @@ function LinksList({
 					</PasswordProtectedLink>
 				) : (
 					<InteractiveLink
-						className={classNames?.cardLink}
+						className={cn(classNames?.cardLink, isAnimated && "animate-pulse")}
 						customPresets={customPresets}
 						href={item.url || "#"}
 						link={item}

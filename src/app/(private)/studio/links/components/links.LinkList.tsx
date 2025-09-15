@@ -108,30 +108,30 @@ const LinkList = (props: LinkListProps) => {
 											links: item.children || [],
 										};
 										return (
-											<SectionCard
-												isDragging={isDragging}
-												linksManager={linksManager}
-												listeners={listeners}
-												onAddLinkToSection={onAddLinkToSection}
-												onRemoveCustomImage={onRemoveCustomImage}
-												onUpdateCustomImage={onUpdateCustomImage}
-												section={sectionData}
-												setActivatorNodeRef={setActivatorNodeRef}
-												{...cardProps}
-											/>
-										);
+									<SectionCard
+										isDragging={isDragging}
+										linksManager={linksManager}
+										listeners={listeners}
+										onAddLinkToSection={onAddLinkToSection}
+										onRemoveCustomImage={onRemoveCustomImage}
+										onUpdateCustomImage={onUpdateCustomImage}
+										section={sectionData}
+										setActivatorNodeRef={setActivatorNodeRef}
+										{...cardProps}
+									/>
+								);
 									}
 									return (
-										<LinkCard
-											archivingLinkId={archivingLinkId}
-											link={item}
-											listeners={listeners}
-											onRemoveCustomImage={onRemoveCustomImage}
-											onUpdateCustomImage={onUpdateCustomImage}
-											setActivatorNodeRef={setActivatorNodeRef}
-											{...cardProps}
-										/>
-									);
+									<LinkCard
+										archivingLinkId={archivingLinkId}
+										link={item}
+										listeners={listeners}
+										onRemoveCustomImage={onRemoveCustomImage}
+										onUpdateCustomImage={onUpdateCustomImage}
+										setActivatorNodeRef={setActivatorNodeRef}
+										{...cardProps}
+									/>
+								);
 								}}
 							</SortableItem>
 						))}
@@ -143,29 +143,29 @@ const LinkList = (props: LinkListProps) => {
 					{activeItem ? (
 						activeItem.isSection ? (
 							<SectionCard
-								isDragging
-								linksManager={linksManager}
-								onAddLinkToSection={onAddLinkToSection}
-								section={{
-									id: activeItem.id.toString(),
-									dbId: activeItem.dbId || 0,
-									title: activeItem.title,
-									active: activeItem.active,
-									order: activeItem.order || 0,
-									links: activeItem.children || [],
-								}}
-								{...cardProps}
-								listeners={{}}
-								setActivatorNodeRef={noop}
-							/>
+							isDragging
+							linksManager={linksManager}
+							onAddLinkToSection={onAddLinkToSection}
+							section={{
+								id: activeItem.id.toString(),
+								dbId: activeItem.dbId || 0,
+								title: activeItem.title,
+								active: activeItem.active,
+								order: activeItem.order || 0,
+								links: activeItem.children || [],
+							}}
+							{...cardProps}
+							listeners={{}}
+							setActivatorNodeRef={noop}
+						/>
 						) : (
 							<LinkCard
-								archivingLinkId={archivingLinkId}
-								link={activeItem}
-								{...cardProps}
-								listeners={{}}
-								setActivatorNodeRef={noop}
-							/>
+							archivingLinkId={archivingLinkId}
+							link={activeItem}
+							{...cardProps}
+							listeners={{}}
+							setActivatorNodeRef={noop}
+						/>
 						)
 					) : null}
 				</DragOverlay>

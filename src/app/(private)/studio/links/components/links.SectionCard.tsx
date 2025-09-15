@@ -31,7 +31,6 @@ interface SectionCardProps {
 	onDeleteLink: (id: number) => void;
 	onSaveEditing: (id: number, title: string, url: string) => void;
 	onToggleActive: (id: number, isActive: boolean) => void;
-
 	onLinkChange: (id: number, field: "title" | "url", value: string) => void;
 	onCancelEditing: (id: number) => void;
 	onStartEditing: (id: number) => void;
@@ -39,7 +38,7 @@ interface SectionCardProps {
 	listeners: any;
 	setActivatorNodeRef: (element: HTMLElement | null) => void;
 	isDragging: boolean;
-	// Novas props para criação de link na seção
+	archivingLinkId?: number | null;
 	onAddLinkToSection?: (sectionId: number) => void;
 	linksManager?: any;
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
@@ -141,11 +140,11 @@ const SectionCard = ({
 								linksManager={{
 									...linksManager,
 									handleAddNewLink: async () => {
-								if (onAddLinkToSection) {
-									await onAddLinkToSection(section.dbId);
-								}
-								setIsAddingLink(false);
-							},
+										if (onAddLinkToSection) {
+											await onAddLinkToSection(section.dbId);
+										}
+										setIsAddingLink(false);
+									},
 									setIsAdding: setIsAddingLink,
 									isAdding: isAddingLink,
 								}}
@@ -165,11 +164,11 @@ const SectionCard = ({
 										setActivatorNodeRef: linkSetActivatorNodeRef,
 									}) => (
 										<LinkCard
-											link={linkItem}
-											listeners={linkListeners}
-											setActivatorNodeRef={linkSetActivatorNodeRef}
-											{...linkCardProps}
-										/>
+									link={linkItem}
+									listeners={linkListeners}
+									setActivatorNodeRef={linkSetActivatorNodeRef}
+									{...linkCardProps}
+								/>
 									)}
 								</SortableItem>
 							))}

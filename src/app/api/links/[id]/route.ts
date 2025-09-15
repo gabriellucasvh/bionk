@@ -28,7 +28,7 @@ export async function PUT(
 	try {
 		const body = await request.json();
 		// Permite que qualquer campo do link seja atualizado
-		const { title, url, active, archived, launchesAt, expiresAt } = body;
+		const { title, url, active, archived, launchesAt, expiresAt, animated } = body;
 
 		const updatedLink = await prisma.link.update({
 			where: { id: Number.parseInt(id, 10) },
@@ -39,6 +39,7 @@ export async function PUT(
 				archived,
 				launchesAt: launchesAt ? new Date(launchesAt) : null,
 				expiresAt: expiresAt ? new Date(expiresAt) : null,
+				animated,
 			},
 		});
 

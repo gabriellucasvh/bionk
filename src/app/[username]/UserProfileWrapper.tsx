@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import SensitiveContentWarning from "@/components/SensitiveContentWarning";
+import { LinkAnimationProvider } from "@/providers/linkAnimationProvider";
 import type { UserProfile as UserProfileData } from "@/types/user-profile";
 
 interface UserProfileWrapperProps {
@@ -53,5 +54,9 @@ export function UserProfileWrapper({
 		);
 	}
 
-	return <>{children}</>;
+	return (
+		<LinkAnimationProvider>
+			{children}
+		</LinkAnimationProvider>
+	);
 }

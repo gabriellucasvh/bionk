@@ -7,6 +7,7 @@ import type { FC, MouseEvent, ReactNode } from "react";
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import LinkOptionsModal from "@/components/modals/LinkOptionsModal";
+import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { UserLink } from "@/types/user-profile";
 import { detectTrafficSource } from "@/utils/traffic-source";
 
@@ -102,8 +103,6 @@ const ImageComponent: FC<ImageComponentProps> = ({
 	);
 };
 
-
-
 const InteractiveLink: FC<InteractiveLinkProps> = ({
 	href,
 	link,
@@ -116,13 +115,15 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [faviconError, setFaviconError] = useState(false);
 	const [customImageError, setCustomImageError] = useState(false);
+	const { animatedLinks } = useLinkAnimation();
+	const isAnimated = animatedLinks.has(link.id.toString());
 
 	// Calcular o borderRadius baseado no customButtonCorners ou usar padrão
 	const imageBorderRadius = customPresets?.customButtonCorners
 		? Number(customPresets.customButtonCorners)
 		: borderRadius || 12; // 12px é o padrão do rounded-xl
 
-	const faviconUrl = getFaviconUrl(link.url || '');
+	const faviconUrl = getFaviconUrl(link.url || "");
 	const imageUrl = getImageUrl(link, customImageError, faviconUrl);
 	const showImage = shouldShowImage(
 		imageUrl,
@@ -131,8 +132,6 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		faviconError
 	);
 	const isGif = isGifImage(imageUrl);
-
-
 
 	// Função auxiliar para enviar dados de clique
 	const sendClickData = () => {
@@ -170,6 +169,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 			<div
 				className={twMerge(
 					"group relative w-full rounded-xl shadow-md",
+					isAnimated ? "animate-shake" : "",
 					className
 				)}
 				style={style}
@@ -205,8 +205,6 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 				>
 					<MoreVertical className="size-5" />
 				</button>
-
-
 			</div>
 
 			<LinkOptionsModal

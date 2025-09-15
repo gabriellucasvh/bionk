@@ -2,7 +2,7 @@
 
 import type { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type {
 	LinkItem,
 	SectionItem,
@@ -54,6 +54,7 @@ export const useLinksManager = (
 	mutateLinks: () => Promise<any>,
 	mutateSections: () => Promise<any>
 ) => {
+
 	// ... (useState, useEffect, useMemo, findContainerId, etc. continuam iguais)
 	const [unifiedItems, setUnifiedItems] = useState<UnifiedItem[]>([]);
 	const [activeId, setActiveId] = useState<string | null>(null);
@@ -428,6 +429,8 @@ export const useLinksManager = (
 			handleLinkUpdate(id, { clicks: link.clicks + 1 });
 		}
 	};
+
+
 
 	return {
 		unifiedItems,
