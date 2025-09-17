@@ -1,9 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
+
+import type { Metadata } from "next";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import HeaderMobile from "@/components/layout/HeaderMobile";
 import { Separator } from "@/components/ui/separator";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
 	title: "Bionk | Termos e Condições",
@@ -26,7 +27,7 @@ export default function TermosECondicoes() {
 								Termos e Condições
 							</h1>
 							<p className="text-muted-foreground">
-								Última atualização: 26/03/2025
+								Última atualização: 17/09/2025
 							</p>
 						</div>
 						<Separator />
@@ -125,35 +126,75 @@ export default function TermosECondicoes() {
 									Você concorda em não usar o Serviço para:
 								</p>
 								<ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
-									<li>Violar qualquer lei ou regulamento aplicável</li>
 									<li>
-										Infringir os direitos de propriedade intelectual de
+										Qualquer propósito ilegal ou para solicitar outros a
+										realizar ou participar de atos ilegais
+									</li>
+									<li>
+										Violar qualquer regulamento, regra, lei ou ordenança local,
+										estadual, nacional ou internacional
+									</li>
+									<li>
+										Infringir ou violar nossos direitos de propriedade
+										intelectual ou os direitos de propriedade intelectual de
 										terceiros
 									</li>
 									<li>
-										Transmitir qualquer material que seja difamatório, ofensivo
-										ou de outra forma censurável
+										Assediar, abusar, insultar, prejudicar, difamar, caluniar,
+										depreciar, intimidar ou discriminar com base em gênero,
+										orientação sexual, religião, etnia, raça, idade,
+										nacionalidade ou deficiência
 									</li>
-									<li>Enviar comunicações comerciais não solicitadas (spam)</li>
+									<li>Enviar informações falsas ou enganosas ou spam</li>
 									<li>
-										Carregar ou transmitir vírus, malware ou outro código
-										malicioso
+										Fazer upload ou transmitir vírus ou qualquer outro tipo de
+										código malicioso que será ou pode ser usado de qualquer
+										forma que afete a funcionalidade ou operação do Serviço ou
+										de qualquer site relacionado, outros sites ou a Internet
+									</li>
+									<li>Coletar ou rastrear as informações pessoais de outros</li>
+									<li>Spam, phish, pharm, pretext, spider, crawl ou scrape</li>
+									<li>
+										Qualquer propósito obsceno ou imoral ou para criar links que
+										redirecionem para conteúdo inadequado
 									</li>
 									<li>
-										Tentar obter acesso não autorizado ao Serviço ou sistemas
-										relacionados
-									</li>
-									<li>
-										Interferir ou interromper a integridade ou o desempenho do
-										Serviço
-									</li>
-									<li>Coletar ou colher dados de usuários sem permissão</li>
-									<li>Personificar outra pessoa ou entidade</li>
-									<li>
-										Usar o Serviço para qualquer finalidade ilegal ou não
-										autorizada
+										Interferir ou contornar os recursos de segurança do Serviço
+										ou qualquer site relacionado, outros sites ou a Internet
 									</li>
 								</ul>
+								<p className="mt-2 text-muted-foreground">
+									Reservamo-nos o direito de encerrar seu uso do Serviço ou
+									qualquer site relacionado por violar qualquer um dos usos
+									proibidos.
+								</p>
+
+								<h3 className="mt-3 font-medium text-lg">
+									6.1 Coleta de Dados e Analytics
+								</h3>
+								<p className="mt-2 text-muted-foreground">
+									Para melhorar nossos serviços e fornecer analytics detalhados,
+									coletamos informações sobre o uso da plataforma, incluindo:
+								</p>
+								<ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
+									<li>Dados de cliques e visualizações de links</li>
+									<li>
+										Informações sobre origem do tráfego (redes sociais,
+										referrers)
+									</li>
+									<li>
+										Tipo de dispositivo e sistema operacional (de forma
+										anonimizada)
+									</li>
+									<li>Localização geográfica aproximada (nível de país)</li>
+									<li>Dados de navegação e interação com a plataforma</li>
+								</ul>
+								<p className="mt-2 text-muted-foreground">
+									Todos os dados são coletados em conformidade com a LGPD e
+									nossa Política de Privacidade. Você pode gerenciar suas
+									preferências de cookies e analytics através das configurações
+									da plataforma.
+								</p>
 							</section>
 
 							<section>
@@ -264,6 +305,35 @@ export default function TermosECondicoes() {
 									sobreviverão à rescisão, incluindo, sem limitação, disposições
 									de propriedade, isenções de garantia, indenização e limitações
 									de responsabilidade.
+								</p>
+
+								<h3 className="mt-3 font-medium text-lg">
+									11.1 Exclusão de Conta pelo Usuário
+								</h3>
+								<p className="mt-2 text-muted-foreground">
+									Você pode solicitar a exclusão permanente de sua conta a
+									qualquer momento através das configurações da sua conta. A
+									exclusão de conta é irreversível e resultará na remoção
+									permanente de:
+								</p>
+								<ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
+									<li>Todos os seus dados pessoais e informações de perfil</li>
+									<li>Todos os links criados e suas estatísticas</li>
+									<li>Dados de analytics e visualizações</li>
+									<li>Configurações e preferências personalizadas</li>
+									<li>Histórico de atividades e interações</li>
+								</ul>
+								<p className="mt-2 text-muted-foreground">
+									Após a confirmação da exclusão, seus dados serão removidos de
+									nossos sistemas em até 30 dias, exceto quando a retenção for
+									exigida por lei. Links públicos criados por você podem
+									permanecer inacessíveis, mas não serão transferidos para
+									outros usuários.
+								</p>
+								<p className="mt-2 text-muted-foreground">
+									<strong>Importante:</strong> A exclusão da conta não pode ser
+									desfeita. Certifique-se de fazer backup de qualquer informação
+									importante antes de proceder com a exclusão.
 								</p>
 							</section>
 

@@ -1,9 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
+
+import type { Metadata } from "next";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import HeaderMobile from "@/components/layout/HeaderMobile";
 import { Separator } from "@/components/ui/separator";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
 	title: "Bionk | Política de Privacidade",
@@ -26,7 +27,7 @@ export default function PoliticaDePrivacidade() {
 								Política de Privacidade
 							</h1>
 							<p className="text-muted-foreground">
-								Última atualização: 26/03/2025
+								Última atualização: 17/09/2025
 							</p>
 						</div>
 						<Separator />
@@ -81,7 +82,9 @@ export default function PoliticaDePrivacidade() {
 									</li>
 								</ul>
 
-								<h3 className="mt-3 font-medium text-lg">2.2 Dados de Uso</h3>
+								<h3 className="mt-3 font-medium text-lg">
+									2.2 Dados de Uso e Analytics
+								</h3>
 								<p className="mt-2 text-muted-foreground">
 									Também coletamos informações sobre como o Serviço é acessado e
 									usado ("Dados de Uso"). Esses Dados de Uso podem incluir
@@ -91,6 +94,43 @@ export default function PoliticaDePrivacidade() {
 									visita, a hora e data da sua visita, o tempo gasto nessas
 									páginas, identificadores exclusivos de dispositivos e outros
 									dados de diagnóstico.
+								</p>
+								<p className="mt-2 text-muted-foreground">
+									Especificamente, coletamos dados detalhados de analytics para
+									melhorar nossos serviços:
+								</p>
+								<ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
+									<li>
+										<strong>Dados de Cliques:</strong> Registramos cliques em
+										links para fornecer estatísticas aos usuários
+									</li>
+									<li>
+										<strong>Visualizações de Perfil:</strong> Contabilizamos
+										visualizações de perfis públicos
+									</li>
+									<li>
+										<strong>Origem do Tráfego:</strong> Identificamos de onde os
+										visitantes chegam (Instagram, WhatsApp, TikTok, Facebook,
+										Twitter/X, LinkedIn, Telegram, YouTube, etc.)
+									</li>
+									<li>
+										<strong>Detecção de Dispositivo:</strong> Identificamos o
+										tipo de dispositivo (mobile, tablet, desktop) de forma
+										anonimizada
+									</li>
+									<li>
+										<strong>Sistema Operacional:</strong> Coletamos informações
+										sobre o sistema operacional usado
+									</li>
+									<li>
+										<strong>User-Agent:</strong> Analisamos o User-Agent para
+										melhor detecção de plataformas e dispositivos
+									</li>
+								</ul>
+								<p className="mt-2 text-muted-foreground">
+									Todos esses dados são coletados respeitando suas preferências
+									de cookies e podem ser desabilitados através das configurações
+									de privacidade.
 								</p>
 
 								<h3 className="mt-3 font-medium text-lg">
@@ -114,7 +154,8 @@ export default function PoliticaDePrivacidade() {
 								<p className="mt-2 text-muted-foreground">
 									Usamos cookies e tecnologias de rastreamento similares para
 									rastrear a atividade em nosso Serviço e armazenar certas
-									informações.
+									informações. Implementamos um sistema de consentimento de
+									cookies em conformidade com a LGPD.
 								</p>
 								<p className="mt-2 text-muted-foreground">
 									Cookies são arquivos com pequena quantidade de dados que podem
@@ -129,31 +170,38 @@ export default function PoliticaDePrivacidade() {
 									Você pode instruir seu navegador a recusar todos os cookies ou
 									indicar quando um cookie está sendo enviado. No entanto, se
 									você não aceitar cookies, pode não conseguir usar algumas
-									partes do nosso Serviço.
+									partes do nosso Serviço. Você também pode gerenciar suas
+									preferências através do nosso banner de cookies.
 								</p>
 								<p className="mt-2 text-muted-foreground">
-									Exemplos de Cookies que usamos:
+									Tipos de Cookies que usamos:
 								</p>
 								<ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
 									<li>
-										<strong>Cookies de Sessão:</strong> Usamos Cookies de Sessão
-										para operar nosso Serviço.
+										<strong>Cookies Essenciais:</strong> Necessários para o
+										funcionamento básico do site, autenticação e segurança
+										(sempre ativos)
 									</li>
 									<li>
-										<strong>Cookies de Preferência:</strong> Usamos Cookies de
-										Preferência para lembrar suas preferências e várias
-										configurações.
+										<strong>Cookies Funcionais:</strong> Armazenam preferências
+										de tema, idioma e configurações de usuário
 									</li>
 									<li>
-										<strong>Cookies de Segurança:</strong> Usamos Cookies de
-										Segurança para fins de segurança.
+										<strong>Cookies de Analytics:</strong> Coletam dados sobre
+										visualizações de perfil, cliques, origem do tráfego, tipo de
+										dispositivo e localização por país
 									</li>
 									<li>
-										<strong>Cookies de Publicidade:</strong> Cookies de
-										Publicidade são usados para apresentar anúncios que podem
-										ser relevantes para você e seus interesses.
+										<strong>Cookies de Marketing:</strong> Usados para
+										personalização de conteúdo e publicidade direcionada
 									</li>
 								</ul>
+								<p className="mt-2 text-muted-foreground">
+									<strong>Importante:</strong> Você pode personalizar suas
+									preferências de cookies a qualquer momento através das
+									configurações de privacidade da plataforma. Os dados de
+									analytics só são coletados com seu consentimento explícito.
+								</p>
 							</section>
 
 							<section>
@@ -305,7 +353,76 @@ export default function PoliticaDePrivacidade() {
 							</section>
 
 							<section>
-								<h2 className="font-semibold text-xl">5. Segurança de Dados</h2>
+								<h2 className="font-semibold text-xl">
+									7. Seus Direitos de Privacidade (LGPD)
+								</h2>
+								<p className="mt-2 text-muted-foreground">
+									De acordo com a Lei Geral de Proteção de Dados (LGPD), você
+									tem os seguintes direitos em relação aos seus dados pessoais:
+								</p>
+								<ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
+									<li>
+										<strong>Confirmação da existência de tratamento:</strong>{" "}
+										Direito de obter confirmação sobre o tratamento de seus
+										dados pessoais
+									</li>
+									<li>
+										<strong>Acesso aos dados:</strong> Direito de acessar seus
+										dados pessoais que estão sendo tratados
+									</li>
+									<li>
+										<strong>Correção de dados:</strong> Direito de solicitar a
+										correção de dados incompletos, inexatos ou desatualizados
+									</li>
+									<li>
+										<strong>Anonimização ou eliminação:</strong> Direito de
+										solicitar a anonimização, bloqueio ou eliminação de dados
+										desnecessários ou excessivos
+									</li>
+									<li>
+										<strong>Portabilidade:</strong> Direito de solicitar a
+										portabilidade dos dados a outro fornecedor de serviço
+									</li>
+									<li>
+										<strong>Eliminação (Direito ao Esquecimento):</strong>{" "}
+										Direito de solicitar a eliminação dos dados tratados com seu
+										consentimento
+									</li>
+									<li>
+										<strong>Informação sobre compartilhamento:</strong> Direito
+										de ser informado sobre entidades com as quais seus dados
+										foram compartilhados
+									</li>
+									<li>
+										<strong>Revogação do consentimento:</strong> Direito de
+										revogar o consentimento a qualquer momento
+									</li>
+								</ul>
+								<p className="mt-2 text-muted-foreground">
+									Para exercer qualquer um desses direitos, você pode:
+								</p>
+								<ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
+									<li>
+										Usar as configurações de privacidade disponíveis em sua
+										conta
+									</li>
+									<li>
+										Utilizar a funcionalidade de exclusão de conta nas
+										configurações
+									</li>
+									<li>
+										Entrar em contato conosco através dos canais de suporte
+									</li>
+								</ul>
+								<p className="mt-2 text-muted-foreground">
+									Responderemos às suas solicitações dentro do prazo
+									estabelecido pela LGPD (15 dias, prorrogáveis por mais 15
+									dias).
+								</p>
+							</section>
+
+							<section>
+								<h2 className="font-semibold text-xl">8. Segurança de Dados</h2>
 								<p className="mt-2 text-muted-foreground">
 									A segurança de seus dados é importante para nós, mas lembre-se
 									que nenhum método de transmissão pela Internet ou método de
@@ -333,58 +450,70 @@ export default function PoliticaDePrivacidade() {
 
 							<section>
 								<h2 className="font-semibold text-xl">
-									6. Seus Direitos de Privacidade
+									6. Exclusão de Dados e Direito ao Esquecimento
 								</h2>
 								<p className="mt-2 text-muted-foreground">
-									De acordo com a Lei Geral de Proteção de Dados (LGPD) e outras
-									leis de proteção de dados aplicáveis, você tem certos direitos
-									em relação às suas informações pessoais:
+									Em conformidade com a LGPD, você tem o direito de solicitar a
+									exclusão de seus dados pessoais. Oferecemos duas formas de
+									exclusão:
+								</p>
+
+								<h3 className="mt-3 font-medium text-lg">
+									6.1 Exclusão de Conta pelo Usuário
+								</h3>
+								<p className="mt-2 text-muted-foreground">
+									Você pode excluir sua conta a qualquer momento através das
+									configurações da sua conta. Ao solicitar a exclusão:
 								</p>
 								<ul className="mt-2 list-inside list-disc space-y-1 text-muted-foreground">
 									<li>
-										<strong>Direito de acesso:</strong> Você tem o direito de
-										solicitar cópias de suas informações pessoais.
+										Todos os seus dados pessoais serão removidos permanentemente
 									</li>
 									<li>
-										<strong>Direito de retificação:</strong> Você tem o direito
-										de solicitar que corrijamos qualquer informação que você
-										acredite ser imprecisa. Você também tem o direito de
-										solicitar que completemos informações que você acredita
-										estarem incompletas.
+										Seu perfil e links associados serão desativados
+										imediatamente
 									</li>
+									<li>Dados de analytics e visualizações serão anonimizados</li>
+									<li>Assinaturas ativas serão canceladas automaticamente</li>
 									<li>
-										<strong>Direito ao esquecimento:</strong> Você tem o direito
-										de solicitar que apaguemos suas informações pessoais, sob
-										certas condições.
-									</li>
-									<li>
-										<strong>Direito à restrição de processamento:</strong> Você
-										tem o direito de solicitar que restrinjamos o processamento
-										de suas informações pessoais, sob certas condições.
-									</li>
-									<li>
-										<strong>Direito à portabilidade de dados:</strong> Você tem
-										o direito de solicitar que transfiramos os dados que
-										coletamos para outra organização, ou diretamente para você,
-										sob certas condições.
-									</li>
-									<li>
-										<strong>Direito de oposição:</strong> Você tem o direito de
-										se opor ao nosso processamento de suas informações pessoais,
-										sob certas condições.
+										Notificações de exclusão serão enviadas para nossos sistemas
+										internos
 									</li>
 								</ul>
 								<p className="mt-2 text-muted-foreground">
-									Se você deseja exercer qualquer desses direitos, entre em
-									contato conosco através das informações de contato fornecidas
-									no final desta política. Responderemos à sua solicitação
-									dentro do prazo exigido pela lei aplicável.
+									<strong>Prazo de Processamento:</strong> A exclusão é
+									processada imediatamente, mas pode levar até 30 dias para ser
+									completamente removida de todos os nossos sistemas e backups.
+								</p>
+								<p className="mt-2 text-muted-foreground">
+									<strong>Importante:</strong> A exclusão da conta é
+									irreversível. Certifique-se de fazer backup de qualquer
+									informação importante antes de prosseguir.
+								</p>
+
+								<h3 className="mt-3 font-medium text-lg">
+									6.2 Solicitação de Exclusão de Dados Específicos
+								</h3>
+								<p className="mt-2 text-muted-foreground">
+									Você também pode solicitar a exclusão de dados específicos sem
+									excluir toda a conta. Para isso, entre em contato conosco
+									através dos canais de suporte disponíveis.
+								</p>
+
+								<h3 className="mt-3 font-medium text-lg">
+									6.3 Retenção de Dados Legais
+								</h3>
+								<p className="mt-2 text-muted-foreground">
+									Alguns dados podem ser mantidos por períodos específicos
+									quando exigido por lei, regulamentação ou para fins de
+									segurança e prevenção de fraudes, mesmo após a solicitação de
+									exclusão.
 								</p>
 							</section>
 
 							<section>
 								<h2 className="font-semibold text-xl">
-									7. Privacidade Infantil
+									9. Privacidade Infantil
 								</h2>
 								<p className="mt-2 text-muted-foreground">
 									Nosso Serviço não se dirige a menores de 13 anos ("Crianças").
@@ -402,7 +531,7 @@ export default function PoliticaDePrivacidade() {
 
 							<section>
 								<h2 className="font-semibold text-xl">
-									8. Transferências Internacionais de Dados
+									10. Transferências Internacionais de Dados
 								</h2>
 								<p className="mt-2 text-muted-foreground">
 									Suas informações, incluindo Dados Pessoais, podem ser
@@ -434,7 +563,7 @@ export default function PoliticaDePrivacidade() {
 
 							<section>
 								<h2 className="font-semibold text-xl">
-									9. Links para Outros Sites
+									11. Links para Outros Sites
 								</h2>
 								<p className="mt-2 text-muted-foreground">
 									Nosso Serviço pode conter links para outros sites que não são
@@ -452,7 +581,7 @@ export default function PoliticaDePrivacidade() {
 
 							<section>
 								<h2 className="font-semibold text-xl">
-									10. Alterações a Esta Política de Privacidade
+									12. Alterações a Esta Política de Privacidade
 								</h2>
 								<p className="mt-2 text-muted-foreground">
 									Podemos atualizar nossa Política de Privacidade de tempos em
@@ -474,7 +603,7 @@ export default function PoliticaDePrivacidade() {
 							</section>
 
 							<section>
-								<h2 className="font-semibold text-xl">11. Contato</h2>
+								<h2 className="font-semibold text-xl">13. Contato</h2>
 								<p className="mt-2 text-muted-foreground">
 									Se você tiver alguma dúvida sobre esta Política de
 									Privacidade, entre em contato conosco:
@@ -491,7 +620,7 @@ export default function PoliticaDePrivacidade() {
 					</div>
 				</div>
 			</main>
-    
+
 			<Footer />
 		</div>
 	);
