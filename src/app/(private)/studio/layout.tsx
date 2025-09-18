@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import LoadingPage from "@/components/layout/LoadingPage";
-import { ThemeProvider } from "@/providers/themeProvider";
 import Sidebar from "./Sidebar";
 
 interface StudioLayoutProps {
@@ -41,15 +40,13 @@ export default function StudioLayout({ children }: StudioLayoutProps) {
 	}
 
 	return (
-		<ThemeProvider>
-			<div className="flex min-h-screen w-full max-w-full overflow-x-hidden bg-gray-50">
-				{!isOnboardingPage && <Sidebar />}
-				<main
-					className={`w-full max-w-full flex-1 overflow-x-hidden ${isOnboardingPage ? "" : "md:ml-64"}`}
-				>
-					{children}
-				</main>
-			</div>
-		</ThemeProvider>
+		<div className="flex min-h-screen w-full max-w-full overflow-x-hidden bg-gray-50">
+			{!isOnboardingPage && <Sidebar />}
+			<main
+				className={`w-full max-w-full flex-1 overflow-x-hidden ${isOnboardingPage ? "" : "md:ml-64"}`}
+			>
+				{children}
+			</main>
+		</div>
 	);
 }

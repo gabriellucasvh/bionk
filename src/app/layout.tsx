@@ -1,9 +1,33 @@
+import type { Metadata } from "next";
+import {
+	Alegreya,
+	Atkinson_Hyperlegible,
+	Dancing_Script,
+	DM_Serif_Display,
+	Fira_Sans,
+	Geist,
+	Inter,
+	Karla,
+	Libre_Baskerville,
+	Merriweather,
+	Montserrat,
+	Mulish,
+	Nunito,
+	Orbitron,
+	Outfit,
+	Playfair_Display,
+	Plus_Jakarta_Sans,
+	Poppins,
+	Public_Sans,
+	Space_Grotesk,
+	Spectral,
+	Urbanist,
+} from "next/font/google";
+import localFont from "next/font/local";
+import { LinkAnimationProvider } from "@/providers/linkAnimationProvider";
 import NextAuthSessionProvider from "@/providers/sessionProvider";
 import { SubscriptionProvider } from "@/providers/subscriptionProvider";
-import { LinkAnimationProvider } from "@/providers/linkAnimationProvider";
-import type { Metadata } from "next";
-import { Geist, Inter, Montserrat, Poppins, Nunito, Playfair_Display, Merriweather, Dancing_Script, DM_Serif_Display, Orbitron, Plus_Jakarta_Sans, Outfit, Space_Grotesk, Libre_Baskerville, Alegreya, Spectral, Urbanist, Karla, Public_Sans, Atkinson_Hyperlegible, Fira_Sans, Mulish } from "next/font/google";
-import localFont from "next/font/local";
+import { ThemeProvider } from "@/providers/themeProvider";
 import "./globals.css";
 
 const Satoshi = localFont({
@@ -135,15 +159,16 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-			<html
-				className={`${geist.variable} ${Satoshi.variable} ${inter.variable} ${montserrat.variable} ${poppins.variable} ${nunito.variable} ${playfairDisplay.variable} ${merriweather.variable} ${dancingScript.variable} ${dmSerifDisplay.variable} ${orbitron.variable} ${plusJakartaSans.variable} ${outfit.variable} ${spaceGrotesk.variable} ${libreBaskerville.variable} ${alegreya.variable} ${spectral.variable} ${urbanist.variable} ${karla.variable} ${publicSans.variable} ${atkinsonHyperlegible.variable} ${firaSans.variable} ${mulish.variable} antialiased`}
-				lang="pt-BR" suppressHydrationWarning={true}
-			>
+		<html
+			className={`${geist.variable} ${Satoshi.variable} ${inter.variable} ${montserrat.variable} ${poppins.variable} ${nunito.variable} ${playfairDisplay.variable} ${merriweather.variable} ${dancingScript.variable} ${dmSerifDisplay.variable} ${orbitron.variable} ${plusJakartaSans.variable} ${outfit.variable} ${spaceGrotesk.variable} ${libreBaskerville.variable} ${alegreya.variable} ${spectral.variable} ${urbanist.variable} ${karla.variable} ${publicSans.variable} ${atkinsonHyperlegible.variable} ${firaSans.variable} ${mulish.variable} antialiased`}
+			lang="pt-BR"
+			suppressHydrationWarning={true}
+		>
 			<body>
 				<NextAuthSessionProvider>
 					<SubscriptionProvider>
 						<LinkAnimationProvider>
-							{children}
+							<ThemeProvider>{children}</ThemeProvider>
 						</LinkAnimationProvider>
 					</SubscriptionProvider>
 				</NextAuthSessionProvider>
