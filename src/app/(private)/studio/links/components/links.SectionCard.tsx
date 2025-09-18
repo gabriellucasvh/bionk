@@ -59,7 +59,7 @@ const SectionCard = ({
 }: SectionCardProps) => {
 	const [isAddingLink, setIsAddingLink] = useState(false);
 	return (
-		<section className="space-y-4 rounded-lg bg-gray-100 p-4">
+		<section className="space-y-4 rounded-lg bg-gray-100 p-4 dark:bg-[#202020]">
 			{/* Header reorganizado para dispositivos móveis */}
 			<div className="space-y-3">
 				{/* Primeira linha: Grip, Título e Menu de opções */}
@@ -100,7 +100,7 @@ const SectionCard = ({
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					{!isAddingLink && (
 						<Button
-							className="h-8 flex-shrink-0"
+							className="h-8 flex-shrink-0 rounded-full"
 							onClick={() => setIsAddingLink(true)}
 							size="sm"
 							variant="outline"
@@ -164,11 +164,11 @@ const SectionCard = ({
 										setActivatorNodeRef: linkSetActivatorNodeRef,
 									}) => (
 										<LinkCard
-									link={linkItem}
-									listeners={linkListeners}
-									setActivatorNodeRef={linkSetActivatorNodeRef}
-									{...linkCardProps}
-								/>
+											link={linkItem}
+											listeners={linkListeners}
+											setActivatorNodeRef={linkSetActivatorNodeRef}
+											{...linkCardProps}
+										/>
 									)}
 								</SortableItem>
 							))}

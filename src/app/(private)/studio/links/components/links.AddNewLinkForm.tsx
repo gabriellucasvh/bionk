@@ -227,12 +227,13 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 	};
 
 	return (
-		<section className="space-y-4 rounded-lg border bg-muted/20 p-4">
+		<section className="space-y-4 rounded-lg border bg-muted/90 p-4">
 			{/* Campos Principais */}
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 				<div className="grid gap-2">
 					<Label htmlFor="title">Título do Link</Label>
 					<Input
+						className="bg-white dark:bg-[#202020]"
 						id="title"
 						onChange={(e) =>
 							setFormData({ ...formData, title: e.target.value })
@@ -244,6 +245,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 				<div className="grid gap-2">
 					<Label htmlFor="url">URL</Label>
 					<Input
+						className="bg-white dark:bg-[#202020]"
 						id="url"
 						onChange={(e) => setFormData({ ...formData, url: e.target.value })}
 						placeholder="https://exemplo.com"
