@@ -77,7 +77,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 					<div className="mt-4 flex w-full flex-col gap-3">
 						<BaseButton asChild className="w-full">
 							<Link href="/registro" rel="noopener noreferrer" target="_blank">
-								Criar sua conta Bionk
+								Crie sua conta na Bionk
 							</Link>
 						</BaseButton>
 					</div>
