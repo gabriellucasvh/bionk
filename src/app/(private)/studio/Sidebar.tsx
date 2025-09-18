@@ -347,7 +347,7 @@ const Sidebar = () => {
 
 			{/* Navbar mobile */}
 			<nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-white transition-colors md:hidden dark:border-neutral-700 dark:bg-neutral-800">
-				<ul className="grid grid-cols-5 divide-x divide-neutral-100 py-3">
+				<ul className="grid grid-cols-5 py-3">
 					{mainLinks.map((link) => {
 						const isActive = pathname === link.href;
 						return (
