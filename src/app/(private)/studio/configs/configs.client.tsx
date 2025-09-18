@@ -340,7 +340,7 @@ export default function ConfigsClient() {
 	}
 
 	return (
-			<div className="container mx-auto max-w-4xl space-y-4 p-3 pb-24 sm:space-y-6 sm:p-6 sm:pb-8 lg:space-y-8 dark:text-white">
+		<div className="container mx-auto max-w-4xl space-y-4 p-3 pb-24 sm:space-y-6 sm:p-6 sm:pb-8 lg:space-y-8 dark:text-white">
 			<header className="space-y-1 sm:space-y-2">
 				<h1 className="font-bold text-xl sm:text-2xl lg:text-3xl dark:text-white">
 					Configurações
@@ -559,7 +559,7 @@ export default function ConfigsClient() {
 									Excluir Conta
 								</Button>
 							</AlertDialogTrigger>
-							<AlertDialogContent className="mx-3 max-w-sm sm:mx-4 sm:max-w-md dark:border-neutral-700 dark:bg-neutral-800">
+							<AlertDialogContent className="mx-auto w-[calc(100vw-2rem)] max-w-md sm:mx-auto sm:w-full dark:border-neutral-700 dark:bg-neutral-800">
 								<AlertDialogHeader className="space-y-2">
 									<AlertDialogTitle className="text-base sm:text-lg dark:text-white">
 										Tem certeza?
@@ -569,7 +569,7 @@ export default function ConfigsClient() {
 										removidos permanentemente.
 									</AlertDialogDescription>
 								</AlertDialogHeader>
-								<AlertDialogFooter className="flex-col gap-2 sm:flex-row sm:gap-3">
+								<AlertDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
 									<AlertDialogCancel className="w-full text-xs sm:w-auto sm:text-sm">
 										Cancelar
 									</AlertDialogCancel>
