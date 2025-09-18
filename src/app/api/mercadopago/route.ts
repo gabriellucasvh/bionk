@@ -251,6 +251,7 @@ async function createPreapprovalPlan(
 	});
 
 	try {
+		const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.bionk.me";
 		const planData = {
 			reason: `Plano ${plan.charAt(0).toUpperCase() + plan.slice(1)} (${billingCycle === "monthly" ? "Mensal" : "Anual"})`,
 			auto_recurring: {
@@ -259,7 +260,11 @@ async function createPreapprovalPlan(
 				transaction_amount: transactionAmount / 100,
 				currency_id: "BRL",
 			},
-			back_url: "https://www.mercadopago.com.br",
+			back_urls: {
+				success: `${baseUrl}/checkout/success`,
+				failure: `${baseUrl}/checkout/failure`,
+				pending: `${baseUrl}/checkout/pending`,
+			},
 		};
 
 		logInfo("Creating preapproval plan", { planData });
@@ -384,6 +389,7 @@ function buildPreapprovalData(
 	endDate: Date
 ) {
 	const testEnv = isTestEnvironment();
+	const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.bionk.me";
 
 	const preapprovalData: any = {
 		payer_email: email,
@@ -396,9 +402,13 @@ function buildPreapprovalData(
 			start_date: startDate.toISOString(),
 			end_date: endDate.toISOString(),
 		},
-		back_url: "https://www.mercadopago.com.br",
+		back_urls: {
+			success: `${baseUrl}/checkout/success`,
+			failure: `${baseUrl}/checkout/failure`,
+			pending: `${baseUrl}/checkout/pending`,
+		},
 		external_reference: userId,
-		notification_url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://www.bionk.me"}/api/mercadopago/webhook`,
+		notification_url: `${baseUrl}/api/mercadopago/webhook`,
 	};
 
 	// Adicionar preapproval_plan_id se foi criado com sucesso
