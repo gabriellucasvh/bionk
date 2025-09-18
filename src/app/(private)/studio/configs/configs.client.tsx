@@ -149,7 +149,7 @@ function CancelSubscriptionButton() {
 function UpgradeSubscriptionCard() {
 	return (
 		<div>
-			<Card className="relative animate-gradient-x overflow-hidden border-0 bg-gradient-to-br from-yellow-500 via-purple-500 to-blue-500 shadow-2xl">
+			<Card className="relative animate-gradient-x overflow-hidden border-0 bg-gradient-to-br from-cyan-500 via-green-500 to-teal-500 shadow-2xl">
 				{/* shimmer */}
 				<div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
@@ -171,7 +171,7 @@ function UpgradeSubscriptionCard() {
 
 				<CardContent className="relative z-10 mb-2">
 					<Link
-						className="group relative w-full transform overflow-hidden rounded-xl bg-lime-400 px-8 py-3 font-medium text-base text-green-800 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-lime-500 hover:shadow-xl"
+						className="group relative w-full transform overflow-hidden rounded-full bg-lime-400 px-8 py-3 font-medium text-base text-green-900 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-lime-500 hover:shadow-xl"
 						href="/planos"
 						passHref
 					>
