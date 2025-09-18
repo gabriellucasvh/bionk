@@ -52,6 +52,9 @@ model User {
   onboardingCompleted           Boolean        @default(false)
   status                        String         @default("pending")
   sensitiveProfile              Boolean        @default(false)
+  isBanned                      Boolean        @default(false)
+  banReason                     String?        @default("violation")
+  bannedAt                      DateTime?
   accounts                      Account[]
   CustomPresets                 CustomPresets?
   Link                          Link[]

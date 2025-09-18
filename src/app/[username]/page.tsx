@@ -38,6 +38,9 @@ export default async function UserPage({ params }: PageProps) {
 			template: true,
 			templateCategory: true,
 			sensitiveProfile: true,
+			isBanned: true,
+			banReason: true,
+			bannedAt: true,
 			// Busca todos os links (incluindo seções) de forma unificada
 			Link: {
 				where: {

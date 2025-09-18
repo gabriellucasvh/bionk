@@ -12,6 +12,16 @@ export async function POST(req: Request) {
 			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 		}
 
+		if (session.user.banido) {
+			return NextResponse.json(
+				{ 
+					error: "Conta suspensa", 
+					message: "Sua conta foi suspensa e não pode realizar esta ação." 
+				},
+				{ status: 403 }
+			);
+		}
+
 		// --- RATE LIMITER ---
 		const identifier = session.user.id; // identificador por usuário
 		const { success } = await getAuthRateLimiter().limit(identifier);

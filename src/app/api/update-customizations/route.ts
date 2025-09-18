@@ -12,6 +12,16 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
+		if (session.user.banido) {
+			return NextResponse.json(
+				{ 
+					error: "Conta suspensa", 
+					message: "Sua conta foi suspensa e não pode realizar esta ação." 
+				},
+				{ status: 403 }
+			);
+		}
+
 		// 1. Recebe as novas personalizações do frontend
 		const newCustomizations = await request.json();
 

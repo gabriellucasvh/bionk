@@ -144,6 +144,21 @@ async function handleOtpRequest(email: string, username: string) {
 		);
 	}
 
+	// Verificar se existe usuário banido com mesmo email ou username
+	const bannedUser = await prisma.user.findFirst({
+		where: {
+			OR: [{ email }, { username: normalizedUsername }],
+			isBanned: true,
+		},
+	});
+
+	if (bannedUser) {
+		return NextResponse.json(
+			{ error: "Não é possível criar conta com estes dados" },
+			{ status: 403 }
+		);
+	}
+
 	// Verificar se Username indisponível ou reservado
 	const existingUsername = await prisma.user.findUnique({
 		where: { username: normalizedUsername },

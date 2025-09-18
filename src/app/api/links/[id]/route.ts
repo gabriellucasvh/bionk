@@ -17,6 +17,16 @@ export async function PUT(
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 	}
 
+	if (session.user.banido) {
+		return NextResponse.json(
+			{ 
+				error: "Conta suspensa", 
+				message: "Sua conta foi suspensa e não pode realizar esta ação." 
+			},
+			{ status: 403 }
+		);
+	}
+
 	const { id } = await params;
 	if (!id) {
 		return NextResponse.json(
@@ -71,6 +81,16 @@ export async function DELETE(
 	const session = await getServerSession(authOptions);
 	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+	}
+
+	if (session.user.banido) {
+		return NextResponse.json(
+			{ 
+				error: "Conta suspensa", 
+				message: "Sua conta foi suspensa e não pode realizar esta ação." 
+			},
+			{ status: 403 }
+		);
 	}
 
 	const { id } = await params;

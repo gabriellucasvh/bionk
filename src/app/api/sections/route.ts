@@ -9,6 +9,16 @@ export async function GET(): Promise<NextResponse> {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 
+	if (session.user.banido) {
+		return NextResponse.json(
+			{ 
+				error: "Conta suspensa", 
+				message: "Sua conta foi suspensa e não pode realizar esta ação." 
+			},
+			{ status: 403 }
+		);
+	}
+
 	const sections = await prisma.section.findMany({
 		where: { userId: session.user.id },
 		orderBy: { order: "asc" },
@@ -29,6 +39,16 @@ export async function POST(req: Request): Promise<NextResponse> {
 	const session = await getServerSession(authOptions);
 	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
+	if (session.user.banido) {
+		return NextResponse.json(
+			{ 
+				error: "Conta suspensa", 
+				message: "Sua conta foi suspensa e não pode realizar esta ação." 
+			},
+			{ status: 403 }
+		);
 	}
 
 	const { title } = await req.json();

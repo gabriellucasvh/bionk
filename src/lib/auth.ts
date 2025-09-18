@@ -16,6 +16,9 @@ function setupInitialToken(token: any, user: ExtendedUser, account: any) {
 	token.picture = user.image ?? undefined;
 	token.onboardingCompleted = user.onboardingCompleted;
 	token.status = user.status;
+	token.isBanned = user.isBanned;
+	token.banReason = user.banReason;
+	token.bannedAt = user.bannedAt;
 
 	if (account?.provider === "google" && account.providerAccountId) {
 		token.googleId = account.providerAccountId;
@@ -31,19 +34,35 @@ function setupAccountData(token: any, account: any) {
 }
 
 function shouldUpdateUserData(token: any): boolean {
-	return token.id && (token.status === "pending" || !token.onboardingCompleted);
+	return (
+		token.id &&
+		(token.status === "pending" ||
+			!token.onboardingCompleted ||
+			token.isBanned === undefined)
+	);
 }
 
 async function updateTokenFromDatabase(token: any) {
 	try {
 		const dbUser = await prisma.user.findUnique({
 			where: { id: token.id as string },
-			select: { onboardingCompleted: true, image: true, status: true },
+			select: {
+				onboardingCompleted: true,
+				image: true,
+				status: true,
+				isBanned: true,
+				banReason: true,
+				bannedAt: true,
+			},
 		});
 
 		if (dbUser) {
 			token.onboardingCompleted = dbUser.onboardingCompleted;
 			token.status = dbUser.status;
+			token.isBanned = dbUser.isBanned;
+			token.banReason = dbUser.banReason;
+			token.bannedAt = dbUser.bannedAt;
+
 			// Só atualizar a imagem se o usuário já completou o onboarding
 			// Durante o onboarding, manter a imagem original do Google
 			if (dbUser.onboardingCompleted && dbUser.image) {
@@ -80,6 +99,9 @@ interface ExtendedUser extends User {
 	onboardingCompleted?: boolean;
 	provider?: string;
 	status?: string;
+	isBanned?: boolean;
+	banReason?: string;
+	bannedAt?: Date;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -198,6 +220,11 @@ export const authOptions: NextAuthOptions = {
 					return null;
 				}
 
+				// Verificar se o usuário está banido
+				if (user.isBanned) {
+					throw new Error("Conta banida");
+				}
+
 				const isValid = await bcrypt.compare(
 					credentials.password,
 					user.hashedPassword
@@ -233,8 +260,8 @@ export const authOptions: NextAuthOptions = {
 				setupAccountData(token, account);
 			}
 
-			// Atualizar dados do usuário se necessário
-			if (shouldUpdateUserData(token)) {
+			// Sempre atualizar dados do usuário para verificar banimento
+			if (token.id) {
 				await updateTokenFromDatabase(token);
 			}
 
@@ -258,6 +285,10 @@ export const authOptions: NextAuthOptions = {
 				onboardingCompleted: token.onboardingCompleted as boolean | undefined,
 				provider: token.provider as string | undefined,
 				status: token.status as string | undefined,
+				banido: token.isBanned as boolean | undefined,
+				isBanned: token.isBanned as boolean | undefined,
+				banReason: token.banReason as string | undefined,
+				bannedAt: token.bannedAt as Date | undefined,
 			};
 			return session;
 		},

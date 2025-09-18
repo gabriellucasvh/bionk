@@ -5,7 +5,7 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(req: NextRequest) {
 	const { pathname } = req.nextUrl;
 
-	const protectedPaths = ["/studio", "/checkout"];
+	const protectedPaths = ["/studio", "/checkout", "/profile"];
 
 	if (protectedPaths.some((path) => pathname.startsWith(path))) {
 		const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -13,6 +13,12 @@ export async function middleware(req: NextRequest) {
 		if (!token) {
 			const registroUrl = new URL("/registro", req.url);
 			return NextResponse.redirect(registroUrl);
+		}
+
+		// Verificar se usuário está banido
+		if (token.isBanned) {
+			const banUrl = new URL("/acesso-negado", req.url);
+			return NextResponse.redirect(banUrl);
 		}
 
 		// Verificar se usuário tem status pending
@@ -32,5 +38,10 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/studio/:path*", "/checkout/:path*", "/onboarding/:path*"],
+	matcher: [
+		"/studio/:path*",
+		"/checkout/:path*",
+		"/onboarding/:path*",
+		"/profile/:path*",
+	],
 };

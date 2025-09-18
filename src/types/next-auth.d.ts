@@ -18,6 +18,10 @@ declare module "next-auth" {
 			onboardingCompleted?: boolean;
 			provider?: string;
 			status?: string;
+			banido?: boolean;
+			isBanned?: boolean;
+			banReason?: string;
+			bannedAt?: Date;
 		} & DefaultSession["user"];
 	}
 
@@ -32,6 +36,10 @@ declare module "next-auth" {
 		onboardingCompleted?: boolean;
 		provider?: string;
 		status?: string;
+		banido?: boolean;
+		isBanned?: boolean;
+		banReason?: string;
+		bannedAt?: Date;
 	}
 }
 
@@ -49,5 +57,8 @@ declare module "next-auth/jwt" {
 		provider?: string;
 		status?: string;
 		accessToken?: string; // Mantido se já estava em uso
+		isBanned?: boolean;
+		banReason?: string;
+		bannedAt?: Date;
 	}
 }

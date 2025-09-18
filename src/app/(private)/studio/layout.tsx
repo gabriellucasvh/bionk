@@ -22,8 +22,15 @@ export default function StudioLayout({ children }: StudioLayoutProps) {
 	useEffect(() => {
 		if (status === "unauthenticated") {
 			router.push("/registro");
+			return;
 		}
-	}, [status, router]);
+
+		// Verificar se o usuário está banido
+		if (status === "authenticated" && session?.user?.isBanned) {
+			router.push("/acesso-negado");
+			return;
+		}
+	}, [status, session, router]);
 
 	if (status === "loading") {
 		return <LoadingPage />;

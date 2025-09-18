@@ -65,6 +65,9 @@ export type UserProfile = PrismaUser & {
 
 	template?: string;
 	templateCategory?: string;
+	isBanned?: boolean;
+	banReason?: string | null;
+	bannedAt?: Date | null;
 };
 
 // --- Props para Templates ---

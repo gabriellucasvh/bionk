@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import BannedUserWarning from "@/components/BannedUserWarning";
 import SensitiveContentWarning from "@/components/SensitiveContentWarning";
 import { LinkAnimationProvider } from "@/providers/linkAnimationProvider";
 import type { UserProfile as UserProfileData } from "@/types/user-profile";
@@ -17,6 +18,17 @@ export function UserProfileWrapper({
 }: UserProfileWrapperProps) {
 	const [showWarning, setShowWarning] = useState(false);
 	const router = useRouter();
+
+	// Verificar se o usuário está banido primeiro
+	if (user.isBanned) {
+		return (
+			<BannedUserWarning
+				bannedAt={user.bannedAt}
+				banReason={user.banReason}
+				username={user.username}
+			/>
+		);
+	}
 
 	useEffect(() => {
 		// Verifica se o perfil é sensível e se o usuário já aceitou o aviso
@@ -54,9 +66,5 @@ export function UserProfileWrapper({
 		);
 	}
 
-	return (
-		<LinkAnimationProvider>
-			{children}
-		</LinkAnimationProvider>
-	);
+	return <LinkAnimationProvider>{children}</LinkAnimationProvider>;
 }

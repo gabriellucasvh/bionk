@@ -63,6 +63,16 @@ export async function POST(request: Request): Promise<NextResponse> {
 		);
 	}
 
+	if (session.user.banido) {
+		return NextResponse.json(
+			{ 
+				error: "Conta suspensa", 
+				message: "Sua conta foi suspensa e não pode realizar esta ação." 
+			},
+			{ status: 403 }
+		);
+	}
+
 	const userExists = await prisma.user.findUnique({
 		where: { id: session.user.id },
 	});
