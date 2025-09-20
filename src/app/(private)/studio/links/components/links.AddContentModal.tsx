@@ -99,9 +99,6 @@ const AddContentModal = ({
 
 				{!selectedOption && (
 					<div className="space-y-6 py-4">
-						<p className="text-center text-muted-foreground text-sm">
-							Escolha o tipo de conteúdo que deseja adicionar:
-						</p>
 
 						<div className="flex justify-center gap-6">
 							<button
