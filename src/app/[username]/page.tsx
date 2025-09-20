@@ -80,6 +80,20 @@ export default async function UserPage({ params }: PageProps) {
 					order: true,
 				},
 			},
+			Text: {
+				where: { active: true },
+				orderBy: { order: "asc" },
+				select: {
+					id: true,
+					title: true,
+					description: true,
+					position: true,
+					hasBackground: true,
+					active: true,
+					order: true,
+					userId: true,
+				},
+			},
 			CustomPresets: {
 				select: {
 					id: true,

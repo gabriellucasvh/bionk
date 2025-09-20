@@ -123,14 +123,17 @@ export async function POST(request: Request): Promise<NextResponse> {
 			}
 		}
 
-		await prisma.link.updateMany({
-			where: { userId: session.user.id, sectionId },
-			data: {
-				order: {
-					increment: 1,
-				},
-			},
-		});
+		// Incrementar order de todos os links e textos existentes do usuário
+		await prisma.$transaction([
+			prisma.link.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+			prisma.text.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+		]);
 
 		const newLink = await prisma.link.create({
 			data: {

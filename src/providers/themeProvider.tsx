@@ -1,8 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 
 type Theme = "light" | "dark";
 
@@ -49,8 +49,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		if (mounted) {
 			const root = document.documentElement;
-			const isStudioRoute = pathname?.startsWith('/studio');
-			
+			const isStudioRoute = pathname?.startsWith("/studio");
+
 			if (isStudioRoute) {
 				if (theme === "dark") {
 					root.classList.add("dark");

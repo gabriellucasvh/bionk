@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { SocialLinkItem } from "@/types/social";
-import type { LinkItem, SectionItem } from "../types/links.types";
+import type { LinkItem, SectionItem, TextItem } from "../types/links.types";
 import { fetcher } from "../utils/links.helpers";
 
 import LinksTabContent from "./links.LinksTabContent";
@@ -51,11 +51,22 @@ const UnifiedLinksManager = () => {
 		isLoading: isLoadingSections,
 	} = useSWR<SectionItem[]>(userId ? "/api/sections" : null, fetcher);
 
+	// Hook SWR para textos
+	const {
+		data: textsData,
+		mutate: mutateTexts,
+		isLoading: isLoadingTexts,
+	} = useSWR<{ texts: TextItem[] }>(
+		userId ? `/api/texts?userId=${userId}` : null,
+		fetcher
+	);
+
 	if (
 		status === "loading" ||
 		isLoadingLinks ||
 		isLoadingSocialLinks ||
-		isLoadingSections
+		isLoadingSections ||
+		isLoadingTexts
 	) {
 		return <LoadingPage />;
 	}
@@ -83,8 +94,10 @@ const UnifiedLinksManager = () => {
 							<LinksTabContent
 								initialLinks={linksData?.links || []}
 								initialSections={sectionsData || []}
+								initialTexts={textsData?.texts || []}
 								mutateLinks={mutateLinks}
 								mutateSections={mutateSections}
+								mutateTexts={mutateTexts}
 								session={session}
 							/>
 						</TabsContent>

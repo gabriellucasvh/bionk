@@ -2,29 +2,29 @@
 "use client";
 
 import type { DragStartEvent } from "@dnd-kit/core";
-import { Layers2, Plus } from "lucide-react";
 import type { Session } from "next-auth";
-import { BaseButton } from "@/components/buttons/BaseButton";
+import type { LinkItem, SectionItem, TextItem } from "../types/links.types";
 import { useLinksManager } from "../hooks/useLinksManager";
-import type { LinkItem, SectionItem } from "../types/links.types";
-import { isValidUrl } from "../utils/links.helpers";
-import AddNewLinkForm from "./links.AddNewLinkForm";
-import AddNewSectionForm from "./links.AddNewSectionForm";
+import AddContentModal from "./links.AddContentModal";
 import LinkList from "./links.LinkList";
 
 interface LinksTabContentProps {
 	initialLinks: LinkItem[];
 	initialSections: SectionItem[];
+	initialTexts: TextItem[];
 	mutateLinks: () => Promise<any>;
 	mutateSections: () => Promise<any>;
+	mutateTexts: () => Promise<any>;
 	session: Session | null;
 }
 
 const LinksTabContent = ({
 	initialLinks,
 	initialSections,
+	initialTexts,
 	mutateLinks,
 	mutateSections,
+	mutateTexts,
 }: LinksTabContentProps) => {
 	const {
 		unifiedItems,
@@ -41,8 +41,10 @@ const LinksTabContent = ({
 	} = useLinksManager(
 		initialLinks,
 		initialSections,
+		initialTexts,
 		mutateLinks,
-		mutateSections
+		mutateSections,
+		mutateTexts
 	);
 
 	const handleDragStart = (event: DragStartEvent) => {
@@ -51,52 +53,24 @@ const LinksTabContent = ({
 
 	return (
 		<div className="space-y-4">
-			{!(isAdding || handlers.isAddingSection) && (
-				<div className="flex gap-2">
-					<BaseButton
-						className="w-full sm:w-auto"
-						onClick={() => setIsAdding(true)}
-					>
-						<span className="flex items-center justify-center">
-							<Plus className="mr-2 h-4 w-4" /> Adicionar link
-						</span>
-					</BaseButton>
-
-					<BaseButton
-						className="w-full sm:w-auto"
-						onClick={() => handlers.setIsAddingSection(true)}
-						variant="white"
-					>
-						<span className="flex items-center justify-center">
-							<Layers2 className="mr-2 h-4 w-4" /> Criar seção
-						</span>
-					</BaseButton>
-				</div>
-			)}
-
-			{isAdding && (
-				<AddNewLinkForm
-					existingSections={existingSections}
-					formData={formData}
-					isSaveDisabled={
-						!isValidUrl(formData.url) || formData.title.trim().length === 0
-					}
-					onCancel={() => setIsAdding(false)}
-					onSave={handlers.handleAddNewLink}
-					setFormData={setFormData}
-				/>
-			)}
-
-			{handlers.isAddingSection && (
-				<AddNewSectionForm
-					existingSections={existingSections}
-					formData={handlers.sectionFormData}
-					isSaveDisabled={handlers.sectionFormData.title.trim().length === 0}
-					onCancel={() => handlers.setIsAddingSection(false)}
-					onSave={handlers.handleAddNewSection}
-					setFormData={handlers.setSectionFormData}
-				/>
-			)}
+			<AddContentModal
+				isAdding={isAdding}
+				isAddingSection={handlers.isAddingSection}
+				isAddingText={handlers.isAddingText}
+				formData={formData}
+				sectionFormData={handlers.sectionFormData}
+				textFormData={handlers.textFormData}
+				existingSections={existingSections}
+				setIsAdding={setIsAdding}
+				setIsAddingSection={handlers.setIsAddingSection}
+				setIsAddingText={handlers.setIsAddingText}
+				setFormData={setFormData}
+				setSectionFormData={handlers.setSectionFormData}
+				setTextFormData={handlers.setTextFormData}
+				handleAddNewLink={handlers.handleAddNewLink}
+				handleAddNewSection={handlers.handleAddNewSection}
+				handleAddNewText={handlers.handleAddNewText}
+			/>
 
 			<LinkList
 				activeId={activeId}
@@ -126,6 +100,12 @@ const LinksTabContent = ({
 				onStartEditing={handlers.handleStartEditing}
 				onToggleActive={handlers.toggleActive}
 				onUpdateCustomImage={handlers.handleUpdateCustomImage}
+				onDeleteText={handlers.handleDeleteText}
+				onArchiveText={handlers.handleArchiveText}
+				onStartEditingText={handlers.handleStartEditingText}
+				onTextChange={handlers.handleTextChange}
+				onSaveEditingText={handlers.handleSaveEditingText}
+				onCancelEditingText={handlers.handleCancelEditingText}
 			/>
 		</div>
 	);

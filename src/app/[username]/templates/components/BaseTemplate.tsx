@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
 import ShareModal from "./ShareModal";
+import TextCard from "./TextCard";
 
 interface BaseTemplateProps extends TemplateComponentProps {
 	classNames?: {
@@ -219,10 +220,7 @@ function LinksList({
 		);
 
 		return (
-			<div
-				className={cn("mb-3 w-full")}
-				key={item.id}
-			>
+			<div className={cn("mb-3 w-full")} key={item.id}>
 				{item.password ? (
 					<PasswordProtectedLink link={item}>
 						<button
@@ -255,44 +253,95 @@ function LinksList({
 		);
 	};
 
-	// Renderizar conteúdo usando seções reais do banco de dados
+	const createContentArray = () => {
+		const allContent: Array<{
+			type: "link" | "text";
+			item: any;
+			order: number;
+		}> = [];
+
+		if (user.Link && user.Link.length > 0) {
+			for (const link of user.Link) {
+				allContent.push({ type: "link", item: link, order: link.order });
+			}
+		}
+
+		if (user.Text && user.Text.length > 0) {
+			for (const text of user.Text) {
+				allContent.push({ type: "text", item: text, order: text.order });
+			}
+		}
+
+		return allContent.sort((a, b) => a.order - b.order);
+	};
+
+	const renderSectionHeader = (link: any, sectionId: number, index: number) => {
+		if (!link.section) {
+			return null;
+		}
+
+		return (
+			<div
+				className="mt-8 mb-6 w-full first:mt-0"
+				key={`section-${sectionId}-${index}`}
+			>
+				<h2 className="text-center font-bold text-xl" style={textStyle}>
+					{link.section.title}
+				</h2>
+			</div>
+		);
+	};
+
+	const renderContentItem = (content: any, index: number, currentSectionId: { value: number | null }) => {
+		const result: JSX.Element[] = [];
+
+		if (content.type === "link") {
+			const link = content.item;
+			const linkSectionId = link.sectionId || null;
+
+			if (linkSectionId !== currentSectionId.value && linkSectionId !== null) {
+				currentSectionId.value = linkSectionId;
+				const sectionHeader = renderSectionHeader(link, linkSectionId, index);
+				if (sectionHeader) {
+					result.push(sectionHeader);
+				}
+			}
+
+			result.push(renderLink(link));
+		} else if (content.type === "text") {
+			const text = content.item;
+			currentSectionId.value = null;
+			result.push(
+				<TextCard
+					customPresets={customPresets}
+					key={`text-${text.id}`}
+					text={text}
+					textStyle={textStyle}
+				/>
+			);
+		}
+
+		return result;
+	};
+
 	const renderOrderedContent = () => {
-		if (!user.Link || user.Link.length === 0) {
+		const allContent = createContentArray();
+
+		if (allContent.length === 0) {
 			return null;
 		}
 
 		const result: JSX.Element[] = [];
-		let currentSectionId: number | null = null;
+		const currentSectionId = { value: null as number | null };
 
-		// Percorrer os links na ordem original
-		user.Link.forEach((link, index) => {
-			const linkSectionId = link.sectionId || null;
-
-			// Se mudou de seção, renderizar o título da nova seção
-			if (linkSectionId !== currentSectionId) {
-				currentSectionId = linkSectionId;
-
-				// Renderizar título da seção se houver uma seção
-				if (linkSectionId && link.section) {
-					result.push(
-						<div
-							className="mt-8 mb-6 w-full first:mt-0"
-							key={`section-${linkSectionId}-${index}`}
-						>
-							<h2 className="text-center font-bold text-xl" style={textStyle}>
-								{link.section.title}
-							</h2>
-						</div>
-					);
-				}
-			}
-
-			// Renderizar o link
-			result.push(renderLink(link));
-		});
+		for (const [index, content] of allContent.entries()) {
+			const contentItems = renderContentItem(content, index, currentSectionId);
+			result.push(...contentItems);
+		}
 
 		return result;
 	};
+
 
 	return <div className="space-y-0">{renderOrderedContent()}</div>;
 }

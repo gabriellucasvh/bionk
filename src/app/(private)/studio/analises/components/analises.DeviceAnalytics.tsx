@@ -89,7 +89,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 					</div>
 					<div className="flex justify-between gap-4">
 						<span>Cliques:</span>
-						<span className="font-medium">{data.clicks.toLocaleString()}</span>
+						<span className="font-medium">{(data.clicks || 0).toLocaleString()}</span>
 					</div>
 					<div className="flex justify-between gap-4 border-t pt-1">
 						<span>Total:</span>
@@ -292,7 +292,7 @@ export default function DeviceAnalytics({
 												className="border-green-200 bg-green-50 text-green-700"
 												variant="secondary"
 											>
-												{item.clicks.toLocaleString()}
+												{(item.clicks || 0).toLocaleString()}
 											</Badge>
 										</TableCell>
 										<TableCell className="text-right font-semibold">

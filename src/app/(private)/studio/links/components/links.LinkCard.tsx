@@ -260,7 +260,7 @@ const LinkActionButtons = ({
 		</AlertDialog>
 		<Badge className="flex items-center gap-1" variant="outline">
 			<MousePointerClick className="h-3 w-3" />
-			{link.clicks.toLocaleString()}
+			{(link.clicks || 0).toLocaleString()}
 		</Badge>
 	</div>
 );

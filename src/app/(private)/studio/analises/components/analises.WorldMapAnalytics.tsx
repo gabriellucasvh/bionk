@@ -496,7 +496,7 @@ export default function WorldMapAnalytics({
 														{country.views.toLocaleString()}
 													</TableCell>
 													<TableCell className="hidden text-right sm:table-cell">
-														{country.clicks.toLocaleString()}
+														{(country.clicks || 0).toLocaleString()}
 													</TableCell>
 													<TableCell className="text-right font-medium">
 														{country.totalInteractions.toLocaleString()}
