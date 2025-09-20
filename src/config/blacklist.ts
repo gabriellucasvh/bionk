@@ -17,6 +17,7 @@ const BASE_FORBIDDEN_USERNAMES: string[] = [
 	"v2",
 	"bionk",
 	"bionkme",
+	"bionk.me",
 	"bionk_me",
 	"facebook",
 	"instagram",
