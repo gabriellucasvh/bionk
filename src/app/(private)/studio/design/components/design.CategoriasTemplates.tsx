@@ -115,11 +115,11 @@ export default function TemplateSettings({
 
 			{selectedCategory && (
 				<div className="mt-4">
-					<div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+					<div className="flex gap-3">
 						{CATEGORIES[selectedCategory as keyof typeof CATEGORIES]?.map(
 							(template) => (
 								<div
-									className={`max-w-[150px] cursor-pointer rounded-lg border-2 p-2 transition-all ${
+									className={`max-w-[350px] cursor-pointer rounded-lg border transition-all ${
 										selectedTemplate === template.id
 											? "border-green-600 bg-green-50"
 											: "border-gray-300 hover:border-green-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-green-400 dark:hover:bg-gray-600"
@@ -140,9 +140,6 @@ export default function TemplateSettings({
 											unoptimized
 											width={200}
 										/>
-										<p className="mt-2 text-center font-medium text-sm">
-											{template.name}
-										</p>
 									</Button>
 								</div>
 							)
