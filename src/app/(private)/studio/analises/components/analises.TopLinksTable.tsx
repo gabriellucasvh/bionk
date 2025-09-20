@@ -89,7 +89,7 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 											size={12}
 										/>
 										<span className="font-medium">
-											{link.clicks.toLocaleString()}
+											{(link.clicks || 0).toLocaleString()}
 										</span>
 										<span className="ml-1 text-muted-foreground">cliques</span>
 									</div>

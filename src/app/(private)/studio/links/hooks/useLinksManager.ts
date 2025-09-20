@@ -119,6 +119,7 @@ export const useLinksManager = (
 			clicks: 0,
 			sensitive: false,
 			isText: true,
+			isEditing: false,
 		}));
 
 		// Links gerais (sem seção)
@@ -510,17 +511,14 @@ export const useLinksManager = (
 	};
 
 	const handleStartEditingText = (id: number) => {
-		const textToEdit = initialTexts.find((t) => t.id === id);
-		if (textToEdit) {
-			const updateEditingStatus = (items: UnifiedItem[]) =>
-				items.map((item) => {
-					if (item.isText && item.id === id) {
-						return { ...item, isEditing: true };
-					}
-					return item;
-				});
-			setUnifiedItems(updateEditingStatus);
-		}
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if (item.isText && item.id === id) {
+					return { ...item, isEditing: true };
+				}
+				return item;
+			})
+		);
 	};
 
 	const handleTextChange = (
@@ -528,21 +526,21 @@ export const useLinksManager = (
 		field: "title" | "description" | "position" | "hasBackground",
 		value: string | boolean
 	) => {
-		const updateItems = (items: UnifiedItem[]) =>
-			items.map((item) => {
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
 				if (item.isText && item.id === id) {
 					return { ...item, [field]: value };
 				}
 				return item;
-			});
-		setUnifiedItems(updateItems);
+			})
+		);
 	};
 
 	const handleSaveEditingText = async (
 		id: number,
 		title: string,
 		description: string,
-		position: string,
+		position: "left" | "center" | "right",
 		hasBackground: boolean
 	) => {
 		await handleTextUpdate(id, {
@@ -557,14 +555,21 @@ export const useLinksManager = (
 	const handleCancelEditingText = (id: number) => {
 		const textToRestore = initialTexts.find((t) => t.id === id);
 		if (textToRestore) {
-			const updateItems = (items: UnifiedItem[]) =>
-				items.map((item) => {
+			setUnifiedItems((prevItems) =>
+				prevItems.map((item) => {
 					if (item.isText && item.id === id) {
-						return { ...textToRestore, isEditing: false };
+						return { 
+							...textToRestore, 
+							url: null,
+							clicks: 0,
+							sensitive: false,
+							isText: true,
+							isEditing: false 
+						};
 					}
 					return item;
-				});
-			setUnifiedItems(updateItems);
+				})
+			);
 		}
 	};
 

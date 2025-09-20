@@ -254,7 +254,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 				<div className="space-y-1 text-sm">
 					<p className="text-muted-foreground">
 						<span className="font-medium">Cliques:</span>{" "}
-						{data.clicks.toLocaleString()}
+						{(data.clicks || 0).toLocaleString()}
 					</p>
 					<p className="text-muted-foreground">
 						<span className="font-medium">Visualizações:</span>{" "}
@@ -471,7 +471,7 @@ export default function ReferrerAnalytics({
 											{item.views.toLocaleString()}
 										</TableCell>
 										<TableCell className="text-right font-mono">
-											{item.clicks.toLocaleString()}
+											{(item.clicks || 0).toLocaleString()}
 										</TableCell>
 										<TableCell className="text-right font-medium font-mono">
 											{item.totalInteractions.toLocaleString()}
