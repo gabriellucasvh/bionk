@@ -2,10 +2,17 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import CategoryDropdown from "@/components/ui/CategoryDropdown";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { CATEGORIES } from "../data/personalizar.data";
 
 interface TemplateSettingsProps {
@@ -15,36 +22,34 @@ interface TemplateSettingsProps {
 export default function TemplateSettings({
 	onTemplateChange,
 }: TemplateSettingsProps = {}) {
-	const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+	const [selectedCategory, setSelectedCategory] = useState<string | null>(
+		"classicos"
+	);
 	const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-	const [currentTemplate, setCurrentTemplate] = useState<{
-		template: string;
-		templateCategory: string;
-	} | null>(null);
 	const [isSaving, setIsSaving] = useState<boolean>(false);
+	const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+	const [pendingTemplate, setPendingTemplate] = useState<{
+		template: string;
+		category: string;
+	} | null>(null);
 
-	useEffect(() => {
-		const fetchTemplate = async () => {
-			const response = await fetch("/api/user-template");
-			const data = await response.json();
+	const handleTemplateSelect = (templateId: string) => {
+		if (selectedCategory) {
+			setPendingTemplate({
+				template: templateId,
+				category: selectedCategory,
+			});
+			setShowConfirmModal(true);
+		}
+	};
 
-			if (data.template) {
-				setCurrentTemplate({
-					template: data.template,
-					templateCategory: data.templateCategory,
-				});
-			}
-		};
-
-		fetchTemplate();
-	}, []);
-
-	const handleSave = async () => {
-		if (!(selectedTemplate && selectedCategory)) {
+	const handleConfirmTemplate = async () => {
+		if (!pendingTemplate) {
 			return;
 		}
 
 		setIsSaving(true);
+		setShowConfirmModal(false);
 		const startTime = Date.now();
 
 		try {
@@ -54,25 +59,25 @@ export default function TemplateSettings({
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					template: selectedTemplate,
-					templateCategory: selectedCategory,
+					template: pendingTemplate.template,
+					templateCategory: pendingTemplate.category,
 				}),
 			});
 
 			if (response.ok) {
-				setCurrentTemplate({
-					template: selectedTemplate,
-					templateCategory: selectedCategory,
-				});
+				setSelectedTemplate(pendingTemplate.template);
+				setPendingTemplate(null);
 
-				// Notificar o componente pai sobre a mudança de template
 				if (onTemplateChange) {
 					onTemplateChange();
 				}
 			}
+		} catch (error) {
+			console.error("Erro ao salvar template:", error);
 		} finally {
 			const elapsedTime = Date.now() - startTime;
-			const remainingTime = Math.max(0, 2000 - elapsedTime);
+			const minDelay = 1000;
+			const remainingTime = Math.max(0, minDelay - elapsedTime);
 
 			setTimeout(() => {
 				setIsSaving(false);
@@ -110,22 +115,6 @@ export default function TemplateSettings({
 
 			{selectedCategory && (
 				<div className="mt-4">
-					<div className="mb-10 flex flex-col items-start gap-4 md:flex-row md:items-center">
-						<h2 className="font-semibold text-xl">Templates Disponíveis</h2>
-						<div className="flex items-center gap-2">
-							<BaseButton
-								loading={!selectedTemplate || isSaving}
-								onClick={handleSave}
-							>
-								{isSaving ? "Salvando..." : "Salvar Template"}
-							</BaseButton>
-						</div>
-					</div>
-					{selectedTemplate && (
-						<p className="mb-2 text-orange-600 text-sm">
-							Salvar um novo template resetará suas personalizações
-						</p>
-					)}
 					<div className="grid grid-cols-2 gap-4 md:grid-cols-5">
 						{CATEGORIES[selectedCategory as keyof typeof CATEGORIES]?.map(
 							(template) => (
@@ -139,7 +128,7 @@ export default function TemplateSettings({
 								>
 									<Button
 										className="flex h-full w-full flex-col p-0"
-										onClick={() => setSelectedTemplate(template.id)}
+										onClick={() => handleTemplateSelect(template.id)}
 										variant="ghost"
 									>
 										<Image
@@ -166,21 +155,32 @@ export default function TemplateSettings({
 
 	return (
 		<div>
-			{currentTemplate && (
-				<div className="mb-6 md:inline-block">
-					<span className="rounded-full bg-green-100 px-4 py-2 font-medium text-green-800 text-sm capitalize">
-						Tema atual:{" "}
-						{currentTemplate.templateCategory.charAt(0) +
-							currentTemplate.templateCategory.slice(1)}{" "}
-						-{" "}
-						{CATEGORIES[
-							currentTemplate.templateCategory as keyof typeof CATEGORIES
-						]?.find((t) => t.id === currentTemplate.template)?.name ||
-							currentTemplate.template}
-					</span>
-				</div>
-			)}
 			<div className="block">{renderContent()}</div>
+
+			<Dialog
+				onOpenChange={(open) => {
+					setShowConfirmModal(open);
+					if (!open) {
+						setPendingTemplate(null);
+					}
+				}}
+				open={showConfirmModal}
+			>
+				<DialogContent className="sm:max-w-md">
+					<DialogHeader>
+						<DialogTitle>Confirmar Alteração de Template</DialogTitle>
+						<DialogDescription>
+							Ao selecionar este template, todas as suas personalizações atuais
+							serão resetadas. Deseja continuar?
+						</DialogDescription>
+					</DialogHeader>
+					<div className="flex justify-end pt-4">
+						<BaseButton disabled={isSaving} onClick={handleConfirmTemplate}>
+							{isSaving ? "Aplicando..." : "Aplicar"}
+						</BaseButton>
+					</div>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

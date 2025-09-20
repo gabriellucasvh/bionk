@@ -113,7 +113,7 @@ export default async function UserPage({ params }: PageProps) {
 		notFound();
 	}
 
-	const category = user.templateCategory ?? "minimalista";
+	const category = user.templateCategory ?? "classicos";
 	const name = user.template ?? "default";
 
 	// Otimização: Import mais eficiente com fallback
@@ -127,7 +127,7 @@ export default async function UserPage({ params }: PageProps) {
 	} catch {
 		// Fallback para template padrão
 		TemplateComponent = (
-			await import("@/app/[username]/templates/minimalista/default")
+			await import("@/app/[username]/templates/classicos/default")
 		).default;
 	}
 

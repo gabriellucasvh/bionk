@@ -21,7 +21,7 @@ model User {
   hashedPassword                String?
   createdAt                     DateTime       @default(now())
   template                      String         @default("default")
-  templateCategory              String         @default("minimalista")
+  templateCategory              String         @default("classicos")
   passwordResetExpires          DateTime?
   passwordResetToken            String?        @unique
   emailVerificationToken        String?        @unique
@@ -207,21 +207,21 @@ model CustomPresets {
 }
 
 model Text {
-  id              Int      @id @default(autoincrement())
-  title           String
-  description     String?
-  position        String   @default("left")
-  order           Int      @default(0)
-  userId          String
-  active          Boolean  @default(true)
-  sectionId       Int?
-  hasBackground   Boolean  @default(true)
-  isCompact       Boolean  @default(false)
-  archived        Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  section         Section? @relation(fields: [sectionId], references: [id])
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String?
+  position      String   @default("left")
+  order         Int      @default(0)
+  userId        String
+  active        Boolean  @default(true)
+  sectionId     Int?
+  hasBackground Boolean  @default(true)
+  isCompact     Boolean  @default(false)
+  archived      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  section       Section? @relation(fields: [sectionId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([sectionId])
   @@index([userId])

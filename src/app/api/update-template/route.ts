@@ -16,7 +16,6 @@ const VALID_TEMPLATES = [
 	"modern",
 	"clean",
 	"dark",
-	"midnight",
 	"artistic",
 	"unique",
 	"elegant",
@@ -24,9 +23,6 @@ const VALID_TEMPLATES = [
 	"neon",
 	"cyber",
 	"retro",
-	"vintage",
-	"photo",
-	"gallery",
 ];
 
 export async function POST(req: Request): Promise<NextResponse> {

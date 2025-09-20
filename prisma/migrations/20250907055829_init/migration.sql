@@ -12,7 +12,7 @@ CREATE TABLE "public"."User" (
     "hashedPassword" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "template" TEXT NOT NULL DEFAULT 'default',
-    "templateCategory" TEXT NOT NULL DEFAULT 'minimalista',
+    "templateCategory" TEXT NOT NULL DEFAULT 'classica',
     "passwordResetExpires" TIMESTAMP(3),
     "passwordResetToken" TEXT,
     "emailVerificationToken" TEXT,

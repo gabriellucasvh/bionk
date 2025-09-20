@@ -1,11 +1,11 @@
 // src/app/(private)/studio/UserComponents.tsx
 
+import type { Prisma } from "@prisma/client";
+import { notFound } from "next/navigation";
+import { getServerSession } from "next-auth";
+import type { FC } from "react";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { notFound } from "next/navigation";
-import type { FC } from "react";
 
 type UserWithLinks = Prisma.UserGetPayload<{
 	include: {
@@ -34,13 +34,13 @@ export default async function UserComponent() {
 		},
 	});
 
-	if (!(user?.username)) {
+	if (!user?.username) {
 		return notFound();
 	}
 
 	const safeUser = user as UserWithLinks;
 
-	const templateCategory = user.templateCategory || "minimalista";
+	const templateCategory = user.templateCategory || "classicos";
 	const templateName = user.template || "default";
 
 	let TemplateComponent: FC<{ user: UserWithLinks }>;
@@ -53,7 +53,7 @@ export default async function UserComponent() {
 		).default as FC<{ user: UserWithLinks }>;
 	} catch {
 		TemplateComponent = (
-			await import("@/app/[username]/templates/minimalista/default")
+			await import("@/app/[username]/templates/classicos/default")
 		).default as FC<{ user: UserWithLinks }>;
 	}
 
