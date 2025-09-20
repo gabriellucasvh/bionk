@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import UnifiedLinksManager from "./components/links.UnifiedLinksManager";
 
 export const metadata: Metadata = {
-	title: "Bionk | Gerenciador de Links",
+	title: "Bionk Links",
 	description:
 		"Adicione, organize e edite seus links de perfil e redes sociais em um só lugar. Uma experiência centralizada para máximo controle.",
 };
