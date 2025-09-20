@@ -1,9 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
 
 // Tipos e Interfaces
 type SectionFormData = {
@@ -55,13 +55,14 @@ const AddNewSectionForm = ({
 			{/* Botões de Ação */}
 			<div className="flex gap-2 border-t pt-4">
 				<BaseButton
+					className="flex-1"
 					disabled={isSaveDisabled}
 					loading={isLoading}
 					onClick={handleSave}
 				>
 					Criar Seção
 				</BaseButton>
-				<BaseButton onClick={onCancel} variant="white">
+				<BaseButton onClick={onCancel} variant="outline">
 					Cancelar
 				</BaseButton>
 			</div>

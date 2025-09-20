@@ -124,36 +124,33 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 				<div className="grid gap-2">
 					<Label htmlFor="position">Posição do Texto</Label>
 					<div className="flex gap-2">
-						<Button
-							className="flex-1"
+						<BaseButton
+							className="rounded-lg"
 							onClick={() => setFormData({ ...formData, position: "left" })}
-							size="sm"
+							size="icon"
 							type="button"
-							variant={formData.position === "left" ? "default" : "outline"}
+							variant={formData.position === "left" ? "default" : "white"}
 						>
-							<AlignLeft className="mr-2 h-4 w-4" />
-							Esquerda
-						</Button>
-						<Button
-							className="flex-1"
+							<AlignLeft className="h-4 w-4" />
+						</BaseButton>
+						<BaseButton
+							className="rounded-lg"
 							onClick={() => setFormData({ ...formData, position: "center" })}
-							size="sm"
+							size="icon"
 							type="button"
-							variant={formData.position === "center" ? "default" : "outline"}
+							variant={formData.position === "center" ? "default" : "white"}
 						>
-							<AlignCenter className="mr-2 h-4 w-4" />
-							Centro
-						</Button>
-						<Button
-							className="flex-1"
+							<AlignCenter className="h-4 w-4" />
+						</BaseButton>
+						<BaseButton
+							className="rounded-lg"
 							onClick={() => setFormData({ ...formData, position: "right" })}
-							size="sm"
+							size="icon"
 							type="button"
-							variant={formData.position === "right" ? "default" : "outline"}
+							variant={formData.position === "right" ? "default" : "white"}
 						>
-							<AlignRight className="mr-2 h-4 w-4" />
-							Direita
-						</Button>
+							<AlignRight className="h-4 w-4" />
+						</BaseButton>
 					</div>
 				</div>
 
@@ -196,15 +193,15 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 			</div>
 
 			<div className="flex gap-3">
-				<BaseButton className="flex-1" onClick={onCancel} variant="outline">
-					Cancelar
-				</BaseButton>
 				<BaseButton
 					className="flex-1"
 					disabled={isSaveDisabled}
 					onClick={onSave}
 				>
 					Salvar Texto
+				</BaseButton>
+				<BaseButton onClick={onCancel} variant="outline">
+					Cancelar
 				</BaseButton>
 			</div>
 		</div>

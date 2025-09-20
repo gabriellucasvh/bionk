@@ -1,5 +1,8 @@
 "use client";
 
+import { format } from "date-fns";
+import { Calendar as CalendarIcon, Clock, Lock, Tags } from "lucide-react";
+import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -11,9 +14,6 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon, Clock, Lock, Tags } from "lucide-react";
-import { useState } from "react";
 
 // Tipos e Interfaces
 type LinkFormData = {
@@ -171,14 +171,19 @@ const BadgePanel = ({ formData, setFormData }: PanelProps) => (
 // --- Componente Principal ---
 const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 	// Use linksManager props if available, otherwise use direct props
-	const formData = props.linksManager?.formData || props.formData || {
-		title: "",
-		url: "",
-		sectionId: null,
-		badge: ""
-	};
-	const setFormData = props.linksManager?.setFormData || props.setFormData || (() => null);
-	const onSave = props.linksManager?.handleAddNewLink || props.onSave || (() => Promise.resolve());
+	const formData = props.linksManager?.formData ||
+		props.formData || {
+			title: "",
+			url: "",
+			sectionId: null,
+			badge: "",
+		};
+	const setFormData =
+		props.linksManager?.setFormData || props.setFormData || (() => null);
+	const onSave =
+		props.linksManager?.handleAddNewLink ||
+		props.onSave ||
+		(() => Promise.resolve());
 	const originalOnCancel = props.linksManager
 		? () => props.linksManager?.setIsAdding(false)
 		: props.onCancel || (() => null);
@@ -289,13 +294,14 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 			{/* Botões de Ação */}
 			<div className="flex gap-2 border-t pt-4">
 				<BaseButton
+					className="flex-1"
 					disabled={isSaveDisabled}
 					loading={isLoading}
 					onClick={handleSave}
 				>
 					Salvar Link
 				</BaseButton>
-				<BaseButton onClick={onCancel} variant="white">
+				<BaseButton onClick={onCancel} variant="outline">
 					Cancelar
 				</BaseButton>
 			</div>

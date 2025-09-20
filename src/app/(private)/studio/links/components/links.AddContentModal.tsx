@@ -112,7 +112,7 @@ const AddContentModal = ({
 								<div className="flex h-12 w-12 items-center justify-center rounded-full bg-lime-400 text-black">
 									<Plus className="h-8 w-8" strokeWidth={1.5} />
 								</div>
-								<span className="font-medium text-sm">Adicionar Link</span>
+								<span className="font-medium text-sm">Link</span>
 							</button>
 
 							<button
@@ -123,7 +123,7 @@ const AddContentModal = ({
 								<div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
 									<Layers2 className="h-8 w-8" strokeWidth={1.5} />
 								</div>
-								<span className="font-medium text-sm">Criar Seção</span>
+								<span className="font-medium text-sm">Seção</span>
 							</button>
 
 							<button
@@ -134,7 +134,7 @@ const AddContentModal = ({
 								<div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
 									<Type className="h-8 w-8" strokeWidth={1.5} />
 								</div>
-								<span className="font-medium text-sm">Adicionar Texto</span>
+								<span className="font-medium text-sm">Texto</span>
 							</button>
 						</div>
 					</div>
