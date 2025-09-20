@@ -3,6 +3,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
@@ -128,6 +129,18 @@ export async function PUT(req: Request): Promise<NextResponse> {
 		}
 
 		await prisma.$transaction(updateTransactions);
+
+		// Revalida tanto o studio quanto a página do perfil
+		revalidatePath("/studio/links");
+
+		// Busca o username do usuário para revalidar sua página
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+			select: { username: true },
+		});
+		if (user?.username) {
+			revalidatePath(`/${user.username}`);
+		}
 
 		return NextResponse.json({ message: "Ordem atualizada com sucesso!" });
 	} catch {

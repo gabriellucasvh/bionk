@@ -127,15 +127,16 @@ export const useLinksManager = (
 			.filter((link) => !link.sectionId)
 			.map((link) => ({ ...link }));
 
-		// Combinar seções, textos e links gerais
-		const newUnifiedItems: UnifiedItem[] = [
+		// Combinar todos os itens (seções, links gerais e textos) em uma única lista
+		const allItems: UnifiedItem[] = [
 			...sectionItems,
-			...textItems,
 			...generalLinks,
+			...textItems,
 		];
 
-		newUnifiedItems.sort((a, b) => a.order - b.order);
-		setUnifiedItems(newUnifiedItems);
+		// Ordenar todos os itens juntos por order
+		allItems.sort((a, b) => a.order - b.order);
+		setUnifiedItems(allItems);
 	}, [initialLinks, initialSections, initialTexts]);
 
 	const existingSections = useMemo(() => {
@@ -154,20 +155,62 @@ export const useLinksManager = (
 			isReorderingRef.current = true;
 
 			try {
-				// Tratar tudo como links unificados - seções são links com type: 'section'
-				const unifiedPayload = items.map((item, index) => ({
-					id: item.id,
-					order: index,
-					type: item.isSection ? "section" : "link",
-					sectionId: item.isSection ? null : item.sectionId || null,
-				}));
+				// Separar itens por tipo para usar as APIs corretas
+				const linkItems = items
+					.filter((item) => !(item.isSection || item.isText))
+					.map((item) => ({
+						id: item.id,
+						order: items.indexOf(item),
+					}));
 
-				// Usar apenas a API de links para tudo
-				await fetch("/api/links/reorder", {
-					method: "PUT",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ items: unifiedPayload }),
-				});
+				const sectionItems = items
+					.filter((item) => item.isSection)
+					.map((item) => ({
+						id: item.id,
+						order: items.indexOf(item),
+					}));
+
+				const textItems = items
+					.filter((item) => item.isText)
+					.map((item) => ({
+						id: item.id,
+						order: items.indexOf(item),
+					}));
+
+				// Fazer chamadas para as APIs específicas
+				const promises: Promise<Response>[] = [];
+
+				if (linkItems.length > 0) {
+					promises.push(
+						fetch("/api/links/reorder", {
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ items: linkItems }),
+						})
+					);
+				}
+
+				if (sectionItems.length > 0) {
+					promises.push(
+						fetch("/api/sections/reorder", {
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ items: sectionItems }),
+						})
+					);
+				}
+
+				if (textItems.length > 0) {
+					promises.push(
+						fetch("/api/texts/reorder", {
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ items: textItems }),
+						})
+					);
+				}
+
+				await Promise.all(promises);
 
 				// Atualizar o estado local imediatamente para refletir as mudanças
 				setUnifiedItems(
@@ -180,7 +223,8 @@ export const useLinksManager = (
 				// Aguardar um pouco antes de atualizar os dados para evitar conflitos
 				setTimeout(async () => {
 					await mutateLinks();
-					// Não precisamos mais de mutateSections pois tudo é tratado como links
+					await mutateSections();
+					await mutateTexts();
 					isReorderingRef.current = false;
 				}, 200);
 			} catch (error) {
@@ -188,7 +232,7 @@ export const useLinksManager = (
 				isReorderingRef.current = false;
 			}
 		},
-		[mutateLinks]
+		[mutateLinks, mutateSections, mutateTexts]
 	);
 
 	const handleDragEnd = (event: DragEndEvent) => {
@@ -210,14 +254,20 @@ export const useLinksManager = (
 				if (item.isSection) {
 					return item.id.toString() === draggedItemId;
 				}
-				return `link-${item.id}` === draggedItemId;
+				if (item.isText) {
+					return `item-${item.id}` === draggedItemId;
+				}
+				return `item-${item.id}` === draggedItemId;
 			});
 
 			const overIndex = prevItems.findIndex((item) => {
 				if (item.isSection) {
 					return item.id.toString() === overId;
 				}
-				return `link-${item.id}` === overId;
+				if (item.isText) {
+					return `item-${item.id}` === overId;
+				}
+				return `item-${item.id}` === overId;
 			});
 
 			if (activeIndex === -1 || overIndex === -1) {
@@ -558,13 +608,13 @@ export const useLinksManager = (
 			setUnifiedItems((prevItems) =>
 				prevItems.map((item) => {
 					if (item.isText && item.id === id) {
-						return { 
-							...textToRestore, 
+						return {
+							...textToRestore,
 							url: null,
 							clicks: 0,
 							sensitive: false,
 							isText: true,
-							isEditing: false 
+							isEditing: false,
 						};
 					}
 					return item;

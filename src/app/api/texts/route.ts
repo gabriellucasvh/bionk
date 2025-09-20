@@ -21,13 +21,17 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const maxOrder = await prisma.text.findFirst({
-			where: { userId: session.user.id },
-			orderBy: { order: "desc" },
-			select: { order: true },
-		});
-
-		const newOrder = (maxOrder?.order || 0) + 1;
+		// Incrementar order de todos os links e textos existentes do usuário
+		await prisma.$transaction([
+			prisma.link.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+			prisma.text.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+		]);
 
 		const text = await prisma.text.create({
 			data: {
@@ -36,7 +40,7 @@ export async function POST(request: Request) {
 				position,
 				hasBackground,
 				active: true,
-				order: newOrder,
+				order: 0,
 				userId: session.user.id,
 				sectionId: sectionId || null,
 			},

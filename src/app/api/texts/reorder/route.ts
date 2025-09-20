@@ -1,11 +1,10 @@
+import { revalidatePath } from "next/cache";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
-import { z } from "zod";
 
-// A API espera um array de objetos com id e order
 const reorderSchema = z.object({
 	items: z.array(
 		z.object({
@@ -34,12 +33,11 @@ export async function PUT(req: Request) {
 
 		const { items } = validation.data;
 
-		// Cria uma transação para atualizar o campo 'order' de cada seção
 		const transactions = items.map((item) =>
-			prisma.section.update({
+			prisma.text.update({
 				where: {
 					id: item.id,
-					userId: session.user.id, // Garante que o usuário só pode atualizar suas próprias seções
+					userId: session.user.id,
 				},
 				data: {
 					order: item.order,
@@ -61,10 +59,12 @@ export async function PUT(req: Request) {
 			revalidatePath(`/${user.username}`);
 		}
 
-		return NextResponse.json({ message: "Seções reordenadas com sucesso!" });
-	} catch  {
+		return NextResponse.json({
+			message: "Ordem dos textos atualizada com sucesso",
+		});
+	} catch {
 		return NextResponse.json(
-			{ error: "Ocorreu um erro ao reordenar as seções." },
+			{ error: "Ocorreu um erro ao reordenar os textos." },
 			{ status: 500 }
 		);
 	}

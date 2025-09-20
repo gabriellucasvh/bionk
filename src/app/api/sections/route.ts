@@ -53,27 +53,26 @@ export async function POST(req: Request): Promise<NextResponse> {
 
 	const { title } = await req.json();
 	
-	// Buscar o menor order entre links e seções para colocar a nova seção no topo
-	const [minLink, minSection] = await Promise.all([
-		prisma.link.findFirst({
+	// Incrementar order de todos os links, textos e seções existentes do usuário
+	await prisma.$transaction([
+		prisma.link.updateMany({
 			where: { userId: session.user.id },
-			orderBy: { order: "asc" },
+			data: { order: { increment: 1 } },
 		}),
-		prisma.section.findFirst({
+		prisma.text.updateMany({
 			where: { userId: session.user.id },
-			orderBy: { order: "asc" },
-		})
+			data: { order: { increment: 1 } },
+		}),
+		prisma.section.updateMany({
+			where: { userId: session.user.id },
+			data: { order: { increment: 1 } },
+		}),
 	]);
-	
-	const minOrder = Math.min(
-		minLink?.order ?? 0,
-		minSection?.order ?? 0
-	);
 	
 	const newSection = await prisma.section.create({
 		data: {
 			title,
-			order: minOrder - 1,
+			order: 0,
 			userId: session.user.id,
 		},
 	});

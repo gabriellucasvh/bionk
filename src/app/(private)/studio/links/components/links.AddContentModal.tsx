@@ -54,7 +54,7 @@ const AddContentModal = ({
 }: AddContentModalProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedOption, setSelectedOption] = useState<
-		"link" | "section" | null
+		"link" | "section" | "text" | null
 	>(null);
 
 	const handleOptionSelect = (option: "link" | "section" | "text") => {
@@ -109,7 +109,7 @@ const AddContentModal = ({
 								onClick={() => handleOptionSelect("link")}
 								type="button"
 							>
-								<div className="flex h-16 w-16 items-center justify-center rounded-full bg-lime-400 text-black">
+								<div className="flex h-12 w-12 items-center justify-center rounded-full bg-lime-400 text-black">
 									<Plus className="h-8 w-8" strokeWidth={1.5} />
 								</div>
 								<span className="font-medium text-sm">Adicionar Link</span>
@@ -120,7 +120,7 @@ const AddContentModal = ({
 								onClick={() => handleOptionSelect("section")}
 								type="button"
 							>
-								<div className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
+								<div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
 									<Layers2 className="h-8 w-8" strokeWidth={1.5} />
 								</div>
 								<span className="font-medium text-sm">Criar Seção</span>
@@ -131,7 +131,7 @@ const AddContentModal = ({
 								onClick={() => handleOptionSelect("text")}
 								type="button"
 							>
-								<div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500 text-white">
+								<div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
 									<Type className="h-8 w-8" strokeWidth={1.5} />
 								</div>
 								<span className="font-medium text-sm">Adicionar Texto</span>

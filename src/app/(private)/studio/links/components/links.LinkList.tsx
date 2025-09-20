@@ -110,119 +110,137 @@ const LinkList = (props: LinkListProps) => {
 			>
 				<SortableContext
 					items={items.map((item) =>
-						item.isSection ? item.id.toString() : `link-${item.id}`
+						item.isSection ? item.id.toString() : `item-${item.id}`
 					)}
 					strategy={verticalListSortingStrategy}
 				>
 					<div className="space-y-3">
-						{items.map((item) => (
-							<SortableItem
-								id={item.isSection ? item.id.toString() : `link-${item.id}`}
-								key={
-									item.isSection
-										? `section-${item.id}`
-										: item.isText
-											? `text-${item.id}`
-											: `link-${item.id}`
-								}
-							>
-								{({ listeners, setActivatorNodeRef, isDragging }) => {
-									if (item.isSection) {
-										// Converter UnifiedItem para SectionItem para compatibilidade
-										const sectionData: SectionItem = {
-											id: item.id.toString(),
-											dbId: item.dbId || 0,
-											title: item.title,
-											active: item.active,
-											order: item.order || 0,
-											links: item.children || [],
-										};
+						{items.map((item) => {
+							let key = "";
+							if (item.isSection) {
+								key = `section-${item.id}`;
+							} else if (item.isText) {
+								key = `text-${item.id}`;
+							} else {
+								key = `link-${item.id}`;
+							}
+
+							const sortableId = item.isSection
+								? item.id.toString()
+								: `item-${item.id}`;
+
+							return (
+								<SortableItem id={sortableId} key={key}>
+									{({ listeners, setActivatorNodeRef, isDragging }) => {
+										if (item.isSection) {
+											// Converter UnifiedItem para SectionItem para compatibilidade
+											const sectionData: SectionItem = {
+												id: item.id.toString(),
+												dbId: item.dbId || 0,
+												title: item.title,
+												active: item.active,
+												order: item.order || 0,
+												links: item.children || [],
+											};
+											return (
+												<SectionCard
+													isDragging={isDragging}
+													linksManager={linksManager}
+													listeners={listeners}
+													onAddLinkToSection={onAddLinkToSection}
+													onRemoveCustomImage={onRemoveCustomImage}
+													onUpdateCustomImage={onUpdateCustomImage}
+													section={sectionData}
+													setActivatorNodeRef={setActivatorNodeRef}
+													{...cardProps}
+												/>
+											);
+										}
+
+										if (item.isText) {
+											return (
+												<TextCard
+													isDragging={isDragging}
+													listeners={listeners}
+													onArchiveText={onArchiveText}
+													onCancelEditingText={onCancelEditingText}
+													onDeleteText={onDeleteText}
+													onSaveEditingText={onSaveEditingText}
+													onStartEditingText={onStartEditingText}
+													onTextChange={onTextChange}
+													onToggleActive={cardProps.onToggleActive}
+													setActivatorNodeRef={setActivatorNodeRef}
+													text={item as TextItem}
+												/>
+											);
+										}
+
 										return (
-											<SectionCard
-												isDragging={isDragging}
-												linksManager={linksManager}
+											<LinkCard
+												archivingLinkId={archivingLinkId}
+												link={item as LinkItem}
 												listeners={listeners}
-												onAddLinkToSection={onAddLinkToSection}
 												onRemoveCustomImage={onRemoveCustomImage}
 												onUpdateCustomImage={onUpdateCustomImage}
-												section={sectionData}
 												setActivatorNodeRef={setActivatorNodeRef}
 												{...cardProps}
 											/>
 										);
-									}
-									if (item.isText) {
-										return (
-											<TextCard
-												isDragging={isDragging}
-												listeners={listeners}
-												onArchiveText={onArchiveText}
-												onCancelEditingText={onCancelEditingText}
-												onDeleteText={onDeleteText}
-												onSaveEditingText={onSaveEditingText}
-												onStartEditingText={onStartEditingText}
-												onTextChange={onTextChange}
-												onToggleActive={cardProps.onToggleActive}
-												setActivatorNodeRef={setActivatorNodeRef}
-												text={item as TextItem}
-											/>
-										);
-									}
-									return (
-										<LinkCard
-											archivingLinkId={archivingLinkId}
-											link={item as LinkItem}
-											listeners={listeners}
-											onRemoveCustomImage={onRemoveCustomImage}
-											onUpdateCustomImage={onUpdateCustomImage}
-											setActivatorNodeRef={setActivatorNodeRef}
-											{...cardProps}
-										/>
-									);
-								}}
-							</SortableItem>
-						))}
+									}}
+								</SortableItem>
+							);
+						})}
 					</div>
 				</SortableContext>
 
 				{/* Adicionado DragOverlay para corrigir a distorção */}
 				<DragOverlay>
-					{activeItem ? (
-						activeItem.isSection ? (
-							<SectionCard
-								isDragging
-								linksManager={linksManager}
-								onAddLinkToSection={onAddLinkToSection}
-								section={{
+					{activeItem &&
+						(() => {
+							if (activeItem.isSection) {
+								const sectionData: SectionItem = {
 									id: activeItem.id.toString(),
 									dbId: activeItem.dbId || 0,
 									title: activeItem.title,
 									active: activeItem.active,
 									order: activeItem.order || 0,
 									links: activeItem.children || [],
-								}}
-								{...cardProps}
-								listeners={{}}
-								setActivatorNodeRef={noop}
-							/>
-						) : activeItem.isText ? (
-							<TextCard
-								isDragging
-								text={activeItem as TextItem}
-								{...cardProps}
-								listeners={{}}
-								setActivatorNodeRef={noop}
-							/>
-						) : (
-							<LinkCard
-								archivingLinkId={archivingLinkId}
-								link={activeItem as LinkItem}
-								{...cardProps}
-								listeners={{}}
-								setActivatorNodeRef={noop}
-							/>
-						)
-					) : null}
+								};
+								return (
+									<SectionCard
+										isDragging
+										linksManager={linksManager}
+										onAddLinkToSection={onAddLinkToSection}
+										section={sectionData}
+										{...cardProps}
+										listeners={{}}
+										setActivatorNodeRef={noop}
+									/>
+								);
+							}
+
+							if (activeItem.isText) {
+								return (
+									<TextCard
+										isDragging
+										text={activeItem as TextItem}
+										{...cardProps}
+										listeners={{}}
+										setActivatorNodeRef={noop}
+									/>
+								);
+							}
+
+							return (
+								<LinkCard
+									archivingLinkId={archivingLinkId}
+									link={activeItem as LinkItem}
+									{...cardProps}
+									listeners={{}}
+									setActivatorNodeRef={noop}
+								/>
+							);
+						})()}
 				</DragOverlay>
 			</DndContext>
 		</div>
