@@ -2,10 +2,11 @@
 
 import type { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
 	LinkItem,
 	SectionItem,
+	TextItem,
 	UnifiedDragItem,
 } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
@@ -26,6 +27,14 @@ export type SectionFormData = {
 	title: string;
 };
 
+export type TextFormData = {
+	title: string;
+	description: string;
+	position: "left" | "center" | "right";
+	hasBackground: boolean;
+	sectionId?: number | null;
+};
+
 export type UnifiedItem = UnifiedDragItem;
 
 const initialFormData: LinkFormData = {
@@ -43,6 +52,14 @@ const initialSectionFormData: SectionFormData = {
 	title: "",
 };
 
+const initialTextFormData: TextFormData = {
+	title: "",
+	description: "",
+	position: "left",
+	hasBackground: true,
+	sectionId: null,
+};
+
 const urlProtocolRegex = /^(https?:\/\/)/;
 
 // --- FUNÇÕES AUXILIARES PARA DRAG AND DROP ---
@@ -51,19 +68,23 @@ const urlProtocolRegex = /^(https?:\/\/)/;
 export const useLinksManager = (
 	initialLinks: LinkItem[],
 	initialSections: SectionItem[],
+	initialTexts: TextItem[],
 	mutateLinks: () => Promise<any>,
-	mutateSections: () => Promise<any>
+	mutateSections: () => Promise<any>,
+	mutateTexts: () => Promise<any>
 ) => {
-
 	// ... (useState, useEffect, useMemo, findContainerId, etc. continuam iguais)
 	const [unifiedItems, setUnifiedItems] = useState<UnifiedItem[]>([]);
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const [isAdding, setIsAdding] = useState(false);
 	const [isAddingSection, setIsAddingSection] = useState(false);
+	const [isAddingText, setIsAddingText] = useState(false);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
 	const [sectionFormData, setSectionFormData] = useState<SectionFormData>(
 		initialSectionFormData
 	);
+	const [textFormData, setTextFormData] =
+		useState<TextFormData>(initialTextFormData);
 	const [_originalLink, setOriginalLink] = useState<LinkItem | null>(null);
 	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
 	// Flag para controlar chamadas simultâneas da API
@@ -91,17 +112,30 @@ export const useLinksManager = (
 			dbId: section.dbId || Number(section.id),
 		}));
 
+		// Converter textos em UnifiedItems
+		const textItems: UnifiedItem[] = initialTexts.map((text) => ({
+			...text,
+			url: null,
+			clicks: 0,
+			sensitive: false,
+			isText: true,
+		}));
+
 		// Links gerais (sem seção)
 		const generalLinks: UnifiedItem[] = initialLinks
 			.filter((link) => !link.sectionId)
 			.map((link) => ({ ...link }));
 
-		// Combinar seções e links gerais
-		const newUnifiedItems: UnifiedItem[] = [...sectionItems, ...generalLinks];
+		// Combinar seções, textos e links gerais
+		const newUnifiedItems: UnifiedItem[] = [
+			...sectionItems,
+			...textItems,
+			...generalLinks,
+		];
 
 		newUnifiedItems.sort((a, b) => a.order - b.order);
 		setUnifiedItems(newUnifiedItems);
-	}, [initialLinks, initialSections]);
+	}, [initialLinks, initialSections, initialTexts]);
 
 	const existingSections = useMemo(() => {
 		return unifiedItems
@@ -264,6 +298,29 @@ export const useLinksManager = (
 		setIsAddingSection(false);
 	};
 
+	const handleAddNewText = async () => {
+		if (!(textFormData.title.trim() && textFormData.description.trim())) {
+			return;
+		}
+
+		await fetch("/api/texts", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				title: textFormData.title.trim(),
+				description: textFormData.description.trim(),
+				position: textFormData.position,
+				hasBackground: textFormData.hasBackground,
+				sectionId: textFormData.sectionId,
+			}),
+		});
+
+		await mutateLinks();
+		await mutateTexts();
+		setTextFormData(initialTextFormData);
+		setIsAddingText(false);
+	};
+
 	const handleAddLinkToSection = async (sectionId: number) => {
 		let formattedUrl = formData.url.trim();
 		if (!urlProtocolRegex.test(formattedUrl)) {
@@ -318,8 +375,12 @@ export const useLinksManager = (
 
 	const toggleActive = (id: number, isActive: boolean) => {
 		const link = initialLinks.find((l) => l.id === id);
+		const text = initialTexts.find((t) => t.id === id);
+
 		if (link) {
 			handleLinkUpdate(id, { active: isActive });
+		} else if (text) {
+			handleTextUpdate(id, { active: isActive });
 		}
 	};
 
@@ -430,28 +491,108 @@ export const useLinksManager = (
 		}
 	};
 
+	const handleTextUpdate = async (id: number, payload: Partial<TextItem>) => {
+		await fetch(`/api/texts/${id}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
+		await mutateTexts();
+	};
 
+	const handleDeleteText = async (id: number) => {
+		await fetch(`/api/texts/${id}`, { method: "DELETE" });
+		await mutateTexts();
+	};
+
+	const handleArchiveText = async (id: number) => {
+		await handleTextUpdate(id, { archived: true });
+	};
+
+	const handleStartEditingText = (id: number) => {
+		const textToEdit = initialTexts.find((t) => t.id === id);
+		if (textToEdit) {
+			const updateEditingStatus = (items: UnifiedItem[]) =>
+				items.map((item) => {
+					if (item.isText && item.id === id) {
+						return { ...item, isEditing: true };
+					}
+					return item;
+				});
+			setUnifiedItems(updateEditingStatus);
+		}
+	};
+
+	const handleTextChange = (
+		id: number,
+		field: "title" | "description" | "position" | "hasBackground",
+		value: string | boolean
+	) => {
+		const updateItems = (items: UnifiedItem[]) =>
+			items.map((item) => {
+				if (item.isText && item.id === id) {
+					return { ...item, [field]: value };
+				}
+				return item;
+			});
+		setUnifiedItems(updateItems);
+	};
+
+	const handleSaveEditingText = async (
+		id: number,
+		title: string,
+		description: string,
+		position: string,
+		hasBackground: boolean
+	) => {
+		await handleTextUpdate(id, {
+			title,
+			description,
+			position,
+			hasBackground,
+			isEditing: false,
+		});
+	};
+
+	const handleCancelEditingText = (id: number) => {
+		const textToRestore = initialTexts.find((t) => t.id === id);
+		if (textToRestore) {
+			const updateItems = (items: UnifiedItem[]) =>
+				items.map((item) => {
+					if (item.isText && item.id === id) {
+						return { ...textToRestore, isEditing: false };
+					}
+					return item;
+				});
+			setUnifiedItems(updateItems);
+		}
+	};
 
 	return {
 		unifiedItems,
 		activeId,
 		isAdding,
 		isAddingSection,
+		isAddingText,
 		formData,
 		sectionFormData,
+		textFormData,
 		existingSections,
 		archivingLinkId,
 		setActiveId,
 		setIsAdding,
 		setIsAddingSection,
+		setIsAddingText,
 		setFormData,
 		setSectionFormData,
+		setTextFormData,
 		handleDragEnd,
 		handleSectionUpdate,
 		handleSectionDelete,
 		handleSectionUngroup,
 		handleAddNewLink,
 		handleAddNewSection,
+		handleAddNewText,
 		handleAddLinkToSection,
 		saveEditing,
 		handleDeleteLink,
@@ -463,5 +604,12 @@ export const useLinksManager = (
 		handleClickLink,
 		handleUpdateCustomImage,
 		handleRemoveCustomImage,
+		handleTextUpdate,
+		handleDeleteText,
+		handleArchiveText,
+		handleStartEditingText,
+		handleTextChange,
+		handleSaveEditingText,
+		handleCancelEditingText,
 	};
 };

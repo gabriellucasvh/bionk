@@ -18,6 +18,7 @@ export type LinkItem = {
 	customImageUrl?: string | null;
 	// Novas propriedades para unificação com seções
 	isSection?: boolean; // Indica se este item é uma seção
+	isText?: boolean; // Indica se este item é um texto
 	children?: LinkItem[]; // Links filhos quando é uma seção
 	dbId?: number; // ID do banco para seções
 };
@@ -31,5 +32,24 @@ export type SectionItem = {
 	links: LinkItem[];
 };
 
+export type TextItem = {
+	id: number;
+	title: string;
+	description: string;
+	position: "left" | "center" | "right";
+	hasBackground: boolean;
+	active: boolean;
+	order: number;
+	userId: number;
+	isEditing?: boolean;
+	archived?: boolean;
+	sectionId?: number | null;
+	// Propriedades para unificação
+	isText?: boolean;
+	isSection?: boolean; // Adicionando para compatibilidade
+	children?: never;
+	dbId?: number;
+};
+
 // Tipo unificado para drag and drop
-export type UnifiedDragItem = LinkItem;
+export type UnifiedDragItem = LinkItem | TextItem;

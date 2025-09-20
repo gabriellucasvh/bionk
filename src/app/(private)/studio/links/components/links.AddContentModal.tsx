@@ -1,6 +1,6 @@
 "use client";
 
-import { Layers2, Plus } from "lucide-react";
+import { Layers2, Plus, Type } from "lucide-react";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import {
@@ -13,53 +13,66 @@ import {
 import { isValidUrl } from "../utils/links.helpers";
 import AddNewLinkForm from "./links.AddNewLinkForm";
 import AddNewSectionForm from "./links.AddNewSectionForm";
+import AddNewTextForm from "./links.AddNewTextForm";
 
 interface AddContentModalProps {
 	isAdding: boolean;
 	isAddingSection: boolean;
+	isAddingText: boolean;
 	formData: any;
 	sectionFormData: any;
+	textFormData: any;
 	existingSections: string[];
 	setIsAdding: (value: boolean) => void;
 	setIsAddingSection: (value: boolean) => void;
+	setIsAddingText: (value: boolean) => void;
 	setFormData: (data: any) => void;
 	setSectionFormData: (data: any) => void;
+	setTextFormData: (data: any) => void;
 	handleAddNewLink: () => void;
 	handleAddNewSection: () => void;
+	handleAddNewText: () => void;
 }
 
 const AddContentModal = ({
 	isAdding,
 	isAddingSection,
+	isAddingText,
 	formData,
 	sectionFormData,
+	textFormData,
 	existingSections,
 	setIsAdding,
 	setIsAddingSection,
+	setIsAddingText,
 	setFormData,
 	setSectionFormData,
+	setTextFormData,
 	handleAddNewLink,
 	handleAddNewSection,
+	handleAddNewText,
 }: AddContentModalProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedOption, setSelectedOption] = useState<
 		"link" | "section" | null
 	>(null);
 
-	const handleOptionSelect = (option: "link" | "section") => {
+	const handleOptionSelect = (option: "link" | "section" | "text") => {
 		setSelectedOption(option);
 		if (option === "link") {
 			setIsAdding(true);
-		} else {
+		} else if (option === "section") {
 			setIsAddingSection(true);
+		} else if (option === "text") {
+			setIsAddingText(true);
 		}
 	};
-
 	const handleClose = () => {
 		setIsOpen(false);
 		setSelectedOption(null);
 		setIsAdding(false);
 		setIsAddingSection(false);
+		setIsAddingText(false);
 	};
 
 	const handleCancel = () => {
@@ -90,7 +103,7 @@ const AddContentModal = ({
 							Escolha o tipo de conteúdo que deseja adicionar:
 						</p>
 
-						<div className="flex justify-center gap-8">
+						<div className="flex justify-center gap-6">
 							<button
 								className="flex flex-col items-center space-y-3 rounded-lg p-4 transition-colors hover:bg-muted/50"
 								onClick={() => handleOptionSelect("link")}
@@ -111,6 +124,17 @@ const AddContentModal = ({
 									<Layers2 className="h-8 w-8" strokeWidth={1.5} />
 								</div>
 								<span className="font-medium text-sm">Criar Seção</span>
+							</button>
+
+							<button
+								className="flex flex-col items-center space-y-3 rounded-lg p-4 transition-colors hover:bg-muted/50"
+								onClick={() => handleOptionSelect("text")}
+								type="button"
+							>
+								<div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-500 text-white">
+									<Type className="h-8 w-8" strokeWidth={1.5} />
+								</div>
+								<span className="font-medium text-sm">Adicionar Texto</span>
 							</button>
 						</div>
 					</div>
@@ -146,6 +170,24 @@ const AddContentModal = ({
 								handleClose();
 							}}
 							setFormData={setSectionFormData}
+						/>
+					</div>
+				)}
+
+				{selectedOption === "text" && isAddingText && (
+					<div className="space-y-4">
+						<AddNewTextForm
+							existingSections={existingSections}
+							formData={textFormData}
+							isSaveDisabled={
+								!(textFormData.title.trim() && textFormData.description.trim())
+							}
+							onCancel={handleCancel}
+							onSave={() => {
+								handleAddNewText();
+								handleClose();
+							}}
+							setFormData={setTextFormData}
 						/>
 					</div>
 				)}

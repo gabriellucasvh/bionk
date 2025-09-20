@@ -3,24 +3,28 @@
 
 import type { DragStartEvent } from "@dnd-kit/core";
 import type { Session } from "next-auth";
+import type { LinkItem, SectionItem, TextItem } from "../types/links.types";
 import { useLinksManager } from "../hooks/useLinksManager";
-import type { LinkItem, SectionItem } from "../types/links.types";
 import AddContentModal from "./links.AddContentModal";
 import LinkList from "./links.LinkList";
 
 interface LinksTabContentProps {
 	initialLinks: LinkItem[];
 	initialSections: SectionItem[];
+	initialTexts: TextItem[];
 	mutateLinks: () => Promise<any>;
 	mutateSections: () => Promise<any>;
+	mutateTexts: () => Promise<any>;
 	session: Session | null;
 }
 
 const LinksTabContent = ({
 	initialLinks,
 	initialSections,
+	initialTexts,
 	mutateLinks,
 	mutateSections,
+	mutateTexts,
 }: LinksTabContentProps) => {
 	const {
 		unifiedItems,
@@ -37,8 +41,10 @@ const LinksTabContent = ({
 	} = useLinksManager(
 		initialLinks,
 		initialSections,
+		initialTexts,
 		mutateLinks,
-		mutateSections
+		mutateSections,
+		mutateTexts
 	);
 
 	const handleDragStart = (event: DragStartEvent) => {
@@ -47,21 +53,24 @@ const LinksTabContent = ({
 
 	return (
 		<div className="space-y-4">
-			{!(isAdding || handlers.isAddingSection) && (
-				<AddContentModal
-					isAdding={isAdding}
-					isAddingSection={handlers.isAddingSection}
-					formData={formData}
-					sectionFormData={handlers.sectionFormData}
-					existingSections={existingSections}
-					setIsAdding={setIsAdding}
-					setIsAddingSection={handlers.setIsAddingSection}
-					setFormData={setFormData}
-					setSectionFormData={handlers.setSectionFormData}
-					handleAddNewLink={handlers.handleAddNewLink}
-					handleAddNewSection={handlers.handleAddNewSection}
-				/>
-			)}
+			<AddContentModal
+				isAdding={isAdding}
+				isAddingSection={handlers.isAddingSection}
+				isAddingText={handlers.isAddingText}
+				formData={formData}
+				sectionFormData={handlers.sectionFormData}
+				textFormData={handlers.textFormData}
+				existingSections={existingSections}
+				setIsAdding={setIsAdding}
+				setIsAddingSection={handlers.setIsAddingSection}
+				setIsAddingText={handlers.setIsAddingText}
+				setFormData={setFormData}
+				setSectionFormData={handlers.setSectionFormData}
+				setTextFormData={handlers.setTextFormData}
+				handleAddNewLink={handlers.handleAddNewLink}
+				handleAddNewSection={handlers.handleAddNewSection}
+				handleAddNewText={handlers.handleAddNewText}
+			/>
 
 			<LinkList
 				activeId={activeId}
@@ -91,6 +100,12 @@ const LinksTabContent = ({
 				onStartEditing={handlers.handleStartEditing}
 				onToggleActive={handlers.toggleActive}
 				onUpdateCustomImage={handlers.handleUpdateCustomImage}
+				onDeleteText={handlers.handleDeleteText}
+				onArchiveText={handlers.handleArchiveText}
+				onStartEditingText={handlers.handleStartEditingText}
+				onTextChange={handlers.handleTextChange}
+				onSaveEditingText={handlers.handleSaveEditingText}
+				onCancelEditingText={handlers.handleCancelEditingText}
 			/>
 		</div>
 	);

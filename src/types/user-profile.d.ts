@@ -4,6 +4,7 @@ import type {
 	Link as PrismaLink,
 	Section as PrismaSection,
 	SocialLink as PrismaSocialLink,
+	Text as PrismaText,
 	User as PrismaUser,
 } from "@prisma/client";
 
@@ -44,6 +45,16 @@ export interface SocialLink extends PrismaSocialLink {
 	platform: SocialPlatform;
 }
 
+// --- Textos ---
+export interface UserText extends PrismaText {
+	id: number;
+	title: string;
+	description: string;
+	order: number;
+	active: boolean;
+	userId: string;
+}
+
 // --- Customização ---
 export interface CustomPresets extends PrismaCustomPresets {
 	customBackgroundColor: string;
@@ -61,6 +72,7 @@ export type UserProfile = PrismaUser & {
 	Section: UserSection[];
 	Link: UserLink[];
 	SocialLink: SocialLink[];
+	Text: UserText[];
 	CustomPresets?: CustomPresets | null;
 
 	template?: string;

@@ -17,10 +17,11 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import type { UnifiedItem } from "../hooks/useLinksManager";
-import type { SectionItem } from "../types/links.types";
+import type { LinkItem, SectionItem, TextItem } from "../types/links.types";
 import LinkCard from "./links.LinkCard";
 import SectionCard from "./links.SectionCard";
 import SortableItem from "./links.SortableItem";
+import TextCard from "./links.TextCard";
 
 interface LinkListProps {
 	items: UnifiedItem[];
@@ -45,6 +46,23 @@ interface LinkListProps {
 	linksManager?: any;
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
 	onRemoveCustomImage?: (id: number) => void;
+	// Props para textos
+	onDeleteText?: (id: number) => void;
+	onArchiveText?: (id: number) => void;
+	onStartEditingText?: (id: number) => void;
+	onTextChange?: (
+		id: number,
+		field: "title" | "description" | "position" | "hasBackground",
+		value: string | boolean
+	) => void;
+	onSaveEditingText?: (
+		id: number,
+		title: string,
+		description: string,
+		position: "left" | "center" | "right",
+		hasBackground: boolean
+	) => void;
+	onCancelEditingText?: (id: number) => void;
 }
 
 const LinkList = (props: LinkListProps) => {
@@ -58,6 +76,12 @@ const LinkList = (props: LinkListProps) => {
 		linksManager,
 		onRemoveCustomImage,
 		onUpdateCustomImage,
+		onDeleteText,
+		onArchiveText,
+		onStartEditingText,
+		onTextChange,
+		onSaveEditingText,
+		onCancelEditingText,
 		...cardProps
 	} = props;
 
@@ -94,7 +118,13 @@ const LinkList = (props: LinkListProps) => {
 						{items.map((item) => (
 							<SortableItem
 								id={item.isSection ? item.id.toString() : `link-${item.id}`}
-								key={item.id}
+								key={
+									item.isSection
+										? `section-${item.id}`
+										: item.isText
+											? `text-${item.id}`
+											: `link-${item.id}`
+								}
 							>
 								{({ listeners, setActivatorNodeRef, isDragging }) => {
 									if (item.isSection) {
@@ -108,30 +138,47 @@ const LinkList = (props: LinkListProps) => {
 											links: item.children || [],
 										};
 										return (
-									<SectionCard
-										isDragging={isDragging}
-										linksManager={linksManager}
-										listeners={listeners}
-										onAddLinkToSection={onAddLinkToSection}
-										onRemoveCustomImage={onRemoveCustomImage}
-										onUpdateCustomImage={onUpdateCustomImage}
-										section={sectionData}
-										setActivatorNodeRef={setActivatorNodeRef}
-										{...cardProps}
-									/>
-								);
+											<SectionCard
+												isDragging={isDragging}
+												linksManager={linksManager}
+												listeners={listeners}
+												onAddLinkToSection={onAddLinkToSection}
+												onRemoveCustomImage={onRemoveCustomImage}
+												onUpdateCustomImage={onUpdateCustomImage}
+												section={sectionData}
+												setActivatorNodeRef={setActivatorNodeRef}
+												{...cardProps}
+											/>
+										);
+									}
+									if (item.isText) {
+										return (
+											<TextCard
+												isDragging={isDragging}
+												listeners={listeners}
+												onArchiveText={onArchiveText}
+												onCancelEditingText={onCancelEditingText}
+												onDeleteText={onDeleteText}
+												onSaveEditingText={onSaveEditingText}
+												onStartEditingText={onStartEditingText}
+												onTextChange={onTextChange}
+												onToggleActive={cardProps.onToggleActive}
+												setActivatorNodeRef={setActivatorNodeRef}
+												text={item as TextItem}
+											/>
+										);
 									}
 									return (
-									<LinkCard
-										archivingLinkId={archivingLinkId}
-										link={item}
-										listeners={listeners}
-										onRemoveCustomImage={onRemoveCustomImage}
-										onUpdateCustomImage={onUpdateCustomImage}
-										setActivatorNodeRef={setActivatorNodeRef}
-										{...cardProps}
-									/>
-								);
+										<LinkCard
+											archivingLinkId={archivingLinkId}
+											link={item as LinkItem}
+											listeners={listeners}
+											onRemoveCustomImage={onRemoveCustomImage}
+											onUpdateCustomImage={onUpdateCustomImage}
+											setActivatorNodeRef={setActivatorNodeRef}
+											{...cardProps}
+										/>
+									);
 								}}
 							</SortableItem>
 						))}
@@ -143,29 +190,37 @@ const LinkList = (props: LinkListProps) => {
 					{activeItem ? (
 						activeItem.isSection ? (
 							<SectionCard
-							isDragging
-							linksManager={linksManager}
-							onAddLinkToSection={onAddLinkToSection}
-							section={{
-								id: activeItem.id.toString(),
-								dbId: activeItem.dbId || 0,
-								title: activeItem.title,
-								active: activeItem.active,
-								order: activeItem.order || 0,
-								links: activeItem.children || [],
-							}}
-							{...cardProps}
-							listeners={{}}
-							setActivatorNodeRef={noop}
-						/>
+								isDragging
+								linksManager={linksManager}
+								onAddLinkToSection={onAddLinkToSection}
+								section={{
+									id: activeItem.id.toString(),
+									dbId: activeItem.dbId || 0,
+									title: activeItem.title,
+									active: activeItem.active,
+									order: activeItem.order || 0,
+									links: activeItem.children || [],
+								}}
+								{...cardProps}
+								listeners={{}}
+								setActivatorNodeRef={noop}
+							/>
+						) : activeItem.isText ? (
+							<TextCard
+								isDragging
+								text={activeItem as TextItem}
+								{...cardProps}
+								listeners={{}}
+								setActivatorNodeRef={noop}
+							/>
 						) : (
 							<LinkCard
-							archivingLinkId={archivingLinkId}
-							link={activeItem}
-							{...cardProps}
-							listeners={{}}
-							setActivatorNodeRef={noop}
-						/>
+								archivingLinkId={archivingLinkId}
+								link={activeItem as LinkItem}
+								{...cardProps}
+								listeners={{}}
+								setActivatorNodeRef={noop}
+							/>
 						)
 					) : null}
 				</DragOverlay>
