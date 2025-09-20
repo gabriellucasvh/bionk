@@ -131,15 +131,16 @@ export default function TemplateSettings({
 										onClick={() => handleTemplateSelect(template.id)}
 										variant="ghost"
 									>
-										<Image
-											alt={template.name}
-											className="aspect-[9/16] w-full max-w-[150px] rounded-lg object-cover"
-											height={120}
-											quality={100}
-											src={template.image}
-											unoptimized
-											width={200}
-										/>
+										<div className="relative h-[266px] w-[150px] overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
+											<Image
+												alt={template.name}
+												className="object-cover"
+												fill
+												quality={100}
+												src={template.image}
+												unoptimized
+											/>
+										</div>
 									</Button>
 								</div>
 							)
