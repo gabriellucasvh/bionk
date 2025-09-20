@@ -42,10 +42,25 @@ function shouldUpdateUserData(token: any): boolean {
 	);
 }
 
+// Cache para evitar consultas desnecessárias ao banco
+const tokenCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutos
+
 async function updateTokenFromDatabase(token: any) {
 	try {
+		const userId = token.id as string;
+		const now = Date.now();
+
+		// Verificar se temos dados em cache válidos
+		const cached = tokenCache.get(userId);
+		if (cached && now - cached.timestamp < CACHE_DURATION) {
+			// Usar dados do cache
+			Object.assign(token, cached.data);
+			return;
+		}
+
 		const dbUser = await prisma.user.findUnique({
-			where: { id: token.id as string },
+			where: { id: userId },
 			select: {
 				onboardingCompleted: true,
 				image: true,
@@ -57,21 +72,33 @@ async function updateTokenFromDatabase(token: any) {
 		});
 
 		if (dbUser) {
-			token.onboardingCompleted = dbUser.onboardingCompleted;
-			token.status = dbUser.status;
-			token.isBanned = dbUser.isBanned;
-			token.banReason = dbUser.banReason;
-			token.bannedAt = dbUser.bannedAt;
+			const userData: any = {
+				onboardingCompleted: dbUser.onboardingCompleted,
+				status: dbUser.status,
+				isBanned: dbUser.isBanned,
+				banReason: dbUser.banReason,
+				bannedAt: dbUser.bannedAt,
+			};
 
 			// Só atualizar a imagem se o usuário já completou o onboarding
-			// Durante o onboarding, manter a imagem original do Google
 			if (dbUser.onboardingCompleted && dbUser.image) {
-				token.picture = dbUser.image;
+				userData.picture = dbUser.image;
 			}
+
+			// Atualizar token
+			Object.assign(token, userData);
+
+			// Salvar no cache
+			tokenCache.set(userId, { data: userData, timestamp: now });
 		}
 	} catch (error) {
 		console.error("Erro ao buscar dados do usuário:", error);
 	}
+}
+
+// Função para limpar cache quando necessário
+export function clearUserTokenCache(userId: string) {
+	tokenCache.delete(userId);
 }
 
 function updateTokenFromSession(token: any, sessionUser: any) {
@@ -246,7 +273,11 @@ export const authOptions: NextAuthOptions = {
 	pages: {
 		signIn: "/registro",
 	},
-	session: { strategy: "jwt" },
+	session: {
+		strategy: "jwt",
+		maxAge: 30 * 24 * 60 * 60, // 30 dias
+		updateAge: 24 * 60 * 60, // 24 horas
+	},
 	secret: process.env.NEXTAUTH_SECRET,
 	callbacks: {
 		async jwt({ token, user, account, trigger, session: updateSessionData }) {
@@ -260,14 +291,18 @@ export const authOptions: NextAuthOptions = {
 				setupAccountData(token, account);
 			}
 
-			// Sempre atualizar dados do usuário para verificar banimento
-			if (token.id) {
+			// Só atualizar dados do usuário quando necessário
+			if (token.id && shouldUpdateUserData(token)) {
 				await updateTokenFromDatabase(token);
 			}
 
 			// Processar atualizações de sessão
 			if (trigger === "update" && updateSessionData?.user) {
 				updateTokenFromSession(token, updateSessionData.user);
+				// Limpar cache quando sessão é atualizada
+				if (token.id) {
+					clearUserTokenCache(token.id as string);
+				}
 			}
 
 			return token;
