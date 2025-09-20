@@ -1,9 +1,9 @@
-// src/app/(private)/studio/personalizar/personalizar.client.tsx
+// src/app/(private)/studio/design/design.client.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import CustomizationPanel from "./CustomizationPanel";
-import CategoriasTemplates from "./components/personalizar.CategoriasTemplates";
+import CategoriasTemplates from "./components/design.CategoriasTemplates";
+import DesignPanel from "./components/design.Panel";
 
 // Definir o tipo das customizações
 type UserCustomizations = {
@@ -100,7 +100,7 @@ const PersonalizarClient = () => {
 						Personalização:
 					</h2>
 
-					<CustomizationPanel
+					<DesignPanel
 						onSave={handleSaveCustomizations}
 						userCustomizations={userCustomizations}
 					/>

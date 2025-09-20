@@ -149,8 +149,8 @@ const mainLinks: SidebarLink[] = [
 	},
 	{
 		key: "personalization",
-		href: "/studio/personalizar",
-		label: "Temas",
+		href: "/studio/design",
+		label: "Design",
 		icon: <Paintbrush className="h-4 w-4" />,
 	},
 	{

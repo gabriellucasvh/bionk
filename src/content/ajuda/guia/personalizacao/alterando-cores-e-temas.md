@@ -10,16 +10,14 @@ A personalização de cores e temas permite que sua página reflita sua identida
 
 ## Como Alterar as Cores
 1. Acesse sua conta na plataforma.
-2. Vá até a seção **Personalização**.
-3. Escolha a opção **Cores e Temas**.
+2. Vá até a seção **Design**.
 4. Selecione uma cor predefinida.
 5. Salve as alterações para aplicar as novas cores.
 
 ## Como Escolher um Tema
-1. Acesse a seção **Personalização**.
-2. Clique em **Temas**.
-3. Visualize as opções disponíveis e selecione a que melhor combina com sua identidade.
-4. Confirme a escolha para aplicar o novo tema.
+1. Acesse a seção **Design**.
+2. Visualize as opções disponíveis e selecione a que melhor combina com sua identidade.
+3. Confirme a escolha para aplicar o novo tema.
 
 ## Dicas de Personalização
 - Escolha cores que representem sua marca e sejam agradáveis para leitura.

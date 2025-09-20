@@ -7,10 +7,10 @@ import { BaseButton } from "@/components/buttons/BaseButton";
 import FontSelectionModal from "@/components/modals/FontSelectionModal";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider"; // Importar o Slider do shadcn/ui
-import { RenderLabel } from "./components/personalizar.RenderLabel";
+import { RenderLabel } from "./design.RenderLabel";
 
 // Interface atualizada
-interface CustomizationPanelProps {
+interface DesignPanelProps {
 	userCustomizations: {
 		customBackgroundColor: string;
 		customBackgroundGradient: string;
@@ -231,10 +231,10 @@ const useDebouncedCallback = (
 	);
 };
 
-export default function CustomizationPanel({
+export default function DesignPanel({
 	userCustomizations,
 	onSave,
-}: CustomizationPanelProps) {
+}: DesignPanelProps) {
 	const [customizations, setCustomizations] = useState(userCustomizations);
 	const [activeColorPicker, setActiveColorPicker] = useState<
 		"background" | "text" | "button" | null

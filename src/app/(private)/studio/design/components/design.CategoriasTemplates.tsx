@@ -1,4 +1,4 @@
-// src/app/(private)/studio/personalizar/CategoriasTemplates.tsx
+// src/app/(private)/studio/design/CategoriasTemplates.tsx
 "use client";
 
 import Image from "next/image";
@@ -13,7 +13,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { CATEGORIES } from "../data/personalizar.data";
+import { CATEGORIES } from "../data/design.data";
 
 interface TemplateSettingsProps {
 	onTemplateChange?: () => void; // Callback para notificar mudança de template
