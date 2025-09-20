@@ -112,6 +112,18 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 		}
 	};
 
+	const deleteAllLinks = async () => {
+		const promises = archivedLinks.map((link) =>
+			fetch(`/api/links/${link.id}`, {
+				method: "DELETE",
+			})
+		);
+		const results = await Promise.all(promises);
+		if (results.every((res) => res.ok)) {
+			setArchivedLinks([]);
+		}
+	};
+
 	const restoreAllItems = async () => {
 		await Promise.all([restoreAllLinks(), restoreAllTexts()]);
 	};
