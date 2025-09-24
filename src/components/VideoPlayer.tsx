@@ -21,7 +21,8 @@ export default function VideoPlayer({
 	};
 
 	const borderRadius = getBorderRadius();
-	const baseClasses = `w-full aspect-video ${borderRadius ? "" : "rounded-xl"} ${className}`;
+	const aspectRatio = type === "tiktok" ? "aspect-[9/16]" : "aspect-video";
+	const baseClasses = `w-full ${aspectRatio} ${borderRadius ? "" : "rounded-xl"} ${className}`;
 	const inlineStyle = borderRadius ? { borderRadius } : undefined;
 
 	if (type === "direct") {

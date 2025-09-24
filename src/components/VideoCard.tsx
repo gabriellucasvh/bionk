@@ -20,6 +20,14 @@ export default function VideoCard({
 	className = "",
 	customPresets,
 }: VideoCardProps) {
+	const isTikTok = type === "tiktok";
+	const videoContainerClass = isTikTok 
+		? "flex justify-center" 
+		: "";
+	const videoPlayerClass = isTikTok 
+		? "max-w-sm" 
+		: "";
+
 	return (
 		<div className={`w-full space-y-2 pb-4 ${className}`}>
 			{title && (
@@ -34,12 +42,15 @@ export default function VideoCard({
 				</p>
 			)}
 
-			<VideoPlayer 
-				customButtonCorners={customPresets?.customButtonCorners}
-				title={title} 
-				type={type} 
-				url={url} 
-			/>
+			<div className={videoContainerClass}>
+				<VideoPlayer 
+					className={videoPlayerClass}
+					customButtonCorners={customPresets?.customButtonCorners}
+					title={title} 
+					type={type} 
+					url={url} 
+				/>
+			</div>
 		</div>
 	);
 }
