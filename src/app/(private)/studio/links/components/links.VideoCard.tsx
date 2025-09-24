@@ -33,7 +33,7 @@ interface VideoCardProps {
 	isDragging?: boolean;
 	listeners?: any;
 	setActivatorNodeRef?: (node: HTMLElement | null) => void;
-	onToggleActive?: (id: number, isActive: boolean) => void;
+	onToggleActive?: (id: number, isActive: boolean) => Promise<void>;
 	onStartEditingVideo?: (id: number) => void;
 	onArchiveVideo?: (id: number) => void;
 	onDeleteVideo?: (id: number) => void;
@@ -234,7 +234,13 @@ const DisplayView = ({
 						<Switch
 							checked={video.active}
 							id={`switch-${video.id}`}
-							onCheckedChange={(checked) => onToggleActive?.(video.id, checked)}
+							onCheckedChange={async (checked) => {
+								try {
+									await onToggleActive?.(video.id, checked);
+								} catch (error) {
+									// Em caso de erro, o switch volta ao estado anterior
+								}
+							}}
 						/>
 						<Label
 							className="cursor-pointer text-sm"

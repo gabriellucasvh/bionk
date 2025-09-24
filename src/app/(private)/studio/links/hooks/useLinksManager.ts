@@ -468,12 +468,22 @@ export const useLinksManager = (
 	};
 
 	const handleVideoUpdate = async (id: number, payload: Partial<VideoItem>) => {
-		await fetch(`/api/videos/${id}`, {
-			method: "PUT",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(payload),
-		});
-		await mutateVideos();
+		try {
+			const response = await fetch(`/api/videos/${id}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || "Erro ao atualizar vídeo");
+			}
+
+			await mutateVideos();
+		} catch (error) {
+			throw error;
+		}
 	};
 
 	const handleDeleteVideo = async (id: number) => {
@@ -595,17 +605,21 @@ export const useLinksManager = (
 		}
 	};
 
-	const toggleActive = (id: number, isActive: boolean) => {
+	const toggleActive = async (id: number, isActive: boolean) => {
 		const link = currentLinks.find((l) => l.id === id);
 		const text = currentTexts.find((t) => t.id === id);
 		const video = currentVideos.find((v) => v.id === id);
 
-		if (link) {
-			handleLinkUpdate(id, { active: isActive });
-		} else if (text) {
-			handleTextUpdate(id, { active: isActive });
-		} else if (video) {
-			handleVideoUpdate(id, { active: isActive });
+		try {
+			if (link) {
+				await handleLinkUpdate(id, { active: isActive });
+			} else if (text) {
+				await handleTextUpdate(id, { active: isActive });
+			} else if (video) {
+				await handleVideoUpdate(id, { active: isActive });
+			}
+		} catch (error) {
+			throw error;
 		}
 	};
 

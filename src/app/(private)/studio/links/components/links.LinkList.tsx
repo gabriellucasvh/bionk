@@ -41,7 +41,7 @@ interface LinkListProps {
 	onArchiveLink: (id: number) => void;
 	onDeleteLink: (id: number) => void;
 	onSaveEditing: (id: number, title: string, url: string) => void;
-	onToggleActive: (id: number, isActive: boolean) => void;
+	onToggleActive: (id: number, isActive: boolean) => Promise<void>;
 
 	onLinkChange: (id: number, field: "title" | "url", value: string) => void;
 	onCancelEditing: (id: number) => void;
