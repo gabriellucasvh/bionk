@@ -8,6 +8,7 @@ import type {
 	SectionItem,
 	TextItem,
 	UnifiedDragItem,
+	VideoItem,
 } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
 
@@ -82,12 +83,14 @@ const urlProtocolRegex = /^(https?:\/\/)/;
 
 // --- HOOK ---
 export const useLinksManager = (
-	initialLinks: LinkItem[],
-	initialSections: SectionItem[],
-	initialTexts: TextItem[],
+	currentLinks: LinkItem[],
+	currentSections: SectionItem[],
+	currentTexts: TextItem[],
+	currentVideos: VideoItem[],
 	mutateLinks: () => Promise<any>,
 	mutateSections: () => Promise<any>,
-	mutateTexts: () => Promise<any>
+	mutateTexts: () => Promise<any>,
+	mutateVideos: () => Promise<any>
 ) => {
 	// ... (useState, useEffect, useMemo, findContainerId, etc. continuam iguais)
 	const [unifiedItems, setUnifiedItems] = useState<UnifiedItem[]>([]);
@@ -117,7 +120,7 @@ export const useLinksManager = (
 		}
 
 		// Converter seções em LinkItems unificados
-		const sectionItems: UnifiedItem[] = initialSections.map((section) => ({
+		const sectionItems: UnifiedItem[] = currentSections.map((section) => ({
 			id: section.dbId || Number(section.id),
 			title: section.title,
 			url: "", // Seções não têm URL
@@ -126,14 +129,14 @@ export const useLinksManager = (
 			sensitive: false,
 			order: section.order,
 			isSection: true,
-			children: initialLinks.filter(
+			children: currentLinks.filter(
 				(link) => link.sectionId === (section.dbId || Number(section.id))
 			),
 			dbId: section.dbId || Number(section.id),
 		}));
 
 		// Converter textos em UnifiedItems
-		const textItems: UnifiedItem[] = initialTexts.map((text) => ({
+		const textItems: UnifiedItem[] = currentTexts.map((text) => ({
 			...text,
 			url: null,
 			clicks: 0,
@@ -142,33 +145,43 @@ export const useLinksManager = (
 			isEditing: false,
 		}));
 
+		// Converter vídeos em UnifiedItems
+		const videoItems: UnifiedItem[] = currentVideos.map((video) => ({
+			...video,
+			clicks: 0,
+			sensitive: false,
+			isVideo: true,
+			isEditing: false,
+		}));
+
 		// Links gerais (sem seção)
-		const generalLinks: UnifiedItem[] = initialLinks
+		const generalLinks: UnifiedItem[] = currentLinks
 			.filter((link) => !link.sectionId)
 			.map((link) => ({ ...link }));
 
-		// Combinar todos os itens (seções, links gerais e textos) em uma única lista
+		// Combinar todos os itens (seções, links gerais, textos e vídeos) em uma única lista
 		const allItems: UnifiedItem[] = [
 			...sectionItems,
 			...generalLinks,
 			...textItems,
+			...videoItems,
 		];
 
 		// Ordenar todos os itens juntos por order
 		allItems.sort((a, b) => a.order - b.order);
 		setUnifiedItems(allItems);
-	}, [initialLinks, initialSections, initialTexts]);
+	}, [currentLinks, currentSections, currentTexts, currentVideos]);
 
 	const existingSections = useMemo(() => {
 		return unifiedItems
 			.filter((item) => item.isSection)
 			.map((item) => ({
 				id: item.id.toString(),
-				title: item.title,
+				title: item.title || "",
 				order: item.order,
 				active: item.active,
 				dbId: item.dbId || item.id,
-				links: item.children || []
+				links: item.children || [],
 			}));
 	}, [unifiedItems]);
 
@@ -184,7 +197,7 @@ export const useLinksManager = (
 			try {
 				// Separar itens por tipo para usar as APIs corretas
 				const linkItems = items
-					.filter((item) => !(item.isSection || item.isText))
+					.filter((item) => !(item.isSection || item.isText || item.isVideo))
 					.map((item) => ({
 						id: item.id,
 						order: items.indexOf(item),
@@ -199,6 +212,13 @@ export const useLinksManager = (
 
 				const textItems = items
 					.filter((item) => item.isText)
+					.map((item) => ({
+						id: item.id,
+						order: items.indexOf(item),
+					}));
+
+				const videoItems = items
+					.filter((item) => item.isVideo)
 					.map((item) => ({
 						id: item.id,
 						order: items.indexOf(item),
@@ -237,6 +257,16 @@ export const useLinksManager = (
 					);
 				}
 
+				if (videoItems.length > 0) {
+					promises.push(
+						fetch("/api/videos/reorder", {
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ items: videoItems }),
+						})
+					);
+				}
+
 				await Promise.all(promises);
 
 				// Atualizar o estado local imediatamente para refletir as mudanças
@@ -252,6 +282,7 @@ export const useLinksManager = (
 					await mutateLinks();
 					await mutateSections();
 					await mutateTexts();
+					await mutateVideos();
 					isReorderingRef.current = false;
 				}, 200);
 			} catch (error) {
@@ -259,7 +290,7 @@ export const useLinksManager = (
 				isReorderingRef.current = false;
 			}
 		},
-		[mutateLinks, mutateSections, mutateTexts]
+		[mutateLinks, mutateSections, mutateTexts, mutateVideos]
 	);
 
 	const handleDragEnd = (event: DragEndEvent) => {
@@ -284,6 +315,9 @@ export const useLinksManager = (
 				if (item.isText) {
 					return `item-${item.id}` === draggedItemId;
 				}
+				if (item.isVideo) {
+					return `item-${item.id}` === draggedItemId;
+				}
 				return `item-${item.id}` === draggedItemId;
 			});
 
@@ -292,6 +326,9 @@ export const useLinksManager = (
 					return item.id.toString() === overId;
 				}
 				if (item.isText) {
+					return `item-${item.id}` === overId;
+				}
+				if (item.isVideo) {
 					return `item-${item.id}` === overId;
 				}
 				return `item-${item.id}` === overId;
@@ -355,6 +392,9 @@ export const useLinksManager = (
 		});
 
 		await mutateLinks();
+		await mutateSections();
+		await mutateTexts();
+		await mutateVideos();
 		setFormData(initialFormData);
 		setIsAdding(false);
 	};
@@ -372,6 +412,8 @@ export const useLinksManager = (
 
 		await mutateLinks();
 		await mutateSections();
+		await mutateTexts();
+		await mutateVideos();
 		setSectionFormData(initialSectionFormData);
 		setIsAddingSection(false);
 	};
@@ -394,9 +436,111 @@ export const useLinksManager = (
 		});
 
 		await mutateLinks();
+		await mutateSections();
 		await mutateTexts();
+		await mutateVideos();
 		setTextFormData(initialTextFormData);
 		setIsAddingText(false);
+	};
+
+	const handleAddNewVideo = async () => {
+		if (!videoFormData.url.trim()) {
+			return;
+		}
+
+		await fetch("/api/videos", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				title: videoFormData.title.trim() || null,
+				description: videoFormData.description.trim() || null,
+				url: videoFormData.url.trim(),
+				sectionId: videoFormData.sectionId,
+			}),
+		});
+
+		await mutateLinks();
+		await mutateSections();
+		await mutateTexts();
+		await mutateVideos();
+		setVideoFormData(initialVideoFormData);
+		setIsAddingVideo(false);
+	};
+
+	const handleVideoUpdate = async (id: number, payload: Partial<VideoItem>) => {
+		await fetch(`/api/videos/${id}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
+		await mutateVideos();
+	};
+
+	const handleDeleteVideo = async (id: number) => {
+		await fetch(`/api/videos/${id}`, { method: "DELETE" });
+		await mutateVideos();
+	};
+
+	const handleArchiveVideo = async (id: number) => {
+		await handleVideoUpdate(id, { archived: true });
+	};
+
+	const handleStartEditingVideo = (id: number) => {
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if (item.isVideo && item.id === id) {
+					return { ...item, isEditing: true };
+				}
+				return item;
+			})
+		);
+	};
+
+	const handleVideoChange = (
+		id: number,
+		field: "title" | "description" | "url",
+		value: string
+	) => {
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if (item.isVideo && item.id === id) {
+					return { ...item, [field]: value };
+				}
+				return item;
+			})
+		);
+	};
+
+	const handleSaveEditingVideo = async (
+		id: number,
+		title: string,
+		description: string,
+		url: string
+	) => {
+		await handleVideoUpdate(id, {
+			title,
+			description,
+			url,
+			isEditing: false,
+		});
+	};
+
+	const handleCancelEditingVideo = (id: number) => {
+		const videoToRestore = currentVideos.find((v) => v.id === id);
+		if (videoToRestore) {
+			setUnifiedItems((prevItems) =>
+				prevItems.map((item) => {
+					if (item.isVideo && item.id === id) {
+						return {
+							...videoToRestore,
+							isVideo: true,
+							isEditing: false,
+						};
+					}
+					return item;
+				})
+			);
+		}
 	};
 
 	const handleAddLinkToSection = async (sectionId: number) => {
@@ -452,8 +596,8 @@ export const useLinksManager = (
 	};
 
 	const toggleActive = (id: number, isActive: boolean) => {
-		const link = initialLinks.find((l) => l.id === id);
-		const text = initialTexts.find((t) => t.id === id);
+		const link = currentLinks.find((l) => l.id === id);
+		const text = currentTexts.find((t) => t.id === id);
 
 		if (link) {
 			handleLinkUpdate(id, { active: isActive });
@@ -494,7 +638,7 @@ export const useLinksManager = (
 	};
 
 	const handleStartEditing = (id: number) => {
-		const linkToEdit = initialLinks.find((l) => l.id === id);
+		const linkToEdit = currentLinks.find((l) => l.id === id);
 		if (linkToEdit) {
 			setOriginalLink(linkToEdit);
 			const updateEditingStatus = (items: UnifiedItem[]) =>
@@ -517,7 +661,7 @@ export const useLinksManager = (
 	};
 
 	const handleCancelEditing = (id: number) => {
-		const linkToRestore = initialLinks.find((l) => l.id === id);
+		const linkToRestore = currentLinks.find((l) => l.id === id);
 		if (linkToRestore) {
 			const updateItems = (items: UnifiedItem[]) =>
 				items.map((item) => {
@@ -563,7 +707,7 @@ export const useLinksManager = (
 	};
 
 	const handleClickLink = (id: number) => {
-		const link = initialLinks.find((l) => l.id === id);
+		const link = currentLinks.find((l) => l.id === id);
 		if (link) {
 			handleLinkUpdate(id, { clicks: link.clicks + 1 });
 		}
@@ -630,7 +774,7 @@ export const useLinksManager = (
 	};
 
 	const handleCancelEditingText = (id: number) => {
-		const textToRestore = initialTexts.find((t) => t.id === id);
+		const textToRestore = currentTexts.find((t) => t.id === id);
 		if (textToRestore) {
 			setUnifiedItems((prevItems) =>
 				prevItems.map((item) => {
@@ -681,6 +825,7 @@ export const useLinksManager = (
 		handleAddNewLink,
 		handleAddNewSection,
 		handleAddNewText,
+		handleAddNewVideo,
 		handleAddLinkToSection,
 		saveEditing,
 		handleDeleteLink,
@@ -699,5 +844,12 @@ export const useLinksManager = (
 		handleTextChange,
 		handleSaveEditingText,
 		handleCancelEditingText,
+		handleVideoUpdate,
+		handleDeleteVideo,
+		handleArchiveVideo,
+		handleStartEditingVideo,
+		handleVideoChange,
+		handleSaveEditingVideo,
+		handleCancelEditingVideo,
 	};
 };

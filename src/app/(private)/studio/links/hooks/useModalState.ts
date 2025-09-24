@@ -83,7 +83,7 @@ export const useModalState = () => {
 		setIsAnimating(false);
 		setTimeout(() => {
 			setIsOpen(false);
-			setSelectedCategory(null);
+			setSelectedCategory("content");
 			setSelectedOption(null);
 		}, 300);
 	};

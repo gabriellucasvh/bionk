@@ -49,6 +49,7 @@ interface AddContentModalProps {
 	handleAddNewLink: () => Promise<void>;
 	handleAddNewSection: () => Promise<void>;
 	handleAddNewText: () => Promise<void>;
+	handleAddNewVideo: () => Promise<void>;
 }
 
 const AddContentModal = ({
@@ -75,6 +76,7 @@ const AddContentModal = ({
 	handleAddNewLink,
 	handleAddNewSection,
 	handleAddNewText,
+	handleAddNewVideo,
 }: AddContentModalProps) => {
 	const {
 		isAnimating,
@@ -86,6 +88,12 @@ const AddContentModal = ({
 		setIsAnimating,
 		setSelectedOption,
 	} = useModalState();
+
+	useEffect(() => {
+		if (!isOpen) {
+			setSelectedOption(null);
+		}
+	}, [isOpen, setSelectedOption]);
 
 	const {
 		isDragging,
@@ -121,6 +129,7 @@ const AddContentModal = ({
 		handleAddNewLink,
 		handleAddNewSection,
 		handleAddNewText,
+		handleAddNewVideo,
 		onClose,
 	});
 

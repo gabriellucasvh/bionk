@@ -4,27 +4,36 @@
 import type { DragStartEvent } from "@dnd-kit/core";
 import type { Session } from "next-auth";
 import { useLinksManager } from "../hooks/useLinksManager";
-import type { LinkItem, SectionItem, TextItem } from "../types/links.types";
+import type {
+	LinkItem,
+	SectionItem,
+	TextItem,
+	VideoItem,
+} from "../types/links.types";
 import AddContentModal from "./links.AddContentModal";
 import LinkList from "./links.LinkList";
 
 interface LinksTabContentProps {
-	initialLinks: LinkItem[];
-	initialSections: SectionItem[];
-	initialTexts: TextItem[];
+	currentLinks: LinkItem[];
+	currentSections: SectionItem[];
+	currentTexts: TextItem[];
+	currentVideos: VideoItem[];
 	mutateLinks: () => Promise<any>;
 	mutateSections: () => Promise<any>;
 	mutateTexts: () => Promise<any>;
+	mutateVideos: () => Promise<any>;
 	session: Session | null;
 }
 
 const LinksTabContent = ({
-	initialLinks,
-	initialSections,
-	initialTexts,
+	currentLinks,
+	currentSections,
+	currentTexts,
+	currentVideos,
 	mutateLinks,
 	mutateSections,
 	mutateTexts,
+	mutateVideos,
 }: LinksTabContentProps) => {
 	const {
 		unifiedItems,
@@ -45,12 +54,14 @@ const LinksTabContent = ({
 		handleDragEnd,
 		...handlers
 	} = useLinksManager(
-		initialLinks,
-		initialSections,
-		initialTexts,
+		currentLinks,
+		currentSections,
+		currentTexts,
+		currentVideos,
 		mutateLinks,
 		mutateSections,
-		mutateTexts
+		mutateTexts,
+		mutateVideos
 	);
 
 	const handleDragStart = (event: DragStartEvent) => {
@@ -65,6 +76,7 @@ const LinksTabContent = ({
 				handleAddNewLink={handlers.handleAddNewLink}
 				handleAddNewSection={handlers.handleAddNewSection}
 				handleAddNewText={handlers.handleAddNewText}
+				handleAddNewVideo={handlers.handleAddNewVideo}
 				isAdding={isAdding}
 				isAddingSection={handlers.isAddingSection}
 				isAddingText={handlers.isAddingText}
@@ -100,25 +112,31 @@ const LinksTabContent = ({
 				onAddLinkToSection={handlers.handleAddLinkToSection}
 				onArchiveLink={handlers.handleArchiveLink}
 				onArchiveText={handlers.handleArchiveText}
+				onArchiveVideo={handlers.handleArchiveVideo}
 				onCancelEditing={handlers.handleCancelEditing}
 				onCancelEditingText={handlers.handleCancelEditingText}
+				onCancelEditingVideo={handlers.handleCancelEditingVideo}
 				onClickLink={handlers.handleClickLink}
 				onDeleteLink={handlers.handleDeleteLink}
 				onDeleteText={handlers.handleDeleteText}
+				onDeleteVideo={handlers.handleDeleteVideo}
 				onDragEnd={handleDragEnd}
 				onDragStart={handleDragStart}
 				onLinkChange={handlers.handleLinkChange}
 				onRemoveCustomImage={handlers.handleRemoveCustomImage}
 				onSaveEditing={handlers.saveEditing}
 				onSaveEditingText={handlers.handleSaveEditingText}
+				onSaveEditingVideo={handlers.handleSaveEditingVideo}
 				onSectionDelete={handlers.handleSectionDelete}
 				onSectionUngroup={handlers.handleSectionUngroup}
 				onSectionUpdate={handlers.handleSectionUpdate}
 				onStartEditing={handlers.handleStartEditing}
 				onStartEditingText={handlers.handleStartEditingText}
+				onStartEditingVideo={handlers.handleStartEditingVideo}
 				onTextChange={handlers.handleTextChange}
 				onToggleActive={handlers.toggleActive}
 				onUpdateCustomImage={handlers.handleUpdateCustomImage}
+				onVideoChange={handlers.handleVideoChange}
 			/>
 		</div>
 	);

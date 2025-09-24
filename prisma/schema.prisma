@@ -242,7 +242,6 @@ model Section {
   videos    Video[]
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, title])
   @@index([userId])
 }
 

@@ -11,33 +11,24 @@ export async function PUT(request: Request) {
 	}
 
 	try {
-		const { videoIds } = await request.json();
+		const { items } = await request.json();
 
-		if (!Array.isArray(videoIds)) {
+		if (!Array.isArray(items)) {
 			return NextResponse.json(
-				{ error: "videoIds deve ser um array" },
+				{ error: "Items deve ser um array" },
 				{ status: 400 }
 			);
 		}
 
-		const videos = await prisma.video.findMany({
-			where: {
-				id: { in: videoIds },
-				userId: session.user.id,
-			},
-		});
-
-		if (videos.length !== videoIds.length) {
-			return NextResponse.json(
-				{ error: "Alguns vídeos não foram encontrados" },
-				{ status: 404 }
-			);
-		}
-
-		const updatePromises = videoIds.map((id: number, index: number) =>
+		const updatePromises = items.map((item) =>
 			prisma.video.update({
-				where: { id },
-				data: { order: index },
+				where: {
+					id: item.id,
+					userId: session.user.id,
+				},
+				data: {
+					order: item.order,
+				},
 			})
 		);
 

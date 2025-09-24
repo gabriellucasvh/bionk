@@ -21,13 +21,21 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Incrementar order de todos os links e textos existentes do usuário
+		// Incrementar order de todos os links, textos, seções e vídeos existentes do usuário
 		await prisma.$transaction([
 			prisma.link.updateMany({
 				where: { userId: session.user.id },
 				data: { order: { increment: 1 } },
 			}),
 			prisma.text.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+			prisma.section.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+			prisma.video.updateMany({
 				where: { userId: session.user.id },
 				data: { order: { increment: 1 } },
 			}),

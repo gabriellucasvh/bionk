@@ -53,13 +53,8 @@ export async function POST(req: Request): Promise<NextResponse> {
 
 	const { title } = await req.json();
 	
-	// Incrementar order de todos os links, textos e seções existentes do usuário
-	await prisma.$transaction([
+	await Promise.all([
 		prisma.link.updateMany({
-			where: { userId: session.user.id },
-			data: { order: { increment: 1 } },
-		}),
-		prisma.text.updateMany({
 			where: { userId: session.user.id },
 			data: { order: { increment: 1 } },
 		}),
@@ -67,11 +62,19 @@ export async function POST(req: Request): Promise<NextResponse> {
 			where: { userId: session.user.id },
 			data: { order: { increment: 1 } },
 		}),
+		prisma.text.updateMany({
+			where: { userId: session.user.id },
+			data: { order: { increment: 1 } },
+		}),
+		prisma.video.updateMany({
+			where: { userId: session.user.id },
+			data: { order: { increment: 1 } },
+		}),
 	]);
 	
 	const newSection = await prisma.section.create({
 		data: {
-			title,
+			title: title.trim(),
 			order: 0,
 			userId: session.user.id,
 		},

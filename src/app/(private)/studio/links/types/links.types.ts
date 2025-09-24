@@ -19,6 +19,7 @@ export type LinkItem = {
 	// Novas propriedades para unificação com seções
 	isSection?: boolean; // Indica se este item é uma seção
 	isText?: boolean; // Indica se este item é um texto
+	isVideo?: boolean; // Indica se este item é um vídeo
 	children?: LinkItem[]; // Links filhos quando é uma seção
 	dbId?: number; // ID do banco para seções
 };
@@ -46,10 +47,31 @@ export type TextItem = {
 	sectionId?: number | null;
 	// Propriedades para unificação
 	isText?: boolean;
+	isVideo?: boolean; // Adicionando para compatibilidade
 	isSection?: boolean; // Adicionando para compatibilidade
 	children?: never;
 	dbId?: number;
 };
 
+export type VideoItem = {
+	id: number;
+	title: string | null;
+	description: string | null;
+	url: string;
+	type: "direct" | "youtube" | "vimeo" | "tiktok" | "twitch";
+	active: boolean;
+	order: number;
+	userId: number;
+	isEditing?: boolean;
+	archived?: boolean;
+	sectionId?: number | null;
+	// Propriedades para unificação
+	isVideo?: boolean;
+	isSection?: boolean;
+	isText?: boolean;
+	children?: never;
+	dbId?: number;
+};
+
 // Tipo unificado para drag and drop
-export type UnifiedDragItem = LinkItem | TextItem;
+export type UnifiedDragItem = LinkItem | TextItem | VideoItem;

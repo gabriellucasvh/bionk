@@ -24,6 +24,7 @@ interface UseModalHandlersProps {
 	handleAddNewLink: () => Promise<void>;
 	handleAddNewSection: () => Promise<void>;
 	handleAddNewText: () => Promise<void>;
+	handleAddNewVideo: () => Promise<void>;
 	onClose: () => void;
 }
 
@@ -43,6 +44,7 @@ export const useModalHandlers = ({
 	handleAddNewLink,
 	handleAddNewSection,
 	handleAddNewText,
+	handleAddNewVideo,
 	onClose,
 }: UseModalHandlersProps) => {
 	const handleLinkSubmit = async () => {
@@ -114,19 +116,14 @@ export const useModalHandlers = ({
 		}
 	};
 
-	const handleVideoSubmit = () => {
-		if (
-			videoFormData.title.trim().length === 0 ||
-			videoFormData.description.trim().length === 0 ||
-			videoFormData.url.trim().length === 0
-		) {
+	const handleVideoSubmit = async () => {
+		if (videoFormData.url.trim().length === 0) {
 			return;
 		}
 
 		setIsAddingVideo(true);
 		try {
-			// TODO: Implementar handleAddNewVideo quando disponível
-			console.warn("Adicionar vídeo ainda não implementado");
+			await handleAddNewVideo();
 			setVideoFormData({
 				title: "",
 				description: "",
@@ -135,8 +132,6 @@ export const useModalHandlers = ({
 				sectionId: null,
 			});
 			onClose();
-		} catch (error) {
-			console.error("Erro ao adicionar vídeo:", error);
 		} finally {
 			setIsAddingVideo(false);
 		}

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { SocialLinkItem } from "@/types/social";
-import type { LinkItem, SectionItem, TextItem } from "../types/links.types";
+import type { LinkItem, SectionItem, TextItem, VideoItem } from "../types/links.types";
 import { fetcher } from "../utils/links.helpers";
 
 import LinksTabContent from "./links.LinksTabContent";
@@ -61,12 +61,23 @@ const UnifiedLinksManager = () => {
 		fetcher
 	);
 
+	// Hook SWR para vídeos
+	const {
+		data: videosData,
+		mutate: mutateVideos,
+		isLoading: isLoadingVideos,
+	} = useSWR<{ videos: VideoItem[] }>(
+		userId ? `/api/videos?userId=${userId}` : null,
+		fetcher
+	);
+
 	if (
 		status === "loading" ||
 		isLoadingLinks ||
 		isLoadingSocialLinks ||
 		isLoadingSections ||
-		isLoadingTexts
+		isLoadingTexts ||
+		isLoadingVideos
 	) {
 		return <LoadingPage />;
 	}
@@ -92,12 +103,14 @@ const UnifiedLinksManager = () => {
 					<CardContent className="space-y-4 p-2 sm:p-6">
 						<TabsContent className="mt-0" value="links">
 							<LinksTabContent
-								initialLinks={linksData?.links || []}
-								initialSections={sectionsData || []}
-								initialTexts={textsData?.texts || []}
+								currentLinks={linksData?.links || []}
+								currentSections={sectionsData || []}
+								currentTexts={textsData?.texts || []}
+								currentVideos={videosData?.videos || []}
 								mutateLinks={mutateLinks}
 								mutateSections={mutateSections}
 								mutateTexts={mutateTexts}
+								mutateVideos={mutateVideos}
 								session={session}
 							/>
 						</TabsContent>
@@ -105,9 +118,7 @@ const UnifiedLinksManager = () => {
 						<TabsContent className="mt-0" value="socials">
 							<SocialLinksTabContent
 								initialSocialLinks={socialLinksData?.socialLinks || []}
-								mutateSocialLinks={async () => {
-									await mutateSocialLinks();
-								}}
+								mutateSocialLinks={mutateSocialLinks}
 								session={session}
 							/>
 						</TabsContent>

@@ -61,11 +61,7 @@ const validateTextForm = (textFormData: TextFormData): boolean => {
 };
 
 const validateVideoForm = (videoFormData: VideoFormData): boolean => {
-	return (
-		videoFormData.title.trim().length > 0 &&
-		videoFormData.description.trim().length > 0 &&
-		videoFormData.url.trim().length > 0
-	);
+	return videoFormData.url.trim().length > 0;
 };
 
 const isVideoOption = (selectedOption: string | null): boolean => {

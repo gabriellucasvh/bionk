@@ -17,11 +17,17 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import type { UnifiedItem } from "../hooks/useLinksManager";
-import type { LinkItem, SectionItem, TextItem } from "../types/links.types";
+import type {
+	LinkItem,
+	SectionItem,
+	TextItem,
+	VideoItem,
+} from "../types/links.types";
 import LinkCard from "./links.LinkCard";
 import SectionCard from "./links.SectionCard";
 import SortableItem from "./links.SortableItem";
 import TextCard from "./links.TextCard";
+import VideoCard from "./links.VideoCard";
 
 interface LinkListProps {
 	items: UnifiedItem[];
@@ -63,6 +69,22 @@ interface LinkListProps {
 		hasBackground: boolean
 	) => void;
 	onCancelEditingText?: (id: number) => void;
+	// Props para vídeos
+	onDeleteVideo?: (id: number) => void;
+	onArchiveVideo?: (id: number) => void;
+	onStartEditingVideo?: (id: number) => void;
+	onVideoChange?: (
+		id: number,
+		field: "title" | "description" | "url",
+		value: string
+	) => void;
+	onSaveEditingVideo?: (
+		id: number,
+		title: string,
+		description: string,
+		url: string
+	) => void;
+	onCancelEditingVideo?: (id: number) => void;
 }
 
 const LinkList = (props: LinkListProps) => {
@@ -82,6 +104,12 @@ const LinkList = (props: LinkListProps) => {
 		onTextChange,
 		onSaveEditingText,
 		onCancelEditingText,
+		onDeleteVideo,
+		onArchiveVideo,
+		onStartEditingVideo,
+		onVideoChange,
+		onSaveEditingVideo,
+		onCancelEditingVideo,
 		...cardProps
 	} = props;
 
@@ -121,6 +149,8 @@ const LinkList = (props: LinkListProps) => {
 								key = `section-${item.id}`;
 							} else if (item.isText) {
 								key = `text-${item.id}`;
+							} else if (item.isVideo) {
+								key = `video-${item.id}`;
 							} else {
 								key = `link-${item.id}`;
 							}
@@ -137,7 +167,7 @@ const LinkList = (props: LinkListProps) => {
 											const sectionData: SectionItem = {
 												id: item.id.toString(),
 												dbId: item.dbId || 0,
-												title: item.title,
+												title: item.title || "",
 												active: item.active,
 												order: item.order || 0,
 												links: item.children || [],
@@ -175,6 +205,24 @@ const LinkList = (props: LinkListProps) => {
 											);
 										}
 
+										if (item.isVideo) {
+											return (
+												<VideoCard
+													isDragging={isDragging}
+													listeners={listeners}
+													onArchiveVideo={onArchiveVideo}
+													onCancelEditingVideo={onCancelEditingVideo}
+													onDeleteVideo={onDeleteVideo}
+													onSaveEditingVideo={onSaveEditingVideo}
+													onStartEditingVideo={onStartEditingVideo}
+													onToggleActive={cardProps.onToggleActive}
+													onVideoChange={onVideoChange}
+													setActivatorNodeRef={setActivatorNodeRef}
+													video={item as VideoItem}
+												/>
+											);
+										}
+
 										return (
 											<LinkCard
 												archivingLinkId={archivingLinkId}
@@ -201,7 +249,7 @@ const LinkList = (props: LinkListProps) => {
 								const sectionData: SectionItem = {
 									id: activeItem.id.toString(),
 									dbId: activeItem.dbId || 0,
-									title: activeItem.title,
+									title: activeItem.title || "",
 									active: activeItem.active,
 									order: activeItem.order || 0,
 									links: activeItem.children || [],
@@ -224,6 +272,18 @@ const LinkList = (props: LinkListProps) => {
 									<TextCard
 										isDragging
 										text={activeItem as TextItem}
+										{...cardProps}
+										listeners={{}}
+										setActivatorNodeRef={noop}
+									/>
+								);
+							}
+
+							if (activeItem.isVideo) {
+								return (
+									<VideoCard
+										isDragging
+										video={activeItem as VideoItem}
 										{...cardProps}
 										listeners={{}}
 										setActivatorNodeRef={noop}

@@ -102,6 +102,10 @@ export async function POST(request: Request) {
 				where: { userId: session.user.id },
 				data: { order: { increment: 1 } },
 			}),
+			prisma.section.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
 			prisma.video.updateMany({
 				where: { userId: session.user.id },
 				data: { order: { increment: 1 } },
