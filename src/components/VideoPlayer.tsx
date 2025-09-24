@@ -3,6 +3,7 @@ interface VideoPlayerProps {
 	url: string;
 	title?: string;
 	className?: string;
+	customButtonCorners?: string;
 }
 
 export default function VideoPlayer({
@@ -10,8 +11,18 @@ export default function VideoPlayer({
 	url,
 	title,
 	className = "",
+	customButtonCorners,
 }: VideoPlayerProps) {
-	const baseClasses = `w-full aspect-video rounded-xl ${className}`;
+	const getBorderRadius = () => {
+		if (customButtonCorners && customButtonCorners !== "") {
+			return `${customButtonCorners}px`;
+		}
+		return;
+	};
+
+	const borderRadius = getBorderRadius();
+	const baseClasses = `w-full aspect-video ${borderRadius ? "" : "rounded-xl"} ${className}`;
+	const inlineStyle = borderRadius ? { borderRadius } : undefined;
 
 	if (type === "direct") {
 		return (
@@ -20,6 +31,7 @@ export default function VideoPlayer({
 				controls
 				preload="metadata"
 				src={url}
+				style={inlineStyle}
 				title={title}
 			>
 				<track
@@ -41,6 +53,7 @@ export default function VideoPlayer({
 				allowFullScreen
 				className={baseClasses}
 				src={url}
+				style={inlineStyle}
 				title={title || "Vídeo do YouTube"}
 			/>
 		);
@@ -53,6 +66,7 @@ export default function VideoPlayer({
 				allowFullScreen
 				className={baseClasses}
 				src={url}
+				style={inlineStyle}
 				title={title || "Vídeo do Vimeo"}
 			/>
 		);
@@ -65,6 +79,7 @@ export default function VideoPlayer({
 				allowFullScreen
 				className={baseClasses}
 				src={url}
+				style={inlineStyle}
 				title={title || "Vídeo do TikTok"}
 			/>
 		);
@@ -77,6 +92,7 @@ export default function VideoPlayer({
 				allowFullScreen
 				className={baseClasses}
 				src={url}
+				style={inlineStyle}
 				title={title || "Vídeo do Twitch"}
 			/>
 		);
@@ -85,6 +101,7 @@ export default function VideoPlayer({
 	return (
 		<div
 			className={`${baseClasses} flex items-center justify-center bg-gray-100`}
+			style={inlineStyle}
 		>
 			<p className="text-gray-500">Tipo de vídeo não suportado</p>
 		</div>

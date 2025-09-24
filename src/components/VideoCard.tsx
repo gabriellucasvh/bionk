@@ -7,6 +7,9 @@ interface VideoCardProps {
 	type: string;
 	url: string;
 	className?: string;
+	customPresets?: {
+		customButtonCorners?: string;
+	};
 }
 
 export default function VideoCard({
@@ -15,6 +18,7 @@ export default function VideoCard({
 	type,
 	url,
 	className = "",
+	customPresets,
 }: VideoCardProps) {
 	return (
 		<div className={`w-full space-y-2 pb-4 ${className}`}>
@@ -30,7 +34,12 @@ export default function VideoCard({
 				</p>
 			)}
 
-			<VideoPlayer title={title} type={type} url={url} />
+			<VideoPlayer 
+				customButtonCorners={customPresets?.customButtonCorners}
+				title={title} 
+				type={type} 
+				url={url} 
+			/>
 		</div>
 	);
 }

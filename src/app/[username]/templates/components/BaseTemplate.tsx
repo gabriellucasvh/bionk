@@ -254,6 +254,18 @@ function LinksList({
 		);
 	};
 
+	const addContentToArray = (
+		allContent: Array<{ type: "link" | "text" | "video"; item: any; order: number }>,
+		items: any[] | undefined,
+		type: "link" | "text" | "video"
+	) => {
+		if (items && items.length > 0) {
+			for (const item of items) {
+				allContent.push({ type, item, order: item.order });
+			}
+		}
+	};
+
 	const createContentArray = () => {
 		const allContent: Array<{
 			type: "link" | "text" | "video";
@@ -261,23 +273,9 @@ function LinksList({
 			order: number;
 		}> = [];
 
-		if (user.Link && user.Link.length > 0) {
-			for (const link of user.Link) {
-				allContent.push({ type: "link", item: link, order: link.order });
-			}
-		}
-
-		if (user.Text && user.Text.length > 0) {
-			for (const text of user.Text) {
-				allContent.push({ type: "text", item: text, order: text.order });
-			}
-		}
-
-		if (user.Video && user.Video.length > 0) {
-			for (const video of user.Video) {
-				allContent.push({ type: "video", item: video, order: video.order });
-			}
-		}
+		addContentToArray(allContent, user.Link, "link");
+		addContentToArray(allContent, user.Text, "text");
+		addContentToArray(allContent, user.Video, "video");
 
 		return allContent.sort((a, b) => a.order - b.order);
 	};
@@ -299,54 +297,72 @@ function LinksList({
 		);
 	};
 
+	const renderLinkContent = (
+		link: any,
+		index: number,
+		currentSectionId: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const linkSectionId = link.sectionId || null;
+
+		if (linkSectionId !== currentSectionId.value && linkSectionId !== null) {
+			currentSectionId.value = linkSectionId;
+			const sectionHeader = renderSectionHeader(link, linkSectionId, index);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		result.push(renderLink(link));
+		return result;
+	};
+
+	const renderTextContent = (text: any) => {
+		return [
+			<TextCard
+				customPresets={customPresets}
+				key={`text-${text.id}`}
+				text={text}
+				textStyle={textStyle}
+			/>
+		];
+	};
+
+	const renderVideoContent = (video: any) => {
+		return [
+			<VideoCard
+				className="mb-3"
+				customPresets={customPresets}
+				description={video.description}
+				id={video.id}
+				key={`video-${video.id}`}
+				title={video.title}
+				type={video.type}
+				url={video.url}
+			/>
+		];
+	};
+
 	const renderContentItem = (
 		content: any,
 		index: number,
 		currentSectionId: { value: number | null }
 	) => {
-		const result: JSX.Element[] = [];
-
 		if (content.type === "link") {
-			const link = content.item;
-			const linkSectionId = link.sectionId || null;
-
-			if (linkSectionId !== currentSectionId.value && linkSectionId !== null) {
-				currentSectionId.value = linkSectionId;
-				const sectionHeader = renderSectionHeader(link, linkSectionId, index);
-				if (sectionHeader) {
-					result.push(sectionHeader);
-				}
-			}
-
-			result.push(renderLink(link));
-		} else if (content.type === "text") {
-			const text = content.item;
+			return renderLinkContent(content.item, index, currentSectionId);
+		}
+		
+		if (content.type === "text") {
 			currentSectionId.value = null;
-			result.push(
-				<TextCard
-					customPresets={customPresets}
-					key={`text-${text.id}`}
-					text={text}
-					textStyle={textStyle}
-				/>
-			);
-		} else if (content.type === "video") {
-			const video = content.item;
+			return renderTextContent(content.item);
+		}
+		
+		if (content.type === "video") {
 			currentSectionId.value = null;
-			result.push(
-				<VideoCard
-					className="mb-3"
-					description={video.description}
-					id={video.id}
-					key={`video-${video.id}`}
-					title={video.title}
-					type={video.type}
-					url={video.url}
-				/>
-			);
+			return renderVideoContent(content.item);
 		}
 
-		return result;
+		return [];
 	};
 
 	const renderOrderedContent = () => {
