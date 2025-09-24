@@ -3,7 +3,6 @@
 import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import type { SectionItem } from "../types/links.types";
 
 type TextFormData = {
 	title: string;
@@ -30,13 +30,13 @@ interface AddNewTextFormProps {
 	onSave?: () => void;
 	onCancel?: () => void;
 	isSaveDisabled?: boolean;
-	existingSections?: string[];
+	existingSections?: SectionItem[];
 	textManager?: {
 		isAddingText: boolean;
 		textFormData: TextFormData;
 		setIsAddingText: (isAdding: boolean) => void;
 		setTextFormData: (data: TextFormData) => void;
-		existingSections: string[];
+		existingSections: SectionItem[];
 		handleAddNewText: () => void;
 	};
 }
@@ -46,7 +46,6 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 		formData: propFormData,
 		setFormData: propSetFormData,
 		onSave: propOnSave,
-		onCancel: propOnCancel,
 		isSaveDisabled: propIsSaveDisabled,
 		existingSections: propExistingSections,
 		textManager,
@@ -64,8 +63,6 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 	const setFormData =
 		propSetFormData || textManager?.setTextFormData || (() => {});
 	const onSave = propOnSave || textManager?.handleAddNewText || (() => {});
-	const onCancel =
-		propOnCancel || (() => textManager?.setIsAddingText(false)) || (() => {});
 	const isSaveDisabled =
 		propIsSaveDisabled ||
 		!formData.title.trim() ||
@@ -80,10 +77,10 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 		if (value === "none") {
 			setFormData({ ...formData, sectionId: null });
 		} else {
-			const sectionIndex = existingSections.indexOf(value);
+			const section = existingSections.find((s) => s.id === value);
 			setFormData({
 				...formData,
-				sectionId: sectionIndex >= 0 ? sectionIndex + 1 : null,
+				sectionId: section ? section.dbId : null,
 			});
 		}
 	};
@@ -164,8 +161,8 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 							<SelectContent>
 								<SelectItem value="none">Sem seção</SelectItem>
 								{existingSections.map((section, index) => (
-									<SelectItem key={index} value={section}>
-										{section}
+									<SelectItem key={index} value={section.id}>
+										{section.title}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -199,9 +196,6 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 					onClick={onSave}
 				>
 					Salvar Texto
-				</BaseButton>
-				<BaseButton onClick={onCancel} variant="outline">
-					Cancelar
 				</BaseButton>
 			</div>
 		</div>

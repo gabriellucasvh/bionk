@@ -3,8 +3,8 @@
 
 import type { DragStartEvent } from "@dnd-kit/core";
 import type { Session } from "next-auth";
-import type { LinkItem, SectionItem, TextItem } from "../types/links.types";
 import { useLinksManager } from "../hooks/useLinksManager";
+import type { LinkItem, SectionItem, TextItem } from "../types/links.types";
 import AddContentModal from "./links.AddContentModal";
 import LinkList from "./links.LinkList";
 
@@ -29,13 +29,19 @@ const LinksTabContent = ({
 	const {
 		unifiedItems,
 		isAdding,
+		isAddingVideo,
 		formData,
+		videoFormData,
 		existingSections,
 		activeId,
 		archivingLinkId,
+		isModalOpen,
 		setActiveId,
 		setIsAdding,
+		setIsAddingVideo,
 		setFormData,
+		setVideoFormData,
+		setIsModalOpen,
 		handleDragEnd,
 		...handlers
 	} = useLinksManager(
@@ -54,22 +60,29 @@ const LinksTabContent = ({
 	return (
 		<div className="space-y-4">
 			<AddContentModal
-				isAdding={isAdding}
-				isAddingSection={handlers.isAddingSection}
-				isAddingText={handlers.isAddingText}
-				formData={formData}
-				sectionFormData={handlers.sectionFormData}
-				textFormData={handlers.textFormData}
 				existingSections={existingSections}
-				setIsAdding={setIsAdding}
-				setIsAddingSection={handlers.setIsAddingSection}
-				setIsAddingText={handlers.setIsAddingText}
-				setFormData={setFormData}
-				setSectionFormData={handlers.setSectionFormData}
-				setTextFormData={handlers.setTextFormData}
+				formData={formData}
 				handleAddNewLink={handlers.handleAddNewLink}
 				handleAddNewSection={handlers.handleAddNewSection}
 				handleAddNewText={handlers.handleAddNewText}
+				isAdding={isAdding}
+				isAddingSection={handlers.isAddingSection}
+				isAddingText={handlers.isAddingText}
+				isAddingVideo={isAddingVideo}
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				onOpen={() => setIsModalOpen(true)}
+				sectionFormData={handlers.sectionFormData}
+				setFormData={setFormData}
+				setIsAdding={setIsAdding}
+				setIsAddingSection={handlers.setIsAddingSection}
+				setIsAddingText={handlers.setIsAddingText}
+				setIsAddingVideo={setIsAddingVideo}
+				setSectionFormData={handlers.setSectionFormData}
+				setTextFormData={handlers.setTextFormData}
+				setVideoFormData={setVideoFormData}
+				textFormData={handlers.textFormData}
+				videoFormData={videoFormData}
 			/>
 
 			<LinkList
@@ -86,26 +99,26 @@ const LinksTabContent = ({
 				}}
 				onAddLinkToSection={handlers.handleAddLinkToSection}
 				onArchiveLink={handlers.handleArchiveLink}
+				onArchiveText={handlers.handleArchiveText}
 				onCancelEditing={handlers.handleCancelEditing}
+				onCancelEditingText={handlers.handleCancelEditingText}
 				onClickLink={handlers.handleClickLink}
 				onDeleteLink={handlers.handleDeleteLink}
+				onDeleteText={handlers.handleDeleteText}
 				onDragEnd={handleDragEnd}
 				onDragStart={handleDragStart}
 				onLinkChange={handlers.handleLinkChange}
 				onRemoveCustomImage={handlers.handleRemoveCustomImage}
 				onSaveEditing={handlers.saveEditing}
+				onSaveEditingText={handlers.handleSaveEditingText}
 				onSectionDelete={handlers.handleSectionDelete}
 				onSectionUngroup={handlers.handleSectionUngroup}
 				onSectionUpdate={handlers.handleSectionUpdate}
 				onStartEditing={handlers.handleStartEditing}
-				onToggleActive={handlers.toggleActive}
-				onUpdateCustomImage={handlers.handleUpdateCustomImage}
-				onDeleteText={handlers.handleDeleteText}
-				onArchiveText={handlers.handleArchiveText}
 				onStartEditingText={handlers.handleStartEditingText}
 				onTextChange={handlers.handleTextChange}
-				onSaveEditingText={handlers.handleSaveEditingText}
-				onCancelEditingText={handlers.handleCancelEditingText}
+				onToggleActive={handlers.toggleActive}
+				onUpdateCustomImage={handlers.handleUpdateCustomImage}
 			/>
 		</div>
 	);

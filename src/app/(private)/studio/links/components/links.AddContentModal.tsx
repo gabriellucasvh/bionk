@@ -8,94 +8,131 @@ import {
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
 import { useDragGesture } from "../hooks/useDragGesture";
+import type {
+	LinkFormData,
+	SectionFormData,
+	TextFormData,
+	VideoFormData,
+} from "../hooks/useLinksManager";
 import { useModalState } from "../hooks/useModalState";
-import { isValidUrl } from "../utils/links.helpers";
+import type { SectionItem } from "../types/links.types";
 import CategorySelector from "./CategorySelector";
 import ContentOptions from "./ContentOptions";
-import AddNewLinkForm from "./links.AddNewLinkForm";
-import AddNewSectionForm from "./links.AddNewSectionForm";
-import AddNewTextForm from "./links.AddNewTextForm";
+import FormRenderer from "./FormRenderer";
 import MediaOptions from "./MediaOptions";
 import MobileBottomSheet from "./MobileBottomSheet";
+import { useModalHandlers } from "./ModalHandlers";
 
 interface AddContentModalProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onOpen: () => void;
 	isAdding: boolean;
 	isAddingSection: boolean;
 	isAddingText: boolean;
-	formData: any;
-	existingSections: string[];
+	isAddingVideo: boolean;
+	formData: LinkFormData;
+	sectionFormData: SectionFormData;
+	textFormData: TextFormData;
+	videoFormData: VideoFormData;
+	existingSections: SectionItem[];
 	setIsAdding: (value: boolean) => void;
 	setIsAddingSection: (value: boolean) => void;
 	setIsAddingText: (value: boolean) => void;
-	setFormData: (data: any) => void;
-	setSectionFormData: (data: any) => void;
-	setTextFormData: (data: any) => void;
-	handleAddNewLink: () => void;
-	handleAddNewSection: () => void;
-	handleAddNewText: () => void;
-	onAddLink?: (url: string, title: string) => void;
-	onAddSection?: (title: string) => void;
-	onAddText?: (content: string) => void;
+	setIsAddingVideo: (value: boolean) => void;
+	setFormData: (data: LinkFormData) => void;
+	setSectionFormData: (data: SectionFormData) => void;
+	setTextFormData: (data: TextFormData) => void;
+	setVideoFormData: (data: VideoFormData) => void;
+	handleAddNewLink: () => Promise<void>;
+	handleAddNewSection: () => Promise<void>;
+	handleAddNewText: () => Promise<void>;
 }
 
 const AddContentModal = ({
+	isOpen,
+	onClose,
+	onOpen,
 	isAdding,
 	isAddingSection,
 	isAddingText,
+	isAddingVideo,
 	formData,
+	sectionFormData,
+	textFormData,
+	videoFormData,
 	existingSections,
 	setIsAdding,
 	setIsAddingSection,
 	setIsAddingText,
+	setIsAddingVideo,
 	setFormData,
 	setSectionFormData,
 	setTextFormData,
+	setVideoFormData,
 	handleAddNewLink,
 	handleAddNewSection,
 	handleAddNewText,
-	onAddLink,
-	onAddSection,
-	onAddText,
 }: AddContentModalProps) => {
 	const {
-		isOpen,
 		isAnimating,
 		selectedCategory,
 		selectedOption,
 		isMobile,
-		linkData,
-		sectionData,
-		textData,
-		setLinkData,
-		setSectionData,
-		setTextData,
-		handleOpen,
-		handleClose,
-		handleCancel,
 		handleCategorySelect,
 		handleOptionSelect,
+		setIsAnimating,
+		setSelectedOption,
 	} = useModalState();
 
 	const {
 		isDragging,
 		dragY,
+		isClosing,
 		handleMouseDown,
 		handleTouchStart,
 		handleMouseMove,
 		handleTouchMove,
 		handleMouseUp,
 		handleTouchEnd,
-	} = useDragGesture(handleClose);
+	} = useDragGesture(onClose);
+
+	const {
+		handleLinkSubmit,
+		handleSectionSubmit,
+		handleTextSubmit,
+		handleVideoSubmit,
+		handleCancelWithState,
+	} = useModalHandlers({
+		formData,
+		sectionFormData,
+		textFormData,
+		videoFormData,
+		setFormData,
+		setSectionFormData,
+		setTextFormData,
+		setVideoFormData,
+		setIsAdding,
+		setIsAddingSection,
+		setIsAddingText,
+		setIsAddingVideo,
+		handleAddNewLink,
+		handleAddNewSection,
+		handleAddNewText,
+		onClose,
+	});
 
 	useEffect(() => {
 		if (isOpen && isMobile) {
+			setIsAnimating(true);
 			document.addEventListener("mousemove", handleMouseMove);
 			document.addEventListener("mouseup", handleMouseUp);
 			document.addEventListener("touchmove", handleTouchMove);
 			document.addEventListener("touchend", handleTouchEnd);
+		} else if (!isOpen) {
+			setIsAnimating(false);
 		}
 
 		return () => {
@@ -111,75 +148,47 @@ const AddContentModal = ({
 		handleMouseUp,
 		handleTouchMove,
 		handleTouchEnd,
+		setIsAnimating,
 	]);
 
-	const handleOptionSelectWithState = (
-		option:
-			| "link"
-			| "section"
-			| "text"
-			| "video"
-			| "youtube"
-			| "vimeo"
-			| "tiktok"
-			| "twitch"
-	) => {
-		handleOptionSelect(option);
-		if (option === "link") {
+	const handleOptionSelectWithState = (option: string) => {
+		const validOptions = [
+			"link",
+			"section",
+			"text",
+			"video",
+			"youtube",
+			"vimeo",
+			"tiktok",
+			"twitch",
+		] as const;
+
+		if (!validOptions.includes(option as any)) {
+			return;
+		}
+
+		const validOption = option as (typeof validOptions)[number];
+		handleOptionSelect(validOption);
+
+		if (validOption === "link") {
 			setIsAdding(true);
-		} else if (option === "section") {
+		} else if (validOption === "section") {
 			setIsAddingSection(true);
-		} else if (option === "text") {
+		} else if (validOption === "text") {
 			setIsAddingText(true);
-		}
-	};
-
-	const handleLinkSubmit = () => {
-		if (linkData.url && linkData.title) {
-			if (onAddLink) {
-				onAddLink(linkData.url, linkData.title);
-			} else {
-				handleAddNewLink();
-			}
-			setLinkData({ url: "", title: "", badge: "" });
-			handleClose();
-		}
-	};
-
-	const handleSectionSubmit = () => {
-		if (sectionData.title) {
-			if (onAddSection) {
-				onAddSection(sectionData.title);
-			} else {
-				handleAddNewSection();
-			}
-			setSectionData({ title: "" });
-			handleClose();
-		}
-	};
-
-	const handleTextSubmit = () => {
-		if (textData.title && textData.description) {
-			if (onAddText) {
-				onAddText(textData.title);
-			} else {
-				handleAddNewText();
-			}
-			setTextFormData({
-				title: "",
-				description: "",
-				position: "center" as const,
-				hasBackground: true,
+		} else if (
+			["video", "youtube", "vimeo", "tiktok", "twitch"].includes(validOption)
+		) {
+			setIsAddingVideo(true);
+			const videoType: "direct" | "youtube" | "vimeo" | "tiktok" | "twitch" =
+				validOption === "video"
+					? "direct"
+					: (validOption as "youtube" | "vimeo" | "tiktok" | "twitch");
+			setVideoFormData({
+				...videoFormData,
+				type: videoType,
 			});
-			handleClose();
 		}
-	};
-
-	const handleCancelWithState = () => {
-		handleCancel();
-		setIsAdding(false);
-		setIsAddingSection(false);
-		setIsAddingText(false);
 	};
 
 	if (isMobile) {
@@ -187,7 +196,7 @@ const AddContentModal = ({
 			<>
 				<BaseButton
 					className="w-full bg-lime-400 text-black hover:bg-lime-500 sm:w-auto"
-					onClick={handleOpen}
+					onClick={onOpen}
 				>
 					<Plus className="mr-2 h-4 w-4" />
 					Adicionar Conteúdo
@@ -197,59 +206,56 @@ const AddContentModal = ({
 					dragY={dragY}
 					isAnimating={isAnimating}
 					isDragging={isDragging}
+					isClosing={isClosing}
 					isOpen={isOpen}
-					onClose={handleClose}
+					onClose={onClose}
 					onMouseDown={handleMouseDown}
 					onTouchStart={handleTouchStart}
 				>
-					<h2 className="mb-6 text-center font-semibold text-xl">
-						Adicionar Conteúdo
-					</h2>
-
-					<CategorySelector
-						onCategorySelect={handleCategorySelect}
-						selectedCategory={selectedCategory}
+					<FormRenderer
+						existingSections={existingSections}
+						formData={formData}
+						isAdding={isAdding}
+						isAddingSection={isAddingSection}
+						isAddingText={isAddingText}
+						isAddingVideo={isAddingVideo}
+						isMobile={true}
+						onBack={() => setSelectedOption(null)}
+						onCancel={handleCancelWithState}
+						onLinkSubmit={handleLinkSubmit}
+						onSectionSubmit={handleSectionSubmit}
+						onTextSubmit={handleTextSubmit}
+						onVideoSubmit={handleVideoSubmit}
+						sectionFormData={sectionFormData}
+						selectedOption={selectedOption}
+						setFormData={setFormData}
+						setSectionFormData={setSectionFormData}
+						setTextFormData={setTextFormData}
+						setVideoFormData={setVideoFormData}
+						textFormData={textFormData}
+						videoFormData={videoFormData}
 					/>
 
-					{selectedCategory === "content" && (
-						<ContentOptions onOptionSelect={handleOptionSelectWithState} />
-					)}
-
-					{selectedCategory === "media" && (
-						<MediaOptions onOptionSelect={handleOptionSelectWithState} />
-					)}
-
-					{selectedOption === "link" && (
-						<AddNewLinkForm
-							formData={linkData}
-							onCancel={handleCancelWithState}
-							onSave={handleLinkSubmit}
-							setFormData={setLinkData}
-						/>
-					)}
-
-					{selectedOption === "section" && (
-						<AddNewSectionForm
-							existingSections={existingSections}
-							formData={sectionData}
-							isSaveDisabled={sectionData.title.trim().length === 0}
-							onCancel={handleCancelWithState}
-							onSave={handleSectionSubmit}
-							setFormData={setSectionData}
-						/>
-					)}
-
-					{selectedOption === "text" && (
-						<AddNewTextForm
-							formData={textData}
-							isSaveDisabled={
-								textData.title.trim().length === 0 ||
-								textData.description.trim().length === 0
-							}
-							onCancel={handleCancelWithState}
-							onSave={handleTextSubmit}
-							setFormData={setTextData}
-						/>
+					{!selectedOption && (
+						<>
+							<h2 className="mb-6 text-center font-semibold text-xl">
+								Adicionar Conteúdo
+							</h2>
+							<div className="flex flex-col space-y-4">
+								<CategorySelector
+									onCategorySelect={handleCategorySelect}
+									selectedCategory={selectedCategory}
+								/>
+								{selectedCategory === "content" && (
+									<ContentOptions
+										onOptionSelect={handleOptionSelectWithState}
+									/>
+								)}
+								{selectedCategory === "media" && (
+									<MediaOptions onOptionSelect={handleOptionSelectWithState} />
+								)}
+							</div>
+						</>
 					)}
 				</MobileBottomSheet>
 			</>
@@ -257,87 +263,79 @@ const AddContentModal = ({
 	}
 
 	return (
-		<Dialog onOpenChange={handleOpen} open={isOpen}>
-			<DialogTrigger asChild>
-				<BaseButton className="w-full sm:w-auto" onClick={handleOpen}>
-					<Plus className="mr-2 h-4 w-4" />
-					Adicionar Conteúdo
-				</BaseButton>
-			</DialogTrigger>
-			<DialogContent className="max-h-[80vh] overflow-hidden sm:max-w-4xl">
-				<DialogHeader>
-					<DialogTitle>Adicionar Conteúdo</DialogTitle>
-				</DialogHeader>
+		<>
+			<BaseButton className="w-full sm:w-auto" onClick={onOpen}>
+				<Plus className="mr-2 h-4 w-4" />
+				Adicionar Conteúdo
+			</BaseButton>
 
-				<div className="flex max-h-[60vh] min-h-[400px] flex-col sm:flex-row">
-					<div className="mb-4 w-full border-border border-b pr-0 pb-4 sm:mb-0 sm:w-48 sm:border-r sm:border-b-0 sm:pr-4 sm:pb-0">
-						<CategorySelector
-							onCategorySelect={handleCategorySelect}
-							selectedCategory={selectedCategory}
-						/>
+			<Dialog onOpenChange={onClose} open={isOpen}>
+				<DialogContent className="h-[80vh] max-h-[600px] min-w-[40vw] max-w-4xl p-0">
+					<div className="flex h-full flex-col">
+						<DialogHeader className="border-b px-6 py-4">
+							<DialogTitle>Adicionar Conteúdo</DialogTitle>
+						</DialogHeader>
+
+						<div className="flex-1 overflow-hidden">
+							{selectedOption ? (
+								<div className="h-full p-6">
+									<FormRenderer
+										existingSections={existingSections}
+										formData={formData}
+										isAdding={isAdding}
+										isAddingSection={isAddingSection}
+										isAddingText={isAddingText}
+										isAddingVideo={isAddingVideo}
+										isMobile={false}
+										onBack={() => setSelectedOption(null)}
+										onCancel={handleCancelWithState}
+										onLinkSubmit={handleLinkSubmit}
+										onSectionSubmit={handleSectionSubmit}
+										onTextSubmit={handleTextSubmit}
+										onVideoSubmit={handleVideoSubmit}
+										sectionFormData={sectionFormData}
+										selectedOption={selectedOption}
+										setFormData={setFormData}
+										setSectionFormData={setSectionFormData}
+										setTextFormData={setTextFormData}
+										setVideoFormData={setVideoFormData}
+										textFormData={textFormData}
+										videoFormData={videoFormData}
+									/>
+								</div>
+							) : (
+								<div className="flex h-full">
+									<div className="w-48 border-r p-2">
+										<CategorySelector
+											onCategorySelect={handleCategorySelect}
+											selectedCategory={selectedCategory}
+										/>
+									</div>
+
+									<div className="flex-1 p-4">
+										{selectedCategory === "content" && (
+											<ContentOptions
+												onOptionSelect={handleOptionSelectWithState}
+											/>
+										)}
+										{selectedCategory === "media" && (
+											<MediaOptions
+												onOptionSelect={handleOptionSelectWithState}
+											/>
+										)}
+										{!selectedCategory && (
+											<div className="flex items-start justify-center pt-8 text-muted-foreground">
+												Selecione uma categoria para ver as opções
+											</div>
+										)}
+									</div>
+								</div>
+							)}
+						</div>
 					</div>
-
-					<div className="flex-1 overflow-y-auto pl-0 sm:pl-6">
-						{!selectedCategory && (
-							<div className="flex h-full items-center justify-center text-muted-foreground">
-								<p>Selecione uma categoria na barra lateral</p>
-							</div>
-						)}
-
-						{selectedCategory === "content" && !selectedOption && (
-							<ContentOptions onOptionSelect={handleOptionSelectWithState} />
-						)}
-
-						{selectedCategory === "media" && !selectedOption && (
-							<MediaOptions onOptionSelect={handleOptionSelectWithState} />
-						)}
-					</div>
-				</div>
-
-				{selectedOption === "link" && isAdding && (
-					<div className="absolute inset-0 z-10 bg-background p-6">
-						<AddNewLinkForm
-							existingSections={existingSections}
-							formData={formData}
-							isSaveDisabled={
-								!isValidUrl(formData.url) || formData.title.trim().length === 0
-							}
-							onCancel={handleCancelWithState}
-							onSave={handleLinkSubmit}
-							setFormData={setFormData}
-						/>
-					</div>
-				)}
-
-				{selectedOption === "section" && isAddingSection && (
-					<div className="absolute inset-0 z-10 bg-background p-6">
-						<AddNewSectionForm
-							existingSections={existingSections}
-							formData={sectionData}
-							isSaveDisabled={sectionData.title.trim().length === 0}
-							onCancel={handleCancelWithState}
-							onSave={handleSectionSubmit}
-							setFormData={setSectionFormData}
-						/>
-					</div>
-				)}
-
-				{selectedOption === "text" && isAddingText && (
-					<div className="absolute inset-0 z-10 bg-background p-6">
-						<AddNewTextForm
-							existingSections={existingSections}
-							formData={textData}
-							isSaveDisabled={
-								!(textData.title.trim() && textData.description.trim())
-							}
-							onCancel={handleCancelWithState}
-							onSave={handleTextSubmit}
-							setFormData={setTextFormData}
-						/>
-					</div>
-				)}
-			</DialogContent>
-		</Dialog>
+				</DialogContent>
+			</Dialog>
+		</>
 	);
 };
 

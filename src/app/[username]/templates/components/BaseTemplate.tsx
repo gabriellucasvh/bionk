@@ -21,6 +21,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import VideoCard from "@/components/VideoCard";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
@@ -255,7 +256,7 @@ function LinksList({
 
 	const createContentArray = () => {
 		const allContent: Array<{
-			type: "link" | "text";
+			type: "link" | "text" | "video";
 			item: any;
 			order: number;
 		}> = [];
@@ -269,6 +270,12 @@ function LinksList({
 		if (user.Text && user.Text.length > 0) {
 			for (const text of user.Text) {
 				allContent.push({ type: "text", item: text, order: text.order });
+			}
+		}
+
+		if (user.Video && user.Video.length > 0) {
+			for (const video of user.Video) {
+				allContent.push({ type: "video", item: video, order: video.order });
 			}
 		}
 
@@ -292,7 +299,11 @@ function LinksList({
 		);
 	};
 
-	const renderContentItem = (content: any, index: number, currentSectionId: { value: number | null }) => {
+	const renderContentItem = (
+		content: any,
+		index: number,
+		currentSectionId: { value: number | null }
+	) => {
 		const result: JSX.Element[] = [];
 
 		if (content.type === "link") {
@@ -319,6 +330,20 @@ function LinksList({
 					textStyle={textStyle}
 				/>
 			);
+		} else if (content.type === "video") {
+			const video = content.item;
+			currentSectionId.value = null;
+			result.push(
+				<VideoCard
+					className="mb-3"
+					description={video.description}
+					id={video.id}
+					key={`video-${video.id}`}
+					title={video.title}
+					type={video.type}
+					url={video.url}
+				/>
+			);
 		}
 
 		return result;
@@ -341,7 +366,6 @@ function LinksList({
 
 		return result;
 	};
-
 
 	return <div className="space-y-0">{renderOrderedContent()}</div>;
 }

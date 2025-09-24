@@ -7,7 +7,7 @@ export const useModalState = () => {
 	const [isAnimating, setIsAnimating] = useState(false);
 	const [selectedCategory, setSelectedCategory] = useState<
 		"content" | "media" | null
-	>(null);
+	>("content");
 	const [selectedOption, setSelectedOption] = useState<
 		| "link"
 		| "section"
@@ -34,6 +34,15 @@ export const useModalState = () => {
 	const [textData, setTextData] = useState({
 		title: "",
 		description: "",
+		position: "center" as "left" | "center" | "right",
+		hasBackground: true,
+	});
+
+	const [videoData, setVideoData] = useState({
+		title: "",
+		description: "",
+		url: "",
+		type: "direct" as "direct" | "youtube" | "vimeo" | "tiktok" | "twitch",
 		position: "center" as "left" | "center" | "right",
 		hasBackground: true,
 	});
@@ -112,9 +121,13 @@ export const useModalState = () => {
 		linkData,
 		sectionData,
 		textData,
+		videoData,
 		setLinkData,
 		setSectionData,
 		setTextData,
+		setVideoData,
+		setIsAnimating,
+		setSelectedOption,
 		handleOpen,
 		handleClose,
 		handleCancel,

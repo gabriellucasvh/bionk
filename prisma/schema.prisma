@@ -63,6 +63,7 @@ model User {
   sessions                      Session[]
   SocialLink                    SocialLink[]
   Text                          Text[]
+  Video                         Video[]
 
   @@index([subscriptionStatus])
   @@index([createdAt])
@@ -238,8 +239,31 @@ model Section {
   updatedAt DateTime @updatedAt
   links     Link[]
   texts     Text[]
+  videos    Video[]
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, title])
   @@index([userId])
+}
+
+model Video {
+  id          Int      @id @default(autoincrement())
+  title       String?
+  description String?
+  type        String
+  url         String
+  order       Int      @default(0)
+  userId      String
+  active      Boolean  @default(true)
+  sectionId   Int?
+  isCompact   Boolean  @default(false)
+  archived    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  section     Section? @relation(fields: [sectionId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@index([userId])
+  @@index([userId, order])
 }

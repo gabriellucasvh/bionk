@@ -11,85 +11,82 @@ interface MediaOptionsProps {
 
 const MediaOptions = ({ onOptionSelect }: MediaOptionsProps) => {
 	return (
-		<div className="space-y-6 py-4">
-			<div className="mx-auto grid max-w-md grid-cols-2 gap-4">
+		<div>
+			<div className="grid grid-cols-3 gap-4">
 				<button
-					className="flex flex-col items-center space-y-3 rounded-lg p-4 transition-colors hover:bg-muted/50"
+					className="flex flex-col items-center gap-2 rounded-lg p-6 transition-colors hover:bg-muted"
 					onClick={() => onOptionSelect("video")}
 					type="button"
 				>
-					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400 text-white">
-						<Video
-							className="h-8 w-8 brightness-0 invert filter"
-							strokeWidth={1.5}
-						/>
+					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-500">
+						<Video className="h-6 w-6 text-white" />
 					</div>
 					<span className="font-medium text-sm">Vídeo</span>
 				</button>
 
 				<button
-					className="flex flex-col items-center space-y-3 rounded-lg p-4 transition-colors hover:bg-muted/50"
+					className="flex flex-col items-center gap-2 rounded-lg p-6 transition-colors hover:bg-muted"
 					onClick={() => onOptionSelect("youtube")}
 					type="button"
 				>
-					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 text-white">
+					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500">
 						<Image
 							alt="YouTube"
-							className="h-8 w-8 brightness-0 invert filter"
-							height={32}
+							className="brightness-0 invert"
+							height={24}
 							src="/icons/youtube.svg"
-							width={32}
+							width={24}
 						/>
 					</div>
 					<span className="font-medium text-sm">YouTube</span>
 				</button>
 
 				<button
-					className="flex flex-col items-center space-y-3 rounded-lg p-4 transition-colors hover:bg-muted/50"
+					className="flex flex-col items-center gap-2 rounded-lg p-6 transition-colors hover:bg-muted"
 					onClick={() => onOptionSelect("vimeo")}
 					type="button"
 				>
-					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white">
+					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600">
 						<Image
 							alt="Vimeo"
-							className="h-8 w-8 brightness-0 invert filter"
-							height={32}
+							className="brightness-0 invert"
+							height={24}
 							src="/icons/vimeo.svg"
-							width={32}
+							width={24}
 						/>
 					</div>
 					<span className="font-medium text-sm">Vimeo</span>
 				</button>
 
 				<button
-					className="flex flex-col items-center space-y-3 rounded-lg p-4 transition-colors hover:bg-muted/50"
+					className="flex flex-col items-center gap-2 rounded-lg p-6 transition-colors hover:bg-muted"
 					onClick={() => onOptionSelect("tiktok")}
 					type="button"
 				>
-					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-black text-white">
+					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-black">
 						<Image
 							alt="TikTok"
-							className="h-8 w-8 brightness-0 invert filter"
-							height={32}
+							className="brightness-0 invert"
+							height={24}
 							src="/icons/tiktok.svg"
-							width={32}
+							width={24}
 						/>
 					</div>
 					<span className="font-medium text-sm">TikTok</span>
 				</button>
 
 				<button
-					className="flex flex-col items-center space-y-3 rounded-lg p-4 transition-colors hover:bg-muted/50"
+					className="flex flex-col items-center gap-2 rounded-lg p-6 transition-colors hover:bg-muted"
 					onClick={() => onOptionSelect("twitch")}
 					type="button"
 				>
-					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white">
+					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-600">
 						<Image
 							alt="Twitch"
-							className="h-8 w-8 brightness-0 invert filter"
-							height={32}
+							className="brightness-0 invert"
+							height={24}
 							src="/icons/twitch.svg"
-							width={32}
+							width={24}
 						/>
 					</div>
 					<span className="font-medium text-sm">Twitch</span>

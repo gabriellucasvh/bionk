@@ -10,13 +10,14 @@ type SectionFormData = {
 	title: string;
 };
 
+import type { SectionItem } from "../types/links.types";
+
 interface AddNewSectionFormProps {
 	formData: SectionFormData;
 	setFormData: (data: SectionFormData) => void;
 	onSave: () => void;
-	onCancel: () => void;
 	isSaveDisabled: boolean;
-	existingSections: string[];
+	existingSections: SectionItem[];
 }
 
 // --- Componente Principal ---
@@ -24,7 +25,6 @@ const AddNewSectionForm = ({
 	formData,
 	setFormData,
 	onSave,
-	onCancel,
 	isSaveDisabled,
 }: AddNewSectionFormProps) => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -61,9 +61,6 @@ const AddNewSectionForm = ({
 					onClick={handleSave}
 				>
 					Criar Seção
-				</BaseButton>
-				<BaseButton onClick={onCancel} variant="outline">
-					Cancelar
 				</BaseButton>
 			</div>
 		</section>

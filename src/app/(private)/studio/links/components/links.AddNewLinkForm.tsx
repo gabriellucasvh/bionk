@@ -14,6 +14,7 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import type { SectionItem } from "../types/links.types";
 
 // Tipos e Interfaces
 type LinkFormData = {
@@ -31,15 +32,14 @@ interface AddNewLinkFormProps {
 	formData?: LinkFormData;
 	setFormData?: (data: LinkFormData) => void;
 	onSave?: () => void;
-	onCancel?: () => void;
 	isSaveDisabled?: boolean;
-	existingSections?: string[];
+	existingSections?: SectionItem[];
 	linksManager?: {
 		isAdding: boolean;
 		formData: LinkFormData;
 		setIsAdding: (isAdding: boolean) => void;
 		setFormData: (data: LinkFormData) => void;
-		existingSections: string[];
+		existingSections: SectionItem[];
 		handleAddNewLink: () => void;
 	};
 }
@@ -184,34 +184,12 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 		props.linksManager?.handleAddNewLink ||
 		props.onSave ||
 		(() => Promise.resolve());
-	const originalOnCancel = props.linksManager
-		? () => props.linksManager?.setIsAdding(false)
-		: props.onCancel || (() => null);
 	const isSaveDisabled = props.isSaveDisabled ?? false;
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [activeOption, setActiveOption] = useState<ActiveOption | null>(null);
 
 	// Função para limpar os dados do formulário
-	const clearFormData = () => {
-		setFormData({
-			title: "",
-			url: "",
-			sectionId: null,
-			badge: "",
-			password: "",
-			deleteOnClicks: undefined,
-			expiresAt: undefined,
-			launchesAt: undefined,
-		});
-		setActiveOption(null);
-	};
-
-	// Função de cancelar que limpa os dados e executa a ação original
-	const onCancel = () => {
-		clearFormData();
-		originalOnCancel();
-	};
 
 	const handleSave = async () => {
 		setIsLoading(true);
@@ -300,9 +278,6 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					onClick={handleSave}
 				>
 					Salvar Link
-				</BaseButton>
-				<BaseButton onClick={onCancel} variant="outline">
-					Cancelar
 				</BaseButton>
 			</div>
 		</section>

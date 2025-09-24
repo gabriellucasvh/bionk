@@ -35,6 +35,14 @@ export type TextFormData = {
 	sectionId?: number | null;
 };
 
+export type VideoFormData = {
+	title: string;
+	description: string;
+	url: string;
+	type: "direct" | "youtube" | "vimeo" | "tiktok" | "twitch";
+	sectionId?: number | null;
+};
+
 export type UnifiedItem = UnifiedDragItem;
 
 const initialFormData: LinkFormData = {
@@ -60,6 +68,14 @@ const initialTextFormData: TextFormData = {
 	sectionId: null,
 };
 
+const initialVideoFormData: VideoFormData = {
+	title: "",
+	description: "",
+	url: "",
+	type: "direct",
+	sectionId: null,
+};
+
 const urlProtocolRegex = /^(https?:\/\/)/;
 
 // --- FUNÇÕES AUXILIARES PARA DRAG AND DROP ---
@@ -79,12 +95,16 @@ export const useLinksManager = (
 	const [isAdding, setIsAdding] = useState(false);
 	const [isAddingSection, setIsAddingSection] = useState(false);
 	const [isAddingText, setIsAddingText] = useState(false);
+	const [isAddingVideo, setIsAddingVideo] = useState(false);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
 	const [sectionFormData, setSectionFormData] = useState<SectionFormData>(
 		initialSectionFormData
 	);
 	const [textFormData, setTextFormData] =
 		useState<TextFormData>(initialTextFormData);
+	const [videoFormData, setVideoFormData] =
+		useState<VideoFormData>(initialVideoFormData);
 	const [_originalLink, setOriginalLink] = useState<LinkItem | null>(null);
 	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
 	// Flag para controlar chamadas simultâneas da API
@@ -142,7 +162,14 @@ export const useLinksManager = (
 	const existingSections = useMemo(() => {
 		return unifiedItems
 			.filter((item) => item.isSection)
-			.map((item) => item.title);
+			.map((item) => ({
+				id: item.id.toString(),
+				title: item.title,
+				order: item.order,
+				active: item.active,
+				dbId: item.dbId || item.id,
+				links: item.children || []
+			}));
 	}, [unifiedItems]);
 
 	const persistReorder = useCallback(
@@ -629,18 +656,24 @@ export const useLinksManager = (
 		isAdding,
 		isAddingSection,
 		isAddingText,
+		isAddingVideo,
+		isModalOpen,
 		formData,
 		sectionFormData,
 		textFormData,
+		videoFormData,
 		existingSections,
 		archivingLinkId,
 		setActiveId,
 		setIsAdding,
 		setIsAddingSection,
 		setIsAddingText,
+		setIsAddingVideo,
+		setIsModalOpen,
 		setFormData,
 		setSectionFormData,
 		setTextFormData,
+		setVideoFormData,
 		handleDragEnd,
 		handleSectionUpdate,
 		handleSectionDelete,
