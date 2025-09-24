@@ -210,69 +210,73 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 	};
 
 	return (
-		<section className="space-y-4 rounded-lg border bg-muted/90 p-4">
-			{/* Campos Principais */}
-			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-				<div className="grid gap-2">
-					<Label htmlFor="title">Título do Link</Label>
-					<Input
-						className="bg-white dark:bg-[#202020]"
-						id="title"
-						onChange={(e) =>
-							setFormData({ ...formData, title: e.target.value })
-						}
-						placeholder="Ex: Meu Portfólio"
-						value={formData.title}
-					/>
-				</div>
-				<div className="grid gap-2">
-					<Label htmlFor="url">URL</Label>
-					<Input
-						className="bg-white dark:bg-[#202020]"
-						id="url"
-						onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-						placeholder="https://exemplo.com"
-						type="url"
-						value={formData.url}
-					/>
-				</div>
+		<div className="flex h-full flex-col space-y-4">
+			<div className="flex-1 space-y-3 overflow-y-auto">
+				<section className="space-y-3 rounded-lg border bg-muted/90 p-4">
+					{/* Campos Principais */}
+					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+						<div className="grid gap-2">
+							<Label htmlFor="title">Título do Link</Label>
+							<Input
+								className="bg-white dark:bg-[#202020]"
+								id="title"
+								onChange={(e) =>
+									setFormData({ ...formData, title: e.target.value })
+								}
+								placeholder="Ex: Meu Portfólio"
+								value={formData.title}
+							/>
+						</div>
+						<div className="grid gap-2">
+							<Label htmlFor="url">URL</Label>
+							<Input
+								className="bg-white dark:bg-[#202020]"
+								id="url"
+								onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+								placeholder="https://exemplo.com"
+								type="url"
+								value={formData.url}
+							/>
+						</div>
+					</div>
+
+					{/* Botões de Opções Avançadas */}
+					<div className="grid grid-cols-3 gap-2 border-t pt-3">
+						<Button
+							className="flex h-16 flex-col"
+							onClick={() => toggleOption("schedule")}
+							variant={activeOption === "schedule" ? "secondary" : "outline"}
+						>
+							<Clock className="mb-1 h-5 w-5" />{" "}
+							<span className="hidden text-xs md:block">Agendar</span>
+						</Button>
+						<Button
+							className="flex h-16 flex-col"
+							onClick={() => toggleOption("protect")}
+							variant={activeOption === "protect" ? "secondary" : "outline"}
+						>
+							<Lock className="mb-1 h-5 w-5" />{" "}
+							<span className="hidden text-xs md:block">Proteger</span>
+						</Button>
+						<Button
+							className="flex h-16 flex-col"
+							onClick={() => toggleOption("badge")}
+							variant={activeOption === "badge" ? "secondary" : "outline"}
+						>
+							<Tags className="mb-1 h-5 w-5" />{" "}
+							<span className="hidden text-xs md:block">Badge</span>
+						</Button>
+					</div>
+
+					{/* Conteúdo das Opções */}
+					{activeOption && optionPanels[activeOption]}
+				</section>
 			</div>
 
-			{/* Botões de Opções Avançadas */}
-			<div className="grid grid-cols-3 gap-2 border-t pt-4">
-				<Button
-					className="flex h-16 flex-col"
-					onClick={() => toggleOption("schedule")}
-					variant={activeOption === "schedule" ? "secondary" : "outline"}
-				>
-					<Clock className="mb-1 h-5 w-5" />{" "}
-					<span className="hidden text-xs md:block">Agendar</span>
-				</Button>
-				<Button
-					className="flex h-16 flex-col"
-					onClick={() => toggleOption("protect")}
-					variant={activeOption === "protect" ? "secondary" : "outline"}
-				>
-					<Lock className="mb-1 h-5 w-5" />{" "}
-					<span className="hidden text-xs md:block">Proteger</span>
-				</Button>
-				<Button
-					className="flex h-16 flex-col"
-					onClick={() => toggleOption("badge")}
-					variant={activeOption === "badge" ? "secondary" : "outline"}
-				>
-					<Tags className="mb-1 h-5 w-5" />{" "}
-					<span className="hidden text-xs md:block">Badge</span>
-				</Button>
-			</div>
-
-			{/* Conteúdo das Opções */}
-			{activeOption && optionPanels[activeOption]}
-
-			{/* Botões de Ação */}
-			<div className="flex gap-2 border-t pt-4">
+			{/* Botão de Ação Fixo */}
+			<div className="flex-shrink-0 border-t pt-3">
 				<BaseButton
-					className="flex-1"
+					className="w-full"
 					disabled={isSaveDisabled}
 					loading={isLoading}
 					onClick={handleSave}
@@ -280,7 +284,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					Salvar Link
 				</BaseButton>
 			</div>
-		</section>
+		</div>
 	);
 };
 

@@ -100,41 +100,42 @@ const LinkFormRenderer = ({
 	setFormData: (data: LinkFormData) => void;
 	onBack: () => void;
 }) => (
-	<>
+	<div className="flex h-full flex-col p-6">
 		<FormHeader onBack={onBack} title="Adicionar Link" />
-		<AddNewLinkForm
-			existingSections={isMobile ? undefined : existingSections}
-			formData={formData}
-			isSaveDisabled={!validateLinkForm(formData, isMobile)}
-			onSave={onLinkSubmit}
-			setFormData={setFormData}
-		/>
-	</>
+		<div className="min-h-0 flex-1">
+			<AddNewLinkForm
+				existingSections={isMobile ? undefined : existingSections}
+				formData={formData}
+				isSaveDisabled={!validateLinkForm(formData, isMobile)}
+				onSave={onLinkSubmit}
+				setFormData={setFormData}
+			/>
+		</div>
+	</div>
 );
 
 const SectionFormRenderer = ({
-	sectionFormData,
-	existingSections,
+	formData,
 	onSectionSubmit,
-	setSectionFormData,
+	setFormData,
 	onBack,
 }: {
-	sectionFormData: SectionFormData;
-	existingSections: SectionItem[];
+	formData: SectionFormData;
 	onSectionSubmit: () => void;
-	setSectionFormData: (data: SectionFormData) => void;
+	setFormData: (data: SectionFormData) => void;
 	onBack: () => void;
 }) => (
-	<>
+	<div className="flex h-full flex-col p-6">
 		<FormHeader onBack={onBack} title="Adicionar Seção" />
-		<AddNewSectionForm
-			existingSections={existingSections}
-			formData={sectionFormData}
-			isSaveDisabled={!validateSectionForm(sectionFormData)}
-			onSave={onSectionSubmit}
-			setFormData={setSectionFormData}
-		/>
-	</>
+		<div className="min-h-0 flex-1">
+			<AddNewSectionForm
+				formData={formData}
+				isSaveDisabled={!validateSectionForm(formData)}
+				onSave={onSectionSubmit}
+				setFormData={setFormData}
+			/>
+		</div>
+	</div>
 );
 
 const TextFormRenderer = ({
@@ -154,17 +155,19 @@ const TextFormRenderer = ({
 	onCancel: () => void;
 	onBack: () => void;
 }) => (
-	<>
+	<div className="flex h-full flex-col p-6">
 		<FormHeader onBack={onBack} title="Adicionar Texto" />
-		<AddNewTextForm
-			existingSections={isMobile ? undefined : existingSections}
-			formData={textFormData}
-			isSaveDisabled={!validateTextForm(textFormData)}
-			onCancel={onCancel}
-			onSave={onTextSubmit}
-			setFormData={setTextFormData}
-		/>
-	</>
+		<div className="min-h-0 flex-1">
+			<AddNewTextForm
+				existingSections={isMobile ? undefined : existingSections}
+				formData={textFormData}
+				isSaveDisabled={!validateTextForm(textFormData)}
+				onCancel={onCancel}
+				onSave={onTextSubmit}
+				setFormData={setTextFormData}
+			/>
+		</div>
+	</div>
 );
 
 const VideoFormRenderer = ({
@@ -184,17 +187,19 @@ const VideoFormRenderer = ({
 	onCancel: () => void;
 	onBack: () => void;
 }) => (
-	<>
+	<div className="flex h-full flex-col p-6">
 		<FormHeader onBack={onBack} title="Adicionar Vídeo" />
-		<AddNewVideoForm
-			existingSections={isMobile ? undefined : existingSections}
-			formData={videoFormData}
-			isSaveDisabled={!validateVideoForm(videoFormData)}
-			onCancel={onCancel}
-			onSave={onVideoSubmit}
-			setFormData={setVideoFormData}
-		/>
-	</>
+		<div className="min-h-0 flex-1">
+			<AddNewVideoForm
+				existingSections={isMobile ? undefined : existingSections}
+				formData={videoFormData}
+				isSaveDisabled={!validateVideoForm(videoFormData)}
+				onCancel={onCancel}
+				onSave={onVideoSubmit}
+				setFormData={setVideoFormData}
+			/>
+		</div>
+	</div>
 );
 
 const FormRenderer = ({
@@ -236,11 +241,10 @@ const FormRenderer = ({
 	if (selectedOption === "section" && (isMobile || isAddingSection)) {
 		return (
 			<SectionFormRenderer
-				existingSections={existingSections}
+				formData={sectionFormData}
 				onBack={onBack}
 				onSectionSubmit={onSectionSubmit}
-				sectionFormData={sectionFormData}
-				setSectionFormData={setSectionFormData}
+				setFormData={setSectionFormData}
 			/>
 		);
 	}

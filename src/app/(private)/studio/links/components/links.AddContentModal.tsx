@@ -214,8 +214,8 @@ const AddContentModal = ({
 				<MobileBottomSheet
 					dragY={dragY}
 					isAnimating={isAnimating}
-					isDragging={isDragging}
 					isClosing={isClosing}
+					isDragging={isDragging}
 					isOpen={isOpen}
 					onClose={onClose}
 					onMouseDown={handleMouseDown}
@@ -285,9 +285,9 @@ const AddContentModal = ({
 							<DialogTitle>Adicionar Conteúdo</DialogTitle>
 						</DialogHeader>
 
-						<div className="flex-1 overflow-hidden">
+						<div className="flex-1 overflow-y-auto">
 							{selectedOption ? (
-								<div className="h-full p-6">
+								<div className="h-full">
 									<FormRenderer
 										existingSections={existingSections}
 										formData={formData}
