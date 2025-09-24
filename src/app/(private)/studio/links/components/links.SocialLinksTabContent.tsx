@@ -1,12 +1,6 @@
 // src/app/(private)/studio/links/components/links.SocialLinksTabContent.tsx
 "use client";
 
-import { BaseButton } from "@/components/buttons/BaseButton";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
-import type { SocialLinkItem, SocialPlatform } from "@/types/social";
 import { closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
 import {
 	arrayMove,
@@ -16,6 +10,12 @@ import {
 import { Edit, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
+import { BaseButton } from "@/components/buttons/BaseButton";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
+import type { SocialLinkItem, SocialPlatform } from "@/types/social";
 import { SortableSocialLinkItem } from "./links.SortableSocialLinkItem";
 
 interface SocialLinksTabContentProps {
@@ -256,7 +256,7 @@ const SocialLinksTabContent = ({
 							/>
 						</div>
 						{selectedPlatform.key === "whatsapp" && (
-							<p className="mt-2 text-xs text-muted-foreground">
+							<p className="mt-2 text-muted-foreground text-xs">
 								💡 Lembre-se de incluir o código do país antes do DDD (ex: +55)
 							</p>
 						)}

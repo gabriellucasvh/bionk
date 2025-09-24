@@ -598,11 +598,14 @@ export const useLinksManager = (
 	const toggleActive = (id: number, isActive: boolean) => {
 		const link = currentLinks.find((l) => l.id === id);
 		const text = currentTexts.find((t) => t.id === id);
+		const video = currentVideos.find((v) => v.id === id);
 
 		if (link) {
 			handleLinkUpdate(id, { active: isActive });
 		} else if (text) {
 			handleTextUpdate(id, { active: isActive });
+		} else if (video) {
+			handleVideoUpdate(id, { active: isActive });
 		}
 	};
 
