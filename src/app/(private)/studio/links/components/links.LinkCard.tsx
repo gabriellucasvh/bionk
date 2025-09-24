@@ -65,6 +65,7 @@ interface LinkCardProps {
 	onRemoveCustomImage?: (id: number) => void;
 	borderRadius?: number;
 	archivingLinkId?: number | null;
+	isTogglingActive?: boolean;
 }
 
 // --- Subcomponentes ---
@@ -278,6 +279,7 @@ const DisplayView = (props: LinkCardProps) => {
 		onUpdateCustomImage,
 		onRemoveCustomImage,
 		archivingLinkId,
+		isTogglingActive,
 	} = props;
 
 	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -351,11 +353,15 @@ const DisplayView = (props: LinkCardProps) => {
 					<div className="flex items-center space-x-2">
 						<Switch
 							checked={link.active}
+							disabled={isTogglingActive}
 							id={`switch-${link.id}`}
 							onCheckedChange={(checked) => onToggleActive(link.id, checked)}
 						/>
 						<Label
-							className="cursor-pointer text-sm"
+							className={cn(
+								"text-sm",
+								isTogglingActive ? "cursor-default opacity-50" : "cursor-pointer"
+							)}
 							htmlFor={`switch-${link.id}`}
 						>
 							{link.active ? "Ativo" : "Inativo"}

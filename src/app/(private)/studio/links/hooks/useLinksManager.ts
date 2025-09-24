@@ -110,6 +110,12 @@ export const useLinksManager = (
 		useState<VideoFormData>(initialVideoFormData);
 	const [_originalLink, setOriginalLink] = useState<LinkItem | null>(null);
 	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
+	const [togglingLinkId, setTogglingLinkId] = useState<number | null>(null);
+	const [togglingTextId, setTogglingTextId] = useState<number | null>(null);
+	const [togglingVideoId, setTogglingVideoId] = useState<number | null>(null);
+	const [togglingSectionId, setTogglingSectionId] = useState<number | null>(
+		null
+	);
 	// Flag para controlar chamadas simultâneas da API
 	const isReorderingRef = useRef(false);
 
@@ -355,13 +361,22 @@ export const useLinksManager = (
 		id: number,
 		payload: Partial<SectionItem>
 	) => {
-		await fetch(`/api/sections/${id}`, {
-			method: "PUT",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(payload),
-		});
-		await mutateLinks();
-		await mutateSections();
+		try {
+			if ("active" in payload) {
+				setTogglingSectionId(id);
+			}
+			await fetch(`/api/sections/${id}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+			});
+			await mutateLinks();
+			await mutateSections();
+		} finally {
+			if ("active" in payload) {
+				setTogglingSectionId(null);
+			}
+		}
 	};
 
 	const handleSectionDelete = async (id: number) => {
@@ -468,7 +483,6 @@ export const useLinksManager = (
 	};
 
 	const handleVideoUpdate = async (id: number, payload: Partial<VideoItem>) => {
-		try {
 			const response = await fetch(`/api/videos/${id}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
@@ -481,9 +495,7 @@ export const useLinksManager = (
 			}
 
 			await mutateVideos();
-		} catch (error) {
-			throw error;
-		}
+
 	};
 
 	const handleDeleteVideo = async (id: number) => {
@@ -612,14 +624,19 @@ export const useLinksManager = (
 
 		try {
 			if (link) {
+				setTogglingLinkId(id);
 				await handleLinkUpdate(id, { active: isActive });
 			} else if (text) {
+				setTogglingTextId(id);
 				await handleTextUpdate(id, { active: isActive });
 			} else if (video) {
+				setTogglingVideoId(id);
 				await handleVideoUpdate(id, { active: isActive });
 			}
-		} catch (error) {
-			throw error;
+		} finally {
+			setTogglingLinkId(null);
+			setTogglingTextId(null);
+			setTogglingVideoId(null);
 		}
 	};
 
@@ -868,5 +885,9 @@ export const useLinksManager = (
 		handleVideoChange,
 		handleSaveEditingVideo,
 		handleCancelEditingVideo,
+		togglingLinkId,
+		togglingTextId,
+		togglingVideoId,
+		togglingSectionId,
 	};
 };

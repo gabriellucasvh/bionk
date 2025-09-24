@@ -85,6 +85,10 @@ interface LinkListProps {
 		url: string
 	) => void;
 	onCancelEditingVideo?: (id: number) => void;
+	togglingVideoId?: number | null;
+	togglingLinkId?: number | null;
+	togglingTextId?: number | null;
+	togglingSectionId?: number | null;
 }
 
 const LinkList = (props: LinkListProps) => {
@@ -110,6 +114,10 @@ const LinkList = (props: LinkListProps) => {
 		onVideoChange,
 		onSaveEditingVideo,
 		onCancelEditingVideo,
+		togglingVideoId,
+		togglingLinkId,
+		togglingTextId,
+		togglingSectionId,
 		...cardProps
 	} = props;
 
@@ -182,6 +190,7 @@ const LinkList = (props: LinkListProps) => {
 													onUpdateCustomImage={onUpdateCustomImage}
 													section={sectionData}
 													setActivatorNodeRef={setActivatorNodeRef}
+													isTogglingActive={togglingSectionId === item.id}
 													{...cardProps}
 												/>
 											);
@@ -201,6 +210,7 @@ const LinkList = (props: LinkListProps) => {
 													onToggleActive={cardProps.onToggleActive}
 													setActivatorNodeRef={setActivatorNodeRef}
 													text={item as TextItem}
+													isTogglingActive={togglingTextId === item.id}
 												/>
 											);
 										}
@@ -219,6 +229,7 @@ const LinkList = (props: LinkListProps) => {
 													onVideoChange={onVideoChange}
 													setActivatorNodeRef={setActivatorNodeRef}
 													video={item as VideoItem}
+													isTogglingActive={togglingVideoId === item.id}
 												/>
 											);
 										}
@@ -231,6 +242,7 @@ const LinkList = (props: LinkListProps) => {
 												onRemoveCustomImage={onRemoveCustomImage}
 												onUpdateCustomImage={onUpdateCustomImage}
 												setActivatorNodeRef={setActivatorNodeRef}
+												isTogglingActive={togglingLinkId === item.id}
 												{...cardProps}
 											/>
 										);
@@ -263,6 +275,7 @@ const LinkList = (props: LinkListProps) => {
 										{...cardProps}
 										listeners={{}}
 										setActivatorNodeRef={noop}
+										isTogglingActive={togglingSectionId === activeItem.id}
 									/>
 								);
 							}
@@ -275,6 +288,7 @@ const LinkList = (props: LinkListProps) => {
 										{...cardProps}
 										listeners={{}}
 										setActivatorNodeRef={noop}
+										isTogglingActive={togglingTextId === activeItem.id}
 									/>
 								);
 							}
@@ -298,6 +312,7 @@ const LinkList = (props: LinkListProps) => {
 									{...cardProps}
 									listeners={{}}
 									setActivatorNodeRef={noop}
+									isTogglingActive={togglingLinkId === activeItem.id}
 								/>
 							);
 						})()}

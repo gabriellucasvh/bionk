@@ -45,6 +45,10 @@ const LinksTabContent = ({
 		activeId,
 		archivingLinkId,
 		isModalOpen,
+		togglingVideoId,
+		togglingLinkId,
+		togglingTextId,
+		togglingSectionId,
 		setActiveId,
 		setIsAdding,
 		setIsAddingVideo,
@@ -137,6 +141,10 @@ const LinksTabContent = ({
 				onToggleActive={handlers.toggleActive}
 				onUpdateCustomImage={handlers.handleUpdateCustomImage}
 				onVideoChange={handlers.handleVideoChange}
+				togglingVideoId={togglingVideoId}
+				togglingLinkId={togglingLinkId}
+					togglingTextId={togglingTextId}
+					togglingSectionId={togglingSectionId}
 			/>
 		</div>
 	);

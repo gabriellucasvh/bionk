@@ -43,6 +43,7 @@ interface SectionCardProps {
 	linksManager?: any;
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
 	onRemoveCustomImage?: (id: number) => void;
+	isTogglingActive?: boolean;
 }
 
 const SectionCard = ({
@@ -55,6 +56,7 @@ const SectionCard = ({
 	isDragging,
 	onAddLinkToSection,
 	linksManager,
+	isTogglingActive,
 	...linkCardProps
 }: SectionCardProps) => {
 	const [isAddingLink, setIsAddingLink] = useState(false);
@@ -114,12 +116,13 @@ const SectionCard = ({
 						<Switch
 							checked={section.active}
 							id={`section-switch-${section.id}`}
+							disabled={isTogglingActive}
 							onCheckedChange={(checked) =>
 								onSectionUpdate(section.dbId, { active: checked })
 							}
 						/>
 						<Label
-							className="cursor-pointer text-sm"
+							className={`cursor-pointer text-sm ${isTogglingActive ? "opacity-50" : ""}`}
 							htmlFor={`section-switch-${section.id}`}
 						>
 							{section.active ? "Ativa" : "Inativa"}

@@ -50,6 +50,7 @@ interface TextCardProps {
 		hasBackground: boolean
 	) => void;
 	onCancelEditingText?: (id: number) => void;
+	isTogglingActive?: boolean;
 }
 
 const TextCard = ({
@@ -64,6 +65,7 @@ const TextCard = ({
 	onTextChange,
 	onSaveEditingText,
 	onCancelEditingText,
+	isTogglingActive,
 }: TextCardProps) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -264,11 +266,12 @@ const TextCard = ({
 					<div className="flex items-center space-x-2">
 						<Switch
 							checked={text.active}
+							disabled={isTogglingActive}
 							id={`switch-${text.id}`}
 							onCheckedChange={(checked) => onToggleActive?.(text.id, checked)}
 						/>
 						<Label
-							className="cursor-pointer text-sm"
+							className={`text-sm ${isTogglingActive ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
 							htmlFor={`switch-${text.id}`}
 						>
 							{text.active ? "Ativo" : "Inativo"}

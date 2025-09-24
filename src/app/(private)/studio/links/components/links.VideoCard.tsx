@@ -49,6 +49,7 @@ interface VideoCardProps {
 		url: string
 	) => void;
 	onCancelEditingVideo?: (id: number) => void;
+	isTogglingActive?: boolean;
 }
 
 // Subcomponentes
@@ -148,6 +149,7 @@ const DisplayView = ({
 	onStartEditingVideo,
 	onArchiveVideo,
 	onDeleteVideo,
+	isTogglingActive,
 }: VideoCardProps) => {
 	const platform = getVideoPlatform(video.url);
 
@@ -233,43 +235,49 @@ const DisplayView = ({
 					<div className="flex items-center space-x-2">
 						<Switch
 							checked={video.active}
+							disabled={isTogglingActive}
 							id={`switch-${video.id}`}
 							onCheckedChange={async (checked) => {
 								try {
 									await onToggleActive?.(video.id, checked);
-								} catch (error) {
+								} catch{
 									// Em caso de erro, o switch volta ao estado anterior
 								}
 							}}
 						/>
 						<Label
-							className="cursor-pointer text-sm"
+							className={cn(
+								"text-sm",
+								isTogglingActive
+									? "cursor-default opacity-50"
+									: "cursor-pointer"
+							)}
 							htmlFor={`switch-${video.id}`}
 						>
 							{video.active ? "Ativo" : "Inativo"}
 						</Label>
 					</div>
 					<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button className="h-8 w-8" size="icon" variant="ghost">
-							<MoreVertical className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuItem onClick={handleStartEditing}>
-							<Edit className="mr-2 h-4 w-4" /> Editar
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={handleArchive}>
-							<Archive className="mr-2 h-4 w-4" /> Arquivar
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							className="text-destructive"
-							onClick={handleDelete}
-						>
-							<Trash2 className="mr-2 h-4 w-4" /> Excluir
-						</DropdownMenuItem>
-					</DropdownMenuContent>
+						<DropdownMenuTrigger asChild>
+							<Button className="h-8 w-8" size="icon" variant="ghost">
+								<MoreVertical className="h-4 w-4" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
+							<DropdownMenuItem onClick={handleStartEditing}>
+								<Edit className="mr-2 h-4 w-4" /> Editar
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem onClick={handleArchive}>
+								<Archive className="mr-2 h-4 w-4" /> Arquivar
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								className="text-destructive"
+								onClick={handleDelete}
+							>
+								<Trash2 className="mr-2 h-4 w-4" /> Excluir
+							</DropdownMenuItem>
+						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
 			</div>
