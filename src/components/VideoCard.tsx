@@ -17,7 +17,7 @@ export default function VideoCard({
 	className = "",
 }: VideoCardProps) {
 	return (
-		<div className={`w-full space-y-4 ${className}`}>
+		<div className={`w-full space-y-2 pb-4 ${className}`}>
 			{title && (
 				<h3 className="text-center font-semibold text-gray-900 text-lg dark:text-white">
 					{title}
