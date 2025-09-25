@@ -106,6 +106,7 @@ export const useModalHandlers = ({
 				description: "",
 				position: "left",
 				hasBackground: true,
+				isCompact: false,
 				sectionId: null,
 			});
 			onClose();

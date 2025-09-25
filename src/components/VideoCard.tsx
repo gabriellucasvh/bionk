@@ -7,7 +7,17 @@ interface VideoCardProps {
 	type: string;
 	url: string;
 	className?: string;
+	classNames?: {
+		name?: string;
+		bio?: string;
+	};
 	customPresets?: {
+		customBackgroundColor?: string;
+		customBackgroundGradient?: string;
+		customTextColor?: string;
+		customFont?: string;
+		customButton?: string;
+		customButtonFill?: string;
 		customButtonCorners?: string;
 	};
 }
@@ -18,6 +28,7 @@ export default function VideoCard({
 	type,
 	url,
 	className = "",
+	classNames,
 	customPresets,
 }: VideoCardProps) {
 	const isTikTok = type === "tiktok";
@@ -28,16 +39,34 @@ export default function VideoCard({
 		? "max-w-sm" 
 		: "";
 
+	const getTitleClasses = () => {
+		if (customPresets?.customTextColor) {
+			return "text-center font-semibold text-lg";
+		}
+		return `text-center font-semibold text-lg ${classNames?.name || "text-gray-900 dark:text-white"}`;
+	};
+
+	const getDescriptionClasses = () => {
+		if (customPresets?.customTextColor) {
+			return "text-center";
+		}
+		return `text-center ${classNames?.bio || "text-gray-600 dark:text-gray-300"}`;
+	};
+
+	const textStyle = customPresets?.customTextColor 
+		? { color: customPresets.customTextColor } 
+		: {};
+
 	return (
 		<div className={`w-full space-y-2 pb-4 ${className}`}>
 			{title && (
-				<h3 className="text-center font-semibold text-gray-900 text-lg dark:text-white">
+				<h3 className={getTitleClasses()} style={textStyle}>
 					{title}
 				</h3>
 			)}
 
 			{description && (
-				<p className="text-center text-gray-600 dark:text-gray-300">
+				<p className={getDescriptionClasses()} style={textStyle}>
 					{description}
 				</p>
 			)}

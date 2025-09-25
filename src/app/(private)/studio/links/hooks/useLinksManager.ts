@@ -781,7 +781,7 @@ export const useLinksManager = (
 
 	const handleTextChange = (
 		id: number,
-		field: "title" | "description" | "position" | "hasBackground",
+		field: "title" | "description" | "position" | "hasBackground" | "isCompact",
 		value: string | boolean
 	) => {
 		setUnifiedItems((prevItems) =>

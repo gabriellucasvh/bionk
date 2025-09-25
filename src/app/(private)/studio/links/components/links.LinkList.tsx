@@ -58,7 +58,7 @@ interface LinkListProps {
 	onStartEditingText?: (id: number) => void;
 	onTextChange?: (
 		id: number,
-		field: "title" | "description" | "position" | "hasBackground",
+		field: "title" | "description" | "position" | "hasBackground" | "isCompact",
 		value: string | boolean
 	) => void;
 	onSaveEditingText?: (
@@ -66,7 +66,8 @@ interface LinkListProps {
 		title: string,
 		description: string,
 		position: "left" | "center" | "right",
-		hasBackground: boolean
+		hasBackground: boolean,
+		isCompact: boolean
 	) => void;
 	onCancelEditingText?: (id: number) => void;
 	// Props para vídeos

@@ -351,6 +351,10 @@ function LinksList({
 		return [
 			<VideoCard
 				className="mb-3"
+				classNames={{
+					name: classNames?.name,
+					bio: classNames?.bio,
+				}}
 				customPresets={customPresets}
 				description={video.description}
 				id={video.id}
