@@ -179,7 +179,7 @@ export async function PUT(
 
 	try {
 		const body = await request.json();
-		const { name, username, bio, bannerUrl } = body;
+		const { name, username, bio, bannerUrl, image } = body;
 
 		const updatedUser = await prisma.user.update({
 			where: { id },
@@ -188,6 +188,7 @@ export async function PUT(
 				username,
 				bio,
 				bannerUrl,
+				image,
 			},
 		});
 

@@ -184,9 +184,30 @@ const Sidebar = () => {
 	const { theme } = useTheme();
 	const [profileUrl, setProfileUrl] = useState("#");
 	const [imageKey, setImageKey] = useState(Date.now());
+	const [userName, setUserName] = useState<string>("");
+	const [userImageUrl, setUserImageUrl] = useState<string>("");
 
 	const username = session?.user?.username;
 	const isLoading = !(session?.user && username);
+
+	// Função para buscar dados atuais do usuário
+	const fetchCurrentUserData = useCallback(async () => {
+		if (!session?.user?.id) {
+			return;
+		}
+
+		try {
+			const response = await fetch(`/api/profile/${session.user.id}`);
+			if (response.ok) {
+				const userData = await response.json();
+				setUserName(userData.name || "");
+				setUserImageUrl(userData.image || "");
+				setImageKey(Date.now());
+			}
+		} catch (error) {
+			console.error("Erro ao buscar dados do usuário:", error);
+		}
+	}, [session?.user?.id]);
 
 	useEffect(() => {
 		const baseUrl =
@@ -203,18 +224,50 @@ const Sidebar = () => {
 		}
 	}, [session?.user?.image]);
 
+	// Busca dados atuais do usuário quando a sessão carrega
+	useEffect(() => {
+		if (session?.user?.id) {
+			fetchCurrentUserData();
+		}
+	}, [session?.user?.id, fetchCurrentUserData]);
+
 	// Escuta evento customizado de atualização da imagem do perfil
 	useEffect(() => {
-		const handleProfileImageUpdate = () => {
+		const handleProfileImageUpdate = (event: CustomEvent) => {
 			setImageKey(Date.now());
+			if (event.detail?.imageUrl) {
+				setUserImageUrl(event.detail.imageUrl);
+			}
 		};
 
-		window.addEventListener("profileImageUpdated", handleProfileImageUpdate);
+		window.addEventListener(
+			"profileImageUpdated",
+			handleProfileImageUpdate as EventListener
+		);
 
 		return () => {
 			window.removeEventListener(
 				"profileImageUpdated",
-				handleProfileImageUpdate
+				handleProfileImageUpdate as EventListener
+			);
+		};
+	}, []);
+
+	// Escuta evento customizado de atualização do nome do perfil
+	useEffect(() => {
+		const handleProfileNameUpdate = (event: CustomEvent) => {
+			setUserName(event.detail.name);
+		};
+
+		window.addEventListener(
+			"profileNameUpdated",
+			handleProfileNameUpdate as EventListener
+		);
+
+		return () => {
+			window.removeEventListener(
+				"profileNameUpdated",
+				handleProfileNameUpdate as EventListener
 			);
 		};
 	}, []);
@@ -324,15 +377,15 @@ const Sidebar = () => {
 								className="rounded-full"
 								height={42}
 								src={
-									session?.user?.image
-										? `${session.user.image}?t=${imageKey}`
+									userImageUrl || session?.user?.image
+										? `${userImageUrl || session?.user?.image}?t=${imageKey}`
 										: "/default-avatar.png"
 								}
 								width={42}
 							/>
 							<div className="flex flex-1 flex-col truncate">
 								<h2 className="truncate font-semibold text-sm dark:text-white">
-									{session?.user?.name}
+									{userName || session?.user?.name}
 								</h2>
 								{subscriptionPlan && (
 									<span

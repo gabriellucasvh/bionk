@@ -90,7 +90,7 @@ const PerfilClient = () => {
 			profile.username !== originalProfile.username ||
 			profile.bio !== originalProfile.bio;
 
-		if (!(session?.user?.id && textChanged)) {
+		if (!(session?.user?.id && (textChanged || profileImageChanged))) {
 			return null;
 		}
 
@@ -114,7 +114,7 @@ const PerfilClient = () => {
 		} catch {
 			return null;
 		}
-	}, [session?.user?.id, profile, originalProfile]);
+	}, [session?.user?.id, profile, originalProfile, profileImageChanged]);
 
 	// Early return após todos os hooks
 	if (isProfileLoading) {
@@ -185,6 +185,20 @@ const PerfilClient = () => {
 				username: updatedUserData.username,
 				bio: updatedUserData.bio || "",
 			});
+
+			window.dispatchEvent(
+				new CustomEvent("profileNameUpdated", {
+					detail: { name: updatedUserData.name },
+				})
+			);
+
+			if (updatedUserData.image) {
+				window.dispatchEvent(
+					new CustomEvent("profileImageUpdated", {
+						detail: { imageUrl: updatedUserData.image },
+					})
+				);
+			}
 		} else {
 			setOriginalProfile({
 				name: profile.name,
@@ -254,9 +268,10 @@ const PerfilClient = () => {
 	};
 
 	const handleProfileImageRemove = () => {
-		setProfilePreview(
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
-		);
+		const defaultImageUrl =
+			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
+		setProfilePreview(defaultImageUrl);
+		setProfile((prev) => ({ ...prev, image: defaultImageUrl }));
 		setSelectedProfileFile(null);
 		setProfileImageChanged(true);
 	};
