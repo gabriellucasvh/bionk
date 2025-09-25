@@ -71,11 +71,11 @@ export default function TextCard({
 		if (customPresets?.customTextColor) {
 			return "";
 		}
-		
+
 		if (text.hasBackground && classNames?.cardTextClasses) {
 			return classNames.cardTextClasses;
 		}
-		
+
 		return classNames?.textClasses || "";
 	};
 
@@ -92,11 +92,17 @@ export default function TextCard({
 		</div>
 	) : (
 		<div className={cn("w-full p-4", textAlignClass)}>
-			<h3 className={cn("mb-2 font-semibold text-lg", getTextClasses())} style={textStyle}>
+			<h3
+				className={cn("mb-2 font-semibold text-lg", getTextClasses())}
+				style={textStyle}
+			>
 				{text.title}
 			</h3>
 			<p
-				className={cn("whitespace-pre-wrap text-md leading-relaxed", getTextClasses())}
+				className={cn(
+					"whitespace-pre-wrap text-md leading-relaxed",
+					getTextClasses()
+				)}
 				style={textStyle}
 			>
 				{displayText}
@@ -117,8 +123,15 @@ export default function TextCard({
 	const getCardClasses = () => {
 		const baseClasses = "border transition-all";
 		const cornerClasses = customPresets?.customButtonCorners || "rounded-xl";
-		const backgroundClasses = customPresets?.customButtonFill ? "" : (classNames?.cardClasses || "");
-		return cn(baseClasses, cornerClasses, backgroundClasses, classNames?.textCard);
+		const backgroundClasses = customPresets?.customButtonFill
+			? ""
+			: classNames?.cardClasses || "";
+		return cn(
+			baseClasses,
+			cornerClasses,
+			backgroundClasses,
+			classNames?.textCard
+		);
 	};
 
 	const getCardStyle = () => {
@@ -132,10 +145,7 @@ export default function TextCard({
 	return (
 		<div className="mb-3 w-full" key={text.id}>
 			{text.hasBackground ? (
-				<div
-					className={getCardClasses()}
-					style={getCardStyle()}
-				>
+				<div className={getCardClasses()} style={getCardStyle()}>
 					{textContent}
 				</div>
 			) : (
@@ -144,7 +154,7 @@ export default function TextCard({
 
 			{(shouldTruncate || text.isCompact) && (
 				<Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
-					<DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
+					<DialogContent className="max-h-[80vh] w-[calc(100vw-2rem)] max-w-2xl overflow-y-auto">
 						<DialogHeader>
 							<DialogTitle>{text.title}</DialogTitle>
 						</DialogHeader>
