@@ -33,6 +33,7 @@ export type TextFormData = {
 	description: string;
 	position: "left" | "center" | "right";
 	hasBackground: boolean;
+	isCompact: boolean;
 	sectionId?: number | null;
 };
 
@@ -66,6 +67,7 @@ const initialTextFormData: TextFormData = {
 	description: "",
 	position: "left",
 	hasBackground: true,
+	isCompact: false,
 	sectionId: null,
 };
 
@@ -446,6 +448,7 @@ export const useLinksManager = (
 				description: textFormData.description.trim(),
 				position: textFormData.position,
 				hasBackground: textFormData.hasBackground,
+				isCompact: textFormData.isCompact,
 				sectionId: textFormData.sectionId,
 			}),
 		});
@@ -796,13 +799,15 @@ export const useLinksManager = (
 		title: string,
 		description: string,
 		position: "left" | "center" | "right",
-		hasBackground: boolean
+		hasBackground: boolean,
+		isCompact: boolean
 	) => {
 		await handleTextUpdate(id, {
 			title,
 			description,
 			position,
 			hasBackground,
+			isCompact,
 			isEditing: false,
 		});
 	};

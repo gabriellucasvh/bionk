@@ -54,6 +54,9 @@ export interface UserText extends PrismaText {
 	order: number;
 	active: boolean;
 	userId: string;
+	isCompact: boolean;
+	position: string;
+	hasBackground: boolean;
 }
 
 // --- Vídeos ---

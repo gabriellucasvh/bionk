@@ -19,6 +19,7 @@ interface TextItem {
 	active: boolean;
 	order: number;
 	userId: number;
+	isCompact: boolean;
 }
 
 interface TextCardProps {
@@ -63,7 +64,18 @@ export default function TextCard({
 		? `${text.description.slice(0, 200)}...`
 		: text.description;
 
-	const textContent = (
+	const textContent = text.isCompact ? (
+		<div className={cn("w-full p-4", textAlignClass)}>
+			<Button
+				className="h-auto p-0 font-semibold text-lg"
+				onClick={() => setIsModalOpen(true)}
+				style={textStyle}
+				variant="link"
+			>
+				{text.title}
+			</Button>
+		</div>
+	) : (
 		<div className={cn("w-full p-4", textAlignClass)}>
 			<h3 className="mb-2 font-semibold text-lg" style={textStyle}>
 				{text.title}
@@ -114,7 +126,7 @@ export default function TextCard({
 				<div className={cn("py-2", textAlignClass)}>{textContent}</div>
 			)}
 
-			{shouldTruncate && (
+			{(shouldTruncate || text.isCompact) && (
 				<Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
 					<DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
 						<DialogHeader>

@@ -39,7 +39,7 @@ interface TextCardProps {
 	onDeleteText?: (id: number) => void;
 	onTextChange?: (
 		id: number,
-		field: "title" | "description" | "position" | "hasBackground",
+		field: "title" | "description" | "position" | "hasBackground" | "isCompact",
 		value: string | boolean
 	) => void;
 	onSaveEditingText?: (
@@ -47,7 +47,8 @@ interface TextCardProps {
 		title: string,
 		description: string,
 		position: "left" | "center" | "right",
-		hasBackground: boolean
+		hasBackground: boolean,
+		isCompact: boolean
 	) => void;
 	onCancelEditingText?: (id: number) => void;
 	isTogglingActive?: boolean;
@@ -97,7 +98,8 @@ const TextCard = ({
 				text.title,
 				text.description,
 				text.position,
-				text.hasBackground
+				text.hasBackground,
+				text.isCompact
 			);
 		}
 	};
@@ -109,7 +111,7 @@ const TextCard = ({
 	};
 
 	const handleFieldChange = (
-		field: "title" | "description" | "position" | "hasBackground",
+		field: "title" | "description" | "position" | "hasBackground" | "isCompact",
 		value: string | boolean
 	) => {
 		if (onTextChange) {
@@ -165,36 +167,33 @@ const TextCard = ({
 						<div className="space-y-2">
 							<Label htmlFor={`position-${text.id}`}>Posição do texto</Label>
 							<div className="flex gap-2">
-								<Button
-									className="flex-1"
+								<BaseButton
+									className="rounded-lg"
 									onClick={() => handleFieldChange("position", "left")}
-									size="sm"
+									size="icon"
 									type="button"
-									variant={text.position === "left" ? "default" : "outline"}
+									variant={text.position === "left" ? "default" : "white"}
 								>
-									<AlignLeft className="mr-2 h-4 w-4" />
-									Esquerda
-								</Button>
-								<Button
-									className="flex-1"
+									<AlignLeft className="h-4 w-4" />
+								</BaseButton>
+								<BaseButton
+									className="rounded-lg"
 									onClick={() => handleFieldChange("position", "center")}
-									size="sm"
+									size="icon"
 									type="button"
-									variant={text.position === "center" ? "default" : "outline"}
+									variant={text.position === "center" ? "default" : "white"}
 								>
-									<AlignCenter className="mr-2 h-4 w-4" />
-									Centro
-								</Button>
-								<Button
-									className="flex-1"
+									<AlignCenter className="h-4 w-4" />
+								</BaseButton>
+								<BaseButton
+									className="rounded-lg"
 									onClick={() => handleFieldChange("position", "right")}
-									size="sm"
+									size="icon"
 									type="button"
-									variant={text.position === "right" ? "default" : "outline"}
+									variant={text.position === "right" ? "default" : "white"}
 								>
-									<AlignRight className="mr-2 h-4 w-4" />
-									Direita
-								</Button>
+									<AlignRight className="h-4 w-4" />
+								</BaseButton>
 							</div>
 						</div>
 						<div className="flex items-center space-x-2">
@@ -205,9 +204,17 @@ const TextCard = ({
 									handleFieldChange("hasBackground", checked)
 								}
 							/>
-							<Label htmlFor={`background-${text.id}`}>
-								Background
-							</Label>
+							<Label htmlFor={`background-${text.id}`}>Background</Label>
+						</div>
+						<div className="flex items-center space-x-2">
+							<Switch
+								checked={text.isCompact}
+								id={`compact-${text.id}`}
+								onCheckedChange={(checked) =>
+									handleFieldChange("isCompact", checked)
+								}
+							/>
+							<Label htmlFor={`compact-${text.id}`}>Modo Compacto</Label>
 						</div>
 					</div>
 				</div>

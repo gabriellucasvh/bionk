@@ -14,15 +14,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import type { TextFormData } from "../hooks/useLinksManager";
 import type { SectionItem } from "../types/links.types";
-
-type TextFormData = {
-	title: string;
-	description: string;
-	position: "left" | "center" | "right";
-	sectionId?: number | null;
-	hasBackground: boolean;
-};
 
 interface AddNewTextFormProps {
 	formData?: TextFormData;
@@ -58,6 +51,7 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 			position: "left" as const,
 			sectionId: null,
 			hasBackground: true,
+			isCompact: false,
 		};
 
 	const setFormData =
@@ -75,7 +69,10 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 	const handleSectionChange = (value: string) => {
 		setActiveSection(value);
 		if (value === "none") {
-			setFormData({ ...formData, sectionId: null });
+			setFormData({
+				...formData,
+				sectionId: null,
+			});
 		} else {
 			const section = existingSections.find((s) => s.id === value);
 			setFormData({
@@ -184,6 +181,22 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 								id="hasBackground"
 								onCheckedChange={(checked) =>
 									setFormData({ ...formData, hasBackground: checked })
+								}
+							/>
+						</div>
+
+						<div className="flex items-center justify-between">
+							<div className="space-y-0.5">
+								<Label htmlFor="isCompact">Modo Compacto</Label>
+								<p className="text-muted-foreground text-sm">
+									Exibe apenas o título como link clicável
+								</p>
+							</div>
+							<Switch
+								checked={formData.isCompact}
+								id="isCompact"
+								onCheckedChange={(checked) =>
+									setFormData({ ...formData, isCompact: checked })
 								}
 							/>
 						</div>

@@ -25,8 +25,15 @@ export async function PUT(
 
 	try {
 		const body = await request.json();
-		const { title, description, position, hasBackground, active, archived } =
-			body;
+		const {
+			title,
+			description,
+			position,
+			hasBackground,
+			isCompact,
+			active,
+			archived,
+		} = body;
 
 		const text = await prisma.text.findFirst({
 			where: { id: textId, userId: session.user.id },
@@ -46,6 +53,7 @@ export async function PUT(
 				...(description !== undefined && { description: description.trim() }),
 				...(position !== undefined && { position }),
 				...(hasBackground !== undefined && { hasBackground }),
+				...(isCompact !== undefined && { isCompact }),
 				...(active !== undefined && { active }),
 				...(archived !== undefined && { archived }),
 			},

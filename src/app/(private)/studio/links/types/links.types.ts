@@ -39,6 +39,7 @@ export type TextItem = {
 	description: string;
 	position: "left" | "center" | "right";
 	hasBackground: boolean;
+	isCompact: boolean;
 	active: boolean;
 	order: number;
 	userId: number;

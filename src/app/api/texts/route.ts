@@ -11,8 +11,14 @@ export async function POST(request: Request) {
 	}
 
 	try {
-		const { title, description, position, hasBackground, sectionId } =
-			await request.json();
+		const {
+			title,
+			description,
+			position,
+			hasBackground,
+			isCompact,
+			sectionId,
+		} = await request.json();
 
 		if (!(title && description)) {
 			return NextResponse.json(
@@ -47,6 +53,7 @@ export async function POST(request: Request) {
 				description: description.trim(),
 				position,
 				hasBackground,
+				isCompact,
 				active: true,
 				order: 0,
 				userId: session.user.id,

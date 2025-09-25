@@ -92,6 +92,7 @@ export default async function UserPage({ params }: PageProps) {
 					active: true,
 					order: true,
 					userId: true,
+					isCompact: true,
 				},
 			},
 			Video: {
