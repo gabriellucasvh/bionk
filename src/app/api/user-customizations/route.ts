@@ -24,6 +24,7 @@ export async function GET() {
 				customButton: "",
 				customButtonFill: "",
 				customButtonCorners: "",
+				headerStyle: "default",
 			}
 		);
 	} catch {

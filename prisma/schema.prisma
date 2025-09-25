@@ -204,6 +204,7 @@ model CustomPresets {
   customButton             String? @default("")
   customButtonFill         String? @default("")
   customButtonCorners      String? @default("")
+  headerStyle              String? @default("default")
   user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

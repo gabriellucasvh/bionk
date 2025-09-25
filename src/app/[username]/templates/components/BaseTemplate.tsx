@@ -49,6 +49,7 @@ interface BaseTemplateProps extends TemplateComponentProps {
 		customButton: string;
 		customButtonFill: string;
 		customButtonCorners: string;
+		headerStyle: string;
 	};
 }
 
@@ -74,39 +75,192 @@ function UserHeader({
 	user,
 	classNames,
 	textStyle,
+	headerStyle = "default",
+	customPresets,
 }: {
 	user: TemplateComponentProps["user"];
 	classNames?: BaseTemplateProps["classNames"];
 	textStyle?: React.CSSProperties;
+	headerStyle?: string;
+	customPresets?: BaseTemplateProps["customPresets"];
 }) {
+	const renderUserImage = (imageClasses: string, imageSize: string) => {
+		if (!user.image) {
+			return null;
+		}
+
+		return (
+			<div className={`relative overflow-hidden ${imageClasses}`}>
+				{user.image.toLowerCase().endsWith(".gif") ? (
+					// biome-ignore lint/performance/noImgElement: <next/image não lida bem com gifs, <img> para segurança>
+					<img
+						alt={user.name || user.username}
+						className="h-full w-full object-cover"
+						src={user.image}
+					/>
+				) : (
+					<Image
+						alt={user.name || user.username}
+						className="object-cover"
+						fill
+						priority
+						quality={100}
+						sizes={imageSize}
+						src={user.image}
+					/>
+				)}
+			</div>
+		);
+	};
+
+	const renderSocialLinks = (socialClasses = "") => {
+		if (!Array.isArray(user.SocialLink) || user.SocialLink.length === 0) {
+			return null;
+		}
+
+		return (
+			<div className={`flex items-center justify-center ${socialClasses}`}>
+				<UserProfileSocialIcons
+					className="space-x-4 space-y-1"
+					iconSize={26}
+					socialLinks={user.SocialLink}
+					theme={classNames?.theme}
+				/>
+			</div>
+		);
+	};
+
+	// Estilo padrão: foto redonda, nome, bio e socialLinks centralizados
+	if (headerStyle === "default") {
+		return (
+			<header className={`mb-8 w-full text-center ${classNames?.header || ""}`}>
+				{renderUserImage("mx-auto mb-4 h-26 w-26 rounded-full", "112px")}
+				<h1
+					className={`font-bold text-2xl ${classNames?.name || ""}`}
+					style={textStyle}
+				>
+					{user.name || user.username}
+				</h1>
+				{user.bio && (
+					<p
+						className={`mt-2 text-sm ${classNames?.bio || ""}`}
+						style={textStyle}
+					>
+						{user.bio}
+					</p>
+				)}
+				{renderSocialLinks("mt-4")}
+			</header>
+		);
+	}
+
+	// Estilo horizontal: foto à esquerda, nome e bio à direita, socialLinks embaixo
+	if (headerStyle === "horizontal") {
+		return (
+			<header className={`mb-8 w-full ${classNames?.header || ""}`}>
+				<div className="mb-4 flex items-start gap-4">
+					{renderUserImage("h-20 w-20 rounded-lg flex-shrink-0", "80px")}
+					<div className="min-w-0 flex-1">
+						<h1
+							className={`font-bold text-xl ${classNames?.name || ""}`}
+							style={textStyle}
+						>
+							{user.name || user.username}
+						</h1>
+						{user.bio && (
+							<p
+								className={`mt-1 text-sm ${classNames?.bio || ""}`}
+								style={textStyle}
+							>
+								{user.bio}
+							</p>
+						)}
+					</div>
+				</div>
+				{renderSocialLinks("justify-center")}
+			</header>
+		);
+	}
+
+	// Estilo hero: foto incorporada com fundo, gradiente, nome e bio embaixo
+	if (headerStyle === "hero") {
+		// Obter a cor de fundo da página para criar o gradiente
+		const pageBackgroundColor =
+			customPresets?.customBackgroundColor || "#000000";
+		const pageBackgroundGradient = customPresets?.customBackgroundGradient;
+
+		return (
+			<header className={`mb-12 w-full ${classNames?.header || ""}`}>
+				{user.image && (
+					<div className="-mx-3.5 -mt-3.5 relative mb-8 h-64 overflow-hidden">
+						{/* Imagem de fundo */}
+						<div className="absolute inset-0">
+							{user.image.toLowerCase().endsWith(".gif") ? (
+								// biome-ignore lint/performance/noImgElement: <next/image não lida bem com gifs, <img> para segurança>
+								<img
+									alt={user.name || user.username}
+									className="h-full w-full object-cover"
+									src={user.image}
+								/>
+							) : (
+								<Image
+									alt={user.name || user.username}
+									className="object-cover"
+									fill
+									priority
+									quality={100}
+									src={user.image}
+								/>
+							)}
+						</div>
+
+						{/* Gradiente que faz a foto "surgir" do fundo da página - apenas na parte inferior */}
+						<div
+							className="absolute inset-0"
+							style={{
+								background: pageBackgroundGradient
+									? `linear-gradient(to bottom, transparent 0%, transparent 70%, ${pageBackgroundGradient} 100%)`
+									: `linear-gradient(to bottom, transparent 0%, transparent 70%, ${pageBackgroundColor} 100%)`,
+							}}
+						/>
+
+						{/* Conteúdo sobreposto */}
+						<div className="absolute right-6 bottom-6 left-6 text-center">
+							<h1
+								className={`font-bold text-2xl text-white drop-shadow-lg ${classNames?.name || ""}`}
+								style={{
+									...textStyle,
+									color: "white",
+									textShadow: "0 2px 4px rgba(0,0,0,0.8)",
+								}}
+							>
+								{user.name || user.username}
+							</h1>
+							{user.bio && (
+								<p
+									className={`mt-2 text-sm text-white/90 drop-shadow-md ${classNames?.bio || ""}`}
+									style={{
+										color: "rgba(255,255,255,0.9)",
+										textShadow: "0 1px 2px rgba(0,0,0,0.8)",
+									}}
+								>
+									{user.bio}
+								</p>
+							)}
+						</div>
+					</div>
+				)}
+				<div className="mt-6 text-center">
+					{renderSocialLinks("justify-center")}
+				</div>
+			</header>
+		);
+	}
+
+	// Fallback para o estilo padrão
 	return (
 		<header className={`mb-8 w-full text-center ${classNames?.header || ""}`}>
-			{user.image && (
-				<div
-					className={`relative mx-auto mb-4 h-26 w-26 overflow-hidden rounded-full ${
-						classNames?.image || ""
-					}`}
-				>
-					{user.image.toLowerCase().endsWith(".gif") ? (
-						// biome-ignore lint/performance/noImgElement: <next/image não lida bem com gifs, <img> para segurança>
-						<img
-							alt={user.name || user.username}
-							className="h-full w-full object-cover"
-							src={user.image}
-						/>
-					) : (
-						<Image
-							alt={user.name || user.username}
-							className="object-cover"
-							fill
-							priority
-							quality={100}
-							sizes="112px"
-							src={user.image}
-						/>
-					)}
-				</div>
-			)}
+			{renderUserImage("mx-auto mb-4 h-26 w-26 rounded-full", "112px")}
 			<h1
 				className={`font-bold text-2xl ${classNames?.name || ""}`}
 				style={textStyle}
@@ -121,16 +275,7 @@ function UserHeader({
 					{user.bio}
 				</p>
 			)}
-			{Array.isArray(user.SocialLink) && user.SocialLink.length > 0 && (
-				<div className="mt-4 flex items-center justify-center">
-					<UserProfileSocialIcons
-						className="space-x-4 space-y-1"
-						iconSize={26}
-						socialLinks={user.SocialLink}
-						theme={classNames?.theme}
-					/>
-				</div>
-			)}
+			{renderSocialLinks("mt-4")}
 		</header>
 	);
 }
@@ -205,14 +350,23 @@ function LinksList({
 	customPresets?: BaseTemplateProps["customPresets"];
 }) {
 	const { animatedLinks } = useLinkAnimation();
-	const textClasses = customPresets?.customTextColor ? "" : (classNames?.name || "");
-	const cardClasses = customPresets?.customButtonFill ? "" : (classNames?.cardLink || "");
-	
+	const textClasses = customPresets?.customTextColor
+		? ""
+		: classNames?.name || "";
+	const cardClasses = customPresets?.customButtonFill
+		? ""
+		: classNames?.cardLink || "";
+
 	const extractTextClasses = (classes: string) => {
-		return classes.split(' ').filter(cls => cls.startsWith('text-')).join(' ');
+		return classes
+			.split(" ")
+			.filter((cls) => cls.startsWith("text-"))
+			.join(" ");
 	};
-	
-	const cardTextClasses = customPresets?.customTextColor ? "" : extractTextClasses(classNames?.cardLink || "");
+
+	const cardTextClasses = customPresets?.customTextColor
+		? ""
+		: extractTextClasses(classNames?.cardLink || "");
 
 	const renderLink = (item: UserLink) => {
 		const isAnimated = animatedLinks.has(item.id.toString());
@@ -522,16 +676,23 @@ export default function BaseTemplate({
 	return (
 		<>
 			<div
-				className={`flex min-h-dvh flex-col items-center px-3.5 py-8 ${
-					classNames?.wrapper || ""
-				}`}
+				className={`flex min-h-dvh flex-col items-center px-3.5 ${
+					customPresets?.headerStyle === "hero" ? "pt-0 pb-8" : "py-8"
+				} ${classNames?.wrapper || ""}`}
 				style={wrapperStyle}
 			>
 				<ProfileViewTracker userId={user.id} />
-				<main className="flex w-full max-w-md flex-grow flex-col items-center">
+
+				{/* ShareButton posicionado de forma fixa */}
+				<div className="fixed top-4 right-4 z-50">
 					<ShareButton onClick={() => setShareModalOpen(true)} />
+				</div>
+
+				<main className="flex w-full max-w-md flex-grow flex-col items-center">
 					<UserHeader
 						classNames={classNames}
+						customPresets={customPresets}
+						headerStyle={customPresets?.headerStyle}
 						textStyle={textStyle}
 						user={user}
 					/>

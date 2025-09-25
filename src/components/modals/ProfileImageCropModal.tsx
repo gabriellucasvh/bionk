@@ -232,7 +232,7 @@ const ProfileImageCropModal: FC<ProfileImageCropModalProps> = ({
 								<Cropper
 									aspect={1}
 									crop={crop}
-									cropShape="round"
+									cropShape="rect"
 									image={selectedImage.src}
 									onCropChange={setCrop}
 									onCropComplete={onCropComplete}

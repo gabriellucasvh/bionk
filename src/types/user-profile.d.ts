@@ -80,6 +80,7 @@ export interface CustomPresets extends PrismaCustomPresets {
 	customButton: string;
 	customButtonFill: string;
 	customButtonCorners: string;
+	headerStyle: string;
 }
 
 // --- Perfil Principal ---

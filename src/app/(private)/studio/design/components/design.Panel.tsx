@@ -6,7 +6,8 @@ import { HexColorInput, HexColorPicker } from "react-colorful";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import FontSelectionModal from "@/components/modals/FontSelectionModal";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider"; // Importar o Slider do shadcn/ui
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
 import { RenderLabel } from "./design.RenderLabel";
 
 // Interface atualizada
@@ -19,6 +20,7 @@ interface DesignPanelProps {
 		customButton: string;
 		customButtonFill: string;
 		customButtonCorners: string;
+		headerStyle: string;
 	};
 	onSave: (
 		partialCustomizations: Partial<{
@@ -29,6 +31,7 @@ interface DesignPanelProps {
 			customButton: string;
 			customButtonFill: string;
 			customButtonCorners: string;
+			headerStyle: string;
 		}>
 	) => void;
 }
@@ -193,6 +196,24 @@ const BUTTON_STYLES = [
 		label: "Interno",
 		preview:
 			"bg-gray-200 text-gray-700 border-gray-400 border-b-2 border-r-2 border-t border-l shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]",
+	},
+];
+
+const HEADER_STYLES = [
+	{
+		value: "default",
+		label: "Padrão",
+		description: "Foto redonda centralizada, nome e bio abaixo",
+	},
+	{
+		value: "horizontal",
+		label: "Horizontal",
+		description: "Foto à esquerda, nome e bio à direita",
+	},
+	{
+		value: "hero",
+		label: "Hero",
+		description: "Foto integrada com fundo e gradiente",
 	},
 ];
 
@@ -421,142 +442,306 @@ export default function DesignPanel({
 	};
 
 	return (
-		<div className="mt-8">
-			{renderColorSelector("customBackgroundColor", "Cor de Fundo")}
-
-			<div className="mb-8">
-				<RenderLabel
-					hasPending={hasPendingChange("customBackgroundGradient")}
-					text="Gradiente de Fundo"
-				/>
-				<div className="mt-2 flex flex-wrap gap-1">
-					{GRADIENTS.map((gradient) => (
-						<button
-							className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
-								customizations.customBackgroundGradient === gradient
-									? "border-blue-500"
-									: "border-gray-200 hover:border-blue-500 dark:border-gray-600 dark:hover:border-blue-400"
-							}`}
-							key={gradient}
-							onClick={() => handleChange("customBackgroundGradient", gradient)}
-							style={{ background: gradient }}
-							type="button"
+		<div className="mt-8 space-y-6">
+			{/* Seção Header */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Header</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div>
+						<RenderLabel
+							hasPending={hasPendingChange("headerStyle")}
+							text="Estilo do Header"
 						/>
-					))}
-				</div>
-			</div>
+						<div className="mt-2 space-y-2">
+							{HEADER_STYLES.map((style) => (
+								<button
+									className={`w-full rounded-lg border-2 p-4 text-left transition-all duration-200 ${
+										customizations.headerStyle === style.value
+											? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+											: "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
+									}`}
+									key={style.value}
+									onClick={() => handleChange("headerStyle", style.value)}
+									type="button"
+								>
+									<div className="flex items-center justify-between">
+										<div>
+											<h4 className="font-medium text-sm">{style.label}</h4>
+											<p className="text-gray-600 text-xs dark:text-gray-400">
+												{style.description}
+											</p>
+										</div>
+										<div
+											className={`h-4 w-4 rounded-full border-2 ${
+												customizations.headerStyle === style.value
+													? "border-blue-500 bg-blue-500"
+													: "border-gray-300 dark:border-gray-600"
+											}`}
+										/>
+									</div>
+								</button>
+							))}
+						</div>
+					</div>
+				</CardContent>
+			</Card>
 
-			{renderColorSelector("customTextColor", "Cor do Texto")}
-			{renderColorSelector("customButtonFill", "Cor do Botão")}
+			{/* Seção Background */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Background</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-6">
+					{renderColorSelector("customBackgroundColor", "Cor de Fundo")}
 
-			{/* Fonte */}
-			<div className="mb-8">
-				<RenderLabel text="Fonte" />
-				{/* Mobile: Button to open modal */}
-				<div className="mt-2 block sm:hidden">
-					<Button
-						className="h-12 w-full justify-between px-4 py-2 text-left"
-						onClick={() => setIsFontModalOpen(true)}
-						variant="outline"
-					>
-						<span className="truncate">
-							{FONT_OPTIONS.find((f) => f.value === customizations.customFont)
-								?.label || "Satoshi"}
-						</span>
-						<Type className="h-4 w-4" />
-					</Button>
-				</div>
-				{/* Desktop: Grid layout */}
-				<div className="mt-2 hidden grid-cols-3 gap-2 sm:grid sm:grid-cols-4 lg:grid-cols-5">
-					{FONT_OPTIONS.map((font) => (
-						<button
-							className={`flex h-16 w-full items-center justify-center rounded border px-2 py-1 text-center text-xs leading-tight transition-colors ${
-								customizations.customFont === font.value
-									? "border-gray-300 bg-neutral-200 dark:border-gray-600 dark:bg-neutral-700"
-									: "border-gray-200 hover:bg-neutral-200 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
-							}`}
-							key={font.value}
-							onClick={() => handleChange("customFont", font.value)}
-							style={{ fontFamily: font.fontFamily || "inherit" }}
-							type="button"
-						>
-							<span className="break-words">{font.label}</span>
-						</button>
-					))}
-				</div>
-			</div>
+					<div>
+						<RenderLabel
+							hasPending={hasPendingChange("customBackgroundGradient")}
+							text="Gradiente de Fundo"
+						/>
+						<div className="mt-2 flex flex-wrap gap-1">
+							{GRADIENTS.map((gradient) => (
+								<button
+									className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
+										customizations.customBackgroundGradient === gradient
+											? "border-blue-500"
+											: "border-gray-200 hover:border-blue-500 dark:border-gray-600 dark:hover:border-blue-400"
+									}`}
+									key={gradient}
+									onClick={() =>
+										handleChange("customBackgroundGradient", gradient)
+									}
+									style={{ background: gradient }}
+									type="button"
+								/>
+							))}
+						</div>
+					</div>
+				</CardContent>
+			</Card>
 
-			{/* Estilo do Botão */}
-			<div className="mb-8">
-				<RenderLabel
-					hasPending={hasPendingChange("customButton")}
-					text="Estilo do Botão"
-				/>
-				<div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-3 md:grid-cols-3">
-					{BUTTON_STYLES.map((style) => (
-						<button
-							className={`flex h-12 w-full items-center justify-center rounded px-2 py-1 text-center text-sm transition-all duration-200 ${
-								style.preview
-							} ${
-								customizations.customButton === style.value
-									? "ring-1 ring-green-500 ring-offset-2"
-									: ""
-							}`}
-							key={style.value}
-							onClick={() => handleChange("customButton", style.value)}
-							type="button"
-						>
-							{style.label}
-						</button>
-					))}
-				</div>
-			</div>
+			{/* Seção Texto */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Texto</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-6">
+					{renderColorSelector("customTextColor", "Cor do Texto")}
 
-			{/* Cantos do Botão com Slider do shadcn/ui */}
-			<div className="mb-12">
-				<RenderLabel
-					hasPending={hasPendingChange("customButtonCorners")}
-					text="Cantos do Botão"
-				/>
-				<div className="mt-2 flex items-center gap-4">
-					<Slider
-						className="w-full"
-						max={36}
-						min={0}
-						onValueChange={(value) =>
-							handleChange("customButtonCorners", value[0].toString())
-						}
-						step={12}
-						value={[
-							Number.parseInt(customizations.customButtonCorners || "12", 10),
-						]}
-					/>
-					<span className="w-20 text-center font-semibold text-gray-700 dark:text-gray-300">
-						{(() => {
-							const value = Number.parseInt(
-								customizations.customButtonCorners || "12",
-								10
-							);
-							switch (value) {
-								case 0:
-									return "Reto";
-								case 12:
-									return "Suave";
-								case 24:
-									return "Médio";
-								case 36:
-									return "Arredondado";
-								default:
-									return `${value}px`;
-							}
-						})()}
-					</span>
-				</div>
-			</div>
+					<div>
+						<RenderLabel text="Fonte" />
+						<div className="mt-2 block sm:hidden">
+							<Button
+								className="h-12 w-full justify-between px-4 py-2 text-left"
+								onClick={() => setIsFontModalOpen(true)}
+								variant="outline"
+							>
+								<span className="truncate">
+									{FONT_OPTIONS.find(
+										(f) => f.value === customizations.customFont
+									)?.label || "Satoshi"}
+								</span>
+								<Type className="h-4 w-4" />
+							</Button>
+						</div>
+						<div className="mt-2 hidden grid-cols-3 gap-2 sm:grid sm:grid-cols-4 lg:grid-cols-5">
+							{FONT_OPTIONS.map((font) => (
+								<button
+									className={`flex h-16 w-full items-center justify-center rounded border px-2 py-1 text-center text-xs leading-tight transition-colors ${
+										customizations.customFont === font.value
+											? "border-gray-300 bg-neutral-200 dark:border-gray-600 dark:bg-neutral-700"
+											: "border-gray-200 hover:bg-neutral-200 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+									}`}
+									key={font.value}
+									onClick={() => handleChange("customFont", font.value)}
+									style={{ fontFamily: font.fontFamily || "inherit" }}
+									type="button"
+								>
+									<span className="break-words">{font.label}</span>
+								</button>
+							))}
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* Seção Botões */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Botões</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-6">
+					{renderColorSelector("customButtonFill", "Cor do Botão")}
+
+					<div>
+						<RenderLabel
+							hasPending={hasPendingChange("customButton")}
+							text="Estilo do Botão"
+						/>
+						<div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-3 md:grid-cols-3">
+							{BUTTON_STYLES.map((style) => (
+								<button
+									className={`flex h-12 w-full items-center justify-center rounded px-2 py-1 text-center text-sm transition-all duration-200 ${
+										style.preview
+									} ${
+										customizations.customButton === style.value
+											? "ring-1 ring-green-500 ring-offset-2"
+											: ""
+									}`}
+									key={style.value}
+									onClick={() => handleChange("customButton", style.value)}
+									type="button"
+								>
+									{style.label}
+								</button>
+							))}
+						</div>
+					</div>
+
+					<div>
+						<RenderLabel
+							hasPending={hasPendingChange("customButtonCorners")}
+							text="Cantos do Botão"
+						/>
+						<div className="mt-2 flex items-center gap-4">
+							<Slider
+								className="w-full"
+								max={36}
+								min={0}
+								onValueChange={(value) =>
+									handleChange("customButtonCorners", value[0].toString())
+								}
+								step={12}
+								value={[
+									Number.parseInt(
+										customizations.customButtonCorners || "12",
+										10
+									),
+								]}
+							/>
+							<span className="w-20 text-center font-semibold text-gray-700 dark:text-gray-300">
+								{(() => {
+									const value = Number.parseInt(
+										customizations.customButtonCorners || "12",
+										10
+									);
+									switch (value) {
+										case 0:
+											return "Reto";
+										case 12:
+											return "Suave";
+										case 24:
+											return "Médio";
+										case 36:
+											return "Arredondado";
+										default:
+											return `${value}px`;
+									}
+								})()}
+							</span>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* Seção Cores */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Cores Selecionadas</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-6">
+					<div className="space-y-4">
+						{/* Cor de Fundo */}
+						{customizations.customBackgroundColor && (
+							<div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+								<div
+									className="h-8 w-8 flex-shrink-0 rounded border-2 border-gray-200 dark:border-gray-600"
+									style={{
+										backgroundColor: customizations.customBackgroundColor,
+									}}
+								/>
+								<div className="flex-1">
+									<p className="font-medium text-sm">Cor de Fundo</p>
+									<p className="text-gray-600 text-xs dark:text-gray-400">
+										{customizations.customBackgroundColor}
+									</p>
+								</div>
+							</div>
+						)}
+
+						{/* Gradiente de Fundo */}
+						{customizations.customBackgroundGradient && (
+							<div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+								<div
+									className="h-8 w-8 flex-shrink-0 rounded border-2 border-gray-200 dark:border-gray-600"
+									style={{
+										background: customizations.customBackgroundGradient,
+									}}
+								/>
+								<div className="flex-1">
+									<p className="font-medium text-sm">Gradiente de Fundo</p>
+									<p className="text-gray-600 text-xs dark:text-gray-400">
+										Gradiente personalizado
+									</p>
+								</div>
+							</div>
+						)}
+
+						{/* Cor do Texto */}
+						{customizations.customTextColor && (
+							<div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+								<div
+									className="h-8 w-8 flex-shrink-0 rounded border-2 border-gray-200 dark:border-gray-600"
+									style={{ backgroundColor: customizations.customTextColor }}
+								/>
+								<div className="flex-1">
+									<p className="font-medium text-sm">Cor do Texto</p>
+									<p className="text-gray-600 text-xs dark:text-gray-400">
+										{customizations.customTextColor}
+									</p>
+								</div>
+							</div>
+						)}
+
+						{/* Cor do Botão */}
+						{customizations.customButtonFill && (
+							<div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+								<div
+									className="h-8 w-8 flex-shrink-0 rounded border-2 border-gray-200 dark:border-gray-600"
+									style={{ backgroundColor: customizations.customButtonFill }}
+								/>
+								<div className="flex-1">
+									<p className="font-medium text-sm">Cor do Botão</p>
+									<p className="text-gray-600 text-xs dark:text-gray-400">
+										{customizations.customButtonFill}
+									</p>
+								</div>
+							</div>
+						)}
+
+						{/* Mensagem quando não há cores selecionadas */}
+						{!(
+							customizations.customBackgroundColor ||
+							customizations.customBackgroundGradient ||
+							customizations.customTextColor ||
+							customizations.customButtonFill
+						) && (
+							<div className="py-8 text-center text-gray-500 dark:text-gray-400">
+								<p className="text-sm">Nenhuma cor personalizada selecionada</p>
+								<p className="mt-1 text-xs">
+									Configure suas cores nas seções acima para vê-las aqui
+								</p>
+							</div>
+						)}
+					</div>
+				</CardContent>
+			</Card>
 
 			{/* Salvar e Cancelar pendências */}
 			{Object.keys(pendingChanges).length > 0 && (
-				<div className="mb-12 flex items-center gap-2">
+				<div className="flex items-center gap-2 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
 					<BaseButton
 						loading={isSaving}
 						onClick={handleCancel}
@@ -570,7 +755,7 @@ export default function DesignPanel({
 					</BaseButton>
 				</div>
 			)}
-			{/* Font Selection Modal for Mobile */}
+
 			<FontSelectionModal
 				fontOptions={FONT_OPTIONS.map((font) => ({
 					label: font.label,

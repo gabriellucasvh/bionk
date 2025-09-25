@@ -119,6 +119,7 @@ export default async function UserPage({ params }: PageProps) {
 					customButtonFill: true,
 					customButtonCorners: true,
 					customFont: true,
+					headerStyle: true,
 				},
 			},
 		},
