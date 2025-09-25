@@ -28,7 +28,7 @@ interface User {
 }
 
 const PerfilClient = () => {
-	const { data: session, update: updateSession } = useSession();
+	const { data: session } = useSession();
 	const [profile, setProfile] = useState({ name: "", username: "", bio: "" });
 	const [originalProfile, setOriginalProfile] = useState({
 		name: "",
@@ -110,7 +110,7 @@ const PerfilClient = () => {
 				}
 				throw new Error(data.error || "Falha ao atualizar");
 			}
-			return data.user as User;
+			return data as User;
 		} catch {
 			return null;
 		}
@@ -175,27 +175,6 @@ const PerfilClient = () => {
 		}
 	};
 
-
-	const applyUpdatedProfile = async (
-		currentSession: any,
-		updateSessionFn: any,
-		updatedUserData: User | null,
-		newImageUrl: string | null
-	) => {
-		if (!currentSession?.user) {
-			return;
-		}
-
-		const newSessionUser = {
-			...currentSession.user,
-			name: updatedUserData?.name ?? currentSession.user.name,
-			username: updatedUserData?.username ?? currentSession.user.username,
-			image: newImageUrl ?? currentSession.user.image,
-		};
-
-		await updateSessionFn({ ...currentSession, user: newSessionUser });
-	};
-
 	const syncLocalProfile = (
 		updatedUserData: User | null,
 		newImageUrl: string | null
@@ -206,9 +185,25 @@ const PerfilClient = () => {
 				username: updatedUserData.username,
 				bio: updatedUserData.bio || "",
 			});
+		} else {
+			setOriginalProfile({
+				name: profile.name,
+				username: profile.username,
+				bio: profile.bio,
+			});
 		}
 		if (newImageUrl) {
+			setProfilePreview(newImageUrl);
 			setOriginalProfileImageUrl(newImageUrl);
+			setSelectedProfileFile(null);
+			setProfileImageChanged(false);
+
+			window.dispatchEvent(
+				new CustomEvent("profileImageUpdated", {
+					detail: { imageUrl: newImageUrl },
+				})
+			);
+		} else if (profileImageChanged) {
 			setSelectedProfileFile(null);
 			setProfileImageChanged(false);
 		}
@@ -238,15 +233,7 @@ const PerfilClient = () => {
 
 		const updatedUserData = await updateProfileText();
 
-		if (newImageUrl || updatedUserData) {
-			await applyUpdatedProfile(
-				session,
-				updateSession,
-				updatedUserData,
-				newImageUrl
-			);
-			syncLocalProfile(updatedUserData, newImageUrl);
-		}
+		syncLocalProfile(updatedUserData, newImageUrl);
 
 		setLoading(false);
 	};
@@ -275,7 +262,7 @@ const PerfilClient = () => {
 	};
 
 	return (
-		<section className="mx-auto min-h-dvh w-full space-y-4 p-4 pb-24 lg:w-1/2">
+		<section className="mx-auto min-h-dvh w-full space-y-4 p-4 pb-24 xl:w-1/2">
 			<header className="flex items-center justify-between">
 				<h2 className="font-bold text-2xl dark:text-white">Perfil</h2>
 				<VerPerfilMobile />

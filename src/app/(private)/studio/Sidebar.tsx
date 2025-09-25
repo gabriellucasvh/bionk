@@ -203,6 +203,22 @@ const Sidebar = () => {
 		}
 	}, [session?.user?.image]);
 
+	// Escuta evento customizado de atualização da imagem do perfil
+	useEffect(() => {
+		const handleProfileImageUpdate = () => {
+			setImageKey(Date.now());
+		};
+
+		window.addEventListener("profileImageUpdated", handleProfileImageUpdate);
+
+		return () => {
+			window.removeEventListener(
+				"profileImageUpdated",
+				handleProfileImageUpdate
+			);
+		};
+	}, []);
+
 	const handleNavClick = useCallback(
 		(href: string) => {
 			router.push(href);
