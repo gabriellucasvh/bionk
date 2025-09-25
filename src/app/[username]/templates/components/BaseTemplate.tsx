@@ -205,6 +205,14 @@ function LinksList({
 	customPresets?: BaseTemplateProps["customPresets"];
 }) {
 	const { animatedLinks } = useLinkAnimation();
+	const textClasses = customPresets?.customTextColor ? "" : (classNames?.name || "");
+	const cardClasses = customPresets?.customButtonFill ? "" : (classNames?.cardLink || "");
+	
+	const extractTextClasses = (classes: string) => {
+		return classes.split(' ').filter(cls => cls.startsWith('text-')).join(' ');
+	};
+	
+	const cardTextClasses = customPresets?.customTextColor ? "" : extractTextClasses(classNames?.cardLink || "");
 
 	const renderLink = (item: UserLink) => {
 		const isAnimated = animatedLinks.has(item.id.toString());
@@ -325,6 +333,12 @@ function LinksList({
 		return [
 			<TextCard
 				buttonStyle={buttonStyle}
+				classNames={{
+					...classNames,
+					textClasses,
+					cardClasses,
+					cardTextClasses,
+				}}
 				customPresets={customPresets}
 				key={`text-${text.id}`}
 				text={text}
@@ -423,6 +437,7 @@ export default function BaseTemplate({
 			fontFamily: `var(--${customPresets.customFont})`,
 		}),
 	};
+
 	const getButtonStyleByType = (buttonType: string) => {
 		const baseStyle = {
 			...(customPresets?.customButtonFill && {

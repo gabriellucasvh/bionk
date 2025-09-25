@@ -37,6 +37,9 @@ interface TextCardProps {
 	};
 	classNames?: {
 		textCard?: string;
+		textClasses?: string;
+		cardClasses?: string;
+		cardTextClasses?: string;
 	};
 }
 
@@ -64,10 +67,22 @@ export default function TextCard({
 		? `${text.description.slice(0, 200)}...`
 		: text.description;
 
+	const getTextClasses = () => {
+		if (customPresets?.customTextColor) {
+			return "";
+		}
+		
+		if (text.hasBackground && classNames?.cardTextClasses) {
+			return classNames.cardTextClasses;
+		}
+		
+		return classNames?.textClasses || "";
+	};
+
 	const textContent = text.isCompact ? (
 		<div className={cn("w-full p-4", textAlignClass)}>
 			<Button
-				className="h-auto p-0 font-semibold text-lg"
+				className={cn("h-auto p-0 font-semibold text-lg", getTextClasses())}
 				onClick={() => setIsModalOpen(true)}
 				style={textStyle}
 				variant="link"
@@ -77,18 +92,18 @@ export default function TextCard({
 		</div>
 	) : (
 		<div className={cn("w-full p-4", textAlignClass)}>
-			<h3 className="mb-2 font-semibold text-lg" style={textStyle}>
+			<h3 className={cn("mb-2 font-semibold text-lg", getTextClasses())} style={textStyle}>
 				{text.title}
 			</h3>
 			<p
-				className="whitespace-pre-wrap text-md leading-relaxed"
+				className={cn("whitespace-pre-wrap text-md leading-relaxed", getTextClasses())}
 				style={textStyle}
 			>
 				{displayText}
 			</p>
 			{shouldTruncate && (
 				<Button
-					className="mt-2 h-auto p-0 text-sm"
+					className={cn("mt-2 h-auto p-0 text-sm", getTextClasses())}
 					onClick={() => setIsModalOpen(true)}
 					style={{ color: textStyle?.color }}
 					variant="link"
@@ -102,7 +117,8 @@ export default function TextCard({
 	const getCardClasses = () => {
 		const baseClasses = "border transition-all";
 		const cornerClasses = customPresets?.customButtonCorners || "rounded-xl";
-		return cn(baseClasses, cornerClasses, classNames?.textCard);
+		const backgroundClasses = customPresets?.customButtonFill ? "" : (classNames?.cardClasses || "");
+		return cn(baseClasses, cornerClasses, backgroundClasses, classNames?.textCard);
 	};
 
 	const getCardStyle = () => {
