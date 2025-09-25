@@ -64,11 +64,11 @@ export default function TextCard({
 
 	const textContent = (
 		<div className={cn("w-full p-4", textAlignClass)}>
-			<h3 className="mb-2 font-semibold text-lg" style={textStyle}>
+			<h3 className="mb-2 font-semibold text-base" style={textStyle}>
 				{text.title}
 			</h3>
 			<p
-				className="whitespace-pre-wrap text-sm leading-relaxed"
+				className="whitespace-pre-wrap text-xs leading-relaxed"
 				style={textStyle}
 			>
 				{displayText}
@@ -91,7 +91,7 @@ export default function TextCard({
 			{text.hasBackground ? (
 				<div
 					className={cn(
-						"rounded-lg border transition-all",
+						"rounded-xl border transition-all",
 						classNames?.textCard
 					)}
 					style={buttonStyle}
