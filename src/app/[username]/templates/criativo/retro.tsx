@@ -8,14 +8,11 @@ export default function SoftRetroTemplate({ user }: TemplateComponentProps) {
 				theme: "light",
 				wrapper:
 					"bg-[#f4f1de] text-[#3d405b]",
-				image:
-					"border-4 border-[#e07a5f] shadow-[4px_4px_0_#3d405b]",
 				header: "",
 				name: "text-[#81b29a]",
 				bio: "text-[#3d405b]",
 				cardLink:
 					"bg-[#f2cc8f] text-[#3d405b] border-2 border-[#e07a5f] shadow-[4px_4px_0_#3d405b] hover:bg-[#ffe8b6] transition-all duration-200",
-				link: "block text-xs text-[#3d405b] underline",
 				footer:
 					"text-[#3d405b]",
 			}}

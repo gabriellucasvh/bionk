@@ -12,26 +12,26 @@ export const ALL_TEMPLATES = [
 			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/simple.png",
 	},
 	{
-		id: "clean",
-		name: "Clean",
+		id: "abacate",
+		name: "Abacate",
 		image:
 			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/clean.png",
 	},
 	{
-		id: "elegant",
-		name: "Elegante",
+		id: "menta",
+		name: "Menta",
 		image:
 			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/elegant.png",
 	},
 	{
-		id: "business",
-		name: "Empresarial",
+		id: "vinho",
+		name: "Vinho",
 		image:
 			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747031556/bionk/templates/business.png",
 	},
 	{
-		id: "corporate",
-		name: "Corporativo",
+		id: "ember",
+		name: "Ember",
 		image:
 			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/corporate.png",
 	},
@@ -42,10 +42,16 @@ export const ALL_TEMPLATES = [
 			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/lux.png",
 	},
 	{
-		id: "dark",
-		name: "Dark",
+		id: "pulse",
+		name: "Pulse",
 		image:
 			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/dark.png",
+	},
+	{
+		id: "mistico",
+		name: "Místico",
+		image:
+			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/mistico.png",
 	},
 	{
 		id: "artistic",
@@ -83,12 +89,7 @@ export const ALL_TEMPLATES = [
 		image:
 			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/vibrant.png",
 	},
-	{
-		id: "gradient",
-		name: "Gradiente",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/gradient.png",
-	},
+
 	{
 		id: "cyber",
 		name: "Cyberpunk",

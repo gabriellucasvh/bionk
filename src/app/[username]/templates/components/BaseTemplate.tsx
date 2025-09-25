@@ -83,7 +83,7 @@ function UserHeader({
 		<header className={`mb-8 w-full text-center ${classNames?.header || ""}`}>
 			{user.image && (
 				<div
-					className={`relative mx-auto mb-4 h-26 w-26 overflow-hidden rounded-full border-2 ${
+					className={`relative mx-auto mb-4 h-26 w-26 overflow-hidden rounded-full ${
 						classNames?.image || ""
 					}`}
 				>

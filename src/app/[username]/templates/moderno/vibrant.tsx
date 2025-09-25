@@ -8,14 +8,10 @@ export default function VibrantTemplate({ user }: TemplateComponentProps) {
 				theme: "dark",
 				wrapper:
 					"bg-gradient-to-br from-fuchsia-600 via-violet-600 to-blue-600 text-white",
-				image:
-					"border-4 border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.5)] hover:shadow-[0_0_25px_rgba(250,204,21,0.7)] transition-all duration-300",
-				header: "",
 				name: "text-white drop-shadow-md",
 				bio: "text-yellow-200 drop-shadow-sm",
 				cardLink:
 					"text-white bg-gradient-to-r from-cyan-500 to-blue-500 border-2 border-cyan-300 shadow-[0_4px_0_rgb(34,211,238)] hover:shadow-[0_6px_0_rgb(34,211,238)] active:shadow-[0_2px_0_rgb(34,211,238)] active:translate-y-1 transition-all",
-				link: "text-gray-300",
 				footer:
 					"text-white",
 			}}

@@ -15,6 +15,16 @@ import {
 } from "@/components/ui/dialog";
 import { CATEGORIES } from "../data/design.data";
 
+const getCategoryDisplayName = (category: string): string => {
+	const categoryNames: Record<string, string> = {
+		classicos: "Clássicos",
+		unicos: "Únicos",
+		criativo: "Criativo",
+		moderno: "Moderno",
+	};
+	return categoryNames[category] || category.replace(/-/g, " ");
+};
+
 interface TemplateSettingsProps {
 	onTemplateChange?: () => void; // Callback para notificar mudança de template
 }
@@ -93,6 +103,7 @@ export default function TemplateSettings({
 					categories={Object.keys(CATEGORIES)}
 					onCategorySelect={setSelectedCategory}
 					selectedCategory={selectedCategory}
+					getCategoryDisplayName={getCategoryDisplayName}
 				/>
 			</div>
 			{/* Desktop: Grid */}
@@ -108,7 +119,7 @@ export default function TemplateSettings({
 						onClick={() => setSelectedCategory(category)}
 						variant="ghost"
 					>
-						<span className="break-words">{category.replace(/-/g, " ")}</span>
+						<span className="break-words">{getCategoryDisplayName(category)}</span>
 					</Button>
 				))}
 			</div>

@@ -6,15 +6,12 @@ export default function DefaultTemplate({ user }: TemplateComponentProps) {
 		<BaseTemplate
 			classNames={{
 				theme: "dark",
-				wrapper: "bg-black text-white",
-				image: "border border-neutral-700",
-				name: "text-white",
-				bio: "text-neutral-400",
+				wrapper: "bg-rose-600 text-white",
+				name: "text-lime-300",
+				bio: "text-lime-400",
 				cardLink:
-					"bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition-colors duration-200",
-				link: "text-neutral-400",
-				footer:
-					"text-whit",
+					"bg-lime-500 hover:bg-lime-600 border border-neutral-800 transition-colors duration-200",
+				footer: "text-lime-300",
 			}}
 			customPresets={user.CustomPresets || undefined}
 			user={user}

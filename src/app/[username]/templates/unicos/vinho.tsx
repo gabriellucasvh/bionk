@@ -1,18 +1,17 @@
 import type { TemplateComponentProps } from "@/types/user-profile";
 import BaseTemplate from "../components/BaseTemplate";
 
-export default function DefaultTemplate({ user }: TemplateComponentProps) {
+export default function BusinessTemplate({ user }: TemplateComponentProps) {
 	return (
 		<BaseTemplate
 			classNames={{
 				theme: "dark",
-				wrapper: "bg-neutral-950 text-white",
+				wrapper: "bg-red-950 text-white",
 				name: "text-white",
-				bio: "text-neutral-400",
+				bio: "text-neutral-100",
 				cardLink:
-					"bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 transition-colors duration-200",
-				footer:
-					"text-blue-500",
+					"text-white bg-red-700 border border-red-500 shadow-md hover:shadow-xl transition-shadow",
+				footer: "text-red-200",
 			}}
 			customPresets={user.CustomPresets || undefined}
 			user={user}
