@@ -206,7 +206,7 @@ const TextCard = ({
 								}
 							/>
 							<Label htmlFor={`background-${text.id}`}>
-								Remover background
+								Background
 							</Label>
 						</div>
 					</div>

@@ -324,6 +324,7 @@ function LinksList({
 	const renderTextContent = (text: any) => {
 		return [
 			<TextCard
+				buttonStyle={buttonStyle}
 				customPresets={customPresets}
 				key={`text-${text.id}`}
 				text={text}

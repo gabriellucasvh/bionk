@@ -43,6 +43,7 @@ export default function TextCard({
 	text,
 	textStyle,
 	buttonStyle,
+	customPresets,
 	classNames,
 }: TextCardProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,11 +65,11 @@ export default function TextCard({
 
 	const textContent = (
 		<div className={cn("w-full p-4", textAlignClass)}>
-			<h3 className="mb-2 font-semibold text-base" style={textStyle}>
+			<h3 className="mb-2 font-semibold text-lg" style={textStyle}>
 				{text.title}
 			</h3>
 			<p
-				className="whitespace-pre-wrap text-xs leading-relaxed"
+				className="whitespace-pre-wrap text-md leading-relaxed"
 				style={textStyle}
 			>
 				{displayText}
@@ -86,15 +87,26 @@ export default function TextCard({
 		</div>
 	);
 
+	const getCardClasses = () => {
+		const baseClasses = "border transition-all";
+		const cornerClasses = customPresets?.customButtonCorners || "rounded-xl";
+		return cn(baseClasses, cornerClasses, classNames?.textCard);
+	};
+
+	const getCardStyle = () => {
+		const style = { ...buttonStyle };
+		if (customPresets?.customButtonFill && text.hasBackground) {
+			style.backgroundColor = customPresets.customButtonFill;
+		}
+		return style;
+	};
+
 	return (
 		<div className="mb-3 w-full" key={text.id}>
 			{text.hasBackground ? (
 				<div
-					className={cn(
-						"rounded-xl border transition-all",
-						classNames?.textCard
-					)}
-					style={buttonStyle}
+					className={getCardClasses()}
+					style={getCardStyle()}
 				>
 					{textContent}
 				</div>
