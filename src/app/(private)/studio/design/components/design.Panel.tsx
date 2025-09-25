@@ -528,13 +528,13 @@ export default function DesignPanel({
 						}
 						step={12}
 						value={[
-							Number.parseInt(customizations.customButtonCorners || "0", 10),
+							Number.parseInt(customizations.customButtonCorners || "12", 10),
 						]}
 					/>
 					<span className="w-20 text-center font-semibold text-gray-700 dark:text-gray-300">
 						{(() => {
 							const value = Number.parseInt(
-								customizations.customButtonCorners || "0",
+								customizations.customButtonCorners || "12",
 								10
 							);
 							switch (value) {
