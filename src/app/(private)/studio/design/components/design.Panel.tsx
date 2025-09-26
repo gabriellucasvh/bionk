@@ -654,12 +654,12 @@ export default function DesignPanel({
 					<CardTitle>Cores Selecionadas</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					<div className="space-y-4">
+					<div className="space-y-1">
 						{/* Cor de Fundo */}
 						{customizations.customBackgroundColor && (
-							<div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+							<div className="flex items-center gap-3 rounded-lg p-2">
 								<div
-									className="h-8 w-8 flex-shrink-0 rounded border-2 border-gray-200 dark:border-gray-600"
+									className="h-8 w-8 flex-shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-600"
 									style={{
 										backgroundColor: customizations.customBackgroundColor,
 									}}
@@ -675,9 +675,9 @@ export default function DesignPanel({
 
 						{/* Gradiente de Fundo */}
 						{customizations.customBackgroundGradient && (
-							<div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+							<div className="flex items-center gap-3 rounded-lg p-2">
 								<div
-									className="h-8 w-8 flex-shrink-0 rounded border-2 border-gray-200 dark:border-gray-600"
+									className="h-8 w-8 flex-shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-600"
 									style={{
 										background: customizations.customBackgroundGradient,
 									}}
@@ -693,9 +693,9 @@ export default function DesignPanel({
 
 						{/* Cor do Texto */}
 						{customizations.customTextColor && (
-							<div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+							<div className="flex items-center gap-3 rounded-lg p-2">
 								<div
-									className="h-8 w-8 flex-shrink-0 rounded border-2 border-gray-200 dark:border-gray-600"
+									className="h-8 w-8 flex-shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-600"
 									style={{ backgroundColor: customizations.customTextColor }}
 								/>
 								<div className="flex-1">
@@ -708,16 +708,16 @@ export default function DesignPanel({
 						)}
 
 						{/* Cor do Botão */}
-						{customizations.customButtonFill && (
-							<div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-700">
+						{customizations.customButton && (
+							<div className="flex items-center gap-3 rounded-lg p-2">
 								<div
-									className="h-8 w-8 flex-shrink-0 rounded border-2 border-gray-200 dark:border-gray-600"
-									style={{ backgroundColor: customizations.customButtonFill }}
+									className="h-8 w-8 flex-shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-600"
+									style={{ backgroundColor: customizations.customButton }}
 								/>
 								<div className="flex-1">
 									<p className="font-medium text-sm">Cor do Botão</p>
 									<p className="text-gray-600 text-xs dark:text-gray-400">
-										{customizations.customButtonFill}
+										{customizations.customButton}
 									</p>
 								</div>
 							</div>
@@ -743,7 +743,7 @@ export default function DesignPanel({
 
 			{/* Salvar e Cancelar pendências */}
 			{Object.keys(pendingChanges).length > 0 && (
-				<div className="flex items-center gap-2 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+				<div className="fixed right-0 bottom-16 left-0 z-50 mx-auto flex w-min items-center gap-2 rounded-lg bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm md:bottom-6 dark:bg-neutral-800/90">
 					<BaseButton
 						loading={isSaving}
 						onClick={handleCancel}
@@ -752,7 +752,12 @@ export default function DesignPanel({
 					>
 						Cancelar
 					</BaseButton>
-					<BaseButton loading={isSaving} onClick={handleSavePending} size="sm">
+					<BaseButton
+						className="px-6"
+						loading={isSaving}
+						onClick={handleSavePending}
+						size="sm"
+					>
 						Salvar
 					</BaseButton>
 				</div>

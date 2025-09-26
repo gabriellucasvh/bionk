@@ -478,7 +478,7 @@ const PersonalizarClient = () => {
 								/>
 							</div>
 							{hasChanges && (
-								<div className="mt-4 flex justify-end gap-2">
+								<div className="fixed right-6 bottom-6 z-50 flex gap-2 rounded-lg bg-white/90 p-3 shadow-lg backdrop-blur-sm dark:bg-neutral-800/90">
 									<BaseButton
 										disabled={loading || isUploadingImage}
 										onClick={handleCancelChanges}
