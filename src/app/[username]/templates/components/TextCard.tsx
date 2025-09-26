@@ -83,7 +83,10 @@ export default function TextCard({
 	const textContent = text.isCompact ? (
 		<div className={cn("w-full p-4", textAlignClass)}>
 			<Button
-				className={cn("h-auto p-0 font-semibold text-lg", getTextClasses())}
+				className={cn(
+					"h-auto whitespace-normal break-words p-0 font-semibold text-lg",
+					getTextClasses()
+				)}
 				onClick={() => setIsModalOpen(true)}
 				style={textStyle}
 				variant="link"
