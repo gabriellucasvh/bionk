@@ -27,7 +27,7 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 		<Dialog onOpenChange={setOpen} open={open}>
 			<DialogTrigger asChild>
 				<Button
-					className="mt-5 inline-block max-w-full break-words text-center text-sm sm:text-base"
+					className="inline-block max-w-full break-words text-center text-sm sm:text-base"
 					onClick={() => setOpen(true)}
 					variant="ghost"
 				>

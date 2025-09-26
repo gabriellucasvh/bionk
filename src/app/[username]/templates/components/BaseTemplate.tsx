@@ -58,7 +58,7 @@ function renderUserImage(
 	}
 
 	return (
-		<div className={`relative overflow-hidden ${imageClasses}`}>
+		<div className={`relative mt-10 overflow-hidden ${imageClasses}`}>
 			{user.image.toLowerCase().endsWith(".gif") ? (
 				// biome-ignore lint/performance/noImgElement: <necessário para GIFs>
 				<img
@@ -108,7 +108,7 @@ function renderDefaultHeader(
 	textStyle?: React.CSSProperties
 ) {
 	return (
-		<header className="mb-8 w-full text-center">
+		<header className="mb-6 w-full text-center">
 			{renderUserImage(user, "mx-auto mb-4 h-26 w-26 rounded-full", "112px")}
 			<h1 className="font-bold text-2xl" style={textStyle}>
 				{user.name || user.username}
@@ -128,7 +128,7 @@ function renderHorizontalHeader(
 	textStyle?: React.CSSProperties
 ) {
 	return (
-		<header className="mb-8 w-full pt-4">
+		<header className="mb-6 w-full pt-4">
 			<div className="mb-4 flex items-start gap-4">
 				{renderUserImage(user, "h-20 w-20 rounded-lg flex-shrink-0", "80px")}
 				<div className="min-w-0 flex-1">
@@ -634,7 +634,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 			>
 				<div
 					className={`relative min-h-dvh w-full sm:mt-8 sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
-						customPresets.headerStyle === "hero" ? "pt-0" : "px-4 pt-8"
+						customPresets.headerStyle === "hero" ? "pt-0" : "px-4"
 					} sm:px-6 sm:pt-8`}
 					style={customPresets.headerStyle !== "hero" ? wrapperStyle : {}}
 				>
@@ -645,7 +645,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					</div>
 
 					<div className="flex min-h-dvh flex-col">
-						<main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center sm:max-w-none">
+						<main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center pt-4 sm:max-w-none">
 							<UserHeader
 								customPresets={customPresets}
 								headerStyle={customPresets.headerStyle}
@@ -664,7 +664,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 							</section>
 						</main>
 						<footer
-							className="mt-auto flex justify-center pt-8 pb-8"
+							className="mt-auto flex justify-center pt-4 pb-4"
 							style={textStyle}
 						>
 							<JoinBionkModal>{user.username}</JoinBionkModal>
