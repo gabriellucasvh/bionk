@@ -510,9 +510,6 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 			borderRadius: borderRadiusValue,
 		};
 
-		console.log("Debug - customButtonStyle:", customPresets.customButtonStyle);
-		console.log("Debug - customPresets:", customPresets);
-
 		// Aplicar estilos baseados no customButtonStyle (estilo selecionado)
 		switch (customPresets.customButtonStyle) {
 			case "solid":
