@@ -8,7 +8,196 @@ import FontSelectionModal from "@/components/modals/FontSelectionModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
+import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
+import type { SocialLinkItem } from "@/types/social";
 import { RenderLabel } from "./design.RenderLabel";
+
+interface UserData {
+	name: string;
+	username: string;
+	bio?: string;
+	image?: string;
+	socialLinks: SocialLinkItem[];
+}
+
+// Função auxiliar para renderizar social links
+const renderSocialLinks = (
+	activeSocialLinks: SocialLinkItem[],
+	maxLinks: number,
+	iconSize: string,
+	additionalClasses = "",
+	showBorder = false
+) => {
+	if (activeSocialLinks.length === 0) {
+		return null;
+	}
+
+	return (
+		<div className={`flex gap-1.5 ${additionalClasses}`}>
+			{activeSocialLinks.slice(0, maxLinks).map((link) => {
+				const platform = SOCIAL_PLATFORMS.find((p) => p.key === link.platform);
+				if (!platform) {
+					return null;
+				}
+				return (
+					<div
+						className={`${iconSize} rounded-full shadow-sm ${
+							showBorder ? "border border-white/20" : ""
+						}`}
+						key={link.id}
+						style={{ backgroundColor: platform.color }}
+						title={platform.name}
+					/>
+				);
+			})}
+			{activeSocialLinks.length > maxLinks && (
+				<div className="flex items-center text-gray-500 text-xs">
+					+{activeSocialLinks.length - maxLinks}
+				</div>
+			)}
+		</div>
+	);
+};
+
+// Função para renderizar estilo default
+const renderDefaultStyle = (userProfileData: UserData) => {
+	const { name, username, bio, image, socialLinks } = userProfileData;
+	const activeSocialLinks = socialLinks.filter((link) => link.active);
+
+	return (
+		<div className="h-full w-full overflow-hidden rounded-t-xl bg-gray-50 dark:bg-gray-900">
+			<div className="flex h-full flex-col items-center justify-center p-4 text-center">
+				<div className="relative mx-auto mb-3 h-16 w-16">
+					{image ? (
+						// biome-ignore lint/performance/noImgElement: <necessário para GIFS>
+						<img
+							alt={name || username}
+							className="h-full w-full rounded-full border-2 border-white object-cover shadow-sm"
+							src={image}
+						/>
+					) : (
+						<div className="h-full w-full rounded-full border-2 border-white bg-gray-300 shadow-sm dark:bg-gray-600" />
+					)}
+				</div>
+				<div className="mb-1 font-semibold text-gray-900 text-sm dark:text-gray-100">
+					{name || username || "Nome do usuário"}
+				</div>
+				{bio && (
+					<div className="mb-3 line-clamp-2 text-gray-600 text-xs dark:text-gray-400">
+						{bio}
+					</div>
+				)}
+				{renderSocialLinks(
+					activeSocialLinks,
+					3,
+					"h-4 w-4",
+					"justify-center gap-2"
+				)}
+			</div>
+		</div>
+	);
+};
+
+// Função para renderizar estilo horizontal
+const renderHorizontalStyle = (userProfileData: UserData) => {
+	const { name, username, bio, image, socialLinks } = userProfileData;
+	const activeSocialLinks = socialLinks.filter((link) => link.active);
+
+	return (
+		<div className="h-full w-full overflow-hidden rounded-t-xl bg-gray-50 dark:bg-gray-900">
+			<div className="flex h-full items-center gap-4 p-4">
+				<div className="relative h-14 w-14 flex-shrink-0">
+					{image ? (
+						// biome-ignore lint/performance/noImgElement: <necessário para GIFS>
+						<img
+							alt={name || username}
+							className="h-full w-full rounded-lg border-2 border-white object-cover shadow-sm"
+							src={image}
+						/>
+					) : (
+						<div className="h-full w-full rounded-lg border-2 border-white bg-gray-300 shadow-sm dark:bg-gray-600" />
+					)}
+				</div>
+				<div className="min-w-0 flex-1">
+					<div className="mb-1 truncate font-semibold text-gray-900 text-sm dark:text-gray-100">
+						{name || username || "Nome do usuário"}
+					</div>
+					{bio && (
+						<div className="mb-2 line-clamp-2 text-gray-600 text-xs dark:text-gray-400">
+							{bio}
+						</div>
+					)}
+					{renderSocialLinks(activeSocialLinks, 4, "h-3 w-3")}
+				</div>
+			</div>
+		</div>
+	);
+};
+
+// Função para renderizar estilo hero
+const renderHeroStyle = (userProfileData: UserData) => {
+	const { name, username, bio, image, socialLinks } = userProfileData;
+	const activeSocialLinks = socialLinks.filter((link) => link.active);
+
+	return (
+		<div
+			className="relative h-full w-full overflow-hidden rounded-t-xl"
+			style={{
+				backgroundImage: image
+					? `url(${image})`
+					: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+				backgroundSize: "cover",
+				backgroundPosition: "center",
+			}}
+		>
+			<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+			<div className="relative z-10 flex h-full flex-col justify-end p-4 text-white">
+				<div className="mb-1 font-semibold text-sm drop-shadow-sm">
+					{name || username || "Nome do usuário"}
+				</div>
+				{bio && (
+					<div className="mb-3 line-clamp-2 text-xs opacity-90 drop-shadow-sm">
+						{bio}
+					</div>
+				)}
+				{renderSocialLinks(activeSocialLinks, 4, "h-3 w-3", "", true)}
+			</div>
+		</div>
+	);
+};
+
+// Componente para preview do header com dados reais
+const HeaderStylePreview = ({
+	style,
+	userProfileData,
+}: {
+	style: string;
+	userProfileData?: UserData;
+}) => {
+	if (!userProfileData) {
+		return (
+			<div className="flex h-full w-full items-center justify-center rounded-t-xl bg-gray-50 dark:bg-gray-900">
+				<div className="text-center text-gray-500 text-xs">
+					Carregando dados...
+				</div>
+			</div>
+		);
+	}
+
+	if (style === "default") {
+		return renderDefaultStyle(userProfileData);
+	}
+
+	if (style === "horizontal") {
+		return renderHorizontalStyle(userProfileData);
+	}
+
+	if (style === "hero") {
+		return renderHeroStyle(userProfileData);
+	}
+
+	return null;
+};
 
 // Interface atualizada
 interface DesignPanelProps {
@@ -23,6 +212,7 @@ interface DesignPanelProps {
 		customButtonCorners: string;
 		headerStyle: string;
 	};
+	userData?: UserData;
 	onSave: (
 		partialCustomizations: Partial<{
 			customBackgroundColor: string;
@@ -205,17 +395,14 @@ const HEADER_STYLES = [
 	{
 		value: "default",
 		label: "Padrão",
-		description: "Foto redonda centralizada, nome e bio abaixo",
 	},
 	{
 		value: "horizontal",
 		label: "Horizontal",
-		description: "Foto à esquerda, nome e bio à direita",
 	},
 	{
 		value: "hero",
 		label: "Hero",
-		description: "Foto integrada com fundo e gradiente",
 	},
 ];
 
@@ -223,6 +410,94 @@ const FIELD_TO_PICKER: Record<string, "background" | "text" | "button"> = {
 	customBackgroundColor: "background",
 	customTextColor: "text",
 	customButtonFill: "button",
+};
+
+// Funções auxiliares para reduzir complexidade
+const updateCustomizations = (
+	field: string,
+	value: string,
+	setCustomizations: React.Dispatch<React.SetStateAction<any>>
+) => {
+	const newCustomizations: any = { [field]: value };
+
+	if (field === "customBackgroundColor" && value) {
+		newCustomizations.customBackgroundGradient = "";
+	}
+
+	if (field === "customBackgroundGradient" && value) {
+		newCustomizations.customBackgroundColor = "";
+	}
+
+	setCustomizations((prev: any) => ({
+		...prev,
+		...newCustomizations,
+	}));
+
+	return newCustomizations;
+};
+
+const updatePendingChanges = (
+	field: string,
+	value: string,
+	userCustomizations: any,
+	setPendingChanges: React.Dispatch<React.SetStateAction<any>>
+) => {
+	const newPendingChanges: any = { [field]: value };
+
+	if (field === "customBackgroundColor" && value) {
+		newPendingChanges.customBackgroundGradient = "";
+	}
+
+	if (field === "customBackgroundGradient" && value) {
+		newPendingChanges.customBackgroundColor = "";
+	}
+
+	setPendingChanges((prev: any) => {
+		const updated = { ...prev, ...newPendingChanges };
+
+		for (const key of Object.keys(newPendingChanges)) {
+			if (updated[key] === userCustomizations[key]) {
+				delete updated[key];
+			}
+		}
+
+		return updated;
+	});
+};
+
+const checkPendingChange = (
+	field: string,
+	pendingChanges: any,
+	customizations: any,
+	userCustomizations: any
+) => {
+	const isPending = pendingChanges[field] !== undefined;
+	const hasChanged = customizations[field] !== userCustomizations[field];
+
+	if (
+		field === "customBackgroundColor" &&
+		!customizations.customBackgroundColor &&
+		pendingChanges.customBackgroundGradient !== undefined
+	) {
+		return false;
+	}
+
+	return isPending && hasChanged;
+};
+
+const getCornerLabel = (value: number) => {
+	switch (value) {
+		case 0:
+			return "Reto";
+		case 12:
+			return "Suave";
+		case 24:
+			return "Médio";
+		case 36:
+			return "Arredondado";
+		default:
+			return `${value}px`;
+	}
 };
 
 // Hook de debounce agora usa useCallback para estabilidade
@@ -256,6 +531,7 @@ const useDebouncedCallback = (
 
 export default function DesignPanel({
 	userCustomizations,
+	userData,
 	onSave,
 }: DesignPanelProps) {
 	const [customizations, setCustomizations] = useState(userCustomizations);
@@ -275,46 +551,8 @@ export default function DesignPanel({
 	}, [userCustomizations]);
 
 	const handleChange = (field: keyof typeof customizations, value: string) => {
-		const newCustomizations: Partial<typeof customizations> = {
-			[field]: value,
-		};
-		const newPendingChanges: Partial<typeof customizations> = {
-			[field]: value,
-		};
-
-		// Se uma cor de fundo é escolhida, limpa o gradiente
-		if (field === "customBackgroundColor" && value) {
-			newCustomizations.customBackgroundGradient = "";
-			newPendingChanges.customBackgroundGradient = "";
-		}
-
-		// Se um gradiente é escolhido, limpa a cor de fundo
-		if (field === "customBackgroundGradient" && value) {
-			newCustomizations.customBackgroundColor = "";
-			newPendingChanges.customBackgroundColor = "";
-		}
-
-		// Atualiza o estado principal
-		setCustomizations((prev) => ({
-			...prev,
-			...newCustomizations,
-		}));
-
-		// Atualiza as alterações pendentes
-		setPendingChanges((prev) => {
-			const updated = { ...prev, ...newPendingChanges };
-
-			// Limpa as alterações pendentes se elas voltarem ao estado original
-			for (const key of Object.keys(newPendingChanges) as Array<
-				keyof typeof newPendingChanges
-			>) {
-				if (updated[key] === userCustomizations[key]) {
-					delete updated[key];
-				}
-			}
-
-			return updated;
-		});
+		updateCustomizations(field, value, setCustomizations);
+		updatePendingChanges(field, value, userCustomizations, setPendingChanges);
 	};
 
 	const debouncedHandleChange = useDebouncedCallback(handleChange, 300);
@@ -340,20 +578,12 @@ export default function DesignPanel({
 
 	// Função auxiliar para verificar se um campo tem alterações pendentes
 	const hasPendingChange = (field: keyof typeof customizations) => {
-		const isPending = pendingChanges[field] !== undefined;
-		const hasChanged = customizations[field] !== userCustomizations[field];
-
-		// Se a cor de fundo foi limpa porque um gradiente foi selecionado,
-		// não mostre o aviso de pendente para a cor.
-		if (
-			field === "customBackgroundColor" &&
-			!customizations.customBackgroundColor &&
-			pendingChanges.customBackgroundGradient !== undefined
-		) {
-			return false;
-		}
-
-		return isPending && hasChanged;
+		return checkPendingChange(
+			field,
+			pendingChanges,
+			customizations,
+			userCustomizations
+		);
 	};
 
 	// Hook para fechar o seletor de cores ao clicar fora
@@ -372,6 +602,27 @@ export default function DesignPanel({
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, []); // Array de dependências vazio para executar apenas uma vez
+
+	const renderColorOption = (
+		color: string,
+		field: "customBackgroundColor" | "customTextColor" | "customButtonFill",
+		isSelected: boolean,
+		isGradient = false
+	) => (
+		<button
+			className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
+				isSelected
+					? "border-2 border-lime-700"
+					: "border-2 border-gray-200 hover:border-blue-500 dark:border-gray-600 dark:hover:border-blue-400"
+			}`}
+			key={color}
+			onClick={() => handleChange(field, color)}
+			style={{
+				background: isGradient ? color : color,
+			}}
+			type="button"
+		/>
+	);
 
 	const renderColorSelector = (
 		field: "customBackgroundColor" | "customTextColor" | "customButtonFill",
@@ -410,19 +661,9 @@ export default function DesignPanel({
 							type="button"
 						/>
 					)}
-					{SOLID_COLORS.map((color) => (
-						<button
-							className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
-								customColor === color
-									? "border-2 border-lime-700"
-									: "border-2 border-gray-200 hover:border-blue-500 dark:border-gray-600 dark:hover:border-blue-400"
-							}`}
-							key={color}
-							onClick={() => handleChange(field, color)}
-							style={{ backgroundColor: color }}
-							type="button"
-						/>
-					))}
+					{SOLID_COLORS.map((color) =>
+						renderColorOption(color, field, customColor === color)
+					)}
 				</div>
 
 				{activeColorPicker === FIELD_TO_PICKER[field] && (
@@ -456,33 +697,37 @@ export default function DesignPanel({
 							hasPending={hasPendingChange("headerStyle")}
 							text="Estilo do Header"
 						/>
-						<div className="mt-2 space-y-2">
+						<div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
 							{HEADER_STYLES.map((style) => (
 								<button
-									className={`w-full rounded-lg border-2 p-4 text-left transition-all duration-200 ${
+									className={`group relative overflow-hidden rounded-xl ${
 										customizations.headerStyle === style.value
-											? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-											: "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
+											? "border-green-500"
+											: "border"
 									}`}
 									key={style.value}
 									onClick={() => handleChange("headerStyle", style.value)}
 									type="button"
 								>
-									<div className="flex items-center justify-between">
-										<div>
-											<h4 className="font-medium text-sm">{style.label}</h4>
-											<p className="text-gray-600 text-xs dark:text-gray-400">
-												{style.description}
-											</p>
-										</div>
-										<div
-											className={`h-4 w-4 rounded-full border-2 ${
-												customizations.headerStyle === style.value
-													? "border-blue-500 bg-blue-500"
-													: "border-gray-300 dark:border-gray-600"
-											}`}
+									{/* Preview Area */}
+									<div className="aspect-[4/3] w-full">
+										<HeaderStylePreview
+											style={style.value}
+											userProfileData={userData}
 										/>
 									</div>
+
+									{/* Info Section */}
+									<div className="border-gray-100 border-t bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+										<div className="flex items-center justify-between">
+											analisar
+										</div>
+									</div>
+
+									{/* Selected Overlay */}
+									{customizations.headerStyle === style.value && (
+										<div className="pointer-events-none absolute inset-0 rounded-xl border border-green-500" />
+									)}
 								</button>
 							))}
 						</div>
@@ -504,21 +749,14 @@ export default function DesignPanel({
 							text="Gradiente de Fundo"
 						/>
 						<div className="mt-2 flex flex-wrap gap-1">
-							{GRADIENTS.map((gradient) => (
-								<button
-									className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
-										customizations.customBackgroundGradient === gradient
-											? "border-blue-500"
-											: "border-gray-200 hover:border-blue-500 dark:border-gray-600 dark:hover:border-blue-400"
-									}`}
-									key={gradient}
-									onClick={() =>
-										handleChange("customBackgroundGradient", gradient)
-									}
-									style={{ background: gradient }}
-									type="button"
-								/>
-							))}
+							{GRADIENTS.map((gradient) =>
+								renderColorOption(
+									gradient,
+									"customBackgroundGradient" as any,
+									customizations.customBackgroundGradient === gradient,
+									true
+								)
+							)}
 						</div>
 					</div>
 				</CardContent>
@@ -530,7 +768,7 @@ export default function DesignPanel({
 					<CardTitle>Texto</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					{renderColorSelector("customTextColor", "Cor do Texto")}
+					{renderColorSelector("customTextColor", "Cor do Texto e Ícones")}
 
 					<div>
 						<RenderLabel text="Fonte" />
@@ -624,24 +862,12 @@ export default function DesignPanel({
 								]}
 							/>
 							<span className="w-20 text-center font-semibold text-gray-700 dark:text-gray-300">
-								{(() => {
-									const value = Number.parseInt(
+								{getCornerLabel(
+									Number.parseInt(
 										customizations.customButtonCorners || "12",
 										10
-									);
-									switch (value) {
-										case 0:
-											return "Reto";
-										case 12:
-											return "Suave";
-										case 24:
-											return "Médio";
-										case 36:
-											return "Arredondado";
-										default:
-											return `${value}px`;
-									}
-								})()}
+									)
+								)}
 							</span>
 						</div>
 					</div>
@@ -699,7 +925,7 @@ export default function DesignPanel({
 									style={{ backgroundColor: customizations.customTextColor }}
 								/>
 								<div className="flex-1">
-									<p className="font-medium text-sm">Cor do Texto</p>
+									<p className="font-medium text-sm">Cor do Texto e Ícones</p>
 									<p className="text-gray-600 text-xs dark:text-gray-400">
 										{customizations.customTextColor}
 									</p>
@@ -743,7 +969,7 @@ export default function DesignPanel({
 
 			{/* Salvar e Cancelar pendências */}
 			{Object.keys(pendingChanges).length > 0 && (
-				<div className="fixed right-0 bottom-16 left-0 z-50 mx-auto flex w-min items-center gap-2 rounded-lg bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm md:bottom-6 dark:bg-neutral-800/90">
+				<div className="fixed right-0 bottom-16 left-0 z-50 mx-auto flex w-min items-center gap-2 rounded-full bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm md:bottom-6 dark:bg-neutral-800/90">
 					<BaseButton
 						loading={isSaving}
 						onClick={handleCancel}

@@ -78,6 +78,7 @@ export default async function UserPage({ params }: PageProps) {
 					platform: true,
 					url: true,
 					order: true,
+					active: true,
 				},
 			},
 			Text: {

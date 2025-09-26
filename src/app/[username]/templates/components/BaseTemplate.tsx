@@ -83,7 +83,8 @@ function renderUserImage(
 
 function renderSocialLinks(
 	user: TemplateComponentProps["user"],
-	socialClasses = ""
+	socialClasses = "",
+	customTextColor?: string
 ) {
 	if (!Array.isArray(user.SocialLink) || user.SocialLink.length === 0) {
 		return null;
@@ -96,6 +97,7 @@ function renderSocialLinks(
 				iconSize={26}
 				socialLinks={user.SocialLink}
 				theme="dark"
+				customColor={customTextColor}
 			/>
 		</div>
 	);
@@ -112,11 +114,11 @@ function renderDefaultHeader(
 				{user.name || user.username}
 			</h1>
 			{user.bio && (
-				<p className="mt-2 text-sm" style={textStyle}>
+				<p className="mt-2" style={textStyle}>
 					{user.bio}
 				</p>
 			)}
-			{renderSocialLinks(user, "mt-4")}
+			{renderSocialLinks(user, "mt-4", textStyle?.color as string)}
 		</header>
 	);
 }
@@ -126,7 +128,7 @@ function renderHorizontalHeader(
 	textStyle?: React.CSSProperties
 ) {
 	return (
-		<header className="mb-8 w-full">
+		<header className="mb-8 w-full pt-4">
 			<div className="mb-4 flex items-start gap-4">
 				{renderUserImage(user, "h-20 w-20 rounded-lg flex-shrink-0", "80px")}
 				<div className="min-w-0 flex-1">
@@ -134,13 +136,13 @@ function renderHorizontalHeader(
 						{user.name || user.username}
 					</h1>
 					{user.bio && (
-						<p className="mt-1 text-sm" style={textStyle}>
+						<p className="mt-1" style={textStyle}>
 							{user.bio}
 						</p>
 					)}
 				</div>
 			</div>
-			{renderSocialLinks(user, "justify-center")}
+			{renderSocialLinks(user, "justify-center", textStyle?.color as string)}
 		</header>
 	);
 }
@@ -199,7 +201,7 @@ function renderHeroHeader(
 						</h1>
 						{user.bio && (
 							<p
-								className="mt-2 text-sm text-white/90 drop-shadow-md"
+								className="mt-2 text-white/90 drop-shadow-md"
 								style={{
 									color: "rgba(255,255,255,0.9)",
 									textShadow: "0 1px 2px rgba(0,0,0,0.8)",
@@ -212,7 +214,7 @@ function renderHeroHeader(
 				</div>
 			)}
 			<div className="mt-6 text-center">
-				{renderSocialLinks(user, "justify-center")}
+				{renderSocialLinks(user, "justify-center", textStyle?.color as string)}
 			</div>
 		</header>
 	);
@@ -319,7 +321,7 @@ function LinksList({
 		const linkContent = (
 			<>
 				<div className="text-center">
-					<h3 className="line-clamp-2 px-2 font-medium text-sm leading-tight">
+					<h3 className="line-clamp-2 px-2 font-medium leading-tight">
 						{item.title}
 					</h3>
 				</div>
@@ -627,39 +629,48 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 
 	return (
 		<>
+			{/* Container principal com aspect ratio de celular em telas maiores */}
 			<div
-				className={`flex min-h-dvh flex-col items-center px-3.5 ${
-					customPresets.headerStyle === "hero" ? "pt-0 pb-8" : "py-8"
-				}`}
-				style={wrapperStyle}
+				className="min-h-dvh sm:flex sm:items-start sm:justify-center sm:bg-neutral-900 dark:sm:bg-gray-900"
+				style={customPresets.headerStyle !== "hero" ? {} : { ...wrapperStyle }}
 			>
-				<ProfileViewTracker userId={user.id} />
+				<div
+					className={`relative w-full sm:mt-8 sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
+						customPresets.headerStyle === "hero" ? "pt-0 pb-8" : "px-4 py-8"
+					} sm:px-6 sm:py-8`}
+					style={customPresets.headerStyle !== "hero" ? wrapperStyle : {}}
+				>
+					<ProfileViewTracker userId={user.id} />
 
-				<div className="fixed top-4 right-4 z-50">
-					<ShareButton onClick={() => setShareModalOpen(true)} />
+					<div className="absolute top-4 right-4 z-50 sm:top-6 sm:right-6">
+						<ShareButton onClick={() => setShareModalOpen(true)} />
+					</div>
+
+					<main className="mx-auto flex w-full max-w-md flex-col items-center sm:max-w-none">
+						<UserHeader
+							customPresets={customPresets}
+							headerStyle={customPresets.headerStyle}
+							textStyle={textStyle}
+							user={user}
+						/>
+						<section className="w-full">
+							{children ?? (
+								<LinksList
+									buttonStyle={buttonStyle}
+									customPresets={customPresets}
+									textStyle={textStyle}
+									user={user}
+								/>
+							)}
+						</section>
+					</main>
+					<footer
+						className="mt-8 flex items-center justify-center"
+						style={textStyle}
+					>
+						<JoinBionkModal>{user.username}</JoinBionkModal>
+					</footer>
 				</div>
-
-				<main className="flex w-full max-w-md flex-grow flex-col items-center">
-					<UserHeader
-						customPresets={customPresets}
-						headerStyle={customPresets.headerStyle}
-						textStyle={textStyle}
-						user={user}
-					/>
-					<section className="w-full">
-						{children ?? (
-							<LinksList
-								buttonStyle={buttonStyle}
-								customPresets={customPresets}
-								textStyle={textStyle}
-								user={user}
-							/>
-						)}
-					</section>
-				</main>
-				<footer style={textStyle}>
-					<JoinBionkModal>{user.username}</JoinBionkModal>
-				</footer>
 			</div>
 
 			<ShareModal

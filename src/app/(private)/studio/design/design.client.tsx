@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
+import type { SocialLinkItem } from "@/types/social";
 import CategoriasTemplates from "./components/design.CategoriasTemplates";
 import DesignPanel from "./components/design.Panel";
 
@@ -34,6 +35,14 @@ interface User {
 	username: string;
 	bio?: string;
 	image?: string;
+}
+
+interface UserData {
+	name: string;
+	username: string;
+	bio?: string;
+	image?: string;
+	socialLinks: SocialLinkItem[];
 }
 
 const PersonalizarClient = () => {
@@ -74,6 +83,15 @@ const PersonalizarClient = () => {
 	const [isImageCropModalOpen, setIsImageCropModalOpen] = useState(false);
 	const [validationError, setValidationError] = useState<string>("");
 
+	// Estado para dados completos do usuário (incluindo links sociais)
+	const [userData, setUserData] = useState<UserData>({
+		name: "",
+		username: "",
+		bio: "",
+		image: "",
+		socialLinks: [],
+	});
+
 	// Carregar perfil
 	useEffect(() => {
 		if (!session?.user?.id) {
@@ -83,6 +101,7 @@ const PersonalizarClient = () => {
 		const fetchProfile = async () => {
 			setIsProfileLoading(true);
 			try {
+				// Buscar dados do perfil
 				const res = await fetch(`/api/profile/${session.user.id}`);
 				const { name = "", username = "", bio = "", image } = await res.json();
 				const currentImage =
@@ -90,16 +109,41 @@ const PersonalizarClient = () => {
 					session?.user?.image ||
 					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 
+				// Buscar links sociais
+				const socialRes = await fetch(
+					`/api/social-links?userId=${session.user.id}`
+				);
+				const socialData = await socialRes.json();
+				const socialLinks = socialData?.socialLinks || [];
+
 				setProfile({ name, username, bio: bio || "" });
 				setOriginalProfile({ name, username, bio: bio || "" });
 				setProfilePreview(currentImage);
 				setOriginalProfileImageUrl(currentImage);
+
+				// Atualizar dados completos do usuário
+				setUserData({
+					name,
+					username,
+					bio: bio || "",
+					image: currentImage,
+					socialLinks,
+				});
 			} catch {
 				const fallbackUrl =
 					session?.user?.image ||
 					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 				setProfilePreview(fallbackUrl);
 				setOriginalProfileImageUrl(fallbackUrl);
+
+				// Dados de fallback
+				setUserData({
+					name: session?.user?.name || "",
+					username: session?.user?.username || "",
+					bio: "",
+					image: fallbackUrl,
+					socialLinks: [],
+				});
 			} finally {
 				setIsProfileLoading(false);
 			}
@@ -516,6 +560,7 @@ const PersonalizarClient = () => {
 					<DesignPanel
 						onSave={handleSaveCustomizations}
 						userCustomizations={userCustomizations}
+						userData={userData}
 					/>
 				</section>
 			</section>
