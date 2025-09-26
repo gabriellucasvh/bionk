@@ -629,13 +629,13 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 		<>
 			{/* Container principal com aspect ratio de celular em telas maiores */}
 			<div
-				className="min-h-dvh sm:flex sm:items-start sm:justify-center sm:bg-neutral-900 dark:sm:bg-gray-900"
+				className="min-h-dvh sm:flex sm:items-start sm:justify-center sm:bg-neutral-900 sm:pt-4 dark:sm:bg-gray-900"
 				style={customPresets.headerStyle !== "hero" ? {} : { ...wrapperStyle }}
 			>
 				<div
-					className={`relative min-h-dvh w-full sm:mt-8 sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
+					className={`relative min-h-dvh w-full sm:min-h-[calc(100vh-2rem)] sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
 						customPresets.headerStyle === "hero" ? "pt-0" : "px-4"
-					} sm:px-6 sm:pt-8`}
+					} sm:px-6 sm:pt-4`}
 					style={customPresets.headerStyle !== "hero" ? wrapperStyle : {}}
 				>
 					<ProfileViewTracker userId={user.id} />
@@ -644,7 +644,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 						<ShareButton onClick={() => setShareModalOpen(true)} />
 					</div>
 
-					<div className="flex min-h-dvh flex-col">
+					<div className="flex min-h-dvh flex-col sm:min-h-[calc(100vh-2rem)]">
 						<main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center pt-4 sm:max-w-none">
 							<UserHeader
 								customPresets={customPresets}
