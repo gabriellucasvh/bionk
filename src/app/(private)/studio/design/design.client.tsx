@@ -97,7 +97,7 @@ const PersonalizarClient = () => {
 	}
 
 	return (
-		<div className="min-h-screen w-full bg-white text-black transition-colors lg:w-7/12 dark:bg-neutral-800 dark:text-white">
+		<div className="min-h-screen w-full bg-white text-black transition-colors md:w-11/12 xl:w-7/12 dark:bg-neutral-800 dark:text-white">
 			<section className="flex min-h-screen flex-col gap-6 px-6 py-8 pb-24">
 				<ProfileSection
 					bioValidationError={bioValidationError}
