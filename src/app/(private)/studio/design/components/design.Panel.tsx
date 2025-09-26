@@ -75,7 +75,7 @@ const renderDefaultStyle = (userProfileData: UserData) => {
 	const activeSocialLinks = socialLinks.filter((link) => link.active);
 
 	return (
-		<div className="h-full w-full overflow-hidden rounded-t-xl bg-neutral-50 dark:bg-neutral-900">
+		<div className="h-full w-full overflow-hidden rounded-t-xl bg-neutral-800 dark:bg-neutral-900">
 			<div className="flex h-full flex-col items-center justify-center p-4 text-center">
 				<div className="relative mx-auto mb-3 h-16 w-16">
 					{image ? (
@@ -89,12 +89,14 @@ const renderDefaultStyle = (userProfileData: UserData) => {
 						<div className="h-full w-full rounded-full bg-neutral-300 shadow-sm dark:bg-neutral-600" />
 					)}
 				</div>
-				<div className="mb-1 font-semibold text-neutral-900 text-sm dark:text-neutral-100">
-					{name || username || "Nome do usuário"}
+				<div className="mb-1 font-semibold text-neutral-100 text-sm">
+					{(name || username || "Nome do usuário").length > 13
+						? `${(name || username || "Nome do usuário").substring(0, 13)}...`
+						: name || username || "Nome do usuário"}
 				</div>
 				{bio && (
-					<div className="mb-3 line-clamp-2 text-neutral-600 text-xs dark:text-neutral-400">
-						{bio}
+					<div className="mb-3 line-clamp-2 text-neutral-300 text-xs">
+						{bio.length > 13 ? `${bio.substring(0, 13)}...` : bio}
 					</div>
 				)}
 				{renderSocialLinks(
@@ -114,7 +116,7 @@ const renderHorizontalStyle = (userProfileData: UserData) => {
 	const activeSocialLinks = socialLinks.filter((link) => link.active);
 
 	return (
-		<div className="h-full w-full overflow-hidden rounded-t-xl bg-neutral-50 dark:bg-neutral-900">
+		<div className="h-full w-full overflow-hidden rounded-t-xl bg-neutral-800 dark:bg-neutral-900">
 			<div className="flex h-full items-center gap-4 p-4">
 				<div className="relative h-14 w-14 flex-shrink-0">
 					{image ? (
@@ -129,12 +131,14 @@ const renderHorizontalStyle = (userProfileData: UserData) => {
 					)}
 				</div>
 				<div className="mt-6 min-w-0 flex-1">
-					<div className="mb-1 truncate font-semibold text-neutral-900 text-sm dark:text-neutral-100">
-						{name || username || "Nome do usuário"}
+					<div className="mb-1 truncate font-semibold text-neutral-100 text-sm">
+						{(name || username || "Nome do usuário").length > 13
+							? `${(name || username || "Nome do usuário").substring(0, 13)}...`
+							: name || username || "Nome do usuário"}
 					</div>
 					{bio && (
-						<div className="mb-2 line-clamp-2 text-left text-neutral-600 text-xs dark:text-neutral-400">
-							{bio}
+						<div className="mb-2 line-clamp-2 text-left text-neutral-300 text-xs">
+							{bio.length > 13 ? `${bio.substring(0, 13)}...` : bio}
 						</div>
 					)}
 					{renderSocialLinks(activeSocialLinks, 4, "h-5 w-5")}
@@ -163,11 +167,13 @@ const renderHeroStyle = (userProfileData: UserData) => {
 			<div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
 			<div className="relative z-10 flex h-full flex-col justify-end p-4 text-white">
 				<div className="mb-1 font-semibold text-sm drop-shadow-sm">
-					{name || username || "Nome do usuário"}
+					{(name || username || "Nome do usuário").length > 13
+						? `${(name || username || "Nome do usuário").substring(0, 13)}...`
+						: name || username || "Nome do usuário"}
 				</div>
 				{bio && (
 					<div className="mb-3 line-clamp-2 text-neutral-300 text-xs opacity-90 drop-shadow-sm">
-						{bio}
+						{bio.length > 13 ? `${bio.substring(0, 13)}...` : bio}
 					</div>
 				)}
 				{renderSocialLinks(
@@ -780,7 +786,7 @@ export default function DesignPanel({
 							>
 								{HEADER_STYLES.map((style) => (
 									<button
-										className={`group relative min-w-[200px] flex-shrink-0 overflow-hidden rounded-xl md:min-w-0 md:flex-shrink ${
+										className={`group relative w-38 flex-shrink-0 overflow-hidden rounded-xl lg:w-40 ${
 											customizations.headerStyle === style.value
 												? "border-green-500"
 												: "border"
@@ -790,7 +796,7 @@ export default function DesignPanel({
 										type="button"
 									>
 										{/* Preview Area */}
-										<div className="h-70 w-70 lg:aspect-[16/22]">
+										<div className="h-56 w-full lg:h-56">
 											<HeaderStylePreview
 												style={style.value}
 												userProfileData={userData}
