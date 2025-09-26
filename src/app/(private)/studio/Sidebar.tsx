@@ -272,6 +272,30 @@ const Sidebar = () => {
 		};
 	}, []);
 
+	// Escuta evento customizado de atualização do username
+	useEffect(() => {
+		const handleUsernameUpdate = (event: CustomEvent) => {
+			const newUsername = event.detail.username;
+			const baseUrl =
+				process.env.NODE_ENV === "production"
+					? "https://www.bionk.me"
+					: "http://localhost:3000";
+			setProfileUrl(newUsername ? `${baseUrl}/${newUsername}` : "#");
+		};
+
+		window.addEventListener(
+			"profileUsernameUpdated",
+			handleUsernameUpdate as EventListener
+		);
+
+		return () => {
+			window.removeEventListener(
+				"profileUsernameUpdated",
+				handleUsernameUpdate as EventListener
+			);
+		};
+	}, []);
+
 	const handleNavClick = useCallback(
 		(href: string) => {
 			router.push(href);
@@ -330,12 +354,12 @@ const Sidebar = () => {
 								className="flex h-12 w-full items-center justify-between rounded-lg border border-neutral-200 bg-neutral-100 px-4 transition hover:bg-neutral-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600"
 								variant="outline"
 							>
-								<div className="flex flex-col items-start justify-center overflow-auto text-left">
+								<div className="flex min-w-0 flex-1 flex-col items-start justify-center overflow-hidden text-left">
 									<p className="flex items-center gap-2 font-medium text-sm">
 										Compartilhar
 									</p>
 									<span className="truncate text-neutral-500 text-xs dark:text-neutral-400">
-										bionk.me/{username}
+										bionk.me/{username && username.length > 20 ? `${username.slice(0, 20)}...` : username}
 									</span>
 								</div>
 								<ExternalLink className="h-5 w-5 flex-shrink-0 text-neutral-400 dark:text-neutral-300" />

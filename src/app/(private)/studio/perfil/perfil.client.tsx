@@ -28,7 +28,7 @@ interface User {
 }
 
 const PerfilClient = () => {
-	const { data: session } = useSession();
+	const { data: session, update } = useSession();
 	const [profile, setProfile] = useState({ name: "", username: "", bio: "" });
 	const [originalProfile, setOriginalProfile] = useState({
 		name: "",
@@ -192,12 +192,30 @@ const PerfilClient = () => {
 				})
 			);
 
+			window.dispatchEvent(
+				new CustomEvent("profileUsernameUpdated", {
+					detail: { username: updatedUserData.username },
+				})
+			);
+
 			if (updatedUserData.image) {
 				window.dispatchEvent(
 					new CustomEvent("profileImageUpdated", {
 						detail: { imageUrl: updatedUserData.image },
 					})
 				);
+			}
+
+			// Atualizar a sessão se o username mudou
+			if (updatedUserData.username !== session?.user?.username) {
+				update({
+					user: {
+						...session?.user,
+						username: updatedUserData.username,
+						name: updatedUserData.name,
+						image: updatedUserData.image,
+					},
+				});
 			}
 		} else {
 			setOriginalProfile({

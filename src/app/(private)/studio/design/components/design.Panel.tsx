@@ -65,7 +65,7 @@ const renderDefaultStyle = (userProfileData: UserData) => {
 	const activeSocialLinks = socialLinks.filter((link) => link.active);
 
 	return (
-		<div className="h-full w-full overflow-hidden rounded-t-xl bg-gray-50 dark:bg-gray-900">
+		<div className="h-full w-full overflow-hidden rounded-t-xl bg-gray-50 dark:bg-neutral-900">
 			<div className="flex h-full flex-col items-center justify-center p-4 text-center">
 				<div className="relative mx-auto mb-3 h-16 w-16">
 					{image ? (
@@ -76,7 +76,7 @@ const renderDefaultStyle = (userProfileData: UserData) => {
 							src={image}
 						/>
 					) : (
-						<div className="h-full w-full rounded-full border-2 border-white bg-gray-300 shadow-sm dark:bg-gray-600" />
+						<div className="h-full w-full rounded-full border-2 border-white bg-gray-300 shadow-sm dark:bg-neutral-600" />
 					)}
 				</div>
 				<div className="mb-1 font-semibold text-gray-900 text-sm dark:text-gray-100">
@@ -104,7 +104,7 @@ const renderHorizontalStyle = (userProfileData: UserData) => {
 	const activeSocialLinks = socialLinks.filter((link) => link.active);
 
 	return (
-		<div className="h-full w-full overflow-hidden rounded-t-xl bg-gray-50 dark:bg-gray-900">
+		<div className="h-full w-full overflow-hidden rounded-t-xl bg-gray-50 dark:bg-neutral-900">
 			<div className="flex h-full items-center gap-4 p-4">
 				<div className="relative h-14 w-14 flex-shrink-0">
 					{image ? (
@@ -115,7 +115,7 @@ const renderHorizontalStyle = (userProfileData: UserData) => {
 							src={image}
 						/>
 					) : (
-						<div className="h-full w-full rounded-lg border-2 border-white bg-gray-300 shadow-sm dark:bg-gray-600" />
+						<div className="h-full w-full rounded-lg border-2 border-white bg-gray-300 shadow-sm dark:bg-neutral-600" />
 					)}
 				</div>
 				<div className="min-w-0 flex-1">
@@ -150,7 +150,7 @@ const renderHeroStyle = (userProfileData: UserData) => {
 				backgroundPosition: "center",
 			}}
 		>
-			<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+			<div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
 			<div className="relative z-10 flex h-full flex-col justify-end p-4 text-white">
 				<div className="mb-1 font-semibold text-sm drop-shadow-sm">
 					{name || username || "Nome do usuário"}
@@ -176,7 +176,7 @@ const HeaderStylePreview = ({
 }) => {
 	if (!userProfileData) {
 		return (
-			<div className="flex h-full w-full items-center justify-center rounded-t-xl bg-gray-50 dark:bg-gray-900">
+			<div className="flex h-full w-full items-center justify-center rounded-t-xl bg-gray-50 dark:bg-neutral-900">
 				<div className="text-center text-gray-500 text-xs">
 					Carregando dados...
 				</div>
@@ -725,20 +725,12 @@ export default function DesignPanel({
 									type="button"
 								>
 									{/* Preview Area */}
-									<div className="aspect-[4/3] w-full">
+									<div className="aspect-[16/22] w-full">
 										<HeaderStylePreview
 											style={style.value}
 											userProfileData={userData}
 										/>
 									</div>
-
-									{/* Info Section */}
-									<div className="border-gray-100 border-t bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-										<div className="flex items-center justify-between">
-											analisar
-										</div>
-									</div>
-
 									{/* Selected Overlay */}
 									{customizations.headerStyle === style.value && (
 										<div className="pointer-events-none absolute inset-0 rounded-xl border border-green-500" />

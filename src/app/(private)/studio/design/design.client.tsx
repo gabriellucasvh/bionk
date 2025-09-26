@@ -47,7 +47,7 @@ interface UserData {
 }
 
 const PersonalizarClient = () => {
-	const { data: session } = useSession();
+	const { data: session, update } = useSession();
 	const [userCustomizations, setUserCustomizations] =
 		useState<UserCustomizations>({
 			customBackgroundColor: "",
@@ -286,12 +286,30 @@ const PersonalizarClient = () => {
 				})
 			);
 
+			window.dispatchEvent(
+				new CustomEvent("profileUsernameUpdated", {
+					detail: { username: updatedUserData.username },
+				})
+			);
+
 			if (updatedUserData.image) {
 				window.dispatchEvent(
 					new CustomEvent("profileImageUpdated", {
 						detail: { imageUrl: updatedUserData.image },
 					})
 				);
+			}
+
+			// Atualizar a sessão se o username mudou
+			if (updatedUserData.username !== session?.user?.username) {
+				update({
+					user: {
+						...session?.user,
+						username: updatedUserData.username,
+						name: updatedUserData.name,
+						image: updatedUserData.image,
+					},
+				});
 			}
 		} else {
 			setOriginalProfile({

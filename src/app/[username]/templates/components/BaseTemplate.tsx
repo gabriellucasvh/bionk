@@ -131,7 +131,7 @@ function renderHorizontalHeader(
 		<header className="mb-6 w-full pt-4">
 			<div className="mb-4 flex items-start gap-4">
 				{renderUserImage(user, "h-20 w-20 rounded-lg flex-shrink-0", "80px")}
-				<div className="min-w-0 flex-1">
+				<div className="mt-10 min-w-0 flex-1">
 					<h1 className="font-bold text-xl" style={textStyle}>
 						{user.name || user.username}
 					</h1>
