@@ -83,10 +83,10 @@ const ProfileSection = ({
 	};
 
 	const getBioCharacterCountColor = () => {
-		if (profile.bio.length > 450) {
+		if (profile.bio.length > 270) {
 			return "text-orange-500";
 		}
-		if (profile.bio.length > 400) {
+		if (profile.bio.length > 240) {
 			return "text-yellow-500";
 		}
 		return "text-gray-500 dark:text-gray-400";
@@ -185,7 +185,7 @@ const ProfileSection = ({
 							}`}
 							disabled={loading || isUploadingImage}
 							id="bio"
-							maxLength={500}
+							maxLength={300}
 							onChange={(e) => handleBioChange(e.target.value)}
 							placeholder="Fale um pouco sobre você"
 							value={profile.bio}
@@ -195,7 +195,7 @@ const ProfileSection = ({
 								{bioValidationError || " "}
 							</p>
 							<p className={`text-sm ${getBioCharacterCountColor()}`}>
-								{profile.bio.length}/500
+								{profile.bio.length}/300
 							</p>
 						</div>
 					</div>

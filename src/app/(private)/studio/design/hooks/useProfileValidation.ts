@@ -7,8 +7,8 @@ export const useProfileValidation = () => {
 	const [isCheckingUsername, setIsCheckingUsername] = useState(false);
 
 	const validateBio = useCallback((bio: string): boolean => {
-		if (bio.length > 500) {
-			setBioValidationError("A biografia deve ter no máximo 500 caracteres.");
+		if (bio.length > 300) {
+			setBioValidationError("A biografia deve ter no máximo 300 caracteres.");
 			return false;
 		}
 		setBioValidationError("");

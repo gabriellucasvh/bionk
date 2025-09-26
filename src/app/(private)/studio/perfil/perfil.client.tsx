@@ -50,6 +50,16 @@ const PerfilClient = () => {
 		useState<string>("");
 	const [isImageCropModalOpen, setIsImageCropModalOpen] = useState(false);
 	const [validationError, setValidationError] = useState<string>("");
+	const [bioValidationError, setBioValidationError] = useState<string>("");
+
+	const validateBio = useCallback((bio: string): boolean => {
+		if (bio.length > 300) {
+			setBioValidationError("A biografia deve ter no máximo 300 caracteres.");
+			return false;
+		}
+		setBioValidationError("");
+		return true;
+	}, []);
 
 	useEffect(() => {
 		if (!session?.user?.id) {
@@ -398,15 +408,27 @@ const PerfilClient = () => {
 							Biografia
 						</Label>
 						<Textarea
-							className="min-h-32 text-neutral-700 dark:bg-neutral-700 dark:text-white"
+							className={`min-h-32 text-neutral-700 dark:bg-neutral-700 dark:text-white ${
+								bioValidationError ? "border-red-500 dark:border-red-400" : ""
+							}`}
 							disabled={loading || isUploadingImage}
 							id="bio"
+							maxLength={300}
 							onChange={(e) => {
 								setProfile({ ...profile, bio: e.target.value });
+								validateBio(e.target.value);
 							}}
 							placeholder="Fale um pouco sobre você"
 							value={profile.bio}
 						/>
+						<div className="flex items-center justify-between">
+							<p className="min-h-[1.25rem] text-red-500 text-sm">
+								{bioValidationError || " "}
+							</p>
+							<p className="text-muted-foreground text-sm">
+								{profile.bio.length}/300
+							</p>
+						</div>
 					</div>
 					{hasChanges && (
 						<div className="mt-4 flex justify-end gap-2">

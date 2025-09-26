@@ -366,14 +366,14 @@ export default function OnboardingPageComponent({
 							<Textarea
 								className="resize-none text-base"
 								id="bio"
-								maxLength={160}
+								maxLength={300}
 								onChange={(e) => setData({ ...data, bio: e.target.value })}
 								placeholder="Conte um pouco sobre você..."
 								rows={4}
 								value={data.bio}
 							/>
 							<p className="text-muted-foreground text-xs">
-								{data.bio.length}/160 caracteres
+								{data.bio.length}/300 caracteres
 							</p>
 						</div>
 					</motion.div>
