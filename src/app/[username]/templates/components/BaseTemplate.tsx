@@ -158,7 +158,7 @@ function renderHeroHeader(
 	return (
 		<header className="mb-6 w-full text-center">
 			{user.image && (
-				<div className="relative mx-auto mb-4 h-94 w-94 overflow-hidden rounded-t-2xl">
+				<div className="relative mx-auto mb-4 h-48 w-48 overflow-hidden rounded-t-2xl sm:h-64 sm:w-64 md:h-80 md:w-80 lg:h-94 lg:w-94">
 					<div className="absolute inset-0">
 						{user.image.toLowerCase().endsWith(".gif") ? (
 							// biome-ignore lint/performance/noImgElement: <necessário para GIFs>
@@ -174,7 +174,7 @@ function renderHeroHeader(
 								fill
 								priority
 								quality={100}
-								sizes="128px"
+								sizes="(max-width: 640px) 192px, (max-width: 768px) 256px, (max-width: 1024px) 320px, 376px"
 								src={user.image}
 							/>
 						)}
@@ -184,8 +184,8 @@ function renderHeroHeader(
 						className="absolute inset-0"
 						style={{
 							background: pageBackgroundGradient
-								? `linear-gradient(to bottom, transparent 0%, transparent 50%, ${pageBackgroundGradient} 100%)`
-								: `linear-gradient(to bottom, transparent 0%, transparent 50%, ${pageBackgroundColor} 100%)`,
+								? `linear-gradient(to bottom, transparent 0%, transparent 70%, ${pageBackgroundGradient} 100%)`
+								: `linear-gradient(to bottom, transparent 0%, transparent 70%, ${pageBackgroundColor} 100%)`,
 						}}
 					/>
 				</div>
