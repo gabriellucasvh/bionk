@@ -18,6 +18,7 @@ interface DesignPanelProps {
 		customTextColor: string;
 		customFont: string;
 		customButton: string;
+		customButtonStyle: string;
 		customButtonFill: string;
 		customButtonCorners: string;
 		headerStyle: string;
@@ -29,6 +30,7 @@ interface DesignPanelProps {
 			customTextColor: string;
 			customFont: string;
 			customButton: string;
+			customButtonStyle: string;
 			customButtonFill: string;
 			customButtonCorners: string;
 			headerStyle: string;
@@ -577,7 +579,7 @@ export default function DesignPanel({
 
 					<div>
 						<RenderLabel
-							hasPending={hasPendingChange("customButton")}
+							hasPending={hasPendingChange("customButtonStyle")}
 							text="Estilo do Botão"
 						/>
 						<div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-3 md:grid-cols-3">
@@ -586,12 +588,12 @@ export default function DesignPanel({
 									className={`flex h-12 w-full items-center justify-center rounded px-2 py-1 text-center text-sm transition-all duration-200 ${
 										style.preview
 									} ${
-										customizations.customButton === style.value
+										customizations.customButtonStyle === style.value
 											? "ring-1 ring-green-500 ring-offset-2"
 											: ""
 									}`}
 									key={style.value}
-									onClick={() => handleChange("customButton", style.value)}
+									onClick={() => handleChange("customButtonStyle", style.value)}
 									type="button"
 								>
 									{style.label}

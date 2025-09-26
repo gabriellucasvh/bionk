@@ -32,18 +32,18 @@ export default function VideoCard({
 	customPresets,
 }: VideoCardProps) {
 	const isTikTok = type === "tiktok";
-	const videoContainerClass = isTikTok 
-		? "flex justify-center" 
+	const videoContainerClass = isTikTok
+		? "flex justify-center"
 		: "";
-	const videoPlayerClass = isTikTok 
-		? "max-w-sm" 
+	const videoPlayerClass = isTikTok
+		? "max-w-sm"
 		: "";
 
 	const getTitleClasses = () => {
 		if (customPresets?.customTextColor) {
-			return "text-center font-semibold text-lg";
+			return "text-center font-extrabold text-lg";
 		}
-		return `text-center font-semibold text-lg ${classNames?.name || "text-gray-900 dark:text-white"}`;
+		return `text-center font-extrabold text-lg ${classNames?.name || "text-gray-900 dark:text-white"}`;
 	};
 
 	const getDescriptionClasses = () => {
@@ -53,8 +53,8 @@ export default function VideoCard({
 		return `text-center ${classNames?.bio || "text-gray-600 dark:text-gray-300"}`;
 	};
 
-	const textStyle = customPresets?.customTextColor 
-		? { color: customPresets.customTextColor } 
+	const textStyle = customPresets?.customTextColor
+		? { color: customPresets.customTextColor }
 		: {};
 
 	return (
@@ -72,12 +72,12 @@ export default function VideoCard({
 			)}
 
 			<div className={videoContainerClass}>
-				<VideoPlayer 
+				<VideoPlayer
 					className={videoPlayerClass}
 					customButtonCorners={customPresets?.customButtonCorners}
-					title={title} 
-					type={type} 
-					url={url} 
+					title={title}
+					type={type}
+					url={url}
 				/>
 			</div>
 		</div>

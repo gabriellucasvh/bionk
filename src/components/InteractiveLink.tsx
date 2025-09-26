@@ -96,11 +96,7 @@ const ImageComponent: FC<ImageComponentProps> = ({
 		width: 32,
 	};
 
-	return (
-		<div className="-translate-y-1/2 absolute top-1/2 left-1 z-20">
-			<Image {...imageProps} />
-		</div>
-	);
+	return <Image {...imageProps} />;
 };
 
 const InteractiveLink: FC<InteractiveLinkProps> = ({
@@ -174,27 +170,32 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 				)}
 				style={style}
 			>
-				{/* Imagem personalizada ou favicon do site na borda esquerda */}
-				{showImage && (
-					<ImageComponent
-						borderRadius={imageBorderRadius}
-						imageUrl={imageUrl}
-						isGif={isGif}
-						link={link}
-						setCustomImageError={setCustomImageError}
-						setFaviconError={setFaviconError}
-					/>
-				)}
-
 				<Link
 					aria-label={link.title}
-					className={twMerge("z-10 w-full")}
+					className="relative z-10 flex h-full w-full items-center"
 					href={href}
 					onClick={handleLinkClick}
 					rel="noopener noreferrer"
 					target="_blank"
 				>
-					{children}
+					{/* Imagem personalizada ou favicon do site na borda esquerda */}
+					{showImage && (
+						<div className="flex-shrink-0">
+							<ImageComponent
+								borderRadius={imageBorderRadius}
+								imageUrl={imageUrl}
+								isGif={isGif}
+								link={link}
+								setCustomImageError={setCustomImageError}
+								setFaviconError={setFaviconError}
+							/>
+						</div>
+					)}
+
+					<div className="flex flex-1 justify-center">{children}</div>
+
+					{/* Espaço reservado para o botão de opções */}
+					<div className="w-10 flex-shrink-0" />
 				</Link>
 
 				<button

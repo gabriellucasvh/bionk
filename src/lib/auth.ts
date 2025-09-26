@@ -165,7 +165,7 @@ export const authOptions: NextAuthOptions = {
 					emailVerified: new Date(),
 					onboardingCompleted: false, // Usuários Google precisam completar onboarding
 					subscriptionPlan: "free",
-					subscriptionStatus: "active",
+					subscriptionStatus: "active"
 				},
 			});
 

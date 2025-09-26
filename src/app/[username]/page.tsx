@@ -116,6 +116,7 @@ export default async function UserPage({ params }: PageProps) {
 					customBackgroundGradient: true,
 					customTextColor: true,
 					customButton: true,
+					customButtonStyle: true,
 					customButtonFill: true,
 					customButtonCorners: true,
 					customFont: true,

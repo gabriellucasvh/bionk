@@ -22,6 +22,7 @@ export async function GET() {
 				customTextColor: "",
 				customFont: "",
 				customButton: "",
+				customButtonStyle: "solid",
 				customButtonFill: "",
 				customButtonCorners: "",
 				headerStyle: "default",

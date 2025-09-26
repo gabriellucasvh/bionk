@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { getTemplatePreset } from "@/utils/templatePresets";
 
 const VALID_TEMPLATES = [
 	"default",
@@ -55,6 +56,8 @@ export async function POST(req: Request): Promise<NextResponse> {
 			);
 		}
 
+		const templatePreset = getTemplatePreset(template);
+
 		await prisma.$transaction(async (tx) => {
 			await tx.user.update({
 				where: { email: userEmail },
@@ -71,14 +74,13 @@ export async function POST(req: Request): Promise<NextResponse> {
 			if (existingPresets) {
 				await tx.customPresets.update({
 					where: { userId: user.id },
+					data: templatePreset,
+				});
+			} else {
+				await tx.customPresets.create({
 					data: {
-						customBackgroundColor: "",
-						customBackgroundGradient: "",
-						customTextColor: "",
-						customFont: "",
-						customButton: "",
-						customButtonFill: "",
-						customButtonCorners: "",
+						userId: user.id,
+						...templatePreset,
 					},
 				});
 			}
@@ -90,7 +92,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 		}
 
 		return NextResponse.json({
-			message: "Template atualizado e personalizações resetadas com sucesso",
+			message: "Template atualizado e configurações aplicadas com sucesso",
 		});
 	} catch {
 		return NextResponse.json(

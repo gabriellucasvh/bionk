@@ -8,6 +8,7 @@ import OtpEmail from "@/emails/OtpEmail";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
+import { getDefaultCustomPresets } from "@/utils/templatePresets";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const OTP_EXPIRY_MINUTES = 2;
@@ -53,59 +54,104 @@ async function cleanupExpiredUsernameReservations() {
 	}
 }
 
+function validateEmail(email: unknown): NextResponse | null {
+	if (!email || typeof email !== "string") {
+		return NextResponse.json({ error: "E-mail inválido" }, { status: 400 });
+	}
+	return null;
+}
+
+function validateUsername(username: unknown): NextResponse | null {
+	if (!username || typeof username !== "string") {
+		return NextResponse.json(
+			{ error: "Username é obrigatório" },
+			{ status: 400 }
+		);
+	}
+	return null;
+}
+
+function validateToken(token: unknown): NextResponse | null {
+	if (!token || typeof token !== "string") {
+		return NextResponse.json({ error: "Token inválido" }, { status: 400 });
+	}
+	return null;
+}
+
+async function applyRateLimit(): Promise<NextResponse | null> {
+	const headersList = await headers();
+	const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
+	const { success } = await getAuthRateLimiter().limit(ip);
+	if (!success) {
+		return NextResponse.json(
+			{ error: "Muitas requisições. Tente novamente mais tarde." },
+			{ status: 429 }
+		);
+	}
+	return null;
+}
+
+async function handleRequestOtpStage(
+	email: unknown,
+	username: unknown
+): Promise<NextResponse> {
+	const emailValidation = validateEmail(email);
+	if (emailValidation) {
+		return emailValidation;
+	}
+
+	const usernameValidation = validateUsername(username);
+	if (usernameValidation) {
+		return usernameValidation;
+	}
+
+	const rateLimitResponse = await applyRateLimit();
+	if (rateLimitResponse) {
+		return rateLimitResponse;
+	}
+
+	return await handleOtpRequest(email as string, username as string);
+}
+
+async function handleVerifyOtpStage(
+	email: unknown,
+	otp: unknown
+): Promise<NextResponse> {
+	const emailValidation = validateEmail(email);
+	if (emailValidation) {
+		return emailValidation;
+	}
+
+	return await handleOtpVerification(email as string, otp as string);
+}
+
+async function handleCreateUserStage(
+	token: unknown,
+	password: unknown,
+	name: unknown
+): Promise<NextResponse> {
+	const tokenValidation = validateToken(token);
+	if (tokenValidation) {
+		return tokenValidation;
+	}
+
+	return await handleUserCreation(token as string, password as string, name as string);
+}
+
 export async function POST(req: Request) {
 	try {
-		// Executar limpeza de reservas expiradas
 		await cleanupExpiredUsernameReservations();
 
 		const { email, username, stage, otp, password, token, name } =
 			await req.json();
 
 		switch (stage) {
-			case "request-otp": {
-				if (!email || typeof email !== "string") {
-					return NextResponse.json(
-						{ error: "E-mail inválido" },
-						{ status: 400 }
-					);
-				}
-				if (!username || typeof username !== "string") {
-					return NextResponse.json(
-						{ error: "Username é obrigatório" },
-						{ status: 400 }
-					);
-				}
-				// --- RATE LIMITER ---
-				const headersList = await headers();
-				const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
-				const { success } = await getAuthRateLimiter().limit(ip);
-				if (!success) {
-					return NextResponse.json(
-						{ error: "Muitas requisições. Tente novamente mais tarde." },
-						{ status: 429 }
-					);
-				}
-				return await handleOtpRequest(email, username);
-			}
-
+			case "request-otp":
+				return await handleRequestOtpStage(email, username);
 			case "verify-otp":
-				if (!email || typeof email !== "string") {
-					return NextResponse.json(
-						{ error: "E-mail inválido" },
-						{ status: 400 }
-					);
-				}
-				return await handleOtpVerification(email, otp);
-
+				return await handleVerifyOtpStage(email, otp);
 			case "create-user":
-				if (!token || typeof token !== "string") {
-					return NextResponse.json(
-						{ error: "Token inválido" },
-						{ status: 400 }
-					);
-				}
-				return await handleUserCreation(token, password, name);
-
+				return await handleCreateUserStage(token, password, name);
 			default:
 				return NextResponse.json(
 					{ error: "Estágio de registro inválido" },
@@ -121,11 +167,9 @@ export async function POST(req: Request) {
 }
 
 // Função para lidar com a solicitação do OTP
-async function handleOtpRequest(email: string, username: string) {
-	// Normalizar username para lowercase
-	const normalizedUsername = username.toLowerCase().trim();
-
-	// Validar formato do username
+function validateUsernameFormat(
+	normalizedUsername: string
+): NextResponse | null {
 	if (!USERNAME_REGEX.test(normalizedUsername)) {
 		return NextResponse.json(
 			{
@@ -135,16 +179,25 @@ async function handleOtpRequest(email: string, username: string) {
 			{ status: 400 }
 		);
 	}
+	return null;
+}
 
-	// Verificar se username está na blacklist
+function validateUsernameBlacklist(
+	normalizedUsername: string
+): NextResponse | null {
 	if (BLACKLISTED_USERNAMES.includes(normalizedUsername)) {
 		return NextResponse.json(
 			{ error: "Username não está disponível" },
 			{ status: 400 }
 		);
 	}
+	return null;
+}
 
-	// Verificar se existe usuário banido com mesmo email ou username
+async function checkBannedUser(
+	email: string,
+	normalizedUsername: string
+): Promise<NextResponse | null> {
 	const bannedUser = await prisma.user.findFirst({
 		where: {
 			OR: [{ email }, { username: normalizedUsername }],
@@ -158,13 +211,17 @@ async function handleOtpRequest(email: string, username: string) {
 			{ status: 403 }
 		);
 	}
+	return null;
+}
 
-	// Verificar se Username indisponível ou reservado
+async function checkUsernameAvailability(
+	email: string,
+	normalizedUsername: string
+): Promise<NextResponse | null> {
 	const existingUsername = await prisma.user.findUnique({
 		where: { username: normalizedUsername },
 	});
-	// Se o username está sendo usado pelo mesmo email, permitir (renovar reserva)
-	// Verificar se username está em uso por outro email e se está reservado ou verificado
+
 	if (
 		existingUsername &&
 		existingUsername.email !== email &&
@@ -178,7 +235,12 @@ async function handleOtpRequest(email: string, username: string) {
 
 		return NextResponse.json({ error: errorMessage }, { status: 409 });
 	}
+	return null;
+}
 
+async function checkEmailVerification(
+	email: string
+): Promise<NextResponse | null> {
 	const user = await prisma.user.findUnique({ where: { email } });
 	if (user?.emailVerified) {
 		return NextResponse.json(
@@ -186,8 +248,14 @@ async function handleOtpRequest(email: string, username: string) {
 			{ status: 409 }
 		);
 	}
+	return null;
+}
 
-	// Verificar se o usuário está bloqueado
+async function checkUserBlocked(
+	email: string
+): Promise<{ response: NextResponse | null; user: any }> {
+	const user = await prisma.user.findUnique({ where: { email } });
+
 	if (
 		user?.registrationOtpBlockedUntil &&
 		user.registrationOtpBlockedUntil > new Date()
@@ -195,69 +263,45 @@ async function handleOtpRequest(email: string, username: string) {
 		const remainingTime = Math.ceil(
 			(user.registrationOtpBlockedUntil.getTime() - Date.now()) / (1000 * 60)
 		);
-		return NextResponse.json(
-			{
-				error: `Você está temporariamente bloqueado. Tente novamente em ${remainingTime} minutos.`,
-			},
-			{ status: 429 }
-		);
+		return {
+			response: NextResponse.json(
+				{
+					error: `Você está temporariamente bloqueado. Tente novamente em ${remainingTime} minutos.`,
+				},
+				{ status: 429 }
+			),
+			user,
+		};
 	}
+	return { response: null, user };
+}
 
-	const registrationOtp = generateOtp();
-	const registrationOtpExpiry = new Date(
-		Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000
-	);
-	const otpToken = generateOtpToken();
-	const otpTokenExpiry = new Date(
-		Date.now() + OTP_TOKEN_EXPIRY_MINUTES * 60 * 1000
-	);
-	const usernameReservationExpiry = new Date(
-		Date.now() + USERNAME_RESERVATION_EXPIRY_MINUTES * 60 * 1000
-	);
+function generateOtpData() {
+	return {
+		registrationOtp: generateOtp(),
+		registrationOtpExpiry: new Date(
+			Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000
+		),
+		otpToken: generateOtpToken(),
+		otpTokenExpiry: new Date(Date.now() + OTP_TOKEN_EXPIRY_MINUTES * 60 * 1000),
+		usernameReservationExpiry: new Date(
+			Date.now() + USERNAME_RESERVATION_EXPIRY_MINUTES * 60 * 1000
+		),
+	};
+}
 
-	await prisma.user.upsert({
-		where: { email },
-		update: {
-			username: normalizedUsername, // Atualizar com o username normalizado
-			registrationOtp,
-			registrationOtpExpiry,
-			otpToken,
-			otpTokenExpiry,
-			usernameReservedAt: new Date(),
-			usernameReservationExpiry,
-			// Resetar tentativas apenas se não estiver bloqueado
-			registrationOtpAttempts: user?.registrationOtpBlockedUntil
-				? user.registrationOtpAttempts
-				: 0,
-			// Manter bloqueio se ainda estiver ativo
-			registrationOtpBlockedUntil:
-				user?.registrationOtpBlockedUntil &&
-				user.registrationOtpBlockedUntil > new Date()
-					? user.registrationOtpBlockedUntil
-					: null,
-		},
-		create: {
-			email,
-			username: normalizedUsername, // Usar o username normalizado
-			registrationOtp,
-			registrationOtpExpiry,
-			otpToken,
-			otpTokenExpiry,
-			usernameReservedAt: new Date(),
-			usernameReservationExpiry,
-			emailVerified: null,
-			registrationOtpAttempts: 0,
-			name: "Usuário", // Valor padrão temporário
-		},
-	});
-
+async function sendOtpEmail(
+	email: string,
+	otp: string,
+	otpToken: string
+): Promise<NextResponse> {
 	try {
 		await resend.emails.send({
 			from: "Bionk <contato@bionk.me>",
 			to: [email],
 			subject: "Seu código de verificação Bionk",
 			react: OtpEmail({
-				otp: registrationOtp,
+				otp,
 				expiryMinutes: 2,
 			}) as React.ReactElement,
 		});
@@ -271,6 +315,73 @@ async function handleOtpRequest(email: string, username: string) {
 			{ status: 500 }
 		);
 	}
+}
+
+async function handleOtpRequest(email: string, username: string) {
+	const normalizedUsername = username.toLowerCase().trim();
+
+	const formatValidation = validateUsernameFormat(normalizedUsername);
+	if (formatValidation) {
+		return formatValidation;
+	}
+
+	const blacklistValidation = validateUsernameBlacklist(normalizedUsername);
+	if (blacklistValidation) {
+		return blacklistValidation;
+	}
+
+	const bannedUserCheck = await checkBannedUser(email, normalizedUsername);
+	if (bannedUserCheck) {
+		return bannedUserCheck;
+	}
+
+	const usernameAvailabilityCheck = await checkUsernameAvailability(
+		email,
+		normalizedUsername
+	);
+	if (usernameAvailabilityCheck) {
+		return usernameAvailabilityCheck;
+	}
+
+	const emailVerificationCheck = await checkEmailVerification(email);
+	if (emailVerificationCheck) {
+		return emailVerificationCheck;
+	}
+
+	const { response: blockedResponse, user } = await checkUserBlocked(email);
+	if (blockedResponse) {
+		return blockedResponse;
+	}
+
+	const otpData = generateOtpData();
+
+	await prisma.user.upsert({
+		where: { email },
+		update: {
+			username: normalizedUsername,
+			...otpData,
+			usernameReservedAt: new Date(),
+			registrationOtpAttempts: user?.registrationOtpBlockedUntil
+				? user.registrationOtpAttempts
+				: 0,
+			registrationOtpBlockedUntil:
+				user?.registrationOtpBlockedUntil &&
+				user.registrationOtpBlockedUntil > new Date()
+					? user.registrationOtpBlockedUntil
+					: null,
+		},
+		create: {
+			email,
+			username: normalizedUsername,
+			...otpData,
+			usernameReservedAt: new Date(),
+			emailVerified: null,
+			registrationOtpAttempts: 0,
+			name: "Usuário",
+		},
+	});
+
+	return await sendOtpEmail(email, otpData.registrationOtp, otpData.otpToken);
 }
 
 // Função para verificar o OTP
@@ -447,6 +558,9 @@ async function handleUserCreation(
 			usernameReservationExpiry: null,
 			subscriptionPlan: "free",
 			subscriptionStatus: "active",
+			CustomPresets: {
+				create: getDefaultCustomPresets(),
+			},
 		},
 	});
 

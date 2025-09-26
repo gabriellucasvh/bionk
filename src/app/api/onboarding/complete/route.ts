@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
-import { authOptions } from "@/lib/auth";
+import { authOptions, clearUserTokenCache } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
+import { getDefaultCustomPresets } from "@/utils/templatePresets";
 
 const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,30}$/;
 const BASE64_IMAGE_REGEX = /^data:image\/\w+;base64,/;
@@ -111,7 +112,7 @@ export async function POST(request: Request) {
 		// Upload da imagem
 		const imageUrl = await uploadProfileImage(profileImage, session.user.image || '');
 
-		// Atualizar usuário no banco
+		// Atualizar usuário no banco e criar presets padrão
 		const updatedUser = await prisma.user.update({
 			where: { id: session.user.id },
 			data: {
@@ -121,8 +122,14 @@ export async function POST(request: Request) {
 				image: imageUrl,
 				onboardingCompleted: true,
 				status: "active",
+				CustomPresets: {
+					create: getDefaultCustomPresets()
+				}
 			},
 		});
+
+		// Limpar cache do token para forçar atualização na próxima requisição
+		clearUserTokenCache(session.user.id);
 
 		return NextResponse.json({
 			message: "Onboarding completado com sucesso",

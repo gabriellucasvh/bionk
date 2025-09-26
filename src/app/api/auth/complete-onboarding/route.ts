@@ -1,8 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
-import { authOptions } from "@/lib/auth";
+import { authOptions, clearUserTokenCache } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getDefaultCustomPresets } from "@/utils/templatePresets";
 
 export async function POST(request: NextRequest) {
 	try {
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Atualizar usuário
+		// Atualizar usuário e criar presets padrão
 		const updatedUser = await prisma.user.update({
 			where: { id: session.user.id },
 			data: {
@@ -76,8 +77,14 @@ export async function POST(request: NextRequest) {
 				username: username.toLowerCase().trim(),
 				bio: bio?.trim() || null,
 				onboardingCompleted: true,
+				CustomPresets: {
+					create: getDefaultCustomPresets()
+				}
 			},
 		});
+
+		// Limpar cache do token para forçar atualização na próxima requisição
+		clearUserTokenCache(session.user.id);
 
 		return NextResponse.json(
 			{

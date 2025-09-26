@@ -93,7 +93,7 @@ export default function TextCard({
 	) : (
 		<div className={cn("w-full p-4", textAlignClass)}>
 			<h3
-				className={cn("mb-2 font-semibold text-lg", getTextClasses())}
+				className={cn("mb-2 font-extrabold text-lg", getTextClasses())}
 				style={textStyle}
 			>
 				{text.title}

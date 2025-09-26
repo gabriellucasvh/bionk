@@ -23,6 +23,7 @@ type UserCustomizations = {
 	customTextColor: string;
 	customFont: string;
 	customButton: string;
+	customButtonStyle: string;
 	customButtonFill: string;
 	customButtonCorners: string;
 	headerStyle: string;
@@ -44,6 +45,7 @@ const PersonalizarClient = () => {
 			customTextColor: "",
 			customFont: "",
 			customButton: "",
+			customButtonStyle: "solid",
 			customButtonFill: "",
 			customButtonCorners: "",
 			headerStyle: "default",
@@ -127,6 +129,7 @@ const PersonalizarClient = () => {
 			customTextColor: "",
 			customFont: "",
 			customButton: "",
+			customButtonStyle: "solid",
 			customButtonFill: "",
 			customButtonCorners: "",
 			headerStyle: "default",

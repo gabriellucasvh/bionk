@@ -202,6 +202,7 @@ model CustomPresets {
   customTextColor          String? @default("")
   customFont               String? @default("")
   customButton             String? @default("")
+  customButtonStyle        String? @default("solid")
   customButtonFill         String? @default("")
   customButtonCorners      String? @default("")
   headerStyle              String? @default("default")

@@ -21,8 +21,8 @@ export async function middleware(req: NextRequest) {
 			return NextResponse.redirect(banUrl);
 		}
 
-		// Verificar se usuário tem status pending
-		if (token.status === "pending") {
+		// Verificar se usuário precisa completar onboarding
+		if (token.status === "pending" || !token.onboardingCompleted) {
 			// Permitir acesso apenas à página de onboarding
 			const onboardingUrl = new URL("/onboarding", req.url);
 			if (!pathname.startsWith("/onboarding")) {

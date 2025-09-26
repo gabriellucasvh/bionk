@@ -78,6 +78,7 @@ export interface CustomPresets extends PrismaCustomPresets {
 	customTextColor: string;
 	customFont: string;
 	customButton: string;
+	customButtonStyle: string;
 	customButtonFill: string;
 	customButtonCorners: string;
 	headerStyle: string;
