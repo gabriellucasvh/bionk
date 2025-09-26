@@ -549,6 +549,7 @@ export default function DesignPanel({
 		Partial<typeof customizations>
 	>({});
 	const [isSaving, setIsSaving] = useState(false);
+	const [isExiting, setIsExiting] = useState(false);
 	const pickerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -567,10 +568,14 @@ export default function DesignPanel({
 		if (!Object.keys(pendingChanges).length) {
 			return;
 		}
+		setIsExiting(true);
 		setIsSaving(true);
 		try {
 			await onSave(pendingChanges);
-			setPendingChanges({});
+			setTimeout(() => {
+				setPendingChanges({});
+				setIsExiting(false);
+			}, 300);
 		} finally {
 			setIsSaving(false);
 		}
@@ -578,8 +583,12 @@ export default function DesignPanel({
 
 	// Nova função para cancelar as alterações
 	const handleCancel = () => {
-		setCustomizations(userCustomizations);
-		setPendingChanges({});
+		setIsExiting(true);
+		setTimeout(() => {
+			setCustomizations(userCustomizations);
+			setPendingChanges({});
+			setIsExiting(false);
+		}, 300);
 	};
 
 	// Função auxiliar para verificar se um campo tem alterações pendentes
@@ -1095,7 +1104,13 @@ export default function DesignPanel({
 
 			{/* Salvar e Cancelar pendências */}
 			{Object.keys(pendingChanges).length > 0 && (
-				<div className="-translate-x-1/2 fixed bottom-16 left-1/2 z-50 mx-auto flex w-max items-center gap-2 rounded-full border bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm md:bottom-6 dark:bg-neutral-800/90">
+				<div
+					className={`-translate-x-1/2 fixed bottom-16 left-1/2 z-50 mx-auto flex w-max transform items-center gap-2 rounded-full border bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm transition-all duration-300 ease-out md:bottom-6 dark:bg-neutral-800/90 ${
+						isExiting
+							? "translate-y-full opacity-0"
+							: "translate-y-0 opacity-100"
+					}`}
+				>
 					<span className="hidden font-medium text-gray-600 text-sm sm:inline-block dark:text-gray-400">
 						Deseja salvar as alterações pendentes?
 					</span>
