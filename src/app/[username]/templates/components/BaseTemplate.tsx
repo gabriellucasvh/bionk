@@ -156,9 +156,9 @@ function renderHeroHeader(
 	const pageBackgroundGradient = customPresets?.customBackgroundGradient;
 
 	return (
-		<header className="mb-12 w-full">
+		<header className="mb-6 w-full text-center">
 			{user.image && (
-				<div className="-mx-3.5 -mt-3.5 relative mb-8 h-64 overflow-hidden">
+				<div className="relative mx-auto mb-4 h-94 w-94 overflow-hidden rounded-t-2xl">
 					<div className="absolute inset-0">
 						{user.image.toLowerCase().endsWith(".gif") ? (
 							// biome-ignore lint/performance/noImgElement: <necessário para GIFs>
@@ -174,6 +174,7 @@ function renderHeroHeader(
 								fill
 								priority
 								quality={100}
+								sizes="128px"
 								src={user.image}
 							/>
 						)}
@@ -183,37 +184,25 @@ function renderHeroHeader(
 						className="absolute inset-0"
 						style={{
 							background: pageBackgroundGradient
-								? `linear-gradient(to bottom, transparent 0%, transparent 70%, ${pageBackgroundGradient} 100%)`
-								: `linear-gradient(to bottom, transparent 0%, transparent 70%, ${pageBackgroundColor} 100%)`,
+								? `linear-gradient(to bottom, transparent 0%, transparent 50%, ${pageBackgroundGradient} 100%)`
+								: `linear-gradient(to bottom, transparent 0%, transparent 50%, ${pageBackgroundColor} 100%)`,
 						}}
 					/>
-
-					<div className="absolute right-6 bottom-6 left-6 text-center">
-						<h1
-							className="font-bold text-2xl text-white drop-shadow-lg"
-							style={{
-								...textStyle,
-								color: "white",
-								textShadow: "0 2px 4px rgba(0,0,0,0.8)",
-							}}
-						>
-							{user.name || user.username}
-						</h1>
-						{user.bio && (
-							<p
-								className="mt-2 text-white/90 drop-shadow-md"
-								style={{
-									color: "rgba(255,255,255,0.9)",
-									textShadow: "0 1px 2px rgba(0,0,0,0.8)",
-								}}
-							>
-								{user.bio}
-							</p>
-						)}
-					</div>
 				</div>
 			)}
-			<div className="mt-6 text-center">
+
+			<div className="text-center">
+				<h1 className="font-bold text-lg" style={textStyle}>
+					{user.name || user.username}
+				</h1>
+				{user.bio && (
+					<p className="mt-2 text-sm opacity-80" style={textStyle}>
+						{user.bio}
+					</p>
+				)}
+			</div>
+
+			<div className="mt-4">
 				{renderSocialLinks(user, "justify-center", textStyle?.color as string)}
 			</div>
 		</header>
@@ -628,15 +617,12 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 	return (
 		<>
 			{/* Container principal com aspect ratio de celular em telas maiores */}
-			<div
-				className="min-h-dvh sm:flex sm:items-start sm:justify-center sm:bg-neutral-900 sm:pt-4 dark:sm:bg-gray-900"
-				style={customPresets.headerStyle !== "hero" ? {} : { ...wrapperStyle }}
-			>
+			<div className="min-h-dvh sm:flex sm:items-start sm:justify-center sm:bg-neutral-900 sm:pt-4 dark:sm:bg-gray-900">
 				<div
 					className={`relative min-h-dvh w-full sm:min-h-[calc(100vh-2rem)] sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
 						customPresets.headerStyle === "hero" ? "pt-0" : "px-4"
 					} sm:px-6 sm:pt-4`}
-					style={customPresets.headerStyle !== "hero" ? wrapperStyle : {}}
+					style={wrapperStyle}
 				>
 					<ProfileViewTracker userId={user.id} />
 
