@@ -94,10 +94,10 @@ function renderSocialLinks(
 		<div className={`flex items-center justify-center ${socialClasses}`}>
 			<UserProfileSocialIcons
 				className="space-x-4 space-y-1"
+				customColor={customTextColor}
 				iconSize={26}
 				socialLinks={user.SocialLink}
 				theme="dark"
-				customColor={customTextColor}
 			/>
 		</div>
 	);
@@ -633,9 +633,9 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 				style={customPresets.headerStyle !== "hero" ? {} : { ...wrapperStyle }}
 			>
 				<div
-					className={`relative w-full sm:mt-8 sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
-						customPresets.headerStyle === "hero" ? "pt-0 pb-8" : "px-4 py-8"
-					} sm:px-6 sm:py-8`}
+					className={`relative min-h-dvh w-full sm:mt-8 sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
+						customPresets.headerStyle === "hero" ? "pt-0" : "px-4 pt-8"
+					} sm:px-6 sm:pt-8`}
 					style={customPresets.headerStyle !== "hero" ? wrapperStyle : {}}
 				>
 					<ProfileViewTracker userId={user.id} />
@@ -644,30 +644,32 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 						<ShareButton onClick={() => setShareModalOpen(true)} />
 					</div>
 
-					<main className="mx-auto flex w-full max-w-md flex-col items-center sm:max-w-none">
-						<UserHeader
-							customPresets={customPresets}
-							headerStyle={customPresets.headerStyle}
-							textStyle={textStyle}
-							user={user}
-						/>
-						<section className="w-full">
-							{children ?? (
-								<LinksList
-									buttonStyle={buttonStyle}
-									customPresets={customPresets}
-									textStyle={textStyle}
-									user={user}
-								/>
-							)}
-						</section>
-					</main>
-					<footer
-						className="mt-8 flex items-center justify-center"
-						style={textStyle}
-					>
-						<JoinBionkModal>{user.username}</JoinBionkModal>
-					</footer>
+					<div className="flex min-h-dvh flex-col">
+						<main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center sm:max-w-none">
+							<UserHeader
+								customPresets={customPresets}
+								headerStyle={customPresets.headerStyle}
+								textStyle={textStyle}
+								user={user}
+							/>
+							<section className="w-full">
+								{children ?? (
+									<LinksList
+										buttonStyle={buttonStyle}
+										customPresets={customPresets}
+										textStyle={textStyle}
+										user={user}
+									/>
+								)}
+							</section>
+						</main>
+						<footer
+							className="mt-auto flex justify-center pt-8 pb-8"
+							style={textStyle}
+						>
+							<JoinBionkModal>{user.username}</JoinBionkModal>
+						</footer>
+					</div>
 				</div>
 			</div>
 
