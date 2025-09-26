@@ -34,6 +34,7 @@ interface TextCardProps {
 		customButton: string;
 		customButtonFill: string;
 		customButtonCorners: string;
+		customButtonColor: string;
 	};
 	classNames?: {
 		textCard?: string;

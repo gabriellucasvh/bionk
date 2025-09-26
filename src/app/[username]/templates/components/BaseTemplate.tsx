@@ -503,7 +503,8 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 	const getButtonStyleByType = () => {
 		const cornerValue = customPresets.customButtonCorners || "12";
 		const borderRadiusValue = `${cornerValue}px`;
-		const buttonColor = customPresets.customButton || "#ffffff";
+		const buttonColor = customPresets.customButtonColor || "#ffffff";
+		const textColor = customPresets.customButtonTextColor || "#000000";
 
 		const baseStyle: React.CSSProperties = {
 			borderRadius: borderRadiusValue,
@@ -519,28 +520,28 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					...baseStyle,
 					backgroundColor: buttonColor,
 					border: "none",
-					color: "#000000",
+					color: textColor,
 				};
 			case "outline":
 				return {
 					...baseStyle,
 					backgroundColor: "transparent",
 					border: `2px solid ${buttonColor}`,
-					color: buttonColor,
+					color: textColor,
 				};
 			case "soft":
 				return {
 					...baseStyle,
 					backgroundColor: `${buttonColor}20`,
 					border: `1px solid ${buttonColor}40`,
-					color: buttonColor,
+					color: textColor,
 				};
 			case "shadow":
 				return {
 					...baseStyle,
 					backgroundColor: `${buttonColor}30`,
 					border: `1px solid ${buttonColor}50`,
-					color: buttonColor,
+					color: textColor,
 					boxShadow:
 						"0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
 				};
@@ -549,7 +550,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					...baseStyle,
 					backgroundColor: "transparent",
 					border: `2px solid ${buttonColor}`,
-					color: buttonColor,
+					color: textColor,
 					boxShadow: `0 0 8px ${buttonColor}40`,
 				};
 			case "dashed":
@@ -557,14 +558,14 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					...baseStyle,
 					backgroundColor: "transparent",
 					border: `2px dashed ${buttonColor}`,
-					color: buttonColor,
+					color: textColor,
 				};
 			case "double":
 				return {
 					...baseStyle,
 					backgroundColor: "transparent",
 					border: `4px double ${buttonColor}`,
-					color: buttonColor,
+					color: textColor,
 				};
 			case "raised":
 				return {
@@ -574,7 +575,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					borderLeft: `2px solid ${buttonColor}`,
 					borderRight: `1px solid ${buttonColor}80`,
 					borderBottom: `1px solid ${buttonColor}80`,
-					color: buttonColor,
+					color: textColor,
 					boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.2)",
 				};
 			case "inset":
@@ -585,7 +586,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					borderRight: `2px solid ${buttonColor}`,
 					borderTop: `1px solid ${buttonColor}80`,
 					borderLeft: `1px solid ${buttonColor}80`,
-					color: buttonColor,
+					color: textColor,
 					boxShadow: "inset 2px 2px 4px rgba(0, 0, 0, 0.2)",
 				};
 			default:
@@ -596,14 +597,14 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 							...baseStyle,
 							backgroundColor: buttonColor,
 							border: "none",
-							color: "#000000",
+							color: textColor,
 						};
 					case "outlined":
 						return {
 							...baseStyle,
 							backgroundColor: "transparent",
 							border: "2px solid currentColor",
-							color: buttonColor,
+							color: textColor,
 						};
 					case "gradient":
 						return {
@@ -612,14 +613,14 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 								customPresets.customBackgroundGradient ||
 								"linear-gradient(135deg, #c026d3 0%, #7c3aed 50%, #2563eb 100%)",
 							border: "none",
-							color: "#ffffff",
+							color: textColor,
 						};
 					default:
 						return {
 							...baseStyle,
 							backgroundColor: buttonColor,
 							border: "none",
-							color: "#000000",
+							color: textColor,
 						};
 				}
 		}

@@ -25,6 +25,8 @@ export async function GET() {
 				customButtonStyle: "solid",
 				customButtonFill: "",
 				customButtonCorners: "",
+				customButtonColor: "",
+				customButtonTextColor: "",
 				headerStyle: "default",
 			}
 		);

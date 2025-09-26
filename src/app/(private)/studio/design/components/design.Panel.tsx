@@ -206,7 +206,8 @@ interface DesignPanelProps {
 		customBackgroundGradient: string;
 		customTextColor: string;
 		customFont: string;
-		customButton: string;
+		customButtonColor: string;
+		customButtonTextColor: string;
 		customButtonStyle: string;
 		customButtonFill: string;
 		customButtonCorners: string;
@@ -219,7 +220,8 @@ interface DesignPanelProps {
 			customBackgroundGradient: string;
 			customTextColor: string;
 			customFont: string;
-			customButton: string;
+			customButtonColor: string;
+			customButtonTextColor: string;
 			customButtonStyle: string;
 			customButtonFill: string;
 			customButtonCorners: string;
@@ -406,10 +408,14 @@ const HEADER_STYLES = [
 	},
 ];
 
-const FIELD_TO_PICKER: Record<string, "background" | "text" | "button"> = {
+const FIELD_TO_PICKER: Record<
+	string,
+	"background" | "text" | "button" | "buttonText"
+> = {
 	customBackgroundColor: "background",
 	customTextColor: "text",
-	customButtonFill: "button",
+	customButtonColor: "button",
+	customButtonTextColor: "buttonText",
 };
 
 // Funções auxiliares para reduzir complexidade
@@ -536,7 +542,7 @@ export default function DesignPanel({
 }: DesignPanelProps) {
 	const [customizations, setCustomizations] = useState(userCustomizations);
 	const [activeColorPicker, setActiveColorPicker] = useState<
-		"background" | "text" | "button" | null
+		"background" | "text" | "button" | "buttonText" | null
 	>(null);
 	const [isFontModalOpen, setIsFontModalOpen] = useState(false);
 	const [pendingChanges, setPendingChanges] = useState<
@@ -605,7 +611,12 @@ export default function DesignPanel({
 
 	const renderColorOption = (
 		color: string,
-		field: "customBackgroundColor" | "customTextColor" | "customButtonFill",
+		field:
+			| "customBackgroundColor"
+			| "customTextColor"
+			| "customButtonFill"
+			| "customButtonColor"
+			| "customButtonTextColor",
 		isSelected: boolean,
 		isGradient = false
 	) => (
@@ -625,7 +636,11 @@ export default function DesignPanel({
 	);
 
 	const renderColorSelector = (
-		field: "customBackgroundColor" | "customTextColor" | "customButtonFill",
+		field:
+			| "customBackgroundColor"
+			| "customTextColor"
+			| "customButtonColor"
+			| "customButtonTextColor",
 		label: string
 	) => {
 		const customColor = customizations[field];
@@ -813,7 +828,11 @@ export default function DesignPanel({
 					<CardTitle>Botões</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					{renderColorSelector("customButtonFill", "Cor do Botão")}
+					{renderColorSelector("customButtonColor", "Cor do Botão")}
+					{renderColorSelector(
+						"customButtonTextColor",
+						"Cor do Texto do Botão"
+					)}
 
 					<div>
 						<RenderLabel
@@ -884,11 +903,17 @@ export default function DesignPanel({
 						{/* Cor de Fundo */}
 						{customizations.customBackgroundColor && (
 							<div className="flex items-center gap-3 rounded-lg p-2">
-								<div
-									className="h-8 w-8 flex-shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-600"
+								<button
+									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-gray-200 transition-colors hover:border-blue-500 dark:border-gray-600"
+									onClick={() =>
+										setActiveColorPicker(
+											activeColorPicker === "background" ? null : "background"
+										)
+									}
 									style={{
 										backgroundColor: customizations.customBackgroundColor,
 									}}
+									type="button"
 								/>
 								<div className="flex-1">
 									<p className="font-medium text-sm">Cor de Fundo</p>
@@ -896,6 +921,24 @@ export default function DesignPanel({
 										{customizations.customBackgroundColor}
 									</p>
 								</div>
+								{activeColorPicker === "background" && (
+									<div className="absolute z-10 mt-2" ref={pickerRef}>
+										<HexColorPicker
+											color={customizations.customBackgroundColor}
+											onChange={(color) =>
+												debouncedHandleChange("customBackgroundColor", color)
+											}
+										/>
+										<HexColorInput
+											className="mt-2 w-full rounded border border-gray-300 p-2 text-center dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+											color={customizations.customBackgroundColor}
+											onChange={(color) =>
+												handleChange("customBackgroundColor", color)
+											}
+											placeholder="#000000"
+										/>
+									</div>
+								)}
 							</div>
 						)}
 
@@ -920,9 +963,15 @@ export default function DesignPanel({
 						{/* Cor do Texto */}
 						{customizations.customTextColor && (
 							<div className="flex items-center gap-3 rounded-lg p-2">
-								<div
-									className="h-8 w-8 flex-shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-600"
+								<button
+									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-gray-200 transition-colors hover:border-blue-500 dark:border-gray-600"
+									onClick={() =>
+										setActiveColorPicker(
+											activeColorPicker === "text" ? null : "text"
+										)
+									}
 									style={{ backgroundColor: customizations.customTextColor }}
+									type="button"
 								/>
 								<div className="flex-1">
 									<p className="font-medium text-sm">Cor do Texto e Ícones</p>
@@ -930,22 +979,106 @@ export default function DesignPanel({
 										{customizations.customTextColor}
 									</p>
 								</div>
+								{activeColorPicker === "text" && (
+									<div className="absolute z-10 mt-2" ref={pickerRef}>
+										<HexColorPicker
+											color={customizations.customTextColor}
+											onChange={(color) =>
+												debouncedHandleChange("customTextColor", color)
+											}
+										/>
+										<HexColorInput
+											className="mt-2 w-full rounded border border-gray-300 p-2 text-center dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+											color={customizations.customTextColor}
+											onChange={(color) =>
+												handleChange("customTextColor", color)
+											}
+											placeholder="#000000"
+										/>
+									</div>
+								)}
 							</div>
 						)}
 
 						{/* Cor do Botão */}
-						{customizations.customButton && (
+						{customizations.customButtonColor && (
 							<div className="flex items-center gap-3 rounded-lg p-2">
-								<div
-									className="h-8 w-8 flex-shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-600"
-									style={{ backgroundColor: customizations.customButton }}
+								<button
+									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-gray-200 transition-colors hover:border-blue-500 dark:border-gray-600"
+									onClick={() =>
+										setActiveColorPicker(
+											activeColorPicker === "button" ? null : "button"
+										)
+									}
+									style={{ backgroundColor: customizations.customButtonColor }}
+									type="button"
 								/>
 								<div className="flex-1">
 									<p className="font-medium text-sm">Cor do Botão</p>
 									<p className="text-gray-600 text-xs dark:text-gray-400">
-										{customizations.customButton}
+										{customizations.customButtonColor}
 									</p>
 								</div>
+								{activeColorPicker === "button" && (
+									<div className="absolute z-10 mt-2" ref={pickerRef}>
+										<HexColorPicker
+											color={customizations.customButtonColor}
+											onChange={(color) =>
+												debouncedHandleChange("customButtonColor", color)
+											}
+										/>
+										<HexColorInput
+											className="mt-2 w-full rounded border border-gray-300 p-2 text-center dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+											color={customizations.customButtonColor}
+											onChange={(color) =>
+												handleChange("customButtonColor", color)
+											}
+											placeholder="#000000"
+										/>
+									</div>
+								)}
+							</div>
+						)}
+
+						{/* Cor do Texto do Botão */}
+						{customizations.customButtonTextColor && (
+							<div className="flex items-center gap-3 rounded-lg p-2">
+								<button
+									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-gray-200 transition-colors hover:border-blue-500 dark:border-gray-600"
+									onClick={() =>
+										setActiveColorPicker(
+											activeColorPicker === "buttonText" ? null : "buttonText"
+										)
+									}
+									style={{
+										backgroundColor: customizations.customButtonTextColor,
+									}}
+									type="button"
+								/>
+								<div className="flex-1">
+									<p className="font-medium text-sm">Cor do Texto do Botão</p>
+									<p className="text-gray-600 text-xs dark:text-gray-400">
+										{customizations.customButtonTextColor}
+									</p>
+								</div>
+								{activeColorPicker === "buttonText" && (
+									<div className="absolute z-10 mt-2" ref={pickerRef}>
+										<HexColorPicker
+											color={customizations.customButtonTextColor}
+											onChange={(color) =>
+												debouncedHandleChange("customButtonTextColor", color)
+											}
+										/>
+										<HexColorInput
+											className="mt-2 w-full rounded border border-gray-300 p-2 text-center dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+											color={customizations.customButtonTextColor}
+											onChange={(color) =>
+												handleChange("customButtonTextColor", color)
+											}
+											placeholder="#000000"
+										/>
+									</div>
+								)}
 							</div>
 						)}
 
@@ -954,7 +1087,8 @@ export default function DesignPanel({
 							customizations.customBackgroundColor ||
 							customizations.customBackgroundGradient ||
 							customizations.customTextColor ||
-							customizations.customButtonFill
+							customizations.customButtonColor ||
+							customizations.customButtonTextColor
 						) && (
 							<div className="py-8 text-center text-gray-500 dark:text-gray-400">
 								<p className="text-sm">Nenhuma cor personalizada selecionada</p>
@@ -969,7 +1103,10 @@ export default function DesignPanel({
 
 			{/* Salvar e Cancelar pendências */}
 			{Object.keys(pendingChanges).length > 0 && (
-				<div className="fixed right-0 bottom-16 left-0 z-50 mx-auto flex w-min items-center gap-2 rounded-full bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm md:bottom-6 dark:bg-neutral-800/90">
+				<div className="-translate-x-1/2 fixed bottom-16 left-1/2 z-50 mx-auto flex w-max items-center gap-2 rounded-full border bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm md:bottom-6 dark:bg-neutral-800/90">
+					<span className="hidden font-medium text-gray-600 text-sm sm:inline-block dark:text-gray-400">
+						Deseja salvar as alterações pendentes?
+					</span>
 					<BaseButton
 						loading={isSaving}
 						onClick={handleCancel}

@@ -19,6 +19,7 @@ interface VideoCardProps {
 		customButton?: string;
 		customButtonFill?: string;
 		customButtonCorners?: string;
+		customButtonColor?: string;
 	};
 }
 
