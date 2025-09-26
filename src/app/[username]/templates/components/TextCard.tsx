@@ -109,7 +109,7 @@ export default function TextCard({
 			</p>
 			{shouldTruncate && (
 				<Button
-					className={cn("mt-2 h-auto p-0 text-sm", getTextClasses())}
+					className={cn("mt-2 h-auto p-0 text-sm underline", getTextClasses())}
 					onClick={() => setIsModalOpen(true)}
 					style={{ color: textStyle?.color }}
 					variant="link"
