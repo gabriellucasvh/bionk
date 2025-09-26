@@ -33,7 +33,7 @@ const renderSocialLinks = (
 	}
 
 	return (
-		<div className={`flex gap-1.5 ${additionalClasses}`}>
+		<div className={`flex gap-2 ${additionalClasses}`}>
 			{activeSocialLinks.slice(0, maxLinks).map((link) => {
 				const platform = SOCIAL_PLATFORMS.find((p) => p.key === link.platform);
 				if (!platform) {
@@ -41,17 +41,27 @@ const renderSocialLinks = (
 				}
 				return (
 					<div
-						className={`${iconSize} rounded-full shadow-sm ${
-							showBorder ? "border border-white/20" : ""
+						className={`${iconSize} flex items-center justify-center ${
+							showBorder ? "rounded-full border border-white/20" : ""
 						}`}
 						key={link.id}
-						style={{ backgroundColor: platform.color }}
 						title={platform.name}
-					/>
+					>
+						<div
+							className="h-66/5 w-66/5"
+							style={{
+								backgroundColor: "white",
+								maskImage: `url(${platform.icon})`,
+								maskSize: "contain",
+								maskRepeat: "no-repeat",
+								maskPosition: "center",
+							}}
+						/>
+					</div>
 				);
 			})}
 			{activeSocialLinks.length > maxLinks && (
-				<div className="flex items-center text-gray-500 text-xs">
+				<div className="flex items-center text-neutral-500 text-xs">
 					+{activeSocialLinks.length - maxLinks}
 				</div>
 			)}
@@ -65,32 +75,32 @@ const renderDefaultStyle = (userProfileData: UserData) => {
 	const activeSocialLinks = socialLinks.filter((link) => link.active);
 
 	return (
-		<div className="h-full w-full overflow-hidden rounded-t-xl bg-gray-50 dark:bg-neutral-900">
+		<div className="h-full w-full overflow-hidden rounded-t-xl bg-neutral-50 dark:bg-neutral-900">
 			<div className="flex h-full flex-col items-center justify-center p-4 text-center">
 				<div className="relative mx-auto mb-3 h-16 w-16">
 					{image ? (
 						// biome-ignore lint/performance/noImgElement: <necessário para GIFS>
 						<img
 							alt={name || username}
-							className="h-full w-full rounded-full border-2 border-white object-cover shadow-sm"
+							className="h-full w-full rounded-full object-cover shadow-sm"
 							src={image}
 						/>
 					) : (
-						<div className="h-full w-full rounded-full border-2 border-white bg-gray-300 shadow-sm dark:bg-neutral-600" />
+						<div className="h-full w-full rounded-full bg-neutral-300 shadow-sm dark:bg-neutral-600" />
 					)}
 				</div>
-				<div className="mb-1 font-semibold text-gray-900 text-sm dark:text-gray-100">
+				<div className="mb-1 font-semibold text-neutral-900 text-sm dark:text-neutral-100">
 					{name || username || "Nome do usuário"}
 				</div>
 				{bio && (
-					<div className="mb-3 line-clamp-2 text-gray-600 text-xs dark:text-gray-400">
+					<div className="mb-3 line-clamp-2 text-neutral-600 text-xs dark:text-neutral-400">
 						{bio}
 					</div>
 				)}
 				{renderSocialLinks(
 					activeSocialLinks,
 					3,
-					"h-4 w-4",
+					"h-5 w-5",
 					"justify-center gap-2"
 				)}
 			</div>
@@ -104,30 +114,30 @@ const renderHorizontalStyle = (userProfileData: UserData) => {
 	const activeSocialLinks = socialLinks.filter((link) => link.active);
 
 	return (
-		<div className="h-full w-full overflow-hidden rounded-t-xl bg-gray-50 dark:bg-neutral-900">
+		<div className="h-full w-full overflow-hidden rounded-t-xl bg-neutral-50 dark:bg-neutral-900">
 			<div className="flex h-full items-center gap-4 p-4">
 				<div className="relative h-14 w-14 flex-shrink-0">
 					{image ? (
 						// biome-ignore lint/performance/noImgElement: <necessário para GIFS>
 						<img
 							alt={name || username}
-							className="h-full w-full rounded-lg border-2 border-white object-cover shadow-sm"
+							className="h-full w-full rounded-lg object-cover shadow-sm"
 							src={image}
 						/>
 					) : (
-						<div className="h-full w-full rounded-lg border-2 border-white bg-gray-300 shadow-sm dark:bg-neutral-600" />
+						<div className="h-full w-full rounded-lg bg-neutral-300 shadow-sm dark:bg-neutral-600" />
 					)}
 				</div>
-				<div className="min-w-0 flex-1">
-					<div className="mb-1 truncate font-semibold text-gray-900 text-sm dark:text-gray-100">
+				<div className="mt-6 min-w-0 flex-1">
+					<div className="mb-1 truncate font-semibold text-neutral-900 text-sm dark:text-neutral-100">
 						{name || username || "Nome do usuário"}
 					</div>
 					{bio && (
-						<div className="mb-2 line-clamp-2 text-gray-600 text-xs dark:text-gray-400">
+						<div className="mb-2 line-clamp-2 text-left text-neutral-600 text-xs dark:text-neutral-400">
 							{bio}
 						</div>
 					)}
-					{renderSocialLinks(activeSocialLinks, 4, "h-3 w-3")}
+					{renderSocialLinks(activeSocialLinks, 4, "h-5 w-5")}
 				</div>
 			</div>
 		</div>
@@ -156,11 +166,17 @@ const renderHeroStyle = (userProfileData: UserData) => {
 					{name || username || "Nome do usuário"}
 				</div>
 				{bio && (
-					<div className="mb-3 line-clamp-2 text-xs opacity-90 drop-shadow-sm">
+					<div className="mb-3 line-clamp-2 text-neutral-300 text-xs opacity-90 drop-shadow-sm">
 						{bio}
 					</div>
 				)}
-				{renderSocialLinks(activeSocialLinks, 4, "h-3 w-3", "", true)}
+				{renderSocialLinks(
+					activeSocialLinks,
+					4,
+					"h-5 w-5",
+					"justify-center",
+					true
+				)}
 			</div>
 		</div>
 	);
@@ -176,8 +192,8 @@ const HeaderStylePreview = ({
 }) => {
 	if (!userProfileData) {
 		return (
-			<div className="flex h-full w-full items-center justify-center rounded-t-xl bg-gray-50 dark:bg-neutral-900">
-				<div className="text-center text-gray-500 text-xs">
+			<div className="flex h-full w-full items-center justify-center rounded-t-xl bg-neutral-50 dark:bg-neutral-900">
+				<div className="text-center text-neutral-500 text-xs">
 					Carregando dados...
 				</div>
 			</div>
@@ -342,54 +358,54 @@ const BUTTON_STYLES = [
 	{
 		value: "solid",
 		label: "Sólido",
-		preview: "bg-gray-500 text-white border-none",
+		preview: "bg-neutral-500 text-white border-none",
 	},
 	{
 		value: "outline",
 		label: "Contorno",
 		preview:
-			"bg-transparent text-gray-700 dark:text-white border-gray-500 border-2",
+			"bg-transparent text-neutral-700 dark:text-white border-neutral-500 border-2",
 	},
 	{
 		value: "soft",
 		label: "Suave",
-		preview: "bg-gray-100 text-gray-700 border-gray-200",
+		preview: "bg-neutral-100 text-neutral-700 border-neutral-200",
 	},
 	{
 		value: "shadow",
 		label: "Sombra",
 		preview:
-			"bg-gray-100 text-gray-700 border-gray-300 shadow-lg dark:shadow-white/20",
+			"bg-neutral-100 text-neutral-700 border-neutral-300 shadow-lg dark:shadow-white/20",
 	},
 	{
 		value: "neon",
 		label: "Neon",
 		preview:
-			"bg-transparent text-gray-700 dark:text-white border-gray-500 border-2 shadow-[0_0_8px_rgba(0,0,0,0.3)]",
+			"bg-transparent text-neutral-700 dark:text-white border-neutral-500 border-2 shadow-[0_0_8px_rgba(0,0,0,0.3)]",
 	},
 	{
 		value: "dashed",
 		label: "Tracejado",
 		preview:
-			"bg-transparent text-gray-700 dark:text-white border-gray-500 border-2 border-dashed",
+			"bg-transparent text-neutral-700 dark:text-white border-neutral-500 border-2 border-dashed",
 	},
 	{
 		value: "double",
 		label: "Dupla",
 		preview:
-			"bg-transparent text-gray-700 dark:text-white border-gray-600 border-4 border-double",
+			"bg-transparent text-neutral-700 dark:text-white border-neutral-600 border-4 border-double",
 	},
 	{
 		value: "raised",
 		label: "Elevado",
 		preview:
-			"bg-gray-200 text-gray-700 border-gray-400 border-t-2 border-l-2 border-r border-b shadow-inner",
+			"bg-neutral-200 text-neutral-700 border-neutral-400 border-t-2 border-l-2 border-r border-b shadow-inner",
 	},
 	{
 		value: "inset",
 		label: "Interno",
 		preview:
-			"bg-gray-200 text-gray-700 border-gray-400 border-b-2 border-r-2 border-t border-l shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]",
+			"bg-neutral-200 text-neutral-700 border-neutral-400 border-b-2 border-r-2 border-t border-l shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]",
 	},
 ];
 
@@ -550,7 +566,10 @@ export default function DesignPanel({
 	>({});
 	const [isSaving, setIsSaving] = useState(false);
 	const [isExiting, setIsExiting] = useState(false);
+	const [showLeftGradient, setShowLeftGradient] = useState(false);
+	const [showRightGradient, setShowRightGradient] = useState(true);
 	const pickerRef = useRef<HTMLDivElement>(null);
+	const headerScrollRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		setCustomizations(userCustomizations);
@@ -590,6 +609,39 @@ export default function DesignPanel({
 			setIsExiting(false);
 		}, 300);
 	};
+
+	const handleHeaderScroll = () => {
+		if (headerScrollRef.current) {
+			const { scrollLeft, scrollWidth, clientWidth } = headerScrollRef.current;
+
+			const isAtStart = scrollLeft <= 5;
+			const isAtEnd = scrollLeft >= scrollWidth - clientWidth - 5;
+			const hasOverflow = scrollWidth > clientWidth;
+
+			if (hasOverflow) {
+				setShowLeftGradient(!isAtStart);
+				setShowRightGradient(!isAtEnd);
+			} else {
+				setShowLeftGradient(false);
+				setShowRightGradient(false);
+			}
+		}
+	};
+
+	useEffect(() => {
+		const container = headerScrollRef.current;
+		if (container) {
+			container.addEventListener("scroll", handleHeaderScroll);
+
+			setTimeout(() => {
+				handleHeaderScroll();
+			}, 100);
+
+			return () => {
+				container.removeEventListener("scroll", handleHeaderScroll);
+			};
+		}
+	}, []);
 
 	// Função auxiliar para verificar se um campo tem alterações pendentes
 	const hasPendingChange = (field: keyof typeof customizations) => {
@@ -633,7 +685,7 @@ export default function DesignPanel({
 			className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
 				isSelected
 					? "border-2 border-lime-700"
-					: "border-2 border-gray-200 hover:border-blue-500 dark:border-gray-600 dark:hover:border-blue-400"
+					: "border-2 border-neutral-200 hover:border-blue-500 dark:border-neutral-600 dark:hover:border-blue-400"
 			}`}
 			key={color}
 			onClick={() => handleChange(field, color)}
@@ -697,7 +749,7 @@ export default function DesignPanel({
 							onChange={(color) => debouncedHandleChange(field, color)}
 						/>
 						<HexColorInput
-							className="mt-2 w-full rounded border border-gray-300 p-2 text-center dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+							className="mt-2 w-full rounded border border-neutral-300 p-2 text-center dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
 							color={customColor}
 							onChange={(color) => handleChange(field, color)}
 							placeholder="#000000"
@@ -721,31 +773,42 @@ export default function DesignPanel({
 							hasPending={hasPendingChange("headerStyle")}
 							text="Estilo do Header"
 						/>
-						<div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-							{HEADER_STYLES.map((style) => (
-								<button
-									className={`group relative overflow-hidden rounded-xl ${
-										customizations.headerStyle === style.value
-											? "border-green-500"
-											: "border"
-									}`}
-									key={style.value}
-									onClick={() => handleChange("headerStyle", style.value)}
-									type="button"
-								>
-									{/* Preview Area */}
-									<div className="aspect-[16/22] w-full">
-										<HeaderStylePreview
-											style={style.value}
-											userProfileData={userData}
-										/>
-									</div>
-									{/* Selected Overlay */}
-									{customizations.headerStyle === style.value && (
-										<div className="pointer-events-none absolute inset-0 rounded-xl border border-green-500" />
-									)}
-								</button>
-							))}
+						<div className="relative mt-4">
+							<div
+								className="scrollbar-hide flex gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible"
+								ref={headerScrollRef}
+							>
+								{HEADER_STYLES.map((style) => (
+									<button
+										className={`group relative min-w-[200px] flex-shrink-0 overflow-hidden rounded-xl md:min-w-0 md:flex-shrink ${
+											customizations.headerStyle === style.value
+												? "border-green-500"
+												: "border"
+										}`}
+										key={style.value}
+										onClick={() => handleChange("headerStyle", style.value)}
+										type="button"
+									>
+										{/* Preview Area */}
+										<div className="h-70 w-70 lg:aspect-[16/22]">
+											<HeaderStylePreview
+												style={style.value}
+												userProfileData={userData}
+											/>
+										</div>
+										{/* Selected Overlay */}
+										{customizations.headerStyle === style.value && (
+											<div className="pointer-events-none absolute inset-0 rounded-xl border border-green-500" />
+										)}
+									</button>
+								))}
+							</div>
+							{showLeftGradient && (
+								<div className="pointer-events-none absolute top-0 left-0 h-full w-8 bg-gradient-to-r from-white to-transparent md:hidden dark:from-neutral-900" />
+							)}
+							{showRightGradient && (
+								<div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent md:hidden dark:from-neutral-900" />
+							)}
 						</div>
 					</div>
 				</CardContent>
@@ -807,8 +870,8 @@ export default function DesignPanel({
 								<button
 									className={`flex h-16 w-full items-center justify-center rounded border px-2 py-1 text-center text-xs leading-tight transition-colors ${
 										customizations.customFont === font.value
-											? "border-gray-300 bg-neutral-200 dark:border-gray-600 dark:bg-neutral-700"
-											: "border-gray-200 hover:bg-neutral-200 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+											? "border-neutral-300 bg-neutral-200 dark:border-neutral-600 dark:bg-neutral-700"
+											: "border-neutral-200 hover:bg-neutral-200 dark:border-neutral-600 dark:text-white dark:hover:bg-neutral-700"
 									}`}
 									key={font.value}
 									onClick={() => handleChange("customFont", font.value)}
@@ -881,7 +944,7 @@ export default function DesignPanel({
 									),
 								]}
 							/>
-							<span className="w-20 text-center font-semibold text-gray-700 dark:text-gray-300">
+							<span className="w-20 text-center font-semibold text-neutral-700 dark:text-neutral-300">
 								{getCornerLabel(
 									Number.parseInt(
 										customizations.customButtonCorners || "12",
@@ -905,7 +968,7 @@ export default function DesignPanel({
 						{customizations.customBackgroundColor && (
 							<div className="flex items-center gap-3 rounded-lg p-2">
 								<button
-									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-gray-200 transition-colors hover:border-blue-500 dark:border-gray-600"
+									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-neutral-200 transition-colors hover:border-blue-500 dark:border-neutral-600"
 									onClick={() =>
 										setActiveColorPicker(
 											activeColorPicker === "background" ? null : "background"
@@ -918,7 +981,7 @@ export default function DesignPanel({
 								/>
 								<div className="flex-1">
 									<p className="font-medium text-sm">Cor de Fundo</p>
-									<p className="text-gray-600 text-xs dark:text-gray-400">
+									<p className="text-neutral-600 text-xs dark:text-neutral-400">
 										{customizations.customBackgroundColor}
 									</p>
 								</div>
@@ -931,7 +994,7 @@ export default function DesignPanel({
 											}
 										/>
 										<HexColorInput
-											className="mt-2 w-full rounded border border-gray-300 p-2 text-center dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+											className="mt-2 w-full rounded border border-neutral-300 p-2 text-center dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
 											color={customizations.customBackgroundColor}
 											onChange={(color) =>
 												handleChange("customBackgroundColor", color)
@@ -947,14 +1010,14 @@ export default function DesignPanel({
 						{customizations.customBackgroundGradient && (
 							<div className="flex items-center gap-3 rounded-lg p-2">
 								<div
-									className="h-8 w-8 flex-shrink-0 rounded-full border-2 border-gray-200 dark:border-gray-600"
+									className="h-8 w-8 flex-shrink-0 rounded-full border-2 border-neutral-200 dark:border-neutral-600"
 									style={{
 										background: customizations.customBackgroundGradient,
 									}}
 								/>
 								<div className="flex-1">
 									<p className="font-medium text-sm">Gradiente de Fundo</p>
-									<p className="text-gray-600 text-xs dark:text-gray-400">
+									<p className="text-neutral-600 text-xs dark:text-neutral-400">
 										Gradiente personalizado
 									</p>
 								</div>
@@ -965,7 +1028,7 @@ export default function DesignPanel({
 						{customizations.customTextColor && (
 							<div className="flex items-center gap-3 rounded-lg p-2">
 								<button
-									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-gray-200 transition-colors hover:border-blue-500 dark:border-gray-600"
+									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-neutral-200 transition-colors hover:border-blue-500 dark:border-neutral-600"
 									onClick={() =>
 										setActiveColorPicker(
 											activeColorPicker === "text" ? null : "text"
@@ -976,7 +1039,7 @@ export default function DesignPanel({
 								/>
 								<div className="flex-1">
 									<p className="font-medium text-sm">Cor do Texto e Ícones</p>
-									<p className="text-gray-600 text-xs dark:text-gray-400">
+									<p className="text-neutral-600 text-xs dark:text-neutral-400">
 										{customizations.customTextColor}
 									</p>
 								</div>
@@ -989,7 +1052,7 @@ export default function DesignPanel({
 											}
 										/>
 										<HexColorInput
-											className="mt-2 w-full rounded border border-gray-300 p-2 text-center dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+											className="mt-2 w-full rounded border border-neutral-300 p-2 text-center dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
 											color={customizations.customTextColor}
 											onChange={(color) =>
 												handleChange("customTextColor", color)
@@ -1005,7 +1068,7 @@ export default function DesignPanel({
 						{customizations.customButtonColor && (
 							<div className="flex items-center gap-3 rounded-lg p-2">
 								<button
-									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-gray-200 transition-colors hover:border-blue-500 dark:border-gray-600"
+									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-neutral-200 transition-colors hover:border-blue-500 dark:border-neutral-600"
 									onClick={() =>
 										setActiveColorPicker(
 											activeColorPicker === "button" ? null : "button"
@@ -1016,7 +1079,7 @@ export default function DesignPanel({
 								/>
 								<div className="flex-1">
 									<p className="font-medium text-sm">Cor do Botão</p>
-									<p className="text-gray-600 text-xs dark:text-gray-400">
+									<p className="text-neutral-600 text-xs dark:text-neutral-400">
 										{customizations.customButtonColor}
 									</p>
 								</div>
@@ -1029,7 +1092,7 @@ export default function DesignPanel({
 											}
 										/>
 										<HexColorInput
-											className="mt-2 w-full rounded border border-gray-300 p-2 text-center dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+											className="mt-2 w-full rounded border border-neutral-300 p-2 text-center dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
 											color={customizations.customButtonColor}
 											onChange={(color) =>
 												handleChange("customButtonColor", color)
@@ -1045,7 +1108,7 @@ export default function DesignPanel({
 						{customizations.customButtonTextColor && (
 							<div className="flex items-center gap-3 rounded-lg p-2">
 								<button
-									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-gray-200 transition-colors hover:border-blue-500 dark:border-gray-600"
+									className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-neutral-200 transition-colors hover:border-blue-500 dark:border-neutral-600"
 									onClick={() =>
 										setActiveColorPicker(
 											activeColorPicker === "buttonText" ? null : "buttonText"
@@ -1058,7 +1121,7 @@ export default function DesignPanel({
 								/>
 								<div className="flex-1">
 									<p className="font-medium text-sm">Cor do Texto do Botão</p>
-									<p className="text-gray-600 text-xs dark:text-gray-400">
+									<p className="text-neutral-600 text-xs dark:text-neutral-400">
 										{customizations.customButtonTextColor}
 									</p>
 								</div>
@@ -1071,7 +1134,7 @@ export default function DesignPanel({
 											}
 										/>
 										<HexColorInput
-											className="mt-2 w-full rounded border border-gray-300 p-2 text-center dark:border-gray-600 dark:bg-neutral-700 dark:text-white"
+											className="mt-2 w-full rounded border border-neutral-300 p-2 text-center dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
 											color={customizations.customButtonTextColor}
 											onChange={(color) =>
 												handleChange("customButtonTextColor", color)
@@ -1091,7 +1154,7 @@ export default function DesignPanel({
 							customizations.customButtonColor ||
 							customizations.customButtonTextColor
 						) && (
-							<div className="py-8 text-center text-gray-500 dark:text-gray-400">
+							<div className="py-8 text-center text-neutral-500 dark:text-neutral-400">
 								<p className="text-sm">Nenhuma cor personalizada selecionada</p>
 								<p className="mt-1 text-xs">
 									Configure suas cores nas seções acima para vê-las aqui
@@ -1111,7 +1174,7 @@ export default function DesignPanel({
 							: "translate-y-0 opacity-100"
 					}`}
 				>
-					<span className="hidden font-medium text-gray-600 text-sm sm:inline-block dark:text-gray-400">
+					<span className="hidden font-medium text-neutral-600 text-sm sm:inline-block dark:text-neutral-400">
 						Deseja salvar as alterações pendentes?
 					</span>
 					<BaseButton

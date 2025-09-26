@@ -98,7 +98,7 @@ const ProfileSection = ({
 				Header
 			</h2>
 			<Card className="border-none shadow-none dark:bg-neutral-800">
-				<CardContent className="space-y-6 p-6">
+				<CardContent className="space-y-6">
 					<article className="flex flex-col gap-4 sm:flex-row sm:items-center">
 						<div className="relative flex items-center justify-center">
 							<div

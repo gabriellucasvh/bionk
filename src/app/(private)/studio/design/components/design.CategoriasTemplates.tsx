@@ -2,7 +2,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import CategoryDropdown from "@/components/ui/CategoryDropdown";
@@ -42,6 +42,49 @@ export default function TemplateSettings({
 		template: string;
 		category: string;
 	} | null>(null);
+	const [showLeftGradient, setShowLeftGradient] = useState(false);
+	const [showRightGradient, setShowRightGradient] = useState(true);
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+	const handleScroll = () => {
+		if (scrollContainerRef.current) {
+			const { scrollLeft, scrollWidth, clientWidth } =
+				scrollContainerRef.current;
+
+			const isAtStart = scrollLeft <= 5;
+			const isAtEnd = scrollLeft >= scrollWidth - clientWidth - 5;
+			const hasOverflow = scrollWidth > clientWidth;
+
+			if (hasOverflow) {
+				setShowLeftGradient(!isAtStart);
+				setShowRightGradient(!isAtEnd);
+			} else {
+				setShowLeftGradient(false);
+				setShowRightGradient(false);
+			}
+		}
+	};
+
+	useEffect(() => {
+		const container = scrollContainerRef.current;
+		if (container) {
+			container.addEventListener("scroll", handleScroll);
+
+			setTimeout(() => {
+				handleScroll();
+			}, 100);
+
+			return () => {
+				container.removeEventListener("scroll", handleScroll);
+			};
+		}
+	}, [selectedCategory]);
+
+	useEffect(() => {
+		setTimeout(() => {
+			handleScroll();
+		}, 100);
+	}, []);
 
 	const handleTemplateSelect = (templateId: string) => {
 		if (selectedCategory) {
@@ -101,9 +144,9 @@ export default function TemplateSettings({
 			<div className="mb-10 block sm:hidden">
 				<CategoryDropdown
 					categories={Object.keys(CATEGORIES)}
+					getCategoryDisplayName={getCategoryDisplayName}
 					onCategorySelect={setSelectedCategory}
 					selectedCategory={selectedCategory}
-					getCategoryDisplayName={getCategoryDisplayName}
 				/>
 			</div>
 			{/* Desktop: Grid */}
@@ -119,42 +162,55 @@ export default function TemplateSettings({
 						onClick={() => setSelectedCategory(category)}
 						variant="ghost"
 					>
-						<span className="break-words">{getCategoryDisplayName(category)}</span>
+						<span className="break-words">
+							{getCategoryDisplayName(category)}
+						</span>
 					</Button>
 				))}
 			</div>
 
 			{selectedCategory && (
 				<div className="mt-4">
-					<div className="flex gap-3">
-						{CATEGORIES[selectedCategory as keyof typeof CATEGORIES]?.map(
-							(template) => (
-								<div
-									className={`max-w-[350px] cursor-pointer rounded-lg border transition-all ${
-										selectedTemplate === template.id
-											? "border-green-600 bg-green-50"
-											: "border-gray-300 hover:border-green-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-green-400 dark:hover:bg-gray-600"
-									}`}
-									key={template.id}
-								>
-									<Button
-										className="flex h-full w-full flex-col p-0"
-										onClick={() => handleTemplateSelect(template.id)}
-										variant="ghost"
+					<div className="relative">
+						<div
+							className="scrollbar-hide flex gap-3 overflow-x-auto pb-2"
+							ref={scrollContainerRef}
+						>
+							{CATEGORIES[selectedCategory as keyof typeof CATEGORIES]?.map(
+								(template) => (
+									<div
+										className={`min-w-[150px] cursor-pointer rounded-lg border transition-all ${
+											selectedTemplate === template.id
+												? "border-green-600 bg-green-50"
+												: "border-neutral-300 hover:border-green-400 hover:bg-neutral-50 dark:border-neutral-600 dark:hover:border-green-400 dark:hover:bg-neutral-600"
+										}`}
+										key={template.id}
 									>
-										<div className="relative h-[266px] w-[150px] overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
-											<Image
-												alt={template.name}
-												className="object-cover"
-												fill
-												quality={100}
-												src={template.image}
-												unoptimized
-											/>
-										</div>
-									</Button>
-								</div>
-							)
+										<Button
+											className="flex h-full w-full flex-col p-0"
+											onClick={() => handleTemplateSelect(template.id)}
+											variant="ghost"
+										>
+											<div className="relative h-[266px] w-[150px] overflow-hidden rounded-lg bg-neutral-200 dark:bg-neutral-700">
+												<Image
+													alt={template.name}
+													className="object-cover"
+													fill
+													quality={100}
+													src={template.image}
+													unoptimized
+												/>
+											</div>
+										</Button>
+									</div>
+								)
+							)}
+						</div>
+						{showLeftGradient && (
+							<div className="pointer-events-none absolute top-0 left-0 h-full w-8 bg-gradient-to-r from-white to-transparent sm:hidden dark:from-neutral-800" />
+						)}
+						{showRightGradient && (
+							<div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent sm:hidden dark:from-neutral-800" />
 						)}
 					</div>
 				</div>
