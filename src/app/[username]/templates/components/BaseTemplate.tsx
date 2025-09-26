@@ -620,7 +620,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 			<div className="min-h-dvh sm:flex sm:items-start sm:justify-center sm:bg-neutral-900 sm:pt-4 dark:sm:bg-gray-900">
 				<div
 					className={`relative min-h-dvh w-full sm:min-h-[calc(100vh-2rem)] sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
-						customPresets.headerStyle === "hero" ? "pt-0" : "px-4"
+						customPresets.headerStyle === "hero" ? "pt-0 px-4" : "px-4"
 					} sm:px-6 sm:pt-4`}
 					style={wrapperStyle}
 				>
@@ -631,7 +631,9 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					</div>
 
 					<div className="flex min-h-dvh flex-col sm:min-h-[calc(100vh-2rem)]">
-						<main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center pt-4 sm:max-w-none">
+						<main className={`mx-auto flex w-full max-w-md flex-1 flex-col items-center sm:max-w-none ${
+							customPresets.headerStyle === "hero" ? "pt-2" : "pt-4"
+						}`}>
 							<UserHeader
 								customPresets={customPresets}
 								headerStyle={customPresets.headerStyle}
