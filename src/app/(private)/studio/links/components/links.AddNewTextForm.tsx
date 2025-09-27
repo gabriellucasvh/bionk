@@ -102,7 +102,7 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 					<div className="grid gap-2">
 						<Label htmlFor="description">Descrição *</Label>
 						<Textarea
-							className="h-24 resize-none overflow-y-auto"
+							className="h-21 resize-none overflow-y-auto"
 							id="description"
 							maxLength={1500}
 							onChange={(e) =>
