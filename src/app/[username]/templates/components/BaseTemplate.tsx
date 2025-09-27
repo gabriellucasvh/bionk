@@ -423,8 +423,23 @@ function LinksList({
 		return result;
 	};
 
-	const renderTextContent = (text: any) => {
-		return [
+	const renderTextContent = (
+		text: any,
+		index: number,
+		sectionIdRef: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const textSectionId = text.sectionId || null;
+
+		if (textSectionId !== sectionIdRef.value && textSectionId !== null) {
+			sectionIdRef.value = textSectionId;
+			const sectionHeader = renderSectionHeader(text, textSectionId, index);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		result.push(
 			<TextCard
 				buttonStyle={buttonStyle}
 				classNames={{}}
@@ -432,36 +447,78 @@ function LinksList({
 				key={`text-${text.id}`}
 				text={text}
 				textStyle={textStyle}
-			/>,
-		];
+			/>
+		);
+		return result;
 	};
 
-	const renderVideoContent = (video: any) => {
-		return [
+	const renderVideoContent = (
+		video: any,
+		index: number,
+		sectionIdRef: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const videoSectionId = video.sectionId || null;
+
+		if (videoSectionId !== sectionIdRef.value && videoSectionId !== null) {
+			sectionIdRef.value = videoSectionId;
+			const sectionHeader = renderSectionHeader(video, videoSectionId, index);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		result.push(
 			<VideoCard
 				customPresets={customPresets}
 				key={`video-${video.id}`}
 				{...video}
-			/>,
-		];
+			/>
+		);
+		return result;
 	};
 
 	const allContent = createContentArray();
 	const currentSectionId = { value: null };
 
+	const shouldAddSectionSpacing = (currentIndex: number) => {
+		const currentItem = allContent[currentIndex];
+		const nextItem = allContent[currentIndex + 1];
+
+		if (!(currentItem && nextItem)) {
+			return false;
+		}
+
+		const currentItemSectionId = currentItem.item.sectionId;
+		const nextItemSectionId = nextItem.item.sectionId;
+
+		// Adiciona espaçamento se o item atual tem seção e o próximo não tem ou tem seção diferente
+		return currentItemSectionId && currentItemSectionId !== nextItemSectionId;
+	};
+
 	return (
 		<div className="space-y-4">
 			{allContent.map((content, index) => {
-				switch (content.type) {
-					case "link":
-						return renderLinkContent(content.item, index, currentSectionId);
-					case "text":
-						return renderTextContent(content.item);
-					case "video":
-						return renderVideoContent(content.item);
-					default:
-						return null;
-				}
+				const renderedContent = (() => {
+					switch (content.type) {
+						case "link":
+							return renderLinkContent(content.item, index, currentSectionId);
+						case "text":
+							return renderTextContent(content.item, index, currentSectionId);
+						case "video":
+							return renderVideoContent(content.item, index, currentSectionId);
+						default:
+							return null;
+					}
+				})();
+
+				const needsSpacing = shouldAddSectionSpacing(index);
+
+				return (
+					<div className={needsSpacing ? "mb-8" : ""} key={`content-${index}`}>
+						{renderedContent}
+					</div>
+				);
 			})}
 		</div>
 	);

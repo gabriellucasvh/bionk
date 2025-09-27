@@ -94,6 +94,13 @@ export default async function UserPage({ params }: PageProps) {
 					order: true,
 					userId: true,
 					isCompact: true,
+					sectionId: true,
+					section: {
+						select: {
+							id: true,
+							title: true,
+						},
+					},
 				},
 			},
 			Video: {
@@ -108,6 +115,44 @@ export default async function UserPage({ params }: PageProps) {
 					order: true,
 					active: true,
 					userId: true,
+					sectionId: true,
+					section: {
+						select: {
+							id: true,
+							title: true,
+						},
+					},
+				},
+			},
+			Section: {
+				where: { active: true },
+				orderBy: { order: "asc" },
+				select: {
+					id: true,
+					title: true,
+					order: true,
+					active: true,
+					links: {
+						where: {
+							active: true,
+							archived: false,
+							OR: [{ launchesAt: null }, { launchesAt: { lte: now } }],
+							AND: [{ OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] }],
+						},
+						orderBy: { order: "asc" },
+						select: {
+							id: true,
+							title: true,
+							url: true,
+							order: true,
+							type: true,
+							clicks: true,
+							customImageUrl: true,
+							badge: true,
+							password: true,
+							animated: true,
+						},
+					},
 				},
 			},
 			CustomPresets: {
