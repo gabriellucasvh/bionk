@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import LoadingPage from "@/components/layout/LoadingPage";
 import ProfileImageCropModal from "@/components/modals/ProfileImageCropModal";
 import CategoriasTemplates from "./components/design.CategoriasTemplates";
-import DesignPanel from "./components/design.Panel";
+import { DesignPanel } from "./components/design.Panel";
 import ProfileSection from "./components/ProfileSection";
 import { useButtonAnimations } from "./hooks/useButtonAnimations";
 import { useCustomizations } from "./hooks/useCustomizations";
