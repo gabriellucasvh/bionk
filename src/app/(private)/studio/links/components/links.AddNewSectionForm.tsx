@@ -45,12 +45,16 @@ const AddNewSectionForm = ({
 						<Input
 							autoFocus
 							id="sectionTitleInput"
+							maxLength={60}
 							onChange={(e) =>
 								setFormData({ ...formData, title: e.target.value })
 							}
 							placeholder="Ex: Redes Sociais, Projetos, Contato"
 							value={formData.title}
 						/>
+						<p className="text-muted-foreground text-xs">
+							{formData.title.length}/60 caracteres
+						</p>
 					</div>
 				</section>
 			</div>

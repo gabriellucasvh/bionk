@@ -53,8 +53,8 @@ const PerfilClient = () => {
 	const [bioValidationError, setBioValidationError] = useState<string>("");
 
 	const validateBio = useCallback((bio: string): boolean => {
-		if (bio.length > 300) {
-			setBioValidationError("A biografia deve ter no máximo 300 caracteres.");
+		if (bio.length > 150) {
+			setBioValidationError("A biografia deve ter no máximo 150 caracteres.");
 			return false;
 		}
 		setBioValidationError("");
@@ -413,7 +413,7 @@ const PerfilClient = () => {
 							}`}
 							disabled={loading || isUploadingImage}
 							id="bio"
-							maxLength={300}
+							maxLength={150}
 							onChange={(e) => {
 								setProfile({ ...profile, bio: e.target.value });
 								validateBio(e.target.value);
@@ -426,7 +426,7 @@ const PerfilClient = () => {
 								{bioValidationError || " "}
 							</p>
 							<p className="text-muted-foreground text-sm">
-								{profile.bio.length}/300
+								{profile.bio.length}/150
 							</p>
 						</div>
 					</div>

@@ -361,13 +361,13 @@ const OnboardingModal = ({
 							<Textarea
 								className="min-h-32 text-neutral-700 dark:bg-neutral-700 dark:text-white"
 								id="bio"
-								maxLength={300}
+								maxLength={150}
 								onChange={(e) => setData({ ...data, bio: e.target.value })}
 								placeholder="Fale um pouco sobre você"
 								value={data.bio}
 							/>
 							<p className="text-muted-foreground text-sm">
-								{data.bio.length}/300 caracteres (Opcional)
+								{data.bio.length}/150 caracteres (Opcional)
 							</p>
 						</div>
 					</motion.div>

@@ -185,7 +185,7 @@ const ProfileSection = ({
 							}`}
 							disabled={loading || isUploadingImage}
 							id="bio"
-							maxLength={300}
+							maxLength={150}
 							onChange={(e) => handleBioChange(e.target.value)}
 							placeholder="Fale um pouco sobre você"
 							value={profile.bio}
@@ -195,7 +195,7 @@ const ProfileSection = ({
 								{bioValidationError || " "}
 							</p>
 							<p className={`text-sm ${getBioCharacterCountColor()}`}>
-								{profile.bio.length}/300
+								{profile.bio.length}/150
 							</p>
 						</div>
 					</div>
