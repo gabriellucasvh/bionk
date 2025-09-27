@@ -102,17 +102,17 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 					<div className="grid gap-2">
 						<Label htmlFor="description">Descrição *</Label>
 						<Textarea
+							className="h-24 resize-none overflow-y-auto"
 							id="description"
-							maxLength={2000}
+							maxLength={1500}
 							onChange={(e) =>
 								setFormData({ ...formData, description: e.target.value })
 							}
 							placeholder="Digite o conteúdo do texto"
-							rows={4}
 							value={formData.description}
 						/>
 						<p className="text-muted-foreground text-xs">
-							{formData.description.length}/2000 caracteres
+							{formData.description.length}/1500 caracteres
 						</p>
 					</div>
 

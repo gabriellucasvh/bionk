@@ -27,6 +27,13 @@ export async function POST(request: Request) {
 			);
 		}
 
+		if (description.length > 1500) {
+			return NextResponse.json(
+				{ error: "Descrição deve ter no máximo 1500 caracteres" },
+				{ status: 400 }
+			);
+		}
+
 		// Incrementar order de todos os links, textos, seções e vídeos existentes do usuário
 		await prisma.$transaction([
 			prisma.link.updateMany({

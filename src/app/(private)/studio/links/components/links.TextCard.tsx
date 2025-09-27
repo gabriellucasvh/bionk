@@ -150,9 +150,9 @@ const TextCard = ({
 							<Textarea
 								className="resize-none whitespace-pre-wrap break-words"
 								id={`description-${text.id}`}
-								maxLength={2000}
-								onChange={(e) => {
-									if (e.target.value.length <= 2000) {
+								maxLength={1500}
+							onChange={(e) => {
+								if (e.target.value.length <= 1500) {
 										handleFieldChange("description", e.target.value);
 									}
 								}}
@@ -161,8 +161,8 @@ const TextCard = ({
 								value={text.description}
 							/>
 							<div className="text-right text-muted-foreground text-xs">
-								{text.description.length}/2000 caracteres
-							</div>
+				{text.description.length}/1500 caracteres
+			</div>
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor={`position-${text.id}`}>Posição do texto</Label>
@@ -253,11 +253,6 @@ const TextCard = ({
 								? `${text.title.slice(0, 64)}...`
 								: text.title}
 						</h3>
-						{!text.active && (
-							<span className="rounded bg-muted px-2 py-1 text-muted-foreground text-xs">
-								Inativo
-							</span>
-						)}
 					</header>
 
 					<p className="text-muted-foreground text-sm">

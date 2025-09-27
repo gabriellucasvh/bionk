@@ -46,6 +46,13 @@ export async function PUT(
 			);
 		}
 
+		if (description && description.length > 1500) {
+			return NextResponse.json(
+				{ error: "Descrição deve ter no máximo 1500 caracteres" },
+				{ status: 400 }
+			);
+		}
+
 		const updatedText = await prisma.text.update({
 			where: { id: textId },
 			data: {

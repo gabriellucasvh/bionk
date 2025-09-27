@@ -486,19 +486,18 @@ export const useLinksManager = (
 	};
 
 	const handleVideoUpdate = async (id: number, payload: Partial<VideoItem>) => {
-			const response = await fetch(`/api/videos/${id}`, {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(payload),
-			});
+		const response = await fetch(`/api/videos/${id}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
 
-			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.error || "Erro ao atualizar vídeo");
-			}
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.error || "Erro ao atualizar vídeo");
+		}
 
-			await mutateVideos();
-
+		await mutateVideos();
 	};
 
 	const handleDeleteVideo = async (id: number) => {
@@ -621,20 +620,40 @@ export const useLinksManager = (
 	};
 
 	const toggleActive = async (id: number, isActive: boolean) => {
-		const link = currentLinks.find((l) => l.id === id);
-		const text = currentTexts.find((t) => t.id === id);
-		const video = currentVideos.find((v) => v.id === id);
+		// Encontrar o item no unifiedItems para determinar o tipo correto
+		const foundItem = unifiedItems.find((item) => item.id === id);
+
+		console.log("toggleActive called with:", { id, isActive });
+		console.log("Found item:", {
+			item: !!foundItem,
+			isText: foundItem?.isText,
+			isVideo: foundItem?.isVideo,
+			isSection: foundItem?.isSection,
+		});
+
+		if (!foundItem) {
+			console.error("Item não encontrado:", id);
+			return;
+		}
 
 		try {
-			if (link) {
-				setTogglingLinkId(id);
-				await handleLinkUpdate(id, { active: isActive });
-			} else if (text) {
-				setTogglingTextId(id);
-				await handleTextUpdate(id, { active: isActive });
-			} else if (video) {
+			if (foundItem.isVideo) {
+				console.log("Toggling video:", id);
 				setTogglingVideoId(id);
 				await handleVideoUpdate(id, { active: isActive });
+			} else if (foundItem.isText) {
+				console.log("Toggling text:", id);
+				setTogglingTextId(id);
+				await handleTextUpdate(id, { active: isActive });
+			} else if (foundItem.isSection) {
+				console.log("Toggling section:", id);
+				setTogglingSectionId(id);
+				await handleSectionUpdate(id, { active: isActive });
+			} else {
+				// Se não é texto, vídeo ou seção, deve ser um link
+				console.log("Toggling link:", id);
+				setTogglingLinkId(id);
+				await handleLinkUpdate(id, { active: isActive });
 			}
 		} finally {
 			setTogglingLinkId(null);
@@ -751,12 +770,24 @@ export const useLinksManager = (
 	};
 
 	const handleTextUpdate = async (id: number, payload: Partial<TextItem>) => {
-		await fetch(`/api/texts/${id}`, {
-			method: "PUT",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(payload),
-		});
-		await mutateTexts();
+		try {
+			await mutateTexts();
+
+			const response = await fetch(`/api/texts/${id}`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+			});
+
+			if (!response.ok) {
+				throw new Error("Falha ao atualizar texto");
+			}
+
+			await mutateTexts();
+		} catch (error) {
+			await mutateTexts();
+			throw error;
+		}
 	};
 
 	const handleDeleteText = async (id: number) => {
