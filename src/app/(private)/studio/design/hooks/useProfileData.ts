@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import type { SocialLinkItem } from "@/types/social";
+import type {
+	SocialLink,
+	UserLink,
+	UserText,
+	UserVideo,
+} from "@/types/user-profile";
 
 interface User {
 	name: string;
@@ -9,11 +15,16 @@ interface User {
 }
 
 interface UserData {
+	id: string;
 	name: string;
 	username: string;
-	bio?: string;
-	image?: string;
+	bio: string;
+	image: string;
 	socialLinks: SocialLinkItem[];
+	Link: UserLink[];
+	Text: UserText[];
+	Video: UserVideo[];
+	SocialLink: SocialLink[];
 }
 
 interface ProfileState {
@@ -34,11 +45,16 @@ export const useProfileData = (userId?: string, sessionImage?: string) => {
 		bio: "",
 	});
 	const [userData, setUserData] = useState<UserData>({
+		id: "",
 		name: "",
 		username: "",
 		bio: "",
 		image: "",
 		socialLinks: [],
+		Link: [],
+		Text: [],
+		Video: [],
+		SocialLink: [],
 	});
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
 
@@ -60,16 +76,36 @@ export const useProfileData = (userId?: string, sessionImage?: string) => {
 			const socialData = await socialRes.json();
 			const socialLinks = socialData?.socialLinks || [];
 
+			// Carregar links do usuário
+			const linksRes = await fetch(`/api/links?userId=${userId}`);
+			const linksData = await linksRes.json();
+			const userLinks = linksData?.links || [];
+
+			// Carregar textos do usuário
+			const textsRes = await fetch("/api/texts");
+			const textsData = await textsRes.json();
+			const userTexts = textsData?.texts || [];
+
+			// Carregar vídeos do usuário
+			const videosRes = await fetch("/api/videos");
+			const videosData = await videosRes.json();
+			const userVideos = videosData?.videos || [];
+
 			const profileData = { name, username, bio: bio || "" };
 			setProfile(profileData);
 			setOriginalProfile(profileData);
 
 			setUserData({
+				id: userId,
 				name,
 				username,
 				bio: bio || "",
 				image: currentImage,
 				socialLinks,
+				Link: userLinks,
+				Text: userTexts,
+				Video: userVideos,
+				SocialLink: socialLinks,
 			});
 
 			return currentImage;
@@ -79,11 +115,16 @@ export const useProfileData = (userId?: string, sessionImage?: string) => {
 				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 
 			setUserData({
+				id: "",
 				name: "",
 				username: "",
 				bio: "",
 				image: fallbackUrl,
 				socialLinks: [],
+				Link: [],
+				Text: [],
+				Video: [],
+				SocialLink: [],
 			});
 
 			return fallbackUrl;
@@ -92,7 +133,7 @@ export const useProfileData = (userId?: string, sessionImage?: string) => {
 		}
 	}, [userId, sessionImage]);
 
-		const updateProfileText = useCallback(async (): Promise<User | null> => {
+	const updateProfileText = useCallback(async (): Promise<User | null> => {
 		if (!userId) {
 			return null;
 		}

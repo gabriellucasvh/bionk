@@ -2,11 +2,14 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useEffect, useRef, useState } from "react";
 import LoadingPage from "@/components/layout/LoadingPage";
 import ProfileImageCropModal from "@/components/modals/ProfileImageCropModal";
+import { useDesignStore } from "@/stores/designStore";
 import CategoriasTemplates from "./components/design.CategoriasTemplates";
 import { DesignPanel } from "./components/design.Panel";
 import ProfileSection from "./components/ProfileSection";
+import UserPagePreview from "./components/UserPagePreview";
 import { useButtonAnimations } from "./hooks/useButtonAnimations";
 import { useCustomizations } from "./hooks/useCustomizations";
 import { useProfileData } from "./hooks/useProfileData";
@@ -16,6 +19,19 @@ import { useSaveProfile } from "./hooks/useSaveProfile";
 
 const PersonalizarClient = () => {
 	const { data: session } = useSession();
+	const { loadInitialData, updateUserField } = useDesignStore();
+	const [mobileView, setMobileView] = useState<"design" | "preview">("design");
+	const previewContainerRef = useRef<HTMLDivElement>(null);
+	const designContainerRef = useRef<HTMLDivElement>(null);
+
+	const handleMobileViewChange = (view: "design" | "preview") => {
+		setMobileView(view);
+		if (view === "preview" && previewContainerRef.current) {
+			setTimeout(() => {
+				previewContainerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+			}, 100);
+		}
+	};
 
 	const {
 		profile,
@@ -25,7 +41,11 @@ const PersonalizarClient = () => {
 		userData,
 		isProfileLoading,
 		updateProfileText,
-	} = useProfileData(session?.user?.id || undefined, session?.user?.image || undefined);
+		fetchProfile,
+	} = useProfileData(
+		session?.user?.id || undefined,
+		session?.user?.image || undefined
+	);
 
 	const {
 		profilePreview,
@@ -59,8 +79,7 @@ const PersonalizarClient = () => {
 		profileImageChanged
 	);
 
-	const { userCustomizations, handleTemplateChange, handleSaveCustomizations } =
-		useCustomizations();
+	const { userCustomizations, handleTemplateChange } = useCustomizations();
 
 	const {
 		loading,
@@ -83,6 +102,75 @@ const PersonalizarClient = () => {
 		animateButtonsOut,
 	});
 
+	// Função para converter UserData do hook para o formato do store
+	const convertUserDataForStore = (userDataInput: any) => {
+		// Combinar links regulares e social links
+		const allLinks = [
+			...(userDataInput.Link || []),
+			...(userDataInput.socialLinks || []),
+		];
+
+		return {
+			id: userDataInput.id,
+			name: userDataInput.name,
+			bio: userDataInput.bio,
+			username: userDataInput.username,
+			image: userDataInput.image,
+			links: allLinks,
+			texts:
+				userDataInput.Text?.map((text: any) => ({
+					id: text.id,
+					content: text.title || text.content || "",
+					description: text.description || "",
+					order: text.order,
+					title: text.title || "",
+					position: text.position || "center",
+					hasBackground: text.hasBackground,
+					isCompact: text.isCompact,
+				})) || [],
+			videos:
+				userDataInput.Video?.map((video: any) => ({
+					id: video.id,
+					title: video.title,
+					description: video.description,
+					url: video.url,
+					order: video.order,
+					type: video.type || "direct",
+				})) || [],
+		};
+	};
+
+	// Carregar dados iniciais no store
+	useEffect(() => {
+		if (userData && userCustomizations) {
+			const convertedUserData = convertUserDataForStore(userData);
+			loadInitialData(convertedUserData, userCustomizations);
+		}
+	}, [userData, userCustomizations, loadInitialData]);
+
+	// Sincronizar mudanças do profile com o store apenas na inicialização
+	useEffect(() => {
+		if (profile && userData && !useDesignStore.getState().userData) {
+			updateUserField("name", profile.name || userData.name || "");
+			updateUserField("bio", profile.bio || userData.bio || "");
+			updateUserField("username", profile.username || userData.username || "");
+			updateUserField("image", profilePreview || userData.image || "");
+		}
+	}, [profile, userData]);
+
+	// Escutar eventos de recarregamento para atualizar preview
+	useEffect(() => {
+		const handleReloadPreview = () => {
+			fetchProfile();
+		};
+
+		window.addEventListener("reloadIframePreview", handleReloadPreview);
+
+		return () => {
+			window.removeEventListener("reloadIframePreview", handleReloadPreview);
+		};
+	}, [fetchProfile]);
+
 	const handleProfileChange = (field: string, value: string) => {
 		setProfile({ ...profile, [field]: value });
 	};
@@ -97,44 +185,104 @@ const PersonalizarClient = () => {
 	}
 
 	return (
-		<div className="min-h-screen w-full bg-white text-black transition-colors md:w-11/12 xl:w-7/12 dark:bg-neutral-800 dark:text-white">
-			<section className="flex min-h-screen flex-col gap-6 px-6 py-8 pb-24">
-				<ProfileSection
-					bioValidationError={bioValidationError}
-					isCheckingUsername={isCheckingUsername}
-					isUploadingImage={isUploadingImage}
-					loading={loading}
-					onBioChange={validateBio}
-					onCancelChanges={handleProfileCancel}
-					onImageEditClick={() => setIsImageCropModalOpen(true)}
-					onProfileChange={handleProfileChange}
-					onSaveProfile={handleSaveProfile}
-					onUsernameChange={debouncedValidateUsername}
-					originalProfile={originalProfile}
-					profile={profile}
-					profilePreview={profilePreview}
-					showButtons={showButtons}
-					validationError={validationError}
-				/>
+		<div className="min-h-screen w-full bg-white text-black transition-colors dark:bg-neutral-800 dark:text-white">
+			{/* Navbar Mobile - Visível apenas em telas menores que md */}
+			<div className="md:hidden">
+				<div className="fixed top-0 right-0 left-0 z-50 border-gray-200 border-b bg-white dark:border-gray-700 dark:bg-neutral-800">
+					<div className="flex">
+						<button
+							className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+								mobileView === "design"
+									? "border-green-600 border-b-2 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400"
+									: "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+							}`}
+							onClick={() => handleMobileViewChange("design")}
+							type="button"
+						>
+							Design
+						</button>
+						<button
+							className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+								mobileView === "preview"
+									? "border-green-600 border-b-2 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400"
+									: "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+							}`}
+							onClick={() => handleMobileViewChange("preview")}
+							type="button"
+						>
+							Preview
+						</button>
+					</div>
+				</div>
+			</div>
 
-				<section className="border-t pt-6 dark:border-gray-700">
-					<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
-						Templates
-					</h2>
-					<CategoriasTemplates onTemplateChange={handleTemplateChange} />
-				</section>
+			{/* Conteúdo Principal */}
+			<div className="md:flex">
+				{/* Painel de Edição */}
+				<div
+					className={`h-screen w-full overflow-y-auto bg-white md:h-auto md:flex-1 md:overflow-visible dark:bg-neutral-800 ${
+						mobileView === "preview" ? "hidden xl:block" : "block"
+					}`}
+					ref={designContainerRef}
+				>
+					<section className="flex min-h-screen flex-col gap-6 px-6 py-8 pt-20 pb-24 md:pt-8 md:pr-8 xl:pr-100">
+						<ProfileSection
+							bioValidationError={bioValidationError}
+							isCheckingUsername={isCheckingUsername}
+							isUploadingImage={isUploadingImage}
+							loading={loading}
+							onBioChange={validateBio}
+							onCancelChanges={handleProfileCancel}
+							onImageEditClick={() => setIsImageCropModalOpen(true)}
+							onProfileChange={handleProfileChange}
+							onSaveProfile={handleSaveProfile}
+							onUsernameChange={debouncedValidateUsername}
+							originalProfile={originalProfile}
+							profile={profile}
+							profilePreview={profilePreview}
+							showButtons={showButtons}
+							validationError={validationError}
+						/>
 
-				<section className="border-t pt-6 dark:border-gray-700">
-					<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
-						Personalização
-					</h2>
-					<DesignPanel
-						onSave={handleSaveCustomizations}
-						userCustomizations={userCustomizations}
-						userData={userData}
-					/>
-				</section>
-			</section>
+						<section className="border-t pt-6 dark:border-gray-700">
+							<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
+								Templates
+							</h2>
+							<CategoriasTemplates onTemplateChange={handleTemplateChange} />
+						</section>
+
+						<section className="border-t pt-6 dark:border-gray-700">
+							<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
+								Personalização
+							</h2>
+							<DesignPanel />
+						</section>
+					</section>
+				</div>
+
+				{/* Preview Mobile - Visível apenas quando selecionado no mobile */}
+				<div
+					className={`h-screen w-full overflow-y-auto bg-gray-100 md:hidden dark:bg-neutral-900 ${
+						mobileView === "design" ? "hidden" : "block"
+					}`}
+					ref={previewContainerRef}
+				>
+					<div className="min-h-full px-4 pt-20 pb-20">
+						<div className="mx-auto max-w-sm overflow-hidden rounded-3xl bg-white shadow-lg dark:bg-neutral-800">
+							<UserPagePreview />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Preview Desktop - Visível apenas em md+ */}
+			<div className="fixed top-4 right-4 z-50 hidden h-[calc(100vh-2rem)] w-80 rounded-[2.5rem] border-4 border-gray-800 bg-gray-900 shadow-2xl xl:block">
+				<div className="flex h-full flex-col">
+					<div className="flex-1 overflow-y-auto rounded-4xl bg-white dark:bg-neutral-900">
+						<UserPagePreview />
+					</div>
+				</div>
+			</div>
 
 			<ProfileImageCropModal
 				currentImageUrl={profilePreview}

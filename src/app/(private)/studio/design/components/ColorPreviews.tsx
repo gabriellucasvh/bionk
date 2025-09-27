@@ -6,7 +6,7 @@ import { HexColorInput, HexColorPicker } from "react-colorful";
 interface ColorPreviewItemProps {
 	label: string;
 	color: string;
-	colorKey: "background" | "text" | "button" | "buttonText";
+	colorKey: string;
 	activeColorPicker: string | null;
 	setActiveColorPicker: (picker: string | null) => void;
 	handleChange: (field: string, value: string) => void;
@@ -33,14 +33,16 @@ function ColorPreviewItem({
 	fieldName
 }: ColorPreviewItemProps) {
 	const pickerRef = useRef<HTMLDivElement>(null);
+	const previewColorKey = `preview-${colorKey}`;
 
 	return (
 		<div className="flex items-center gap-3 rounded-lg p-2">
 			<button
 				className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-neutral-200 transition-colors hover:border-blue-500 dark:border-neutral-600"
+				data-color-button
 				onClick={() =>
 					setActiveColorPicker(
-						activeColorPicker === colorKey ? null : colorKey
+						activeColorPicker === previewColorKey ? null : previewColorKey
 					)
 				}
 				style={{ backgroundColor: color }}
@@ -52,8 +54,8 @@ function ColorPreviewItem({
 					{color}
 				</p>
 			</div>
-			{activeColorPicker === colorKey && (
-				<div className="absolute z-10 mt-2" ref={pickerRef}>
+			{activeColorPicker === previewColorKey && (
+				<div className="absolute z-10 mt-2" data-color-picker ref={pickerRef}>
 					<HexColorPicker
 						color={color}
 						onChange={(newColor) =>
@@ -107,7 +109,7 @@ export function ColorPreviews({
 				<ColorPreviewItem
 					label="Cor de Fundo"
 					color={customizations.customBackgroundColor}
-					colorKey="background"
+					colorKey="customBackgroundColor"
 					activeColorPicker={activeColorPicker}
 					setActiveColorPicker={setActiveColorPicker}
 					handleChange={handleChange}
@@ -121,7 +123,7 @@ export function ColorPreviews({
 				<ColorPreviewItem
 					label="Cor do Texto e Ícones"
 					color={customizations.customTextColor}
-					colorKey="text"
+					colorKey="customTextColor"
 					activeColorPicker={activeColorPicker}
 					setActiveColorPicker={setActiveColorPicker}
 					handleChange={handleChange}
@@ -135,7 +137,7 @@ export function ColorPreviews({
 				<ColorPreviewItem
 					label="Cor do Botão"
 					color={customizations.customButtonColor}
-					colorKey="button"
+					colorKey="customButtonColor"
 					activeColorPicker={activeColorPicker}
 					setActiveColorPicker={setActiveColorPicker}
 					handleChange={handleChange}
@@ -149,7 +151,7 @@ export function ColorPreviews({
 				<ColorPreviewItem
 					label="Cor do Texto do Botão"
 					color={customizations.customButtonTextColor}
-					colorKey="buttonText"
+					colorKey="customButtonTextColor"
 					activeColorPicker={activeColorPicker}
 					setActiveColorPicker={setActiveColorPicker}
 					handleChange={handleChange}

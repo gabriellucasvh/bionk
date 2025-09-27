@@ -3,6 +3,7 @@
 import { Lock, SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
 import { type FormEvent, useState } from "react";
+import { FONT_OPTIONS } from "@/app/(private)/studio/design/constants/design.constants";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import CookieConsent from "@/components/CookieConsent";
 import InteractiveLink from "@/components/InteractiveLink";
@@ -25,6 +26,11 @@ import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
 import { getTemplatePreset } from "@/utils/templatePresets";
 import ShareModal from "./ShareModal";
 import TextCard from "./TextCard";
+
+function getFontFamily(customFont: string): string {
+	const fontOption = FONT_OPTIONS.find((option) => option.value === customFont);
+	return fontOption ? fontOption.fontFamily : "var(--font-sans)";
+}
 
 interface BaseTemplateProps extends TemplateComponentProps {
 	children?: React.ReactNode;
@@ -158,23 +164,23 @@ function renderHeroHeader(
 	return (
 		<header className="mb-6 w-full text-center">
 			{user.image && (
-				<div className="relative mx-auto mb-4 h-48 w-48 overflow-hidden rounded-t-2xl sm:h-64 sm:w-64 md:h-80 md:w-80 lg:h-94 lg:w-94">
+				<div className="relative mb-4 h-48 w-full overflow-hidden sm:h-64 md:h-80 lg:h-94">
 					<div className="absolute inset-0">
 						{user.image.toLowerCase().endsWith(".gif") ? (
 							// biome-ignore lint/performance/noImgElement: <necessário para GIFs>
 							<img
 								alt={user.name || user.username}
-								className="h-full w-full object-cover"
+								className="h-full w-full object-cover sm:rounded-t-3xl"
 								src={user.image}
 							/>
 						) : (
 							<Image
 								alt={user.name || user.username}
-								className="object-cover"
+								className="object-cover sm:rounded-t-3xl"
 								fill
 								priority
 								quality={100}
-								sizes="(max-width: 640px) 192px, (max-width: 768px) 256px, (max-width: 1024px) 320px, 376px"
+								sizes="100vw"
 								src={user.image}
 							/>
 						)}
@@ -191,19 +197,16 @@ function renderHeroHeader(
 				</div>
 			)}
 
-			<div className="text-center">
-				<h1 className="font-bold text-lg" style={textStyle}>
+			<div className="px-4 text-center">
+				<h1 className="font-bold text-2xl" style={textStyle}>
 					{user.name || user.username}
 				</h1>
 				{user.bio && (
-					<p className="mt-2 text-sm opacity-80" style={textStyle}>
+					<p className="mt-2" style={textStyle}>
 						{user.bio}
 					</p>
 				)}
-			</div>
-
-			<div className="mt-4">
-				{renderSocialLinks(user, "justify-center", textStyle?.color as string)}
+				{renderSocialLinks(user, "mt-4", textStyle?.color as string)}
 			</div>
 		</header>
 	);
@@ -479,7 +482,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 			background: customPresets.customBackgroundGradient,
 		}),
 		...(customPresets.customFont && {
-			fontFamily: customPresets.customFont.replace("font-", ""),
+			fontFamily: getFontFamily(customPresets.customFont),
 		}),
 	};
 
@@ -595,7 +598,8 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					case "gradient":
 						return {
 							...baseStyle,
-							background:
+							backgroundColor: "transparent",
+							backgroundImage:
 								customPresets.customBackgroundGradient ||
 								"linear-gradient(135deg, #c026d3 0%, #7c3aed 50%, #2563eb 100%)",
 							border: "none",
@@ -620,8 +624,8 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 			<div className="min-h-dvh sm:flex sm:items-start sm:justify-center sm:bg-neutral-900 sm:pt-4 dark:sm:bg-gray-900">
 				<div
 					className={`relative min-h-dvh w-full sm:min-h-[calc(100vh-2rem)] sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
-						customPresets.headerStyle === "hero" ? "pt-0 px-4" : "px-4"
-					} sm:px-6 sm:pt-4`}
+						customPresets.headerStyle === "hero" ? "pt-0" : "px-4"
+					} ${customPresets.headerStyle !== "hero" ? "sm:px-6 sm:pt-4" : ""}`}
 					style={wrapperStyle}
 				>
 					<ProfileViewTracker userId={user.id} />
@@ -630,16 +634,33 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 						<ShareButton onClick={() => setShareModalOpen(true)} />
 					</div>
 
-					<div className="flex min-h-dvh flex-col sm:min-h-[calc(100vh-2rem)]">
-						<main className={`mx-auto flex w-full max-w-md flex-1 flex-col items-center sm:max-w-none ${
-							customPresets.headerStyle === "hero" ? "pt-2" : "pt-4"
-						}`}>
-							<UserHeader
-								customPresets={customPresets}
-								headerStyle={customPresets.headerStyle}
-								textStyle={textStyle}
-								user={user}
-							/>
+					{/* Renderizar header hero fora do container com padding */}
+					{customPresets.headerStyle === "hero" && (
+						<UserHeader
+							customPresets={customPresets}
+							headerStyle={customPresets.headerStyle}
+							textStyle={textStyle}
+							user={user}
+						/>
+					)}
+
+					<div
+						className={`flex min-h-dvh flex-col sm:min-h-[calc(100vh-2rem)] ${customPresets.headerStyle === "hero" ? "px-4 sm:px-6" : ""}`}
+					>
+						<main
+							className={`mx-auto flex w-full max-w-md flex-1 flex-col items-center sm:max-w-none ${
+								customPresets.headerStyle === "hero" ? "pt-2" : "pt-4"
+							}`}
+						>
+							{/* Renderizar header padrão/horizontal dentro do container com padding */}
+							{customPresets.headerStyle !== "hero" && (
+								<UserHeader
+									customPresets={customPresets}
+									headerStyle={customPresets.headerStyle}
+									textStyle={textStyle}
+									user={user}
+								/>
+							)}
 							<section className="w-full">
 								{children ?? (
 									<LinksList

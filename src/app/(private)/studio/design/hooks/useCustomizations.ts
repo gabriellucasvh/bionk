@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDesignStore } from "@/stores/designStore";
 
 type UserCustomizations = {
 	customBackgroundColor: string;
@@ -20,7 +21,7 @@ const defaultCustomizations: UserCustomizations = {
 	customFont: "",
 	customButtonColor: "",
 	customButtonTextColor: "",
-	customButtonStyle: "solid",
+	customButtonStyle: "",
 	customButtonFill: "",
 	customButtonCorners: "",
 	headerStyle: "default",
@@ -29,21 +30,40 @@ const defaultCustomizations: UserCustomizations = {
 export const useCustomizations = () => {
 	const [userCustomizations, setUserCustomizations] =
 		useState<UserCustomizations>(defaultCustomizations);
+	const { setCustomizations } = useDesignStore();
 
 	useEffect(() => {
 		const fetchCustomizations = async () => {
 			const response = await fetch("/api/user-customizations");
 			const data = await response.json();
 			if (data) {
-				setUserCustomizations(data);
+				const customizations = {
+					...defaultCustomizations,
+					...data,
+				};
+				setUserCustomizations(customizations);
+				setCustomizations(customizations);
 			}
 		};
 		fetchCustomizations();
-	}, []);
+	}, [setCustomizations]);
 
-	const handleTemplateChange = () => {
-		setUserCustomizations(defaultCustomizations);
-		window.dispatchEvent(new CustomEvent("reloadIframePreview"));
+	const handleTemplateChange = async () => {
+		try {
+			const response = await fetch("/api/user-customizations");
+			const data = await response.json();
+			if (data) {
+				const updatedCustomizations = {
+					...defaultCustomizations,
+					...data,
+				};
+				setUserCustomizations(updatedCustomizations);
+				setCustomizations(updatedCustomizations);
+			}
+		} catch {
+			setUserCustomizations(defaultCustomizations);
+			setCustomizations(defaultCustomizations);
+		}
 	};
 
 	const handleSaveCustomizations = async (

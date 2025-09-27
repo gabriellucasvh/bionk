@@ -34,8 +34,6 @@ export function ColorOption({
 	isSelected,
 	handleChange,
 }: ColorOptionProps) {
-	const isGradient = color.includes("gradient");
-
 	return (
 		<button
 			className={`h-10 w-10 rounded-full border-2 ${
@@ -46,7 +44,7 @@ export function ColorOption({
 			key={color}
 			onClick={() => handleChange(field, color)}
 			style={{
-				background: isGradient ? color : color,
+				background: color,
 			}}
 			type="button"
 		/>
@@ -73,6 +71,7 @@ export function ColorSelector({
 			<div className="mt-2 mb-3 flex flex-wrap gap-1">
 				<button
 					className="flex h-10 w-10 items-center justify-center rounded-full"
+					data-color-button
 					onClick={() =>
 						setActiveColorPicker(
 							activeColorPicker === FIELD_TO_PICKER[field]
@@ -109,7 +108,7 @@ export function ColorSelector({
 			</div>
 
 			{activeColorPicker === FIELD_TO_PICKER[field] && (
-				<div className="mt-3 w-min" ref={pickerRef}>
+				<div className="mt-3 w-min" data-color-picker ref={pickerRef}>
 					<HexColorPicker
 						color={customColor}
 						onChange={(color) => debouncedHandleChange(field, color)}

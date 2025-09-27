@@ -1,14 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import FontSelectionModal from "@/components/modals/FontSelectionModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { SocialLinkItem } from "@/types/social";
-import {
-	FONT_OPTIONS,
-	GRADIENTS,
-} from "../constants/design.constants";
-import { useDesignForm } from "../hooks/useDesignForm";
+import { useDesignStore } from "@/stores/designStore";
+import { FONT_OPTIONS, GRADIENTS } from "../constants/design.constants";
 import { ColorPreviews } from "./ColorPreviews";
 import { ColorSelector } from "./ColorSelectors";
 import { RenderLabel } from "./design.RenderLabel";
@@ -19,57 +16,88 @@ import {
 } from "./FontButtonSelectors";
 import { HeaderStyleButtons } from "./HeaderStylePreview";
 
-interface UserData {
-	name: string;
-	username: string;
-	bio?: string;
-	image?: string;
-	socialLinks: SocialLinkItem[];
-}
+const convertCustomizationsToRecord = (
+	customizations: any
+): Record<string, string> => ({
+	customBackgroundColor: customizations.customBackgroundColor,
+	customTextColor: customizations.customTextColor,
+	customButtonColor: customizations.customButtonColor,
+	customButtonTextColor: customizations.customButtonTextColor,
+});
 
-
-
-// Interface atualizada
-interface DesignPanelProps {
-	userCustomizations: {
-		customBackgroundColor: string;
-		customBackgroundGradient: string;
-		customTextColor: string;
-		customFont: string;
-		customButtonColor: string;
-		customButtonTextColor: string;
-		customButtonStyle: string;
-		customButtonFill: string;
-		customButtonCorners: string;
-		headerStyle: string;
-	};
-	userData?: UserData;
-	onSave: (changes: Partial<Record<string, string>>) => Promise<void>;
-}
-
-export function DesignPanel({
-	userCustomizations,
-	userData,
-	onSave,
-}: DesignPanelProps) {
+export function DesignPanel() {
 	const {
+		userData,
 		customizations,
-		activeColorPicker,
-		isFontModalOpen,
-		pendingChanges,
-		isSaving,
-		isExiting,
-		handleChange,
-		debouncedHandleChange,
-		handleSavePending,
-		handleCancel,
-		hasPendingChange,
-		setActiveColorPicker,
-		setIsFontModalOpen,
-	} = useDesignForm({
-		userCustomizations,
-		onSave,
-	});
+		updateCustomization,
+		hasUnsavedChanges,
+		saveChanges,
+		discardChanges,
+	} = useDesignStore();
+
+	const [activeColorPicker, setActiveColorPicker] = useState<string | null>(
+		null
+	);
+	const [isFontModalOpen, setIsFontModalOpen] = useState(false);
+
+	const handleChange = (field: string, value: string) => {
+		updateCustomization(field as any, value);
+	};
+
+	const debouncedHandleChange = handleChange;
+
+	const handleSavePending = async () => {
+		try {
+			await saveChanges();
+			setActiveColorPicker(null);
+		} catch (error) {
+			console.error("Erro ao salvar:", error);
+		}
+	};
+
+	const handleCancel = () => {
+		discardChanges();
+		setActiveColorPicker(null);
+	};
+
+	const hasPendingChange = (field: string) => {
+		if (!hasUnsavedChanges) {
+			return false;
+		}
+
+		const originalCustomizations =
+			useDesignStore.getState().originalCustomizations;
+		const currentCustomizations = useDesignStore.getState().customizations;
+
+		if (field in currentCustomizations && field in originalCustomizations) {
+			return (
+				currentCustomizations[field as keyof typeof currentCustomizations] !==
+				originalCustomizations[field as keyof typeof originalCustomizations]
+			);
+		}
+
+		return hasUnsavedChanges;
+	};
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as Element;
+
+			const isColorPickerClick =
+				target.closest("[data-color-picker]") ||
+				target.closest(".react-colorful") ||
+				target.closest("[data-color-button]");
+
+			if (!isColorPickerClick && activeColorPicker) {
+				setActiveColorPicker(null);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [activeColorPicker]);
 
 	return (
 		<div className="mt-8 space-y-6">
@@ -117,7 +145,7 @@ export function DesignPanel({
 				<CardContent className="space-y-6">
 					<ColorSelector
 						activeColorPicker={activeColorPicker}
-						customizations={customizations}
+						customizations={convertCustomizationsToRecord(customizations)}
 						debouncedHandleChange={debouncedHandleChange}
 						field="customBackgroundColor"
 						handleChange={handleChange}
@@ -160,7 +188,7 @@ export function DesignPanel({
 				<CardContent className="space-y-6">
 					<ColorSelector
 						activeColorPicker={activeColorPicker}
-						customizations={customizations}
+						customizations={convertCustomizationsToRecord(customizations)}
 						debouncedHandleChange={debouncedHandleChange}
 						field="customTextColor"
 						handleChange={handleChange}
@@ -170,7 +198,7 @@ export function DesignPanel({
 					/>
 
 					<FontSelector
-						customizations={customizations}
+						customizations={convertCustomizationsToRecord(customizations)}
 						handleChange={handleChange}
 						setIsFontModalOpen={setIsFontModalOpen}
 					/>
@@ -185,7 +213,7 @@ export function DesignPanel({
 				<CardContent className="space-y-6">
 					<ColorSelector
 						activeColorPicker={activeColorPicker}
-						customizations={customizations}
+						customizations={convertCustomizationsToRecord(customizations)}
 						debouncedHandleChange={debouncedHandleChange}
 						field="customButtonColor"
 						handleChange={handleChange}
@@ -196,7 +224,7 @@ export function DesignPanel({
 
 					<ColorSelector
 						activeColorPicker={activeColorPicker}
-						customizations={customizations}
+						customizations={convertCustomizationsToRecord(customizations)}
 						debouncedHandleChange={debouncedHandleChange}
 						field="customButtonTextColor"
 						handleChange={handleChange}
@@ -206,13 +234,13 @@ export function DesignPanel({
 					/>
 
 					<ButtonStyleSelector
-						customizations={customizations}
+						customizations={convertCustomizationsToRecord(customizations)}
 						handleChange={handleChange}
 						hasPendingChange={hasPendingChange}
 					/>
 
 					<ButtonCornersSelector
-						customizations={customizations}
+						customizations={convertCustomizationsToRecord(customizations)}
 						handleChange={handleChange}
 						hasPendingChange={hasPendingChange}
 					/>
@@ -227,7 +255,7 @@ export function DesignPanel({
 				<CardContent className="space-y-6">
 					<ColorPreviews
 						activeColorPicker={activeColorPicker}
-						customizations={customizations}
+						customizations={convertCustomizationsToRecord(customizations)}
 						debouncedHandleChange={debouncedHandleChange}
 						handleChange={handleChange}
 						setActiveColorPicker={setActiveColorPicker}
@@ -236,31 +264,15 @@ export function DesignPanel({
 			</Card>
 
 			{/* Salvar e Cancelar pendências */}
-			{Object.keys(pendingChanges).length > 0 && (
-				<div
-					className={`-translate-x-1/2 fixed bottom-16 left-1/2 z-50 mx-auto flex w-max transform items-center gap-2 rounded-full border bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm transition-all duration-300 ease-out md:bottom-6 dark:bg-neutral-800/90 ${
-						isExiting
-							? "translate-y-full opacity-0"
-							: "translate-y-0 opacity-100"
-					}`}
-				>
+			{hasUnsavedChanges && (
+				<div className="-translate-x-1/2 fixed bottom-16 left-1/2 z-50 mx-auto flex w-max transform items-center gap-2 rounded-full border bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm transition-all duration-300 ease-out md:bottom-6 dark:bg-neutral-800/90">
 					<span className="hidden font-medium text-neutral-600 text-sm sm:inline-block dark:text-neutral-400">
 						Deseja salvar as alterações pendentes?
 					</span>
-					<BaseButton
-						loading={isSaving}
-						onClick={handleCancel}
-						size="sm"
-						variant="white"
-					>
+					<BaseButton onClick={handleCancel} size="sm" variant="white">
 						Cancelar
 					</BaseButton>
-					<BaseButton
-						className="px-6"
-						loading={isSaving}
-						onClick={handleSavePending}
-						size="sm"
-					>
+					<BaseButton className="px-6" onClick={handleSavePending} size="sm">
 						Salvar
 					</BaseButton>
 				</div>

@@ -118,10 +118,15 @@ export function useDesignForm({
 	// Hook para fechar o seletor de cores ao clicar fora
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
-			if (
-				pickerRef.current &&
-				!pickerRef.current.contains(event.target as Node)
-			) {
+			const target = event.target as Element;
+
+			// Verifica se o clique foi em um color picker ou seus elementos
+			const isColorPickerClick =
+				target.closest("[data-color-picker]") ||
+				target.closest(".react-colorful") ||
+				target.closest("[data-color-button]");
+
+			if (!isColorPickerClick && activeColorPicker) {
 				setActiveColorPicker(null);
 			}
 		};
@@ -130,7 +135,7 @@ export function useDesignForm({
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
-	}, []);
+	}, [activeColorPicker]);
 
 	const handleSetActiveColorPicker = (picker: string | null) => {
 		setActiveColorPicker(

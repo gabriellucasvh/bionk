@@ -58,17 +58,25 @@ export default function VideoCard({
 		? { color: customPresets.customTextColor }
 		: {};
 
+	const displayTitle = title && title.length > 64
+		? `${title.slice(0, 64)}...`
+		: title;
+
+	const displayDescription = description && description.length > 100
+		? `${description.slice(0, 100)}...`
+		: description;
+
 	return (
 		<div className={`w-full space-y-2 pb-4 ${className}`}>
-			{title && (
+			{displayTitle && (
 				<h3 className={getTitleClasses()} style={textStyle}>
-					{title}
+					{displayTitle}
 				</h3>
 			)}
 
-			{description && (
+			{displayDescription && (
 				<p className={getDescriptionClasses()} style={textStyle}>
-					{description}
+					{displayDescription}
 				</p>
 			)}
 

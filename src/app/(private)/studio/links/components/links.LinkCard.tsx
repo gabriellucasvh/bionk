@@ -196,11 +196,11 @@ const LinkActionButtons = ({
 	setIsImageModalOpen: (open: boolean) => void;
 	toggleAnimation: (id: number) => Promise<void>;
 }) => (
-	<div className="flex items-center gap-2">
+	<div className="flex flex-wrap items-center gap-2">
 		{/* Botão de imagem simples */}
 		<Button
 			className={cn(
-				"h-8 w-8",
+				"h-8 w-8 flex-shrink-0",
 				link.customImageUrl
 					? "text-green-600 hover:text-green-700"
 					: "text-muted-foreground hover:text-foreground"
@@ -220,15 +220,13 @@ const LinkActionButtons = ({
 			<AlertDialogTrigger asChild>
 				<Button
 					className={cn(
-						"h-8 w-8",
+						"h-8 w-8 flex-shrink-0",
 						isLinkAnimated
 							? "text-green-600 hover:text-green-700"
 							: "text-muted-foreground hover:text-foreground"
 					)}
 					size="icon"
-					title={
-						isLinkAnimated ? "Desativar animação" : "Ativar animação"
-					}
+					title={isLinkAnimated ? "Desativar animação" : "Ativar animação"}
 					variant="ghost"
 				>
 					<Zap className="h-4 w-4" />
@@ -259,9 +257,12 @@ const LinkActionButtons = ({
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
-		<Badge className="flex items-center gap-1" variant="outline">
+		<Badge className="flex flex-shrink-0 items-center gap-1" variant="outline">
 			<MousePointerClick className="h-3 w-3" />
-			{(link.clicks || 0).toLocaleString()}
+			<span className="hidden sm:inline">
+				{(link.clicks || 0).toLocaleString()}
+			</span>
+			<span className="sm:hidden">{link.clicks || 0}</span>
 		</Badge>
 	</div>
 );
@@ -284,7 +285,8 @@ const DisplayView = (props: LinkCardProps) => {
 
 	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 	const { toggleAnimation } = useLinkAnimation();
-	const { isLinkAnimated, isArchiving, isLaunching, isExpiring, isLinkLocked } = useLinkStates(link, archivingLinkId);
+	const { isLinkAnimated, isArchiving, isLaunching, isExpiring, isLinkLocked } =
+		useLinkStates(link, archivingLinkId);
 
 	return (
 		<article
@@ -342,14 +344,14 @@ const DisplayView = (props: LinkCardProps) => {
 					)}
 				</div>
 			</div>
-			<div className="flex items-center justify-between border-t pt-3">
+			<div className="flex flex-col gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
 				<LinkActionButtons
-					link={link}
 					isLinkAnimated={isLinkAnimated}
+					link={link}
 					setIsImageModalOpen={setIsImageModalOpen}
 					toggleAnimation={toggleAnimation}
 				/>
-				<div className="flex items-center gap-2 sm:gap-4">
+				<div className="flex items-center justify-between gap-2 sm:gap-4">
 					<div className="flex items-center space-x-2">
 						<Switch
 							checked={link.active}
@@ -360,7 +362,9 @@ const DisplayView = (props: LinkCardProps) => {
 						<Label
 							className={cn(
 								"text-sm",
-								isTogglingActive ? "cursor-default opacity-50" : "cursor-pointer"
+								isTogglingActive
+									? "cursor-default opacity-50"
+									: "cursor-pointer"
 							)}
 							htmlFor={`switch-${link.id}`}
 						>
@@ -369,7 +373,11 @@ const DisplayView = (props: LinkCardProps) => {
 					</div>
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button className="h-8 w-8" size="icon" variant="ghost">
+							<Button
+								className="h-8 w-8 flex-shrink-0"
+								size="icon"
+								variant="ghost"
+							>
 								<MoreVertical className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
