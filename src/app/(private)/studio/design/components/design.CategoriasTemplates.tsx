@@ -173,7 +173,7 @@ export default function TemplateSettings({
 				<div className="mt-4">
 					<div className="relative">
 						<div
-							className="scrollbar-hide flex gap-3 overflow-x-auto pb-2"
+							className=" flex gap-3 overflow-x-auto pb-2"
 							ref={scrollContainerRef}
 						>
 							{CATEGORIES[selectedCategory as keyof typeof CATEGORIES]?.map(

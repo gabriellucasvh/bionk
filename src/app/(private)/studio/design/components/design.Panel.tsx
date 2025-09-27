@@ -781,7 +781,7 @@ export default function DesignPanel({
 						/>
 						<div className="relative mt-4">
 							<div
-								className="scrollbar-hide flex gap-4 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible"
+								className="flex gap-4 overflow-x-auto pb-2 lg:grid lg:grid-cols-3 lg:overflow-visible"
 								ref={headerScrollRef}
 							>
 								{HEADER_STYLES.map((style) => (
