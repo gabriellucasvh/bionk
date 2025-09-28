@@ -84,7 +84,7 @@ export default function PageRegistro() {
 	}
 
 	return (
-		<div className="flex min-h-screen">
+		<div className="flex min-h-dvh">
 			{/* Lado esquerdo - Formulário */}
 			<div className="flex flex-1 items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
 				<div className="w-full max-w-lg">
