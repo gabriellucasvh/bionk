@@ -678,9 +678,21 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 	return (
 		<>
 			{/* Container principal com aspect ratio de celular em telas maiores */}
-			<div className="min-h-dvh sm:flex sm:items-start sm:justify-center sm:bg-neutral-900 sm:pt-4 dark:sm:bg-gray-900">
+			<div
+				className="relative min-h-dvh sm:flex sm:items-start sm:justify-center sm:pt-4"
+				style={{
+					backgroundColor: "#1a1a1a",
+					backgroundImage: user.image ? `url(${user.image})` : undefined,
+					backgroundSize: "cover",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+				}}
+			>
+				{user.image && (
+					<div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" />
+				)}
 				<div
-					className={`relative min-h-dvh w-full sm:min-h-[calc(100vh-2rem)] sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
+					className={`relative z-10 min-h-dvh w-full sm:min-h-[calc(100vh-2rem)] sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
 						customPresets.headerStyle === "hero" ? "pt-0" : "px-4"
 					} ${customPresets.headerStyle !== "hero" ? "sm:px-6 sm:pt-4" : ""}`}
 					style={wrapperStyle}
