@@ -34,8 +34,8 @@ export default function FontSelectionModal({
 	}
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-			<div className="relative mx-4 max-h-[80vh] w-full max-w-md overflow-hidden rounded-lg bg-white shadow-xl">
+		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+			<div className="relative mx-4 max-h-[80vh] w-full max-w-md overflow-hidden rounded-lg bg-white shadow-xl dark:bg-neutral-800">
 				{/* Header */}
 				<div className="flex items-center justify-between border-b p-4">
 					<h2 className="font-semibold text-lg">Selecionar Fonte</h2>
@@ -56,8 +56,8 @@ export default function FontSelectionModal({
 							<button
 								className={`flex w-full items-center justify-center rounded border p-3 text-left text-xs transition-colors ${
 									selectedFont === font.value
-										? "border-gray-300 bg-neutral-200"
-										: "border-gray-200 hover:bg-neutral-100"
+										? "border-gray-300 bg-neutral-200 dark:border-gray-600 dark:bg-neutral-700"
+										: "border-gray-200 hover:bg-neutral-100 dark:border-gray-500 dark:hover:bg-neutral-700"
 								}`}
 								key={font.value}
 								onClick={() => handleFontSelect(font.value)}
