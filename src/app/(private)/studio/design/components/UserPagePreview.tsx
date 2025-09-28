@@ -458,6 +458,43 @@ function ContentList({
 		return result;
 	};
 
+	const renderCompactText = (text: any) => (
+		<div className="w-full" key={`text-${text.id}`}>
+			<button
+				className="flex min-h-[3.5rem] w-full items-center rounded-lg border px-1 py-3 text-left transition-all duration-200 hover:scale-[1.02]"
+				style={getButtonStyle(customizations)}
+				type="button"
+			>
+				<div className="w-10 flex-shrink-0" />
+				<div className="flex flex-1 justify-center">
+					<h3 className="line-clamp-2 px-2 font-medium leading-tight">
+						{text.title}
+					</h3>
+				</div>
+				<div className="w-10 flex-shrink-0" />
+			</button>
+		</div>
+	);
+
+	const renderExpandedText = (text: any, displayText: string) => (
+		<div
+			className={cn(
+				"w-full rounded-lg p-4",
+				text.hasBackground ? "bg-white/10 backdrop-blur-sm" : "",
+				text.position === "center" && "text-center",
+				text.position === "right" && "text-right"
+			)}
+			key={`text-${text.id}`}
+		>
+			<h3 className="mb-2 font-bold text-lg" style={textStyle}>
+				{text.title}
+			</h3>
+			<p className="text-sm" style={textStyle}>
+				{displayText}
+			</p>
+		</div>
+	);
+
 	const renderTextContent = (
 		text: any,
 		index: number,
@@ -480,25 +517,11 @@ function ContentList({
 			? `${description.slice(0, 200)}...`
 			: description;
 
-		result.push(
-			<div
-				className={cn(
-					"w-full rounded-lg p-4",
-					text.hasBackground ? "bg-white/10 backdrop-blur-sm" : "",
-					text.position === "center" && "text-center",
-					text.position === "right" && "text-right",
-					text.isCompact && "p-2"
-				)}
-				key={`text-${text.id}`}
-			>
-				<h3 className="mb-2 font-bold text-lg" style={textStyle}>
-					{text.title}
-				</h3>
-				<p className="text-sm" style={textStyle}>
-					{displayText}
-				</p>
-			</div>
-		);
+		const textElement = text.isCompact
+			? renderCompactText(text)
+			: renderExpandedText(text, displayText);
+
+		result.push(textElement);
 		return result;
 	};
 
@@ -624,17 +647,25 @@ export default function UserPagePreview() {
 		return null;
 	}
 
+	const getBackgroundStyle = () => {
+		if (customizations?.customBackgroundGradient) {
+			return {
+				backgroundImage: customizations.customBackgroundGradient,
+				backgroundColor: "transparent",
+			};
+		}
+
+		if (customizations?.customBackgroundColor) {
+			return {
+				backgroundColor: customizations.customBackgroundColor,
+			};
+		}
+
+		return {};
+	};
+
 	const wrapperStyle: React.CSSProperties = {
-		...(customizations?.customBackgroundGradient
-			? {
-					backgroundImage: customizations.customBackgroundGradient,
-					backgroundColor: "transparent",
-				}
-			: customizations?.customBackgroundColor
-				? {
-						backgroundColor: customizations.customBackgroundColor,
-					}
-				: {}),
+		...getBackgroundStyle(),
 		...(customizations?.customFont && {
 			fontFamily: getFontFamily(customizations.customFont),
 		}),
