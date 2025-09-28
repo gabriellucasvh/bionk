@@ -69,6 +69,7 @@ const TextCard = ({
 	isTogglingActive,
 }: TextCardProps) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const handleEdit = () => {
 		if (onStartEditingText) {
@@ -91,16 +92,21 @@ const TextCard = ({
 		setIsMenuOpen(false);
 	};
 
-	const handleSave = () => {
-		if (onSaveEditingText) {
-			onSaveEditingText(
-				text.id,
-				text.title,
-				text.description,
-				text.position,
-				text.hasBackground,
-				text.isCompact
-			);
+	const handleSave = async () => {
+		setIsLoading(true);
+		try {
+			if (onSaveEditingText) {
+				await onSaveEditingText(
+					text.id,
+					text.title,
+					text.description,
+					text.position,
+					text.hasBackground,
+					text.isCompact
+				);
+			}
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -223,7 +229,13 @@ const TextCard = ({
 						<X className="mr-2 h-4 w-4" />
 						Cancelar
 					</BaseButton>
-					<BaseButton onClick={handleSave} size="sm" variant="default">
+					<BaseButton 
+						onClick={handleSave} 
+						size="sm" 
+						variant="default"
+						loading={isLoading}
+						disabled={isLoading}
+					>
 						<Save className="mr-2 h-4 w-4" />
 						Salvar
 					</BaseButton>

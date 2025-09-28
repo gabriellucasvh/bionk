@@ -65,7 +65,17 @@ const AddNewVideoForm = (props: AddNewVideoFormProps) => {
 	const existingSections =
 		propExistingSections || videoManager?.existingSections || [];
 
+	const [isLoading, setIsLoading] = useState(false);
 	const [activeSection, setActiveSection] = useState<string>("");
+
+	const handleSave = async () => {
+		setIsLoading(true);
+		try {
+			await onSave();
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	const handleSectionChange = (value: string) => {
 		setActiveSection(value);
@@ -177,8 +187,8 @@ const AddNewVideoForm = (props: AddNewVideoFormProps) => {
 					<BaseButton
 						className="flex-1"
 						disabled={isSaveDisabled}
-						onClick={onSave}
-						type="button"
+						loading={isLoading}
+						onClick={handleSave}
 					>
 						Salvar Vídeo
 					</BaseButton>

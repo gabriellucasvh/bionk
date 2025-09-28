@@ -64,7 +64,17 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 	const existingSections =
 		propExistingSections || textManager?.existingSections || [];
 
+	const [isLoading, setIsLoading] = useState(false);
 	const [activeSection, setActiveSection] = useState<string>("");
+
+	const handleSave = async () => {
+		setIsLoading(true);
+		try {
+			await onSave();
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	const handleSectionChange = (value: string) => {
 		setActiveSection(value);
@@ -209,7 +219,8 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 					<BaseButton
 						className="flex-1"
 						disabled={isSaveDisabled}
-						onClick={onSave}
+						loading={isLoading}
+						onClick={handleSave}
 					>
 						Salvar Texto
 					</BaseButton>

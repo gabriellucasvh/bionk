@@ -105,40 +105,54 @@ const EditingView = ({
 	| "onArchiveLink"
 	| "onDeleteLink"
 	| "onClickLink"
->) => (
-	<div className="flex flex-col gap-3 rounded-lg border-2 border-blue-500 p-3 sm:p-4">
-		<div className="flex items-center gap-2">
-			<div className="flex-1 space-y-1.5">
-				<Input
-					onChange={(e) => onLinkChange(link.id, "title", e.target.value)}
-					placeholder="Título"
-					value={link.title}
-				/>
-				<Input
-					onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
-					placeholder="URL"
-					value={link.url || ""}
-				/>
-			</div>
-			<div className="flex flex-col gap-2">
-				<BaseButton
-					disabled={!(isValidUrl(link.url || "") && link.title)}
-					onClick={() => onSaveEditing(link.id, link.title, link.url || "")}
-					size="icon"
-				>
-					<Save className="h-4 w-4" />
-				</BaseButton>
-				<Button
-					onClick={() => onCancelEditing(link.id)}
-					size="icon"
-					variant="ghost"
-				>
-					<X className="h-4 w-4" />
-				</Button>
+>) => {
+	const [isLoading, setIsLoading] = useState(false);
+
+	const handleSave = async () => {
+		setIsLoading(true);
+		try {
+			await onSaveEditing(link.id, link.title, link.url || "");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	return (
+		<div className="flex flex-col gap-3 rounded-lg border-2 border-blue-500 p-3 sm:p-4">
+			<div className="flex items-center gap-2">
+				<div className="flex-1 space-y-1.5">
+					<Input
+						onChange={(e) => onLinkChange(link.id, "title", e.target.value)}
+						placeholder="Título"
+						value={link.title}
+					/>
+					<Input
+						onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
+						placeholder="URL"
+						value={link.url || ""}
+					/>
+				</div>
+				<div className="flex flex-col gap-2">
+					<BaseButton
+						disabled={!(isValidUrl(link.url || "") && link.title)}
+						loading={isLoading}
+						onClick={handleSave}
+						size="icon"
+					>
+						<Save className="h-4 w-4" />
+					</BaseButton>
+					<Button
+						onClick={() => onCancelEditing(link.id)}
+						size="icon"
+						variant="ghost"
+					>
+						<X className="h-4 w-4" />
+					</Button>
+				</div>
 			</div>
 		</div>
-	</div>
-);
+	);
+};
 
 const LinkContent = ({
 	link,

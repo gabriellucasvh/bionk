@@ -27,6 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { VideoItem } from "../types/links.types";
 import { getVideoPlatform } from "../utils/video.helpers";
+import { useState } from "react";
 
 interface VideoCardProps {
 	video: VideoItem;
@@ -62,14 +63,21 @@ const EditingView = ({
 	VideoCardProps,
 	"video" | "onVideoChange" | "onSaveEditingVideo" | "onCancelEditingVideo"
 >) => {
-	const handleSave = () => {
+	const [isLoading, setIsLoading] = useState(false);
+
+	const handleSave = async () => {
 		if (video.title && video.url) {
-			onSaveEditingVideo?.(
-				video.id,
-				video.title,
-				video.description || "",
-				video.url
-			);
+			setIsLoading(true);
+			try {
+				await onSaveEditingVideo?.(
+					video.id,
+					video.title,
+					video.description || "",
+					video.url
+				);
+			} finally {
+				setIsLoading(false);
+			}
 		}
 	};
 
@@ -129,6 +137,7 @@ const EditingView = ({
 				</Button>
 				<BaseButton
 					disabled={!(video.title && video.url)}
+					loading={isLoading}
 					onClick={handleSave}
 					size="sm"
 				>
