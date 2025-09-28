@@ -82,7 +82,7 @@ export default async function UserPage({ params }: PageProps) {
 				},
 			},
 			Text: {
-				where: { active: true },
+				where: { active: true, archived: false },
 				orderBy: { order: "asc" },
 				select: {
 					id: true,
