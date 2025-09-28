@@ -554,7 +554,6 @@ function ContentList({
 	const allContent = createContentArray();
 	const currentSectionId = { value: null };
 
-
 	const shouldAddSectionSpacing = (currentIndex: number) => {
 		const currentItem = allContent[currentIndex];
 		const nextItem = allContent[currentIndex + 1];
@@ -671,14 +670,14 @@ export default function UserPagePreview() {
 	};
 
 	return (
-		<div className="h-full w-full overflow-auto">
+		<div className="h-full w-full">
 			<div
-				className={`relative min-h-full w-full ${
+				className={`relative h-full w-full ${
 					customizations.headerStyle === "hero" ? "" : "px-4 sm:px-6 sm:pt-4"
 				}`}
 				style={wrapperStyle}
 			>
-				<div className="flex min-h-full flex-col">
+				<div className="flex h-full flex-col">
 					{customizations.headerStyle === "hero" ? (
 						<>
 							<UserHeader
@@ -719,10 +718,10 @@ export default function UserPagePreview() {
 						</main>
 					)}
 					<footer
-						className="mt-auto flex justify-center pt-4 pb-4"
+						className="mt-auto flex justify-center pt-2 pb-2"
 						style={textStyle}
 					>
-						<span className="text-sm opacity-60">{user.username}</span>
+						<span className="text-sm opacity-60">{user.username} | Bionk</span>
 					</footer>
 				</div>
 			</div>
