@@ -476,24 +476,41 @@ function ContentList({
 		</div>
 	);
 
-	const renderExpandedText = (text: any, displayText: string) => (
-		<div
-			className={cn(
-				"w-full rounded-lg p-4",
-				text.hasBackground ? "bg-white/10 backdrop-blur-sm" : "",
-				text.position === "center" && "text-center",
-				text.position === "right" && "text-right"
-			)}
-			key={`text-${text.id}`}
-		>
-			<h3 className="mb-2 font-bold text-lg" style={textStyle}>
-				{text.title}
-			</h3>
-			<p className="text-sm" style={textStyle}>
-				{displayText}
-			</p>
-		</div>
-	);
+	const renderExpandedText = (text: any) => {
+		const cornerValue = customizations?.customButtonCorners || "12";
+		const borderRadiusValue = `${cornerValue}px`;
+
+		const getTextBackgroundStyle = () => {
+			if (!(text.hasBackground && customizations)) {
+				return {};
+			}
+
+			return {
+				...getButtonStyle(customizations),
+				borderRadius: borderRadiusValue,
+			};
+		};
+
+		return (
+			<div
+				className={cn(
+					"w-full p-4",
+					text.hasBackground ? "border" : "",
+					text.position === "center" && "text-center",
+					text.position === "right" && "text-right"
+				)}
+				key={`text-${text.id}`}
+				style={getTextBackgroundStyle()}
+			>
+				<h3 className="mb-2 font-bold text-lg" style={textStyle}>
+					{text.title}
+				</h3>
+				<p className="text-sm" style={textStyle}>
+					{text.description}
+				</p>
+			</div>
+		);
+	};
 
 	const renderTextContent = (
 		text: any,
@@ -511,15 +528,9 @@ function ContentList({
 			}
 		}
 
-		const description = text.description || "";
-		const shouldTruncate = description.length > 200;
-		const displayText = shouldTruncate
-			? `${description.slice(0, 200)}...`
-			: description;
-
 		const textElement = text.isCompact
 			? renderCompactText(text)
-			: renderExpandedText(text, displayText);
+			: renderExpandedText(text);
 
 		result.push(textElement);
 		return result;

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -65,10 +64,7 @@ export default function TextCard({
 		right: "text-right",
 	}[text.position];
 
-	const shouldTruncate = text.description.length > 200;
-	const displayText = shouldTruncate
-		? `${text.description.slice(0, 200)}...`
-		: text.description;
+	const displayText = text.description;
 
 	const getTextClasses = () => {
 		if (customPresets?.customTextColor) {
@@ -248,20 +244,6 @@ export default function TextCard({
 			>
 				{displayText}
 			</p>
-			{shouldTruncate && (
-				<Button
-					className={cn("mt-2 h-auto px-2 py-1 text-sm", getTextClasses())}
-					onClick={() => setIsModalOpen(true)}
-					style={
-						customPresets
-							? getCompactButtonStyle()
-							: { color: textStyle?.color }
-					}
-					variant={customPresets ? "ghost" : "link"}
-				>
-					Ler mais
-				</Button>
-			)}
 		</div>
 	);
 
@@ -280,11 +262,11 @@ export default function TextCard({
 	};
 
 	const getCardStyle = () => {
-		const style = { ...buttonStyle };
-		if (customPresets?.customButtonFill && text.hasBackground) {
-			style.backgroundColor = customPresets.customButtonFill;
+		if (!(text.hasBackground && customPresets)) {
+			return buttonStyle;
 		}
-		return style;
+
+		return getCompactButtonStyle();
 	};
 
 	return (
@@ -297,7 +279,7 @@ export default function TextCard({
 				<div className={cn("py-2", textAlignClass)}>{textContent}</div>
 			)}
 
-			{(shouldTruncate || text.isCompact) && (
+			{text.isCompact && (
 				<Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
 					<DialogContent className="max-h-[80vh] w-[calc(100vw-2rem)] max-w-2xl overflow-y-auto">
 						<DialogHeader>
