@@ -73,7 +73,6 @@ const PerfilClient = () => {
 				const { name = "", username = "", bio = "", image } = await res.json();
 				const currentImage =
 					image ||
-					session?.user?.image ||
 					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 
 				setProfile({ name, username, bio: bio || "" });
@@ -81,9 +80,7 @@ const PerfilClient = () => {
 				setProfilePreview(currentImage);
 				setOriginalProfileImageUrl(currentImage);
 			} catch {
-				const fallbackUrl =
-					session?.user?.image ||
-					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
+				const fallbackUrl = "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 				setProfilePreview(fallbackUrl);
 				setOriginalProfileImageUrl(fallbackUrl);
 			} finally {
@@ -92,7 +89,7 @@ const PerfilClient = () => {
 		};
 
 		fetchProfile();
-	}, [session?.user?.id, session?.user?.image]);
+	}, [session?.user?.id]);
 
 	const updateProfileText = useCallback(async (): Promise<User | null> => {
 		const textChanged =

@@ -554,13 +554,6 @@ function ContentList({
 	const allContent = createContentArray();
 	const currentSectionId = { value: null };
 
-	if (allContent.length === 0) {
-		return (
-			<div className="py-8 text-center" style={textStyle}>
-				<p className="opacity-60">Nenhum conteúdo adicionado ainda</p>
-			</div>
-		);
-	}
 
 	const shouldAddSectionSpacing = (currentIndex: number) => {
 		const currentItem = allContent[currentIndex];

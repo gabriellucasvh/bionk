@@ -111,8 +111,7 @@ function updateTokenFromSession(token: any, sessionUser: any) {
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
-// Regex para substituir parâmetros de tamanho de imagem do Google
-const GOOGLE_IMAGE_SIZE_REGEX = /=s\d+-c$/;
+
 
 if (!(clientId && clientSecret)) {
 	throw new Error("Missing Google OAuth environment variables");
@@ -141,10 +140,7 @@ export const authOptions: NextAuthOptions = {
 			picture?: string;
 			provider?: string;
 		}) => {
-			// CORREÇÃO: A imagem já virá em alta resolução do 'profile'
-			const imageUrl =
-				data.picture ??
-				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
+			const imageUrl = "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 
 			// Determinar status e username baseado no provider
 			const isGoogleProvider = data.provider === "google" || (data as any).sub;
@@ -163,7 +159,7 @@ export const authOptions: NextAuthOptions = {
 					googleId: (data as any).sub ?? null,
 					provider: "google",
 					emailVerified: new Date(),
-					onboardingCompleted: false, // Usuários Google precisam completar onboarding
+					onboardingCompleted: false,
 					subscriptionPlan: "free",
 					subscriptionStatus: "active"
 				},
@@ -212,18 +208,12 @@ export const authOptions: NextAuthOptions = {
 			clientId,
 			clientSecret,
 			profile(profile) {
-				// NOVO: Altera a URL da imagem para obter alta resolução (400px)
-				const highResImage = profile.picture?.replace(
-					GOOGLE_IMAGE_SIZE_REGEX,
-					"=s512-c"
-				);
-
 				return {
 					...profile,
 					id: profile.sub,
 					name: profile.name,
 					email: profile.email,
-					image: highResImage, // Utiliza a nova URL de alta resolução
+					image: null,
 					googleId: profile.sub,
 				};
 			},

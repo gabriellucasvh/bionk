@@ -68,7 +68,6 @@ const STEPS = [
 
 export default function OnboardingPageComponent({
 	onComplete,
-	user,
 	initialData,
 	loading = false,
 }: OnboardingPageProps) {
@@ -93,15 +92,10 @@ export default function OnboardingPageComponent({
 
 	// Configurar imagem inicial
 	useEffect(() => {
-		// Priorizar imagem do Google se existir e não for nula/vazia
-		const googleImage =
-			user?.image && user.image.trim() !== "" ? user.image : null;
-		const finalImage =
-			googleImage ||
-			initialData?.image ||
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
-		setProfilePreview(finalImage);
-	}, [initialData, user?.image]);
+		setProfilePreview(
+			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
+		);
+	}, []);
 
 	// Debounce timer ref
 	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);

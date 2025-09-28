@@ -67,7 +67,6 @@ const STEPS = [
 const OnboardingModal = ({
 	isOpen,
 	onComplete,
-	user,
 	initialData,
 	loading = false,
 }: OnboardingModalProps) => {
@@ -77,17 +76,9 @@ const OnboardingModal = ({
 		username: initialData?.username || "",
 		bio: "",
 	});
-	const [profilePreview, setProfilePreview] = useState<string>(() => {
-		// Priorizar imagem do Google se existir e não for nula/vazia
-		const googleImage =
-			user?.image && user.image.trim() !== "" ? user.image : null;
-		const finalImage =
-			googleImage ||
-			initialData?.image ||
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
-
-		return finalImage;
-	});
+	const [profilePreview, setProfilePreview] = useState<string>(
+		"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
+	);
 	const [selectedProfileFile, setSelectedProfileFile] = useState<File | null>(
 		null
 	);
@@ -107,18 +98,13 @@ const OnboardingModal = ({
 				username: initialData?.username || "",
 				bio: "",
 			});
-			// Priorizar imagem do Google se existir e não for nula/vazia
-			const googleImage =
-				user?.image && user.image.trim() !== "" ? user.image : null;
-			const finalImage =
-				googleImage ||
-				initialData?.image ||
-				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
-			setProfilePreview(finalImage);
+			setProfilePreview(
+				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
+			);
 			setSelectedProfileFile(null);
 			setUsernameValidation({ isValid: true, message: "", isChecking: false });
 		}
-	}, [isOpen, initialData, user?.image]);
+	}, [isOpen, initialData]);
 
 	const validateUsername = useCallback(async (username: string) => {
 		if (!username.trim()) {
