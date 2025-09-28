@@ -14,7 +14,7 @@ const CategorySelector = ({
 	return (
 		<div className="space-y-2">
 			<button
-				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-muted/50 ${
+				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-neutral-200 dark:hover:bg-neutral-700 ${
 					selectedCategory === "content" ? "bg-muted" : ""
 				}`}
 				onClick={() => onCategorySelect("content")}
@@ -25,7 +25,7 @@ const CategorySelector = ({
 			</button>
 
 			<button
-				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-muted/50 ${
+				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-neutral-200 dark:hover:bg-neutral-700 ${
 					selectedCategory === "media" ? "bg-muted" : ""
 				}`}
 				onClick={() => onCategorySelect("media")}
