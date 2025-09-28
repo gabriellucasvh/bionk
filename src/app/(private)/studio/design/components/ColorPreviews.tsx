@@ -36,26 +36,28 @@ function ColorPreviewItem({
 	const previewColorKey = `preview-${colorKey}`;
 
 	return (
-		<div className="flex items-center gap-3 rounded-lg p-2">
-			<button
-				className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-neutral-200 transition-colors hover:border-blue-500 dark:border-neutral-600"
-				data-color-button
-				onClick={() =>
-					setActiveColorPicker(
-						activeColorPicker === previewColorKey ? null : previewColorKey
-					)
-				}
-				style={{ backgroundColor: color }}
-				type="button"
-			/>
-			<div className="flex-1">
-				<p className="font-medium text-sm">{label}</p>
-				<p className="text-neutral-600 text-xs dark:text-neutral-400">
-					{color}
-				</p>
+		<div className="rounded-lg p-2">
+			<div className="flex items-center gap-3">
+				<button
+					className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-neutral-200 transition-colors hover:border-blue-500 dark:border-neutral-600"
+					data-color-button
+					onClick={() =>
+						setActiveColorPicker(
+							activeColorPicker === previewColorKey ? null : previewColorKey
+						)
+					}
+					style={{ backgroundColor: color }}
+					type="button"
+				/>
+				<div className="flex-1">
+					<p className="font-medium text-sm">{label}</p>
+					<p className="text-neutral-600 text-xs dark:text-neutral-400">
+						{color}
+					</p>
+				</div>
 			</div>
 			{activeColorPicker === previewColorKey && (
-				<div className="absolute z-10 mt-2" data-color-picker ref={pickerRef}>
+				<div className="mt-3 w-min" data-color-picker ref={pickerRef}>
 					<HexColorPicker
 						color={color}
 						onChange={(newColor) =>
