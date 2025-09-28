@@ -393,7 +393,7 @@ function LinksList({
 
 		return (
 			<div
-				className="mt-8 mb-6 w-full first:mt-0"
+				className="mt-8 mb-3 w-full first:mt-0"
 				key={`section-${sectionId}-${index}`}
 			>
 				<h2 className="text-center font-bold text-xl" style={textStyle}>
