@@ -689,7 +689,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 				}}
 			>
 				{user.image && (
-					<div className="absolute inset-0 bg-black/80 backdrop-blur-3xl" />
+					<div className="absolute inset-0 bg-black/80 backdrop-blur-[100px]" />
 				)}
 				<div
 					className={`relative z-10 min-h-dvh w-full sm:min-h-[calc(100vh-2rem)] sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
