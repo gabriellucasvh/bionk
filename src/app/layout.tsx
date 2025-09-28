@@ -136,6 +136,12 @@ export const metadata: Metadata = {
 	title: "Bionk",
 	description: "Reúna todos os seus links em um só lugar!",
 	manifest: "/manifest.json",
+	viewport: {
+		width: "device-width",
+		initialScale: 1,
+		maximumScale: 1,
+		userScalable: false,
+	},
 	openGraph: {
 		title: "Bionk",
 		description: "Reúna todos os seus links em um só lugar!",

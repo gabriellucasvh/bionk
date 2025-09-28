@@ -262,13 +262,19 @@ const PersonalizarClient = () => {
 
 				{/* Preview Mobile - Visível apenas quando selecionado no mobile */}
 				<div
-					className={`h-screen w-full overflow-y-auto bg-gray-100 md:hidden dark:bg-neutral-900 ${
+					className={`fixed inset-0 z-10 bg-gray-100 md:hidden dark:bg-neutral-900 ${
 						mobileView === "design" ? "hidden" : "block"
 					}`}
 					ref={previewContainerRef}
 				>
-					<div className="min-h-full px-4 pt-20 pb-20">
-						<div className="mx-auto max-w-sm overflow-hidden rounded-3xl bg-white shadow-lg dark:bg-neutral-800">
+					<div className="h-full overflow-y-auto px-6 pt-20 pb-20">
+						<div
+							className="mx-auto w-full overflow-hidden rounded-3xl bg-white shadow-lg dark:bg-neutral-800"
+							style={{
+								minHeight: "calc(100vh - 8rem)",
+								maxWidth: "365px",
+							}}
+						>
 							<UserPagePreview />
 						</div>
 					</div>

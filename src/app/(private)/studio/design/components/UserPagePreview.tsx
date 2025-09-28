@@ -686,7 +686,7 @@ export default function UserPagePreview() {
 								textStyle={textStyle}
 								user={user}
 							/>
-							<main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center px-4 pt-2">
+							<main className="mx-auto flex w-full flex-1 flex-col items-center px-4 pt-2">
 								<section className="w-full">
 									<ContentList
 										customizations={customizations}
@@ -699,7 +699,7 @@ export default function UserPagePreview() {
 					) : (
 						<main
 							className={
-								"mx-auto flex w-full max-w-md flex-1 flex-col items-center pt-4"
+								"mx-auto flex w-full flex-1 flex-col items-center pt-4"
 							}
 						>
 							<UserHeader
