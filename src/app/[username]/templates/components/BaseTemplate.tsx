@@ -326,7 +326,7 @@ function LinksList({
 					<PasswordProtectedLink link={item}>
 						<button
 							className={cn(
-								"flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200 hover:scale-[1.02]",
+								"flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200 hover:brightness-110",
 								isAnimated && "animate-pulse"
 							)}
 							style={buttonStyle}
@@ -341,7 +341,7 @@ function LinksList({
 				) : (
 					<InteractiveLink
 						className={cn(
-							"flex w-full items-center rounded-lg border p-1 text-left transition-all duration-200 hover:scale-[1.02]",
+							"flex w-full items-center rounded-lg border p-1 text-left transition-all duration-200 hover:brightness-110",
 							isAnimated && "animate-pulse"
 						)}
 						customPresets={customPresets}

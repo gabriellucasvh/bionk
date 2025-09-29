@@ -461,7 +461,7 @@ function ContentList({
 	const renderCompactText = (text: any) => (
 		<div className="w-full" key={`text-${text.id}`}>
 			<button
-				className="flex min-h-[3.5rem] w-full items-center rounded-lg border px-1 py-3 text-left transition-all duration-200 hover:scale-[1.02]"
+				className="flex min-h-[3.5rem] w-full items-center rounded-lg border px-1 py-3 text-left transition-all duration-200 hover:brightness-110"
 				style={getButtonStyle(customizations)}
 				type="button"
 			>

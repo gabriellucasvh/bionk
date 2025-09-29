@@ -208,7 +208,7 @@ export default function TextCard({
 	const textContent = text.isCompact ? (
 		<div className="w-full">
 			<button
-				className="flex min-h-[3.5rem] w-full items-center rounded-lg border px-1 py-3 text-left transition-all duration-200 hover:scale-[1.02]"
+				className="flex min-h-[3.5rem] w-full items-center rounded-lg border px-1 py-3 text-left transition-all duration-200 hover:brightness-110"
 				onClick={() => setIsModalOpen(true)}
 				style={getCompactButtonStyle()}
 				type="button"
