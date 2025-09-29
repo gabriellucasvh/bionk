@@ -23,6 +23,7 @@ import type {
 	TextItem,
 	VideoItem,
 } from "../types/links.types";
+import DragPreview from "./links.DragPreview";
 import LinkCard from "./links.LinkCard";
 import SectionCard from "./links.SectionCard";
 import SortableItem from "./links.SortableItem";
@@ -129,13 +130,13 @@ const LinkList = (props: LinkListProps) => {
 	);
 
 	const activeItem = activeId
-		? items.find((item) => item.id.toString() === activeId)
+		? items.find((item) => {
+				if (item.isSection) {
+					return item.id.toString() === activeId;
+				}
+				return `item-${item.id}` === activeId;
+			})
 		: null;
-
-	// Função No-op para satisfazer o linter e o TypeScript
-	const noop = () => {
-		/* A função do overlay não precisa de um ativador */
-	};
 
 	return (
 		<div className="space-y-6 border-t pt-6">
@@ -184,6 +185,7 @@ const LinkList = (props: LinkListProps) => {
 											return (
 												<SectionCard
 													isDragging={isDragging}
+													isTogglingActive={togglingSectionId === item.id}
 													linksManager={linksManager}
 													listeners={listeners}
 													onAddLinkToSection={onAddLinkToSection}
@@ -191,7 +193,6 @@ const LinkList = (props: LinkListProps) => {
 													onUpdateCustomImage={onUpdateCustomImage}
 													section={sectionData}
 													setActivatorNodeRef={setActivatorNodeRef}
-													isTogglingActive={togglingSectionId === item.id}
 													{...cardProps}
 												/>
 											);
@@ -201,6 +202,7 @@ const LinkList = (props: LinkListProps) => {
 											return (
 												<TextCard
 													isDragging={isDragging}
+													isTogglingActive={togglingTextId === item.id}
 													listeners={listeners}
 													onArchiveText={onArchiveText}
 													onCancelEditingText={onCancelEditingText}
@@ -211,7 +213,6 @@ const LinkList = (props: LinkListProps) => {
 													onToggleActive={cardProps.onToggleActive}
 													setActivatorNodeRef={setActivatorNodeRef}
 													text={item as TextItem}
-													isTogglingActive={togglingTextId === item.id}
 												/>
 											);
 										}
@@ -220,6 +221,7 @@ const LinkList = (props: LinkListProps) => {
 											return (
 												<VideoCard
 													isDragging={isDragging}
+													isTogglingActive={togglingVideoId === item.id}
 													listeners={listeners}
 													onArchiveVideo={onArchiveVideo}
 													onCancelEditingVideo={onCancelEditingVideo}
@@ -230,7 +232,6 @@ const LinkList = (props: LinkListProps) => {
 													onVideoChange={onVideoChange}
 													setActivatorNodeRef={setActivatorNodeRef}
 													video={item as VideoItem}
-													isTogglingActive={togglingVideoId === item.id}
 												/>
 											);
 										}
@@ -238,12 +239,12 @@ const LinkList = (props: LinkListProps) => {
 										return (
 											<LinkCard
 												archivingLinkId={archivingLinkId}
+												isTogglingActive={togglingLinkId === item.id}
 												link={item as LinkItem}
 												listeners={listeners}
 												onRemoveCustomImage={onRemoveCustomImage}
 												onUpdateCustomImage={onUpdateCustomImage}
 												setActivatorNodeRef={setActivatorNodeRef}
-												isTogglingActive={togglingLinkId === item.id}
 												{...cardProps}
 											/>
 										);
@@ -254,69 +255,9 @@ const LinkList = (props: LinkListProps) => {
 					</div>
 				</SortableContext>
 
-				{/* Adicionado DragOverlay para corrigir a distorção */}
+				{/* DragOverlay com preview simplificado */}
 				<DragOverlay>
-					{activeItem &&
-						(() => {
-							if (activeItem.isSection) {
-								const sectionData: SectionItem = {
-									id: activeItem.id.toString(),
-									dbId: activeItem.dbId || 0,
-									title: activeItem.title || "",
-									active: activeItem.active,
-									order: activeItem.order || 0,
-									links: activeItem.children || [],
-								};
-								return (
-									<SectionCard
-										isDragging
-										linksManager={linksManager}
-										onAddLinkToSection={onAddLinkToSection}
-										section={sectionData}
-										{...cardProps}
-										listeners={{}}
-										setActivatorNodeRef={noop}
-										isTogglingActive={togglingSectionId === activeItem.id}
-									/>
-								);
-							}
-
-							if (activeItem.isText) {
-								return (
-									<TextCard
-										isDragging
-										text={activeItem as TextItem}
-										{...cardProps}
-										listeners={{}}
-										setActivatorNodeRef={noop}
-										isTogglingActive={togglingTextId === activeItem.id}
-									/>
-								);
-							}
-
-							if (activeItem.isVideo) {
-								return (
-									<VideoCard
-										isDragging
-										video={activeItem as VideoItem}
-										{...cardProps}
-										listeners={{}}
-										setActivatorNodeRef={noop}
-									/>
-								);
-							}
-
-							return (
-								<LinkCard
-									archivingLinkId={archivingLinkId}
-									link={activeItem as LinkItem}
-									{...cardProps}
-									listeners={{}}
-									setActivatorNodeRef={noop}
-									isTogglingActive={togglingLinkId === activeItem.id}
-								/>
-							);
-						})()}
+					{activeItem && <DragPreview item={activeItem} />}
 				</DragOverlay>
 			</DndContext>
 		</div>
