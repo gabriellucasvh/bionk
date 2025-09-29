@@ -23,75 +23,36 @@ interface InteractiveLinkProps {
 	};
 }
 
-// Função auxiliar para extrair o favicon da URL
-const getFaviconUrl = (url: string) => {
-	try {
-		const urlObj = new URL(url);
-		return `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=128`;
-	} catch {
-		return null;
-	}
-};
-
-// Função auxiliar para determinar a URL da imagem
-const getImageUrl = (
-	link: UserLink,
-	customImageError: boolean,
-	faviconUrl: string | null
-) => {
-	return link.customImageUrl && !customImageError
-		? link.customImageUrl
-		: faviconUrl;
-};
-
-// Função auxiliar para verificar se deve mostrar a imagem
+// Função auxiliar para verificar se deve mostrar a imagem personalizada
 const shouldShowImage = (
-	imageUrl: string | null,
 	link: UserLink,
-	customImageError: boolean,
-	faviconError: boolean
+	customImageError: boolean
 ) => {
-	return imageUrl && (link.customImageUrl ? !customImageError : !faviconError);
+	return link.customImageUrl && !customImageError;
 };
 
-// Função auxiliar para verificar se é GIF
-const isGifImage = (imageUrl: string | null): boolean => {
-	return imageUrl?.toLowerCase().includes(".gif") ?? false;
-};
-
-// Componente auxiliar para renderizar imagem
+// Componente auxiliar para renderizar imagem personalizada
 interface ImageComponentProps {
 	link: UserLink;
-	imageUrl: string | null;
-	isGif: boolean;
 	borderRadius: number;
 	setCustomImageError: (error: boolean) => void;
-	setFaviconError: (error: boolean) => void;
 }
 
 const ImageComponent: FC<ImageComponentProps> = ({
 	link,
-	imageUrl,
 	borderRadius,
 	setCustomImageError,
-	setFaviconError,
 }) => {
 	const handleImageError = () => {
-		if (link.customImageUrl) {
-			setCustomImageError(true);
-		} else {
-			setFaviconError(true);
-		}
+		setCustomImageError(true);
 	};
 
 	const imageProps = {
-		alt: link.customImageUrl
-			? `Ícone personalizado de ${link.title}`
-			: `Favicon de ${link.title}`,
+		alt: `Ícone personalizado de ${link.title}`,
 		className: "ml-1 size-13 object-cover",
 		height: 32,
 		onError: handleImageError,
-		src: imageUrl || "",
+		src: link.customImageUrl || "",
 		style: { borderRadius: `${borderRadius}px` },
 		width: 32,
 	};
@@ -109,7 +70,6 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 	customPresets,
 }) => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [faviconError, setFaviconError] = useState(false);
 	const [customImageError, setCustomImageError] = useState(false);
 	const { animatedLinks } = useLinkAnimation();
 	const isAnimated = animatedLinks.has(link.id.toString());
@@ -119,15 +79,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		? Number(customPresets.customButtonCorners)
 		: borderRadius || 12; // 12px é o padrão do rounded-xl
 
-	const faviconUrl = getFaviconUrl(link.url || "");
-	const imageUrl = getImageUrl(link, customImageError, faviconUrl);
-	const showImage = shouldShowImage(
-		imageUrl,
-		link,
-		customImageError,
-		faviconError
-	);
-	const isGif = isGifImage(imageUrl);
+	const showImage = shouldShowImage(link, customImageError);
 
 	// Função auxiliar para enviar dados de clique
 	const sendClickData = () => {
@@ -178,19 +130,18 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 					rel="noopener noreferrer"
 					target="_blank"
 				>
-					{/* Imagem personalizada ou favicon do site na borda esquerda */}
-					{showImage && (
-						<div className="flex-shrink-0">
+					{/* Espaço reservado para imagem personalizada na borda esquerda */}
+					<div className="flex-shrink-0">
+						{showImage ? (
 							<ImageComponent
 								borderRadius={imageBorderRadius}
-								imageUrl={imageUrl}
-								isGif={isGif}
 								link={link}
 								setCustomImageError={setCustomImageError}
-								setFaviconError={setFaviconError}
 							/>
-						</div>
-					)}
+						) : (
+							<div className="ml-1 size-13" />
+						)}
+					</div>
 
 					<div className="flex flex-1 justify-center">{children}</div>
 

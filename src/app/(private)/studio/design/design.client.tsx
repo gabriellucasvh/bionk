@@ -282,7 +282,7 @@ const PersonalizarClient = () => {
 			</div>
 
 			{/* Preview Desktop - Visível apenas em md+ */}
-			<div className="fixed top-4 right-4 z-50 hidden h-[calc(100vh-2rem)] w-80 rounded-[2.5rem] border-4 border-gray-800 bg-gray-900 shadow-2xl xl:block">
+			<div className="fixed top-4 right-4 z-50 hidden h-[calc(100vh-2rem)] w-90 rounded-[2.5rem] border-4 border-gray-800 bg-gray-900 shadow-2xl xl:block">
 				<div className="flex h-full flex-col">
 					<div className="flex-1 overflow-y-auto rounded-4xl bg-white dark:bg-neutral-900">
 						<UserPagePreview />

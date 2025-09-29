@@ -324,31 +324,28 @@ function ContentList({
 	const buttonStyle = getButtonStyle(customizations);
 
 	const renderLink = (item: UserLink) => {
-		const getFaviconUrl = (url: string) => {
-			try {
-				const urlObj = new URL(url);
-				return `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=128`;
-			} catch {
-				return null;
-			}
-		};
-
-		const imageUrl = item.customImageUrl || getFaviconUrl(item.url || "");
-		const showImage = imageUrl && item.url;
+		const customImageUrl =
+			item.customImageUrl && typeof item.customImageUrl === "string"
+				? item.customImageUrl
+				: null;
+		const showImage = customImageUrl !== null;
 
 		const linkContent = (
 			<>
-				{showImage && (
-					<div className="flex-shrink-0 ">
+				{/* Espaço reservado para imagem personalizada */}
+				<div className="flex-shrink-0">
+					{showImage && customImageUrl ? (
 						<Image
-							alt={`Ícone de ${item.title}`}
+							alt={`Ícone personalizado de ${item.title}`}
 							className="ml-1 size-8 rounded object-cover"
 							height={32}
-							src={imageUrl}
+							src={customImageUrl}
 							width={32}
 						/>
-					</div>
-				)}
+					) : (
+						<div className="ml-1 size-8" />
+					)}
+				</div>
 				<div className="flex flex-1 justify-center">
 					<h3 className="line-clamp-2 px-2 font-medium leading-tight">
 						{item.title}
