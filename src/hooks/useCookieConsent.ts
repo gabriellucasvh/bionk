@@ -14,7 +14,7 @@ const COOKIE_PREFERENCES_KEY = "bionk-cookie-preferences";
 
 const defaultPreferences: CookiePreferences = {
 	essential: true,
-	analytics: false,
+	analytics: true,
 	functional: false,
 	marketing: false,
 };
@@ -114,15 +114,15 @@ export function getCookiePreferencesFromRequest(
 ): CookiePreferences {
 	const cookieHeader = request.headers.get("cookie") || "";
 
-	const getCookie = (name: string): boolean => {
+	const getCookie = (name: string, defaultValue = false): boolean => {
 		const match = cookieHeader.match(new RegExp(`(^| )${name}=([^;]+)`));
-		return match ? match[2] === "true" : false;
+		return match ? match[2] === "true" : defaultValue;
 	};
 
 	return {
 		essential: true, // Sempre true
-		analytics: getCookie("cookie-analytics"),
-		functional: getCookie("cookie-functional"),
-		marketing: getCookie("cookie-marketing"),
+		analytics: getCookie("cookie-analytics", true), // Usar padrão true para analytics
+		functional: getCookie("cookie-functional", false),
+		marketing: getCookie("cookie-marketing", false),
 	};
 }

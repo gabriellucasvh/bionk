@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BannedUserWarning from "@/components/BannedUserWarning";
+import ProfileViewTracker from "@/components/ProfileViewTracker";
 import SensitiveContentWarning from "@/components/SensitiveContentWarning";
 import { LinkAnimationProvider } from "@/providers/linkAnimationProvider";
 import type { UserProfile as UserProfileData } from "@/types/user-profile";
@@ -19,17 +20,6 @@ export function UserProfileWrapper({
 	const [showWarning, setShowWarning] = useState(false);
 	const router = useRouter();
 
-	// Verificar se o usuário está banido primeiro
-	if (user.isBanned) {
-		return (
-			<BannedUserWarning
-				bannedAt={user.bannedAt}
-				banReason={user.banReason}
-				username={user.username}
-			/>
-		);
-	}
-
 	useEffect(() => {
 		// Verifica se o perfil é sensível e se o usuário já aceitou o aviso
 		if (user.sensitiveProfile) {
@@ -41,6 +31,17 @@ export function UserProfileWrapper({
 			}
 		}
 	}, [user.sensitiveProfile, user.username]);
+
+	// Verificar se o usuário está banido primeiro
+	if (user.isBanned) {
+		return (
+			<BannedUserWarning
+				bannedAt={user.bannedAt}
+				banReason={user.banReason}
+				username={user.username}
+			/>
+		);
+	}
 
 	const handleContinue = () => {
 		// Salva a aceitação do aviso na sessão
@@ -66,5 +67,10 @@ export function UserProfileWrapper({
 		);
 	}
 
-	return <LinkAnimationProvider>{children}</LinkAnimationProvider>;
+	return (
+		<LinkAnimationProvider>
+			<ProfileViewTracker userId={user.id} />
+			{children}
+		</LinkAnimationProvider>
+	);
 }

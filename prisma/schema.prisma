@@ -58,7 +58,6 @@ model User {
   accounts                      Account[]
   CustomPresets                 CustomPresets?
   Link                          Link[]
-  ProfileView                   ProfileView[]
   Section                       Section[]
   sessions                      Session[]
   SocialLink                    SocialLink[]
@@ -187,7 +186,6 @@ model ProfileView {
   userAgent String?
   country   String?
   referrer  String?
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([device])
