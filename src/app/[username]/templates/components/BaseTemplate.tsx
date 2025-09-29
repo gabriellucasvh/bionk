@@ -248,7 +248,7 @@ function PasswordProtectedLink({
 		e.preventDefault();
 		if (passwordInput === link.password) {
 			if (link.url) {
-				window.open(link.url, "_blank");
+				window.open(link.url, "_blank", "noopener,noreferrer");
 			}
 			setIsOpen(false);
 			setPasswordInput("");
@@ -306,6 +306,21 @@ function LinksList({
 	buttonStyle?: React.CSSProperties;
 }) {
 	const { animatedLinks } = useLinkAnimation();
+	const [showTooltip, setShowTooltip] = useState<string | null>(null);
+
+	const handleLockClick = (e: React.MouseEvent, linkId: string) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setShowTooltip(showTooltip === linkId ? null : linkId);
+	};
+
+	const handleMouseEnter = (linkId: string) => {
+		setShowTooltip(linkId);
+	};
+
+	const handleMouseLeave = () => {
+		setShowTooltip(null);
+	};
 
 	const renderLink = (item: UserLink) => {
 		const isAnimated = animatedLinks.has(item.id.toString());
@@ -324,25 +339,65 @@ function LinksList({
 			<div className="w-full" key={item.id}>
 				{item.password ? (
 					<PasswordProtectedLink link={item}>
-						<button
+						<div
 							className={cn(
-								"flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200 hover:brightness-110",
-								isAnimated && "animate-pulse"
+								"group relative w-full rounded-xl p-1 shadow-md transition-all duration-200 hover:brightness-110",
+								isAnimated && "animate-shake"
 							)}
 							style={buttonStyle}
-							type="button"
 						>
-							<div className="mr-3 flex-shrink-0">
-								<Lock className="h-4 w-4" />
-							</div>
-							{linkContent}
-						</button>
+							<button
+								className="relative z-10 flex h-full w-full items-center"
+								type="button"
+							>
+								{/* Espaço reservado para imagem personalizada na borda esquerda */}
+								<div className="flex-shrink-0">
+									{item.customImageUrl ? (
+										<Image
+											alt={`Ícone personalizado de ${item.title}`}
+											className="ml-1 size-13 object-cover"
+											height={32}
+											src={item.customImageUrl}
+											style={{ borderRadius: "12px" }}
+											width={32}
+										/>
+									) : (
+										<div className="ml-1 size-13" />
+									)}
+								</div>
+
+								<div className="flex flex-1 justify-center">{linkContent}</div>
+
+								{/* Espaço reservado para o cadeado */}
+								<div className="w-10 flex-shrink-0" />
+							</button>
+
+							{/* Cadeado posicionado absolutamente em relação ao card */}
+							<button
+								aria-label="Link protegido por senha"
+								className="-translate-y-1/2 absolute top-1/2 right-3 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
+								onClick={(e) => handleLockClick(e, item.id.toString())}
+								onMouseEnter={() => handleMouseEnter(item.id.toString())}
+								onMouseLeave={handleMouseLeave}
+								type="button"
+							>
+								<Lock className="size-5" />
+							</button>
+
+							{/* Tooltip responsivo */}
+							{showTooltip === item.id.toString() && (
+								<div className="-mb-1 absolute right-0 bottom-full z-30 mr-4 whitespace-nowrap rounded bg-black px-2 py-1 text-white text-xs dark:bg-white dark:text-black">
+									Link protegido por senha
+									<div className="absolute top-full right-2 h-0 w-0 border-transparent border-t-4 border-t-black border-r-4 border-l-4 dark:border-t-white" />
+								</div>
+							)}
+						</div>
 					</PasswordProtectedLink>
 				) : (
 					<InteractiveLink
 						className={cn(
 							"flex w-full items-center rounded-lg border p-1 text-left transition-all duration-200 hover:brightness-110",
-							isAnimated && "animate-pulse"
+							isAnimated && "animate-shake"
 						)}
 						customPresets={customPresets}
 						href={item.url || "#"}

@@ -77,7 +77,7 @@ const SchedulePanel = ({ formData, setFormData }: PanelProps) => {
 							)}
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent className="w-auto p-0">
+					<PopoverContent className="z-[60] w-auto p-0">
 						<Calendar
 							initialFocus
 							mode="single"
@@ -106,7 +106,7 @@ const SchedulePanel = ({ formData, setFormData }: PanelProps) => {
 							)}
 						</Button>
 					</PopoverTrigger>
-					<PopoverContent className="w-auto p-0">
+					<PopoverContent className="z-[60] w-auto p-0">
 						<Calendar
 							initialFocus
 							mode="single"
@@ -232,7 +232,9 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 							<Input
 								className="bg-white dark:bg-[#202020]"
 								id="url"
-								onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+								onChange={(e) =>
+									setFormData({ ...formData, url: e.target.value })
+								}
 								placeholder="https://exemplo.com"
 								type="url"
 								value={formData.url}

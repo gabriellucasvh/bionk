@@ -27,6 +27,13 @@ export async function POST(req: NextRequest) {
 			const linkWithIncrementedClicks = await prisma.link.update({
 				where: { id: Number(linkId) },
 				data: { clicks: { increment: 1 } },
+				select: {
+					id: true,
+					clicks: true,
+					deleteOnClicks: true,
+					active: true,
+					title: true,
+				},
 			});
 
 			if (
@@ -72,6 +79,13 @@ export async function POST(req: NextRequest) {
 			prisma.link.update({
 				where: { id: Number(linkId) },
 				data: { clicks: { increment: 1 } },
+				select: {
+					id: true,
+					clicks: true,
+					deleteOnClicks: true,
+					active: true,
+					title: true,
+				},
 			}),
 		]);
 

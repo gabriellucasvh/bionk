@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreVertical } from "lucide-react";
+import { Clock, Lock, MoreVertical, MousePointerClick } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { FC, MouseEvent, ReactNode } from "react";
@@ -24,10 +24,7 @@ interface InteractiveLinkProps {
 }
 
 // Função auxiliar para verificar se deve mostrar a imagem personalizada
-const shouldShowImage = (
-	link: UserLink,
-	customImageError: boolean
-) => {
+const shouldShowImage = (link: UserLink, customImageError: boolean) => {
 	return link.customImageUrl && !customImageError;
 };
 
@@ -71,6 +68,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 }) => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [customImageError, setCustomImageError] = useState(false);
+	const [showTooltip, setShowTooltip] = useState(false);
 	const { animatedLinks } = useLinkAnimation();
 	const isAnimated = animatedLinks.has(link.id.toString());
 
@@ -80,6 +78,36 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		: borderRadius || 12; // 12px é o padrão do rounded-xl
 
 	const showImage = shouldShowImage(link, customImageError);
+
+	// Função para determinar qual ícone e tooltip mostrar
+	const getLinkIcon = () => {
+		if (link.password) {
+			return {
+				icon: <Lock className="size-5" />,
+				tooltip: "Link protegido por senha",
+			};
+		}
+		if (link.deleteOnClicks) {
+			return {
+				icon: <MousePointerClick className="size-5" />,
+				tooltip: `Será excluído após ${link.deleteOnClicks} cliques`,
+			};
+		}
+		if (link.expiresAt) {
+			const expirationDate = new Date(link.expiresAt);
+			const formattedDate = expirationDate.toLocaleDateString("pt-BR");
+			return {
+				icon: <Clock className="size-5" />,
+				tooltip: `Expira em ${formattedDate}`,
+			};
+		}
+		return {
+			icon: <MoreVertical className="size-5" />,
+			tooltip: "Mais opções",
+		};
+	};
+
+	const { icon, tooltip } = getLinkIcon();
 
 	// Função auxiliar para enviar dados de clique
 	const sendClickData = () => {
@@ -109,7 +137,23 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 	const handleOptionsClick = (e: MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
-		setIsModalOpen(true);
+
+		// Se for um link especial (não o MoreVertical), mostrar tooltip no mobile
+		const isSpecialLink =
+			link.password || link.deleteOnClicks || link.expiresAt;
+		if (isSpecialLink) {
+			setShowTooltip(!showTooltip);
+		} else {
+			setIsModalOpen(true);
+		}
+	};
+
+	const handleMouseEnter = () => {
+		setShowTooltip(true);
+	};
+
+	const handleMouseLeave = () => {
+		setShowTooltip(false);
 	};
 
 	return (
@@ -149,14 +193,26 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 					<div className="w-10 flex-shrink-0" />
 				</Link>
 
-				<button
-					aria-label="Mais opções"
-					className="-translate-y-1/2 absolute top-1/2 right-2 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
-					onClick={handleOptionsClick}
-					type="button"
-				>
-					<MoreVertical className="size-5" />
-				</button>
+				<div className="relative">
+					<button
+						aria-label={tooltip}
+						className="-translate-y-1/2 absolute top-1/2 right-2 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
+						onClick={handleOptionsClick}
+						onMouseEnter={handleMouseEnter}
+						onMouseLeave={handleMouseLeave}
+						type="button"
+					>
+						{icon}
+					</button>
+
+					{/* Tooltip responsivo */}
+					{showTooltip && (
+						<div className="absolute right-0 bottom-full z-30 mr-4 mb-6 whitespace-nowrap rounded bg-black px-2 py-1 text-white text-xs dark:bg-white dark:text-black">
+							{tooltip}
+							<div className="absolute top-full right-2 h-0 w-0 border-transparent border-t-4 border-t-black border-r-4 border-l-4 dark:border-t-white" />
+						</div>
+					)}
+				</div>
 			</div>
 
 			<LinkOptionsModal

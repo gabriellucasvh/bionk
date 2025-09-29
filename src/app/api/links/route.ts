@@ -38,10 +38,12 @@ export async function GET(request: Request): Promise<NextResponse> {
 		const transformedLinks = links.map((link) => ({
 			...link,
 			sectionId: link.section?.id || link.sectionId,
-			section: link.section ? {
-				id: link.section.id,
-				title: link.section.title,
-			} : null,
+			section: link.section
+				? {
+						id: link.section.id,
+						title: link.section.title,
+					}
+				: null,
 		}));
 
 		return NextResponse.json({ links: transformedLinks });
@@ -65,9 +67,9 @@ export async function POST(request: Request): Promise<NextResponse> {
 
 	if (session.user.banido) {
 		return NextResponse.json(
-			{ 
-				error: "Conta suspensa", 
-				message: "Sua conta foi suspensa e não pode realizar esta ação." 
+			{
+				error: "Conta suspensa",
+				message: "Sua conta foi suspensa e não pode realizar esta ação.",
 			},
 			{ status: 403 }
 		);
@@ -152,10 +154,11 @@ export async function POST(request: Request): Promise<NextResponse> {
 				active: true,
 				sectionId: sectionId || null,
 				badge: badge || null,
-				password,
-				expiresAt,
-				deleteOnClicks,
-				launchesAt,
+				password: password && password.trim() !== "" ? password.trim() : null,
+				expiresAt: expiresAt ? new Date(expiresAt) : null,
+				deleteOnClicks:
+					deleteOnClicks && deleteOnClicks > 0 ? deleteOnClicks : null,
+				launchesAt: launchesAt ? new Date(launchesAt) : null,
 			},
 		});
 
