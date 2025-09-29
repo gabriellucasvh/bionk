@@ -205,12 +205,33 @@ export default function TextCard({
 		}
 	};
 
+	const getCompactButtonStyleWithoutBackground = () => {
+		if (!customPresets?.customButtonCorners) {
+			return;
+		}
+
+		const cornerValue = customPresets.customButtonCorners || "12";
+		const borderRadiusValue = `${cornerValue}px`;
+
+		return {
+			borderRadius: borderRadiusValue,
+		};
+	};
+
 	const textContent = text.isCompact ? (
 		<div className="w-full">
 			<button
-				className="flex min-h-[3.5rem] w-full items-center rounded-lg border px-1 py-3 text-left transition-all duration-200 hover:brightness-110"
+				className={`flex min-h-[3.5rem] w-full items-center px-1 py-3 text-left transition-all duration-200 hover:brightness-110 ${
+					text.hasBackground
+						? "rounded-lg border"
+						: "bg-white/3 hover:bg-white/5"
+				}`}
 				onClick={() => setIsModalOpen(true)}
-				style={getCompactButtonStyle()}
+				style={
+					text.hasBackground
+						? getCompactButtonStyle()
+						: getCompactButtonStyleWithoutBackground()
+				}
 				type="button"
 			>
 				{/* Espaço reservado para imagem (mesmo que os links) */}
@@ -218,7 +239,13 @@ export default function TextCard({
 
 				{/* Título centralizado com mesmo comportamento dos links */}
 				<div className="flex flex-1 justify-center">
-					<h3 className="line-clamp-2 px-2 font-medium leading-tight">
+					<h3
+						className={cn(
+							"line-clamp-2 px-2 font-medium leading-tight",
+							getTextClasses()
+						)}
+						style={textStyle}
+					>
 						{text.title}
 					</h3>
 				</div>
