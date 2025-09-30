@@ -8,6 +8,7 @@ export interface TemplatePreset {
 	customButtonFill: string;
 	customButtonCorners: string;
 	headerStyle: string;
+	customBlurredBackground: boolean;
 }
 
 export function getTemplatePreset(templateId: string) {
@@ -25,6 +26,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "simple":
 			return {
@@ -38,6 +40,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "abacate":
 			return {
@@ -51,6 +54,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "menta":
 			return {
@@ -64,6 +68,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "vinho":
 			return {
@@ -77,6 +82,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "ember":
 			return {
@@ -90,6 +96,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "lux":
 			return {
@@ -104,6 +111,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "outlined",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "pulse":
 			return {
@@ -117,6 +125,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "mistico":
 			return {
@@ -130,6 +139,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "artistic":
 			return {
@@ -143,6 +153,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "outlined",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "unique":
 			return {
@@ -157,6 +168,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "neon":
 			return {
@@ -171,6 +183,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "outlined",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "retro":
 			return {
@@ -184,6 +197,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "modern":
 			return {
@@ -197,6 +211,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "vibrant":
 			return {
@@ -211,6 +226,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "gradient",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		case "cyber":
 			return {
@@ -224,6 +240,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "outlined",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 		default:
 			return {
@@ -238,6 +255,7 @@ export function getTemplatePreset(templateId: string) {
 				customButtonFill: "filled",
 				customButtonCorners: "12",
 				headerStyle: "default",
+				customBlurredBackground: true,
 			};
 	}
 }
@@ -254,6 +272,7 @@ export function getDefaultCustomPresets() {
 		customButtonFill: "filled",
 		customButtonCorners: "12",
 		headerStyle: "default",
+		customBlurredBackground: true,
 	};
 }
 

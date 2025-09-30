@@ -205,6 +205,7 @@ model CustomPresets {
   customButtonFill         String? @default("")
   customButtonCorners      String? @default("")
   headerStyle              String? @default("default")
+  customBlurredBackground  Boolean @default(true)
   user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

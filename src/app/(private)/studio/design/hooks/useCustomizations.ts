@@ -12,6 +12,7 @@ type UserCustomizations = {
 	customButtonFill: string;
 	customButtonCorners: string;
 	headerStyle: string;
+	customBlurredBackground: boolean;
 };
 
 const defaultCustomizations: UserCustomizations = {
@@ -25,6 +26,7 @@ const defaultCustomizations: UserCustomizations = {
 	customButtonFill: "",
 	customButtonCorners: "",
 	headerStyle: "default",
+	customBlurredBackground: true,
 };
 
 export const useCustomizations = () => {

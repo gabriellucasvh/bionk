@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import FontSelectionModal from "@/components/modals/FontSelectionModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { useDesignStore } from "@/stores/designStore";
 import { FONT_OPTIONS, GRADIENTS } from "../constants/design.constants";
 import { ColorPreviews } from "./ColorPreviews";
@@ -40,7 +41,7 @@ export function DesignPanel() {
 	);
 	const [isFontModalOpen, setIsFontModalOpen] = useState(false);
 
-	const handleChange = (field: string, value: string) => {
+	const handleChange = (field: string, value: string | boolean) => {
 		updateCustomization(field as any, value);
 	};
 
@@ -176,6 +177,24 @@ export function DesignPanel() {
 								/>
 							))}
 						</div>
+					</div>
+
+					<div className="flex items-center justify-between">
+						<div>
+							<RenderLabel
+								hasPending={hasPendingChange("customBlurredBackground")}
+								text="Background Desfocado"
+							/>
+							<p className="text-sm text-muted-foreground">
+								Usar imagem do perfil como fundo desfocado em telas maiores
+							</p>
+						</div>
+						<Switch
+							checked={customizations.customBlurredBackground ?? true}
+							onCheckedChange={(checked) =>
+								handleChange("customBlurredBackground", checked)
+							}
+						/>
 					</div>
 				</CardContent>
 			</Card>

@@ -33,6 +33,7 @@ export interface Customizations {
 	customButtonFill: string;
 	customButtonCorners: string;
 	headerStyle: string;
+	customBlurredBackground: boolean;
 }
 
 interface DesignStore {
@@ -55,7 +56,7 @@ interface DesignStore {
 
 	// Ações para customizações
 	setCustomizations: (customizations: Customizations) => void;
-	updateCustomization: (field: keyof Customizations, value: string) => void;
+	updateCustomization: (field: keyof Customizations, value: string | boolean) => void;
 
 	// Ações de controle
 	setLoading: (loading: boolean) => void;
@@ -81,6 +82,7 @@ const defaultCustomizations: Customizations = {
 	customButtonFill: "",
 	customButtonCorners: "",
 	headerStyle: "default",
+	customBlurredBackground: true,
 };
 
 export const useDesignStore = create<DesignStore>((set, get) => ({

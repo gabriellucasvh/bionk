@@ -730,20 +730,27 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 
 	const buttonStyle = getButtonStyleByType();
 
+	const shouldUseBlurredBackground =
+		customPresets?.customBlurredBackground !== false &&
+		user.image &&
+		!user.image.includes('default_xry2zk');
+
 	return (
 		<>
 			{/* Container principal com aspect ratio de celular em telas maiores */}
 			<div
-				className="relative min-h-dvh sm:flex sm:items-start sm:justify-center sm:pt-4"
+				className={`relative min-h-dvh sm:flex sm:items-start sm:justify-center sm:pt-4 ${
+					!shouldUseBlurredBackground ? 'bg-neutral-900' : ''
+				}`}
 				style={{
-					backgroundColor: "#1a1a1a",
-					backgroundImage: user.image ? `url(${user.image})` : undefined,
+					backgroundColor: shouldUseBlurredBackground ? "#1a1a1a" : undefined,
+					backgroundImage: shouldUseBlurredBackground ? `url(${user.image})` : undefined,
 					backgroundSize: "cover",
 					backgroundPosition: "center",
 					backgroundRepeat: "no-repeat",
 				}}
 			>
-				{user.image && (
+				{shouldUseBlurredBackground && (
 					<div className="absolute inset-0 bg-black/80 backdrop-blur-[100px]" />
 				)}
 				<div

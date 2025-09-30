@@ -84,6 +84,7 @@ export interface CustomPresets extends PrismaCustomPresets {
 	customButtonColor: string;
 	customButtonTextColor: string;
 	headerStyle: string;
+	customBlurredBackground: boolean;
 }
 
 // --- Perfil Principal ---
