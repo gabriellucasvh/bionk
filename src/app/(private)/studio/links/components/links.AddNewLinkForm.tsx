@@ -220,12 +220,16 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 							<Input
 								className="bg-white dark:bg-[#202020]"
 								id="title"
+								maxLength={80}
 								onChange={(e) =>
 									setFormData({ ...formData, title: e.target.value })
 								}
 								placeholder="Ex: Meu Portfólio"
 								value={formData.title}
 							/>
+							<p className="mt-1 text-muted-foreground text-xs">
+								{formData.title.length}/80 caracteres
+							</p>
 						</div>
 						<div className="grid gap-2">
 							<Label htmlFor="url">URL</Label>
@@ -239,6 +243,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 								type="url"
 								value={formData.url}
 							/>
+							<div className="mt-1 h-4"></div>
 						</div>
 					</div>
 

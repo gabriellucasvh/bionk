@@ -109,6 +109,13 @@ export async function POST(request: Request): Promise<NextResponse> {
 			);
 		}
 
+		if (title.length > 80) {
+			return NextResponse.json(
+				{ error: "O título do link deve ter no máximo 80 caracteres." },
+				{ status: 400 }
+			);
+		}
+
 		// Validar se sectionId existe se fornecido
 		if (sectionId) {
 			const section = await prisma.section.findFirst({

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Link" ALTER COLUMN "title" SET DATA TYPE VARCHAR(80);

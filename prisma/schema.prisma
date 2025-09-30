@@ -107,7 +107,7 @@ model VerificationToken {
 
 model Link {
   id              Int         @id @default(autoincrement())
-  title           String
+  title           String      @db.VarChar(80)
   url             String?
   active          Boolean     @default(true)
   clicks          Int         @default(0)

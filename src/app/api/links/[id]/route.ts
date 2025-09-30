@@ -40,6 +40,13 @@ export async function PUT(
 		// Permite que qualquer campo do link seja atualizado
 		const { title, url, active, archived, launchesAt, expiresAt, animated } = body;
 
+		if (title && title.length > 80) {
+			return NextResponse.json(
+				{ error: "O título do link deve ter no máximo 80 caracteres." },
+				{ status: 400 }
+			);
+		}
+
 		const updatedLink = await prisma.link.update({
 			where: { id: Number.parseInt(id, 10) },
 			data: {

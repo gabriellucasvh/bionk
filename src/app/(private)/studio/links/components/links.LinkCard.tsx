@@ -121,16 +121,25 @@ const EditingView = ({
 		<div className="flex flex-col gap-3 rounded-lg border-2 border-blue-500 p-3 sm:p-4">
 			<div className="flex items-center gap-2">
 				<div className="flex-1 space-y-1.5">
-					<Input
-						onChange={(e) => onLinkChange(link.id, "title", e.target.value)}
-						placeholder="Título"
-						value={link.title}
-					/>
-					<Input
-						onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
-						placeholder="URL"
-						value={link.url || ""}
-					/>
+					<div className="space-y-1">
+						<Input
+							maxLength={80}
+							onChange={(e) => onLinkChange(link.id, "title", e.target.value)}
+							placeholder="Título"
+							value={link.title}
+						/>
+						<p className="text-muted-foreground text-xs">
+							{link.title.length}/80 caracteres
+						</p>
+					</div>
+					<div className="space-y-1">
+						<Input
+							onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
+							placeholder="URL"
+							value={link.url || ""}
+						/>
+						<div className="h-4"></div>
+					</div>
 				</div>
 				<div className="flex flex-col gap-2">
 					<BaseButton
