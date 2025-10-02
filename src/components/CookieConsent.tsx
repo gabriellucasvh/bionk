@@ -191,31 +191,33 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 							</Link>
 						</p>
 
-						<div className="flex flex-col gap-3 sm:flex-row-reverse">
-							<BaseButton
-								className="flex-1 bg-black text-white hover:bg-black/80"
-								fullWidth
-								onClick={handleAcceptAll}
-							>
-								Aceitar Todos
-							</BaseButton>
-							<BaseButton
-								className="flex-1"
-								fullWidth
-								onClick={handleRejectAll}
-								variant="outline"
-							>
-								Rejeitar Todos
-							</BaseButton>
-							<BaseButton
-								className="flex-1 sm:flex-none"
-								fullWidth
+						<div className=" flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+							<button
+								className="py-2 sm:w-auto sm:flex-none"
 								onClick={() => setShowCustomization(true)}
-								variant="link"
+								type="button"
 							>
-								<Settings className="mr-2 h-4 w-4" />
-								Personalizar
-							</BaseButton>
+								<span className="flex items-center text-sm hover:underline">
+									<Settings className="mr-2 h-4 w-4" />
+									Gerenciar Preferências
+								</span>
+							</button>
+							<div className="flex flex-row gap-1 sm:gap-3">
+								<BaseButton
+									className="flex-1 rounded-lg bg-black text-white hover:bg-black/80 sm:w-auto sm:flex-none"
+									fullWidth
+									onClick={handleRejectAll}
+								>
+									Rejeitar
+								</BaseButton>
+								<BaseButton
+									className="flex-1 rounded-lg bg-black text-white hover:bg-black/80 sm:w-auto sm:flex-none"
+									fullWidth
+									onClick={handleAcceptAll}
+								>
+									Aceitar
+								</BaseButton>
+							</div>
 						</div>
 					</CardContent>
 				</Card>
@@ -360,17 +362,17 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 
 					<div className="flex flex-col gap-3 pt-4 sm:flex-row">
 						<BaseButton
-							className="flex-1 bg-black text-white hover:bg-black/80"
-							onClick={handleCustomSave}
-						>
-							Salvar Preferências
-						</BaseButton>
-						<BaseButton
-							className="flex-1 sm:flex-none"
+							className="flex-1 rounded-lg sm:flex-none"
 							onClick={() => setShowCustomization(false)}
 							variant="outline"
 						>
 							Cancelar
+						</BaseButton>
+						<BaseButton
+							className="flex-1 rounded-lg bg-black text-white hover:bg-black/80"
+							onClick={handleCustomSave}
+						>
+							Salvar Preferências
 						</BaseButton>
 					</div>
 				</DialogContent>
