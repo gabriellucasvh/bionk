@@ -455,23 +455,42 @@ function ContentList({
 		return result;
 	};
 
-	const renderCompactText = (text: any) => (
-		<div className="w-full" key={`text-${text.id}`}>
-			<button
-				className="flex min-h-[3.5rem] w-full items-center rounded-lg border px-1 py-3 text-left transition-all duration-200 hover:brightness-110"
-				style={getButtonStyle(customizations)}
-				type="button"
-			>
-				<div className="w-10 flex-shrink-0" />
-				<div className="flex flex-1 justify-center">
-					<h3 className="line-clamp-2 px-2 font-medium leading-tight">
-						{text.title}
-					</h3>
-				</div>
-				<div className="w-10 flex-shrink-0" />
-			</button>
-		</div>
-	);
+	const renderCompactText = (text: any) => {
+		const getCompactTextStyle = () => {
+			if (!text.hasBackground) {
+				const cornerValue = customizations?.customButtonCorners || "12";
+				return {
+					borderRadius: `${cornerValue}px`,
+				};
+			}
+			return getButtonStyle(customizations);
+		};
+
+		return (
+			<div className="w-full" key={`text-${text.id}`}>
+				<button
+					className={`flex min-h-[3.5rem] w-full items-center px-1 py-3 text-left transition-all duration-200 hover:brightness-110 ${
+						text.hasBackground
+							? "rounded-lg border"
+							: "bg-white/3 hover:bg-white/5"
+					}`}
+					style={getCompactTextStyle()}
+					type="button"
+				>
+					<div className="w-10 flex-shrink-0" />
+					<div className="flex flex-1 justify-center">
+						<h3
+							className="line-clamp-2 px-2 font-medium leading-tight"
+							style={textStyle}
+						>
+							{text.title}
+						</h3>
+					</div>
+					<div className="w-10 flex-shrink-0" />
+				</button>
+			</div>
+		);
+	};
 
 	const renderExpandedText = (text: any) => {
 		const cornerValue = customizations?.customButtonCorners || "12";
@@ -678,14 +697,14 @@ export default function UserPagePreview() {
 	};
 
 	return (
-		<div className="h-full w-full">
+		<div className="min-h-full w-full">
 			<div
-				className={`relative h-full w-full ${
+				className={`relative min-h-full w-full ${
 					customizations.headerStyle === "hero" ? "" : "px-4 sm:px-6 sm:pt-4"
 				}`}
 				style={wrapperStyle}
 			>
-				<div className="flex h-full flex-col">
+				<div className="flex min-h-full flex-col">
 					{customizations.headerStyle === "hero" ? (
 						<>
 							<UserHeader
