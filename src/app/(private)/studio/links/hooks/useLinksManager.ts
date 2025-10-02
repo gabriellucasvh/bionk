@@ -111,6 +111,8 @@ export const useLinksManager = (
 	const [videoFormData, setVideoFormData] =
 		useState<VideoFormData>(initialVideoFormData);
 	const [_originalLink, setOriginalLink] = useState<LinkItem | null>(null);
+	const [_originalText, setOriginalText] = useState<TextItem | null>(null);
+	const [_originalVideo, setOriginalVideo] = useState<VideoItem | null>(null);
 	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
 	const [togglingLinkId, setTogglingLinkId] = useState<number | null>(null);
 	const [togglingTextId, setTogglingTextId] = useState<number | null>(null);
@@ -144,23 +146,33 @@ export const useLinksManager = (
 		}));
 
 		// Converter textos em UnifiedItems
-		const textItems: UnifiedItem[] = currentTexts.map((text) => ({
-			...text,
-			url: null,
-			clicks: 0,
-			sensitive: false,
-			isText: true,
-			isEditing: false,
-		}));
+		const textItems: UnifiedItem[] = currentTexts.map((text) => {
+			const existingItem = unifiedItems.find(
+				(item) => item.isText && item.id === text.id
+			);
+			return {
+				...text,
+				url: null,
+				clicks: 0,
+				sensitive: false,
+				isText: true,
+				isEditing: existingItem?.isEditing,
+			};
+		});
 
 		// Converter vídeos em UnifiedItems
-		const videoItems: UnifiedItem[] = currentVideos.map((video) => ({
-			...video,
-			clicks: 0,
-			sensitive: false,
-			isVideo: true,
-			isEditing: false,
-		}));
+		const videoItems: UnifiedItem[] = currentVideos.map((video) => {
+			const existingItem = unifiedItems.find(
+				(item) => item.isVideo && item.id === video.id
+			);
+			return {
+				...video,
+				clicks: 0,
+				sensitive: false,
+				isVideo: true,
+				isEditing: existingItem?.isEditing,
+			};
+		});
 
 		// Links gerais (sem seção)
 		const generalLinks: UnifiedItem[] = currentLinks
@@ -510,8 +522,20 @@ export const useLinksManager = (
 	};
 
 	const handleStartEditingVideo = (id: number) => {
+		const videoToEdit = unifiedItems.find(
+			(item) => item.isVideo && item.id === id
+		) as VideoItem;
+		if (videoToEdit) {
+			setOriginalVideo(videoToEdit);
+		}
+
 		setUnifiedItems((prevItems) =>
 			prevItems.map((item) => {
+				// Cancelar edição de todos os outros items
+				if (item.isEditing && item.id !== id) {
+					return { ...item, isEditing: false };
+				}
+				// Ativar edição apenas do item específico
 				if (item.isVideo && item.id === id) {
 					return { ...item, isEditing: true };
 				}
@@ -565,6 +589,7 @@ export const useLinksManager = (
 				})
 			);
 		}
+		setOriginalVideo(null);
 	};
 
 	const handleAddLinkToSection = async (sectionId: number) => {
@@ -699,15 +724,28 @@ export const useLinksManager = (
 			setOriginalLink(linkToEdit);
 			const updateEditingStatus = (items: UnifiedItem[]) =>
 				items.map((item) => {
-					if (!item.isSection && item.id === id) {
+					// Cancelar edição de todos os outros items
+					if (item.isEditing && item.id !== id) {
+						return { ...item, isEditing: false };
+					}
+					// Ativar edição apenas do link específico (não texto nem vídeo)
+					if (
+						!(item.isSection || item.isText || item.isVideo) &&
+						item.id === id
+					) {
 						return { ...item, isEditing: true };
 					}
 					if (item.isSection && item.children) {
 						return {
 							...item,
-							children: item.children.map((link) =>
-								link.id === id ? { ...link, isEditing: true } : link
-							),
+							children: item.children.map((link) => {
+								// Cancelar edição de outros links na seção
+								if (link.isEditing && link.id !== id) {
+									return { ...link, isEditing: false };
+								}
+								// Ativar edição apenas do link específico
+								return link.id === id ? { ...link, isEditing: true } : link;
+							}),
 						};
 					}
 					return item;
@@ -721,7 +759,11 @@ export const useLinksManager = (
 		if (linkToRestore) {
 			const updateItems = (items: UnifiedItem[]) =>
 				items.map((item) => {
-					if (!item.isSection && item.id === id) {
+					// Restaurar apenas links (não texto nem vídeo)
+					if (
+						!(item.isSection || item.isText || item.isVideo) &&
+						item.id === id
+					) {
 						return { ...linkToRestore, isEditing: false };
 					}
 					if (item.isSection && item.children) {
@@ -746,7 +788,11 @@ export const useLinksManager = (
 	) => {
 		const updateItems = (items: UnifiedItem[]) =>
 			items.map((item) => {
-				if (!item.isSection && item.id === id) {
+				// Atualizar apenas links (não texto nem vídeo)
+				if (
+					!(item.isSection || item.isText || item.isVideo) &&
+					item.id === id
+				) {
 					return { ...item, [field]: value };
 				}
 				if (item.isSection && item.children) {
@@ -800,8 +846,20 @@ export const useLinksManager = (
 	};
 
 	const handleStartEditingText = (id: number) => {
+		const textToEdit = unifiedItems.find(
+			(item) => item.isText && item.id === id
+		) as TextItem;
+		if (textToEdit) {
+			setOriginalText(textToEdit);
+		}
+
 		setUnifiedItems((prevItems) =>
 			prevItems.map((item) => {
+				// Cancelar edição de todos os outros items
+				if (item.isEditing && item.id !== id) {
+					return { ...item, isEditing: false };
+				}
+				// Ativar edição apenas do item específico
 				if (item.isText && item.id === id) {
 					return { ...item, isEditing: true };
 				}
@@ -862,6 +920,7 @@ export const useLinksManager = (
 				})
 			);
 		}
+		setOriginalText(null);
 	};
 
 	return {
@@ -925,5 +984,8 @@ export const useLinksManager = (
 		togglingTextId,
 		togglingVideoId,
 		togglingSectionId,
+		originalLink: _originalLink,
+		originalText: _originalText,
+		originalVideo: _originalVideo,
 	};
 };

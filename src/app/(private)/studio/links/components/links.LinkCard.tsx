@@ -66,6 +66,7 @@ interface LinkCardProps {
 	borderRadius?: number;
 	archivingLinkId?: number | null;
 	isTogglingActive?: boolean;
+	originalLink?: LinkItem | null;
 }
 
 // --- Subcomponentes ---
@@ -97,6 +98,7 @@ const EditingView = ({
 	onLinkChange,
 	onSaveEditing,
 	onCancelEditing,
+	originalLink,
 }: Omit<
 	LinkCardProps,
 	| "listeners"
@@ -107,6 +109,10 @@ const EditingView = ({
 	| "onClickLink"
 >) => {
 	const [isLoading, setIsLoading] = useState(false);
+
+	const hasChanges = originalLink
+		? link.title !== originalLink.title || link.url !== originalLink.url
+		: true;
 
 	const handleSave = async () => {
 		setIsLoading(true);
@@ -119,8 +125,8 @@ const EditingView = ({
 
 	return (
 		<div className="flex flex-col gap-3 rounded-lg border-2 border-blue-500 p-3 sm:p-4">
-			<div className="flex items-center gap-2">
-				<div className="flex-1 space-y-1.5">
+			<div className="space-y-3">
+				<div className="space-y-1.5">
 					<div className="space-y-1">
 						<Input
 							maxLength={80}
@@ -138,25 +144,27 @@ const EditingView = ({
 							placeholder="URL"
 							value={link.url || ""}
 						/>
-						<div className="h-4"></div>
+						<div className="h-4" />
 					</div>
 				</div>
-				<div className="flex flex-col gap-2">
+				<div className="flex justify-end gap-2">
 					<BaseButton
-						disabled={!(isValidUrl(link.url || "") && link.title)}
+						onClick={() => onCancelEditing(link.id)}
+						size="sm"
+						variant="white"
+					>
+						<X className="mr-2 h-4 w-4" />
+						Cancelar
+					</BaseButton>
+					<BaseButton
+						disabled={!(isValidUrl(link.url || "") && link.title && hasChanges)}
 						loading={isLoading}
 						onClick={handleSave}
-						size="icon"
+						size="sm"
 					>
-						<Save className="h-4 w-4" />
+						<Save className="mr-2 h-4 w-4" />
+						Salvar
 					</BaseButton>
-					<Button
-						onClick={() => onCancelEditing(link.id)}
-						size="icon"
-						variant="ghost"
-					>
-						<X className="h-4 w-4" />
-					</Button>
 				</div>
 			</div>
 		</div>

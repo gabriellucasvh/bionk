@@ -52,6 +52,7 @@ interface TextCardProps {
 	) => void;
 	onCancelEditingText?: (id: number) => void;
 	isTogglingActive?: boolean;
+	originalText?: TextItem | null;
 }
 
 const TextCard = ({
@@ -67,9 +68,18 @@ const TextCard = ({
 	onSaveEditingText,
 	onCancelEditingText,
 	isTogglingActive,
+	originalText,
 }: TextCardProps) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+
+	const hasChanges = originalText
+		? text.title !== originalText.title ||
+			text.description !== originalText.description ||
+			text.position !== originalText.position ||
+			text.hasBackground !== originalText.hasBackground ||
+			text.isCompact !== originalText.isCompact
+		: true;
 
 	const handleEdit = () => {
 		if (onStartEditingText) {
@@ -157,8 +167,8 @@ const TextCard = ({
 								className="resize-none whitespace-pre-wrap break-words"
 								id={`description-${text.id}`}
 								maxLength={1500}
-							onChange={(e) => {
-								if (e.target.value.length <= 1500) {
+								onChange={(e) => {
+									if (e.target.value.length <= 1500) {
 										handleFieldChange("description", e.target.value);
 									}
 								}}
@@ -167,8 +177,8 @@ const TextCard = ({
 								value={text.description}
 							/>
 							<div className="text-right text-muted-foreground text-xs">
-				{text.description.length}/1500 caracteres
-			</div>
+								{text.description.length}/1500 caracteres
+							</div>
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor={`position-${text.id}`}>Posição do texto</Label>
@@ -229,12 +239,12 @@ const TextCard = ({
 						<X className="mr-2 h-4 w-4" />
 						Cancelar
 					</BaseButton>
-					<BaseButton 
-						onClick={handleSave} 
-						size="sm" 
-						variant="default"
+					<BaseButton
+						disabled={isLoading || !text.title || !hasChanges}
 						loading={isLoading}
-						disabled={isLoading}
+						onClick={handleSave}
+						size="sm"
+						variant="default"
 					>
 						<Save className="mr-2 h-4 w-4" />
 						Salvar

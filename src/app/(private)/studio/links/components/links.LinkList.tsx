@@ -91,6 +91,9 @@ interface LinkListProps {
 	togglingLinkId?: number | null;
 	togglingTextId?: number | null;
 	togglingSectionId?: number | null;
+	originalLink?: LinkItem | null;
+	originalText?: TextItem | null;
+	originalVideo?: VideoItem | null;
 }
 
 const LinkList = (props: LinkListProps) => {
@@ -120,6 +123,9 @@ const LinkList = (props: LinkListProps) => {
 		togglingLinkId,
 		togglingTextId,
 		togglingSectionId,
+		originalLink,
+		originalText,
+		originalVideo,
 		...cardProps
 	} = props;
 
@@ -147,27 +153,38 @@ const LinkList = (props: LinkListProps) => {
 				sensors={sensors}
 			>
 				<SortableContext
-					items={items.map((item) =>
-						item.isSection ? item.id.toString() : `item-${item.id}`
-					)}
+					items={items.map((item) => {
+						if (item.isSection) {
+							return `section-${item.id}`;
+						}
+						if (item.isText) {
+							return `text-${item.id}`;
+						}
+						if (item.isVideo) {
+							return `video-${item.id}`;
+						}
+						return `link-${item.id}`;
+					})}
 					strategy={verticalListSortingStrategy}
 				>
 					<div className="space-y-3">
 						{items.map((item) => {
 							let key = "";
+							let sortableId = "";
+
 							if (item.isSection) {
 								key = `section-${item.id}`;
+								sortableId = `section-${item.id}`;
 							} else if (item.isText) {
 								key = `text-${item.id}`;
+								sortableId = `text-${item.id}`;
 							} else if (item.isVideo) {
 								key = `video-${item.id}`;
+								sortableId = `video-${item.id}`;
 							} else {
 								key = `link-${item.id}`;
+								sortableId = `link-${item.id}`;
 							}
-
-							const sortableId = item.isSection
-								? item.id.toString()
-								: `item-${item.id}`;
 
 							return (
 								<SortableItem id={sortableId} key={key}>
@@ -211,6 +228,7 @@ const LinkList = (props: LinkListProps) => {
 													onStartEditingText={onStartEditingText}
 													onTextChange={onTextChange}
 													onToggleActive={cardProps.onToggleActive}
+													originalText={originalText}
 													setActivatorNodeRef={setActivatorNodeRef}
 													text={item as TextItem}
 												/>
@@ -230,6 +248,7 @@ const LinkList = (props: LinkListProps) => {
 													onStartEditingVideo={onStartEditingVideo}
 													onToggleActive={cardProps.onToggleActive}
 													onVideoChange={onVideoChange}
+													originalVideo={originalVideo}
 													setActivatorNodeRef={setActivatorNodeRef}
 													video={item as VideoItem}
 												/>
@@ -244,6 +263,7 @@ const LinkList = (props: LinkListProps) => {
 												listeners={listeners}
 												onRemoveCustomImage={onRemoveCustomImage}
 												onUpdateCustomImage={onUpdateCustomImage}
+												originalLink={originalLink}
 												setActivatorNodeRef={setActivatorNodeRef}
 												{...cardProps}
 											/>

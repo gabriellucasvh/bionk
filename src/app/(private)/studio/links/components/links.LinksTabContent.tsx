@@ -49,6 +49,9 @@ const LinksTabContent = ({
 		togglingLinkId,
 		togglingTextId,
 		togglingSectionId,
+		originalLink,
+		originalText,
+		originalVideo,
 		setActiveId,
 		setIsAdding,
 		setIsAddingVideo,
@@ -143,8 +146,11 @@ const LinksTabContent = ({
 				onVideoChange={handlers.handleVideoChange}
 				togglingVideoId={togglingVideoId}
 				togglingLinkId={togglingLinkId}
-					togglingTextId={togglingTextId}
-					togglingSectionId={togglingSectionId}
+				togglingTextId={togglingTextId}
+				togglingSectionId={togglingSectionId}
+				originalLink={originalLink}
+				originalText={originalText}
+				originalVideo={originalVideo}
 			/>
 		</div>
 	);

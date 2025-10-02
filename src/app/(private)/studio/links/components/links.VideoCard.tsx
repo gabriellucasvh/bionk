@@ -11,6 +11,7 @@ import {
 	X,
 } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +28,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { VideoItem } from "../types/links.types";
 import { getVideoPlatform } from "../utils/video.helpers";
-import { useState } from "react";
 
 interface VideoCardProps {
 	video: VideoItem;
@@ -51,6 +51,7 @@ interface VideoCardProps {
 	) => void;
 	onCancelEditingVideo?: (id: number) => void;
 	isTogglingActive?: boolean;
+	originalVideo?: VideoItem | null;
 }
 
 // Subcomponentes
@@ -59,11 +60,22 @@ const EditingView = ({
 	onVideoChange,
 	onSaveEditingVideo,
 	onCancelEditingVideo,
+	originalVideo,
 }: Pick<
 	VideoCardProps,
-	"video" | "onVideoChange" | "onSaveEditingVideo" | "onCancelEditingVideo"
+	| "video"
+	| "onVideoChange"
+	| "onSaveEditingVideo"
+	| "onCancelEditingVideo"
+	| "originalVideo"
 >) => {
 	const [isLoading, setIsLoading] = useState(false);
+
+	const hasChanges = originalVideo
+		? video.title !== originalVideo.title ||
+			video.description !== originalVideo.description ||
+			video.url !== originalVideo.url
+		: true;
 
 	const handleSave = async () => {
 		if (video.title && video.url) {
@@ -131,12 +143,12 @@ const EditingView = ({
 			</div>
 
 			<div className="flex justify-end gap-2">
-				<Button onClick={handleCancel} size="sm" variant="outline">
+				<BaseButton onClick={handleCancel} size="sm" variant="white">
 					<X className="mr-2 h-4 w-4" />
 					Cancelar
-				</Button>
+				</BaseButton>
 				<BaseButton
-					disabled={!(video.title && video.url)}
+					disabled={!(video.title && video.url && hasChanges)}
 					loading={isLoading}
 					onClick={handleSave}
 					size="sm"
@@ -249,7 +261,7 @@ const DisplayView = ({
 							onCheckedChange={async (checked) => {
 								try {
 									await onToggleActive?.(video.id, checked);
-								} catch{
+								} catch {
 									// Em caso de erro, o switch volta ao estado anterior
 								}
 							}}
