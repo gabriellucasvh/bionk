@@ -574,7 +574,7 @@ export default function ConfigsClient() {
 										Cancelar
 									</AlertDialogCancel>
 									<AlertDialogAction
-										className="w-full bg-destructive text-red-100 text-xs sm:w-auto sm:text-sm dark:hover:bg-red-500"
+										className="w-full bg-red-500 text-white text-xs sm:w-auto sm:text-sm"
 										onClick={handleDeleteAccount}
 									>
 										Sim, excluir minha conta
