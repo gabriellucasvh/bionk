@@ -2,8 +2,91 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import { authOptions, clearUserTokenCache } from "@/lib/auth";
+import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { getDefaultCustomPresets } from "@/utils/templatePresets";
+
+const BASE64_IMAGE_REGEX = /^data:image\/\w+;base64,/;
+
+async function uploadProfileImage(input: unknown, defaultImage: string) {
+	if (!input) {
+		return defaultImage;
+	}
+
+	try {
+		// String input: URL or base64
+		if (typeof input === "string") {
+			const profileImage = input.trim();
+			if (!profileImage) {
+				return defaultImage;
+			}
+			if (profileImage.startsWith("http")) {
+				return profileImage;
+			}
+			const buffer = Buffer.from(
+				profileImage.replace(BASE64_IMAGE_REGEX, ""),
+				"base64"
+			);
+
+			const uploadResponse = await new Promise((resolve, reject) => {
+				cloudinary.uploader
+					.upload_stream(
+						{
+							folder: "profile-images",
+							transformation: [
+								{ width: 400, height: 400, crop: "fill" },
+								{ quality: "auto" },
+							],
+						},
+						(error, result) => {
+							if (error) {
+								reject(error);
+							} else {
+								resolve(result);
+							}
+						}
+					)
+					.end(buffer);
+			});
+
+			return (uploadResponse as any).secure_url;
+		}
+
+		// Blob/File input from FormData
+		if (typeof (input as Blob)?.arrayBuffer === "function") {
+			const blob = input as Blob;
+			const buffer = Buffer.from(await blob.arrayBuffer());
+
+			const uploadResponse = await new Promise((resolve, reject) => {
+				cloudinary.uploader
+					.upload_stream(
+						{
+							folder: "profile-images",
+							transformation: [
+								{ width: 400, height: 400, crop: "fill" },
+								{ quality: "auto" },
+							],
+						},
+						(error, result) => {
+							if (error) {
+								reject(error);
+							} else {
+								resolve(result);
+							}
+						}
+					)
+					.end(buffer);
+			});
+
+			return (uploadResponse as any).secure_url;
+		}
+
+		return defaultImage;
+	} catch (error) {
+		console.error("Erro no upload da imagem (auth onboarding):", error);
+		return defaultImage;
+	}
+}
 
 export async function POST(request: NextRequest) {
 	try {
@@ -13,7 +96,35 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 		}
 
-		const { name, username, bio } = await request.json();
+		// Suporta JSON e FormData
+		const contentType = request.headers.get("content-type") || "";
+		let name = "";
+		let username = "";
+		let bio: string | null = null;
+		let profileImageInput: unknown = null;
+
+		if (contentType.includes("multipart/form-data")) {
+			const form = await request.formData();
+			name = String(form.get("name") || "");
+			username = String(form.get("username") || "");
+			bio = form.get("bio") ? String(form.get("bio")) : null;
+			profileImageInput = form.get("profileImage") ?? null;
+		} else {
+			const body = await request.json().catch(async () => {
+				// Fallback para formData caso .json() falhe
+				const form = await request.formData();
+				return {
+					name: String(form.get("name") || ""),
+					username: String(form.get("username") || ""),
+					bio: form.get("bio") ? String(form.get("bio")) : null,
+					profileImage: form.get("profileImage") ?? null,
+				};
+			});
+			name = body.name || "";
+			username = body.username || "";
+			bio = body.bio ?? null;
+			profileImageInput = body.profileImage ?? null;
+		}
 
 		// Validações
 		if (!name || name.trim().length === 0) {
@@ -69,17 +180,23 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Atualizar usuário e criar presets padrão
+		// Upload da imagem (se houver) e atualizar usuário, criando presets padrão
+		const imageUrl = await uploadProfileImage(
+			profileImageInput,
+			session.user.image || ""
+		);
+
 		const updatedUser = await prisma.user.update({
 			where: { id: session.user.id },
 			data: {
 				name: name.trim(),
 				username: username.toLowerCase().trim(),
 				bio: bio?.trim() || null,
+				image: imageUrl,
 				onboardingCompleted: true,
 				CustomPresets: {
-					create: getDefaultCustomPresets()
-				}
+					create: getDefaultCustomPresets(),
+				},
 			},
 		});
 

@@ -14,6 +14,16 @@ export default function OnboardingPage() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	// Converte File para base64 data URL
+	const fileToDataUrl = (file: File): Promise<string> => {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => resolve(reader.result as string);
+			reader.onerror = (e) => reject(e);
+			reader.readAsDataURL(file);
+		});
+	};
+
 	const handleOnboardingComplete = async (data: OnboardingData) => {
 		setIsLoading(true);
 		setError(null);
@@ -29,12 +39,22 @@ export default function OnboardingPage() {
 				throw new Error(errorData.error || "Erro ao verificar username");
 			}
 
+			// Prepara payload JSON e converte imagem para base64, se existir
+			const payload: any = {
+				name: data.name,
+				username: data.username,
+				bio: data.bio,
+			};
+			if (data.profileImage) {
+				payload.profileImage = await fileToDataUrl(data.profileImage);
+			}
+
 			const response = await fetch("/api/onboarding/complete", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(data),
+				body: JSON.stringify(payload),
 			});
 
 			if (!response.ok) {
