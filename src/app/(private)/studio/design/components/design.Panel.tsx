@@ -18,12 +18,16 @@ import {
 import { HeaderStyleButtons } from "./HeaderStylePreview";
 
 const convertCustomizationsToRecord = (
-	customizations: any
+    customizations: any
 ): Record<string, string> => ({
-	customBackgroundColor: customizations.customBackgroundColor,
-	customTextColor: customizations.customTextColor,
-	customButtonColor: customizations.customButtonColor,
-	customButtonTextColor: customizations.customButtonTextColor,
+    customBackgroundColor: customizations.customBackgroundColor,
+    customBackgroundGradient: customizations.customBackgroundGradient,
+    customTextColor: customizations.customTextColor,
+    customFont: customizations.customFont,
+    customButtonColor: customizations.customButtonColor,
+    customButtonTextColor: customizations.customButtonTextColor,
+    customButtonStyle: customizations.customButtonStyle,
+    customButtonCorners: customizations.customButtonCorners,
 });
 
 export function DesignPanel() {

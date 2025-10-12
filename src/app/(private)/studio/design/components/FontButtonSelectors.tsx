@@ -1,6 +1,6 @@
 "use client";
 
-import { Type } from "lucide-react";
+import { Check, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { BUTTON_STYLES, FONT_OPTIONS } from "../constants/design.constants";
@@ -93,22 +93,31 @@ export function ButtonStyleSelector({
 				text="Estilo do Botão"
 			/>
 			<div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-3 md:grid-cols-3">
-				{BUTTON_STYLES.map((style) => (
-					<button
-						className={`flex h-12 w-full items-center justify-center rounded px-2 py-1 text-center text-sm transition-all duration-200 ${
-							style.preview
-						} ${
-							customizations.customButtonStyle === style.value
-								? "ring-1 ring-green-500 ring-offset-2"
-								: ""
-						}`}
-						key={style.value}
-						onClick={() => handleChange("customButtonStyle", style.value)}
-						type="button"
-					>
-						{style.label}
-					</button>
-				))}
+				{BUTTON_STYLES.map((style) => {
+					const isActive = customizations.customButtonStyle === style.value;
+					return (
+						<div
+							className={`relative min-h-12 w-full cursor-pointer rounded-lg transition-all ${
+								isActive ? "" : "hover:bg-neutral-50 dark:hover:bg-neutral-600"
+							}`}
+							key={style.value}
+							onClick={() => handleChange("customButtonStyle", style.value)}
+							role="none"
+						>
+							{isActive && (
+								<div className="absolute top-1 left-1 rounded-full bg-green-600 p-1 text-white shadow-sm">
+									<Check className="h-3 w-3" />
+								</div>
+							)}
+							<button
+								className={`flex h-12 w-full items-center justify-center rounded px-2 py-1 text-center text-sm transition-all duration-200 ${style.preview}`}
+								type="button"
+							>
+								{style.label}
+							</button>
+						</div>
+					);
+				})}
 			</div>
 		</div>
 	);
