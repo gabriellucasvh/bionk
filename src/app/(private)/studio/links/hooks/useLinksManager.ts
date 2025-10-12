@@ -817,8 +817,6 @@ export const useLinksManager = (
 
 	const handleTextUpdate = async (id: number, payload: Partial<TextItem>) => {
 		try {
-			await mutateTexts();
-
 			const response = await fetch(`/api/texts/${id}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
@@ -828,6 +826,15 @@ export const useLinksManager = (
 			if (!response.ok) {
 				throw new Error("Falha ao atualizar texto");
 			}
+
+			setUnifiedItems((prevItems) =>
+				prevItems.map((item) => {
+					if (item.isText && item.id === id) {
+						return { ...item, ...payload };
+					}
+					return item;
+				})
+			);
 
 			await mutateTexts();
 		} catch (error) {
