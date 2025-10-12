@@ -289,7 +289,7 @@ export default function OnboardingPageComponent({
 								id="name"
 								maxLength={44}
 								onChange={(e) => setData({ ...data, name: e.target.value })}
-								placeholder="Como você quer aparecer na Bionk?"
+								placeholder="Seu nome"
 								value={data.name}
 							/>
 							<p className="text-muted-foreground text-xs">
