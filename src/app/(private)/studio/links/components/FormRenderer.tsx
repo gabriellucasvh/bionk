@@ -100,7 +100,7 @@ const LinkFormRenderer = ({
 	setFormData: (data: LinkFormData) => void;
 	onBack: () => void;
 }) => (
-	<div className="flex h-full flex-col p-6">
+	<div className="flex h-full flex-col pb-6">
 		<FormHeader onBack={onBack} title="Adicionar Link" />
 		<div className="min-h-0 flex-1">
 			<AddNewLinkForm
@@ -125,7 +125,7 @@ const SectionFormRenderer = ({
 	setFormData: (data: SectionFormData) => void;
 	onBack: () => void;
 }) => (
-	<div className="flex h-full flex-col p-6">
+	<div className="flex h-full flex-col pb-6">
 		<FormHeader onBack={onBack} title="Adicionar Seção" />
 		<div className="min-h-0 flex-1">
 			<AddNewSectionForm
@@ -155,7 +155,7 @@ const TextFormRenderer = ({
 	onCancel: () => void;
 	onBack: () => void;
 }) => (
-	<div className="flex h-full flex-col p-6">
+	<div className="flex h-full flex-col pb-6">
 		<FormHeader onBack={onBack} title="Adicionar Texto" />
 		<div className="min-h-0 flex-1">
 			<AddNewTextForm
@@ -187,7 +187,7 @@ const VideoFormRenderer = ({
 	onCancel: () => void;
 	onBack: () => void;
 }) => (
-	<div className="flex h-full flex-col p-6">
+	<div className="flex h-full flex-col pb-6">
 		<FormHeader onBack={onBack} title="Adicionar Vídeo" />
 		<div className="min-h-0 flex-1">
 			<AddNewVideoForm
