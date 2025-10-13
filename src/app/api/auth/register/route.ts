@@ -547,22 +547,26 @@ async function handleUserCreation(
 
 	const hashedPassword = await bcrypt.hash(password, 10);
 
-	const updatedUser = await prisma.user.update({
-		where: { id: user.id },
-		data: {
-			name: name.trim(),
-			hashedPassword,
-			passwordSetupToken: null,
-			passwordSetupTokenExpiry: null,
-			usernameReservedAt: null,
-			usernameReservationExpiry: null,
-			subscriptionPlan: "free",
-			subscriptionStatus: "active",
-			CustomPresets: {
-				create: getDefaultCustomPresets(),
-			},
-		},
-	});
+  const updatedUser = await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      name: name.trim(),
+      hashedPassword,
+      // Ativar a conta e marcar onboarding como concluído para fluxo de credenciais
+      status: "active",
+      onboardingCompleted: true,
+      provider: "credentials",
+      passwordSetupToken: null,
+      passwordSetupTokenExpiry: null,
+      usernameReservedAt: null,
+      usernameReservationExpiry: null,
+      subscriptionPlan: "free",
+      subscriptionStatus: "active",
+      CustomPresets: {
+        create: getDefaultCustomPresets(),
+      },
+    },
+  });
 
 	// Notificar Discord sobre novo registro
 	try {

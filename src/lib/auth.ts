@@ -149,21 +149,21 @@ export const authOptions: NextAuthOptions = {
 				? `temp_${crypto.randomUUID().slice(0, 8)}`
 				: `user_${crypto.randomUUID().slice(0, 8)}`;
 
-			const newUser = await prisma.user.create({
-				data: {
-					email: data.email,
-					name: data.name || "Usuário",
-					username,
-					status,
-					image: imageUrl,
-					googleId: (data as any).sub ?? null,
-					provider: "google",
-					emailVerified: new Date(),
-					onboardingCompleted: false,
-					subscriptionPlan: "free",
-					subscriptionStatus: "active"
-				},
-			});
+            const newUser = await prisma.user.create({
+              data: {
+                email: data.email,
+                name: data.name || "Usuário",
+                username,
+                status,
+                image: imageUrl,
+                googleId: (data as any).sub ?? null,
+                provider: isGoogleProvider ? "google" : "credentials",
+                emailVerified: new Date(),
+                onboardingCompleted: false,
+                subscriptionPlan: "free",
+                subscriptionStatus: "active"
+              },
+            });
 
 			// Notificar Discord sobre novo registro via Google OAuth
 			try {

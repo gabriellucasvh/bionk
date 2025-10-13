@@ -5,7 +5,7 @@ import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -129,13 +129,14 @@ function Register() {
 		}
 	}, [status, router]);
 
-	const emailForm = useForm<EmailFormData>({
-		resolver: zodResolver(emailSchema),
-		defaultValues: {
-			email: "",
-			username: "",
-		},
-	});
+    const emailForm = useForm<EmailFormData>({
+        resolver: zodResolver(emailSchema),
+        mode: "onChange",
+        defaultValues: {
+            email: "",
+            username: "",
+        },
+    });
 
 	const otpForm = useForm<OtpFormData>({
 		resolver: zodResolver(otpSchema),
@@ -204,9 +205,10 @@ function Register() {
 		setMessage(null);
 		clearTimers();
 		otpForm.reset();
-		try {
+	try {
 			await axios.post("/api/auth/register", {
 				email: data.email,
+				username: data.username,
 				stage: "request-otp",
 			});
 			setEmail(data.email);
@@ -284,12 +286,26 @@ function Register() {
 				password: data.password,
 				stage: "create-user",
 			});
-			setStage("success");
-			setMessage({
-				type: "success",
-				text: "Conta criada com sucesso! Você será redirecionado para o studio.",
+			// Tentar login automático com credenciais
+			const result = await signIn("credentials", {
+				email,
+				password: data.password,
+				redirect: false,
 			});
-			setTimeout(() => router.push("/studio/perfil"), 3000);
+
+			setStage("success");
+			if (result && !result.error) {
+				setMessage({
+					type: "success",
+					text: "Conta criada e login efetuado! Redirecionando...",
+				});
+				router.replace("/studio/perfil");
+			} else {
+				setMessage({
+					type: "success",
+					text: "Conta criada com sucesso! Faça login manualmente se não ocorrer automaticamente.",
+				});
+			}
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				setMessage({

@@ -5,7 +5,7 @@ import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { Suspense, useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -106,13 +106,18 @@ function PasswordRegistrationPageContent() {
 				password: data.password,
 				stage: "create-user",
 			});
-			setMessage({
-				type: "success",
-				text: "Conta criada com sucesso! Redirecionando...",
+			// Login automático
+			const result = await signIn("credentials", {
+				email: userEmail as string,
+				password: data.password,
+				redirect: false,
 			});
-			setTimeout(() => {
-				router.push("/studio");
-			}, 2000);
+			if (result && !result.error) {
+				setMessage({ type: "success", text: "Conta criada e login efetuado!" });
+				router.replace("/studio/perfil");
+			} else {
+				setMessage({ type: "success", text: "Conta criada! Faça login." });
+			}
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				setMessage({

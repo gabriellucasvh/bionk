@@ -77,11 +77,11 @@ function Login() {
 				redirect: false,
 			});
 
-			if (result?.error) {
-				setMessage("Credenciais inválidas. Tente novamente.");
-			} else {
-				router.replace("/");
-			}
+            if (result?.error) {
+                setMessage("Credenciais inválidas. Tente novamente.");
+            } else {
+                router.replace("/studio/perfil");
+            }
 		} catch {
 			setMessage("Ocorreu um erro durante o login");
 		} finally {

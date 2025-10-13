@@ -28,22 +28,44 @@ export function EmailForm({ form, onSubmit, loading }: EmailFormProps) {
 	const [usernameCheckTimeout, setUsernameCheckTimeout] =
 		useState<NodeJS.Timeout | null>(null);
 
-	const [isTyping, setIsTyping] = useState(false);
+    const [isTyping, setIsTyping] = useState(false);
 
-	// Função para verificar se o formulário pode ser submetido
-	const canSubmit = () => {
-		const { username, email } = form.getValues();
-		const hasErrors = Object.keys(form.formState.errors).length > 0;
+    // Observar mudanças para re-render e refletir imediatamente
+    const watchedUsername = form.watch("username");
+    const watchedEmail = form.watch("email");
 
-		return (
-			!hasErrors &&
-			username &&
-			email &&
-			usernameStatus.type === "available" &&
-			!loading &&
-			!isTyping
-		);
-	};
+    // Função para verificar se o formulário pode ser submetido
+    const canSubmit = () => {
+        const hasErrors = Object.keys(form.formState.errors).length > 0;
+
+        return (
+            !hasErrors &&
+            watchedUsername &&
+            watchedEmail &&
+            usernameStatus.type === "available" &&
+            !loading &&
+            !isTyping
+        );
+    };
+
+    // Quando email e username estão preenchidos e sem erros, garantir que a disponibilidade seja checada
+    useEffect(() => {
+        const hasErrors = Object.keys(form.formState.errors).length > 0;
+        const normalizedUsername = (watchedUsername || "").toLowerCase().trim();
+        const emailPresent = !!watchedEmail;
+        // Etapa 1: username válido; Etapa 2: email presente e válido
+        const usernameSeemsValid = normalizedUsername.length >= 3;
+        if (
+            !hasErrors &&
+            usernameSeemsValid &&
+            emailPresent &&
+            usernameStatus.type === "idle" &&
+            !loading &&
+            !isTyping
+        ) {
+            checkUsernameAvailability(normalizedUsername);
+        }
+    }, [watchedUsername, watchedEmail, form.formState.errors, loading, isTyping, usernameStatus.type]);
 
 	const checkUsernameAvailability = async (username: string) => {
 		if (!username || username.length < 3) {
@@ -76,9 +98,9 @@ export function EmailForm({ form, onSubmit, loading }: EmailFormProps) {
 		}
 	};
 
-	const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, "");
-		form.setValue("username", value, { shouldValidate: true });
+    const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, "");
+        form.setValue("username", value, { shouldValidate: true });
 
 		// Marcar como digitando e limpar mensagens
 		setIsTyping(true);
@@ -88,13 +110,25 @@ export function EmailForm({ form, onSubmit, loading }: EmailFormProps) {
 			clearTimeout(usernameCheckTimeout);
 		}
 
-		const timeout = setTimeout(() => {
-			setIsTyping(false);
-			checkUsernameAvailability(value);
-		}, 1500);
+        const timeout = setTimeout(() => {
+            setIsTyping(false);
+            checkUsernameAvailability(value);
+        }, 600);
 
-		setUsernameCheckTimeout(timeout);
-	};
+        setUsernameCheckTimeout(timeout);
+    };
+
+    const handleUsernameBlur = () => {
+        const value = (form.getValues().username || "").toLowerCase().trim();
+        if (!value) return;
+        // Se o usuário parou de digitar, garantir a verificação imediata
+        if (usernameCheckTimeout) {
+            clearTimeout(usernameCheckTimeout);
+            setUsernameCheckTimeout(null);
+        }
+        setIsTyping(false);
+        checkUsernameAvailability(value);
+    };
 
 	useEffect(() => {
 		return () => {
@@ -139,7 +173,8 @@ export function EmailForm({ form, onSubmit, loading }: EmailFormProps) {
 						})()} `}
 						disabled={loading}
 						maxLength={30}
-						onChange={handleUsernameChange}
+                    onChange={handleUsernameChange}
+                    onBlur={handleUsernameBlur}
 						placeholder="seuUsername"
 						type="text"
 						value={form.watch("username") || ""}
@@ -167,13 +202,17 @@ export function EmailForm({ form, onSubmit, loading }: EmailFormProps) {
 				<Label className="mb-2 block font-semibold text-base text-black">
 					Seu email
 				</Label>
-				<Input
-					className="w-full rounded-md border px-4 py-4 text-base transition-colors duration-400 focus-visible:border-lime-500"
-					placeholder="Digite seu e-mail"
-					type="email"
-					{...form.register("email")}
-					disabled={loading}
-				/>
+            <Input
+                className="w-full rounded-md border px-4 py-4 text-base transition-colors duration-400 focus-visible:border-lime-500"
+                placeholder="Digite seu e-mail"
+                type="email"
+                {...form.register("email")}
+                onBlur={() => {
+                    // Garantir que a validação do email seja aplicada ao sair do campo
+                    void form.trigger("email");
+                }}
+                disabled={loading}
+            />
 				{/* Espaço reservado para mensagem de erro do email */}
 				<div className="mt-2 flex h-2 items-center">
 					{form.formState.errors.email && (
