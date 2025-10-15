@@ -118,6 +118,7 @@ export function ColorSelector({
 						color={customColor}
 						onChange={(color) => handleChange(field, color)}
 						placeholder="#000000"
+						prefixed
 					/>
 				</div>
 			)}

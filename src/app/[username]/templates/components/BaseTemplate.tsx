@@ -587,12 +587,15 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 	const customPresets = user.CustomPresets || templatePreset;
 
 	const wrapperStyle: React.CSSProperties = {
-		...(customPresets.customBackgroundColor && {
-			backgroundColor: customPresets.customBackgroundColor,
-		}),
-		...(customPresets.customBackgroundGradient && {
-			background: customPresets.customBackgroundGradient,
-		}),
+		// Prioriza cor sólida quando ambas existem
+		...(customPresets.customBackgroundColor
+			? { backgroundColor: customPresets.customBackgroundColor }
+			: customPresets.customBackgroundGradient
+				? {
+						backgroundImage: customPresets.customBackgroundGradient,
+						backgroundColor: "transparent",
+					}
+				: {}),
 		...(customPresets.customFont && {
 			fontFamily: getFontFamily(customPresets.customFont),
 		}),
@@ -733,18 +736,20 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 	const shouldUseBlurredBackground =
 		customPresets?.customBlurredBackground !== false &&
 		user.image &&
-		!user.image.includes('default_xry2zk');
+		!user.image.includes("default_xry2zk");
 
 	return (
 		<>
 			{/* Container principal com aspect ratio de celular em telas maiores */}
 			<div
 				className={`relative min-h-dvh sm:flex sm:items-start sm:justify-center sm:pt-4 ${
-					!shouldUseBlurredBackground ? 'bg-neutral-900' : ''
+					shouldUseBlurredBackground ? "" : "bg-neutral-900"
 				}`}
 				style={{
 					backgroundColor: shouldUseBlurredBackground ? "#1a1a1a" : undefined,
-					backgroundImage: shouldUseBlurredBackground ? `url(${user.image})` : undefined,
+					backgroundImage: shouldUseBlurredBackground
+						? `url(${user.image})`
+						: undefined,
 					backgroundSize: "cover",
 					backgroundPosition: "center",
 					backgroundRepeat: "no-repeat",

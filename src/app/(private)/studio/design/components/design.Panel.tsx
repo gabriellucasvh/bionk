@@ -18,16 +18,16 @@ import {
 import { HeaderStyleButtons } from "./HeaderStylePreview";
 
 const convertCustomizationsToRecord = (
-    customizations: any
+	customizations: any
 ): Record<string, string> => ({
-    customBackgroundColor: customizations.customBackgroundColor,
-    customBackgroundGradient: customizations.customBackgroundGradient,
-    customTextColor: customizations.customTextColor,
-    customFont: customizations.customFont,
-    customButtonColor: customizations.customButtonColor,
-    customButtonTextColor: customizations.customButtonTextColor,
-    customButtonStyle: customizations.customButtonStyle,
-    customButtonCorners: customizations.customButtonCorners,
+	customBackgroundColor: customizations.customBackgroundColor,
+	customBackgroundGradient: customizations.customBackgroundGradient,
+	customTextColor: customizations.customTextColor,
+	customFont: customizations.customFont,
+	customButtonColor: customizations.customButtonColor,
+	customButtonTextColor: customizations.customButtonTextColor,
+	customButtonStyle: customizations.customButtonStyle,
+	customButtonCorners: customizations.customButtonCorners,
 });
 
 export function DesignPanel() {
@@ -45,11 +45,51 @@ export function DesignPanel() {
 	);
 	const [isFontModalOpen, setIsFontModalOpen] = useState(false);
 
+	// Tipo de fundo selecionado (apenas um por vez)
+	const [backgroundType, setBackgroundType] = useState<
+		"color" | "gradient" | "image" | "video"
+	>(
+		customizations.customBackgroundGradient
+			? "gradient"
+			: customizations.customBackgroundColor
+				? "color"
+				: "color"
+	);
+
+	useEffect(() => {
+		// Sincroniza o tipo com os valores atuais das customizações
+		if (customizations.customBackgroundGradient) {
+			setBackgroundType("gradient");
+		} else if (customizations.customBackgroundColor) {
+			setBackgroundType("color");
+		}
+	}, [
+		customizations.customBackgroundGradient,
+		customizations.customBackgroundColor,
+	]);
+
 	const handleChange = (field: string, value: string | boolean) => {
 		updateCustomization(field as any, value);
 	};
 
 	const debouncedHandleChange = handleChange;
+
+	const handleBackgroundTypeChange = (
+		type: "color" | "gradient" | "image" | "video"
+	) => {
+		setBackgroundType(type);
+
+		// Garantir exclusividade limpando campos conflitantes
+		if (type === "color") {
+			handleChange("customBackgroundGradient", "");
+		} else if (type === "gradient") {
+			handleChange("customBackgroundColor", "");
+		} else {
+			// imagem ou vídeo (reservado): limpa ambos por enquanto
+			handleChange("customBackgroundColor", "");
+			handleChange("customBackgroundGradient", "");
+		}
+	};
 
 	const handleSavePending = async () => {
 		try {
@@ -148,40 +188,96 @@ export function DesignPanel() {
 					<CardTitle>Background</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					<ColorSelector
-						activeColorPicker={activeColorPicker}
-						customizations={convertCustomizationsToRecord(customizations)}
-						debouncedHandleChange={debouncedHandleChange}
-						field="customBackgroundColor"
-						handleChange={handleChange}
-						hasPendingChange={hasPendingChange}
-						label="Cor de Fundo"
-						setActiveColorPicker={setActiveColorPicker}
-					/>
-
+					{/* Tipo de Fundo */}
 					<div>
 						<RenderLabel
-							hasPending={hasPendingChange("customBackgroundGradient")}
-							text="Gradiente de Fundo"
+							hasPending={
+								hasPendingChange("customBackgroundColor") ||
+								hasPendingChange("customBackgroundGradient")
+							}
+							text="Tipo de Fundo"
 						/>
-						<div className="mt-2 flex flex-wrap gap-1">
-							{GRADIENTS.map((gradient) => (
+						<div className="mt-2 flex flex-wrap gap-2">
+							{(
+								[
+									{ key: "color", label: "Cor sólida" },
+									{ key: "gradient", label: "Gradiente" },
+									{ key: "image", label: "Imagem (em breve)" },
+									{ key: "video", label: "Vídeo (em breve)" },
+								] as const
+							).map((opt) => (
 								<button
-									className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
-										customizations.customBackgroundGradient === gradient
-											? "border-2 border-lime-700"
-											: "border-2 border-neutral-200 hover:border-blue-500 dark:border-neutral-600 dark:hover:border-blue-400"
+									className={`rounded-xl border px-3 py-5 text-sm transition-all ${
+										backgroundType === opt.key
+											? "border-lime-700 text-lime-700 dark:border-lime-600 dark:text-lime-400"
+											: "border-neutral-200 text-neutral-700 hover:border-green-500 hover:text-green-600 dark:border-neutral-600 dark:text-neutral-300 dark:hover:border-green-400 dark:hover:text-green-300"
 									}`}
-									key={gradient}
-									onClick={() =>
-										handleChange("customBackgroundGradient", gradient)
-									}
-									style={{ background: gradient }}
+									key={opt.key}
+									onClick={() => handleBackgroundTypeChange(opt.key)}
 									type="button"
-								/>
+								>
+									{opt.label}
+								</button>
 							))}
 						</div>
+						<p className="mt-2 text-muted-foreground text-xs">
+							Apenas uma opção de fundo é usada por vez. Alternar o tipo limpa a
+							seleção anterior.
+						</p>
 					</div>
+
+					{/* Cor de Fundo */}
+					{backgroundType === "color" && (
+						<ColorSelector
+							activeColorPicker={activeColorPicker}
+							customizations={convertCustomizationsToRecord(customizations)}
+							debouncedHandleChange={debouncedHandleChange}
+							field="customBackgroundColor"
+							handleChange={handleChange}
+							hasPendingChange={hasPendingChange}
+							label="Cor de Fundo"
+							setActiveColorPicker={setActiveColorPicker}
+						/>
+					)}
+
+					{/* Gradiente de Fundo */}
+					{backgroundType === "gradient" && (
+						<div>
+							<RenderLabel
+								hasPending={hasPendingChange("customBackgroundGradient")}
+								text="Gradiente de Fundo"
+							/>
+							<div className="mt-2 flex flex-wrap gap-1">
+								{GRADIENTS.map((gradient) => (
+									<button
+										className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
+											customizations.customBackgroundGradient === gradient
+												? "border-2 border-lime-700"
+												: "border-2 border-neutral-200 hover:border-green-500 dark:border-neutral-600 dark:hover:border-green-400"
+										}`}
+										key={gradient}
+										onClick={() =>
+											handleChange("customBackgroundGradient", gradient)
+										}
+										style={{ background: gradient }}
+										type="button"
+									/>
+								))}
+							</div>
+						</div>
+					)}
+
+					{/* Placeholders reservados */}
+					{backgroundType === "image" && (
+						<div className="rounded-md border p-3 text-muted-foreground text-sm">
+							Em breve: você poderá definir uma imagem como fundo.
+						</div>
+					)}
+					{backgroundType === "video" && (
+						<div className="rounded-md border p-3 text-muted-foreground text-sm">
+							Em breve: você poderá definir um vídeo como fundo.
+						</div>
+					)}
 
 					<div className="flex items-center justify-between">
 						<div>
@@ -189,7 +285,7 @@ export function DesignPanel() {
 								hasPending={hasPendingChange("customBlurredBackground")}
 								text="Background Desfocado"
 							/>
-							<p className="text-sm text-muted-foreground">
+							<p className="text-muted-foreground text-sm">
 								Usar imagem do perfil como fundo desfocado em telas maiores
 							</p>
 						</div>

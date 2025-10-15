@@ -667,16 +667,17 @@ export default function UserPagePreview() {
 	}
 
 	const getBackgroundStyle = () => {
+		// Prioriza cor sólida quando ambas existem
+		if (customizations?.customBackgroundColor) {
+			return {
+				backgroundColor: customizations.customBackgroundColor,
+			};
+		}
+
 		if (customizations?.customBackgroundGradient) {
 			return {
 				backgroundImage: customizations.customBackgroundGradient,
 				backgroundColor: "transparent",
-			};
-		}
-
-		if (customizations?.customBackgroundColor) {
-			return {
-				backgroundColor: customizations.customBackgroundColor,
 			};
 		}
 
