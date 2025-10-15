@@ -77,12 +77,11 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 		}
 
-		// Verificar se usuário tem status pending
-		if (session.user.status !== "pending") {
+		// Verificar se usuário tem status pending e evitar recompletar onboarding
+		if (session.user.status !== "pending" || session.user.onboardingCompleted) {
 			return NextResponse.json(
 				{
-					error:
-						"Onboarding disponível apenas para usuários com status pending",
+					error: "Onboarding já foi concluído ou indisponível para este usuário",
 				},
 				{ status: 400 }
 			);
@@ -112,7 +111,7 @@ export async function POST(request: Request) {
 		// Upload da imagem
 		const imageUrl = await uploadProfileImage(profileImage, session.user.image || '');
 
-		// Atualizar usuário no banco e criar presets padrão
+		// Atualizar usuário no banco e criar presets padrão (idempotente)
 		const updatedUser = await prisma.user.update({
 			where: { id: session.user.id },
 			data: {
@@ -123,7 +122,10 @@ export async function POST(request: Request) {
 				onboardingCompleted: true,
 				status: "active",
 				CustomPresets: {
-					create: getDefaultCustomPresets()
+					upsert: {
+						create: getDefaultCustomPresets(),
+						update: {},
+					},
 				}
 			},
 		});

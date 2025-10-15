@@ -131,18 +131,72 @@ const LinkList = (props: LinkListProps) => {
 
 	const sensors = useSensors(
 		useSensor(MouseSensor),
-		useSensor(TouchSensor),
+		// Melhora UX no mobile: exige breve hold ou movimento antes de arrastar
+		useSensor(TouchSensor, {
+			activationConstraint: { delay: 150, tolerance: 5 },
+		}),
 		useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
 	);
 
-	const activeItem = activeId
-		? items.find((item) => {
-				if (item.isSection) {
-					return item.id.toString() === activeId;
-				}
-				return `item-${item.id}` === activeId;
-			})
-		: null;
+	// Resolve o item ativo para o DragOverlay, cobrindo itens dentro de seções
+	const activePreviewItem = (() => {
+		if (!activeId) {
+			return null;
+		}
+		const [type, idStr] = activeId.split("-");
+		const idNum = Number(idStr);
+
+		if (type === "section") {
+			const sectionUnified = items.find((i) => i.isSection && i.id === idNum);
+			if (!sectionUnified) {
+				return null;
+			}
+			const sectionData: SectionItem = {
+				id: sectionUnified.id.toString(),
+				dbId: sectionUnified.dbId || 0,
+				title: sectionUnified.title || "",
+				active: sectionUnified.active,
+				order: sectionUnified.order || 0,
+				links: sectionUnified.children || [],
+			};
+			return sectionData;
+		}
+
+		if (type === "text") {
+			return (
+				(items.find((i) => i.isText && i.id === idNum) as TextItem) || null
+			);
+		}
+
+		if (type === "video") {
+			return (
+				(items.find((i) => i.isVideo && i.id === idNum) as VideoItem) || null
+			);
+		}
+
+		if (type === "link") {
+			const topLevelLink = items.find(
+				(i) => !(i.isSection || i.isText || i.isVideo) && i.id === idNum
+			) as LinkItem | undefined;
+			if (topLevelLink) {
+				return topLevelLink;
+			}
+
+			const sectionWithLink = items.find(
+				(i) =>
+					i.isSection &&
+					Array.isArray(i.children) &&
+					i.children.some((l) => l.id === idNum)
+			);
+			if (sectionWithLink?.children) {
+				const child =
+					sectionWithLink.children.find((l) => l.id === idNum) || null;
+				return child;
+			}
+		}
+
+		return null;
+	})();
 
 	return (
 		<div className="space-y-6 border-t pt-6">
@@ -277,7 +331,7 @@ const LinkList = (props: LinkListProps) => {
 
 				{/* DragOverlay com preview simplificado */}
 				<DragOverlay>
-					{activeItem && <DragPreview item={activeItem} />}
+					{activePreviewItem && <DragPreview item={activePreviewItem} />}
 				</DragOverlay>
 			</DndContext>
 		</div>

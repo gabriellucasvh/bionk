@@ -195,7 +195,10 @@ export async function POST(request: NextRequest) {
 				image: imageUrl,
 				onboardingCompleted: true,
 				CustomPresets: {
-					create: getDefaultCustomPresets(),
+					upsert: {
+						create: getDefaultCustomPresets(),
+						update: {},
+					},
 				},
 			},
 		});

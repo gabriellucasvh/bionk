@@ -67,15 +67,16 @@ const STEPS = [
 ];
 
 export default function OnboardingPageComponent({
-	onComplete,
-	initialData,
-	loading = false,
+    onComplete,
+    initialData,
+    loading = false,
 }: OnboardingPageProps) {
-	const [currentStep, setCurrentStep] = useState<Step>(1);
-	const [data, setData] = useState({
-		name: initialData?.name || "",
-		username: initialData?.username || "",
-		bio: "",
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [currentStep, setCurrentStep] = useState<Step>(1);
+    const [data, setData] = useState({
+        name: initialData?.name || "",
+        username: initialData?.username || "",
+        bio: "",
 	});
 	const [profilePreview, setProfilePreview] = useState<string>(
 		"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
@@ -223,12 +224,16 @@ export default function OnboardingPageComponent({
 		}
 	};
 
-	const handleComplete = () => {
-		onComplete({
-			...data,
-			profileImage: selectedProfileFile || undefined,
-		});
-	};
+    const handleComplete = () => {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+        onComplete({
+            ...data,
+            profileImage: selectedProfileFile || undefined,
+        });
+        // Fallback: if parent doesn't toggle loading, re-enable after a delay
+        setTimeout(() => setIsSubmitting(false), 5000);
+    };
 
 	const renderStepContent = () => {
 		switch (currentStep) {
@@ -285,7 +290,7 @@ export default function OnboardingPageComponent({
 						<div className="space-y-2">
 							<Label htmlFor="name">Nome de exibição *</Label>
 							<Input
-								className="py-3 text-lg"
+								className="py-3"
 								id="name"
 								maxLength={44}
 								onChange={(e) => setData({ ...data, name: e.target.value })}
@@ -314,7 +319,7 @@ export default function OnboardingPageComponent({
 							<div className="flex items-center space-x-2">
 								<span className="text-muted-foreground text-sm">bionk.me/</span>
 								<Input
-									className={`flex-1 py-3 text-lg ${
+									className={`flex-1 py-3 ${
 										usernameValidation.isValid ? "" : "border-red-500"
 									}`}
 									id="username"
@@ -442,18 +447,18 @@ export default function OnboardingPageComponent({
 							<ArrowRight className="h-4 w-4" />
 						</BaseButton>
 					) : (
-						<BaseButton
-							className="flex items-center gap-2"
-							disabled={loading || !canProceedToNext()}
-							onClick={handleComplete}
-						>
-							{loading ? (
-								<Loader2 className="h-4 w-4 animate-spin" />
-							) : (
-								<Check className="h-4 w-4" />
-							)}
-							Concluir
-						</BaseButton>
+                        <BaseButton
+                            className="flex items-center gap-2"
+                            disabled={loading || isSubmitting || !canProceedToNext()}
+                            onClick={handleComplete}
+                        >
+                            {loading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <Check className="h-4 w-4" />
+                            )}
+                            Concluir
+                        </BaseButton>
 					)}
 				</div>
 			</div>
