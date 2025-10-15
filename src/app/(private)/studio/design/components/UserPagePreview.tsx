@@ -696,20 +696,20 @@ export default function UserPagePreview() {
 		}),
 	};
 
-	return (
-		<div className="min-h-full w-full">
-			<div
-				className={`relative min-h-full w-full ${
-					customizations.headerStyle === "hero" ? "" : "px-4 sm:px-6 sm:pt-4"
-				}`}
-				style={wrapperStyle}
-			>
-				<div className="flex min-h-full flex-col">
-					{customizations.headerStyle === "hero" ? (
-						<>
-							<UserHeader
-								customizations={customizations}
-								headerStyle={customizations.headerStyle}
+    return (
+        <div className="h-full w-full">
+            <div
+                className={`relative h-full w-full ${
+                    customizations.headerStyle === "hero" ? "" : "px-4 sm:px-6 sm:pt-4"
+                }`}
+                style={wrapperStyle}
+            >
+                <div className="flex h-full flex-col">
+                    {customizations.headerStyle === "hero" ? (
+                        <>
+                            <UserHeader
+                                customizations={customizations}
+                                headerStyle={customizations.headerStyle}
 								textStyle={textStyle}
 								user={user}
 							/>
