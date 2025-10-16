@@ -14,29 +14,35 @@ import AddNewLinkForm from "./links.AddNewLinkForm";
 import AddNewSectionForm from "./links.AddNewSectionForm";
 import AddNewTextForm from "./links.AddNewTextForm";
 import AddNewVideoForm from "./links.AddNewVideoForm";
+import AddNewImageForm from "./links.AddNewImageForm";
+import type { ImageFormData } from "../hooks/useLinksManager";
 
 interface FormRendererProps {
-	selectedOption: string | null;
-	isMobile: boolean;
-	isAdding: boolean;
-	isAddingSection: boolean;
-	isAddingText: boolean;
-	isAddingVideo: boolean;
-	formData: LinkFormData;
-	sectionFormData: SectionFormData;
-	textFormData: TextFormData;
-	videoFormData: VideoFormData;
-	existingSections: SectionItem[];
-	setFormData: (data: LinkFormData) => void;
-	setSectionFormData: (data: SectionFormData) => void;
-	setTextFormData: (data: TextFormData) => void;
-	setVideoFormData: (data: VideoFormData) => void;
-	onCancel: () => void;
-	onLinkSubmit: () => void;
-	onSectionSubmit: () => void;
-	onTextSubmit: () => void;
-	onVideoSubmit: () => void;
-	onBack: () => void;
+    selectedOption: string | null;
+    isMobile: boolean;
+    isAdding: boolean;
+    isAddingSection: boolean;
+    isAddingText: boolean;
+    isAddingVideo: boolean;
+    isAddingImage: boolean;
+    formData: LinkFormData;
+    sectionFormData: SectionFormData;
+    textFormData: TextFormData;
+    videoFormData: VideoFormData;
+    imageFormData: ImageFormData;
+    existingSections: SectionItem[];
+    setFormData: (data: LinkFormData) => void;
+    setSectionFormData: (data: SectionFormData) => void;
+    setTextFormData: (data: TextFormData) => void;
+    setVideoFormData: (data: VideoFormData) => void;
+    setImageFormData: (data: ImageFormData) => void;
+    onCancel: () => void;
+    onLinkSubmit: () => void;
+    onSectionSubmit: () => void;
+    onTextSubmit: () => void;
+    onVideoSubmit: () => void;
+    onImageSubmit: () => void;
+    onBack: () => void;
 }
 
 const validateLinkForm = (
@@ -61,12 +67,29 @@ const validateTextForm = (textFormData: TextFormData): boolean => {
 };
 
 const validateVideoForm = (videoFormData: VideoFormData): boolean => {
-	return videoFormData.url.trim().length > 0;
+    return videoFormData.url.trim().length > 0;
+};
+
+const validateImageForm = (imageFormData: ImageFormData): boolean => {
+    const hasImages = Array.isArray(imageFormData.images) && imageFormData.images.length > 0;
+    if (imageFormData.layout === "column") {
+        return hasImages && imageFormData.title.trim().length > 0;
+    }
+    return hasImages;
 };
 
 const isVideoOption = (selectedOption: string | null): boolean => {
-	const videoOptions = ["video", "youtube", "vimeo", "tiktok", "twitch"];
-	return videoOptions.includes(selectedOption || "");
+    const videoOptions = ["video", "youtube", "vimeo", "tiktok", "twitch"];
+    return videoOptions.includes(selectedOption || "");
+};
+
+const isImageOption = (selectedOption: string | null): boolean => {
+    const imageOptions = [
+        "image_single",
+        "image_column",
+        "image_carousel",
+    ];
+    return imageOptions.includes(selectedOption || "");
 };
 
 const FormHeader = ({
@@ -171,21 +194,21 @@ const TextFormRenderer = ({
 );
 
 const VideoFormRenderer = ({
-	videoFormData,
-	isMobile,
-	existingSections,
-	onVideoSubmit,
-	setVideoFormData,
-	onCancel,
-	onBack,
+    videoFormData,
+    isMobile,
+    existingSections,
+    onVideoSubmit,
+    setVideoFormData,
+    onCancel,
+    onBack,
 }: {
-	videoFormData: VideoFormData;
-	isMobile: boolean;
-	existingSections: SectionItem[];
-	onVideoSubmit: () => void;
-	setVideoFormData: (data: VideoFormData) => void;
-	onCancel: () => void;
-	onBack: () => void;
+    videoFormData: VideoFormData;
+    isMobile: boolean;
+    existingSections: SectionItem[];
+    onVideoSubmit: () => void;
+    setVideoFormData: (data: VideoFormData) => void;
+    onCancel: () => void;
+    onBack: () => void;
 }) => (
 	<div className="flex h-full flex-col pb-6">
 		<FormHeader onBack={onBack} title="Adicionar Vídeo" />
@@ -202,32 +225,68 @@ const VideoFormRenderer = ({
 	</div>
 );
 
+const ImageFormRenderer = ({
+    imageFormData,
+    isMobile,
+    existingSections,
+    onImageSubmit,
+    setImageFormData,
+    onCancel,
+    onBack,
+}: {
+    imageFormData: ImageFormData;
+    isMobile: boolean;
+    existingSections: SectionItem[];
+    onImageSubmit: () => void;
+    setImageFormData: (data: ImageFormData) => void;
+    onCancel: () => void;
+    onBack: () => void;
+}) => (
+    <div className="flex h-full flex-col pb-6">
+        <FormHeader onBack={onBack} title="Adicionar Imagem" />
+        <div className="min-h-0 flex-1">
+            <AddNewImageForm
+                existingSections={isMobile ? undefined : existingSections}
+                formData={imageFormData}
+                isSaveDisabled={!validateImageForm(imageFormData)}
+                onCancel={onCancel}
+                onSave={onImageSubmit}
+                setFormData={setImageFormData}
+            />
+        </div>
+    </div>
+);
+
 const FormRenderer = ({
-	selectedOption,
-	isMobile,
-	isAdding,
-	isAddingSection,
-	isAddingText,
-	isAddingVideo,
-	formData,
-	sectionFormData,
-	textFormData,
-	videoFormData,
-	existingSections,
-	setFormData,
-	setSectionFormData,
-	setTextFormData,
-	setVideoFormData,
-	onCancel,
-	onLinkSubmit,
-	onSectionSubmit,
-	onTextSubmit,
-	onVideoSubmit,
-	onBack,
+    selectedOption,
+    isMobile,
+    isAdding,
+    isAddingSection,
+    isAddingText,
+    isAddingVideo,
+    isAddingImage,
+    formData,
+    sectionFormData,
+    textFormData,
+    videoFormData,
+    imageFormData,
+    existingSections,
+    setFormData,
+    setSectionFormData,
+    setTextFormData,
+    setVideoFormData,
+    setImageFormData,
+    onCancel,
+    onLinkSubmit,
+    onSectionSubmit,
+    onTextSubmit,
+    onVideoSubmit,
+    onImageSubmit,
+    onBack,
 }: FormRendererProps) => {
-	if (selectedOption === "link" && (isMobile || isAdding)) {
-		return (
-			<LinkFormRenderer
+    if (selectedOption === "link" && (isMobile || isAdding)) {
+        return (
+            <LinkFormRenderer
 				existingSections={existingSections}
 				formData={formData}
 				isMobile={isMobile}
@@ -235,8 +294,8 @@ const FormRenderer = ({
 				onLinkSubmit={onLinkSubmit}
 				setFormData={setFormData}
 			/>
-		);
-	}
+        );
+    }
 
 	if (selectedOption === "section" && (isMobile || isAddingSection)) {
 		return (
@@ -263,9 +322,9 @@ const FormRenderer = ({
 		);
 	}
 
-	if (isVideoOption(selectedOption) && (isMobile || isAddingVideo)) {
-		return (
-			<VideoFormRenderer
+    if (isVideoOption(selectedOption) && (isMobile || isAddingVideo)) {
+        return (
+            <VideoFormRenderer
 				existingSections={existingSections}
 				isMobile={isMobile}
 				onBack={onBack}
@@ -274,10 +333,24 @@ const FormRenderer = ({
 				setVideoFormData={setVideoFormData}
 				videoFormData={videoFormData}
 			/>
-		);
-	}
+        );
+    }
 
-	return null;
+    if (isImageOption(selectedOption) && (isMobile || isAddingImage)) {
+        return (
+            <ImageFormRenderer
+                existingSections={existingSections}
+                isMobile={isMobile}
+                onBack={onBack}
+                onCancel={onCancel}
+                onImageSubmit={onImageSubmit}
+                setImageFormData={setImageFormData}
+                imageFormData={imageFormData}
+            />
+        );
+    }
+
+    return null;
 };
 
 export default FormRenderer;

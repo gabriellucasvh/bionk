@@ -63,6 +63,7 @@ model User {
   SocialLink                    SocialLink[]
   Text                          Text[]
   Video                         Video[]
+  Image                         Image[]
 
   @@index([subscriptionStatus])
   @@index([createdAt])
@@ -193,24 +194,24 @@ model ProfileView {
 }
 
 model CustomPresets {
-  id                       String  @id @default(uuid())
-  userId                   String  @unique
-  customBackgroundColor    String? @default("")
-  customBackgroundGradient String? @default("")
+  id                        String  @id @default(uuid())
+  userId                    String  @unique
+  customBackgroundColor     String? @default("")
+  customBackgroundGradient  String? @default("")
   // Novo: mídia de background (imagem/vídeo)
   customBackgroundMediaType String? @default("")
   customBackgroundImageUrl  String?
   customBackgroundVideoUrl  String?
-  customTextColor          String? @default("")
-  customFont               String? @default("")
-  customButtonColor        String? @default("")
-  customButtonTextColor    String? @default("")
-  customButtonStyle        String? @default("solid")
-  customButtonFill         String? @default("")
-  customButtonCorners      String? @default("")
-  headerStyle              String? @default("default")
-  customBlurredBackground  Boolean @default(true)
-  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customTextColor           String? @default("")
+  customFont                String? @default("")
+  customButtonColor         String? @default("")
+  customButtonTextColor     String? @default("")
+  customButtonStyle         String? @default("solid")
+  customButtonFill          String? @default("")
+  customButtonCorners       String? @default("")
+  headerStyle               String? @default("default")
+  customBlurredBackground   Boolean @default(true)
+  user                      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Text {
@@ -246,6 +247,7 @@ model Section {
   links     Link[]
   texts     Text[]
   videos    Video[]
+  images    Image[]
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -257,6 +259,30 @@ model Video {
   description String?
   type        String
   url         String
+  order       Int      @default(0)
+  userId      String
+  active      Boolean  @default(true)
+  sectionId   Int?
+  isCompact   Boolean  @default(false)
+  archived    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  section     Section? @relation(fields: [sectionId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@index([userId])
+  @@index([userId, order])
+}
+
+model Image {
+  id          Int      @id @default(autoincrement())
+  title       String?
+  description String?
+  layout      String
+  ratio       String   @default("square")
+  sizePercent Int      @default(100)
+  items       Json
   order       Int      @default(0)
   userId      String
   active      Boolean  @default(true)

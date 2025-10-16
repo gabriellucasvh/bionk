@@ -2,6 +2,7 @@
 
 import { Lock, SquareArrowOutUpRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import { FONT_OPTIONS } from "@/app/(private)/studio/design/constants/design.constants";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -396,7 +397,7 @@ function LinksList({
 				) : (
 					<InteractiveLink
 						className={cn(
-							"flex w-full items-center rounded-lg border p-1 text-left transition-all duration-200 hover:brightness-110",
+							"flex w-full items-center border p-1 text-left transition-all duration-200 hover:brightness-110",
 							isAnimated && "animate-shake"
 						)}
 						customPresets={customPresets}
@@ -413,12 +414,12 @@ function LinksList({
 
 	const addContentToArray = (
 		contentArray: Array<{
-			type: "link" | "text" | "video";
+			type: "link" | "text" | "video" | "image";
 			item: any;
 			order: number;
 		}>,
 		items: any[] | undefined,
-		type: "link" | "text" | "video"
+		type: "link" | "text" | "video" | "image"
 	) => {
 		if (items && items.length > 0) {
 			for (const item of items) {
@@ -429,7 +430,7 @@ function LinksList({
 
 	const createContentArray = () => {
 		const contentArray: Array<{
-			type: "link" | "text" | "video";
+			type: "link" | "text" | "video" | "image";
 			item: any;
 			order: number;
 		}> = [];
@@ -437,6 +438,7 @@ function LinksList({
 		addContentToArray(contentArray, user.Link, "link");
 		addContentToArray(contentArray, user.Text, "text");
 		addContentToArray(contentArray, user.Video, "video");
+		addContentToArray(contentArray, (user as any).Image, "image");
 
 		return contentArray.sort((a, b) => a.order - b.order);
 	};
@@ -533,6 +535,182 @@ function LinksList({
 		return result;
 	};
 
+	// Helpers para imagens
+	const normalizeExternalUrl = (url?: string | null): string | null => {
+		if (!url) return null;
+		const trimmed = url.trim();
+		if (!trimmed) return null;
+		// Mantém protocolos válidos e URLs protocol-relative
+		if (/^(https?:\/\/|mailto:|tel:|\/\/)/i.test(trimmed)) {
+			return trimmed;
+		}
+		// Caso não tenha protocolo, força https
+		return `https://${trimmed}`;
+	};
+	const getAspectRatioStyle = (ratio?: string): React.CSSProperties => {
+		switch (ratio) {
+			case "square":
+				return { aspectRatio: "1 / 1" };
+			case "16:9":
+				return { aspectRatio: "16 / 9" };
+			case "3:2":
+				return { aspectRatio: "3 / 2" };
+			case "3:1":
+				return { aspectRatio: "3 / 1" };
+			default:
+				return {};
+		}
+	};
+
+	const renderImageItem = (img: any, ratio?: string) => {
+		const src = img.previewUrl || img.url;
+		const content = (
+			<div
+				className="relative w-full overflow-hidden"
+				style={{ ...getAspectRatioStyle(ratio) }}
+			>
+				{typeof src === "string" && src.toLowerCase().endsWith(".gif") ? (
+					// biome-ignore lint/performance/noImgElement: gif rendering
+					<img
+						alt={img.authorName || "Imagem"}
+						className="h-full w-full object-cover"
+						src={src}
+					/>
+				) : (
+					<Image
+						alt={img.authorName || "Imagem"}
+						className="object-cover"
+						fill
+						sizes="(max-width: 640px) 100vw, 575px"
+						src={src}
+					/>
+				)}
+			</div>
+		);
+
+		const href = normalizeExternalUrl(img.linkUrl);
+		if (href) {
+			return (
+				<a href={href} rel="noopener noreferrer" target="_blank">
+					{content}
+				</a>
+			);
+		}
+
+		return content;
+	};
+
+	const renderImageBlock = (image: any) => {
+		const widthPercent = Math.max(
+			10,
+			Math.min(100, Number(image.sizePercent) || 100)
+		);
+		const wrapperStyle: React.CSSProperties = {
+			width: `${widthPercent}%`,
+			marginLeft: "auto",
+			marginRight: "auto",
+		};
+
+		const header = (
+			<div className="mb-2 text-center" style={textStyle}>
+				{image.title ? (
+					<h3 className="font-semibold text-lg">{image.title}</h3>
+				) : null}
+				{image.description ? (
+					<p className="text-sm opacity-80">{image.description}</p>
+				) : null}
+			</div>
+		);
+
+			switch (image.layout) {
+				case "single":
+					return (
+						<div
+							className="w-full"
+							key={`image-${image.id}`}
+							style={wrapperStyle}
+						>
+							{header}
+							<div className="overflow-hidden" style={buttonStyle}>
+								{renderImageItem(image.items?.[0], image.ratio)}
+							</div>
+						</div>
+					);
+			case "column":
+				return (
+					<div
+						className="w-full"
+						key={`image-${image.id}`}
+						style={wrapperStyle}
+					>
+						{header}
+						<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+							{(image.items || []).map((img: any, idx: number) => (
+								<div
+									className="overflow-hidden border p-1"
+									key={`img-${image.id}-${idx}`}
+									style={buttonStyle}
+								>
+									{renderImageItem(img, image.ratio)}
+								</div>
+							))}
+						</div>
+					</div>
+				);
+			case "carousel":
+				return (
+					<div
+						className="w-full"
+						key={`image-${image.id}`}
+						style={wrapperStyle}
+					>
+						{header}
+						<div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
+							{(image.items || []).map((img: any, idx: number) => (
+								<div
+									className="w-64 flex-shrink-0 snap-center overflow-hidden border p-1"
+									key={`img-${image.id}-${idx}`}
+									style={buttonStyle}
+								>
+									{renderImageItem(img, image.ratio)}
+								</div>
+							))}
+						</div>
+					</div>
+				);
+			default:
+				return (
+					<div
+						className="w-full"
+						key={`image-${image.id}`}
+						style={wrapperStyle}
+					>
+						{header}
+					</div>
+				);
+		}
+	};
+
+	const renderImageContent = (
+		image: any,
+		index: number,
+		sectionIdRef: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const imageSectionId = image.sectionId || null;
+
+		if (imageSectionId !== sectionIdRef.value && imageSectionId !== null) {
+			sectionIdRef.value = imageSectionId;
+			const sectionHeader = renderSectionHeader(image, imageSectionId, index);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		result.push(renderImageBlock(image));
+		return result;
+	};
+
 	const allContent = createContentArray();
 	const currentSectionId = { value: null };
 
@@ -562,6 +740,8 @@ function LinksList({
 							return renderTextContent(content.item, index, currentSectionId);
 						case "video":
 							return renderVideoContent(content.item, index, currentSectionId);
+						case "image":
+							return renderImageContent(content.item, index, currentSectionId);
 						default:
 							return null;
 					}

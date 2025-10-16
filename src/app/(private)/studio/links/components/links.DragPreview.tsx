@@ -1,8 +1,16 @@
 "use client";
 
-import { FolderOpen, Grip, Link as LinkIcon, Type, Video } from "lucide-react";
+import {
+	FolderOpen,
+	Grip,
+	Image as ImageIcon,
+	Link as LinkIcon,
+	Type,
+	Video,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
+	ImageItem,
 	LinkItem,
 	SectionItem,
 	TextItem,
@@ -10,7 +18,7 @@ import type {
 } from "../types/links.types";
 
 interface DragPreviewProps {
-	item: LinkItem | SectionItem | TextItem | VideoItem;
+	item: LinkItem | SectionItem | TextItem | VideoItem | ImageItem;
 	className?: string;
 }
 
@@ -38,6 +46,14 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
 				label: "Vídeo",
 				color: "text-red-600",
 				title: item.title || "Vídeo sem título",
+			};
+		}
+		if ("isImage" in item && item.isImage) {
+			return {
+				icon: ImageIcon,
+				label: "Imagem",
+				color: "text-indigo-600",
+				title: item.title || "Imagem sem título",
 			};
 		}
 		return {

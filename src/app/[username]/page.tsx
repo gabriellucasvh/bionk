@@ -103,27 +103,50 @@ export default async function UserPage({ params }: PageProps) {
 					},
 				},
 			},
-			Video: {
-				where: { active: true, archived: false },
-				orderBy: { order: "asc" },
-				select: {
-					id: true,
-					title: true,
-					description: true,
-					type: true,
-					url: true,
-					order: true,
-					active: true,
-					userId: true,
-					sectionId: true,
-					section: {
-						select: {
-							id: true,
-							title: true,
-						},
-					},
-				},
-			},
+            Video: {
+                where: { active: true, archived: false },
+                orderBy: { order: "asc" },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    type: true,
+                    url: true,
+                    order: true,
+                    active: true,
+                    userId: true,
+                    sectionId: true,
+                    section: {
+                        select: {
+                            id: true,
+                            title: true,
+                        },
+                    },
+                },
+            },
+            Image: {
+                where: { active: true, archived: false },
+                orderBy: { order: "asc" },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    layout: true,
+                    ratio: true,
+                    sizePercent: true,
+                    items: true,
+                    order: true,
+                    active: true,
+                    userId: true,
+                    sectionId: true,
+                    section: {
+                        select: {
+                            id: true,
+                            title: true,
+                        },
+                    },
+                },
+            },
 			Section: {
 				where: { active: true },
 				orderBy: { order: "asc" },

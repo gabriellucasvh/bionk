@@ -18,12 +18,14 @@ import {
 } from "@dnd-kit/sortable";
 import type { UnifiedItem } from "../hooks/useLinksManager";
 import type {
+	ImageItem,
 	LinkItem,
 	SectionItem,
 	TextItem,
 	VideoItem,
 } from "../types/links.types";
 import DragPreview from "./links.DragPreview";
+import ImageCard from "./links.ImageCard";
 import LinkCard from "./links.LinkCard";
 import SectionCard from "./links.SectionCard";
 import SortableItem from "./links.SortableItem";
@@ -88,12 +90,25 @@ interface LinkListProps {
 	) => void;
 	onCancelEditingVideo?: (id: number) => void;
 	togglingVideoId?: number | null;
+	// Props para imagens
+	onDeleteImage?: (id: number) => void;
+	onArchiveImage?: (id: number) => void;
+	onStartEditingImage?: (id: number) => void;
+	onImageChange?: (
+		id: number,
+		field: "title" | "description",
+		value: string
+	) => void;
+	onSaveEditingImage?: (id: number, title: string, description: string) => void;
+	onCancelEditingImage?: (id: number) => void;
+	togglingImageId?: number | null;
 	togglingLinkId?: number | null;
 	togglingTextId?: number | null;
 	togglingSectionId?: number | null;
 	originalLink?: LinkItem | null;
 	originalText?: TextItem | null;
 	originalVideo?: VideoItem | null;
+	originalImage?: ImageItem | null;
 }
 
 const LinkList = (props: LinkListProps) => {
@@ -120,12 +135,14 @@ const LinkList = (props: LinkListProps) => {
 		onSaveEditingVideo,
 		onCancelEditingVideo,
 		togglingVideoId,
+		togglingImageId,
 		togglingLinkId,
 		togglingTextId,
 		togglingSectionId,
 		originalLink,
 		originalText,
 		originalVideo,
+		originalImage,
 		...cardProps
 	} = props;
 
@@ -174,6 +191,14 @@ const LinkList = (props: LinkListProps) => {
 			);
 		}
 
+		if (type === "image") {
+			return (
+				(items.find(
+					(i) => (i as any).isImage && i.id === idNum
+				) as ImageItem) || null
+			);
+		}
+
 		if (type === "link") {
 			const topLevelLink = items.find(
 				(i) => !(i.isSection || i.isText || i.isVideo) && i.id === idNum
@@ -217,6 +242,9 @@ const LinkList = (props: LinkListProps) => {
 						if (item.isVideo) {
 							return `video-${item.id}`;
 						}
+						if ((item as any).isImage) {
+							return `image-${item.id}`;
+						}
 						return `link-${item.id}`;
 					})}
 					strategy={verticalListSortingStrategy}
@@ -235,6 +263,9 @@ const LinkList = (props: LinkListProps) => {
 							} else if (item.isVideo) {
 								key = `video-${item.id}`;
 								sortableId = `video-${item.id}`;
+							} else if ((item as any).isImage) {
+								key = `image-${item.id}`;
+								sortableId = `image-${item.id}`;
 							} else {
 								key = `link-${item.id}`;
 								sortableId = `link-${item.id}`;
@@ -305,6 +336,26 @@ const LinkList = (props: LinkListProps) => {
 													originalVideo={originalVideo}
 													setActivatorNodeRef={setActivatorNodeRef}
 													video={item as VideoItem}
+												/>
+											);
+										}
+
+										if ((item as any).isImage) {
+											return (
+												<ImageCard
+													image={item as ImageItem}
+													isDragging={isDragging}
+													isTogglingActive={togglingImageId === item.id}
+													listeners={listeners}
+													onArchiveImage={cardProps.onArchiveImage}
+													onCancelEditingImage={cardProps.onCancelEditingImage}
+													onDeleteImage={cardProps.onDeleteImage}
+													onImageChange={cardProps.onImageChange}
+													onSaveEditingImage={cardProps.onSaveEditingImage}
+													onStartEditingImage={cardProps.onStartEditingImage}
+													onToggleActive={cardProps.onToggleActive}
+													originalImage={originalImage}
+													setActivatorNodeRef={setActivatorNodeRef}
 												/>
 											);
 										}

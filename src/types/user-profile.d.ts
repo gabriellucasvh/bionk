@@ -6,6 +6,7 @@ import type {
 	SocialLink as PrismaSocialLink,
 	Text as PrismaText,
 	Video as PrismaVideo,
+	Image as PrismaImage,
 	User as PrismaUser,
 } from "@prisma/client";
 
@@ -71,6 +72,26 @@ export interface UserVideo extends PrismaVideo {
 	userId: string;
 }
 
+// --- Imagens ---
+export type ImageItemMeta = {
+    url: string;
+    previewUrl?: string;
+    provider?: string;
+    authorName?: string;
+    authorLink?: string;
+    sourceLink?: string;
+    linkUrl?: string;
+};
+
+export interface UserImage extends PrismaImage {
+    // items é Json no Prisma; aqui tipamos para uso no front
+    items: ImageItemMeta[];
+    section?: {
+        id: number;
+        title: string;
+    } | null;
+}
+
 // --- Customização ---
 export interface CustomPresets extends PrismaCustomPresets {
     customBackgroundColor: string;
@@ -98,6 +119,7 @@ export type UserProfile = PrismaUser & {
 	SocialLink: SocialLink[];
 	Text: UserText[];
 	Video: UserVideo[];
+	Image: UserImage[];
 	CustomPresets?: CustomPresets | null;
 
 	template?: string;

@@ -390,12 +390,12 @@ function ContentList({
 
 	const addContentToArray = (
 		contentArray: Array<{
-			type: "link" | "text" | "video";
+			type: "link" | "text" | "video" | "image";
 			item: any;
 			order: number;
 		}>,
 		items: any[] | undefined,
-		type: "link" | "text" | "video"
+		type: "link" | "text" | "video" | "image"
 	) => {
 		if (items && items.length > 0) {
 			for (const item of items) {
@@ -406,7 +406,7 @@ function ContentList({
 
 	const createContentArray = () => {
 		const contentArray: Array<{
-			type: "link" | "text" | "video";
+			type: "link" | "text" | "video" | "image";
 			item: any;
 			order: number;
 		}> = [];
@@ -414,6 +414,7 @@ function ContentList({
 		addContentToArray(contentArray, user.Link, "link");
 		addContentToArray(contentArray, user.Text, "text");
 		addContentToArray(contentArray, user.Video, "video");
+		addContentToArray(contentArray, (user as any).Image, "image");
 
 		return contentArray.sort((a, b) => a.order - b.order);
 	};
@@ -578,6 +579,176 @@ function ContentList({
 		return result;
 	};
 
+	// Imagens (preview simplificado)
+	const normalizeExternalUrl = (url?: string | null): string | null => {
+		if (!url) {
+			return null;
+		}
+		const trimmed = url.trim();
+		if (!trimmed) {
+			return null;
+		}
+		if (/^(https?:\/\/|mailto:|tel:|\/\/)/i.test(trimmed)) {
+			return trimmed;
+		}
+		return `https://${trimmed}`;
+	};
+	const getAspectRatioStyle = (ratio?: string): React.CSSProperties => {
+		if (!ratio) {
+			return {};
+		}
+		return {
+			aspectRatio: ratio.includes(":") ? ratio.replace(":", " / ") : ratio,
+		};
+	};
+
+	const renderImageItem = (img: any, ratio?: string) => {
+		const src = img?.previewUrl || img?.url;
+		if (!src) {
+			return null;
+		}
+		const content = (
+			<div
+				className="relative w-full overflow-hidden"
+				style={getAspectRatioStyle(ratio)}
+			>
+				{typeof src === "string" && src.toLowerCase().endsWith(".gif") ? (
+					// biome-ignore lint/performance/noImgElement: gif rendering
+					<img
+						alt={img?.authorName || "Imagem"}
+						className="h-full w-full object-cover"
+						src={src}
+					/>
+				) : (
+					<Image
+						alt={img?.authorName || "Imagem"}
+						className="object-cover"
+						fill
+						sizes="(max-width: 640px) 100vw, 575px"
+						src={src}
+					/>
+				)}
+			</div>
+		);
+		const href = normalizeExternalUrl(img?.linkUrl);
+		return href ? (
+			<a href={href} rel="noopener noreferrer" target="_blank">
+				{content}
+			</a>
+		) : (
+			content
+		);
+	};
+
+	const renderImageBlock = (image: any) => {
+		const widthPercent = Math.max(
+			10,
+			Math.min(100, Number(image?.sizePercent) || 100)
+		);
+		const wrapperStyle: React.CSSProperties = {
+			width: `${widthPercent}%`,
+			marginLeft: "auto",
+			marginRight: "auto",
+		};
+		const header = (
+			<div className="mb-2 text-center" style={textStyle}>
+				{image?.title ? (
+					<h3 className="font-semibold text-lg">{image.title}</h3>
+				) : null}
+				{image?.description ? (
+					<p className="text-sm opacity-80">{image.description}</p>
+				) : null}
+			</div>
+		);
+		switch (image?.layout) {
+			case "single":
+				return (
+					<div
+						className="w-full"
+						key={`image-${image.id}`}
+						style={wrapperStyle}
+					>
+						{header}
+						<div className="rounded-lg border p-1" style={buttonStyle}>
+							{renderImageItem(image?.items?.[0], image?.ratio)}
+						</div>
+					</div>
+				);
+			case "column":
+				return (
+					<div
+						className="w-full"
+						key={`image-${image.id}`}
+						style={wrapperStyle}
+					>
+						{header}
+						<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+							{(image?.items || []).map((img: any, idx: number) => (
+								<div
+									className="overflow-hidden rounded-lg border p-1"
+									key={`img-${image.id}-${idx}`}
+									style={buttonStyle}
+								>
+									{renderImageItem(img, image?.ratio)}
+								</div>
+							))}
+						</div>
+					</div>
+				);
+			case "carousel":
+				return (
+					<div
+						className="w-full"
+						key={`image-${image.id}`}
+						style={wrapperStyle}
+					>
+						{header}
+						<div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
+							{(image?.items || []).map((img: any, idx: number) => (
+								<div
+									className="w-64 flex-shrink-0 snap-center overflow-hidden rounded-lg border p-1"
+									key={`img-${image.id}-${idx}`}
+									style={buttonStyle}
+								>
+									{renderImageItem(img, image?.ratio)}
+								</div>
+							))}
+						</div>
+					</div>
+				);
+			default:
+				return (
+					<div
+						className="w-full"
+						key={`image-${image.id}`}
+						style={wrapperStyle}
+					>
+						{header}
+					</div>
+				);
+		}
+	};
+
+	const renderImageContent = (
+		image: any,
+		index: number,
+		sectionIdRef: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const imageSectionId = image.sectionId || null;
+
+		if (imageSectionId !== sectionIdRef.value && imageSectionId !== null) {
+			sectionIdRef.value = imageSectionId;
+			const sectionHeader = renderSectionHeader(image, imageSectionId, index);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		result.push(renderImageBlock(image));
+		return result;
+	};
+
 	const allContent = createContentArray();
 	const currentSectionId = { value: null };
 
@@ -607,6 +778,8 @@ function ContentList({
 							return renderTextContent(content.item, index, currentSectionId);
 						case "video":
 							return renderVideoContent(content.item, index, currentSectionId);
+						case "image":
+							return renderImageContent(content.item, index, currentSectionId);
 						default:
 							return null;
 					}
@@ -639,6 +812,7 @@ function convertUserDataToUserProfile(userData: any): UserProfile {
 		Link: regularLinks,
 		Text: userData.texts || [],
 		Video: userData.videos || [],
+		Image: userData.images || [],
 		SocialLink: socialLinks,
 	} as UserProfile;
 }

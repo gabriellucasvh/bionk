@@ -20,6 +20,25 @@ export interface UserData {
 		url: string;
 		order: number;
 	}>;
+	images?: Array<{
+		id: number;
+		title?: string | null;
+		description?: string | null;
+		layout: string;
+		ratio?: string | null;
+		sizePercent?: number | null;
+		items: Array<{
+			url: string;
+			previewUrl?: string;
+			provider?: string;
+			authorName?: string;
+			authorLink?: string;
+			sourceLink?: string;
+			linkUrl?: string;
+		}>;
+		order: number;
+		sectionId?: number | null;
+	}>;
 }
 
 export interface Customizations {

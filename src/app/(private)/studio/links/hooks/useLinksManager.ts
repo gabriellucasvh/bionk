@@ -3,14 +3,16 @@
 import type { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import useSWR from "swr";
 import type {
+	ImageItem,
 	LinkItem,
 	SectionItem,
 	TextItem,
 	UnifiedDragItem,
 	VideoItem,
 } from "../types/links.types";
-import { isValidUrl } from "../utils/links.helpers";
+import { fetcher, isValidUrl } from "../utils/links.helpers";
 
 // --- TIPOS E CONSTANTES ---
 export type LinkFormData = {
@@ -42,6 +44,16 @@ export type VideoFormData = {
 	description: string;
 	url: string;
 	type: "direct" | "youtube" | "vimeo" | "tiktok" | "twitch";
+	sectionId?: number | null;
+};
+
+export type ImageFormData = {
+	title: string;
+	description: string;
+	layout: "single" | "column" | "carousel";
+	ratio: string;
+	sizePercent: number;
+	images: Array<{ url: string; linkUrl?: string }>;
 	sectionId?: number | null;
 };
 
@@ -79,6 +91,16 @@ const initialVideoFormData: VideoFormData = {
 	sectionId: null,
 };
 
+const initialImageFormData: ImageFormData = {
+	title: "",
+	description: "",
+	layout: "single",
+	ratio: "square",
+	sizePercent: 100,
+	images: [],
+	sectionId: null,
+};
+
 const urlProtocolRegex = /^(https?:\/\/)/;
 
 // --- FUNÇÕES AUXILIARES PARA DRAG AND DROP ---
@@ -101,6 +123,7 @@ export const useLinksManager = (
 	const [isAddingSection, setIsAddingSection] = useState(false);
 	const [isAddingText, setIsAddingText] = useState(false);
 	const [isAddingVideo, setIsAddingVideo] = useState(false);
+	const [isAddingImage, setIsAddingImage] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
 	const [sectionFormData, setSectionFormData] = useState<SectionFormData>(
@@ -110,18 +133,33 @@ export const useLinksManager = (
 		useState<TextFormData>(initialTextFormData);
 	const [videoFormData, setVideoFormData] =
 		useState<VideoFormData>(initialVideoFormData);
+	const [imageFormData, setImageFormData] =
+		useState<ImageFormData>(initialImageFormData);
 	const [_originalLink, setOriginalLink] = useState<LinkItem | null>(null);
 	const [_originalText, setOriginalText] = useState<TextItem | null>(null);
 	const [_originalVideo, setOriginalVideo] = useState<VideoItem | null>(null);
+	const [_originalImage, setOriginalImage] = useState<ImageItem | null>(null);
 	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
 	const [togglingLinkId, setTogglingLinkId] = useState<number | null>(null);
 	const [togglingTextId, setTogglingTextId] = useState<number | null>(null);
 	const [togglingVideoId, setTogglingVideoId] = useState<number | null>(null);
+	const [togglingImageId, setTogglingImageId] = useState<number | null>(null);
 	const [togglingSectionId, setTogglingSectionId] = useState<number | null>(
 		null
 	);
 	// Flag para controlar chamadas simultâneas da API
 	const isReorderingRef = useRef(false);
+
+	// Buscar imagens via SWR dentro do hook
+	const { data: imagesRes, mutate: mutateImages } = useSWR(
+		"/api/images",
+		fetcher
+	);
+	// Importante: estabiliza a referência de currentImages para evitar re-render infinito
+	const currentImages: ImageItem[] = useMemo(
+		() => imagesRes?.images ?? [],
+		[imagesRes]
+	);
 
 	useEffect(() => {
 		// Se estamos reordenando, não atualizar o estado para evitar conflitos visuais
@@ -174,23 +212,44 @@ export const useLinksManager = (
 			};
 		});
 
+		// Converter imagens em UnifiedItems
+		const imageItems: UnifiedItem[] = currentImages.map((image) => {
+			const existingItem = unifiedItems.find(
+				(item) => (item as any).isImage && item.id === image.id
+			);
+			return {
+				...(image as any),
+				clicks: 0,
+				sensitive: false,
+				isImage: true as any,
+				isEditing: existingItem?.isEditing,
+			} as any;
+		});
+
 		// Links gerais (sem seção)
 		const generalLinks: UnifiedItem[] = currentLinks
 			.filter((link) => !link.sectionId)
 			.map((link) => ({ ...link }));
 
-		// Combinar todos os itens (seções, links gerais, textos e vídeos) em uma única lista
+		// Combinar todos os itens (seções, links gerais, textos, vídeos e imagens) em uma única lista
 		const allItems: UnifiedItem[] = [
 			...sectionItems,
 			...generalLinks,
 			...textItems,
 			...videoItems,
+			...imageItems,
 		];
 
 		// Ordenar todos os itens juntos por order
 		allItems.sort((a, b) => a.order - b.order);
 		setUnifiedItems(allItems);
-	}, [currentLinks, currentSections, currentTexts, currentVideos]);
+	}, [
+		currentLinks,
+		currentSections,
+		currentTexts,
+		currentVideos,
+		currentImages,
+	]);
 
 	const existingSections = useMemo(() => {
 		return unifiedItems
@@ -244,6 +303,13 @@ export const useLinksManager = (
 						order: items.indexOf(item),
 					}));
 
+				const imageItems = items
+					.filter((item) => (item as any).isImage)
+					.map((item) => ({
+						id: item.id,
+						order: items.indexOf(item),
+					}));
+
 				// Fazer chamadas para as APIs específicas
 				const promises: Promise<Response>[] = [];
 
@@ -287,6 +353,16 @@ export const useLinksManager = (
 					);
 				}
 
+				if (imageItems.length > 0) {
+					promises.push(
+						fetch("/api/images/reorder", {
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ items: imageItems }),
+						})
+					);
+				}
+
 				await Promise.all(promises);
 
 				// Atualizar o estado local imediatamente para refletir as mudanças
@@ -303,6 +379,7 @@ export const useLinksManager = (
 					await mutateSections();
 					await mutateTexts();
 					await mutateVideos();
+					await mutateImages();
 					isReorderingRef.current = false;
 				}, 200);
 			} catch (error) {
@@ -310,7 +387,7 @@ export const useLinksManager = (
 				isReorderingRef.current = false;
 			}
 		},
-		[mutateLinks, mutateSections, mutateTexts, mutateVideos]
+		[mutateLinks, mutateSections, mutateTexts, mutateVideos, mutateImages]
 	);
 
 	const handleDragEnd = (event: DragEndEvent) => {
@@ -493,8 +570,60 @@ export const useLinksManager = (
 		await mutateSections();
 		await mutateTexts();
 		await mutateVideos();
+		await mutateImages();
 		setVideoFormData(initialVideoFormData);
 		setIsAddingVideo(false);
+	};
+
+	const handleAddNewImage = async () => {
+		const images = Array.isArray(imageFormData.images)
+			? imageFormData.images.filter((i) => i.url?.trim())
+			: [];
+		if (images.length === 0) {
+			return;
+		}
+
+		// Para layout "single", garantir apenas 1 imagem
+		const items = (
+			imageFormData.layout === "single" ? images.slice(0, 1) : images
+		).map((img) => {
+			const raw = img.linkUrl?.trim();
+			let linkUrl = raw && raw.length > 0 ? raw : null;
+			if (linkUrl) {
+				if (!urlProtocolRegex.test(linkUrl)) {
+					linkUrl = `https://${linkUrl}`;
+				}
+				if (!isValidUrl(linkUrl)) {
+					linkUrl = null;
+				}
+			}
+			return { url: img.url.trim(), linkUrl };
+		});
+
+		await fetch("/api/images", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				title:
+					imageFormData.layout === "column"
+						? imageFormData.title.trim() || null
+						: imageFormData.title.trim() || null,
+				description: imageFormData.description.trim() || null,
+				layout: imageFormData.layout,
+				ratio: imageFormData.ratio,
+				sizePercent: imageFormData.sizePercent,
+				sectionId: imageFormData.sectionId,
+				items,
+			}),
+		});
+
+		await mutateLinks();
+		await mutateSections();
+		await mutateTexts();
+		await mutateVideos();
+		await mutateImages();
+		setImageFormData(initialImageFormData);
+		setIsAddingImage(false);
 	};
 
 	const handleVideoUpdate = async (id: number, payload: Partial<VideoItem>) => {
@@ -592,6 +721,99 @@ export const useLinksManager = (
 		setOriginalVideo(null);
 	};
 
+	const handleImageUpdate = async (id: number, payload: Partial<ImageItem>) => {
+		const response = await fetch(`/api/images/${id}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.error || "Erro ao atualizar imagem");
+		}
+
+		await mutateImages();
+	};
+
+	const handleDeleteImage = async (id: number) => {
+		await fetch(`/api/images/${id}`, { method: "DELETE" });
+		await mutateImages();
+	};
+
+	const handleArchiveImage = async (id: number) => {
+		await handleImageUpdate(id, { archived: true });
+	};
+
+	const handleStartEditingImage = (id: number) => {
+		const imageToEdit = unifiedItems.find(
+			(item) => (item as any).isImage && item.id === id
+		) as ImageItem;
+		if (imageToEdit) {
+			setOriginalImage(imageToEdit);
+		}
+
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				// Cancelar edição de todos os outros items
+				if (item.isEditing && item.id !== id) {
+					return { ...item, isEditing: false } as any;
+				}
+				// Ativar edição apenas do item específico
+				if ((item as any).isImage && item.id === id) {
+					return { ...item, isEditing: true } as any;
+				}
+				return item;
+			})
+		);
+	};
+
+	const handleImageChange = (
+		id: number,
+		field: "title" | "description",
+		value: string
+	) => {
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if ((item as any).isImage && item.id === id) {
+					return { ...item, [field]: value } as any;
+				}
+				return item;
+			})
+		);
+	};
+
+	const handleSaveEditingImage = async (
+		id: number,
+		title: string,
+		description: string
+	) => {
+		await handleImageUpdate(id, {
+			title,
+			description,
+			isEditing: false as any,
+		});
+	};
+
+	const handleCancelEditingImage = (id: number) => {
+		const imageToRestore = currentImages.find((i) => i.id === id);
+		if (imageToRestore) {
+			setUnifiedItems((prevItems) =>
+				prevItems.map((item) => {
+					if ((item as any).isImage && item.id === id) {
+						return {
+							...(imageToRestore as any),
+							isImage: true,
+							isEditing: false,
+						} as any;
+					}
+					return item;
+				})
+			);
+		}
+		setOriginalImage(null);
+	};
+
 	const handleAddLinkToSection = async (sectionId: number) => {
 		let formattedUrl = formData.url.trim();
 		if (!urlProtocolRegex.test(formattedUrl)) {
@@ -666,6 +888,10 @@ export const useLinksManager = (
 				console.log("Toggling video:", id);
 				setTogglingVideoId(id);
 				await handleVideoUpdate(id, { active: isActive });
+			} else if ((foundItem as any).isImage) {
+				console.log("Toggling image:", id);
+				setTogglingImageId(id);
+				await handleImageUpdate(id, { active: isActive });
 			} else if (foundItem.isText) {
 				console.log("Toggling text:", id);
 				setTogglingTextId(id);
@@ -684,6 +910,7 @@ export const useLinksManager = (
 			setTogglingLinkId(null);
 			setTogglingTextId(null);
 			setTogglingVideoId(null);
+			setTogglingImageId(null);
 		}
 	};
 
@@ -937,11 +1164,13 @@ export const useLinksManager = (
 		isAddingSection,
 		isAddingText,
 		isAddingVideo,
+		isAddingImage,
 		isModalOpen,
 		formData,
 		sectionFormData,
 		textFormData,
 		videoFormData,
+		imageFormData,
 		existingSections,
 		archivingLinkId,
 		setActiveId,
@@ -949,11 +1178,13 @@ export const useLinksManager = (
 		setIsAddingSection,
 		setIsAddingText,
 		setIsAddingVideo,
+		setIsAddingImage,
 		setIsModalOpen,
 		setFormData,
 		setSectionFormData,
 		setTextFormData,
 		setVideoFormData,
+		setImageFormData,
 		handleDragEnd,
 		handleSectionUpdate,
 		handleSectionDelete,
@@ -962,6 +1193,7 @@ export const useLinksManager = (
 		handleAddNewSection,
 		handleAddNewText,
 		handleAddNewVideo,
+		handleAddNewImage,
 		handleAddLinkToSection,
 		saveEditing,
 		handleDeleteLink,
@@ -987,12 +1219,21 @@ export const useLinksManager = (
 		handleVideoChange,
 		handleSaveEditingVideo,
 		handleCancelEditingVideo,
+		handleImageUpdate,
+		handleDeleteImage,
+		handleArchiveImage,
+		handleStartEditingImage,
+		handleImageChange,
+		handleSaveEditingImage,
+		handleCancelEditingImage,
 		togglingLinkId,
 		togglingTextId,
 		togglingVideoId,
+		togglingImageId,
 		togglingSectionId,
 		originalLink: _originalLink,
 		originalText: _originalText,
 		originalVideo: _originalVideo,
+		originalImage: _originalImage,
 	};
 };

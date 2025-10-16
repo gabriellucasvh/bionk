@@ -5,10 +5,10 @@ import type { DragStartEvent } from "@dnd-kit/core";
 import type { Session } from "next-auth";
 import { useLinksManager } from "../hooks/useLinksManager";
 import type {
-	LinkItem,
-	SectionItem,
-	TextItem,
-	VideoItem,
+    LinkItem,
+    SectionItem,
+    TextItem,
+    VideoItem,
 } from "../types/links.types";
 import AddContentModal from "./links.AddContentModal";
 import LinkList from "./links.LinkList";
@@ -39,24 +39,30 @@ const LinksTabContent = ({
 		unifiedItems,
 		isAdding,
 		isAddingVideo,
+		isAddingImage,
 		formData,
 		videoFormData,
+		imageFormData,
 		existingSections,
 		activeId,
 		archivingLinkId,
 		isModalOpen,
 		togglingVideoId,
+		togglingImageId,
 		togglingLinkId,
 		togglingTextId,
 		togglingSectionId,
 		originalLink,
 		originalText,
 		originalVideo,
+		originalImage,
 		setActiveId,
 		setIsAdding,
 		setIsAddingVideo,
+		setIsAddingImage,
 		setFormData,
 		setVideoFormData,
+		setImageFormData,
 		setIsModalOpen,
 		handleDragEnd,
 		...handlers
@@ -77,32 +83,37 @@ const LinksTabContent = ({
 
 	return (
 		<div className="space-y-4">
-			<AddContentModal
-				existingSections={existingSections}
-				formData={formData}
-				handleAddNewLink={handlers.handleAddNewLink}
-				handleAddNewSection={handlers.handleAddNewSection}
-				handleAddNewText={handlers.handleAddNewText}
-				handleAddNewVideo={handlers.handleAddNewVideo}
-				isAdding={isAdding}
-				isAddingSection={handlers.isAddingSection}
-				isAddingText={handlers.isAddingText}
-				isAddingVideo={isAddingVideo}
-				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-				onOpen={() => setIsModalOpen(true)}
-				sectionFormData={handlers.sectionFormData}
-				setFormData={setFormData}
-				setIsAdding={setIsAdding}
-				setIsAddingSection={handlers.setIsAddingSection}
-				setIsAddingText={handlers.setIsAddingText}
-				setIsAddingVideo={setIsAddingVideo}
-				setSectionFormData={handlers.setSectionFormData}
-				setTextFormData={handlers.setTextFormData}
-				setVideoFormData={setVideoFormData}
-				textFormData={handlers.textFormData}
-				videoFormData={videoFormData}
-			/>
+		<AddContentModal
+			existingSections={existingSections}
+			formData={formData}
+			handleAddNewLink={handlers.handleAddNewLink}
+			handleAddNewSection={handlers.handleAddNewSection}
+			handleAddNewText={handlers.handleAddNewText}
+			handleAddNewVideo={handlers.handleAddNewVideo}
+			handleAddNewImage={handlers.handleAddNewImage}
+			isAdding={isAdding}
+			isAddingSection={handlers.isAddingSection}
+			isAddingText={handlers.isAddingText}
+			isAddingVideo={isAddingVideo}
+			isAddingImage={isAddingImage}
+			isOpen={isModalOpen}
+			onClose={() => setIsModalOpen(false)}
+			onOpen={() => setIsModalOpen(true)}
+			sectionFormData={handlers.sectionFormData}
+			setFormData={setFormData}
+			setIsAdding={setIsAdding}
+			setIsAddingSection={handlers.setIsAddingSection}
+			setIsAddingText={handlers.setIsAddingText}
+			setIsAddingVideo={setIsAddingVideo}
+			setIsAddingImage={setIsAddingImage}
+			setSectionFormData={handlers.setSectionFormData}
+			setTextFormData={handlers.setTextFormData}
+			setVideoFormData={setVideoFormData}
+			setImageFormData={setImageFormData}
+			textFormData={handlers.textFormData}
+			videoFormData={videoFormData}
+			imageFormData={imageFormData}
+		/>
 
 			<LinkList
 				activeId={activeId}
@@ -127,6 +138,7 @@ const LinksTabContent = ({
 				onDeleteLink={handlers.handleDeleteLink}
 				onDeleteText={handlers.handleDeleteText}
 				onDeleteVideo={handlers.handleDeleteVideo}
+				onDeleteImage={handlers.handleDeleteImage}
 				onDragEnd={handleDragEnd}
 				onDragStart={handleDragStart}
 				onLinkChange={handlers.handleLinkChange}
@@ -134,23 +146,29 @@ const LinksTabContent = ({
 				onSaveEditing={handlers.saveEditing}
 				onSaveEditingText={handlers.handleSaveEditingText}
 				onSaveEditingVideo={handlers.handleSaveEditingVideo}
+				onSaveEditingImage={handlers.handleSaveEditingImage}
 				onSectionDelete={handlers.handleSectionDelete}
 				onSectionUngroup={handlers.handleSectionUngroup}
 				onSectionUpdate={handlers.handleSectionUpdate}
 				onStartEditing={handlers.handleStartEditing}
 				onStartEditingText={handlers.handleStartEditingText}
 				onStartEditingVideo={handlers.handleStartEditingVideo}
+				onStartEditingImage={handlers.handleStartEditingImage}
 				onTextChange={handlers.handleTextChange}
+				onImageChange={handlers.handleImageChange}
 				onToggleActive={handlers.toggleActive}
 				onUpdateCustomImage={handlers.handleUpdateCustomImage}
 				onVideoChange={handlers.handleVideoChange}
+				onArchiveImage={handlers.handleArchiveImage}
 				togglingVideoId={togglingVideoId}
+				togglingImageId={togglingImageId}
 				togglingLinkId={togglingLinkId}
 				togglingTextId={togglingTextId}
 				togglingSectionId={togglingSectionId}
 				originalLink={originalLink}
 				originalText={originalText}
 				originalVideo={originalVideo}
+				originalImage={originalImage}
 			/>
 		</div>
 	);

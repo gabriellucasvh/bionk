@@ -1,51 +1,60 @@
 "use client";
 
 import type {
-	LinkFormData,
-	SectionFormData,
-	TextFormData,
-	VideoFormData,
+    LinkFormData,
+    SectionFormData,
+    TextFormData,
+    VideoFormData,
+    ImageFormData,
 } from "../hooks/useLinksManager";
 import { isValidUrl } from "../utils/links.helpers";
 
 interface UseModalHandlersProps {
-	formData: LinkFormData;
-	sectionFormData: SectionFormData;
-	textFormData: TextFormData;
-	videoFormData: VideoFormData;
-	setFormData: (data: LinkFormData) => void;
-	setSectionFormData: (data: SectionFormData) => void;
-	setTextFormData: (data: TextFormData) => void;
-	setVideoFormData: (data: VideoFormData) => void;
-	setIsAdding: (value: boolean) => void;
-	setIsAddingSection: (value: boolean) => void;
-	setIsAddingText: (value: boolean) => void;
-	setIsAddingVideo: (value: boolean) => void;
-	handleAddNewLink: () => Promise<void>;
-	handleAddNewSection: () => Promise<void>;
-	handleAddNewText: () => Promise<void>;
-	handleAddNewVideo: () => Promise<void>;
-	onClose: () => void;
+    formData: LinkFormData;
+    sectionFormData: SectionFormData;
+    textFormData: TextFormData;
+    videoFormData: VideoFormData;
+    imageFormData: ImageFormData;
+    setFormData: (data: LinkFormData) => void;
+    setSectionFormData: (data: SectionFormData) => void;
+    setTextFormData: (data: TextFormData) => void;
+    setVideoFormData: (data: VideoFormData) => void;
+    setImageFormData: (data: ImageFormData) => void;
+    setIsAdding: (value: boolean) => void;
+    setIsAddingSection: (value: boolean) => void;
+    setIsAddingText: (value: boolean) => void;
+    setIsAddingVideo: (value: boolean) => void;
+    setIsAddingImage: (value: boolean) => void;
+    handleAddNewLink: () => Promise<void>;
+    handleAddNewSection: () => Promise<void>;
+    handleAddNewText: () => Promise<void>;
+    handleAddNewVideo: () => Promise<void>;
+    handleAddNewImage: () => Promise<void>;
+    onClose: () => void;
 }
 
 export const useModalHandlers = ({
-	formData,
-	sectionFormData,
-	textFormData,
-	videoFormData,
-	setFormData,
-	setSectionFormData,
-	setTextFormData,
-	setVideoFormData,
-	setIsAdding,
-	setIsAddingSection,
-	setIsAddingText,
-	setIsAddingVideo,
-	handleAddNewLink,
-	handleAddNewSection,
-	handleAddNewText,
-	handleAddNewVideo,
-	onClose,
+    formData,
+    sectionFormData,
+    textFormData,
+    videoFormData,
+    imageFormData,
+    setFormData,
+    setSectionFormData,
+    setTextFormData,
+    setVideoFormData,
+    setImageFormData,
+    setIsAdding,
+    setIsAddingSection,
+    setIsAddingText,
+    setIsAddingVideo,
+    setIsAddingImage,
+    handleAddNewLink,
+    handleAddNewSection,
+    handleAddNewText,
+    handleAddNewVideo,
+    handleAddNewImage,
+    onClose,
 }: UseModalHandlersProps) => {
 	const handleLinkSubmit = async () => {
 		if (!isValidUrl(formData.url) || formData.title.trim().length === 0) {
@@ -117,39 +126,65 @@ export const useModalHandlers = ({
 		}
 	};
 
-	const handleVideoSubmit = async () => {
-		if (videoFormData.url.trim().length === 0) {
-			return;
-		}
+    const handleVideoSubmit = async () => {
+        if (videoFormData.url.trim().length === 0) {
+            return;
+        }
 
-		setIsAddingVideo(true);
-		try {
-			await handleAddNewVideo();
-			setVideoFormData({
-				title: "",
-				description: "",
-				url: "",
-				type: "direct",
-				sectionId: null,
-			});
-			onClose();
-		} finally {
-			setIsAddingVideo(false);
-		}
-	};
+        setIsAddingVideo(true);
+        try {
+            await handleAddNewVideo();
+            setVideoFormData({
+                title: "",
+                description: "",
+                url: "",
+                type: "direct",
+                sectionId: null,
+            });
+            onClose();
+        } finally {
+            setIsAddingVideo(false);
+        }
+    };
 
-	const handleCancelWithState = () => {
-		setIsAdding(false);
-		setIsAddingSection(false);
-		setIsAddingText(false);
-		setIsAddingVideo(false);
-	};
+    const handleImageSubmit = async () => {
+        const hasImages = Array.isArray((imageFormData as any).images) && (imageFormData as any).images.length > 0;
+        if (!hasImages) {
+            return;
+        }
 
-	return {
-		handleLinkSubmit,
-		handleSectionSubmit,
-		handleTextSubmit,
-		handleVideoSubmit,
-		handleCancelWithState,
-	};
+        setIsAddingImage(true);
+        try {
+            await handleAddNewImage();
+            setImageFormData({
+                title: "",
+                description: "",
+                layout: "single",
+                ratio: "square",
+                sizePercent: 100,
+                images: [],
+                sectionId: null,
+            } as any);
+            onClose();
+        } finally {
+            setIsAddingImage(false);
+        }
+    };
+
+    const handleCancelWithState = () => {
+        setIsAdding(false);
+        setIsAddingSection(false);
+        setIsAddingText(false);
+        setIsAddingVideo(false);
+        setIsAddingImage(false);
+    };
+
+    return {
+        handleLinkSubmit,
+        handleSectionSubmit,
+        handleTextSubmit,
+        handleVideoSubmit,
+        handleImageSubmit,
+        handleCancelWithState,
+    };
 };

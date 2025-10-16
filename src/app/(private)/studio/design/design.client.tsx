@@ -146,6 +146,7 @@ const PersonalizarClient = () => {
 			username: userDataInput.username,
 			image: userDataInput.image,
 			links: allLinks,
+			images: userDataInput.Image || [],
 			texts:
 				userDataInput.Text?.map((text: any) => ({
 					id: text.id,

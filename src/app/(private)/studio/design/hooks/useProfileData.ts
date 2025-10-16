@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import type { SocialLinkItem } from "@/types/social";
 import type {
-	SocialLink,
-	UserLink,
-	UserText,
-	UserVideo,
+    SocialLink,
+    UserLink,
+    UserText,
+    UserVideo,
+    UserImage,
 } from "@/types/user-profile";
 
 interface User {
@@ -15,16 +16,17 @@ interface User {
 }
 
 interface UserData {
-	id: string;
-	name: string;
-	username: string;
-	bio: string;
-	image: string;
-	socialLinks: SocialLinkItem[];
-	Link: UserLink[];
-	Text: UserText[];
-	Video: UserVideo[];
-	SocialLink: SocialLink[];
+    id: string;
+    name: string;
+    username: string;
+    bio: string;
+    image: string;
+    socialLinks: SocialLinkItem[];
+    Link: UserLink[];
+    Text: UserText[];
+    Video: UserVideo[];
+    SocialLink: SocialLink[];
+    Image: UserImage[];
 }
 
 interface ProfileState {
@@ -55,6 +57,7 @@ export const useProfileData = (userId?: string, sessionImage?: string) => {
 		Text: [],
 		Video: [],
 		SocialLink: [],
+		Image: [],
 	});
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
 
@@ -91,6 +94,11 @@ export const useProfileData = (userId?: string, sessionImage?: string) => {
 			const videosData = await videosRes.json();
 			const userVideos = videosData?.videos || [];
 
+			// Carregar imagens do usuário
+			const imagesRes = await fetch("/api/images");
+			const imagesData = await imagesRes.json();
+			const userImages = imagesData?.images || [];
+
 			const profileData = { name, username, bio: bio || "" };
 			setProfile(profileData);
 			setOriginalProfile(profileData);
@@ -106,6 +114,7 @@ export const useProfileData = (userId?: string, sessionImage?: string) => {
 				Text: userTexts,
 				Video: userVideos,
 				SocialLink: socialLinks,
+				Image: userImages,
 			});
 
 			return currentImage;
@@ -125,6 +134,7 @@ export const useProfileData = (userId?: string, sessionImage?: string) => {
 				Text: [],
 				Video: [],
 				SocialLink: [],
+				Image: [],
 			});
 
 			return fallbackUrl;

@@ -11,10 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import { useDragGesture } from "../hooks/useDragGesture";
 import type {
-	LinkFormData,
-	SectionFormData,
-	TextFormData,
-	VideoFormData,
+    LinkFormData,
+    SectionFormData,
+    TextFormData,
+    VideoFormData,
+    ImageFormData,
 } from "../hooks/useLinksManager";
 import { useModalState } from "../hooks/useModalState";
 import type { SectionItem } from "../types/links.types";
@@ -22,61 +23,72 @@ import CategorySelector from "./CategorySelector";
 import ContentOptions from "./ContentOptions";
 import FormRenderer from "./FormRenderer";
 import MediaOptions from "./MediaOptions";
+import ImageOptions from "./ImageOptions";
 import MobileBottomSheet from "./MobileBottomSheet";
 import { useModalHandlers } from "./ModalHandlers";
 
 interface AddContentModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-	onOpen: () => void;
-	isAdding: boolean;
-	isAddingSection: boolean;
-	isAddingText: boolean;
-	isAddingVideo: boolean;
-	formData: LinkFormData;
-	sectionFormData: SectionFormData;
-	textFormData: TextFormData;
-	videoFormData: VideoFormData;
-	existingSections: SectionItem[];
-	setIsAdding: (value: boolean) => void;
-	setIsAddingSection: (value: boolean) => void;
-	setIsAddingText: (value: boolean) => void;
-	setIsAddingVideo: (value: boolean) => void;
-	setFormData: (data: LinkFormData) => void;
-	setSectionFormData: (data: SectionFormData) => void;
-	setTextFormData: (data: TextFormData) => void;
-	setVideoFormData: (data: VideoFormData) => void;
-	handleAddNewLink: () => Promise<void>;
-	handleAddNewSection: () => Promise<void>;
-	handleAddNewText: () => Promise<void>;
-	handleAddNewVideo: () => Promise<void>;
+    isOpen: boolean;
+    onClose: () => void;
+    onOpen: () => void;
+    isAdding: boolean;
+    isAddingSection: boolean;
+    isAddingText: boolean;
+    isAddingVideo: boolean;
+    isAddingImage: boolean;
+    formData: LinkFormData;
+    sectionFormData: SectionFormData;
+    textFormData: TextFormData;
+    videoFormData: VideoFormData;
+    imageFormData: ImageFormData;
+    existingSections: SectionItem[];
+    setIsAdding: (value: boolean) => void;
+    setIsAddingSection: (value: boolean) => void;
+    setIsAddingText: (value: boolean) => void;
+    setIsAddingVideo: (value: boolean) => void;
+    setIsAddingImage: (value: boolean) => void;
+    setFormData: (data: LinkFormData) => void;
+    setSectionFormData: (data: SectionFormData) => void;
+    setTextFormData: (data: TextFormData) => void;
+    setVideoFormData: (data: VideoFormData) => void;
+    setImageFormData: (data: ImageFormData) => void;
+    handleAddNewLink: () => Promise<void>;
+    handleAddNewSection: () => Promise<void>;
+    handleAddNewText: () => Promise<void>;
+    handleAddNewVideo: () => Promise<void>;
+    handleAddNewImage: () => Promise<void>;
 }
 
 const AddContentModal = ({
-	isOpen,
-	onClose,
-	onOpen,
-	isAdding,
-	isAddingSection,
-	isAddingText,
-	isAddingVideo,
-	formData,
-	sectionFormData,
-	textFormData,
-	videoFormData,
-	existingSections,
-	setIsAdding,
-	setIsAddingSection,
-	setIsAddingText,
-	setIsAddingVideo,
-	setFormData,
-	setSectionFormData,
-	setTextFormData,
-	setVideoFormData,
-	handleAddNewLink,
-	handleAddNewSection,
-	handleAddNewText,
-	handleAddNewVideo,
+    isOpen,
+    onClose,
+    onOpen,
+    isAdding,
+    isAddingSection,
+    isAddingText,
+    isAddingVideo,
+    isAddingImage,
+    formData,
+    sectionFormData,
+    textFormData,
+    videoFormData,
+    imageFormData,
+    existingSections,
+    setIsAdding,
+    setIsAddingSection,
+    setIsAddingText,
+    setIsAddingVideo,
+    setIsAddingImage,
+    setFormData,
+    setSectionFormData,
+    setTextFormData,
+    setVideoFormData,
+    setImageFormData,
+    handleAddNewLink,
+    handleAddNewSection,
+    handleAddNewText,
+    handleAddNewVideo,
+    handleAddNewImage,
 }: AddContentModalProps) => {
 	const {
 		isAnimating,
@@ -107,31 +119,36 @@ const AddContentModal = ({
 		handleTouchEnd,
 	} = useDragGesture(onClose);
 
-	const {
-		handleLinkSubmit,
-		handleSectionSubmit,
-		handleTextSubmit,
-		handleVideoSubmit,
-		handleCancelWithState,
-	} = useModalHandlers({
-		formData,
-		sectionFormData,
-		textFormData,
-		videoFormData,
-		setFormData,
-		setSectionFormData,
-		setTextFormData,
-		setVideoFormData,
-		setIsAdding,
-		setIsAddingSection,
-		setIsAddingText,
-		setIsAddingVideo,
-		handleAddNewLink,
-		handleAddNewSection,
-		handleAddNewText,
-		handleAddNewVideo,
-		onClose,
-	});
+    const {
+        handleLinkSubmit,
+        handleSectionSubmit,
+        handleTextSubmit,
+        handleVideoSubmit,
+        handleImageSubmit,
+        handleCancelWithState,
+    } = useModalHandlers({
+        formData,
+        sectionFormData,
+        textFormData,
+        videoFormData,
+        imageFormData,
+        setFormData,
+        setSectionFormData,
+        setTextFormData,
+        setVideoFormData,
+        setImageFormData,
+        setIsAdding,
+        setIsAddingSection,
+        setIsAddingText,
+        setIsAddingVideo,
+        setIsAddingImage,
+        handleAddNewLink,
+        handleAddNewSection,
+        handleAddNewText,
+        handleAddNewVideo,
+        handleAddNewImage,
+        onClose,
+    });
 
 	useEffect(() => {
 		if (isOpen && isMobile) {
@@ -200,6 +217,24 @@ const AddContentModal = ({
 		}
 	};
 
+    const handleImageOptionSelect = (
+        option: "image_single" | "image_column" | "image_carousel"
+    ) => {
+        setSelectedOption(option);
+        setIsAddingImage(true);
+        const layoutMap = {
+            image_single: "single",
+            image_column: "column",
+            image_carousel: "carousel",
+        } as const;
+        const layout = layoutMap[option];
+        setImageFormData({
+            ...imageFormData,
+            layout,
+            images: [],
+        });
+    };
+
 	if (isMobile) {
 		return (
 			<>
@@ -221,51 +256,58 @@ const AddContentModal = ({
 					onMouseDown={handleMouseDown}
 					onTouchStart={handleTouchStart}
 				>
-					<FormRenderer
-						existingSections={existingSections}
-						formData={formData}
-						isAdding={isAdding}
-						isAddingSection={isAddingSection}
-						isAddingText={isAddingText}
-						isAddingVideo={isAddingVideo}
-						isMobile={true}
-						onBack={() => setSelectedOption(null)}
-						onCancel={handleCancelWithState}
-						onLinkSubmit={handleLinkSubmit}
-						onSectionSubmit={handleSectionSubmit}
-						onTextSubmit={handleTextSubmit}
-						onVideoSubmit={handleVideoSubmit}
-						sectionFormData={sectionFormData}
-						selectedOption={selectedOption}
-						setFormData={setFormData}
-						setSectionFormData={setSectionFormData}
-						setTextFormData={setTextFormData}
-						setVideoFormData={setVideoFormData}
-						textFormData={textFormData}
-						videoFormData={videoFormData}
-					/>
+                    <FormRenderer
+                        existingSections={existingSections}
+                        formData={formData}
+                        isAdding={isAdding}
+                        isAddingSection={isAddingSection}
+                        isAddingText={isAddingText}
+                        isAddingVideo={isAddingVideo}
+                        isAddingImage={isAddingImage}
+                        isMobile={true}
+                        onBack={() => setSelectedOption(null)}
+                        onCancel={handleCancelWithState}
+                        onLinkSubmit={handleLinkSubmit}
+                        onSectionSubmit={handleSectionSubmit}
+                        onTextSubmit={handleTextSubmit}
+                        onVideoSubmit={handleVideoSubmit}
+                        onImageSubmit={handleImageSubmit}
+                        sectionFormData={sectionFormData}
+                        selectedOption={selectedOption}
+                        setFormData={setFormData}
+                        setSectionFormData={setSectionFormData}
+                        setTextFormData={setTextFormData}
+                        setVideoFormData={setVideoFormData}
+                        setImageFormData={setImageFormData}
+                        textFormData={textFormData}
+                        videoFormData={videoFormData}
+                        imageFormData={imageFormData}
+                    />
 
-					{!selectedOption && (
-						<>
-							<h2 className="mb-6 text-center font-semibold text-xl">
-								Adicionar Conteúdo
-							</h2>
-							<div className="flex flex-col space-y-4">
-								<CategorySelector
-									onCategorySelect={handleCategorySelect}
-									selectedCategory={selectedCategory}
-								/>
-								{selectedCategory === "content" && (
-									<ContentOptions
-										onOptionSelect={handleOptionSelectWithState}
+						{!selectedOption && (
+							<>
+								<h2 className="mb-6 text-center font-semibold text-xl">
+									Adicionar Conteúdo
+								</h2>
+								<div className="flex flex-col space-y-4">
+									<CategorySelector
+										onCategorySelect={handleCategorySelect}
+										selectedCategory={selectedCategory}
 									/>
-								)}
-								{selectedCategory === "media" && (
-									<MediaOptions onOptionSelect={handleOptionSelectWithState} />
-								)}
-							</div>
-						</>
-					)}
+									{selectedCategory === "content" && (
+										<ContentOptions
+											onOptionSelect={handleOptionSelectWithState}
+										/>
+									)}
+									{selectedCategory === "video" && (
+										<MediaOptions onOptionSelect={handleOptionSelectWithState} />
+									)}
+									{selectedCategory === "image" && (
+										<ImageOptions onOptionSelect={handleImageOptionSelect} />
+									)}
+								</div>
+							</>
+						)}
 				</MobileBottomSheet>
 			</>
 		);
@@ -288,29 +330,33 @@ const AddContentModal = ({
 						<div className="flex-1 overflow-y-auto">
 							{selectedOption ? (
 								<div className="h-full">
-									<FormRenderer
-										existingSections={existingSections}
-										formData={formData}
-										isAdding={isAdding}
-										isAddingSection={isAddingSection}
-										isAddingText={isAddingText}
-										isAddingVideo={isAddingVideo}
-										isMobile={false}
-										onBack={() => setSelectedOption(null)}
-										onCancel={handleCancelWithState}
-										onLinkSubmit={handleLinkSubmit}
-										onSectionSubmit={handleSectionSubmit}
-										onTextSubmit={handleTextSubmit}
-										onVideoSubmit={handleVideoSubmit}
-										sectionFormData={sectionFormData}
-										selectedOption={selectedOption}
-										setFormData={setFormData}
-										setSectionFormData={setSectionFormData}
-										setTextFormData={setTextFormData}
-										setVideoFormData={setVideoFormData}
-										textFormData={textFormData}
-										videoFormData={videoFormData}
-									/>
+                                    <FormRenderer
+                                        existingSections={existingSections}
+                                        formData={formData}
+                                        isAdding={isAdding}
+                                        isAddingSection={isAddingSection}
+                                        isAddingText={isAddingText}
+                                        isAddingVideo={isAddingVideo}
+                                        isAddingImage={isAddingImage}
+                                        isMobile={false}
+                                        onBack={() => setSelectedOption(null)}
+                                        onCancel={handleCancelWithState}
+                                        onLinkSubmit={handleLinkSubmit}
+                                        onSectionSubmit={handleSectionSubmit}
+                                        onTextSubmit={handleTextSubmit}
+                                        onVideoSubmit={handleVideoSubmit}
+                                        onImageSubmit={handleImageSubmit}
+                                        sectionFormData={sectionFormData}
+                                        selectedOption={selectedOption}
+                                        setFormData={setFormData}
+                                        setSectionFormData={setSectionFormData}
+                                        setTextFormData={setTextFormData}
+                                        setVideoFormData={setVideoFormData}
+                                        setImageFormData={setImageFormData}
+                                        textFormData={textFormData}
+                                        videoFormData={videoFormData}
+                                        imageFormData={imageFormData}
+                                    />
 								</div>
 							) : (
 								<div className="flex h-full">
@@ -322,21 +368,24 @@ const AddContentModal = ({
 									</div>
 
 									<div className="flex-1 p-4">
-										{selectedCategory === "content" && (
-											<ContentOptions
-												onOptionSelect={handleOptionSelectWithState}
-											/>
-										)}
-										{selectedCategory === "media" && (
-											<MediaOptions
-												onOptionSelect={handleOptionSelectWithState}
-											/>
-										)}
-										{!selectedCategory && (
-											<div className="flex items-start justify-center pt-8 text-muted-foreground">
-												Selecione uma categoria para ver as opções
-											</div>
-										)}
+									{selectedCategory === "content" && (
+										<ContentOptions
+											onOptionSelect={handleOptionSelectWithState}
+										/>
+									)}
+									{selectedCategory === "video" && (
+										<MediaOptions
+											onOptionSelect={handleOptionSelectWithState}
+										/>
+									)}
+									{selectedCategory === "image" && (
+										<ImageOptions onOptionSelect={handleImageOptionSelect} />
+									)}
+									{!selectedCategory && (
+										<div className="flex items-start justify-center pt-8 text-muted-foreground">
+											Selecione uma categoria para ver as opções
+										</div>
+									)}
 									</div>
 								</div>
 							)}

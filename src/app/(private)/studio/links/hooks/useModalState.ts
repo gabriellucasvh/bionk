@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 export const useModalState = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isAnimating, setIsAnimating] = useState(false);
-	const [selectedCategory, setSelectedCategory] = useState<
-		"content" | "media" | null
-	>("content");
+    const [selectedCategory, setSelectedCategory] = useState<
+        "content" | "video" | "image" | null
+    >("content");
 	const [selectedOption, setSelectedOption] = useState<
 		| "link"
 		| "section"
@@ -17,6 +17,9 @@ export const useModalState = () => {
 		| "vimeo"
 		| "tiktok"
 		| "twitch"
+        | "image_single"
+        | "image_column"
+        | "image_carousel"
 		| null
 	>(null);
 	const [isMobile, setIsMobile] = useState(false);
@@ -93,10 +96,10 @@ export const useModalState = () => {
 		setSelectedOption(null);
 	};
 
-	const handleCategorySelect = (category: "content" | "media") => {
-		setSelectedCategory(category);
-		setSelectedOption(null);
-	};
+    const handleCategorySelect = (category: "content" | "video" | "image") => {
+        setSelectedCategory(category);
+        setSelectedOption(null);
+    };
 
 	const handleOptionSelect = (
 		option:

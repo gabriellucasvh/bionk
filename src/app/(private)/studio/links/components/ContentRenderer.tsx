@@ -3,13 +3,14 @@
 import CategorySelector from "./CategorySelector";
 import ContentOptions from "./ContentOptions";
 import MediaOptions from "./MediaOptions";
+import ImageOptions from "./ImageOptions";
 
 interface ContentRendererProps {
-	selectedCategory: "content" | "media" | null;
-	selectedOption: string | null;
-	onCategorySelect: (category: "content" | "media") => void;
-	onOptionSelect: (option: string) => void;
-	showCategorySelector?: boolean;
+    selectedCategory: "content" | "video" | "image" | null;
+    selectedOption: string | null;
+    onCategorySelect: (category: "content" | "video" | "image") => void;
+    onOptionSelect: (option: string) => void;
+    showCategorySelector?: boolean;
 }
 
 const ContentRenderer = ({
@@ -40,11 +41,21 @@ const ContentRenderer = ({
 				<ContentOptions onOptionSelect={onOptionSelect} />
 			)}
 
-			{selectedCategory === "media" && !selectedOption && (
-				<MediaOptions onOptionSelect={onOptionSelect} />
-			)}
-		</>
-	);
+            {selectedCategory === "video" && !selectedOption && (
+                <MediaOptions onOptionSelect={onOptionSelect} />
+            )}
+
+            {selectedCategory === "image" && !selectedOption && (
+                <ImageOptions
+                    onOptionSelect={(option) => {
+                        // ContentRenderer não controla formulários;
+                        // apenas repassa a opção selecionada
+                        onOptionSelect(option);
+                    }}
+                />
+            )}
+        </>
+    );
 };
 
 export default ContentRenderer;
