@@ -91,11 +91,21 @@ export async function POST(request: Request) {
 				{ quality: "auto" }
 			);
 
+			// Antes de enviar imagem, remover vídeo existente para garantir exclusividade
+			try {
+				await cloudinary.uploader.destroy(
+					`backgrounds/${session.user.id}/video/background`,
+					{ resource_type: "video" } as any
+				);
+			} catch {}
+
 			const uploadResponse: any = await new Promise((resolve, reject) => {
 				cloudinary.uploader
 					.upload_stream(
 						{
 							folder: `backgrounds/${session.user.id}/image`,
+							public_id: "background",
+							overwrite: true,
 							resource_type: "image",
 							transformation: transformations,
 						},
@@ -130,11 +140,21 @@ export async function POST(request: Request) {
 
 			const buffer = Buffer.from(await file.arrayBuffer());
 
+			// Antes de enviar vídeo, remover imagem existente para garantir exclusividade
+			try {
+				await cloudinary.uploader.destroy(
+					`backgrounds/${session.user.id}/image/background`,
+					{ resource_type: "image" } as any
+				);
+			} catch {}
+
 			const uploadResponse: any = await new Promise((resolve, reject) => {
 				cloudinary.uploader
 					.upload_stream(
 						{
 							folder: `backgrounds/${session.user.id}/video`,
+							public_id: "background",
+							overwrite: true,
 							resource_type: "video",
 							// Remover gravity:auto em transformação de vídeo para evitar erro de incoming transformation
 							transformation: [

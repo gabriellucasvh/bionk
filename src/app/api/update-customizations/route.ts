@@ -4,7 +4,29 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
+
+// Regex de extensão definido no escopo de módulo para performance
+const EXTENSION_REGEX = /\.[^/.]+$/;
+
+function extractBackgroundPublicId(url: string | null | undefined) {
+	if (!url) {
+		return null;
+	}
+	try {
+		const u = new URL(url);
+		const parts = u.pathname.split("/").filter(Boolean);
+		const bgIdx = parts.findIndex((seg) => seg === "backgrounds");
+		if (bgIdx === -1) {
+			return null;
+		}
+		const publicIdWithExt = parts.slice(bgIdx).join("/");
+		return publicIdWithExt.replace(EXTENSION_REGEX, "");
+	} catch {
+		return null;
+	}
+}
 
 export async function POST(request: Request) {
 	try {
@@ -78,10 +100,87 @@ export async function POST(request: Request) {
 				}
 				return NextResponse.json(existingPresets);
 			}
-			// 4. Atualiza apenas os campos enviados, preservando os existentes
+			// 4. Garantir exclusividade e limpar Cloudinary quando apropriado
+			const incomingType = cleanedCustomizations.customBackgroundMediaType as
+				| "image"
+				| "video"
+				| undefined;
+
+			// Forçar exclusividade nas URLs com base no tipo informado
+			if (incomingType === "image") {
+				cleanedCustomizations.customBackgroundVideoUrl = "";
+			} else if (incomingType === "video") {
+				cleanedCustomizations.customBackgroundImageUrl = "";
+			}
+
+			// Apagar do Cloudinary a mídia oposta quando o tipo muda
+			try {
+				if (
+					incomingType === "image" &&
+					existingPresets.customBackgroundVideoUrl
+				) {
+					const publicId = extractBackgroundPublicId(
+						existingPresets.customBackgroundVideoUrl
+					);
+					if (publicId) {
+						await cloudinary.uploader.destroy(publicId, {
+							resource_type: "video",
+						} as any);
+					}
+				}
+				if (
+					incomingType === "video" &&
+					existingPresets.customBackgroundImageUrl
+				) {
+					const publicId = extractBackgroundPublicId(
+						existingPresets.customBackgroundImageUrl
+					);
+					if (publicId) {
+						await cloudinary.uploader.destroy(publicId, {
+							resource_type: "image",
+						} as any);
+					}
+				}
+			} catch {}
+
+			// Apagar imagem quando for removida explicitamente
+			try {
+				if (
+					cleanedCustomizations.customBackgroundImageUrl === "" &&
+					existingPresets.customBackgroundImageUrl
+				) {
+					const publicId = extractBackgroundPublicId(
+						existingPresets.customBackgroundImageUrl
+					);
+					if (publicId) {
+						await cloudinary.uploader.destroy(publicId, {
+							resource_type: "image",
+						} as any);
+					}
+				}
+			} catch {}
+
+			// Apagar vídeo quando for removido explicitamente
+			try {
+				if (
+					cleanedCustomizations.customBackgroundVideoUrl === "" &&
+					existingPresets.customBackgroundVideoUrl
+				) {
+					const publicId = extractBackgroundPublicId(
+						existingPresets.customBackgroundVideoUrl
+					);
+					if (publicId) {
+						await cloudinary.uploader.destroy(publicId, {
+							resource_type: "video",
+						} as any);
+					}
+				}
+			} catch {}
+
+			// Agora atualiza os campos enviados
 			const updated = await prisma.customPresets.update({
 				where: { userId: session.user.id },
-				data: cleanedCustomizations, // Apenas os campos que mudaram
+				data: cleanedCustomizations,
 			});
 
 			// Revalida a página do perfil do usuário

@@ -26,6 +26,11 @@ module.exports = {
 				hostname: "http2.mlstatic.com",
 				pathname: "/**",
 			},
+			{
+				protocol: "https",
+				hostname: "images.pexels.com",
+				pathname: "/**",
+			},
 		],
 		qualities: [25, 50, 75, 90, 95, 100],
 	},

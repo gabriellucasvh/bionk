@@ -102,6 +102,28 @@ const PersonalizarClient = () => {
 		animateButtonsOut,
 	});
 
+	// Atualiza a imagem de perfil do ProfileSection quando outro fluxo disparar o evento
+	useEffect(() => {
+		const handleProfileImageUpdate = (event: CustomEvent) => {
+			const newUrl = (event as any)?.detail?.imageUrl as string | undefined;
+			if (newUrl) {
+				updateOriginalImageUrl(newUrl);
+			}
+		};
+
+		window.addEventListener(
+			"profileImageUpdated",
+			handleProfileImageUpdate as unknown as EventListener
+		);
+
+		return () => {
+			window.removeEventListener(
+				"profileImageUpdated",
+				handleProfileImageUpdate as unknown as EventListener
+			);
+		};
+	}, [updateOriginalImageUrl]);
+
 	// Função para converter UserData do hook para o formato do store
 	const convertUserDataForStore = (userDataInput: any) => {
 		// Combinar links regulares e social links

@@ -1,8 +1,8 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import LoadingSpinner from "@/components/buttons/LoadingSpinner";
 import BackgroundMediaModal from "@/components/modals/BackgroundMediaModal";
 import FontSelectionModal from "@/components/modals/FontSelectionModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -290,7 +290,7 @@ export function DesignPanel() {
 					{backgroundType === "image" && (
 						<div className="space-y-3 rounded-md border p-3">
 							<p className="text-muted-foreground text-sm">
-								Selecione uma imagem vertical e faça o crop 9:16.
+								Selecione uma imagem vertical (9:16).
 							</p>
 
 							<div className="flex gap-2">
@@ -324,8 +324,7 @@ export function DesignPanel() {
 					{backgroundType === "video" && (
 						<div className="space-y-3 rounded-md border p-3">
 							<p className="text-muted-foreground text-sm">
-								Upload de vídeo vertical. Será reproduzido em loop e sem
-								controles.
+								Upload de vídeo vertical (9:16). Será reproduzido em loop.
 							</p>
 
 							<div className="flex gap-2">
@@ -500,10 +499,14 @@ export function DesignPanel() {
 						onClick={handleSavePending}
 						size="sm"
 					>
-						{isSavingPending && (
-							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+						{isSavingPending ? (
+							<span className="flex items-center gap-2">
+								<LoadingSpinner />
+								Salvando
+							</span>
+						) : (
+							<span>Salvar</span>
 						)}
-						Salvar
 					</BaseButton>
 				</div>
 			)}
