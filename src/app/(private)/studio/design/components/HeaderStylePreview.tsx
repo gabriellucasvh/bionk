@@ -167,39 +167,41 @@ export function HeaderStyleButtons({
 	fontFamily?: string;
 }) {
 	return (
-		<div className="grid grid-cols-3 gap-3">
-			{HEADER_STYLES.map((style) => (
-				<button
-					className={`relative w-32 rounded-lg border-2 p-2 transition-all duration-200 md:w-36 lg:w-40 ${
-						selectedStyle === style.value
-							? "border-green-500 bg-green-50 dark:bg-green-950"
-							: "border-neutral-200 hover:border-neutral-300 dark:border-neutral-700 dark:hover:border-neutral-600"
-					}`}
-					key={style.value}
-					onClick={() => onStyleChange(style.value)}
-					type="button"
-				>
-					<div className="h-48 w-full md:h-52 lg:h-56">
-						<HeaderStylePreview
-							backgroundColor={backgroundColor}
-							backgroundImage={backgroundImage}
-							bio={bio}
-							buttonColor={buttonColor}
-							buttonStyle={buttonStyle}
-							buttonTextColor={buttonTextColor}
-							fontFamily={fontFamily}
-							image={image}
-							name={name}
-							style={style.value}
-							textColor={textColor}
-							username={username}
-						/>
-					</div>
-					<p className="mt-2 text-center font-medium text-neutral-700 text-xs dark:text-neutral-300">
-						{style.label}
-					</p>
-				</button>
-			))}
+		<div className="max-w-full overflow-x-auto overscroll-x-contain px-1">
+			<div className="flex snap-x snap-mandatory gap-3">
+				{HEADER_STYLES.map((style) => (
+					<button
+						className={`relative w-32 flex-shrink-0 snap-start rounded-lg border-2 p-2 transition-all duration-200 md:w-36 lg:w-40 ${
+							selectedStyle === style.value
+								? "border-green-500 bg-green-50 dark:bg-green-950"
+								: "border-neutral-200 hover:border-neutral-300 dark:border-neutral-700 dark:hover:border-neutral-600"
+						}`}
+						key={style.value}
+						onClick={() => onStyleChange(style.value)}
+						type="button"
+					>
+						<div className="h-48 w-full md:h-52 lg:h-56">
+							<HeaderStylePreview
+								backgroundColor={backgroundColor}
+								backgroundImage={backgroundImage}
+								bio={bio}
+								buttonColor={buttonColor}
+								buttonStyle={buttonStyle}
+								buttonTextColor={buttonTextColor}
+								fontFamily={fontFamily}
+								image={image}
+								name={name}
+								style={style.value}
+								textColor={textColor}
+								username={username}
+							/>
+						</div>
+						<p className="mt-2 text-center font-medium text-neutral-700 text-xs dark:text-neutral-300">
+							{style.label}
+						</p>
+					</button>
+				))}
+			</div>
 		</div>
 	);
 }
