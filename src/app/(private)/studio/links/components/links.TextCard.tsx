@@ -138,7 +138,7 @@ const TextCard = ({
 	if (text.isEditing) {
 		return (
 			<article
-				className={`relative flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-800 ${
+				className={`relative flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-900 ${
 					isDragging ? "opacity-50" : ""
 				}`}
 			>
@@ -256,7 +256,7 @@ const TextCard = ({
 
 	return (
 		<article
-			className={`relative flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-800 ${
+			className={`relative flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-900 ${
 				isDragging ? "opacity-50" : ""
 			}`}
 		>

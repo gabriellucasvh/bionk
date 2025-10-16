@@ -14,7 +14,12 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { SocialLinkItem } from "@/types/social";
-import type { LinkItem, SectionItem, TextItem, VideoItem } from "../types/links.types";
+import type {
+	LinkItem,
+	SectionItem,
+	TextItem,
+	VideoItem,
+} from "../types/links.types";
 import { fetcher } from "../utils/links.helpers";
 
 import LinksTabContent from "./links.LinksTabContent";
@@ -83,9 +88,9 @@ const UnifiedLinksManager = () => {
 	}
 
 	return (
-		<section className="mx-auto min-h-dvh w-full max-w-4xl touch-manipulation">
+		<section className="mx-auto min-h-dvh w-full max-w-4xl touch-manipulation pb-4">
 			<Tabs className="w-full" defaultValue="links">
-				<Card className="border-none px-4 shadow-none">
+				<Card className="border-none px-4 shadow-none dark:bg-neutral-800">
 					<CardHeader className="flex flex-col items-start justify-between px-2 sm:px-6 lg:flex-row lg:items-center">
 						<div className="mb-4 sm:mb-0">
 							<CardTitle className="text-xl sm:text-2xl">

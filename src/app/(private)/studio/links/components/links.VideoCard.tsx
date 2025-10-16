@@ -189,7 +189,7 @@ const DisplayView = ({
 	return (
 		<article
 			className={cn(
-				"relative flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-800",
+				"relative flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-neutral-900",
 				isDragging && "opacity-50"
 			)}
 		>
