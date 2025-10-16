@@ -296,11 +296,11 @@ const PersonalizarClient = () => {
 					}`}
 					ref={previewContainerRef}
 				>
-					<div className="h-full overflow-y-auto px-6 pt-20 pb-20">
+					<div className="flex h-full justify-center overflow-y-auto px-6 pt-20 pb-20">
 						<div
-							className="mx-auto w-full overflow-hidden rounded-3xl bg-white shadow-lg dark:bg-neutral-800"
+							className="mx-auto h-full w-full overflow-hidden rounded-3xl bg-white shadow-lg dark:bg-neutral-800"
 							style={{
-								minHeight: "calc(100vh - 8rem)",
+								height: "calc(100vh - 10rem)",
 								maxWidth: "365px",
 							}}
 						>
