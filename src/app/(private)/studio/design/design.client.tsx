@@ -124,6 +124,13 @@ const PersonalizarClient = () => {
 		};
 	}, [updateOriginalImageUrl]);
 
+	// Sincroniza a imagem inicial do usuário após o fetch para evitar imagem antiga em reload
+	useEffect(() => {
+		if (userData?.image) {
+			updateOriginalImageUrl(userData.image);
+		}
+	}, [userData?.image, updateOriginalImageUrl]);
+
 	// Função para converter UserData do hook para o formato do store
 	const convertUserDataForStore = (userDataInput: any) => {
 		// Combinar links regulares e social links

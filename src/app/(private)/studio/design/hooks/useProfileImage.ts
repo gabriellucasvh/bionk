@@ -56,7 +56,7 @@ export const useProfileImage = (initialImageUrl: string) => {
 	const resetImageState = useCallback(
 		(newImageUrl?: string) => {
 			const imageUrl = newImageUrl || originalProfileImageUrl;
-			setProfilePreview(imageUrl);
+			setProfilePreview(`${imageUrl}?t=${Date.now()}`);
 			setOriginalProfileImageUrl(imageUrl);
 			setSelectedProfileFile(null);
 			setProfileImageChanged(false);
@@ -66,7 +66,7 @@ export const useProfileImage = (initialImageUrl: string) => {
 
 	const updateOriginalImageUrl = useCallback((newUrl: string) => {
 		setOriginalProfileImageUrl(newUrl);
-		setProfilePreview(newUrl);
+		setProfilePreview(`${newUrl}?t=${Date.now()}`);
 	}, []);
 
 	return {

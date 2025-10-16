@@ -475,8 +475,8 @@ const Sidebar = () => {
 									className="rounded-full"
 									height={24}
 									src={
-										session?.user?.image
-											? `${session.user.image}?t=${imageKey}`
+										(userImageUrl || session?.user?.image)
+											? `${userImageUrl || session?.user?.image}?t=${imageKey}`
 											: "/default-avatar.png"
 									}
 									width={24}

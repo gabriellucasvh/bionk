@@ -31,6 +31,7 @@ export async function POST(
 			folder: "profile-pictures",
 			public_id: id,
 			overwrite: true,
+			invalidate: true,
 			// Preserva o formato original para GIFs
 			...(isGif && {
 				format: "gif",
