@@ -63,17 +63,8 @@ export function DesignPanel() {
 				: "color"
 	);
 
-	useEffect(() => {
-		// Sincroniza o tipo com os valores atuais das customizações
-		if (customizations.customBackgroundGradient) {
-			setBackgroundType("gradient");
-		} else if (customizations.customBackgroundColor) {
-			setBackgroundType("color");
-		}
-	}, [
-		customizations.customBackgroundGradient,
-		customizations.customBackgroundColor,
-	]);
+ // Não sincronizar automaticamente o tipo ao mudar valores,
+ // para evitar que alternar a aba mude o preview sem seleção.
 
 	const handleChange = (field: string, value: string | boolean) => {
 		updateCustomization(field as any, value);
@@ -81,31 +72,18 @@ export function DesignPanel() {
 
 	const debouncedHandleChange = handleChange;
 
-	const handleBackgroundTypeChange = (
-		type: "color" | "gradient" | "image" | "video"
-	) => {
-		setBackgroundType(type);
+ const handleBackgroundTypeChange = (
+     type: "color" | "gradient" | "image" | "video"
+ ) => {
+     // Alternar apenas a aba exibida; não limpar valores existentes.
+     setBackgroundType(type);
 
-		// Garantir exclusividade limpando campos conflitantes
-		if (type === "color") {
-			handleChange("customBackgroundGradient", "");
-			handleChange("customBackgroundMediaType", "");
-			handleChange("customBackgroundImageUrl", "");
-			handleChange("customBackgroundVideoUrl", "");
-		} else if (type === "gradient") {
-			handleChange("customBackgroundColor", "");
-			handleChange("customBackgroundMediaType", "");
-			handleChange("customBackgroundImageUrl", "");
-			handleChange("customBackgroundVideoUrl", "");
-		} else {
-			// imagem ou vídeo: limpa cor e gradiente
-			handleChange("customBackgroundColor", "");
-			handleChange("customBackgroundGradient", "");
-			// Abre modal de seleção
-			setBackgroundModalType(type);
-			setIsBackgroundModalOpen(true);
-		}
-	};
+     // Para imagem/vídeo, abrir modal de seleção sem alterar o preview atual.
+     if (type === "image" || type === "video") {
+         setBackgroundModalType(type);
+         setIsBackgroundModalOpen(true);
+     }
+ };
 
 	const handleSavePending = async () => {
 		try {
@@ -239,10 +217,10 @@ export function DesignPanel() {
 								</button>
 							))}
 						</div>
-						<p className="mt-2 text-muted-foreground text-xs">
-							Apenas uma opção de fundo é usada por vez. Alternar o tipo limpa a
-							seleção anterior.
-						</p>
+                        <p className="mt-2 text-muted-foreground text-xs">
+                            Apenas uma opção de fundo é usada por vez. Alternar o tipo não altera
+                            o fundo atual; a mudança ocorre ao selecionar uma opção.
+                        </p>
 					</div>
 
 					{/* Cor de Fundo */}
@@ -267,21 +245,26 @@ export function DesignPanel() {
 								text="Gradiente de Fundo"
 							/>
 							<div className="mt-2 flex flex-wrap gap-1">
-								{GRADIENTS.map((gradient) => (
-									<button
-										className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
-											customizations.customBackgroundGradient === gradient
-												? "border-2 border-lime-700"
-												: "border-2 border-neutral-200 hover:border-green-500 dark:border-neutral-600 dark:hover:border-green-400"
-										}`}
-										key={gradient}
-										onClick={() =>
-											handleChange("customBackgroundGradient", gradient)
-										}
-										style={{ background: gradient }}
-										type="button"
-									/>
-								))}
+                                {GRADIENTS.map((gradient) => (
+                                    <button
+                                        className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
+                                            customizations.customBackgroundGradient === gradient
+                                                ? "border-2 border-lime-700"
+                                                : "border-2 border-neutral-200 hover:border-green-500 dark:border-neutral-600 dark:hover:border-green-400"
+                                        }`}
+                                        key={gradient}
+                                        onClick={() => {
+                                            // Selecionar gradiente e limpar opções conflitantes
+                                            handleChange("customBackgroundGradient", gradient);
+                                            handleChange("customBackgroundColor", "");
+                                            handleChange("customBackgroundMediaType", "");
+                                            handleChange("customBackgroundImageUrl", "");
+                                            handleChange("customBackgroundVideoUrl", "");
+                                        }}
+                                        style={{ background: gradient }}
+                                        type="button"
+                                    />
+                                ))}
 							</div>
 						</div>
 					)}

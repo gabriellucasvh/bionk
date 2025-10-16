@@ -52,18 +52,31 @@ export function ColorOption({
 }
 
 export function ColorSelector({
-	field,
-	label,
-	customizations,
-	activeColorPicker,
-	setActiveColorPicker,
-	handleChange,
-	debouncedHandleChange,
-	hasPendingChange,
+    field,
+    label,
+    customizations,
+    activeColorPicker,
+    setActiveColorPicker,
+    handleChange,
+    debouncedHandleChange,
+    hasPendingChange,
 }: ColorSelectorProps) {
-	const pickerRef = useRef<HTMLDivElement>(null);
-	const customColor = customizations[field];
-	const isSolidColor = SOLID_COLORS.includes(customColor);
+    const pickerRef = useRef<HTMLDivElement>(null);
+    const customColor = customizations[field];
+    const isSolidColor = SOLID_COLORS.includes(customColor);
+
+    // Quando selecionamos cor de fundo, limpar opções conflitantes
+    const applyChange = (f: string, value: string) => {
+        if (f === "customBackgroundColor") {
+            handleChange("customBackgroundColor", value);
+            handleChange("customBackgroundGradient", "");
+            handleChange("customBackgroundMediaType", "");
+            handleChange("customBackgroundImageUrl", "");
+            handleChange("customBackgroundVideoUrl", "");
+        } else {
+            handleChange(f, value);
+        }
+    };
 
 	return (
 		<div className="mb-8">
@@ -96,32 +109,40 @@ export function ColorSelector({
 						type="button"
 					/>
 				)}
-				{SOLID_COLORS.map((color) => (
-					<ColorOption
-						color={color}
-						field={field}
-						handleChange={handleChange}
-						isSelected={customColor === color}
-						key={color}
-					/>
-				))}
+                {SOLID_COLORS.map((color) => (
+                    <ColorOption
+                        color={color}
+                        field={field}
+                        handleChange={applyChange}
+                        isSelected={customColor === color}
+                        key={color}
+                    />
+                ))}
 			</div>
 
 			{activeColorPicker === FIELD_TO_PICKER[field] && (
-				<div className="mt-3 w-min" data-color-picker ref={pickerRef}>
-					<HexColorPicker
-						color={customColor}
-						onChange={(color) => debouncedHandleChange(field, color)}
-					/>
-					<HexColorInput
-						className="mt-2 w-full rounded border border-neutral-300 p-2 text-center dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
-						color={customColor}
-						onChange={(color) => handleChange(field, color)}
-						placeholder="#000000"
-						prefixed
-					/>
-				</div>
-			)}
-		</div>
-	);
+                <div className="mt-3 w-min" data-color-picker ref={pickerRef}>
+                    <HexColorPicker
+                        color={customColor}
+                        onChange={(color) => {
+                            debouncedHandleChange(field, color);
+                            if (field === "customBackgroundColor") {
+                                handleChange("customBackgroundGradient", "");
+                                handleChange("customBackgroundMediaType", "");
+                                handleChange("customBackgroundImageUrl", "");
+                                handleChange("customBackgroundVideoUrl", "");
+                            }
+                        }}
+                    />
+                    <HexColorInput
+                        className="mt-2 w-full rounded border border-neutral-300 p-2 text-center dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
+                        color={customColor}
+                        onChange={(color) => applyChange(field, color)}
+                        placeholder="#000000"
+                        prefixed
+                    />
+                </div>
+            )}
+        </div>
+    );
 }
