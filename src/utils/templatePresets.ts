@@ -1,14 +1,18 @@
 export interface TemplatePreset {
-	customBackgroundColor: string;
-	customBackgroundGradient: string;
-	customTextColor: string;
-	customFont: string;
-	customButtonColor: string;
-	customButtonTextColor: string;
-	customButtonFill: string;
-	customButtonCorners: string;
-	headerStyle: string;
-	customBlurredBackground: boolean;
+  customBackgroundColor: string;
+  customBackgroundGradient: string;
+  customBackgroundMediaType: string;
+  customBackgroundImageUrl: string;
+  customBackgroundVideoUrl: string;
+  customTextColor: string;
+  customFont: string;
+  customButtonColor: string;
+  customButtonTextColor: string;
+  customButtonStyle: string;
+  customButtonFill: string;
+  customButtonCorners: string;
+  headerStyle: string;
+  customBlurredBackground: boolean;
 }
 
 export function getTemplatePreset(templateId: string) {
@@ -18,6 +22,9 @@ export function getTemplatePreset(templateId: string) {
 				customBackgroundColor: "",
 				customBackgroundGradient:
 					"linear-gradient(to bottom, #fafafa, #e5e5e5)",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#000000",
 				customFont: "font-satoshi",
 				customButtonColor: "#ffffff",
@@ -32,6 +39,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#000000",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#22c55e",
 				customFont: "font-satoshi",
 				customButtonColor: "#16a34a",
@@ -46,6 +56,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#14532d",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#a3e635",
 				customFont: "font-satoshi",
 				customButtonColor: "#a3e635",
@@ -60,6 +73,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#0f172a",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#4ade80",
 				customFont: "font-satoshi",
 				customButtonColor: "#134e4a",
@@ -74,6 +90,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#450a0a",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#ffffff",
 				customFont: "font-satoshi",
 				customButtonColor: "#b91c1c",
@@ -88,6 +107,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#431407",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#facc15",
 				customFont: "font-satoshi",
 				customButtonColor: "#ca8a04",
@@ -103,6 +125,9 @@ export function getTemplatePreset(templateId: string) {
 				customBackgroundColor: "",
 				customBackgroundGradient:
 					"linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#ffffff",
 				customFont: "font-satoshi",
 				customButtonColor: "#facc15",
@@ -117,6 +142,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#e11d48",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#bef264",
 				customFont: "font-satoshi",
 				customButtonColor: "#84cc16",
@@ -131,6 +159,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#7c3aed",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#6ee7b7",
 				customFont: "font-satoshi",
 				customButtonColor: "#10b981",
@@ -145,6 +176,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#f5f0e8",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#6d4c41",
 				customFont: "font-playfair-display",
 				customButtonColor: "#f5f0e8",
@@ -160,6 +194,9 @@ export function getTemplatePreset(templateId: string) {
 				customBackgroundColor: "",
 				customBackgroundGradient:
 					"linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#f43f5e",
 				customFont: "font-satoshi",
 				customButtonColor: "#53354a",
@@ -175,6 +212,9 @@ export function getTemplatePreset(templateId: string) {
 				customBackgroundColor: "",
 				customBackgroundGradient:
 					"linear-gradient(135deg, #312e81 0%, #7c2d12 50%, #be185d 100%)",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#ffffff",
 				customFont: "font-satoshi",
 				customButtonColor: "#be185d",
@@ -189,6 +229,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#f4f1de",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#3d405b",
 				customFont: "font-poppins",
 				customButtonColor: "#f2cc8f",
@@ -203,6 +246,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#0a0a0a",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#ffffff",
 				customFont: "font-inter",
 				customButtonColor: "#171717",
@@ -218,6 +264,9 @@ export function getTemplatePreset(templateId: string) {
 				customBackgroundColor: "",
 				customBackgroundGradient:
 					"linear-gradient(135deg, #c026d3 0%, #7c3aed 50%, #2563eb 100%)",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#ffffff",
 				customFont: "font-satoshi",
 				customButtonColor: "",
@@ -232,6 +281,9 @@ export function getTemplatePreset(templateId: string) {
 			return {
 				customBackgroundColor: "#000000",
 				customBackgroundGradient: "",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#00fff7",
 				customFont: "font-inter",
 				customButtonColor: "#00fff7",
@@ -247,6 +299,9 @@ export function getTemplatePreset(templateId: string) {
 				customBackgroundColor: "",
 				customBackgroundGradient:
 					"linear-gradient(to bottom, #fafafa, #e5e5e5)",
+				customBackgroundMediaType: "",
+				customBackgroundImageUrl: "",
+				customBackgroundVideoUrl: "",
 				customTextColor: "#000000",
 				customFont: "font-satoshi",
 				customButtonColor: "#ffffff",
@@ -261,19 +316,22 @@ export function getTemplatePreset(templateId: string) {
 }
 
 export function getDefaultCustomPresets() {
-	return {
-		customBackgroundColor: "",
-		customBackgroundGradient: "linear-gradient(to bottom, #fafafa, #e5e5e5)",
-		customTextColor: "#000000",
-		customFont: "font-satoshi",
-		customButtonColor: "#ffffff",
-		customButtonTextColor: "#000000",
-		customButtonStyle: "solid",
-		customButtonFill: "filled",
-		customButtonCorners: "12",
-		headerStyle: "default",
-		customBlurredBackground: true,
-	};
+  return {
+    customBackgroundColor: "",
+    customBackgroundGradient: "linear-gradient(to bottom, #fafafa, #e5e5e5)",
+    customBackgroundMediaType: "",
+    customBackgroundImageUrl: "",
+    customBackgroundVideoUrl: "",
+    customTextColor: "#000000",
+    customFont: "font-satoshi",
+    customButtonColor: "#ffffff",
+    customButtonTextColor: "#000000",
+    customButtonStyle: "solid",
+    customButtonFill: "filled",
+    customButtonCorners: "12",
+    headerStyle: "default",
+    customBlurredBackground: true,
+  };
 }
 
 export function getTemplateInfo(templateId: string) {

@@ -667,6 +667,13 @@ export default function UserPagePreview() {
 	}
 
 	const getBackgroundStyle = () => {
+		// Se houver mídia de fundo, não aplicar cor/gradiente no wrapper
+		if (
+			customizations?.customBackgroundMediaType === "image" ||
+			customizations?.customBackgroundMediaType === "video"
+		) {
+			return {};
+		}
 		// Prioriza cor sólida quando ambas existem
 		if (customizations?.customBackgroundColor) {
 			return {
@@ -697,20 +704,58 @@ export default function UserPagePreview() {
 		}),
 	};
 
-    return (
-        <div className="h-full w-full">
-            <div
-                className={`relative h-full w-full ${
-                    customizations.headerStyle === "hero" ? "" : "px-4 sm:px-6 sm:pt-4"
-                }`}
-                style={wrapperStyle}
-            >
-                <div className="flex h-full flex-col">
-                    {customizations.headerStyle === "hero" ? (
-                        <>
-                            <UserHeader
-                                customizations={customizations}
-                                headerStyle={customizations.headerStyle}
+	const renderFixedBackground = () => {
+		const type = customizations?.customBackgroundMediaType;
+		const imageUrl = customizations?.customBackgroundImageUrl;
+		const videoUrl = customizations?.customBackgroundVideoUrl;
+
+		if (type === "image" && imageUrl) {
+			return (
+				<div
+					aria-hidden
+					className="pointer-events-none absolute inset-0 z-0 rounded-[inherit]"
+					style={{
+						backgroundImage: `url(${imageUrl})`,
+						backgroundSize: "cover",
+						backgroundPosition: "center",
+					}}
+				/>
+			);
+		}
+
+		if (type === "video" && videoUrl) {
+			return (
+				<video
+					aria-hidden
+					autoPlay
+					className="pointer-events-none absolute inset-0 z-0 h-full w-full rounded-[inherit] object-cover"
+					controls={false}
+					loop
+					muted
+					playsInline
+					src={videoUrl}
+				/>
+			);
+		}
+
+		return null;
+	};
+
+	return (
+		<div className="h-full w-full">
+			<div
+				className={`relative h-full w-full overflow-hidden ${
+					customizations.headerStyle === "hero" ? "" : "px-4 sm:px-6 sm:pt-4"
+				}`}
+				style={wrapperStyle}
+			>
+				{renderFixedBackground()}
+				<div className="relative z-10 flex h-full flex-col">
+					{customizations.headerStyle === "hero" ? (
+						<>
+							<UserHeader
+								customizations={customizations}
+								headerStyle={customizations.headerStyle}
 								textStyle={textStyle}
 								user={user}
 							/>

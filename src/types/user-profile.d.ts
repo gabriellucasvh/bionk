@@ -73,13 +73,16 @@ export interface UserVideo extends PrismaVideo {
 
 // --- Customização ---
 export interface CustomPresets extends PrismaCustomPresets {
-	customBackgroundColor: string;
-	customBackgroundGradient: string;
-	customTextColor: string;
-	customFont: string;
-	customButton: string;
-	customButtonStyle: string;
-	customButtonFill: string;
+    customBackgroundColor: string;
+    customBackgroundGradient: string;
+    customBackgroundMediaType?: "image" | "video" | "" | null;
+    customBackgroundImageUrl?: string | null;
+    customBackgroundVideoUrl?: string | null;
+    customTextColor: string;
+    customFont: string;
+    customButton: string;
+    customButtonStyle: string;
+    customButtonFill: string;
 	customButtonCorners: string;
 	customButtonColor: string;
 	customButtonTextColor: string;

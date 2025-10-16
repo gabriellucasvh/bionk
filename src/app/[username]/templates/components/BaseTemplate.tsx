@@ -586,16 +586,22 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 	const templatePreset = getTemplatePreset(templateId);
 	const customPresets = user.CustomPresets || templatePreset;
 
+	const hasBackgroundMedia =
+		customPresets?.customBackgroundMediaType === "image" ||
+		customPresets?.customBackgroundMediaType === "video";
+
 	const wrapperStyle: React.CSSProperties = {
 		// Prioriza cor sólida quando ambas existem
-		...(customPresets.customBackgroundColor
-			? { backgroundColor: customPresets.customBackgroundColor }
-			: customPresets.customBackgroundGradient
-				? {
-						backgroundImage: customPresets.customBackgroundGradient,
-						backgroundColor: "transparent",
-					}
-				: {}),
+		...(hasBackgroundMedia
+			? {}
+			: customPresets.customBackgroundColor
+				? { backgroundColor: customPresets.customBackgroundColor }
+				: customPresets.customBackgroundGradient
+					? {
+							backgroundImage: customPresets.customBackgroundGradient,
+							backgroundColor: "transparent",
+						}
+					: {}),
 		...(customPresets.customFont && {
 			fontFamily: getFontFamily(customPresets.customFont),
 		}),
@@ -738,6 +744,43 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 		user.image &&
 		!user.image.includes("default_xry2zk");
 
+	const renderFixedBackground = () => {
+		const type = customPresets?.customBackgroundMediaType;
+		const imageUrl = customPresets?.customBackgroundImageUrl;
+		const videoUrl = customPresets?.customBackgroundVideoUrl;
+
+		if (type === "image" && imageUrl) {
+			return (
+				<div
+					aria-hidden
+					className="pointer-events-none absolute inset-0 z-0 rounded-[inherit]"
+					style={{
+						backgroundImage: `url(${imageUrl})`,
+						backgroundSize: "cover",
+						backgroundPosition: "center",
+					}}
+				/>
+			);
+		}
+
+		if (type === "video" && videoUrl) {
+			return (
+				<video
+					aria-hidden
+					autoPlay
+					className="pointer-events-none absolute inset-0 z-0 h-full w-full rounded-[inherit] object-cover"
+					controls={false}
+					loop
+					muted
+					playsInline
+					src={videoUrl}
+				/>
+			);
+		}
+
+		return null;
+	};
+
 	return (
 		<>
 			{/* Container principal com aspect ratio de celular em telas maiores */}
@@ -759,11 +802,12 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					<div className="absolute inset-0 bg-black/80 backdrop-blur-[100px]" />
 				)}
 				<div
-					className={`relative z-10 min-h-dvh w-full sm:min-h-[calc(100vh-2rem)] sm:w-[575px] sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
+					className={`relative z-10 min-h-dvh w-full sm:min-h-[calc(100vh-2rem)] sm:w-[575px] sm:overflow-hidden sm:rounded-t-3xl sm:shadow-2xl sm:shadow-black/20 ${
 						customPresets.headerStyle === "hero" ? "pt-0" : "px-4"
 					} ${customPresets.headerStyle !== "hero" ? "sm:px-6 sm:pt-4" : ""}`}
 					style={wrapperStyle}
 				>
+					{renderFixedBackground()}
 					<ProfileViewTracker userId={user.id} />
 
 					<div className="absolute top-4 right-4 z-50 sm:top-6 sm:right-6">
@@ -772,16 +816,18 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 
 					{/* Renderizar header hero fora do container com padding */}
 					{customPresets.headerStyle === "hero" && (
-						<UserHeader
-							customPresets={customPresets}
-							headerStyle={customPresets.headerStyle}
-							textStyle={textStyle}
-							user={user}
-						/>
+						<div className="relative z-10">
+							<UserHeader
+								customPresets={customPresets}
+								headerStyle={customPresets.headerStyle}
+								textStyle={textStyle}
+								user={user}
+							/>
+						</div>
 					)}
 
 					<div
-						className={`flex min-h-dvh flex-col sm:min-h-[calc(100vh-2rem)] ${customPresets.headerStyle === "hero" ? "px-4 sm:px-6" : ""}`}
+						className={`relative z-10 flex min-h-dvh flex-col sm:min-h-[calc(100vh-2rem)] ${customPresets.headerStyle === "hero" ? "px-4 sm:px-6" : ""}`}
 					>
 						<main
 							className={`mx-auto flex w-full max-w-md flex-1 flex-col items-center sm:max-w-none ${

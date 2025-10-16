@@ -2,31 +2,37 @@ import { useEffect, useState } from "react";
 import { useDesignStore } from "@/stores/designStore";
 
 type UserCustomizations = {
-	customBackgroundColor: string;
-	customBackgroundGradient: string;
-	customTextColor: string;
-	customFont: string;
-	customButtonColor: string;
-	customButtonTextColor: string;
-	customButtonStyle: string;
-	customButtonFill: string;
-	customButtonCorners: string;
-	headerStyle: string;
-	customBlurredBackground: boolean;
+  customBackgroundColor: string;
+  customBackgroundGradient: string;
+  customBackgroundMediaType: string;
+  customBackgroundImageUrl: string;
+  customBackgroundVideoUrl: string;
+  customTextColor: string;
+  customFont: string;
+  customButtonColor: string;
+  customButtonTextColor: string;
+  customButtonStyle: string;
+  customButtonFill: string;
+  customButtonCorners: string;
+  headerStyle: string;
+  customBlurredBackground: boolean;
 };
 
 const defaultCustomizations: UserCustomizations = {
-	customBackgroundColor: "",
-	customBackgroundGradient: "",
-	customTextColor: "",
-	customFont: "",
-	customButtonColor: "",
-	customButtonTextColor: "",
-	customButtonStyle: "",
-	customButtonFill: "",
-	customButtonCorners: "",
-	headerStyle: "default",
-	customBlurredBackground: true,
+  customBackgroundColor: "",
+  customBackgroundGradient: "",
+  customBackgroundMediaType: "",
+  customBackgroundImageUrl: "",
+  customBackgroundVideoUrl: "",
+  customTextColor: "",
+  customFont: "",
+  customButtonColor: "",
+  customButtonTextColor: "",
+  customButtonStyle: "",
+  customButtonFill: "",
+  customButtonCorners: "",
+  headerStyle: "default",
+  customBlurredBackground: true,
 };
 
 export const useCustomizations = () => {

@@ -1,7 +1,9 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import BackgroundMediaModal from "@/components/modals/BackgroundMediaModal";
 import FontSelectionModal from "@/components/modals/FontSelectionModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -44,6 +46,11 @@ export function DesignPanel() {
 		null
 	);
 	const [isFontModalOpen, setIsFontModalOpen] = useState(false);
+	const [isBackgroundModalOpen, setIsBackgroundModalOpen] = useState(false);
+	const [backgroundModalType, setBackgroundModalType] = useState<
+		"image" | "video"
+	>("image");
+	const [isSavingPending, setIsSavingPending] = useState(false);
 
 	// Tipo de fundo selecionado (apenas um por vez)
 	const [backgroundType, setBackgroundType] = useState<
@@ -82,21 +89,33 @@ export function DesignPanel() {
 		// Garantir exclusividade limpando campos conflitantes
 		if (type === "color") {
 			handleChange("customBackgroundGradient", "");
+			handleChange("customBackgroundMediaType", "");
+			handleChange("customBackgroundImageUrl", "");
+			handleChange("customBackgroundVideoUrl", "");
 		} else if (type === "gradient") {
 			handleChange("customBackgroundColor", "");
+			handleChange("customBackgroundMediaType", "");
+			handleChange("customBackgroundImageUrl", "");
+			handleChange("customBackgroundVideoUrl", "");
 		} else {
-			// imagem ou vídeo (reservado): limpa ambos por enquanto
+			// imagem ou vídeo: limpa cor e gradiente
 			handleChange("customBackgroundColor", "");
 			handleChange("customBackgroundGradient", "");
+			// Abre modal de seleção
+			setBackgroundModalType(type);
+			setIsBackgroundModalOpen(true);
 		}
 	};
 
 	const handleSavePending = async () => {
 		try {
+			setIsSavingPending(true);
 			await saveChanges();
 			setActiveColorPicker(null);
 		} catch (error) {
 			console.error("Erro ao salvar:", error);
+		} finally {
+			setIsSavingPending(false);
 		}
 	};
 
@@ -202,8 +221,8 @@ export function DesignPanel() {
 								[
 									{ key: "color", label: "Cor sólida" },
 									{ key: "gradient", label: "Gradiente" },
-									{ key: "image", label: "Imagem (em breve)" },
-									{ key: "video", label: "Vídeo (em breve)" },
+									{ key: "image", label: "Imagem" },
+									{ key: "video", label: "Vídeo" },
 								] as const
 							).map((opt) => (
 								<button
@@ -267,15 +286,73 @@ export function DesignPanel() {
 						</div>
 					)}
 
-					{/* Placeholders reservados */}
+					{/* Imagem de Fundo */}
 					{backgroundType === "image" && (
-						<div className="rounded-md border p-3 text-muted-foreground text-sm">
-							Em breve: você poderá definir uma imagem como fundo.
+						<div className="space-y-3 rounded-md border p-3">
+							<p className="text-muted-foreground text-sm">
+								Selecione uma imagem vertical e faça o crop 9:16.
+							</p>
+
+							<div className="flex gap-2">
+								<button
+									className="rounded-md border px-4 py-2 text-sm"
+									onClick={() => {
+										setBackgroundModalType("image");
+										setIsBackgroundModalOpen(true);
+									}}
+									type="button"
+								>
+									Selecionar imagem
+								</button>
+
+								{customizations.customBackgroundImageUrl && (
+									<button
+										className="rounded-md border px-4 py-2 text-sm"
+										onClick={() => {
+											handleChange("customBackgroundMediaType", "");
+											handleChange("customBackgroundImageUrl", "");
+										}}
+										type="button"
+									>
+										Remover imagem
+									</button>
+								)}
+							</div>
 						</div>
 					)}
+					{/* Vídeo de Fundo */}
 					{backgroundType === "video" && (
-						<div className="rounded-md border p-3 text-muted-foreground text-sm">
-							Em breve: você poderá definir um vídeo como fundo.
+						<div className="space-y-3 rounded-md border p-3">
+							<p className="text-muted-foreground text-sm">
+								Upload de vídeo vertical. Será reproduzido em loop e sem
+								controles.
+							</p>
+
+							<div className="flex gap-2">
+								<button
+									className="rounded-md border px-4 py-2 text-sm"
+									onClick={() => {
+										setBackgroundModalType("video");
+										setIsBackgroundModalOpen(true);
+									}}
+									type="button"
+								>
+									Selecionar vídeo
+								</button>
+
+								{customizations.customBackgroundVideoUrl && (
+									<button
+										className="rounded-md border px-4 py-2 text-sm"
+										onClick={() => {
+											handleChange("customBackgroundMediaType", "");
+											handleChange("customBackgroundVideoUrl", "");
+										}}
+										type="button"
+									>
+										Remover vídeo
+									</button>
+								)}
+							</div>
 						</div>
 					)}
 
@@ -298,6 +375,27 @@ export function DesignPanel() {
 					</div>
 				</CardContent>
 			</Card>
+
+			<BackgroundMediaModal
+				isOpen={isBackgroundModalOpen}
+				onClose={() => setIsBackgroundModalOpen(false)}
+				onUploaded={(url, t) => {
+					if (t === "image") {
+						updateCustomization("customBackgroundMediaType", "image");
+						updateCustomization("customBackgroundImageUrl", url);
+						updateCustomization("customBackgroundVideoUrl", "");
+					} else {
+						updateCustomization("customBackgroundMediaType", "video");
+						updateCustomization("customBackgroundVideoUrl", url);
+						updateCustomization("customBackgroundImageUrl", "");
+					}
+
+					// Garantir exclusividade: limpar cor e gradiente
+					updateCustomization("customBackgroundColor", "");
+					updateCustomization("customBackgroundGradient", "");
+				}}
+				type={backgroundModalType}
+			/>
 
 			{/* Seção Texto */}
 			<Card>
@@ -388,10 +486,23 @@ export function DesignPanel() {
 					<span className="hidden font-medium text-neutral-600 text-sm sm:inline-block dark:text-neutral-400">
 						Deseja salvar as alterações pendentes?
 					</span>
-					<BaseButton onClick={handleCancel} size="sm" variant="white">
+					<BaseButton
+						disabled={isSavingPending}
+						onClick={handleCancel}
+						size="sm"
+						variant="white"
+					>
 						Cancelar
 					</BaseButton>
-					<BaseButton className="px-6" onClick={handleSavePending} size="sm">
+					<BaseButton
+						className="px-6"
+						disabled={isSavingPending}
+						onClick={handleSavePending}
+						size="sm"
+					>
+						{isSavingPending && (
+							<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+						)}
 						Salvar
 					</BaseButton>
 				</div>

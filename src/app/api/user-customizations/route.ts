@@ -15,21 +15,24 @@ export async function GET() {
 			where: { userId: session.user.id },
 		});
 
-		return NextResponse.json(
-			customPresets || {
-				customBackgroundColor: "",
-				customBackgroundGradient: "",
-				customTextColor: "",
-				customFont: "",
-				customButton: "",
-				customButtonStyle: "solid",
-				customButtonFill: "",
-				customButtonCorners: "",
-				customButtonColor: "",
-				customButtonTextColor: "",
-				headerStyle: "default",
-			}
-		);
+        return NextResponse.json(
+            customPresets || {
+                customBackgroundColor: "",
+                customBackgroundGradient: "",
+                customBackgroundMediaType: "",
+                customBackgroundImageUrl: "",
+                customBackgroundVideoUrl: "",
+                customTextColor: "",
+                customFont: "",
+                customButtonStyle: "solid",
+                customButtonFill: "",
+                customButtonCorners: "",
+                customButtonColor: "",
+                customButtonTextColor: "",
+                headerStyle: "default",
+                customBlurredBackground: true,
+            }
+        );
 	} catch {
 		return NextResponse.json(
 			{ error: "Failed to fetch customizations" },

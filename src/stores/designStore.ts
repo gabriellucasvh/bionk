@@ -25,6 +25,9 @@ export interface UserData {
 export interface Customizations {
 	customBackgroundColor: string;
 	customBackgroundGradient: string;
+	customBackgroundMediaType: string; // "" | "image" | "video"
+	customBackgroundImageUrl: string;
+	customBackgroundVideoUrl: string;
 	customTextColor: string;
 	customFont: string;
 	customButtonColor: string;
@@ -56,7 +59,10 @@ interface DesignStore {
 
 	// Ações para customizações
 	setCustomizations: (customizations: Customizations) => void;
-	updateCustomization: (field: keyof Customizations, value: string | boolean) => void;
+	updateCustomization: (
+		field: keyof Customizations,
+		value: string | boolean
+	) => void;
 
 	// Ações de controle
 	setLoading: (loading: boolean) => void;
@@ -74,6 +80,9 @@ interface DesignStore {
 const defaultCustomizations: Customizations = {
 	customBackgroundColor: "",
 	customBackgroundGradient: "",
+	customBackgroundMediaType: "",
+	customBackgroundImageUrl: "",
+	customBackgroundVideoUrl: "",
 	customTextColor: "",
 	customFont: "",
 	customButtonColor: "",
@@ -186,7 +195,16 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
 			});
 
 			if (!customResponse.ok) {
-				throw new Error("Erro ao salvar customizações");
+				let serverError: any = null;
+				try {
+					serverError = await customResponse.json();
+				} catch {}
+				console.error(
+					"Falha ao salvar customizações:",
+					customResponse.status,
+					serverError || (await customResponse.text().catch(() => ""))
+				);
+				throw new Error(serverError?.error || "Erro ao salvar customizações");
 			}
 
 			// Atualizar estado original
