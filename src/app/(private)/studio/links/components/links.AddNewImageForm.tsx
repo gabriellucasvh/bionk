@@ -527,20 +527,6 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 
 			<div className="flex-shrink-0 border-t pt-3">
 				<div className="flex gap-3">
-					{typeof propOnSave === "function" && props.onCancel && (
-						<BaseButton
-							className="flex-1"
-							onClick={() => {
-								setDidSubmit(false);
-								setShowInputsSingle(false);
-								props.onCancel?.();
-							}}
-							type="button"
-							variant="white"
-						>
-							Cancelar
-						</BaseButton>
-					)}
 					<BaseButton
 						className="flex-1"
 						disabled={isSaveDisabled || (propMode === "edit" && didSubmit)}
