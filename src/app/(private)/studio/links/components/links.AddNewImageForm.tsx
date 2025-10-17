@@ -201,7 +201,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 			const currentCount = (formData.images || []).length;
 			const allowed = Math.max(0, maxImages - currentCount);
 			if (allowed <= 0) {
-				setUploadError(`Limite de ${maxImages} imagem(ns) atingido`);
+				setUploadError(`Limite de ${maxImages} imagem(s) atingido`);
 				return;
 			}
 			const sliced = toAdd.slice(0, allowed);

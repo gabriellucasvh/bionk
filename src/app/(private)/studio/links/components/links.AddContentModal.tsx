@@ -56,7 +56,7 @@ interface AddContentModalProps {
 	handleAddNewSection: () => Promise<void>;
 	handleAddNewText: () => Promise<void>;
 	handleAddNewVideo: () => Promise<void>;
-    handleAddNewImage: (override?: Partial<ImageFormData>) => Promise<void>;
+	handleAddNewImage: (override?: Partial<ImageFormData>) => Promise<void>;
 }
 
 const AddContentModal = ({
@@ -96,7 +96,6 @@ const AddContentModal = ({
 		selectedOption,
 		isMobile,
 		handleCategorySelect,
-		handleOptionSelect,
 		setIsAnimating,
 		setSelectedOption,
 	} = useModalState();
@@ -177,7 +176,7 @@ const AddContentModal = ({
 		setIsAnimating,
 	]);
 
-	const handleOptionSelectWithState = async (option: string) => {
+	const handleOptionSelectWithState = (option: string) => {
 		const validOptions = [
 			"link",
 			"section",
@@ -210,15 +209,15 @@ const AddContentModal = ({
 		onClose();
 
 		if (validOption === "link") {
-			setTimeout(async () => {
-				await handleAddNewLink();
+			setTimeout(() => {
+				handleAddNewLink();
 			}, 0);
 			return;
 		}
 
 		if (validOption === "text") {
-			setTimeout(async () => {
-				await handleAddNewText();
+			setTimeout(() => {
+				handleAddNewText();
 			}, 0);
 			return;
 		}
@@ -234,32 +233,34 @@ const AddContentModal = ({
 				...videoFormData,
 				type: videoType,
 			});
-			setTimeout(async () => {
-				await handleAddNewVideo();
+			setTimeout(() => {
+				handleAddNewVideo();
 			}, 0);
 			return;
 		}
 	};
 
-    const handleImageOptionSelect = (
-        option: "image_single" | "image_column" | "image_carousel"
-    ) => {
-        // Criar rascunho e abrir edição fora do modal
-        // Garantir que o formulário de seção esteja fechado
-        setIsAddingSection(false);
-        const layoutMap = {
-            image_single: "single",
-            image_column: "column",
-            image_carousel: "carousel",
-        } as const;
-        const layout = layoutMap[option];
-        // Não depender do setState assíncrono: passar o layout diretamente
-        setSelectedOption(null);
-        void handleAddNewImage({ layout, images: [], title: "" }).finally(() => {
-            setIsAddingImage(false);
-            onClose();
-        });
-    };
+	const handleImageOptionSelect = (
+		option: "image_single" | "image_column" | "image_carousel"
+	) => {
+		// Criar rascunho e abrir edição fora do modal
+		// Garantir que o formulário de seção esteja fechado
+		setIsAddingSection(false);
+		const layoutMap = {
+			image_single: "single",
+			image_column: "column",
+			image_carousel: "carousel",
+		} as const;
+		const layout = layoutMap[option];
+		// Não depender do setState assíncrono: passar o layout diretamente
+		setSelectedOption(null);
+		Promise.resolve(
+			handleAddNewImage({ layout, images: [], title: "" })
+		).finally(() => {
+			setIsAddingImage(false);
+			onClose();
+		});
+	};
 
 	if (isMobile) {
 		return (

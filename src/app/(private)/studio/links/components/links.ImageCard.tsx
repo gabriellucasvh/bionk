@@ -162,7 +162,7 @@ const DisplayView = ({
 						</div>
 						<span className="font-medium text-sm">Imagem ({layoutLabel})</span>
 						<span className="text-muted-foreground text-xs">
-							{itemCount} item(s)
+							{itemCount} Imagem(s)
 						</span>
 					</header>
 
