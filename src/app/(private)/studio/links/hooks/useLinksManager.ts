@@ -487,7 +487,7 @@ export const useLinksManager = (
 		await mutateSections();
 	};
 
-	const handleAddNewLink = () => {
+	const handleAddNewLink = async () => {
 		// Criar rascunho local do link e abrir em modo edição
 		const id = tempIdCounterRef.current--;
 		const order = -1;
@@ -541,7 +541,7 @@ export const useLinksManager = (
 		setIsAddingSection(false);
 	};
 
-	const handleAddNewText = () => {
+	const handleAddNewText = async () => {
 		// Criar rascunho local de texto e abrir em modo edição
 		const id = tempIdCounterRef.current--;
 		const order = -1;
@@ -577,7 +577,7 @@ export const useLinksManager = (
 		setTextFormData(initialTextFormData);
 	};
 
-	const handleAddNewVideo = () => {
+	const handleAddNewVideo = async () => {
 		// Criar rascunho local de vídeo e abrir em modo edição
 		const id = tempIdCounterRef.current--;
 		const order = -1;
@@ -612,7 +612,7 @@ export const useLinksManager = (
 		setVideoFormData(initialVideoFormData);
 	};
 
-	const handleAddNewImage = (override?: Partial<ImageFormData>) => {
+	const handleAddNewImage = async (override?: Partial<ImageFormData>) => {
 		// Criar rascunho local de imagens e abrir em modo edição
 		const id = tempIdCounterRef.current--;
 		const order = -1;

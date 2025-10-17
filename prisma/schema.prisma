@@ -198,7 +198,6 @@ model CustomPresets {
   userId                    String  @unique
   customBackgroundColor     String? @default("")
   customBackgroundGradient  String? @default("")
-  // Novo: mídia de background (imagem/vídeo)
   customBackgroundMediaType String? @default("")
   customBackgroundImageUrl  String?
   customBackgroundVideoUrl  String?
