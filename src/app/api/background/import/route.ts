@@ -43,15 +43,8 @@ export async function POST(request: Request) {
 			// ignore tracking errors
 		}
 
+		// Importação de IMAGEM via Cloudinary fetch (sem exclusões imediatas)
 		if (type === "image") {
-			// Antes de importar imagem, remover vídeo existente para garantir exclusividade
-			try {
-				await cloudinary.uploader.destroy(
-					`backgrounds/${session.user.id}/video/background`,
-					{ resource_type: "video" } as any
-				);
-			} catch {}
-
 			const transformations: any[] = [];
 			if (crop) {
 				const { x, y, width, height } = crop;
@@ -64,44 +57,36 @@ export async function POST(request: Request) {
 				}
 			}
 
-			// Enforce vertical 9:16 output
+			// 9:16 vertical
 			transformations.push(
 				{ crop: "fill", gravity: "auto", width: 1080, height: 1920 },
 				{ quality: "auto" }
 			);
 
-			const uploadResponse = await cloudinary.uploader.upload(url, {
-				folder: `backgrounds/${session.user.id}/image`,
-				public_id: "background",
-				overwrite: true,
+			const imageUrl = cloudinary.url(url, {
 				resource_type: "image",
+				type: "fetch",
 				transformation: transformations,
+				secure: true,
 			} as any);
 
-			return NextResponse.json({ url: (uploadResponse as any).secure_url });
+			return NextResponse.json({ url: imageUrl });
 		}
 
+		// Importação de VÍDEO via Cloudinary fetch (sem exclusões imediatas)
 		if (type === "video") {
-			// Antes de importar vídeo, remover imagem existente para garantir exclusividade
-			try {
-				await cloudinary.uploader.destroy(
-					`backgrounds/${session.user.id}/image/background`,
-					{ resource_type: "image" } as any
-				);
-			} catch {}
-
-			const uploadResponse = await cloudinary.uploader.upload(url, {
-				folder: `backgrounds/${session.user.id}/video`,
-				public_id: "background",
-				overwrite: true,
+			const videoUrl = cloudinary.url(url, {
 				resource_type: "video",
+				type: "fetch",
+				// Remover gravity:auto em vídeo para evitar erro de incoming transformation
 				transformation: [
 					{ crop: "fill", width: 1080, height: 1920 },
 					{ quality: "auto" },
 				],
+				secure: true,
 			} as any);
 
-			return NextResponse.json({ url: (uploadResponse as any).secure_url });
+			return NextResponse.json({ url: videoUrl });
 		}
 
 		return NextResponse.json({ error: "Tipo inválido" }, { status: 400 });

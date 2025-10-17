@@ -121,6 +121,11 @@ export default function BackgroundMediaModal({
 		try {
 			const qs = new URLSearchParams({ type, q: query || "" }).toString();
 			const res = await fetch(`/api/media/search?${qs}`);
+			const ct = res.headers.get("content-type") || "";
+			if (!ct.includes("application/json")) {
+				const text = await res.text();
+				throw new Error(text || "Falha na busca de mídias");
+			}
 			const data = await res.json();
 			if (!res.ok) {
 				throw new Error(data?.error || "Falha na busca de mídias");
@@ -135,7 +140,7 @@ export default function BackgroundMediaModal({
 
 	useEffect(() => {
 		if (activeTab === "library" && results.length === 0) {
-			void performSearch();
+			performSearch().catch(() => {});
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [activeTab]);
@@ -163,20 +168,6 @@ export default function BackgroundMediaModal({
 		return "Tipo inválido";
 	};
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const f = e.target.files?.[0];
-		if (!f) {
-			return;
-		}
-		const err = validateFile(f);
-		if (err) {
-			setError(err);
-			return;
-		}
-		setFile(f);
-		setError("");
-	};
-
 	const handleFileSelect = (f: File) => {
 		const err = validateFile(f);
 		if (err) {
@@ -201,7 +192,7 @@ export default function BackgroundMediaModal({
 		e.preventDefault();
 		e.stopPropagation();
 		setDragActive(false);
-		if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+		if (e.dataTransfer?.files[0]) {
 			handleFileSelect(e.dataTransfer.files[0]);
 		}
 	};
@@ -211,22 +202,57 @@ export default function BackgroundMediaModal({
 		try {
 			// Upload local de arquivo
 			if (file) {
-				const fd = new FormData();
-				fd.append("file", file);
-				fd.append("type", type);
-				if (type === "image" && croppedAreaPixels) {
-					fd.append("crop", JSON.stringify(croppedAreaPixels));
+				// Assinar upload direto no Cloudinary
+				const signRes = await fetch("/api/background/sign-upload", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						type,
+						crop:
+							type === "image" && croppedAreaPixels
+								? {
+										x: Math.round(croppedAreaPixels.x),
+										y: Math.round(croppedAreaPixels.y),
+										width: Math.round(croppedAreaPixels.width),
+										height: Math.round(croppedAreaPixels.height),
+									}
+								: null,
+					}),
+				});
+				const signCt = signRes.headers.get("content-type") || "";
+				if (!signCt.includes("application/json")) {
+					const text = await signRes.text();
+					throw new Error(text || "Falha ao preparar upload");
+				}
+				const signData = await signRes.json();
+				if (!signRes.ok) {
+					throw new Error(signData?.error || "Falha ao preparar upload");
 				}
 
-				const res = await fetch("/api/background/upload", {
+				const fd = new FormData();
+				fd.append("file", file);
+				fd.append("api_key", signData.apiKey);
+				fd.append("timestamp", String(signData.timestamp));
+				fd.append("signature", signData.signature);
+				fd.append("folder", signData.params.folder);
+				fd.append("public_id", signData.params.public_id);
+				fd.append("overwrite", String(signData.params.overwrite));
+				fd.append("transformation", signData.params.transformation);
+
+				const uploadRes = await fetch(signData.uploadUrl, {
 					method: "POST",
 					body: fd,
 				});
-				const data = await res.json();
-				if (!res.ok) {
-					throw new Error(data?.error || "Falha no upload");
+				const uploadCt = uploadRes.headers.get("content-type") || "";
+				if (!uploadCt.includes("application/json")) {
+					const text = await uploadRes.text();
+					throw new Error(text || "Falha no upload");
 				}
-				onUploaded(data.url, type);
+				const uploadData = await uploadRes.json();
+				if (!uploadRes.ok) {
+					throw new Error(uploadData?.error?.message || "Falha no upload");
+				}
+				onUploaded(uploadData.secure_url, type);
 				reset();
 				onClose();
 				return;
@@ -260,6 +286,11 @@ export default function BackgroundMediaModal({
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify(body),
 				});
+				const contentType = res.headers.get("content-type") || "";
+				if (!contentType.includes("application/json")) {
+					const text = await res.text();
+					throw new Error(text || "Falha ao importar mídia");
+				}
 				const data = await res.json();
 				if (!res.ok) {
 					throw new Error(data?.error || "Falha ao importar mídia");
