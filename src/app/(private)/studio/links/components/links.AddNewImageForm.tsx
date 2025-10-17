@@ -1,7 +1,8 @@
 "use client";
 
+import { Upload } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,9 @@ interface AddNewImageFormProps {
 	onCancel?: () => void;
 	isSaveDisabled?: boolean;
 	existingSections?: SectionItem[];
+	// Novo: controle de edição e limites
+	mode?: "create" | "edit";
+	maxImages?: number; // aplica para layouts com múltiplas imagens
 	imageManager?: {
 		isAddingImage: boolean;
 		imageFormData: ImageFormData;
@@ -41,6 +45,8 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 		isSaveDisabled: propIsSaveDisabled,
 		existingSections: propExistingSections,
 		imageManager,
+		mode: propMode = "create",
+		maxImages: propMaxImages,
 	} = props;
 
 	const formData = propFormData ||
@@ -69,11 +75,19 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 	const isSaveDisabled =
 		typeof propIsSaveDisabled === "boolean"
 			? propIsSaveDisabled
-			: computedDisabled;
+			: propMode === "edit"
+				? false
+				: computedDisabled;
 	const existingSections =
 		propExistingSections || imageManager?.existingSections || [];
 
 	const [isLoading, setIsLoading] = useState(false);
+	const [didSubmit, setDidSubmit] = useState(false);
+	const [showInputsSingle, setShowInputsSingle] = useState(() => false);
+	const [isDragOverSingle, setIsDragOverSingle] = useState(false);
+	const [isDragOverMultiple, setIsDragOverMultiple] = useState(false);
+	const fileInputSingleRef = useRef<HTMLInputElement>(null);
+	const fileInputMultipleRef = useRef<HTMLInputElement>(null);
 	const [activeSection, setActiveSection] = useState<string>("");
 	const [uploadError, setUploadError] = useState<string>("");
 
@@ -91,78 +105,107 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 	];
 	const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
+	const maxImages = useMemo(() => {
+		if (formData.layout === "single") {
+			return 1;
+		}
+		return typeof propMaxImages === "number" ? propMaxImages : 10;
+	}, [formData.layout, propMaxImages]);
+
+	// Quando remover a única imagem em "single", reabrir o dropzone (evita acionar no primeiro render)
+	const didMountRef = useRef(false);
+	useEffect(() => {
+		if (formData.layout === "single") {
+			const count = (formData.images || []).length;
+			if (didMountRef.current && count === 0) {
+				setShowInputsSingle(true);
+			}
+		}
+		didMountRef.current = true;
+	}, [formData.layout, formData.images?.length]);
+
 	const uploadFiles = async (files: FileList) => {
 		setUploadError("");
-		const toAdd: Array<{ url: string; linkUrl?: string }> = [];
-		for (const file of Array.from(files)) {
+		const arr = Array.from(files);
+		const accepted = arr.filter((file) => {
 			if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
 				setUploadError("Formato não suportado");
-				continue;
+				return false;
 			}
 			if (file.size > MAX_IMAGE_SIZE_BYTES) {
 				setUploadError("Imagem muito grande (máx. 10MB)");
-				continue;
+				return false;
 			}
+			return true;
+		});
+
+		const requests = accepted.map((file) => {
 			const fd = new FormData();
 			fd.append("file", file);
-			try {
-				const res = await fetch("/api/images/upload", {
-					method: "POST",
-					body: fd,
-				});
-				const json = await res.json();
-				if (!(res.ok && json.url)) {
-					setUploadError(json.error || "Falha no upload");
-					continue;
+			return fetch("/api/images/upload", { method: "POST", body: fd }).then(
+				async (res) => {
+					const json = await res.json();
+					if (!(res.ok && json.url)) {
+						throw new Error(json.error || "Falha no upload");
+					}
+					return { url: json.url } as { url: string; linkUrl?: string };
 				}
-				toAdd.push({ url: json.url });
-			} catch (e) {
-				setUploadError("Erro no upload");
-			}
-		}
-		if (toAdd.length > 0) {
-			if (formData.layout === "single") {
-				setFormData({ ...formData, images: [toAdd[0]] });
-			} else {
-				setFormData({
-					...formData,
-					images: [...(formData.images || []), ...toAdd],
-				});
-			}
-		}
-	};
+			);
+		});
 
-	const addImageUrls = (urls: string[]) => {
-		const cleaned = urls.map((u) => u.trim()).filter((u) => !!u);
-		if (cleaned.length === 0) return;
-		const items = cleaned.map((u) => ({ url: u }));
-		if (formData.layout === "single") {
-			setFormData({ ...formData, images: [items[0]] });
-		} else {
+		try {
+			const results = await Promise.allSettled(requests);
+			const toAdd = results
+				.filter((r) => r.status === "fulfilled")
+				.map(
+					(r) =>
+						(r as PromiseFulfilledResult<{ url: string; linkUrl?: string }>)
+							.value
+				);
+
+			if (toAdd.length === 0) {
+				const firstRej = results.find((r) => r.status === "rejected") as
+					| PromiseRejectedResult
+					| undefined;
+				if (firstRej) {
+					setUploadError(firstRej.reason?.message || "Erro no upload");
+				}
+				return;
+			}
+
+			// Para layout "single", sempre substituir a imagem existente
+			if (formData.layout === "single") {
+				setFormData({ ...formData, images: [toAdd.at(-1)!] });
+				setUploadError("");
+				// Oculta o dropzone após escolher a imagem
+				setShowInputsSingle(false);
+				return;
+			}
+
+			// Para layouts com múltiplas imagens, respeitar o limite
+			const currentCount = (formData.images || []).length;
+			const allowed = Math.max(0, maxImages - currentCount);
+			if (allowed <= 0) {
+				setUploadError(`Limite de ${maxImages} imagem(ns) atingido`);
+				return;
+			}
+			const sliced = toAdd.slice(0, allowed);
 			setFormData({
 				...formData,
-				images: [...(formData.images || []), ...items],
+				images: [...(formData.images || []), ...sliced],
 			});
+		} catch (e) {
+			setUploadError("Erro no upload");
 		}
 	};
 
-	const handleUrlAddSingle = (value: string) => {
-		const v = value.trim();
-		if (!v) return;
-		addImageUrls([v]);
-	};
-
-	const handleUrlAddMultiple = (value: string) => {
-		const parts = value
-			.split(/\n|,/)
-			.map((u) => u.trim())
-			.filter((u) => !!u);
-		addImageUrls(parts);
-	};
+	// Removidos handlers de URL de imagem não utilizados
 
 	const updateLinkUrl = (index: number, linkUrl: string) => {
 		const next = [...(formData.images || [])];
-		if (!next[index]) return;
+		if (!next[index]) {
+			return;
+		}
 		next[index] = { ...next[index], linkUrl };
 		setFormData({ ...formData, images: next });
 	};
@@ -171,9 +214,18 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 		const next = [...(formData.images || [])];
 		next.splice(index, 1);
 		setFormData({ ...formData, images: next });
+		if (formData.layout === "single") {
+			setShowInputsSingle(next.length === 0);
+		}
 	};
 
 	const handleSave = async () => {
+		if (propMode === "edit" && didSubmit) {
+			return;
+		}
+		if (propMode === "edit") {
+			setDidSubmit(true);
+		}
 		setIsLoading(true);
 		try {
 			await onSave();
@@ -204,65 +256,130 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 				<div className="grid gap-3">
 					{formData.layout === "single" ? (
 						<div className="grid gap-4">
-							<div className="grid gap-2">
-								<Label>Upload de imagem</Label>
-								<Input
-									accept={ACCEPTED_IMAGE_TYPES.join(",")}
-									onChange={(e) => {
-										const files = e.target.files;
-										if (files) uploadFiles(files);
-									}}
-									type="file"
-								/>
-								{uploadError && (
-									<p className="text-destructive text-xs">{uploadError}</p>
-								)}
-							</div>
-							<div className="grid gap-2">
-								<Label>Ou usar URL</Label>
-								<div className="flex gap-2">
-									<Input
-										onBlur={(e) => handleUrlAddSingle(e.target.value)}
-										placeholder="https://..."
-									/>
+							{showInputsSingle && (
+								<>
+									<div className="grid gap-2">
+										<Label>Upload de imagem</Label>
+										<input
+											accept={ACCEPTED_IMAGE_TYPES.join(",")}
+											className="hidden"
+											onChange={(e) => {
+												const files = e.target.files;
+												if (files) {
+													uploadFiles(files);
+												}
+											}}
+											ref={fileInputSingleRef}
+											type="file"
+										/>
+										<div
+											className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+												isDragOverSingle
+													? "border-emerald-500 bg-emerald-50"
+													: "border-gray-300 hover:bg-muted/30"
+											}`}
+											onClick={() => fileInputSingleRef.current?.click()}
+											onDragLeave={(e) => {
+												e.preventDefault();
+												setIsDragOverSingle(false);
+											}}
+											onDragOver={(e) => {
+												e.preventDefault();
+												setIsDragOverSingle(true);
+											}}
+											onDrop={(e) => {
+												e.preventDefault();
+												setIsDragOverSingle(false);
+												const files = e.dataTransfer.files;
+												if (files && files.length > 0) {
+													uploadFiles(files);
+												}
+											}}
+											role="none"
+										>
+											<Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+											<p className="mt-2 font-medium">
+												Arraste uma imagem ou clique para selecionar
+											</p>
+											<p className="text-muted-foreground text-sm">
+												Formatos: JPG, PNG, GIF, SVG, WebP, etc.
+											</p>
+										</div>
+										{uploadError && (
+											<p className="text-destructive text-xs">{uploadError}</p>
+										)}
+									</div>
+									{/* Removido: opção de adicionar por URL */}
+								</>
+							)}
+							{!showInputsSingle && (
+								<div className="flex justify-end">
 									<BaseButton
-										onClick={() => {
-											const el = document.querySelector<HTMLInputElement>(
-												"input[placeholder='https://...']"
-											);
-											if (el) handleUrlAddSingle(el.value);
-										}}
+										onClick={() => setShowInputsSingle(true)}
+										variant="white"
 									>
-										Adicionar
+										Alterar imagem
 									</BaseButton>
 								</div>
-							</div>
+							)}
 						</div>
 					) : (
 						<div className="grid gap-4">
-							<div className="grid gap-2">
-								<Label>Upload de imagens</Label>
-								<Input
-									accept={ACCEPTED_IMAGE_TYPES.join(",")}
-									multiple
-									onChange={(e) => {
-										const files = e.target.files;
-										if (files) uploadFiles(files);
-									}}
-									type="file"
-								/>
-								{uploadError && (
-									<p className="text-destructive text-xs">{uploadError}</p>
-								)}
-							</div>
-							<div className="grid gap-2">
-								<Label>URLs das imagens</Label>
-								<Textarea
-									className="min-h-[80px] resize-none"
-									onBlur={(e) => handleUrlAddMultiple(e.target.value)}
-									placeholder="Cole uma ou várias URLs (uma por linha ou separadas por vírgula)"
-								/>
-							</div>
+							{(formData.images || []).length < maxImages && (
+								<div className="grid gap-2">
+									<Label>Upload de imagens</Label>
+									<input
+										accept={ACCEPTED_IMAGE_TYPES.join(",")}
+										className="hidden"
+										multiple
+										onChange={(e) => {
+											const files = e.target.files;
+											if (files) {
+												uploadFiles(files);
+											}
+										}}
+										ref={fileInputMultipleRef}
+										type="file"
+									/>
+									<div
+										className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+											isDragOverMultiple
+												? "border-emerald-500 bg-emerald-50"
+												: "border-gray-300 hover:bg-muted/30"
+										}`}
+										onClick={() => fileInputMultipleRef.current?.click()}
+										onDragLeave={(e) => {
+											e.preventDefault();
+											setIsDragOverMultiple(false);
+										}}
+										onDragOver={(e) => {
+											e.preventDefault();
+											setIsDragOverMultiple(true);
+										}}
+										onDrop={(e) => {
+											e.preventDefault();
+											setIsDragOverMultiple(false);
+											const files = e.dataTransfer.files;
+											if (files && files.length > 0) {
+												uploadFiles(files);
+											}
+										}}
+										role="none"
+									>
+										<Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+										<p className="mt-2 font-medium">
+											Arraste imagens ou clique para selecionar
+										</p>
+										<p className="text-muted-foreground text-sm">
+											Formatos: JPG, PNG, GIF, SVG, WebP, etc.
+										</p>
+									</div>
+									{uploadError && (
+										<p className="text-destructive text-xs">{uploadError}</p>
+									)}
+								</div>
+							)}
+							{/* Removido: opção de adicionar múltiplas imagens por URL */}
 						</div>
 					)}
 
@@ -275,10 +392,10 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 										className="flex items-center gap-3"
 										key={`${img.url}-${idx}`}
 									>
-										<div className="relative h-12 w-12 overflow-hidden rounded">
+										<div className="relative h-28 w-28 overflow-hidden rounded">
 											<Image
 												alt={`Imagem ${idx + 1}`}
-												className="h-12 w-12 object-cover"
+												className="h-28 w-28 object-cover"
 												height={48}
 												src={img.url}
 												width={48}
@@ -289,12 +406,15 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 											placeholder="URL do link (opcional)"
 											value={img.linkUrl || ""}
 										/>
-										<BaseButton
-											onClick={() => removeImage(idx)}
-											variant="white"
-										>
-											Remover
-										</BaseButton>
+										{!(propMode === "edit" && formData.layout === "single") && (
+											<BaseButton
+												className="h-10"
+												onClick={() => removeImage(idx)}
+												variant="white"
+											>
+												Remover
+											</BaseButton>
+										)}
 									</div>
 								))}
 							</div>
@@ -363,17 +483,21 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 						<Label htmlFor="size">Tamanho (%)</Label>
 						<input
 							id="size"
-							max={120}
+							max={100}
 							min={50}
-							onChange={(e) =>
+							onChange={(e) => {
+								const next = Math.max(
+									50,
+									Math.min(100, Number(e.target.value))
+								);
 								setFormData({
 									...formData,
-									sizePercent: Number(e.target.value),
-								})
-							}
+									sizePercent: next,
+								});
+							}}
 							step={5}
 							type="range"
-							value={formData.sizePercent}
+							value={Math.max(50, Math.min(100, formData.sizePercent))}
 						/>
 						<p className="text-muted-foreground text-xs">
 							{formData.sizePercent}%
@@ -403,9 +527,23 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 
 			<div className="flex-shrink-0 border-t pt-3">
 				<div className="flex gap-3">
+					{typeof propOnSave === "function" && props.onCancel && (
+						<BaseButton
+							className="flex-1"
+							onClick={() => {
+								setDidSubmit(false);
+								setShowInputsSingle(false);
+								props.onCancel?.();
+							}}
+							type="button"
+							variant="white"
+						>
+							Cancelar
+						</BaseButton>
+					)}
 					<BaseButton
 						className="flex-1"
-						disabled={isSaveDisabled}
+						disabled={isSaveDisabled || (propMode === "edit" && didSubmit)}
 						loading={isLoading}
 						onClick={handleSave}
 					>

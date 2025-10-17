@@ -119,6 +119,7 @@ const LinksTabContent = ({
 				activeId={activeId}
 				archivingLinkId={archivingLinkId}
 				items={unifiedItems}
+				existingSections={existingSections}
 				linksManager={{
 					isAdding,
 					formData,
@@ -134,6 +135,7 @@ const LinksTabContent = ({
 				onCancelEditing={handlers.handleCancelEditing}
 				onCancelEditingText={handlers.handleCancelEditingText}
 				onCancelEditingVideo={handlers.handleCancelEditingVideo}
+				onCancelEditingImage={handlers.handleCancelEditingImage}
 				onClickLink={handlers.handleClickLink}
 				onDeleteLink={handlers.handleDeleteLink}
 				onDeleteText={handlers.handleDeleteText}

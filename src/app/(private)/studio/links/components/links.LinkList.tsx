@@ -99,7 +99,7 @@ interface LinkListProps {
 		field: "title" | "description",
 		value: string
 	) => void;
-	onSaveEditingImage?: (id: number, title: string, description: string) => void;
+	onSaveEditingImage?: (id: number, payload: Partial<ImageItem>) => void;
 	onCancelEditingImage?: (id: number) => void;
 	togglingImageId?: number | null;
 	togglingLinkId?: number | null;
@@ -109,6 +109,7 @@ interface LinkListProps {
 	originalText?: TextItem | null;
 	originalVideo?: VideoItem | null;
 	originalImage?: ImageItem | null;
+	existingSections?: SectionItem[];
 }
 
 const LinkList = (props: LinkListProps) => {
@@ -143,6 +144,7 @@ const LinkList = (props: LinkListProps) => {
 		originalText,
 		originalVideo,
 		originalImage,
+		existingSections,
 		...cardProps
 	} = props;
 
@@ -343,6 +345,7 @@ const LinkList = (props: LinkListProps) => {
 										if ((item as any).isImage) {
 											return (
 												<ImageCard
+													existingSections={existingSections}
 													image={item as ImageItem}
 													isDragging={isDragging}
 													isTogglingActive={togglingImageId === item.id}

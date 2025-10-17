@@ -584,8 +584,11 @@ export const useLinksManager = (
 		}
 
 		// Para layout "single", garantir apenas 1 imagem
+		const maxCount = imageFormData.layout === "single" ? 1 : 10;
 		const items = (
-			imageFormData.layout === "single" ? images.slice(0, 1) : images
+			imageFormData.layout === "single"
+				? images.slice(0, 1)
+				: images.slice(0, maxCount)
 		).map((img) => {
 			const raw = img.linkUrl?.trim();
 			let linkUrl = raw && raw.length > 0 ? raw : null;
@@ -611,7 +614,7 @@ export const useLinksManager = (
 				description: imageFormData.description.trim() || null,
 				layout: imageFormData.layout,
 				ratio: imageFormData.ratio,
-				sizePercent: imageFormData.sizePercent,
+				sizePercent: Math.max(50, Math.min(100, imageFormData.sizePercent)),
 				sectionId: imageFormData.sectionId,
 				items,
 			}),
@@ -785,14 +788,38 @@ export const useLinksManager = (
 
 	const handleSaveEditingImage = async (
 		id: number,
-		title: string,
-		description: string
+		payload: Partial<ImageItem>
 	) => {
-		await handleImageUpdate(id, {
-			title,
-			description,
-			isEditing: false as any,
-		});
+		const next: Partial<ImageItem> = { ...payload };
+		if (typeof next.sizePercent === "number") {
+			next.sizePercent = Math.max(50, Math.min(100, next.sizePercent));
+		}
+		if (Array.isArray(next.items)) {
+			const maxCount = next.layout === "single" ? 1 : 10;
+			next.items = (next.items || []).slice(0, maxCount).map((img) => {
+				const raw = (img.linkUrl || "").trim();
+				let linkUrl = raw.length > 0 ? raw : null;
+				if (linkUrl) {
+					if (!urlProtocolRegex.test(linkUrl)) {
+						linkUrl = `https://${linkUrl}`;
+					}
+					if (!isValidUrl(linkUrl)) {
+						linkUrl = null;
+					}
+				}
+				return { ...img, linkUrl } as any;
+			});
+		}
+		// Fechar edição imediatamente no estado local para melhor UX
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if ((item as any).isImage && item.id === id) {
+					return { ...(item as any), ...next, isEditing: false } as any;
+				}
+				return item;
+			})
+		);
+		await handleImageUpdate(id, next);
 	};
 
 	const handleCancelEditingImage = (id: number) => {
