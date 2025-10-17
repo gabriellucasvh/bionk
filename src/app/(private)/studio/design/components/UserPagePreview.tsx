@@ -669,7 +669,7 @@ function ContentList({
 						style={wrapperStyle}
 					>
 						{header}
-						<div className="rounded-lg border p-1" style={buttonStyle}>
+						<div className="overflow-hidden" style={buttonStyle}>
 							{renderImageItem(image?.items?.[0], image?.ratio)}
 						</div>
 					</div>
@@ -685,7 +685,7 @@ function ContentList({
 						<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
 							{(image?.items || []).map((img: any, idx: number) => (
 								<div
-									className="overflow-hidden rounded-lg border p-1"
+									className="overflow-hidden border p-1"
 									key={`img-${image.id}-${idx}`}
 									style={buttonStyle}
 								>
@@ -706,7 +706,7 @@ function ContentList({
 						<div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
 							{(image?.items || []).map((img: any, idx: number) => (
 								<div
-									className="w-64 flex-shrink-0 snap-center overflow-hidden rounded-lg border p-1"
+									className="w-64 flex-shrink-0 snap-center overflow-hidden border p-1"
 									key={`img-${image.id}-${idx}`}
 									style={buttonStyle}
 								>

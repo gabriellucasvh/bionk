@@ -1,8 +1,12 @@
 "use client";
 
-import { Lock, SquareArrowOutUpRight } from "lucide-react";
+import {
+	ChevronRight,
+	Images,
+	Lock,
+	SquareArrowOutUpRight,
+} from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import { FONT_OPTIONS } from "@/app/(private)/studio/design/constants/design.constants";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -537,9 +541,13 @@ function LinksList({
 
 	// Helpers para imagens
 	const normalizeExternalUrl = (url?: string | null): string | null => {
-		if (!url) return null;
+		if (!url) {
+			return null;
+		}
 		const trimmed = url.trim();
-		if (!trimmed) return null;
+		if (!trimmed) {
+			return null;
+		}
 		// Mantém protocolos válidos e URLs protocol-relative
 		if (/^(https?:\/\/|mailto:|tel:|\/\/)/i.test(trimmed)) {
 			return trimmed;
@@ -611,6 +619,8 @@ function LinksList({
 			marginRight: "auto",
 		};
 
+		const cornerValue = customPresets?.customButtonCorners || "12";
+
 		const header = (
 			<div className="mb-2 text-center" style={textStyle}>
 				{image.title ? (
@@ -622,21 +632,8 @@ function LinksList({
 			</div>
 		);
 
-			switch (image.layout) {
-				case "single":
-					return (
-						<div
-							className="w-full"
-							key={`image-${image.id}`}
-							style={wrapperStyle}
-						>
-							{header}
-							<div className="overflow-hidden" style={buttonStyle}>
-								{renderImageItem(image.items?.[0], image.ratio)}
-							</div>
-						</div>
-					);
-			case "column":
+		switch (image.layout) {
+			case "single":
 				return (
 					<div
 						className="w-full"
@@ -644,17 +641,71 @@ function LinksList({
 						style={wrapperStyle}
 					>
 						{header}
-						<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-							{(image.items || []).map((img: any, idx: number) => (
+						<div className="overflow-hidden" style={buttonStyle}>
+							{renderImageItem(image.items?.[0], image.ratio)}
+						</div>
+					</div>
+				);
+			case "column":
+				return (
+					<div
+						className="w-full"
+						key={`image-${image.id}`}
+						style={{ marginLeft: "auto", marginRight: "auto" }}
+					>
+						<details>
+							<summary className="list-none">
 								<div
-									className="overflow-hidden border p-1"
-									key={`img-${image.id}-${idx}`}
+									className={cn(
+										"group relative w-full rounded-xl p-1 shadow-md transition-all duration-200 hover:cursor-pointer hover:brightness-110"
+									)}
 									style={buttonStyle}
 								>
-									{renderImageItem(img, image.ratio)}
+									<div className="relative z-10 flex h-full w-full items-center">
+										<div className="flex-shrink-0">
+											<div className="ml-1 size-13" />
+										</div>
+										<div className="flex flex-1 justify-center">
+											<h3 className="line-clamp-2 select-none px-2 font-medium leading-tight">
+												{image.title || "Imagens"}
+											</h3>
+										</div>
+										<div className="w-10 flex-shrink-0" />
+									</div>
+
+									{/* Ícone à direita, absoluto como nos outros cards */}
+									<div
+										aria-hidden
+										className="-translate-y-1/2 absolute top-1/2 right-3 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
+									>
+										<Images className="size-5" />
+									</div>
 								</div>
-							))}
-						</div>
+							</summary>
+
+							<div style={wrapperStyle}>
+								{image.description ? (
+									<p
+										className="my-4 text-center text-sm opacity-80"
+										style={textStyle}
+									>
+										{image.description}
+									</p>
+								) : null}
+
+								<div className="mt-2 space-y-3">
+									{(image.items || []).map((img: any, idx: number) => (
+										<div
+											className="overflow-hidden"
+											key={`img-${image.id}-${idx}`}
+											style={{ borderRadius: `${cornerValue}px` }}
+										>
+											{renderImageItem(img, image.ratio)}
+										</div>
+									))}
+								</div>
+							</div>
+						</details>
 					</div>
 				);
 			case "carousel":
@@ -665,16 +716,32 @@ function LinksList({
 						style={wrapperStyle}
 					>
 						{header}
-						<div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-							{(image.items || []).map((img: any, idx: number) => (
-								<div
-									className="w-64 flex-shrink-0 snap-center overflow-hidden border p-1"
-									key={`img-${image.id}-${idx}`}
-									style={buttonStyle}
-								>
-									{renderImageItem(img, image.ratio)}
-								</div>
-							))}
+						<div className="relative">
+							<div
+								className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-3"
+								id={`carousel-${image.id}`}
+							>
+								{(image.items || []).map((img: any, idx: number) => (
+									<div
+										className="w-64 flex-shrink-0 snap-center overflow-hidden"
+										key={`img-${image.id}-${idx}`}
+										style={{ borderRadius: `${cornerValue}px` }}
+									>
+										{renderImageItem(img, image.ratio)}
+									</div>
+								))}
+							</div>
+							<button
+								aria-label="Avançar"
+								className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-white/80 p-2 shadow-md"
+								onClick={() => {
+									const el = document.getElementById(`carousel-${image.id}`);
+									el?.scrollBy({ left: 240, behavior: "smooth" });
+								}}
+								type="button"
+							>
+								<ChevronRight className="h-5 w-5 text-black" />
+							</button>
 						</div>
 					</div>
 				);
