@@ -47,6 +47,8 @@ interface LinkListProps {
 	onToggleActive: (id: number, isActive: boolean) => Promise<void>;
 
 	onLinkChange: (id: number, field: "title" | "url", value: string) => void;
+	// Novo handler para campos avançados do link
+	onLinkAdvancedChange?: (id: number, payload: Partial<LinkItem>) => void;
 	onCancelEditing: (id: number) => void;
 	onStartEditing: (id: number) => void;
 	onClickLink: (id: number) => void;

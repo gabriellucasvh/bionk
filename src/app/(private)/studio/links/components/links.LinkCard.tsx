@@ -10,6 +10,7 @@ import {
 	MoreVertical,
 	MousePointerClick,
 	Save,
+	Tags,
 	Trash2,
 	X,
 	Zap,
@@ -41,6 +42,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
@@ -54,6 +62,7 @@ interface LinkCardProps {
 	listeners: any;
 	setActivatorNodeRef: (element: HTMLElement | null) => void;
 	onLinkChange: (id: number, field: "title" | "url", value: string) => void;
+	onLinkAdvancedChange?: (id: number, payload: Partial<LinkItem>) => void;
 	onSaveEditing: (id: number, title: string, url: string) => void;
 	onCancelEditing: (id: number) => void;
 	onStartEditing: (id: number) => void;
@@ -96,6 +105,7 @@ const CountdownTimer = ({
 const EditingView = ({
 	link,
 	onLinkChange,
+	onLinkAdvancedChange,
 	onSaveEditing,
 	onCancelEditing,
 	originalLink,
@@ -110,9 +120,37 @@ const EditingView = ({
 >) => {
 	const [isLoading, setIsLoading] = useState(false);
 
+	const toInputValue = (iso?: string | null) => {
+		if (!iso) {
+			return "";
+		}
+		const d = new Date(iso);
+		const pad = (n: number) => `${n}`.padStart(2, "0");
+		return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
+			d.getHours()
+		)}:${pad(d.getMinutes())}`;
+	};
+
 	const hasChanges = originalLink
-		? link.title !== originalLink.title || link.url !== originalLink.url
+		? link.title !== originalLink.title ||
+			(link.url || "") !== (originalLink.url || "") ||
+			(link.badge || null) !== (originalLink.badge || null) ||
+			(link.password || null) !== (originalLink.password || null) ||
+			(link.deleteOnClicks ?? null) !== (originalLink.deleteOnClicks ?? null) ||
+			(link.launchesAt || null) !== (originalLink.launchesAt || null) ||
+			(link.expiresAt || null) !== (originalLink.expiresAt || null)
 		: true;
+
+	// Toggles para opções avançadas
+	const [passwordEnabled, setPasswordEnabled] = useState(
+		!!(link.password && link.password.length > 0)
+	);
+	const [expiresEnabled, setExpiresEnabled] = useState(!!link.expiresAt);
+	const [deleteClicksEnabled, setDeleteClicksEnabled] = useState(
+		!!link.deleteOnClicks
+	);
+	const [badgeEnabled, setBadgeEnabled] = useState(!!link.badge);
+	const [launchEnabled, setLaunchEnabled] = useState(!!link.launchesAt);
 
 	const handleSave = async () => {
 		setIsLoading(true);
@@ -127,26 +165,272 @@ const EditingView = ({
 		<div className="flex flex-col gap-3 rounded-lg border-2 border-foreground/20 p-3 sm:p-4">
 			<div className="space-y-3">
 				<div className="space-y-1.5">
-					<div className="space-y-1">
-						<Input
-							maxLength={80}
-							onChange={(e) => onLinkChange(link.id, "title", e.target.value)}
-							placeholder="Título"
-							value={link.title}
-						/>
-						<p className="text-muted-foreground text-xs">
-							{link.title.length}/80 caracteres
+					{/* Campos principais com labels */}
+					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+						<div className="grid gap-2">
+							<Label htmlFor="title">Título *</Label>
+							<Input
+								className="bg-white dark:bg-[#202020]"
+								id="title"
+								maxLength={80}
+								onChange={(e) => onLinkChange(link.id, "title", e.target.value)}
+								placeholder="Ex: Meu Portfólio"
+								value={link.title}
+							/>
+							<p className="mt-1 text-muted-foreground text-xs">
+								{link.title.length}/80 caracteres
+							</p>
+						</div>
+						<div className="grid gap-2">
+							<Label htmlFor="url">URL *</Label>
+							<Input
+								className="bg-white dark:bg-[#202020]"
+								id="url"
+								onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
+								placeholder="https://exemplo.com"
+								type="url"
+								value={link.url || ""}
+							/>
+							<div className="mt-1 h-4" />
+						</div>
+					</div>
+
+					{/* Opções Avançadas */}
+					<div className="border-t pt-3">
+						<p className="text-center font-medium text-muted-foreground text-xs">
+							OPÇÕES AVANÇADAS
 						</p>
 					</div>
-					<div className="space-y-1">
-						<Input
-							onChange={(e) => onLinkChange(link.id, "url", e.target.value)}
-							placeholder="URL"
-							value={link.url || ""}
-						/>
-						<div className="h-4" />
+
+					{/* Proteger com Senha */}
+					<div className="rounded-md border p-3">
+						<div className="flex items-center justify-between gap-3">
+							<div className="flex items-center gap-3">
+								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300">
+									<Lock className="h-5 w-5" />
+								</div>
+								<div>
+									<div className="font-medium">Proteger com Senha</div>
+									<div className="text-muted-foreground text-sm">
+										Exigir senha para acessar o link
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={passwordEnabled}
+								onCheckedChange={(v) => {
+									setPasswordEnabled(v);
+									if (!v) {
+										onLinkAdvancedChange?.(link.id, { password: "" });
+									}
+								}}
+							/>
+						</div>
+						{passwordEnabled && (
+							<div className="mt-2">
+								<div className="grid gap-2">
+									<Label htmlFor="password">Senha de Acesso</Label>
+									<Input
+										id="password"
+										onChange={(e) =>
+											onLinkAdvancedChange?.(link.id, {
+												password: e.target.value,
+											})
+										}
+										placeholder="••••••••"
+										type="password"
+										value={link.password || ""}
+									/>
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* Data de Expiração */}
+					<div className="rounded-md border p-3">
+						<div className="flex items-center justify-between gap-3">
+							<div className="flex items-center gap-3">
+								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+									<Clock className="h-5 w-5" />
+								</div>
+								<div>
+									<div className="font-medium">Data de Expiração</div>
+									<div className="text-muted-foreground text-sm">
+										Link será excluído automaticamente
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={expiresEnabled}
+								onCheckedChange={(v) => {
+									setExpiresEnabled(v);
+									if (!v) {
+										onLinkAdvancedChange?.(link.id, { expiresAt: null });
+									}
+								}}
+							/>
+						</div>
+						{expiresEnabled && (
+							<div className="mt-2">
+								<div className="grid gap-2">
+									<Label htmlFor="expiresAt">Expira em</Label>
+									<Input
+										id="expiresAt"
+										onChange={(e) =>
+											onLinkAdvancedChange?.(link.id, {
+												expiresAt: e.target.value || null,
+											})
+										}
+										type="datetime-local"
+										value={toInputValue(link.expiresAt)}
+									/>
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* Limite de Cliques */}
+					<div className="rounded-md border p-3">
+						<div className="flex items-center justify-between gap-3">
+							<div className="flex items-center gap-3">
+								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
+									<MousePointerClick className="h-5 w-5" />
+								</div>
+								<div>
+									<div className="font-medium">Limite de Cliques</div>
+									<div className="text-muted-foreground text-sm">
+										Excluir após X cliques
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={deleteClicksEnabled}
+								onCheckedChange={(v) => {
+									setDeleteClicksEnabled(v);
+									if (!v) {
+										onLinkAdvancedChange?.(link.id, { deleteOnClicks: null });
+									}
+								}}
+							/>
+						</div>
+						{deleteClicksEnabled && (
+							<div className="mt-2">
+								<div className="grid gap-2">
+									<Label htmlFor="deleteOnClicks">Excluir após X cliques</Label>
+									<Input
+										id="deleteOnClicks"
+										min={1}
+										onChange={(e) =>
+											onLinkAdvancedChange?.(link.id, {
+												deleteOnClicks: e.target.value
+													? Number(e.target.value)
+													: null,
+											})
+										}
+										placeholder="Ex: 100"
+										type="number"
+										value={link.deleteOnClicks ?? ""}
+									/>
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* Adicionar Badge */}
+					<div className="rounded-md border p-3">
+						<div className="flex items-center justify-between gap-3">
+							<div className="flex items-center gap-3">
+								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+									<Tags className="h-5 w-5" />
+								</div>
+								<div>
+									<div className="font-medium">Adicionar Badge</div>
+									<div className="text-muted-foreground text-sm">
+										Destaque o link com uma etiqueta
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={badgeEnabled}
+								onCheckedChange={(v) => {
+									setBadgeEnabled(v);
+									if (!v) {
+										onLinkAdvancedChange?.(link.id, { badge: null });
+									}
+								}}
+							/>
+						</div>
+						{badgeEnabled && (
+							<div className="mt-2">
+								<div className="grid gap-2">
+									<Label htmlFor="badge">Badge</Label>
+									<Select
+										onValueChange={(val) =>
+											onLinkAdvancedChange?.(link.id, { badge: val as any })
+										}
+										value={link.badge ?? undefined}
+									>
+										<SelectTrigger>
+											<SelectValue placeholder="Selecione um badge" />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="promovido">promovido</SelectItem>
+											<SelectItem value="15% off">15% off</SelectItem>
+											<SelectItem value="expirando">expirando</SelectItem>
+										</SelectContent>
+									</Select>
+									<p className="text-muted-foreground text-xs">
+										Máximo de 12 caracteres.
+									</p>
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* Lançamento */}
+					<div className="rounded-md border p-3">
+						<div className="flex items-center justify-between gap-3">
+							<div className="flex items-center gap-3">
+								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+									<Clock className="h-5 w-5" />
+								</div>
+								<div>
+									<div className="font-medium">Lançamento</div>
+									<div className="text-muted-foreground text-sm">
+										Link será lançado automaticamente
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={launchEnabled}
+								onCheckedChange={(v) => {
+									setLaunchEnabled(v);
+									if (!v) {
+										onLinkAdvancedChange?.(link.id, { launchesAt: null });
+									}
+								}}
+							/>
+						</div>
+						{launchEnabled && (
+							<div className="mt-2">
+								<div className="grid gap-2">
+									<Label htmlFor="launchesAt">Lançamento Agendado</Label>
+									<Input
+										id="launchesAt"
+										onChange={(e) =>
+											onLinkAdvancedChange?.(link.id, {
+												launchesAt: e.target.value || null,
+											})
+										}
+										type="datetime-local"
+										value={toInputValue(link.launchesAt)}
+									/>
+								</div>
+							</div>
+						)}
 					</div>
 				</div>
+
 				<div className="flex justify-end gap-2">
 					<BaseButton
 						onClick={() => onCancelEditing(link.id)}

@@ -13,6 +13,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import type { SectionItem } from "../types/links.types";
 
@@ -44,113 +45,12 @@ interface AddNewLinkFormProps {
 	};
 }
 
-type ActiveOption = "schedule" | "protect" | "badge";
 type PanelProps = {
 	formData: LinkFormData;
 	setFormData: (data: LinkFormData) => void;
 };
 
 // --- Subcomponentes para cada painel de opção ---
-
-const SchedulePanel = ({ formData, setFormData }: PanelProps) => {
-	const handleDateChange = (field: "expiresAt" | "launchesAt", date?: Date) => {
-		setFormData({ ...formData, [field]: date });
-	};
-	return (
-		<div className="grid grid-cols-1 gap-4 rounded-md border bg-background/50 p-3 sm:grid-cols-2">
-			<div>
-				<Label className="mb-2">Lançamento Agendado</Label>
-				<Popover>
-					<PopoverTrigger asChild>
-						<Button
-							className={cn(
-								"w-full justify-start text-left font-normal",
-								!formData.launchesAt && "text-muted-foreground"
-							)}
-							variant="outline"
-						>
-							<CalendarIcon className="mr-2 h-4 w-4" />
-							{formData.launchesAt ? (
-								format(formData.launchesAt, "PPP")
-							) : (
-								<span>Escolha uma data</span>
-							)}
-						</Button>
-					</PopoverTrigger>
-					<PopoverContent className="z-[60] w-auto p-0">
-						<Calendar
-							initialFocus
-							mode="single"
-							onSelect={(date) => handleDateChange("launchesAt", date)}
-							selected={formData.launchesAt}
-						/>
-					</PopoverContent>
-				</Popover>
-			</div>
-			<div>
-				<Label className="mb-2">Expira em</Label>
-				<Popover>
-					<PopoverTrigger asChild>
-						<Button
-							className={cn(
-								"w-full justify-start text-left font-normal",
-								!formData.expiresAt && "text-muted-foreground"
-							)}
-							variant="outline"
-						>
-							<CalendarIcon className="mr-2 h-4 w-4" />
-							{formData.expiresAt ? (
-								format(formData.expiresAt, "PPP")
-							) : (
-								<span>Escolha uma data</span>
-							)}
-						</Button>
-					</PopoverTrigger>
-					<PopoverContent className="z-[60] w-auto p-0">
-						<Calendar
-							initialFocus
-							mode="single"
-							onSelect={(date) => handleDateChange("expiresAt", date)}
-							selected={formData.expiresAt}
-						/>
-					</PopoverContent>
-				</Popover>
-			</div>
-		</div>
-	);
-};
-
-const ProtectPanel = ({ formData, setFormData }: PanelProps) => (
-	<div className="grid grid-cols-1 gap-4 rounded-md border bg-background/50 p-3 sm:grid-cols-2">
-		<div className="grid gap-2">
-			<Label htmlFor="deleteOnClicks">Excluir após X cliques</Label>
-			<Input
-				id="deleteOnClicks"
-				min={1}
-				onChange={(e) =>
-					setFormData({
-						...formData,
-						deleteOnClicks:
-							Number(e.target.value) >= 1 ? Number(e.target.value) : undefined,
-					})
-				}
-				placeholder="Ex: 100"
-				type="number"
-				value={formData.deleteOnClicks || ""}
-			/>
-		</div>
-		<div className="grid gap-2">
-			<Label htmlFor="password">Senha de Acesso</Label>
-			<Input
-				id="password"
-				onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-				placeholder="••••••••"
-				type="password"
-				value={formData.password || ""}
-			/>
-		</div>
-	</div>
-);
 
 const BadgePanel = ({ formData, setFormData }: PanelProps) => (
 	<div className="grid gap-2 rounded-md border bg-background/50 p-3">
@@ -165,6 +65,72 @@ const BadgePanel = ({ formData, setFormData }: PanelProps) => (
 		<p className="mt-1 text-muted-foreground text-xs">
 			Máximo de 12 caracteres.
 		</p>
+	</div>
+);
+
+// Painéis específicos para cada opção avançada
+const PasswordPanel = ({ formData, setFormData }: PanelProps) => (
+	<div className="grid gap-2 rounded-md border bg-background/50 p-3">
+		<Label htmlFor="password">Senha de Acesso</Label>
+		<Input
+			id="password"
+			onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+			placeholder="••••••••"
+			type="password"
+			value={formData.password || ""}
+		/>
+	</div>
+);
+
+const ClicksPanel = ({ formData, setFormData }: PanelProps) => (
+	<div className="grid gap-2 rounded-md border bg-background/50 p-3">
+		<Label htmlFor="deleteOnClicks">Excluir após X cliques</Label>
+		<Input
+			id="deleteOnClicks"
+			min={1}
+			onChange={(e) =>
+				setFormData({
+					...formData,
+					deleteOnClicks:
+						Number(e.target.value) >= 1 ? Number(e.target.value) : undefined,
+				})
+			}
+			placeholder="Ex: 100"
+			type="number"
+			value={formData.deleteOnClicks || ""}
+		/>
+	</div>
+);
+
+const ExpirePanel = ({ formData, setFormData }: PanelProps) => (
+	<div className="grid gap-2 rounded-md border bg-background/50 p-3">
+		<Label className="mb-2">Data de Expiração</Label>
+		<Popover>
+			<PopoverTrigger asChild>
+				<Button
+					className={cn(
+						"w-full justify-start text-left font-normal",
+						!formData.expiresAt && "text-muted-foreground"
+					)}
+					variant="outline"
+				>
+					<CalendarIcon className="mr-2 h-4 w-4" />
+					{formData.expiresAt ? (
+						format(formData.expiresAt, "PPP")
+					) : (
+						<span>Escolha uma data</span>
+					)}
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className="z-[60] w-auto p-0">
+				<Calendar
+					initialFocus
+					mode="single"
+					onSelect={(date) => setFormData({ ...formData, expiresAt: date })}
+					selected={formData.expiresAt}
+				/>
+			</PopoverContent>
+		</Popover>
 	</div>
 );
 
@@ -187,9 +153,11 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 	const isSaveDisabled = props.isSaveDisabled ?? false;
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [activeOption, setActiveOption] = useState<ActiveOption | null>(null);
-
-	// Função para limpar os dados do formulário
+	// Estados de toggle das opções avançadas
+	const [passwordEnabled, setPasswordEnabled] = useState(false);
+	const [expiresEnabled, setExpiresEnabled] = useState(false);
+	const [deleteClicksEnabled, setDeleteClicksEnabled] = useState(false);
+	const [badgeEnabled, setBadgeEnabled] = useState(false);
 
 	const handleSave = async () => {
 		setIsLoading(true);
@@ -200,15 +168,6 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 		}
 	};
 
-	const toggleOption = (option: ActiveOption) =>
-		setActiveOption(activeOption === option ? null : option);
-
-	const optionPanels: Record<ActiveOption, React.ReactNode> = {
-		schedule: <SchedulePanel formData={formData} setFormData={setFormData} />,
-		protect: <ProtectPanel formData={formData} setFormData={setFormData} />,
-		badge: <BadgePanel formData={formData} setFormData={setFormData} />,
-	};
-
 	return (
 		<div className="flex h-full flex-col space-y-4">
 			<div className="flex-1 space-y-3 overflow-y-auto">
@@ -216,7 +175,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					{/* Campos Principais */}
 					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 						<div className="grid gap-2">
-							<Label htmlFor="title">Título do Link</Label>
+							<Label htmlFor="title">Título *</Label>
 							<Input
 								className="bg-white dark:bg-[#202020]"
 								id="title"
@@ -232,7 +191,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 							</p>
 						</div>
 						<div className="grid gap-2">
-							<Label htmlFor="url">URL</Label>
+							<Label htmlFor="url">URL *</Label>
 							<Input
 								className="bg-white dark:bg-[#202020]"
 								id="url"
@@ -247,36 +206,128 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 						</div>
 					</div>
 
-					{/* Botões de Opções Avançadas */}
-					<div className="grid grid-cols-3 gap-2 border-t pt-3">
-						<Button
-							className="flex h-16 flex-col"
-							onClick={() => toggleOption("schedule")}
-							variant={activeOption === "schedule" ? "secondary" : "outline"}
-						>
-							<Clock className="mb-1 h-5 w-5" />{" "}
-							<span className="hidden text-xs md:block">Agendar</span>
-						</Button>
-						<Button
-							className="flex h-16 flex-col"
-							onClick={() => toggleOption("protect")}
-							variant={activeOption === "protect" ? "secondary" : "outline"}
-						>
-							<Lock className="mb-1 h-5 w-5" />{" "}
-							<span className="hidden text-xs md:block">Proteger</span>
-						</Button>
-						<Button
-							className="flex h-16 flex-col"
-							onClick={() => toggleOption("badge")}
-							variant={activeOption === "badge" ? "secondary" : "outline"}
-						>
-							<Tags className="mb-1 h-5 w-5" />{" "}
-							<span className="hidden text-xs md:block">Badge</span>
-						</Button>
+					{/* Opções Avançadas */}
+					<div className="border-t pt-3">
+						<p className="text-center font-medium text-muted-foreground text-xs">
+							OPÇÕES AVANÇADAS
+						</p>
 					</div>
 
-					{/* Conteúdo das Opções */}
-					{activeOption && optionPanels[activeOption]}
+					{/* Proteger com Senha */}
+					<div className="rounded-md border p-3">
+						<div className="flex items-start justify-between gap-3">
+							<div className="flex items-start gap-3">
+								<Lock className="mt-0.5 h-5 w-5" />
+								<div>
+									<div className="font-medium">Proteger com Senha</div>
+									<div className="text-muted-foreground text-sm">
+										Exigir senha para acessar o link
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={passwordEnabled}
+								onCheckedChange={(v) => {
+									setPasswordEnabled(v);
+									if (!v) {
+										setFormData({ ...formData, password: "" });
+									}
+								}}
+							/>
+						</div>
+						{passwordEnabled && (
+							<div className="mt-2">
+								<PasswordPanel formData={formData} setFormData={setFormData} />
+							</div>
+						)}
+					</div>
+
+					{/* Data de Expiração */}
+					<div className="rounded-md border p-3">
+						<div className="flex items-start justify-between gap-3">
+							<div className="flex items-start gap-3">
+								<Clock className="mt-0.5 h-5 w-5" />
+								<div>
+									<div className="font-medium">Data de Expiração</div>
+									<div className="text-muted-foreground text-sm">
+										Link será excluído automaticamente
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={expiresEnabled}
+								onCheckedChange={(v) => {
+									setExpiresEnabled(v);
+									if (!v) {
+										setFormData({ ...formData, expiresAt: undefined });
+									}
+								}}
+							/>
+						</div>
+						{expiresEnabled && (
+							<div className="mt-2">
+								<ExpirePanel formData={formData} setFormData={setFormData} />
+							</div>
+						)}
+					</div>
+
+					{/* Limite de Cliques */}
+					<div className="rounded-md border p-3">
+						<div className="flex items-start justify-between gap-3">
+							<div className="flex items-start gap-3">
+								<Tags className="mt-0.5 h-5 w-5" />
+								<div>
+									<div className="font-medium">Limite de Cliques</div>
+									<div className="text-muted-foreground text-sm">
+										Excluir após X cliques
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={deleteClicksEnabled}
+								onCheckedChange={(v) => {
+									setDeleteClicksEnabled(v);
+									if (!v) {
+										setFormData({ ...formData, deleteOnClicks: undefined });
+									}
+								}}
+							/>
+						</div>
+						{deleteClicksEnabled && (
+							<div className="mt-2">
+								<ClicksPanel formData={formData} setFormData={setFormData} />
+							</div>
+						)}
+					</div>
+
+					{/* Adicionar Badge */}
+					<div className="rounded-md border p-3">
+						<div className="flex items-start justify-between gap-3">
+							<div className="flex items-start gap-3">
+								<Tags className="mt-0.5 h-5 w-5" />
+								<div>
+									<div className="font-medium">Adicionar Badge</div>
+									<div className="text-muted-foreground text-sm">
+										Destaque o link com uma etiqueta
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={badgeEnabled}
+								onCheckedChange={(v) => {
+									setBadgeEnabled(v);
+									if (!v) {
+										setFormData({ ...formData, badge: "" });
+									}
+								}}
+							/>
+						</div>
+						{badgeEnabled && (
+							<div className="mt-2">
+								<BadgePanel formData={formData} setFormData={setFormData} />
+							</div>
+						)}
+					</div>
 				</section>
 			</div>
 

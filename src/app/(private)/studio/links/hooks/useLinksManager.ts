@@ -142,9 +142,9 @@ export const useLinksManager = (
 	const [_originalImage, setOriginalImage] = useState<ImageItem | null>(null);
 	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
 	const [togglingLinkId, setTogglingLinkId] = useState<number | null>(null);
-	const [togglingTextId, setTogglingTextId] = useState<number | null>(null);
-	const [togglingVideoId, setTogglingVideoId] = useState<number | null>(null);
-	const [togglingImageId, setTogglingImageId] = useState<number | null>(null);
+	const [togglingTextId] = useState<number | null>(null);
+	const [togglingVideoId] = useState<number | null>(null);
+	const [togglingImageId] = useState<number | null>(null);
 	const [togglingSectionId, setTogglingSectionId] = useState<number | null>(
 		null
 	);
@@ -162,6 +162,7 @@ export const useLinksManager = (
 		[imagesRes]
 	);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: depende de unifiedItems.find para preservar isEditing; adicionar unifiedItems causaria loops
 	useEffect(() => {
 		// Se estamos reordenando, não atualizar o estado para evitar conflitos visuais
 		if (isReorderingRef.current) {
@@ -452,7 +453,6 @@ export const useLinksManager = (
 		setActiveId(null);
 	};
 
-	// ... O resto dos handlers continuam aqui ...
 	const handleSectionUpdate = async (
 		id: number,
 		payload: Partial<SectionItem>
@@ -487,7 +487,7 @@ export const useLinksManager = (
 		await mutateSections();
 	};
 
-	const handleAddNewLink = async () => {
+	const handleAddNewLink = () => {
 		// Criar rascunho local do link e abrir em modo edição
 		const id = tempIdCounterRef.current--;
 		const order = -1;
@@ -541,7 +541,7 @@ export const useLinksManager = (
 		setIsAddingSection(false);
 	};
 
-	const handleAddNewText = async () => {
+	const handleAddNewText = () => {
 		// Criar rascunho local de texto e abrir em modo edição
 		const id = tempIdCounterRef.current--;
 		const order = -1;
@@ -577,7 +577,7 @@ export const useLinksManager = (
 		setTextFormData(initialTextFormData);
 	};
 
-	const handleAddNewVideo = async () => {
+	const handleAddNewVideo = () => {
 		// Criar rascunho local de vídeo e abrir em modo edição
 		const id = tempIdCounterRef.current--;
 		const order = -1;
@@ -612,53 +612,53 @@ export const useLinksManager = (
 		setVideoFormData(initialVideoFormData);
 	};
 
-    const handleAddNewImage = async (override?: Partial<ImageFormData>) => {
-        // Criar rascunho local de imagens e abrir em modo edição
-        const id = tempIdCounterRef.current--;
-        const order = -1;
-        // Usar dados do estado com possíveis sobrescritas fornecidas
-        const source: ImageFormData = {
-            ...imageFormData,
-            ...(override || {}),
-        };
-        // Sanitiza e limita as imagens vindas do formulário antes de criar o rascunho
-        const maxCount = source.layout === "single" ? 1 : 10;
-        const sanitizedItems = (source.images || [])
-            .slice(0, maxCount)
-            .map((img) => {
-                let linkUrl = (img.linkUrl || "").trim();
-                if (linkUrl.length > 0) {
-                    if (!urlProtocolRegex.test(linkUrl)) {
-                        linkUrl = `https://${linkUrl}`;
-                    }
-                    if (!isValidUrl(linkUrl)) {
-                        linkUrl = "";
-                    }
-                }
-                return { url: img.url, linkUrl: linkUrl || null } as any;
-            });
-        const draft: ImageItem = {
-            id,
-            title: source.title?.trim() || null,
-            description: source.description?.trim() || null,
-            layout: source.layout,
-            ratio: source.ratio,
-            sizePercent: Math.max(50, Math.min(100, source.sizePercent)),
-            items: sanitizedItems,
-            active: true,
-            order,
-            userId: 0,
-            isEditing: true,
+	const handleAddNewImage = (override?: Partial<ImageFormData>) => {
+		// Criar rascunho local de imagens e abrir em modo edição
+		const id = tempIdCounterRef.current--;
+		const order = -1;
+		// Usar dados do estado com possíveis sobrescritas fornecidas
+		const source: ImageFormData = {
+			...imageFormData,
+			...(override || {}),
+		};
+		// Sanitiza e limita as imagens vindas do formulário antes de criar o rascunho
+		const maxCount = source.layout === "single" ? 1 : 10;
+		const sanitizedItems = (source.images || [])
+			.slice(0, maxCount)
+			.map((img) => {
+				let linkUrl = (img.linkUrl || "").trim();
+				if (linkUrl.length > 0) {
+					if (!urlProtocolRegex.test(linkUrl)) {
+						linkUrl = `https://${linkUrl}`;
+					}
+					if (!isValidUrl(linkUrl)) {
+						linkUrl = "";
+					}
+				}
+				return { url: img.url, linkUrl: linkUrl || null } as any;
+			});
+		const draft: ImageItem = {
+			id,
+			title: source.title?.trim() || null,
+			description: source.description?.trim() || null,
+			layout: source.layout,
+			ratio: source.ratio,
+			sizePercent: Math.max(50, Math.min(100, source.sizePercent)),
+			items: sanitizedItems,
+			active: true,
+			order,
+			userId: 0,
+			isEditing: true,
 			isDraft: true,
 			archived: false,
-            sectionId: source.sectionId ?? null,
-            isImage: true,
-            isSection: false,
-            isText: false,
-            isVideo: false,
-            dbId: undefined,
-            children: undefined as never,
-        };
+			sectionId: source.sectionId ?? null,
+			isImage: true,
+			isSection: false,
+			isText: false,
+			isVideo: false,
+			dbId: undefined,
+			children: undefined as never,
+		};
 		setUnifiedItems((prev) => {
 			const cleaned = prev
 				.filter((item) => !(item as any).isDraft)
@@ -826,6 +826,7 @@ export const useLinksManager = (
 		}
 		await fetch(`/api/images/${id}`, { method: "DELETE" });
 		await mutateImages();
+		await mutateSections();
 	};
 
 	const handleArchiveImage = async (id: number) => {
@@ -870,67 +871,71 @@ export const useLinksManager = (
 		);
 	};
 
-	const handleSaveEditingImage = async (
-		id: number,
-		payload: Partial<ImageItem>
-	) => {
-		const next: Partial<ImageItem> = { ...payload };
-		if (typeof next.sizePercent === "number") {
-			next.sizePercent = Math.max(50, Math.min(100, next.sizePercent));
+	const normalizeImageItem = (img: ImageItem["items"][number]) => {
+		const raw = (img.linkUrl || "").trim();
+		let linkUrl = raw.length > 0 ? raw : null;
+		if (linkUrl) {
+			if (!urlProtocolRegex.test(linkUrl)) {
+				linkUrl = `https://${linkUrl}`;
+			}
+			if (!isValidUrl(linkUrl)) {
+				linkUrl = null;
+			}
 		}
-		if (Array.isArray(next.items)) {
-			const maxCount = next.layout === "single" ? 1 : 10;
-			next.items = (next.items || []).slice(0, maxCount).map((img) => {
-				const raw = (img.linkUrl || "").trim();
-				let linkUrl = raw.length > 0 ? raw : null;
-				if (linkUrl) {
-					if (!urlProtocolRegex.test(linkUrl)) {
-						linkUrl = `https://${linkUrl}`;
-					}
-					if (!isValidUrl(linkUrl)) {
-						linkUrl = null;
-					}
-				}
-				return { ...img, linkUrl } as any;
-			});
-		}
-		const target = unifiedItems.find(
-			(item) => (item as any).isImage && item.id === id
-		) as ImageItem | undefined;
-		if (target?.isDraft) {
-			await fetch("/api/images", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					title: next.title ?? target.title ?? null,
-					description: next.description ?? target.description ?? null,
-					layout: next.layout ?? target.layout,
-					ratio: next.ratio ?? target.ratio,
-					sizePercent: Math.max(
-						50,
-						Math.min(100, (next.sizePercent ?? target.sizePercent) || 100)
-					),
-					sectionId: target.sectionId ?? null,
-					items: next.items ?? target.items ?? [],
-				}),
-			});
-			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
-			await mutateImages();
-			await mutateSections();
-			setOriginalImage(null);
-			return;
-		}
-		// Fechar edição imediatamente no estado local para melhor UX
-		setUnifiedItems((prevItems) =>
-			prevItems.map((item) => {
-				if ((item as any).isImage && item.id === id) {
-					return { ...(item as any), ...next, isEditing: false } as any;
-				}
-				return item;
-			})
-		);
-		await handleImageUpdate(id, next);
+		return { ...img, linkUrl } as any;
 	};
+
+	const handleSaveEditingImage =
+		// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: função extensa, será refatorada futuramente
+		async (id: number, payload: Partial<ImageItem>) => {
+			const next: Partial<ImageItem> = { ...payload };
+			if (typeof next.sizePercent === "number") {
+				next.sizePercent = Math.max(50, Math.min(100, next.sizePercent));
+			}
+			if (Array.isArray(next.items)) {
+				const maxCount = next.layout === "single" ? 1 : 10;
+				const sanitizedItems = (next.items || [])
+					.slice(0, maxCount)
+					.map(normalizeImageItem);
+				next.items = sanitizedItems;
+			}
+			const target = unifiedItems.find(
+				(item) => (item as any).isImage && item.id === id
+			) as ImageItem | undefined;
+			if (target?.isDraft) {
+				await fetch("/api/images", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						title: next.title ?? target.title ?? null,
+						description: next.description ?? target.description ?? null,
+						layout: next.layout ?? target.layout,
+						ratio: next.ratio ?? target.ratio,
+						sizePercent: Math.max(
+							50,
+							Math.min(100, (next.sizePercent ?? target.sizePercent) || 100)
+						),
+						sectionId: target.sectionId ?? null,
+						items: next.items ?? target.items ?? [],
+					}),
+				});
+				setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+				await mutateImages();
+				await mutateSections();
+				setOriginalImage(null);
+				return;
+			}
+			// Fechar edição imediatamente no estado local para melhor UX
+			setUnifiedItems((prevItems) =>
+				prevItems.map((item) => {
+					if ((item as any).isImage && item.id === id) {
+						return { ...(item as any), ...next, isEditing: false } as any;
+					}
+					return item;
+				})
+			);
+			await handleImageUpdate(id, next);
+		};
 
 	const handleCancelEditingImage = (id: number) => {
 		const target = unifiedItems.find(
@@ -988,33 +993,142 @@ export const useLinksManager = (
 		await mutateLinks();
 	};
 
-	const saveEditing = async (id: number, title: string, url: string) => {
+	// Link handlers adicionados
+	const toggleActive = async (id: number, active: boolean) => {
+		setTogglingLinkId(id);
+		try {
+			await handleLinkUpdate(id, { active });
+		} finally {
+			setTogglingLinkId(null);
+		}
+	};
+
+	const handleArchiveLink = async (id: number) => {
+		setArchivingLinkId(id);
+		try {
+			await handleLinkUpdate(id, { archived: true });
+		} finally {
+			setArchivingLinkId(null);
+		}
+	};
+
+	const handleStartEditing = (id: number) => {
+		const linkToEdit = unifiedItems.find(
+			(item) =>
+				!(item.isSection || item.isText || item.isVideo) && item.id === id
+		) as LinkItem;
+		if (linkToEdit) {
+			setOriginalLink(linkToEdit);
+		}
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if (item.isEditing && item.id !== id) {
+					return { ...(item as any), isEditing: false } as any;
+				}
+				if (
+					!(item.isSection || item.isText || item.isVideo) &&
+					item.id === id
+				) {
+					return { ...(item as any), isEditing: true } as any;
+				}
+				return item;
+			})
+		);
+	};
+
+	const handleCancelEditing = (id: number) => {
 		const target = unifiedItems.find(
 			(item) =>
 				!(item.isSection || item.isText || item.isVideo) && item.id === id
 		) as LinkItem | undefined;
-		let formattedUrl = url.trim();
-		if (!urlProtocolRegex.test(formattedUrl)) {
-			formattedUrl = `https://${formattedUrl}`;
-		}
 		if (target?.isDraft) {
-			await fetch("/api/links", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					title,
-					url: formattedUrl,
-					sectionId: target.sectionId ?? null,
-				}),
-			});
 			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
-			await mutateLinks();
-			await mutateSections();
 			setOriginalLink(null);
 			return;
 		}
-		await handleLinkUpdate(id, { title, url: formattedUrl, isEditing: false });
+		const linkToRestore = currentLinks.find((l) => l.id === id);
+		if (linkToRestore) {
+			setUnifiedItems((prevItems) =>
+				prevItems.map((item) => {
+					if (
+						!(item.isSection || item.isText || item.isVideo) &&
+						item.id === id
+					) {
+						return { ...(linkToRestore as any), isEditing: false } as any;
+					}
+					return item;
+				})
+			);
+		}
 		setOriginalLink(null);
+	};
+
+	const handleLinkChange = (
+		id: number,
+		field: "title" | "url",
+		value: string
+	) => {
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if (
+					!(item.isSection || item.isText || item.isVideo) &&
+					item.id === id
+				) {
+					return { ...(item as any), [field]: value } as any;
+				}
+				return item;
+			})
+		);
+	};
+
+	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: validações agrupadas; refatoraremos em helpers
+	const handleLinkAdvancedChange = (id: number, payload: Partial<LinkItem>) => {
+		const sanitized: Partial<LinkItem> = {};
+		if ("badge" in payload) {
+			const v = (payload.badge ?? null) as any;
+			const allowed: LinkItem["badge"][] = [
+				"promovido",
+				"15% off",
+				"expirando",
+			];
+			sanitized.badge = allowed.includes(v as any)
+				? (v as LinkItem["badge"])
+				: null;
+		}
+		if ("password" in payload) {
+			const p = payload.password?.trim() || null;
+			sanitized.password = p;
+		}
+		if ("deleteOnClicks" in payload) {
+			const n = payload.deleteOnClicks ?? null;
+			sanitized.deleteOnClicks = n && n > 0 ? n : null;
+		}
+		if ("launchesAt" in payload) {
+			sanitized.launchesAt = payload.launchesAt || null;
+		}
+		if ("expiresAt" in payload) {
+			sanitized.expiresAt = payload.expiresAt || null;
+		}
+
+		setUnifiedItems((prev) =>
+			prev.map((item) => {
+				if (
+					!(item.isSection || item.isText || item.isVideo) &&
+					item.id === id
+				) {
+					return { ...(item as any), ...sanitized } as any;
+				}
+				return item;
+			})
+		);
+	};
+
+	const handleUpdateCustomImage = async (id: number, imageUrl: string) => {
+		await handleLinkUpdate(id, { customImageUrl: imageUrl });
+	};
+
+	const handleRemoveCustomImage = async (id: number) => {
+		await handleLinkUpdate(id, { customImageUrl: null });
 	};
 
 	const handleDeleteLink = async (id: number) => {
@@ -1030,191 +1144,92 @@ export const useLinksManager = (
 		await mutateLinks();
 	};
 
-	const handleArchiveLink = async (id: number) => {
-		setArchivingLinkId(id);
-		try {
-			await handleLinkUpdate(id, { archived: true });
-		} finally {
-			setArchivingLinkId(null);
-		}
-	};
-
-	const toggleActive = async (id: number, isActive: boolean) => {
-		// Encontrar o item no unifiedItems para determinar o tipo correto
-		const foundItem = unifiedItems.find((item) => item.id === id);
-
-		console.log("toggleActive called with:", { id, isActive });
-		console.log("Found item:", {
-			item: !!foundItem,
-			isText: foundItem?.isText,
-			isVideo: foundItem?.isVideo,
-			isSection: foundItem?.isSection,
-		});
-
-		if (!foundItem) {
-			console.error("Item não encontrado:", id);
-			return;
-		}
-
-		try {
-			if (foundItem.isVideo) {
-				console.log("Toggling video:", id);
-				setTogglingVideoId(id);
-				await handleVideoUpdate(id, { active: isActive });
-			} else if ((foundItem as any).isImage) {
-				console.log("Toggling image:", id);
-				setTogglingImageId(id);
-				await handleImageUpdate(id, { active: isActive });
-			} else if (foundItem.isText) {
-				console.log("Toggling text:", id);
-				setTogglingTextId(id);
-				await handleTextUpdate(id, { active: isActive });
-			} else if (foundItem.isSection) {
-				console.log("Toggling section:", id);
-				setTogglingSectionId(id);
-				await handleSectionUpdate(id, { active: isActive });
-			} else {
-				// Se não é texto, vídeo ou seção, deve ser um link
-				console.log("Toggling link:", id);
-				setTogglingLinkId(id);
-				await handleLinkUpdate(id, { active: isActive });
-			}
-		} finally {
-			setTogglingLinkId(null);
-			setTogglingTextId(null);
-			setTogglingVideoId(null);
-			setTogglingImageId(null);
-		}
-	};
-
-	const handleUpdateCustomImage = async (id: number, imageUrl: string) => {
-		try {
-			// A imagem já foi salva na API, agora só precisamos atualizar o estado local
-			handleLinkUpdate(id, { customImageUrl: imageUrl });
-			// Revalidar os dados para garantir sincronização
-			await mutateLinks();
-		} catch (error) {
-			console.error("Erro ao atualizar imagem personalizada:", error);
-		}
-	};
-
-	const handleRemoveCustomImage = async (id: number) => {
-		try {
-			// Fazer a requisição DELETE para remover a imagem do servidor
-			const response = await fetch(`/api/links/${id}/upload`, {
-				method: "DELETE",
-			});
-
-			if (!response.ok) {
-				throw new Error("Erro ao remover imagem");
-			}
-
-			// Atualizar o estado local removendo a URL da imagem
-			handleLinkUpdate(id, { customImageUrl: null });
-			// Revalidar os dados para garantir sincronização
-			await mutateLinks();
-		} catch (error) {
-			console.error("Erro ao remover imagem personalizada:", error);
-		}
-	};
-
-	const handleStartEditing = (id: number) => {
-		const linkToEdit = currentLinks.find((l) => l.id === id);
-		if (linkToEdit) {
-			setOriginalLink(linkToEdit);
-			const updateEditingStatus = (items: UnifiedItem[]) =>
-				items.map((item) => {
-					// Cancelar edição de todos os outros items
-					if (item.isEditing && item.id !== id) {
-						return { ...item, isEditing: false };
-					}
-					// Ativar edição apenas do link específico (não texto nem vídeo)
-					if (
-						!(item.isSection || item.isText || item.isVideo) &&
-						item.id === id
-					) {
-						return { ...item, isEditing: true };
-					}
-					if (item.isSection && item.children) {
-						return {
-							...item,
-							children: item.children.map((link) => {
-								// Cancelar edição de outros links na seção
-								if (link.isEditing && link.id !== id) {
-									return { ...link, isEditing: false };
-								}
-								// Ativar edição apenas do link específico
-								return link.id === id ? { ...link, isEditing: true } : link;
-							}),
-						};
-					}
-					return item;
-				});
-			setUnifiedItems(updateEditingStatus);
-		}
-	};
-
-	const handleCancelEditing = (id: number) => {
+	// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: fluxo de criação/atualização é detalhado e será quebrado em helpers
+	const saveEditing = async (id: number, title: string, url: string) => {
 		const target = unifiedItems.find(
 			(item) =>
 				!(item.isSection || item.isText || item.isVideo) && item.id === id
 		) as LinkItem | undefined;
-		if (target?.isDraft) {
-			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
-			setOriginalLink(null);
-			return;
+		let formattedUrl = url.trim();
+		if (!urlProtocolRegex.test(formattedUrl)) {
+			formattedUrl = `https://${formattedUrl}`;
 		}
-		const linkToRestore = currentLinks.find((l) => l.id === id);
-		if (linkToRestore) {
-			const updateItems = (items: UnifiedItem[]) =>
-				items.map((item) => {
-					// Restaurar apenas links (não texto nem vídeo)
+		if (target?.isDraft) {
+			// Criação do link novo com campos avançados
+			const res = await fetch("/api/links", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					title,
+					url: formattedUrl,
+					sectionId: target.sectionId ?? null,
+					badge: target.badge ?? null,
+					password: target.password ?? null,
+					deleteOnClicks: target.deleteOnClicks ?? null,
+					launchesAt: target.launchesAt ?? null,
+					expiresAt: target.expiresAt ?? null,
+				}),
+			});
+
+			if (!res.ok) {
+				throw new Error("Falha ao criar link");
+			}
+
+			const newLink = await res.json();
+			await mutateLinks();
+
+			setUnifiedItems((prev) =>
+				prev.map((item) => {
 					if (
-						!(item.isSection || item.isText || item.isVideo) &&
-						item.id === id
+						(item as any).isSection &&
+						Array.isArray((item as any).children)
 					) {
-						return { ...linkToRestore, isEditing: false };
-					}
-					if (item.isSection && item.children) {
 						return {
 							...item,
-							children: item.children.map((link) =>
-								link.id === id ? { ...linkToRestore, isEditing: false } : link
+							children: (item as any).children.map((link: any) =>
+								link.id === id
+									? {
+											...(link as any),
+											...newLink,
+											isDraft: false,
+											isEditing: false,
+										}
+									: link
 							),
-						};
+						} as UnifiedItem;
+					}
+					if (
+						!(
+							(item as any).isSection ||
+							(item as any).isText ||
+							(item as any).isVideo
+						) &&
+						item.id === id
+					) {
+						return {
+							...(item as any),
+							...newLink,
+							isDraft: false,
+							isEditing: false,
+						} as UnifiedItem;
 					}
 					return item;
-				});
-			setUnifiedItems(updateItems);
+				})
+			);
+			return;
 		}
-		setOriginalLink(null);
-	};
 
-	const handleLinkChange = (
-		id: number,
-		field: "title" | "url",
-		value: string
-	) => {
-		const updateItems = (items: UnifiedItem[]) =>
-			items.map((item) => {
-				// Atualizar apenas links (não texto nem vídeo)
-				if (
-					!(item.isSection || item.isText || item.isVideo) &&
-					item.id === id
-				) {
-					return { ...item, [field]: value };
-				}
-				if (item.isSection && item.children) {
-					return {
-						...item,
-						children: item.children.map((link) =>
-							link.id === id ? { ...link, [field]: value } : link
-						),
-					};
-				}
-				return item;
-			});
-		setUnifiedItems(updateItems);
+		// Atualização de link existente incluindo campos avançados
+		await handleLinkUpdate(id, {
+			title,
+			url: formattedUrl,
+			badge: target?.badge ?? null,
+			password: target?.password ?? null,
+			deleteOnClicks: target?.deleteOnClicks ?? null,
+			launchesAt: target?.launchesAt ?? null,
+			expiresAt: target?.expiresAt ?? null,
+			isEditing: false,
+		});
 	};
 
 	const handleClickLink = (id: number) => {
@@ -1421,6 +1436,7 @@ export const useLinksManager = (
 		handleStartEditing,
 		handleCancelEditing,
 		handleLinkChange,
+		handleLinkAdvancedChange,
 		handleClickLink,
 		handleUpdateCustomImage,
 		handleRemoveCustomImage,

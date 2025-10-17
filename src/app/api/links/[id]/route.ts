@@ -19,9 +19,9 @@ export async function PUT(
 
 	if (session.user.banido) {
 		return NextResponse.json(
-			{ 
-				error: "Conta suspensa", 
-				message: "Sua conta foi suspensa e não pode realizar esta ação." 
+			{
+				error: "Conta suspensa",
+				message: "Sua conta foi suspensa e não pode realizar esta ação.",
 			},
 			{ status: 403 }
 		);
@@ -37,12 +37,32 @@ export async function PUT(
 
 	try {
 		const body = await request.json();
-		// Permite que qualquer campo do link seja atualizado
-		const { title, url, active, archived, launchesAt, expiresAt, animated } = body;
+		// Permite que campos avançados também sejam atualizados
+		const {
+			title,
+			url,
+			active,
+			archived,
+			launchesAt,
+			expiresAt,
+			animated,
+			badge,
+			password,
+			deleteOnClicks,
+			customImageUrl,
+		} = body;
 
 		if (title && title.length > 80) {
 			return NextResponse.json(
 				{ error: "O título do link deve ter no máximo 80 caracteres." },
+				{ status: 400 }
+			);
+		}
+
+		// Validação simples do badge (máximo 12 caracteres)
+		if (typeof badge === "string" && badge.length > 12) {
+			return NextResponse.json(
+				{ error: "O badge deve ter no máximo 12 caracteres." },
 				{ status: 400 }
 			);
 		}
@@ -57,6 +77,17 @@ export async function PUT(
 				launchesAt: launchesAt ? new Date(launchesAt) : null,
 				expiresAt: expiresAt ? new Date(expiresAt) : null,
 				animated,
+				badge:
+					typeof badge === "string" && badge.trim() !== ""
+						? badge.trim()
+						: null,
+				password:
+					typeof password === "string" ? password.trim() || null : password,
+				deleteOnClicks:
+					typeof deleteOnClicks === "number" && deleteOnClicks > 0
+						? deleteOnClicks
+						: null,
+				customImageUrl,
 			},
 		});
 
@@ -92,9 +123,9 @@ export async function DELETE(
 
 	if (session.user.banido) {
 		return NextResponse.json(
-			{ 
-				error: "Conta suspensa", 
-				message: "Sua conta foi suspensa e não pode realizar esta ação." 
+			{
+				error: "Conta suspensa",
+				message: "Sua conta foi suspensa e não pode realizar esta ação.",
 			},
 			{ status: 403 }
 		);
