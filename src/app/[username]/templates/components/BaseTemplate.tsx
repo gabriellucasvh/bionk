@@ -1047,6 +1047,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					backgroundSize: "cover",
 					backgroundPosition: "center",
 					backgroundRepeat: "no-repeat",
+					backgroundAttachment: "fixed",
 				}}
 			>
 				{shouldUseBlurredBackground && (
