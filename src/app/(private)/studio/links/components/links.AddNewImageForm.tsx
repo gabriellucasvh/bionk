@@ -1,11 +1,17 @@
 "use client";
 
-import { Upload } from "lucide-react";
+import { HelpCircle, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import {
 	Select,
 	SelectContent,
@@ -13,6 +19,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import type { ImageFormData } from "../hooks/useLinksManager";
 import type { SectionItem } from "../types/links.types";
@@ -63,6 +70,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 	const setFormData =
 		propSetFormData || imageManager?.setImageFormData || (() => {});
 	const onSave = propOnSave || imageManager?.handleAddNewImage || (() => {});
+	const onCancel = props.onCancel || (() => {});
 	const hasImages =
 		Array.isArray((formData as any).images) &&
 		(formData as any).images.length > 0;
@@ -75,11 +83,18 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 	const isSaveDisabled =
 		typeof propIsSaveDisabled === "boolean"
 			? propIsSaveDisabled
-			: propMode === "edit"
-				? false
-				: computedDisabled;
+			: computedDisabled;
 	const existingSections =
 		propExistingSections || imageManager?.existingSections || [];
+
+	// Destaques visuais por layout para diferenciar claramente os formulários
+	const accent =
+		formData.layout === "single"
+			? { border: "border-emerald-500", bg: "bg-emerald-50" }
+			: formData.layout === "column"
+				? { border: "border-teal-500", bg: "bg-teal-50" }
+				: { border: "border-indigo-500", bg: "bg-indigo-50" };
+	const accentDragClass = `${accent.border} ${accent.bg}`;
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [didSubmit, setDidSubmit] = useState(false);
@@ -234,6 +249,10 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 		}
 	};
 
+	const handleCancel = () => {
+		onCancel();
+	};
+
 	const handleSectionChange = (value: string) => {
 		setActiveSection(value);
 		if (value === "none") {
@@ -253,6 +272,46 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 	return (
 		<div className="flex h-full flex-col space-y-4">
 			<div className="flex-1 space-y-3 overflow-y-auto">
+				{/* Cabeçalho profissional com ajuda contextual */}
+				<div className="flex items-center justify-between">
+					<h3 className="font-semibold text-lg">
+						{formData.layout === "single" && "Imagem – Única"}
+						{formData.layout === "column" && "Imagem – Coluna"}
+						{formData.layout === "carousel" && "Imagem – Carrossel"}
+					</h3>
+					<Popover>
+						<PopoverTrigger asChild>
+							<Button
+								aria-label="Ajuda do layout"
+								className="h-8 w-8"
+								size="icon"
+								variant="ghost"
+							>
+								<HelpCircle className="h-4 w-4" />
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className="w-70 text-sm">
+							{formData.layout === "single" && (
+								<p>
+									Envie uma única imagem para destaque simples. Limite: 1
+									imagem.
+								</p>
+							)}
+							{formData.layout === "column" && (
+								<p>
+									Organize várias imagens em colunas. Título é obrigatório.
+									Limite: 10 imagens.
+								</p>
+							)}
+							{formData.layout === "carousel" && (
+								<p>
+									Crie um carrossel navegável de imagens. Título opcional.
+									Limite: 10 imagens.
+								</p>
+							)}
+						</PopoverContent>
+					</Popover>
+				</div>
 				<div className="grid gap-3">
 					{formData.layout === "single" ? (
 						<div className="grid gap-4">
@@ -275,7 +334,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 										<div
 											className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
 												isDragOverSingle
-													? "border-emerald-500 bg-emerald-50"
+													? accentDragClass
 													: "border-gray-300 hover:bg-muted/30"
 											}`}
 											onClick={() => fileInputSingleRef.current?.click()}
@@ -344,7 +403,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 									<div
 										className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
 											isDragOverMultiple
-												? "border-emerald-500 bg-emerald-50"
+												? accentDragClass
 												: "border-gray-300 hover:bg-muted/30"
 										}`}
 										onClick={() => fileInputMultipleRef.current?.click()}
@@ -439,24 +498,37 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 						</div>
 					)}
 
-					{formData.layout !== "single" && (
+					{formData.layout !== "column" && (
 						<div className="grid gap-2">
-							<Label htmlFor="description">Descrição (opcional)</Label>
-							<Textarea
-								className="min-h-[60px] resize-none"
-								id="description"
-								maxLength={200}
+							<Label htmlFor="title">Título (opcional)</Label>
+							<Input
+								id="title"
+								maxLength={100}
 								onChange={(e) =>
-									setFormData({ ...formData, description: e.target.value })
+									setFormData({ ...formData, title: e.target.value })
 								}
-								placeholder="Descrição do bloco de imagem"
-								value={formData.description}
+								placeholder="Título do bloco de imagem"
+								value={formData.title}
 							/>
-							<p className="text-muted-foreground text-xs">
-								Máximo 200 caracteres
-							</p>
 						</div>
 					)}
+
+					<div className="grid gap-2">
+						<Label htmlFor="description">Descrição (opcional)</Label>
+						<Textarea
+							className="min-h-[60px] resize-none"
+							id="description"
+							maxLength={200}
+							onChange={(e) =>
+								setFormData({ ...formData, description: e.target.value })
+							}
+							placeholder="Descrição do bloco de imagem"
+							value={formData.description}
+						/>
+						<p className="text-muted-foreground text-xs">
+							Máximo 200 caracteres
+						</p>
+					</div>
 
 					<div className="grid gap-2">
 						<Label htmlFor="ratio">Proporção</Label>
@@ -481,23 +553,16 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 
 					<div className="grid gap-2">
 						<Label htmlFor="size">Tamanho (%)</Label>
-						<input
-							id="size"
+						<Slider
 							max={100}
 							min={50}
-							onChange={(e) => {
-								const next = Math.max(
-									50,
-									Math.min(100, Number(e.target.value))
-								);
-								setFormData({
-									...formData,
-									sizePercent: next,
-								});
+							onValueChange={(vals) => {
+								const raw = Array.isArray(vals) ? (vals[0] ?? 50) : 50;
+								const next = Math.max(50, Math.min(100, Number(raw)));
+								setFormData({ ...formData, sizePercent: next });
 							}}
 							step={5}
-							type="range"
-							value={Math.max(50, Math.min(100, formData.sizePercent))}
+							value={[Math.max(50, Math.min(100, formData.sizePercent))]}
 						/>
 						<p className="text-muted-foreground text-xs">
 							{formData.sizePercent}%
@@ -526,14 +591,23 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 			</div>
 
 			<div className="flex-shrink-0 border-t pt-3">
-				<div className="flex gap-3">
+				<div className="flex items-center justify-end gap-3">
 					<BaseButton
-						className="flex-1"
+						className="px-4"
+						onClick={handleCancel}
+						type="button"
+						variant="white"
+					>
+						<X className="mr-2 h-4 w-4" /> Cancelar
+					</BaseButton>
+					<BaseButton
+						className="px-4"
 						disabled={isSaveDisabled || (propMode === "edit" && didSubmit)}
 						loading={isLoading}
 						onClick={handleSave}
+						type="button"
 					>
-						Salvar Imagem
+						<Save className="mr-2 h-4 w-4" /> Salvar
 					</BaseButton>
 				</div>
 			</div>

@@ -8,6 +8,7 @@ export type LinkItem = {
 	sensitive: boolean;
 	order: number;
 	isEditing?: boolean;
+	isDraft?: boolean;
 	archived?: boolean;
 	sectionId?: number | null; // ID da seção à qual o link pertence
 	badge?: "promovido" | "15% off" | "expirando" | null;
@@ -44,6 +45,7 @@ export type TextItem = {
 	order: number;
 	userId: number;
 	isEditing?: boolean;
+	isDraft?: boolean;
 	archived?: boolean;
 	sectionId?: number | null;
 	// Propriedades para unificação
@@ -55,54 +57,56 @@ export type TextItem = {
 };
 
 export type VideoItem = {
-  id: number;
-  title: string | null;
-  description: string | null;
-  url: string;
-  type: "direct" | "youtube" | "vimeo" | "tiktok" | "twitch";
-  active: boolean;
-  order: number;
-  userId: number;
-  isEditing?: boolean;
-  archived?: boolean;
-  sectionId?: number | null;
-  // Propriedades para unificação
-  isVideo?: boolean;
-  isSection?: boolean;
-  isText?: boolean;
-  children?: never;
-  dbId?: number;
+	id: number;
+	title: string | null;
+	description: string | null;
+	url: string;
+	type: "direct" | "youtube" | "vimeo" | "tiktok" | "twitch";
+	active: boolean;
+	order: number;
+	userId: number;
+	isEditing?: boolean;
+	isDraft?: boolean;
+	archived?: boolean;
+	sectionId?: number | null;
+	// Propriedades para unificação
+	isVideo?: boolean;
+	isSection?: boolean;
+	isText?: boolean;
+	children?: never;
+	dbId?: number;
 };
 
 export type ImageItem = {
-  id: number;
-  title: string | null;
-  description: string | null;
-  layout: "single" | "column" | "carousel";
-  ratio: string; // ex.: "square", "16:9", etc
-  sizePercent: number; // 50 - 120
-  items: Array<{
-    url: string;
-    previewUrl?: string | null;
-    provider?: string | null;
-    authorName?: string | null;
-    authorLink?: string | null;
-    sourceLink?: string | null;
-    linkUrl?: string | null; // link opcional por imagem
-  }>;
-  active: boolean;
-  order: number;
-  userId: number;
-  isEditing?: boolean;
-  archived?: boolean;
-  sectionId?: number | null;
-  // Propriedades para unificação
-  isImage?: boolean;
-  isSection?: boolean;
-  isText?: boolean;
-  isVideo?: boolean;
-  children?: never;
-  dbId?: number;
+	id: number;
+	title: string | null;
+	description: string | null;
+	layout: "single" | "column" | "carousel";
+	ratio: string; // ex.: "square", "16:9", etc
+	sizePercent: number; // 50 - 120
+	items: Array<{
+		url: string;
+		previewUrl?: string | null;
+		provider?: string | null;
+		authorName?: string | null;
+		authorLink?: string | null;
+		sourceLink?: string | null;
+		linkUrl?: string | null; // link opcional por imagem
+	}>;
+	active: boolean;
+	order: number;
+	userId: number;
+	isEditing?: boolean;
+	isDraft?: boolean;
+	archived?: boolean;
+	sectionId?: number | null;
+	// Propriedades para unificação
+	isImage?: boolean;
+	isSection?: boolean;
+	isText?: boolean;
+	isVideo?: boolean;
+	children?: never;
+	dbId?: number;
 };
 
 // Tipo unificado para drag and drop

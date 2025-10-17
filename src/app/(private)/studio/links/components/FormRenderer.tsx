@@ -11,7 +11,9 @@ import type {
 } from "../hooks/useLinksManager";
 import type { SectionItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
-import AddNewImageForm from "./links.AddNewImageForm";
+import AddNewImageCarouselForm from "./links.AddNewImageCarouselForm";
+import AddNewImageColumnForm from "./links.AddNewImageColumnForm";
+import AddNewImageSingleForm from "./links.AddNewImageSingleForm";
 import AddNewLinkForm from "./links.AddNewLinkForm";
 import AddNewSectionForm from "./links.AddNewSectionForm";
 import AddNewTextForm from "./links.AddNewTextForm";
@@ -82,11 +84,6 @@ const validateImageForm = (imageFormData: ImageFormData): boolean => {
 const isVideoOption = (selectedOption: string | null): boolean => {
 	const videoOptions = ["video", "youtube", "vimeo", "tiktok", "twitch"];
 	return videoOptions.includes(selectedOption || "");
-};
-
-const isImageOption = (selectedOption: string | null): boolean => {
-	const imageOptions = ["image_single", "image_column", "image_carousel"];
-	return imageOptions.includes(selectedOption || "");
 };
 
 const FormHeader = ({
@@ -222,7 +219,7 @@ const VideoFormRenderer = ({
 	</div>
 );
 
-const ImageFormRenderer = ({
+const ImageSingleFormRenderer = ({
 	imageFormData,
 	isMobile,
 	existingSections,
@@ -240,12 +237,82 @@ const ImageFormRenderer = ({
 	onBack: () => void;
 }) => (
 	<div className="flex h-full flex-col p-4">
-		<FormHeader onBack={onBack} title="Adicionar Imagem" />
+		<FormHeader onBack={onBack} title="Adicionar Imagem Única" />
 		<div className="min-h-0 flex-1">
-			<AddNewImageForm
+			<AddNewImageSingleForm
 				existingSections={isMobile ? undefined : existingSections}
 				formData={imageFormData}
-				isSaveDisabled={!validateImageForm(imageFormData)}
+				isSaveDisabled={
+					!validateImageForm({ ...imageFormData, layout: "single" })
+				}
+				onCancel={onCancel}
+				onSave={onImageSubmit}
+				setFormData={setImageFormData}
+			/>
+		</div>
+	</div>
+);
+
+const ImageColumnFormRenderer = ({
+	imageFormData,
+	isMobile,
+	existingSections,
+	onImageSubmit,
+	setImageFormData,
+	onCancel,
+	onBack,
+}: {
+	imageFormData: ImageFormData;
+	isMobile: boolean;
+	existingSections: SectionItem[];
+	onImageSubmit: () => void;
+	setImageFormData: (data: ImageFormData) => void;
+	onCancel: () => void;
+	onBack: () => void;
+}) => (
+	<div className="flex h-full flex-col p-4">
+		<FormHeader onBack={onBack} title="Adicionar Imagens em Coluna" />
+		<div className="min-h-0 flex-1">
+			<AddNewImageColumnForm
+				existingSections={isMobile ? undefined : existingSections}
+				formData={imageFormData}
+				isSaveDisabled={
+					!validateImageForm({ ...imageFormData, layout: "column" })
+				}
+				onCancel={onCancel}
+				onSave={onImageSubmit}
+				setFormData={setImageFormData}
+			/>
+		</div>
+	</div>
+);
+
+const ImageCarouselFormRenderer = ({
+	imageFormData,
+	isMobile,
+	existingSections,
+	onImageSubmit,
+	setImageFormData,
+	onCancel,
+	onBack,
+}: {
+	imageFormData: ImageFormData;
+	isMobile: boolean;
+	existingSections: SectionItem[];
+	onImageSubmit: () => void;
+	setImageFormData: (data: ImageFormData) => void;
+	onCancel: () => void;
+	onBack: () => void;
+}) => (
+	<div className="flex h-full flex-col p-4">
+		<FormHeader onBack={onBack} title="Adicionar Carrossel de Imagens" />
+		<div className="min-h-0 flex-1">
+			<AddNewImageCarouselForm
+				existingSections={isMobile ? undefined : existingSections}
+				formData={imageFormData}
+				isSaveDisabled={
+					!validateImageForm({ ...imageFormData, layout: "carousel" })
+				}
 				onCancel={onCancel}
 				onSave={onImageSubmit}
 				setFormData={setImageFormData}
@@ -333,18 +400,46 @@ const FormRenderer = ({
 		);
 	}
 
-	if (isImageOption(selectedOption) && (isMobile || isAddingImage)) {
-		return (
-			<ImageFormRenderer
-				existingSections={existingSections}
-				imageFormData={imageFormData}
-				isMobile={isMobile}
-				onBack={onBack}
-				onCancel={onCancel}
-				onImageSubmit={onImageSubmit}
-				setImageFormData={setImageFormData}
-			/>
-		);
+	if (isMobile || isAddingImage) {
+		if (selectedOption === "image_single") {
+			return (
+				<ImageSingleFormRenderer
+					existingSections={existingSections}
+					imageFormData={imageFormData}
+					isMobile={isMobile}
+					onBack={onBack}
+					onCancel={onCancel}
+					onImageSubmit={onImageSubmit}
+					setImageFormData={setImageFormData}
+				/>
+			);
+		}
+		if (selectedOption === "image_column") {
+			return (
+				<ImageColumnFormRenderer
+					existingSections={existingSections}
+					imageFormData={imageFormData}
+					isMobile={isMobile}
+					onBack={onBack}
+					onCancel={onCancel}
+					onImageSubmit={onImageSubmit}
+					setImageFormData={setImageFormData}
+				/>
+			);
+		}
+		if (selectedOption === "image_carousel") {
+			return (
+				<ImageCarouselFormRenderer
+					existingSections={existingSections}
+					imageFormData={imageFormData}
+					isMobile={isMobile}
+					onBack={onBack}
+					onCancel={onCancel}
+					onImageSubmit={onImageSubmit}
+					setImageFormData={setImageFormData}
+				/>
+			);
+		}
 	}
 
 	return null;

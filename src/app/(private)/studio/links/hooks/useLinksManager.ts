@@ -119,6 +119,7 @@ export const useLinksManager = (
 	// ... (useState, useEffect, useMemo, findContainerId, etc. continuam iguais)
 	const [unifiedItems, setUnifiedItems] = useState<UnifiedItem[]>([]);
 	const [activeId, setActiveId] = useState<string | null>(null);
+	const tempIdCounterRef = useRef(-1);
 	const [isAdding, setIsAdding] = useState(false);
 	const [isAddingSection, setIsAddingSection] = useState(false);
 	const [isAddingText, setIsAddingText] = useState(false);
@@ -277,6 +278,7 @@ export const useLinksManager = (
 				// Separar itens por tipo para usar as APIs corretas
 				const linkItems = items
 					.filter((item) => !(item.isSection || item.isText || item.isVideo))
+					.filter((item) => !(item as any).isDraft)
 					.map((item) => ({
 						id: item.id,
 						order: items.indexOf(item),
@@ -291,6 +293,7 @@ export const useLinksManager = (
 
 				const textItems = items
 					.filter((item) => item.isText)
+					.filter((item) => !(item as any).isDraft)
 					.map((item) => ({
 						id: item.id,
 						order: items.indexOf(item),
@@ -298,6 +301,7 @@ export const useLinksManager = (
 
 				const videoItems = items
 					.filter((item) => item.isVideo)
+					.filter((item) => !(item as any).isDraft)
 					.map((item) => ({
 						id: item.id,
 						order: items.indexOf(item),
@@ -305,6 +309,7 @@ export const useLinksManager = (
 
 				const imageItems = items
 					.filter((item) => (item as any).isImage)
+					.filter((item) => !(item as any).isDraft)
 					.map((item) => ({
 						id: item.id,
 						order: items.indexOf(item),
@@ -483,26 +488,38 @@ export const useLinksManager = (
 	};
 
 	const handleAddNewLink = async () => {
-		let formattedUrl = formData.url.trim();
-		if (!urlProtocolRegex.test(formattedUrl)) {
-			formattedUrl = `https://${formattedUrl}`;
-		}
-		if (!isValidUrl(formattedUrl)) {
-			return;
-		}
-
-		await fetch("/api/links", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ ...formData, url: formattedUrl }),
+		// Criar rascunho local do link e abrir em modo edição
+		const id = tempIdCounterRef.current--;
+		const order = -1;
+		const draft: LinkItem = {
+			id,
+			title: (formData.title || "").trim(),
+			url: formData.url || "",
+			active: true,
+			clicks: 0,
+			sensitive: false,
+			order,
+			isEditing: true,
+			isDraft: true,
+			archived: false,
+			sectionId: formData.sectionId ?? null,
+			badge: (formData.badge as any) || null,
+			password: formData.password || null,
+			expiresAt: null,
+			deleteOnClicks: formData.deleteOnClicks ?? null,
+			launchesAt: null,
+			customImageUrl: null,
+		};
+		setUnifiedItems((prev) => {
+			const cleaned = prev
+				.filter((item) => !(item as any).isDraft)
+				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
+			const next = [draft, ...cleaned];
+			return next.sort((a, b) => a.order - b.order);
 		});
-
-		await mutateLinks();
-		await mutateSections();
-		await mutateTexts();
-		await mutateVideos();
-		setFormData(initialFormData);
+		setOriginalLink(null);
 		setIsAdding(false);
+		setFormData(initialFormData);
 	};
 
 	const handleAddNewSection = async () => {
@@ -525,108 +542,133 @@ export const useLinksManager = (
 	};
 
 	const handleAddNewText = async () => {
-		if (!(textFormData.title.trim() && textFormData.description.trim())) {
-			return;
-		}
-
-		await fetch("/api/texts", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				title: textFormData.title.trim(),
-				description: textFormData.description.trim(),
-				position: textFormData.position,
-				hasBackground: textFormData.hasBackground,
-				isCompact: textFormData.isCompact,
-				sectionId: textFormData.sectionId,
-			}),
+		// Criar rascunho local de texto e abrir em modo edição
+		const id = tempIdCounterRef.current--;
+		const order = -1;
+		const draft: TextItem = {
+			id,
+			title: (textFormData.title || "").trim(),
+			description: (textFormData.description || "").trim(),
+			position: textFormData.position,
+			hasBackground: textFormData.hasBackground,
+			isCompact: textFormData.isCompact,
+			active: true,
+			order,
+			userId: 0,
+			isEditing: true,
+			isDraft: true,
+			archived: false,
+			sectionId: textFormData.sectionId ?? null,
+			isText: true,
+			isSection: false,
+			isVideo: false,
+			dbId: undefined,
+			children: undefined as never,
+		};
+		setUnifiedItems((prev) => {
+			const cleaned = prev
+				.filter((item) => !(item as any).isDraft)
+				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
+			const next = [draft, ...cleaned];
+			return next.sort((a, b) => a.order - b.order);
 		});
-
-		await mutateLinks();
-		await mutateSections();
-		await mutateTexts();
-		await mutateVideos();
-		setTextFormData(initialTextFormData);
+		setOriginalText(null);
 		setIsAddingText(false);
+		setTextFormData(initialTextFormData);
 	};
 
 	const handleAddNewVideo = async () => {
-		if (!videoFormData.url.trim()) {
-			return;
-		}
-
-		await fetch("/api/videos", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				title: videoFormData.title.trim() || null,
-				description: videoFormData.description.trim() || null,
-				url: videoFormData.url.trim(),
-				sectionId: videoFormData.sectionId,
-			}),
+		// Criar rascunho local de vídeo e abrir em modo edição
+		const id = tempIdCounterRef.current--;
+		const order = -1;
+		const draft: VideoItem = {
+			id,
+			title: videoFormData.title?.trim() || null,
+			description: videoFormData.description?.trim() || null,
+			url: videoFormData.url || "",
+			type: videoFormData.type,
+			active: true,
+			order,
+			userId: 0,
+			isEditing: true,
+			isDraft: true,
+			archived: false,
+			sectionId: videoFormData.sectionId ?? null,
+			isVideo: true,
+			isSection: false,
+			isText: false,
+			dbId: undefined,
+			children: undefined as never,
+		};
+		setUnifiedItems((prev) => {
+			const cleaned = prev
+				.filter((item) => !(item as any).isDraft)
+				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
+			const next = [draft, ...cleaned];
+			return next.sort((a, b) => a.order - b.order);
 		});
-
-		await mutateLinks();
-		await mutateSections();
-		await mutateTexts();
-		await mutateVideos();
-		await mutateImages();
-		setVideoFormData(initialVideoFormData);
+		setOriginalVideo(null);
 		setIsAddingVideo(false);
+		setVideoFormData(initialVideoFormData);
 	};
 
-	const handleAddNewImage = async () => {
-		const images = Array.isArray(imageFormData.images)
-			? imageFormData.images.filter((i) => i.url?.trim())
-			: [];
-		if (images.length === 0) {
-			return;
-		}
-
-		// Para layout "single", garantir apenas 1 imagem
-		const maxCount = imageFormData.layout === "single" ? 1 : 10;
-		const items = (
-			imageFormData.layout === "single"
-				? images.slice(0, 1)
-				: images.slice(0, maxCount)
-		).map((img) => {
-			const raw = img.linkUrl?.trim();
-			let linkUrl = raw && raw.length > 0 ? raw : null;
-			if (linkUrl) {
-				if (!urlProtocolRegex.test(linkUrl)) {
-					linkUrl = `https://${linkUrl}`;
-				}
-				if (!isValidUrl(linkUrl)) {
-					linkUrl = null;
-				}
-			}
-			return { url: img.url.trim(), linkUrl };
+    const handleAddNewImage = async (override?: Partial<ImageFormData>) => {
+        // Criar rascunho local de imagens e abrir em modo edição
+        const id = tempIdCounterRef.current--;
+        const order = -1;
+        // Usar dados do estado com possíveis sobrescritas fornecidas
+        const source: ImageFormData = {
+            ...imageFormData,
+            ...(override || {}),
+        };
+        // Sanitiza e limita as imagens vindas do formulário antes de criar o rascunho
+        const maxCount = source.layout === "single" ? 1 : 10;
+        const sanitizedItems = (source.images || [])
+            .slice(0, maxCount)
+            .map((img) => {
+                let linkUrl = (img.linkUrl || "").trim();
+                if (linkUrl.length > 0) {
+                    if (!urlProtocolRegex.test(linkUrl)) {
+                        linkUrl = `https://${linkUrl}`;
+                    }
+                    if (!isValidUrl(linkUrl)) {
+                        linkUrl = "";
+                    }
+                }
+                return { url: img.url, linkUrl: linkUrl || null } as any;
+            });
+        const draft: ImageItem = {
+            id,
+            title: source.title?.trim() || null,
+            description: source.description?.trim() || null,
+            layout: source.layout,
+            ratio: source.ratio,
+            sizePercent: Math.max(50, Math.min(100, source.sizePercent)),
+            items: sanitizedItems,
+            active: true,
+            order,
+            userId: 0,
+            isEditing: true,
+			isDraft: true,
+			archived: false,
+            sectionId: source.sectionId ?? null,
+            isImage: true,
+            isSection: false,
+            isText: false,
+            isVideo: false,
+            dbId: undefined,
+            children: undefined as never,
+        };
+		setUnifiedItems((prev) => {
+			const cleaned = prev
+				.filter((item) => !(item as any).isDraft)
+				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
+			const next = [draft, ...cleaned];
+			return next.sort((a, b) => a.order - b.order);
 		});
-
-		await fetch("/api/images", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				title:
-					imageFormData.layout === "column"
-						? imageFormData.title.trim() || null
-						: imageFormData.title.trim() || null,
-				description: imageFormData.description.trim() || null,
-				layout: imageFormData.layout,
-				ratio: imageFormData.ratio,
-				sizePercent: Math.max(50, Math.min(100, imageFormData.sizePercent)),
-				sectionId: imageFormData.sectionId,
-				items,
-			}),
-		});
-
-		await mutateLinks();
-		await mutateSections();
-		await mutateTexts();
-		await mutateVideos();
-		await mutateImages();
-		setImageFormData(initialImageFormData);
+		setOriginalImage(null);
 		setIsAddingImage(false);
+		setImageFormData(initialImageFormData);
 	};
 
 	const handleVideoUpdate = async (id: number, payload: Partial<VideoItem>) => {
@@ -645,6 +687,13 @@ export const useLinksManager = (
 	};
 
 	const handleDeleteVideo = async (id: number) => {
+		const target = unifiedItems.find(
+			(item) => item.isVideo && item.id === id
+		) as VideoItem | undefined;
+		if (target?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			return;
+		}
 		await fetch(`/api/videos/${id}`, { method: "DELETE" });
 		await mutateVideos();
 	};
@@ -697,6 +746,26 @@ export const useLinksManager = (
 		description: string,
 		url: string
 	) => {
+		const target = unifiedItems.find(
+			(item) => item.isVideo && item.id === id
+		) as VideoItem | undefined;
+		if (target?.isDraft) {
+			await fetch("/api/videos", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					title: title?.trim() || null,
+					description: description?.trim() || null,
+					url,
+					sectionId: target.sectionId ?? null,
+				}),
+			});
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			await mutateVideos();
+			await mutateSections();
+			setOriginalVideo(null);
+			return;
+		}
 		await handleVideoUpdate(id, {
 			title,
 			description,
@@ -706,6 +775,14 @@ export const useLinksManager = (
 	};
 
 	const handleCancelEditingVideo = (id: number) => {
+		const target = unifiedItems.find(
+			(item) => item.isVideo && item.id === id
+		) as VideoItem | undefined;
+		if (target?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			setOriginalVideo(null);
+			return;
+		}
 		const videoToRestore = currentVideos.find((v) => v.id === id);
 		if (videoToRestore) {
 			setUnifiedItems((prevItems) =>
@@ -740,6 +817,13 @@ export const useLinksManager = (
 	};
 
 	const handleDeleteImage = async (id: number) => {
+		const target = unifiedItems.find(
+			(item) => (item as any).isImage && item.id === id
+		) as ImageItem | undefined;
+		if (target?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			return;
+		}
 		await fetch(`/api/images/${id}`, { method: "DELETE" });
 		await mutateImages();
 	};
@@ -810,6 +894,32 @@ export const useLinksManager = (
 				return { ...img, linkUrl } as any;
 			});
 		}
+		const target = unifiedItems.find(
+			(item) => (item as any).isImage && item.id === id
+		) as ImageItem | undefined;
+		if (target?.isDraft) {
+			await fetch("/api/images", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					title: next.title ?? target.title ?? null,
+					description: next.description ?? target.description ?? null,
+					layout: next.layout ?? target.layout,
+					ratio: next.ratio ?? target.ratio,
+					sizePercent: Math.max(
+						50,
+						Math.min(100, (next.sizePercent ?? target.sizePercent) || 100)
+					),
+					sectionId: target.sectionId ?? null,
+					items: next.items ?? target.items ?? [],
+				}),
+			});
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			await mutateImages();
+			await mutateSections();
+			setOriginalImage(null);
+			return;
+		}
 		// Fechar edição imediatamente no estado local para melhor UX
 		setUnifiedItems((prevItems) =>
 			prevItems.map((item) => {
@@ -823,6 +933,14 @@ export const useLinksManager = (
 	};
 
 	const handleCancelEditingImage = (id: number) => {
+		const target = unifiedItems.find(
+			(item) => (item as any).isImage && item.id === id
+		) as ImageItem | undefined;
+		if (target?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			setOriginalImage(null);
+			return;
+		}
 		const imageToRestore = currentImages.find((i) => i.id === id);
 		if (imageToRestore) {
 			setUnifiedItems((prevItems) =>
@@ -870,16 +988,44 @@ export const useLinksManager = (
 		await mutateLinks();
 	};
 
-	const saveEditing = (id: number, title: string, url: string) => {
+	const saveEditing = async (id: number, title: string, url: string) => {
+		const target = unifiedItems.find(
+			(item) =>
+				!(item.isSection || item.isText || item.isVideo) && item.id === id
+		) as LinkItem | undefined;
 		let formattedUrl = url.trim();
 		if (!urlProtocolRegex.test(formattedUrl)) {
 			formattedUrl = `https://${formattedUrl}`;
 		}
-		handleLinkUpdate(id, { title, url: formattedUrl, isEditing: false });
+		if (target?.isDraft) {
+			await fetch("/api/links", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					title,
+					url: formattedUrl,
+					sectionId: target.sectionId ?? null,
+				}),
+			});
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			await mutateLinks();
+			await mutateSections();
+			setOriginalLink(null);
+			return;
+		}
+		await handleLinkUpdate(id, { title, url: formattedUrl, isEditing: false });
 		setOriginalLink(null);
 	};
 
 	const handleDeleteLink = async (id: number) => {
+		const target = unifiedItems.find(
+			(item) =>
+				!(item.isSection || item.isText || item.isVideo) && item.id === id
+		) as LinkItem | undefined;
+		if (target?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			return;
+		}
 		await fetch(`/api/links/${id}`, { method: "DELETE" });
 		await mutateLinks();
 	};
@@ -1009,6 +1155,15 @@ export const useLinksManager = (
 	};
 
 	const handleCancelEditing = (id: number) => {
+		const target = unifiedItems.find(
+			(item) =>
+				!(item.isSection || item.isText || item.isVideo) && item.id === id
+		) as LinkItem | undefined;
+		if (target?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			setOriginalLink(null);
+			return;
+		}
 		const linkToRestore = currentLinks.find((l) => l.id === id);
 		if (linkToRestore) {
 			const updateItems = (items: UnifiedItem[]) =>
@@ -1098,6 +1253,13 @@ export const useLinksManager = (
 	};
 
 	const handleDeleteText = async (id: number) => {
+		const target = unifiedItems.find((item) => item.isText && item.id === id) as
+			| TextItem
+			| undefined;
+		if (target?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			return;
+		}
 		await fetch(`/api/texts/${id}`, { method: "DELETE" });
 		await mutateTexts();
 	};
@@ -1152,6 +1314,28 @@ export const useLinksManager = (
 		hasBackground: boolean,
 		isCompact: boolean
 	) => {
+		const target = unifiedItems.find((item) => item.isText && item.id === id) as
+			| TextItem
+			| undefined;
+		if (target?.isDraft) {
+			await fetch("/api/texts", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					title,
+					description,
+					position,
+					hasBackground,
+					isCompact,
+					sectionId: target.sectionId ?? null,
+				}),
+			});
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			await mutateTexts();
+			await mutateSections();
+			setOriginalText(null);
+			return;
+		}
 		await handleTextUpdate(id, {
 			title,
 			description,
@@ -1163,6 +1347,14 @@ export const useLinksManager = (
 	};
 
 	const handleCancelEditingText = (id: number) => {
+		const target = unifiedItems.find((item) => item.isText && item.id === id) as
+			| TextItem
+			| undefined;
+		if (target?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			setOriginalText(null);
+			return;
+		}
 		const textToRestore = currentTexts.find((t) => t.id === id);
 		if (textToRestore) {
 			setUnifiedItems((prevItems) =>

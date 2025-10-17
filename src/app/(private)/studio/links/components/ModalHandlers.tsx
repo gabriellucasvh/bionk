@@ -29,7 +29,7 @@ interface UseModalHandlersProps {
     handleAddNewSection: () => Promise<void>;
     handleAddNewText: () => Promise<void>;
     handleAddNewVideo: () => Promise<void>;
-    handleAddNewImage: () => Promise<void>;
+    handleAddNewImage: (override?: Partial<ImageFormData>) => Promise<void>;
     onClose: () => void;
 }
 

@@ -11,6 +11,7 @@ import type {
     VideoItem,
 } from "../types/links.types";
 import AddContentModal from "./links.AddContentModal";
+import AddNewSectionForm from "./links.AddNewSectionForm";
 import LinkList from "./links.LinkList";
 
 interface LinksTabContentProps {
@@ -114,6 +115,21 @@ const LinksTabContent = ({
 			videoFormData={videoFormData}
 			imageFormData={imageFormData}
 		/>
+
+		{handlers.isAddingSection && (
+			<div className="rounded-lg border bg-muted/20 p-4">
+				<AddNewSectionForm
+					formData={handlers.sectionFormData}
+					setFormData={handlers.setSectionFormData}
+					onSave={handlers.handleAddNewSection}
+					onCancel={() => {
+						handlers.setSectionFormData({ title: "" });
+						handlers.setIsAddingSection(false);
+					}}
+					isSaveDisabled={!handlers.sectionFormData.title.trim()}
+				/>
+			</div>
+		)}
 
 			<LinkList
 				activeId={activeId}

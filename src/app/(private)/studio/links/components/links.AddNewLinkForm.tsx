@@ -243,7 +243,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 								type="url"
 								value={formData.url}
 							/>
-							<div className="mt-1 h-4"></div>
+							<div className="mt-1 h-4" />
 						</div>
 					</div>
 

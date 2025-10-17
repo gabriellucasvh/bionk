@@ -84,7 +84,7 @@ const EditingView = ({
 	};
 
 	return (
-		<div className="flex flex-col gap-3 rounded-lg border-2 border-indigo-500 p-3 sm:p-4">
+		<div className="flex flex-col gap-3 rounded-lg border-2 border-foreground/20 p-3 sm:p-4">
 			<AddNewImageForm
 				existingSections={existingSections}
 				formData={localData as any}
@@ -155,7 +155,7 @@ const DisplayView = ({
 					<header className="flex items-center gap-3">
 						<div
 							className={cn(
-								"flex items-center justify-center rounded-md bg-indigo-600 p-1.5"
+								"flex items-center justify-center rounded-md bg-lime-500 p-1.5"
 							)}
 						>
 							<ImageIcon className="h-4 w-4 text-white" />
