@@ -1002,7 +1002,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					aria-hidden
 					className="pointer-events-none absolute inset-0 z-0 rounded-[inherit]"
 					style={{
-						backgroundImage: `url(${imageUrl})`,
+						backgroundImage: `url("${imageUrl}")`,
 						backgroundSize: "cover",
 						backgroundPosition: "center",
 					}}
@@ -1017,6 +1017,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					autoPlay
 					className="pointer-events-none absolute inset-0 z-0 h-full w-full rounded-[inherit] object-cover"
 					controls={false}
+					key={videoUrl}
 					loop
 					muted
 					playsInline

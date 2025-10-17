@@ -604,7 +604,9 @@ function ContentList({
 			case "3:1":
 				return { aspectRatio: "3 / 1" };
 			default:
-				if (!ratio) return {};
+				if (!ratio) {
+					return {};
+				}
 				return {
 					aspectRatio: ratio.includes(":") ? ratio.replace(":", " / ") : ratio,
 				};
@@ -941,7 +943,7 @@ export default function UserPagePreview() {
 					aria-hidden
 					className="pointer-events-none absolute inset-0 z-0 rounded-[inherit]"
 					style={{
-						backgroundImage: `url(${imageUrl})`,
+						backgroundImage: `url("${imageUrl}")`,
 						backgroundSize: "cover",
 						backgroundPosition: "center",
 					}}
@@ -956,6 +958,7 @@ export default function UserPagePreview() {
 					autoPlay
 					className="pointer-events-none absolute inset-0 z-0 h-full w-full rounded-[inherit] object-cover"
 					controls={false}
+					key={videoUrl}
 					loop
 					muted
 					playsInline

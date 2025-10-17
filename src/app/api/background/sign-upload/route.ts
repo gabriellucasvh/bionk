@@ -48,8 +48,9 @@ export async function POST(request: Request) {
 		if (type === "image") {
 			transformations.push("c_fill,g_auto,w_1080,h_1920", "q_auto");
 		} else {
-			// vídeo não suporta gravity:auto com fill (evitar incoming transformation error)
-			transformations.push("c_fill,w_1080,h_1920", "q_auto");
+			// Vídeo: evitar transcodificação pesada no upload para acelerar envio
+			// Mantemos somente otimização de qualidade, sem resize/crop aqui
+			transformations.push("q_auto");
 		}
 
 		const transformation = transformations.join("/");
