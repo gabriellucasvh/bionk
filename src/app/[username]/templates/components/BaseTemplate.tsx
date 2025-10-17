@@ -1000,9 +1000,11 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 			return (
 				<div
 					aria-hidden
-					className="pointer-events-none absolute inset-0 z-0 rounded-[inherit]"
+					className="pointer-events-none fixed top-0 right-0 left-0 z-0 mx-auto w-full max-w-[575px] rounded-[inherit]"
 					style={{
+						height: "100dvh",
 						backgroundImage: `url("${imageUrl}")`,
+						backgroundAttachment: "fixed",
 						backgroundSize: "cover",
 						backgroundPosition: "center",
 					}}
@@ -1015,13 +1017,14 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 				<video
 					aria-hidden
 					autoPlay
-					className="pointer-events-none absolute inset-0 z-0 h-full w-full rounded-[inherit] object-cover"
+					className="pointer-events-none fixed top-0 right-0 left-0 z-0 mx-auto w-full max-w-[575px] rounded-[inherit] object-cover"
 					controls={false}
 					key={videoUrl}
 					loop
 					muted
 					playsInline
 					src={videoUrl}
+					style={{ height: "100dvh" }}
 				/>
 			);
 		}
