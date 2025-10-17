@@ -100,13 +100,16 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 						<Label htmlFor="title">Título *</Label>
 						<Input
 							id="title"
-							maxLength={100}
+							maxLength={80}
 							onChange={(e) =>
 								setFormData({ ...formData, title: e.target.value })
 							}
 							placeholder="Digite o título do texto"
 							value={formData.title}
 						/>
+						<p className="text-muted-foreground text-xs">
+							{formData.title.length}/80 caracteres
+						</p>
 					</div>
 
 					<div className="grid gap-2">

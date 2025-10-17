@@ -485,7 +485,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 							<Label htmlFor="title">Título *</Label>
 							<Input
 								id="title"
-								maxLength={100}
+								maxLength={80}
 								onChange={(e) =>
 									setFormData({ ...formData, title: e.target.value })
 								}
@@ -493,7 +493,8 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 								value={formData.title}
 							/>
 							<p className="text-muted-foreground text-xs">
-								Obrigatório no layout de coluna
+								{formData.title.length}/80 caracteres • Obrigatório no layout de
+								coluna
 							</p>
 						</div>
 					)}
@@ -503,13 +504,16 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 							<Label htmlFor="title">Título (opcional)</Label>
 							<Input
 								id="title"
-								maxLength={100}
+								maxLength={80}
 								onChange={(e) =>
 									setFormData({ ...formData, title: e.target.value })
 								}
 								placeholder="Título do bloco de imagem"
 								value={formData.title}
 							/>
+							<p className="text-muted-foreground text-xs">
+								{formData.title.length}/80 caracteres
+							</p>
 						</div>
 					)}
 
@@ -526,7 +530,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 							value={formData.description}
 						/>
 						<p className="text-muted-foreground text-xs">
-							Máximo 200 caracteres
+							{formData.description.length}/200 caracteres
 						</p>
 					</div>
 

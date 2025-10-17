@@ -156,10 +156,14 @@ const TextCard = ({
 							<Input
 								className="break-words"
 								id={`title-${text.id}`}
+								maxLength={80}
 								onChange={(e) => handleFieldChange("title", e.target.value)}
 								placeholder="Digite o título do texto"
 								value={text.title}
 							/>
+							<div className="text-right text-muted-foreground text-xs">
+								{text.title.length}/80 caracteres
+							</div>
 						</div>
 						<div className="space-y-2">
 							<Label htmlFor={`description-${text.id}`}>Descrição</Label>
