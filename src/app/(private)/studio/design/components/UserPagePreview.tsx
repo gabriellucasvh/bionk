@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock, MoreVertical } from "lucide-react";
+import { Images, Lock, MoreVertical } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useReducer, useState } from "react";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
@@ -594,12 +594,21 @@ function ContentList({
 		return `https://${trimmed}`;
 	};
 	const getAspectRatioStyle = (ratio?: string): React.CSSProperties => {
-		if (!ratio) {
-			return {};
+		switch (ratio) {
+			case "square":
+				return { aspectRatio: "1 / 1" };
+			case "16:9":
+				return { aspectRatio: "16 / 9" };
+			case "3:2":
+				return { aspectRatio: "3 / 2" };
+			case "3:1":
+				return { aspectRatio: "3 / 1" };
+			default:
+				if (!ratio) return {};
+				return {
+					aspectRatio: ratio.includes(":") ? ratio.replace(":", " / ") : ratio,
+				};
 		}
-		return {
-			aspectRatio: ratio.includes(":") ? ratio.replace(":", " / ") : ratio,
-		};
 	};
 
 	const renderImageItem = (img: any, ratio?: string) => {
@@ -674,27 +683,70 @@ function ContentList({
 						</div>
 					</div>
 				);
-			case "column":
+			case "column": {
+				const cornerValue = customizations?.customButtonCorners || "12";
 				return (
 					<div
 						className="w-full"
 						key={`image-${image.id}`}
-						style={wrapperStyle}
+						style={{ marginLeft: "auto", marginRight: "auto" }}
 					>
-						{header}
-						<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-							{(image?.items || []).map((img: any, idx: number) => (
+						<details>
+							<summary className="list-none">
 								<div
-									className="overflow-hidden border p-1"
-									key={`img-${image.id}-${idx}`}
+									className={cn(
+										"group relative w-full rounded-xl p-1 transition-all duration-200 hover:cursor-pointer hover:brightness-110"
+									)}
 									style={buttonStyle}
 								>
-									{renderImageItem(img, image?.ratio)}
+									<div className="relative z-10 flex h-full w-full items-center">
+										<div className="flex-shrink-0">
+											<div className="ml-1 size-13" />
+										</div>
+										<div className="flex flex-1 justify-center">
+											<h3 className="line-clamp-2 select-none px-2 font-medium leading-tight">
+												{image?.title || "Imagens"}
+											</h3>
+										</div>
+										<div className="w-10 flex-shrink-0" />
+									</div>
+
+									<div
+										aria-hidden
+										className="-translate-y-1/2 absolute top-1/2 right-3 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
+									>
+										<Images className="size-5" />
+									</div>
 								</div>
-							))}
-						</div>
+							</summary>
+
+							<div style={wrapperStyle}>
+								{image?.description ? (
+									<p
+										className="my-4 text-center text-sm opacity-80"
+										style={textStyle}
+									>
+										{image.description}
+									</p>
+								) : null}
+
+								<div className="mt-2 space-y-3">
+									{(image?.items || []).map((img: any, idx: number) => (
+										<div
+											className="overflow-hidden"
+											key={`img-${image.id}-${idx}`}
+											style={{ borderRadius: `${cornerValue}px` }}
+										>
+											{renderImageItem(img, image?.ratio)}
+										</div>
+									))}
+								</div>
+							</div>
+						</details>
 					</div>
 				);
+			}
+			// column layout moved above to match BaseTemplate design
 			case "carousel":
 				return (
 					<div
@@ -918,7 +970,7 @@ export default function UserPagePreview() {
 	return (
 		<div className="h-full w-full">
 			<div
-				className={`relative h-full w-full overflow-hidden ${
+				className={`relative h-full w-full overflow-y-auto overflow-x-hidden ${
 					customizations.headerStyle === "hero" ? "" : "px-4 sm:px-6 sm:pt-4"
 				}`}
 				style={wrapperStyle}
