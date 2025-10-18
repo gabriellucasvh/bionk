@@ -19,6 +19,7 @@ import type {
 	SectionItem,
 	TextItem,
 	VideoItem,
+	ImageItem,
 } from "../types/links.types";
 import { fetcher } from "../utils/links.helpers";
 
@@ -76,13 +77,21 @@ const UnifiedLinksManager = () => {
 		fetcher
 	);
 
+	// Hook SWR para imagens (unificado com os demais)
+	const {
+		data: imagesData,
+		mutate: mutateImages,
+		isLoading: isLoadingImages,
+	} = useSWR<{ images: ImageItem[] }>(userId ? "/api/images" : null, fetcher);
+
 	if (
 		status === "loading" ||
 		isLoadingLinks ||
 		isLoadingSocialLinks ||
 		isLoadingSections ||
 		isLoadingTexts ||
-		isLoadingVideos
+		isLoadingVideos ||
+		isLoadingImages
 	) {
 		return <LoadingPage />;
 	}
@@ -112,10 +121,12 @@ const UnifiedLinksManager = () => {
 								currentSections={sectionsData || []}
 								currentTexts={textsData?.texts || []}
 								currentVideos={videosData?.videos || []}
+								currentImages={imagesData?.images || []}
 								mutateLinks={mutateLinks}
 								mutateSections={mutateSections}
 								mutateTexts={mutateTexts}
 								mutateVideos={mutateVideos}
+								mutateImages={mutateImages}
 								session={session}
 							/>
 						</TabsContent>

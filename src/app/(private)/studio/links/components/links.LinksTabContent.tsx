@@ -9,6 +9,7 @@ import type {
 	SectionItem,
 	TextItem,
 	VideoItem,
+	ImageItem,
 } from "../types/links.types";
 import AddContentModal from "./links.AddContentModal";
 import AddNewSectionForm from "./links.AddNewSectionForm";
@@ -19,10 +20,12 @@ interface LinksTabContentProps {
 	currentSections: SectionItem[];
 	currentTexts: TextItem[];
 	currentVideos: VideoItem[];
+	currentImages: ImageItem[];
 	mutateLinks: () => Promise<any>;
 	mutateSections: () => Promise<any>;
 	mutateTexts: () => Promise<any>;
 	mutateVideos: () => Promise<any>;
+	mutateImages: () => Promise<any>;
 	session: Session | null;
 }
 
@@ -31,10 +34,12 @@ const LinksTabContent = ({
 	currentSections,
 	currentTexts,
 	currentVideos,
+	currentImages,
 	mutateLinks,
 	mutateSections,
 	mutateTexts,
 	mutateVideos,
+	mutateImages,
 }: LinksTabContentProps) => {
 	const {
 		unifiedItems,
@@ -72,10 +77,12 @@ const LinksTabContent = ({
 		currentSections,
 		currentTexts,
 		currentVideos,
+		currentImages,
 		mutateLinks,
 		mutateSections,
 		mutateTexts,
-		mutateVideos
+		mutateVideos,
+		mutateImages
 	);
 
 	const handleDragStart = (event: DragStartEvent) => {

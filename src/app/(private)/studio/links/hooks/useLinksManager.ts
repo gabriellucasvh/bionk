@@ -3,7 +3,7 @@
 import type { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import useSWR from "swr";
+// import useSWR from "swr";
 import type {
 	ImageItem,
 	LinkItem,
@@ -113,10 +113,12 @@ export const useLinksManager = (
 	currentSections: SectionItem[],
 	currentTexts: TextItem[],
 	currentVideos: VideoItem[],
+	currentImages: ImageItem[],
 	mutateLinks: () => Promise<any>,
 	mutateSections: () => Promise<any>,
 	mutateTexts: () => Promise<any>,
-	mutateVideos: () => Promise<any>
+	mutateVideos: () => Promise<any>,
+	mutateImages: () => Promise<any>
 ) => {
 	// ... (useState, useEffect, useMemo, findContainerId, etc. continuam iguais)
 	const [unifiedItems, setUnifiedItems] = useState<UnifiedItem[]>([]);
@@ -153,16 +155,7 @@ export const useLinksManager = (
 	// Flag para controlar chamadas simultâneas da API
 	const isReorderingRef = useRef(false);
 
-	// Buscar imagens via SWR dentro do hook
-	const { data: imagesRes, mutate: mutateImages } = useSWR(
-		"/api/images",
-		fetcher
-	);
-	// Importante: estabiliza a referência de currentImages para evitar re-render infinito
-	const currentImages: ImageItem[] = useMemo(
-		() => imagesRes?.images ?? [],
-		[imagesRes]
-	);
+	// Imagens são fornecidas via props: currentImages e mutateImages
 
 	// biome-ignore lint/correctness/useExhaustiveDependencies: depende de unifiedItems.find para preservar isEditing; adicionar unifiedItems causaria loops
 	useEffect(() => {
