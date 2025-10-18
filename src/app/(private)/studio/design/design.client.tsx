@@ -229,9 +229,9 @@ const PersonalizarClient = () => {
 				type="button"
 			>
 				{mobileView === "design" ? (
-					<Eye className="h-6 w-6 text-black" />
+					<Eye className="h-6 w-6 text-black" strokeWidth={1.5} />
 				) : (
-					<EyeOff className="h-6 w-6 text-black" />
+					<EyeOff className="h-6 w-6 text-black" strokeWidth={1.5} />
 				)}
 			</button>
 
