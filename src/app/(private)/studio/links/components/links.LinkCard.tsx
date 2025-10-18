@@ -94,7 +94,7 @@ const CountdownTimer = ({
 		return <p className="font-medium text-red-600 text-sm">{endText}</p>;
 	}
 	return (
-		<div className="flex items-center gap-1 text-center font-semibold text-blue-600 text-sm">
+		<div className="flex items-center gap-1 text-center font-semibold text-green-700 text-sm">
 			<Clock className="h-4 w-4" />
 			<span>{prefix}: </span>
 			<span>{`${days}d ${hours}h ${minutes}m ${seconds}s`}</span>
@@ -138,7 +138,8 @@ const EditingView = ({
 			(link.password || null) !== (originalLink.password || null) ||
 			(link.deleteOnClicks ?? null) !== (originalLink.deleteOnClicks ?? null) ||
 			(link.launchesAt || null) !== (originalLink.launchesAt || null) ||
-			(link.expiresAt || null) !== (originalLink.expiresAt || null)
+			(link.expiresAt || null) !== (originalLink.expiresAt || null) ||
+			(link.shareAllowed ?? false) !== (originalLink.shareAllowed ?? false)
 		: true;
 
 	// Toggles para opções avançadas
@@ -149,6 +150,7 @@ const EditingView = ({
 	const [deleteClicksEnabled, setDeleteClicksEnabled] = useState(
 		!!link.deleteOnClicks
 	);
+
 	const [badgeEnabled, setBadgeEnabled] = useState(!!link.badge);
 	const [launchEnabled, setLaunchEnabled] = useState(!!link.launchesAt);
 
@@ -271,7 +273,7 @@ const EditingView = ({
 							/>
 						</div>
 						{expiresEnabled && (
-							<div className="mt-2">
+							<div className="mt-2 space-y-2">
 								<div className="grid gap-2">
 									<Label htmlFor="expiresAt">Expira em</Label>
 									<Input
@@ -283,6 +285,24 @@ const EditingView = ({
 										}
 										type="datetime-local"
 										value={toInputValue(link.expiresAt)}
+									/>
+								</div>
+								<div className="flex items-center justify-between gap-3 rounded-md border bg-background/50 p-3">
+									<div className="flex items-center gap-3">
+										<div className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
+											<MoreVertical className="h-5 w-5" />
+										</div>
+										<div>
+											<div className="font-medium">
+												Permitir compartilhamento
+											</div>
+										</div>
+									</div>
+									<Switch
+										checked={!!link.shareAllowed}
+										onCheckedChange={(v) => {
+											onLinkAdvancedChange?.(link.id, { shareAllowed: v });
+										}}
 									/>
 								</div>
 							</div>
@@ -314,7 +334,7 @@ const EditingView = ({
 							/>
 						</div>
 						{deleteClicksEnabled && (
-							<div className="mt-2">
+							<div className="mt-2 space-y-2">
 								<div className="grid gap-2">
 									<Label htmlFor="deleteOnClicks">Excluir após X cliques</Label>
 									<Input
@@ -330,6 +350,24 @@ const EditingView = ({
 										placeholder="Ex: 100"
 										type="number"
 										value={link.deleteOnClicks ?? ""}
+									/>
+								</div>
+								<div className="flex items-center justify-between gap-3 rounded-md border bg-background/50 p-3">
+									<div className="flex items-center gap-3">
+										<div className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
+											<MoreVertical className="h-5 w-5" />
+										</div>
+										<div>
+											<div className="font-medium">
+												Permitir compartilhamento
+											</div>
+										</div>
+									</div>
+									<Switch
+										checked={!!link.shareAllowed}
+										onCheckedChange={(v) => {
+											onLinkAdvancedChange?.(link.id, { shareAllowed: v });
+										}}
 									/>
 								</div>
 							</div>

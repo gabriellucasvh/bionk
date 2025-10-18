@@ -24,6 +24,7 @@ export type LinkFormData = {
 	expiresAt?: Date;
 	deleteOnClicks?: number;
 	launchesAt?: Date;
+	shareAllowed?: boolean;
 };
 
 export type SectionFormData = {
@@ -68,6 +69,7 @@ const initialFormData: LinkFormData = {
 	deleteOnClicks: undefined,
 	expiresAt: undefined,
 	launchesAt: undefined,
+	shareAllowed: false,
 };
 
 const initialSectionFormData: SectionFormData = {
@@ -509,6 +511,7 @@ export const useLinksManager = (
 			deleteOnClicks: formData.deleteOnClicks ?? null,
 			launchesAt: null,
 			customImageUrl: null,
+			shareAllowed: formData.shareAllowed ?? false,
 		};
 		setUnifiedItems((prev) => {
 			const cleaned = prev
@@ -1109,6 +1112,9 @@ export const useLinksManager = (
 		if ("expiresAt" in payload) {
 			sanitized.expiresAt = payload.expiresAt || null;
 		}
+		if ("shareAllowed" in payload) {
+			sanitized.shareAllowed = !!payload.shareAllowed;
+		}
 
 		setUnifiedItems((prev) =>
 			prev.map((item) => {
@@ -1168,6 +1174,7 @@ export const useLinksManager = (
 					deleteOnClicks: target.deleteOnClicks ?? null,
 					launchesAt: target.launchesAt ?? null,
 					expiresAt: target.expiresAt ?? null,
+					shareAllowed: target.shareAllowed ?? false,
 				}),
 			});
 
@@ -1228,6 +1235,7 @@ export const useLinksManager = (
 			deleteOnClicks: target?.deleteOnClicks ?? null,
 			launchesAt: target?.launchesAt ?? null,
 			expiresAt: target?.expiresAt ?? null,
+			shareAllowed: target?.shareAllowed ?? false,
 			isEditing: false,
 		});
 	};

@@ -1,7 +1,13 @@
 "use client";
 
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Clock, Lock, Tags } from "lucide-react";
+import {
+	Calendar as CalendarIcon,
+	Clock,
+	Lock,
+	MoreVertical,
+	Tags,
+} from "lucide-react";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
@@ -27,6 +33,7 @@ type LinkFormData = {
 	expiresAt?: Date;
 	deleteOnClicks?: number;
 	launchesAt?: Date;
+	shareAllowed?: boolean;
 };
 
 interface AddNewLinkFormProps {
@@ -267,6 +274,22 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 						{expiresEnabled && (
 							<div className="mt-2">
 								<ExpirePanel formData={formData} setFormData={setFormData} />
+								<div className="mt-3 flex items-start justify-between gap-3 rounded-md border bg-background/50 p-3">
+									<div className="flex items-start gap-3">
+										<MoreVertical className="mt-0.5 h-5 w-5" />
+										<div>
+											<div className="font-medium">
+												Permitir compartilhamento
+											</div>
+										</div>
+									</div>
+									<Switch
+										checked={!!formData.shareAllowed}
+										onCheckedChange={(v) => {
+											setFormData({ ...formData, shareAllowed: v });
+										}}
+									/>
+								</div>
 							</div>
 						)}
 					</div>
@@ -296,6 +319,22 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 						{deleteClicksEnabled && (
 							<div className="mt-2">
 								<ClicksPanel formData={formData} setFormData={setFormData} />
+								<div className="mt-3 flex items-start justify-between gap-3 rounded-md border bg-background/50 p-3">
+									<div className="flex items-start gap-3">
+										<MoreVertical className="mt-0.5 h-5 w-5" />
+										<div>
+											<div className="font-medium">
+												Permitir compartilhamento
+											</div>
+										</div>
+									</div>
+									<Switch
+										checked={!!formData.shareAllowed}
+										onCheckedChange={(v) => {
+											setFormData({ ...formData, shareAllowed: v });
+										}}
+									/>
+								</div>
 							</div>
 						)}
 					</div>

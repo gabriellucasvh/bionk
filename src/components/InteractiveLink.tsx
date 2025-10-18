@@ -81,30 +81,51 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 
 	// Função para determinar qual ícone e tooltip mostrar
 	const getLinkIcon = () => {
-		if (link.password) {
+	const hasClicks = !!link.deleteOnClicks;
+	const hasExpiry = !!link.expiresAt;
+	if (link.password) {
+		return {
+			icon: <Lock className="size-5" />,
+			tooltip: "Link protegido por senha",
+		};
+	}
+	// Se ambos (expiração e cliques) estiverem ativos, usar ícone de mais opções
+	if (hasClicks && hasExpiry) {
+		return {
+			icon: <MoreVertical className="size-5" />,
+			tooltip: "Expiração e limite de cliques ativos",
+		};
+	}
+	if (hasClicks) {
+		if (link.shareAllowed) {
 			return {
-				icon: <Lock className="size-5" />,
-				tooltip: "Link protegido por senha",
-			};
-		}
-		if (link.deleteOnClicks) {
-			return {
-				icon: <MousePointerClick className="size-5" />,
-				tooltip: `Será excluído após ${link.deleteOnClicks} cliques`,
-			};
-		}
-		if (link.expiresAt) {
-			const expirationDate = new Date(link.expiresAt);
-			const formattedDate = expirationDate.toLocaleDateString("pt-BR");
-			return {
-				icon: <Clock className="size-5" />,
-				tooltip: `Expira em ${formattedDate}`,
+				icon: <MoreVertical className="size-5" />,
+				tooltip: "Compartilhamento permitido",
 			};
 		}
 		return {
-			icon: <MoreVertical className="size-5" />,
-			tooltip: "Mais opções",
+			icon: <MousePointerClick className="size-5" />,
+			tooltip: `Será excluído após ${link.deleteOnClicks} cliques`,
 		};
+	}
+	if (hasExpiry) {
+		const expirationDate = new Date(link.expiresAt!);
+		const formattedDate = expirationDate.toLocaleDateString("pt-BR");
+		if (link.shareAllowed) {
+			return {
+				icon: <MoreVertical className="size-5" />,
+				tooltip: `Expira em ${formattedDate} — compartilhável`,
+			};
+		}
+		return {
+			icon: <Clock className="size-5" />,
+			tooltip: `Expira em ${formattedDate}`,
+		};
+	}
+	return {
+		icon: <MoreVertical className="size-5" />,
+		tooltip: "Mais opções",
+	};
 	};
 
 	const { icon, tooltip } = getLinkIcon();

@@ -24,6 +24,7 @@ export interface UserLink extends PrismaLink {
 	deleteOnClicks?: number | null;
 	launchesAt?: string | null;
 	customImageUrl?: string | null;
+	shareAllowed?: boolean | null;
 }
 
 export type UserSection = PrismaSection & {

@@ -17,6 +17,7 @@ export type LinkItem = {
 	deleteOnClicks?: number | null;
 	launchesAt?: string | null;
 	customImageUrl?: string | null;
+	shareAllowed?: boolean; // Permitir compartilhamento quando expiração/cliques ativos
 	// Novas propriedades para unificação com seções
 	isSection?: boolean; // Indica se este item é uma seção
 	isText?: boolean; // Indica se este item é um texto

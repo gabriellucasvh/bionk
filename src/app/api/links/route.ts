@@ -100,6 +100,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 			expiresAt,
 			deleteOnClicks,
 			launchesAt,
+			shareAllowed,
 		} = body;
 
 		if (!(title && url)) {
@@ -166,6 +167,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 				deleteOnClicks:
 					deleteOnClicks && deleteOnClicks > 0 ? deleteOnClicks : null,
 				launchesAt: launchesAt ? new Date(launchesAt) : null,
+				shareAllowed: Boolean(shareAllowed),
 			},
 		});
 

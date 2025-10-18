@@ -127,6 +127,7 @@ model Link {
   customImageUrl  String?
   type            String      @default("link")
   animated        Boolean     @default(false)
+  shareAllowed    Boolean     @default(false)
   section         Section?    @relation(fields: [sectionId], references: [id])
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   LinkClick       LinkClick[]

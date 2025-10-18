@@ -50,6 +50,7 @@ export async function PUT(
 			password,
 			deleteOnClicks,
 			customImageUrl,
+			shareAllowed,
 		} = body;
 
 		if (title && title.length > 80) {
@@ -88,6 +89,7 @@ export async function PUT(
 						? deleteOnClicks
 						: null,
 				customImageUrl,
+				shareAllowed: typeof shareAllowed === "boolean" ? shareAllowed : undefined,
 			},
 		});
 
