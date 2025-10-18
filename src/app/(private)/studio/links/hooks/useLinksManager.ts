@@ -1088,15 +1088,13 @@ export const useLinksManager = (
 	const handleLinkAdvancedChange = (id: number, payload: Partial<LinkItem>) => {
 		const sanitized: Partial<LinkItem> = {};
 		if ("badge" in payload) {
-			const v = (payload.badge ?? null) as any;
-			const allowed: LinkItem["badge"][] = [
-				"promovido",
-				"15% off",
-				"expirando",
-			];
-			sanitized.badge = allowed.includes(v as any)
-				? (v as LinkItem["badge"])
-				: null;
+			const raw = payload.badge ?? null;
+			if (raw === null) {
+				sanitized.badge = null;
+			} else {
+				const v = String(raw).slice(0, 12).trim();
+				sanitized.badge = v.length ? v : null;
+			}
 		}
 		if ("password" in payload) {
 			const p = payload.password?.trim() || null;

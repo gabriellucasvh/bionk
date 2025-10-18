@@ -81,6 +81,7 @@ const PasswordPanel = ({ formData, setFormData }: PanelProps) => (
 		<Label htmlFor="password">Senha de Acesso</Label>
 		<Input
 			id="password"
+			maxLength={20}
 			onChange={(e) => setFormData({ ...formData, password: e.target.value })}
 			placeholder="••••••••"
 			type="password"
@@ -94,17 +95,20 @@ const ClicksPanel = ({ formData, setFormData }: PanelProps) => (
 		<Label htmlFor="deleteOnClicks">Excluir após X cliques</Label>
 		<Input
 			id="deleteOnClicks"
+			inputMode="numeric"
+			max={999_999}
 			min={1}
-			onChange={(e) =>
+			onChange={(e) => {
+				const raw = e.target.value.replace(/\D/g, "").slice(0, 6);
 				setFormData({
 					...formData,
-					deleteOnClicks:
-						Number(e.target.value) >= 1 ? Number(e.target.value) : undefined,
-				})
-			}
+					deleteOnClicks: raw ? Math.max(1, Number(raw)) : undefined,
+				});
+			}}
+			pattern="[0-9]*"
 			placeholder="Ex: 100"
-			type="number"
-			value={formData.deleteOnClicks || ""}
+			type="text"
+			value={(formData.deleteOnClicks ?? "").toString()}
 		/>
 	</div>
 );
@@ -131,6 +135,7 @@ const ExpirePanel = ({ formData, setFormData }: PanelProps) => (
 			</PopoverTrigger>
 			<PopoverContent className="z-[60] w-auto p-0">
 				<Calendar
+					disabled={{ before: new Date() }}
 					initialFocus
 					mode="single"
 					onSelect={(date) => setFormData({ ...formData, expiresAt: date })}

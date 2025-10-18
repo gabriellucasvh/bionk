@@ -42,13 +42,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
@@ -125,6 +118,14 @@ const EditingView = ({
 			return "";
 		}
 		const d = new Date(iso);
+		const pad = (n: number) => `${n}`.padStart(2, "0");
+		return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
+			d.getHours()
+		)}:${pad(d.getMinutes())}`;
+	};
+	// Valor mínimo (agora) para inputs datetime-local
+	const nowInputValue = () => {
+		const d = new Date();
 		const pad = (n: number) => `${n}`.padStart(2, "0");
 		return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
 			d.getHours()
@@ -234,6 +235,7 @@ const EditingView = ({
 									<Label htmlFor="password">Senha de Acesso</Label>
 									<Input
 										id="password"
+										maxLength={20}
 										onChange={(e) =>
 											onLinkAdvancedChange?.(link.id, {
 												password: e.target.value,
@@ -278,11 +280,16 @@ const EditingView = ({
 									<Label htmlFor="expiresAt">Expira em</Label>
 									<Input
 										id="expiresAt"
-										onChange={(e) =>
+										min={nowInputValue()}
+										onChange={(e) => {
+											const v = e.target.value;
+											if (v && new Date(v).getTime() < Date.now()) {
+												return;
+											}
 											onLinkAdvancedChange?.(link.id, {
-												expiresAt: e.target.value || null,
-											})
-										}
+												expiresAt: v || null,
+											});
+										}}
 										type="datetime-local"
 										value={toInputValue(link.expiresAt)}
 									/>
@@ -339,17 +346,19 @@ const EditingView = ({
 									<Label htmlFor="deleteOnClicks">Excluir após X cliques</Label>
 									<Input
 										id="deleteOnClicks"
+										inputMode="numeric"
+										max={999_999}
 										min={1}
-										onChange={(e) =>
+										onChange={(e) => {
+											const raw = e.target.value.replace(/\D/g, "").slice(0, 6);
 											onLinkAdvancedChange?.(link.id, {
-												deleteOnClicks: e.target.value
-													? Number(e.target.value)
-													: null,
-											})
-										}
+												deleteOnClicks: raw ? Math.max(1, Number(raw)) : null,
+											});
+										}}
+										pattern="[0-9]*"
 										placeholder="Ex: 100"
-										type="number"
-										value={link.deleteOnClicks ?? ""}
+										type="text"
+										value={(link.deleteOnClicks ?? "").toString()}
 									/>
 								</div>
 								<div className="flex items-center justify-between gap-3 rounded-md border bg-background/50 p-3">
@@ -402,21 +411,17 @@ const EditingView = ({
 							<div className="mt-2">
 								<div className="grid gap-2">
 									<Label htmlFor="badge">Badge</Label>
-									<Select
-										onValueChange={(val) =>
-											onLinkAdvancedChange?.(link.id, { badge: val as any })
+									<Input
+										id="badge"
+										maxLength={12}
+										onChange={(e) =>
+											onLinkAdvancedChange?.(link.id, {
+												badge: e.target.value.slice(0, 12) || null,
+											})
 										}
-										value={link.badge ?? undefined}
-									>
-										<SelectTrigger>
-											<SelectValue placeholder="Selecione um badge" />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="promovido">promovido</SelectItem>
-											<SelectItem value="15% off">15% off</SelectItem>
-											<SelectItem value="expirando">expirando</SelectItem>
-										</SelectContent>
-									</Select>
+										placeholder="Ex: PROMO"
+										value={link.badge ?? ""}
+									/>
 									<p className="text-muted-foreground text-xs">
 										Máximo de 12 caracteres.
 									</p>
@@ -455,11 +460,16 @@ const EditingView = ({
 									<Label htmlFor="launchesAt">Lançamento Agendado</Label>
 									<Input
 										id="launchesAt"
-										onChange={(e) =>
+										min={nowInputValue()}
+										onChange={(e) => {
+											const v = e.target.value;
+											if (v && new Date(v).getTime() < Date.now()) {
+												return;
+											}
 											onLinkAdvancedChange?.(link.id, {
-												launchesAt: e.target.value || null,
-											})
-										}
+												launchesAt: v || null,
+											});
+										}}
 										type="datetime-local"
 										value={toInputValue(link.launchesAt)}
 									/>

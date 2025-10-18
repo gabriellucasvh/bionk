@@ -11,7 +11,7 @@ export type LinkItem = {
 	isDraft?: boolean;
 	archived?: boolean;
 	sectionId?: number | null; // ID da seção à qual o link pertence
-	badge?: "promovido" | "15% off" | "expirando" | null;
+	badge?: string | null;
 	password?: string | null;
 	expiresAt?: string | null;
 	deleteOnClicks?: number | null;
