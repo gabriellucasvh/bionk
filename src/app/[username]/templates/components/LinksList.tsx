@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Images, Lock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Images, Lock } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
 import InteractiveLink from "@/components/InteractiveLink";
@@ -27,6 +27,46 @@ export default function LinksList({
 }) {
 	const { animatedLinks } = useLinkAnimation();
 	const [showTooltip, setShowTooltip] = React.useState<string | null>(null);
+	// Estado para controlar visibilidade das setas dos carrosséis
+	const [carouselStates, setCarouselStates] = React.useState<
+		Record<
+			string,
+			{ canLeft: boolean; canRight: boolean; isOverflowing: boolean }
+		>
+	>({});
+
+	const updateCarouselStateFor = (el: HTMLElement) => {
+		const id = el.id.replace("carousel-", "");
+		const maxScrollLeft = el.scrollWidth - el.clientWidth;
+		const canLeft = el.scrollLeft > 0;
+		const canRight = Math.ceil(el.scrollLeft) < maxScrollLeft;
+		const isOverflowing = el.scrollWidth > el.clientWidth;
+		setCarouselStates((prev) => {
+			const old = prev[id];
+			if (
+				old &&
+				old.canLeft === canLeft &&
+				old.canRight === canRight &&
+				old.isOverflowing === isOverflowing
+			) {
+				return prev;
+			}
+			return { ...prev, [id]: { canLeft, canRight, isOverflowing } };
+		});
+	};
+
+	const recalcAllCarousels = () => {
+		const elements =
+			document.querySelectorAll<HTMLElement>('[id^="carousel-"]');
+		elements.forEach(updateCarouselStateFor);
+	};
+
+	React.useEffect(() => {
+		recalcAllCarousels();
+		const onResize = () => recalcAllCarousels();
+		window.addEventListener("resize", onResize);
+		return () => window.removeEventListener("resize", onResize);
+	}, [user]);
 
 	const handleLockClick = (e: React.MouseEvent, linkId: string) => {
 		e.preventDefault();
@@ -467,6 +507,9 @@ export default function LinksList({
 							<div
 								className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-3"
 								id={`carousel-${image.id}`}
+								onScroll={(e) =>
+									updateCarouselStateFor(e.currentTarget as HTMLElement)
+								}
 							>
 								{(image.items || []).map((img: any, idx: number) => (
 									<div
@@ -478,17 +521,38 @@ export default function LinksList({
 									</div>
 								))}
 							</div>
-							<button
-								aria-label="Avançar"
-								className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-white/80 p-2 shadow-md"
-								onClick={() => {
-									const el = document.getElementById(`carousel-${image.id}`);
-									el?.scrollBy({ left: 240, behavior: "smooth" });
-								}}
-								type="button"
-							>
-								<ChevronRight className="h-5 w-5 text-black" />
-							</button>
+							{carouselStates[String(image.id)]?.isOverflowing &&
+								carouselStates[String(image.id)]?.canLeft && (
+									<button
+										aria-label="Voltar"
+										className="-translate-y-1/2 absolute top-1/2 left-2 rounded-full bg-white/80 p-2 shadow-md"
+										onClick={() => {
+											const el = document.getElementById(
+												`carousel-${image.id}`
+											);
+											el?.scrollBy({ left: -240, behavior: "smooth" });
+										}}
+										type="button"
+									>
+										<ChevronLeft className="h-5 w-5 text-black" />
+									</button>
+								)}
+							{carouselStates[String(image.id)]?.isOverflowing &&
+								carouselStates[String(image.id)]?.canRight && (
+									<button
+										aria-label="Avançar"
+										className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-white/80 p-2 shadow-md"
+										onClick={() => {
+											const el = document.getElementById(
+												`carousel-${image.id}`
+											);
+											el?.scrollBy({ left: 240, behavior: "smooth" });
+										}}
+										type="button"
+									>
+										<ChevronRight className="h-5 w-5 text-black" />
+									</button>
+								)}
 						</div>
 					</div>
 				);
