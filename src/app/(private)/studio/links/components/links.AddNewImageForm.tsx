@@ -72,9 +72,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 		propSetFormData || imageManager?.setImageFormData || (() => {});
 	const onSave = propOnSave || imageManager?.handleAddNewImage || (() => {});
 	const onCancel = props.onCancel || (() => {});
-	const hasImages =
-		Array.isArray((formData as any).images) &&
-		(formData as any).images.length > 0;
+
 	const computedDisabled = useMemo(() => {
 		const count = Array.isArray(formData.images) ? formData.images.length : 0;
 		if (formData.layout === "column") {
@@ -301,22 +299,30 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 						</PopoverTrigger>
 						<PopoverContent className="w-70 text-sm">
 							{formData.layout === "single" && (
-								<p>
-									Envie uma única imagem para destaque simples. Limite: 1
-									imagem.
-								</p>
+								<ul>
+									<li className="ml-2 list-disc">
+										Envie uma única imagem para destaque simples.
+									</li>
+									<li className="ml-2 list-disc">Limite: 1 imagem.</li>
+								</ul>
 							)}
 							{formData.layout === "column" && (
-								<p>
-									Organize várias imagens em colunas. Título é obrigatório.
-									Limite: 10 imagens.
-								</p>
+								<ul>
+									<li className="ml-2 list-disc">
+										Organize várias imagens em colunas.
+									</li>
+									<li className="ml-2 list-disc">Título é obrigatório.</li>
+									<li className="ml-2 list-disc">Limite: 10 imagens.</li>
+								</ul>
 							)}
 							{formData.layout === "carousel" && (
-								<p>
-									Crie um carrossel navegável de imagens. Título opcional.
-									Limite: 10 imagens.
-								</p>
+								<ul>
+									<li className="ml-2 list-disc">
+										Crie um carrossel navegável de imagens.
+									</li>
+									<li className="ml-2 list-disc">Mínimo: 2 imagens.</li>
+									<li className="ml-2 list-disc">Limite: 10 imagens.</li>
+								</ul>
 							)}
 						</PopoverContent>
 					</Popover>
@@ -400,6 +406,12 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 										{uploadError && (
 											<p className="text-destructive text-xs">{uploadError}</p>
 										)}
+										{formData.layout === "carousel" &&
+											(formData.images?.length ?? 0) < 2 && (
+												<p className="text-muted-foreground text-xs">
+													Para carrossel, adicione pelo menos 2 imagens.
+												</p>
+											)}
 									</div>
 									{/* Removido: opção de adicionar por URL */}
 								</>
