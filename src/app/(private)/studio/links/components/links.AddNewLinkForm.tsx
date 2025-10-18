@@ -262,7 +262,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 								<div>
 									<div className="font-medium">Data de Expiração</div>
 									<div className="text-muted-foreground text-sm">
-										Link será excluído automaticamente
+										Link ficará inativo automaticamente
 									</div>
 								</div>
 							</div>

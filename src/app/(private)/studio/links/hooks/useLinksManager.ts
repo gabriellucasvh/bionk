@@ -1109,6 +1109,10 @@ export const useLinksManager = (
 		}
 		if ("expiresAt" in payload) {
 			sanitized.expiresAt = payload.expiresAt || null;
+			// Se a nova data de expiração é futura, reativa o link localmente
+			if (sanitized.expiresAt && new Date(sanitized.expiresAt) > new Date()) {
+				sanitized.active = true;
+			}
 		}
 		if ("shareAllowed" in payload) {
 			sanitized.shareAllowed = !!payload.shareAllowed;
@@ -1194,11 +1198,11 @@ export const useLinksManager = (
 							children: (item as any).children.map((link: any) =>
 								link.id === id
 									? {
-											...(link as any),
-											...newLink,
-											isDraft: false,
-											isEditing: false,
-										}
+										...(link as any),
+										...newLink,
+										isDraft: false,
+										isEditing: false,
+									}
 									: link
 							),
 						} as UnifiedItem;
@@ -1225,7 +1229,7 @@ export const useLinksManager = (
 		}
 
 		// Atualização de link existente incluindo campos avançados
-		await handleLinkUpdate(id, {
+		const updatePayload: Partial<LinkItem> = {
 			title,
 			url: formattedUrl,
 			badge: target?.badge ?? null,
@@ -1235,7 +1239,13 @@ export const useLinksManager = (
 			expiresAt: target?.expiresAt ?? null,
 			shareAllowed: target?.shareAllowed ?? false,
 			isEditing: false,
-		});
+		};
+		// Se a expiração está definida para o futuro, reativa no backend
+		if (target?.expiresAt && new Date(target.expiresAt) > new Date()) {
+			updatePayload.active = true;
+		}
+
+		await handleLinkUpdate(id, updatePayload);
 	};
 
 	const handleClickLink = (id: number) => {

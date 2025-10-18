@@ -19,6 +19,12 @@ export async function GET(request: Request): Promise<NextResponse> {
 	}
 
 	try {
+		// Inativar automaticamente links expirados antes de listar
+		await prisma.link.updateMany({
+			where: { userId, expiresAt: { lte: new Date() }, active: true },
+			data: { active: false },
+		});
+
 		const links = await prisma.link.findMany({
 			where: { userId, archived: status === "archived" },
 			orderBy: { order: "asc" },

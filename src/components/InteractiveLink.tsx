@@ -91,31 +91,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 				kind: "lock",
 			};
 		}
-		// Compartilhamento: mostra três pontos e abre modal
-		if (isShare) {
-			if (hasExpiry) {
-				const expirationDate = new Date(link.expiresAt!);
-				const formattedDate = expirationDate.toLocaleDateString("pt-BR");
-				return {
-					icon: <MoreVertical className="size-5" />,
-					tooltip: `Expira em ${formattedDate} — compartilhável`,
-					kind: "more",
-				};
-			}
-			return {
-				icon: <MoreVertical className="size-5" />,
-				tooltip: hasClicks ? "Compartilhamento permitido" : "Mais opções",
-				kind: "more",
-			};
-		}
-		// Sem compartilhamento: prioriza ícones específicos
-		if (hasClicks) {
-			return {
-				icon: <MousePointerClick className="size-5" />,
-				tooltip: `Será excluído após ${link.deleteOnClicks} cliques`,
-				kind: "click",
-			};
-		}
+		// Hierarquia: cadeado > clock > click > três pontos
 		if (hasExpiry) {
 			const expirationDate = new Date(link.expiresAt!);
 			const formattedDate = expirationDate.toLocaleDateString("pt-BR");
@@ -123,6 +99,21 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 				icon: <Clock className="size-5" />,
 				tooltip: `Expira em ${formattedDate}`,
 				kind: "clock",
+			};
+		}
+		if (hasClicks) {
+			return {
+				icon: <MousePointerClick className="size-5" />,
+				tooltip: `Será excluído após ${link.deleteOnClicks} cliques`,
+				kind: "click",
+			};
+		}
+		// Três pontos se for compartilhável ou sem atribuições
+		if (isShare) {
+			return {
+				icon: <MoreVertical className="size-5" />,
+				tooltip: "Compartilhamento permitido",
+				kind: "more",
 			};
 		}
 		return {

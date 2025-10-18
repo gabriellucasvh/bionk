@@ -84,6 +84,10 @@ const CountdownTimer = ({
 }) => {
 	const { days, hours, minutes, seconds, hasEnded } = useCountdown(date);
 	if (hasEnded) {
+		// Se não houver endText (string vazia), não renderiza nada para evitar duplicação
+		if (!endText || endText.trim().length === 0) {
+			return null;
+		}
 		return <p className="font-medium text-red-600 text-sm">{endText}</p>;
 	}
 	return (
@@ -260,7 +264,7 @@ const EditingView = ({
 								<div>
 									<div className="font-medium">Data de Expiração</div>
 									<div className="text-muted-foreground text-sm">
-										Link será excluído automaticamente
+										Link ficará inativo automaticamente
 									</div>
 								</div>
 							</div>
@@ -553,11 +557,13 @@ const LinkActionButtons = ({
 	isLinkAnimated,
 	setIsImageModalOpen,
 	toggleAnimation,
+	isExpired,
 }: {
 	link: LinkItem;
 	isLinkAnimated: boolean;
 	setIsImageModalOpen: (open: boolean) => void;
 	toggleAnimation: (id: number) => Promise<void>;
+	isExpired: boolean;
 }) => (
 	<div className="flex flex-wrap items-center gap-2">
 		{/* Botão de imagem simples */}
@@ -568,12 +574,20 @@ const LinkActionButtons = ({
 					? "text-green-600 hover:text-green-700"
 					: "text-muted-foreground hover:text-foreground"
 			)}
-			onClick={() => setIsImageModalOpen(true)}
+			disabled={isExpired}
+			onClick={() => {
+				if (isExpired) {
+					return;
+				}
+				setIsImageModalOpen(true);
+			}}
 			size="icon"
 			title={
-				link.customImageUrl
-					? "Alterar imagem personalizada"
-					: "Adicionar imagem personalizada"
+				isExpired
+					? "Expirado — adicionar/alterar imagem indisponível"
+					: link.customImageUrl
+						? "Alterar imagem personalizada"
+						: "Adicionar imagem personalizada"
 			}
 			variant="ghost"
 		>
@@ -588,8 +602,15 @@ const LinkActionButtons = ({
 							? "text-green-600 hover:text-green-700"
 							: "text-muted-foreground hover:text-foreground"
 					)}
+					disabled={isExpired}
 					size="icon"
-					title={isLinkAnimated ? "Desativar animação" : "Ativar animação"}
+					title={
+						isExpired
+							? "Expirado — animação indisponível"
+							: isLinkAnimated
+								? "Desativar animação"
+								: "Ativar animação"
+					}
 					variant="ghost"
 				>
 					<Zap className="h-4 w-4" />
@@ -612,6 +633,9 @@ const LinkActionButtons = ({
 					<AlertDialogAction
 						className="bg-green-600 hover:bg-green-700"
 						onClick={async () => {
+							if (isExpired) {
+								return;
+							}
 							await toggleAnimation(link.id);
 						}}
 					>
@@ -650,6 +674,13 @@ const DisplayView = (props: LinkCardProps) => {
 	const { toggleAnimation } = useLinkAnimation();
 	const { isLinkAnimated, isArchiving, isLaunching, isExpiring, isLinkLocked } =
 		useLinkStates(link, archivingLinkId);
+
+	// Força re-render e estado correto ao expirar usando o countdown
+	const { hasEnded: expirationEnded } = useCountdown(
+		link.expiresAt ??
+			new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 10).toISOString()
+	);
+	const isExpired = !!link.expiresAt && expirationEnded;
 
 	return (
 		<article
@@ -691,6 +722,7 @@ const DisplayView = (props: LinkCardProps) => {
 						onClickLink={onClickLink}
 					/>
 
+					{/* Dentro do header do DisplayView, abaixo dos timers */}
 					{isLaunching && link.launchesAt && (
 						<CountdownTimer
 							date={link.launchesAt}
@@ -698,17 +730,21 @@ const DisplayView = (props: LinkCardProps) => {
 							prefix="Lança em"
 						/>
 					)}
-					{isExpiring && !isLaunching && link.expiresAt && (
+					{isExpiring && !isExpired && !isLaunching && link.expiresAt && (
 						<CountdownTimer
 							date={link.expiresAt}
-							endText="Expirado!"
+							endText=""
 							prefix="Expira em"
 						/>
+					)}
+					{!isLaunching && isExpired && link.expiresAt && (
+						<p className="font-medium text-red-600 text-sm">Expirado!</p>
 					)}
 				</div>
 			</div>
 			<div className="flex flex-col gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
 				<LinkActionButtons
+					isExpired={isExpired}
 					isLinkAnimated={isLinkAnimated}
 					link={link}
 					setIsImageModalOpen={setIsImageModalOpen}
@@ -718,18 +754,21 @@ const DisplayView = (props: LinkCardProps) => {
 					<div className="flex items-center space-x-2">
 						<Switch
 							checked={link.active}
-							disabled={isTogglingActive}
+							disabled={isTogglingActive || isExpired}
 							id={`switch-${link.id}`}
 							onCheckedChange={(checked) => onToggleActive(link.id, checked)}
 						/>
 						<Label
 							className={cn(
 								"text-sm",
-								isTogglingActive
+								isTogglingActive || isExpired
 									? "cursor-default opacity-50"
 									: "cursor-pointer"
 							)}
 							htmlFor={`switch-${link.id}`}
+							title={
+								isExpired ? "Expirado — reativação indisponível" : undefined
+							}
 						>
 							{link.active ? "Ativo" : "Inativo"}
 						</Label>
@@ -766,7 +805,7 @@ const DisplayView = (props: LinkCardProps) => {
 			{/* Modal de upload de imagem */}
 			<ImageCropModal
 				currentImageUrl={link.customImageUrl}
-				isOpen={isImageModalOpen}
+				isOpen={isImageModalOpen && !isExpired}
 				linkId={link.id.toString()}
 				onClose={() => setIsImageModalOpen(false)}
 				onImageRemove={() => onRemoveCustomImage?.(link.id)}

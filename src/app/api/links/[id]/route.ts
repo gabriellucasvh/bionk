@@ -68,29 +68,50 @@ export async function PUT(
 			);
 		}
 
+		// Buscar expiração atual para validar reativação
+		const current = await prisma.link.findUnique({
+			where: { id: Number.parseInt(id, 10) },
+			select: { expiresAt: true },
+		});
+
+		const requestedExpiresDate = expiresAt ? new Date(expiresAt) : null;
+		const effectiveExpires = requestedExpiresDate ?? current?.expiresAt ?? null;
+		if (active === true && effectiveExpires && effectiveExpires <= new Date()) {
+			return NextResponse.json(
+				{ error: "Link expirado — não pode ser reativado" },
+				{ status: 400 }
+			);
+		}
+
+		// Montar payload de update sem apagar datas quando não enviadas
+		const updateData: any = {
+			title,
+			url,
+			active,
+			archived,
+			animated,
+			badge:
+				typeof badge === "string" && badge.trim() !== "" ? badge.trim() : null,
+			password:
+				typeof password === "string" ? password.trim() || null : password,
+			deleteOnClicks:
+				typeof deleteOnClicks === "number" && deleteOnClicks > 0
+					? deleteOnClicks
+					: null,
+			customImageUrl,
+			shareAllowed:
+				typeof shareAllowed === "boolean" ? shareAllowed : undefined,
+		};
+		if (Object.hasOwn(body, "launchesAt")) {
+			updateData.launchesAt = launchesAt ? new Date(launchesAt) : null;
+		}
+		if (Object.hasOwn(body, "expiresAt")) {
+			updateData.expiresAt = expiresAt ? new Date(expiresAt) : null;
+		}
+
 		const updatedLink = await prisma.link.update({
 			where: { id: Number.parseInt(id, 10) },
-			data: {
-				title,
-				url,
-				active,
-				archived,
-				launchesAt: launchesAt ? new Date(launchesAt) : null,
-				expiresAt: expiresAt ? new Date(expiresAt) : null,
-				animated,
-				badge:
-					typeof badge === "string" && badge.trim() !== ""
-						? badge.trim()
-						: null,
-				password:
-					typeof password === "string" ? password.trim() || null : password,
-				deleteOnClicks:
-					typeof deleteOnClicks === "number" && deleteOnClicks > 0
-						? deleteOnClicks
-						: null,
-				customImageUrl,
-				shareAllowed: typeof shareAllowed === "boolean" ? shareAllowed : undefined,
-			},
+			data: updateData,
 		});
 
 		// Revalida tanto o studio quanto a página do perfil
