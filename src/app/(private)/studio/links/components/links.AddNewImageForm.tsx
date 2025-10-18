@@ -550,7 +550,6 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 								<SelectItem value="16:9">16:9</SelectItem>
 								<SelectItem value="3:2">3:2</SelectItem>
 								<SelectItem value="3:1">3:1</SelectItem>
-								<SelectItem value="auto">Auto</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
