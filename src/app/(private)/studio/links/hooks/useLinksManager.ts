@@ -12,7 +12,7 @@ import type {
 	UnifiedDragItem,
 	VideoItem,
 } from "../types/links.types";
-import { fetcher, isValidUrl } from "../utils/links.helpers";
+import { isValidUrl } from "../utils/links.helpers";
 
 // --- TIPOS E CONSTANTES ---
 export type LinkFormData = {
