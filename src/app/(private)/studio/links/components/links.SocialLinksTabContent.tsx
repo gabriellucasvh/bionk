@@ -263,6 +263,16 @@ const SocialLinksTabContent = ({
 					</div>
 					<div className="flex flex-col gap-2 pt-2 sm:flex-row">
 						<BaseButton
+							className="w-full sm:w-auto"
+							onClick={handleCancel}
+							variant="white"
+						>
+							<span className="flex items-center justify-center">
+								<X className="mr-2 h-4 w-4" />
+								Cancelar
+							</span>
+						</BaseButton>
+						<BaseButton
 							className="w-full flex-grow sm:w-auto"
 							loading={isSaving}
 							onClick={handleAddOrUpdateSocialLink}
@@ -274,16 +284,6 @@ const SocialLinksTabContent = ({
 									<Plus className="mr-2 h-4 w-4" />
 								)}
 								{editingLinkId ? "Salvar Alterações" : "Adicionar Link"}
-							</span>
-						</BaseButton>
-						<BaseButton
-							className="w-full sm:w-auto"
-							onClick={handleCancel}
-							variant="white"
-						>
-							<span className="flex items-center justify-center">
-								<X className="mr-2 h-4 w-4" />
-								Cancelar
 							</span>
 						</BaseButton>
 					</div>
