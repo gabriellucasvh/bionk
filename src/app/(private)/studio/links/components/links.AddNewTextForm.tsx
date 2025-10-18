@@ -225,7 +225,7 @@ const AddNewTextForm = (props: AddNewTextFormProps) => {
 						loading={isLoading}
 						onClick={handleSave}
 					>
-						Salvar Texto
+						Salvar 
 					</BaseButton>
 				</div>
 			</div>

@@ -8,6 +8,7 @@ import VideoCard from "@/components/VideoCard";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
+import { detectTrafficSource } from "@/utils/traffic-source";
 import PasswordProtectedLink from "./PasswordProtectedLink";
 import TextCard from "./TextCard";
 
@@ -285,7 +286,33 @@ export default function LinksList({
 		}
 	};
 
-	const renderImageItem = (img: any, ratio?: string) => {
+	const sendImageClickData = (imageId: number, itemIndex: number) => {
+		try {
+			const payload = JSON.stringify({
+				imageId,
+				itemIndex,
+				trafficSource: detectTrafficSource(),
+			});
+			if ("sendBeacon" in navigator) {
+				const blob = new Blob([payload], { type: "application/json" });
+				navigator.sendBeacon("/api/image-click", blob);
+			} else {
+				fetch("/api/image-click", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: payload,
+					keepalive: true,
+				}).catch(() => {});
+			}
+		} catch {}
+	};
+
+	const renderImageItem = (
+		imageId: number,
+		img: any,
+		itemIndex: number,
+		ratio?: string
+	) => {
 		const src = img.previewUrl || img.url;
 		const content = (
 			<div
@@ -314,7 +341,12 @@ export default function LinksList({
 		const href = normalizeExternalUrl(img.linkUrl);
 		if (href) {
 			return (
-				<a href={href} rel="noopener noreferrer" target="_blank">
+				<a
+					href={href}
+					onClick={() => sendImageClickData(imageId, itemIndex)}
+					rel="noopener noreferrer"
+					target="_blank"
+				>
 					{content}
 				</a>
 			);
@@ -357,7 +389,7 @@ export default function LinksList({
 					>
 						{header}
 						<div className="overflow-hidden" style={buttonStyle}>
-							{renderImageItem(image.items?.[0], image.ratio)}
+							{renderImageItem(image.id, image.items?.[0], 0, image.ratio)}
 						</div>
 					</div>
 				);
@@ -415,7 +447,7 @@ export default function LinksList({
 											key={`img-${image.id}-${idx}`}
 											style={{ borderRadius: `${cornerValue}px` }}
 										>
-											{renderImageItem(img, image.ratio)}
+											{renderImageItem(image.id, img, idx, image.ratio)}
 										</div>
 									))}
 								</div>
@@ -442,7 +474,7 @@ export default function LinksList({
 										key={`img-${image.id}-${idx}`}
 										style={{ borderRadius: `${cornerValue}px` }}
 									>
-										{renderImageItem(img, image.ratio)}
+										{renderImageItem(image.id, img, idx, image.ratio)}
 									</div>
 								))}
 							</div>

@@ -93,6 +93,7 @@ export type ImageItem = {
 		authorLink?: string | null;
 		sourceLink?: string | null;
 		linkUrl?: string | null; // link opcional por imagem
+		clicks?: number; // contagem de cliques por imagem
 	}>;
 	active: boolean;
 	order: number;

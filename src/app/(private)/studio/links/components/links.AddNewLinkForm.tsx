@@ -383,7 +383,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					loading={isLoading}
 					onClick={handleSave}
 				>
-					Salvar Link
+					Salvar 
 				</BaseButton>
 			</div>
 		</div>

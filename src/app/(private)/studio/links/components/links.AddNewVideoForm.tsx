@@ -190,7 +190,7 @@ const AddNewVideoForm = (props: AddNewVideoFormProps) => {
 						loading={isLoading}
 						onClick={handleSave}
 					>
-						Salvar Vídeo
+						Salvar
 					</BaseButton>
 				</div>
 			</div>

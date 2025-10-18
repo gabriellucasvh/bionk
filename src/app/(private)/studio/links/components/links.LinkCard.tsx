@@ -484,11 +484,7 @@ const EditingView = ({
 				</div>
 
 				<div className="flex justify-end gap-2">
-					<BaseButton
-						onClick={() => onCancelEditing(link.id)}
-						size="sm"
-						variant="white"
-					>
+					<BaseButton onClick={() => onCancelEditing(link.id)} variant="white">
 						<X className="mr-2 h-4 w-4" />
 						Cancelar
 					</BaseButton>
@@ -496,7 +492,6 @@ const EditingView = ({
 						disabled={!(isValidUrl(link.url || "") && link.title && hasChanges)}
 						loading={isLoading}
 						onClick={handleSave}
-						size="sm"
 					>
 						<Save className="mr-2 h-4 w-4" />
 						Salvar

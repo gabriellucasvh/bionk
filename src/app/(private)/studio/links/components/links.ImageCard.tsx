@@ -5,10 +5,13 @@ import {
 	Edit,
 	Grip,
 	Image as ImageIcon,
+	LinkIcon,
 	MoreVertical,
+	MousePointerClick,
 	Trash2,
 } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -122,6 +125,16 @@ const DisplayView = ({
 	};
 
 	const itemCount = Array.isArray(image.items) ? image.items.length : 0;
+	const clickableCount = Array.isArray(image.items)
+		? image.items.filter((it) => !!(it.linkUrl && it.linkUrl?.trim())).length
+		: 0;
+
+	const totalClicks = Array.isArray(image.items)
+		? image.items.reduce(
+				(sum: number, it: any) => sum + (Number(it?.clicks) || 0),
+				0
+			)
+		: 0;
 
 	const layoutLabel = (() => {
 		switch (image.layout) {
@@ -161,9 +174,7 @@ const DisplayView = ({
 							<ImageIcon className="h-4 w-4 text-white" />
 						</div>
 						<span className="font-medium text-sm">Imagem ({layoutLabel})</span>
-						<span className="text-muted-foreground text-xs">
-							{itemCount} Imagem(s)
-						</span>
+						{/* Removed inline item count next to title */}
 					</header>
 
 					{(image.title || image.description) && (
@@ -186,7 +197,46 @@ const DisplayView = ({
 					)}
 				</div>
 			</div>
-			<div className="flex items-center justify-end border-t pt-3">
+			<div className="flex items-center justify-between border-t pt-3">
+				<div className="flex items-center gap-2">
+					<Badge
+						className="flex items-center gap-1"
+						title="Quantidade de imagens"
+						variant="outline"
+					>
+						<ImageIcon className="h-3 w-3" />
+						<span className="hidden sm:inline">
+							{itemCount.toLocaleString()}
+						</span>
+						<span className="sm:hidden">{itemCount}</span>
+					</Badge>
+					{clickableCount > 0 && (
+						<Badge
+							className="flex items-center gap-1"
+							title="Imagens com link"
+							variant="outline"
+						>
+							<LinkIcon className="h-3 w-3" />
+							<span className="hidden sm:inline">
+								{clickableCount.toLocaleString()}
+							</span>
+							<span className="sm:hidden">{clickableCount}</span>
+						</Badge>
+					)}
+					{totalClicks > 0 && (
+						<Badge
+							className="flex items-center gap-1"
+							title="Total de cliques"
+							variant="outline"
+						>
+							<MousePointerClick className="h-3 w-3" />
+							<span className="hidden sm:inline">
+								{totalClicks.toLocaleString()}
+							</span>
+							<span className="sm:hidden">{totalClicks}</span>
+						</Badge>
+					)}
+				</div>
 				<div className="flex items-center gap-2 sm:gap-4">
 					<div className="flex items-center space-x-2">
 						<Switch

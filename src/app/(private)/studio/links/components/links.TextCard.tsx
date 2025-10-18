@@ -239,7 +239,7 @@ const TextCard = ({
 					</div>
 				</div>
 				<div className="flex items-center justify-end gap-2 border-t pt-3">
-					<BaseButton onClick={handleCancel} size="sm" variant="white">
+					<BaseButton onClick={handleCancel} variant="white">
 						<X className="mr-2 h-4 w-4" />
 						Cancelar
 					</BaseButton>
@@ -247,7 +247,6 @@ const TextCard = ({
 						disabled={isLoading || !text.title || !hasChanges}
 						loading={isLoading}
 						onClick={handleSave}
-						size="sm"
 						variant="default"
 					>
 						<Save className="mr-2 h-4 w-4" />

@@ -7,6 +7,7 @@ import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons"
 import VideoCard from "@/components/VideoCard";
 import { cn } from "@/lib/utils";
 import type { UserLink, UserProfile } from "@/types/user-profile";
+import { detectTrafficSource } from "@/utils/traffic-source";
 import { FONT_OPTIONS } from "../constants/design.constants";
 import { useInstantPreview } from "../hooks/useInstantPreview";
 
@@ -613,7 +614,34 @@ function ContentList({
 		}
 	};
 
-	const renderImageItem = (img: any, ratio?: string) => {
+	// Send image click tracking to backend
+	const sendImageClickData = (imageId: number | string, itemIndex: number) => {
+		try {
+			const trafficSource = detectTrafficSource();
+			const payload = JSON.stringify({ imageId, itemIndex, trafficSource });
+			const url = "/api/image-click";
+			if (navigator.sendBeacon) {
+				const blob = new Blob([payload], { type: "application/json" });
+				navigator.sendBeacon(url, blob);
+			} else {
+				fetch(url, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: payload,
+					keepalive: true,
+				});
+			}
+		} catch (_) {
+			// ignore errors in preview
+		}
+	};
+
+	const renderImageItem = (
+		img: any,
+		ratio?: string,
+		imageId?: number | string,
+		itemIndex?: number
+	) => {
 		const src = img?.previewUrl || img?.url;
 		if (!src) {
 			return null;
@@ -643,7 +671,16 @@ function ContentList({
 		);
 		const href = normalizeExternalUrl(img?.linkUrl);
 		return href ? (
-			<a href={href} rel="noopener noreferrer" target="_blank">
+			<a
+				href={href}
+				onClick={() => {
+					if (imageId != null && itemIndex != null) {
+						sendImageClickData(imageId, itemIndex);
+					}
+				}}
+				rel="noopener noreferrer"
+				target="_blank"
+			>
 				{content}
 			</a>
 		) : (
@@ -681,7 +718,7 @@ function ContentList({
 					>
 						{header}
 						<div className="overflow-hidden" style={buttonStyle}>
-							{renderImageItem(image?.items?.[0], image?.ratio)}
+							{renderImageItem(image?.items?.[0], image?.ratio, image?.id, 0)}
 						</div>
 					</div>
 				);
@@ -739,7 +776,7 @@ function ContentList({
 											key={`img-${image.id}-${idx}`}
 											style={{ borderRadius: `${cornerValue}px` }}
 										>
-											{renderImageItem(img, image?.ratio)}
+											{renderImageItem(img, image?.ratio, image?.id, idx)}
 										</div>
 									))}
 								</div>
@@ -764,7 +801,7 @@ function ContentList({
 									key={`img-${image.id}-${idx}`}
 									style={buttonStyle}
 								>
-									{renderImageItem(img, image?.ratio)}
+									{renderImageItem(img, image?.ratio, image?.id, idx)}
 								</div>
 							))}
 						</div>
