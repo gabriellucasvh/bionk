@@ -222,7 +222,7 @@ const PersonalizarClient = () => {
 				aria-label={
 					mobileView === "design" ? "Ver preview" : "Voltar ao design"
 				}
-				className="fixed right-6 bottom-24 z-50 rounded-full bg-lime-400 p-3 text-white shadow-lg transition-colors hover:bg-lime-500 active:scale-95 md:hidden"
+				className="fixed right-6 bottom-30 z-50 rounded-full bg-lime-400 p-3 text-white shadow-lg transition-colors hover:bg-lime-500 active:scale-95 md:hidden"
 				onClick={() =>
 					handleMobileViewChange(mobileView === "design" ? "preview" : "design")
 				}

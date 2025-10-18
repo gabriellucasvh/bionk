@@ -745,7 +745,7 @@ const DisplayView = (props: LinkCardProps) => {
 					setIsImageModalOpen={setIsImageModalOpen}
 					toggleAnimation={toggleAnimation}
 				/>
-				<div className="flex items-center justify-between gap-2 sm:gap-4">
+				<div className="flex items-center justify-end gap-2 sm:gap-4">
 					<div className="flex items-center space-x-2">
 						<Switch
 							checked={link.active}
