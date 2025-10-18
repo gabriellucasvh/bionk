@@ -894,9 +894,26 @@ function convertUserDataToUserProfile(userData: any): UserProfile {
 	}
 
 	// Separar links regulares dos social links
-	const allLinks = userData.links || [];
-	const regularLinks = allLinks.filter((link: any) => !link.platform);
-	const socialLinks = allLinks.filter((link: any) => link.platform);
+	const allLinks = Array.isArray(userData.links) ? userData.links : [];
+	const now = new Date();
+	const withinSchedule = (l: any) => {
+		const launchesOk = !l?.launchesAt || new Date(l.launchesAt) <= now;
+		const expiresOk = !l?.expiresAt || new Date(l.expiresAt) >= now;
+		return launchesOk && expiresOk;
+	};
+
+	const regularLinks = allLinks
+		.filter((link: any) => !link.platform)
+		// Não renderizar itens do tipo seção como links
+		.filter((link: any) => link?.type !== "section")
+		// Ocultar inativos/arquivados e fora da janela de tempo
+		.filter((link: any) => link?.active !== false && link?.archived !== true)
+		.filter(withinSchedule);
+
+	const socialLinks = allLinks
+		.filter((link: any) => link.platform)
+		// Social links seguem apenas flag de ativo
+		.filter((link: any) => link?.active !== false);
 
 	return {
 		...userData,

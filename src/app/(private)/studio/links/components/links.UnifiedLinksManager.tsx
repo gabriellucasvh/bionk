@@ -3,6 +3,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 import useSWR from "swr";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
@@ -13,13 +14,14 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useDesignStore } from "@/stores/designStore";
 import type { SocialLinkItem } from "@/types/social";
 import type {
+	ImageItem,
 	LinkItem,
 	SectionItem,
 	TextItem,
 	VideoItem,
-	ImageItem,
 } from "../types/links.types";
 import { fetcher } from "../utils/links.helpers";
 
@@ -84,6 +86,27 @@ const UnifiedLinksManager = () => {
 		isLoading: isLoadingImages,
 	} = useSWR<{ images: ImageItem[] }>(userId ? "/api/images" : null, fetcher);
 
+	// Sincroniza o preview em tempo real com os dados do SWR
+	useEffect(() => {
+		const storeUser = useDesignStore.getState().userData;
+		if (!storeUser) {
+			return;
+		}
+
+		const mergedLinks = [
+			...(linksData?.links || []),
+			...(socialLinksData?.socialLinks || []),
+		];
+
+		useDesignStore.getState().setUserData({
+			...storeUser,
+			links: mergedLinks as any,
+			texts: (textsData?.texts || []) as any,
+			videos: (videosData?.videos || []) as any,
+			images: (imagesData?.images || []) as any,
+		});
+	}, [linksData, socialLinksData, textsData, videosData, imagesData]);
+
 	if (
 		status === "loading" ||
 		isLoadingLinks ||
@@ -117,16 +140,16 @@ const UnifiedLinksManager = () => {
 					<CardContent className="space-y-4 p-2 sm:p-6">
 						<TabsContent className="mt-0" value="links">
 							<LinksTabContent
+								currentImages={imagesData?.images || []}
 								currentLinks={linksData?.links || []}
 								currentSections={sectionsData || []}
 								currentTexts={textsData?.texts || []}
 								currentVideos={videosData?.videos || []}
-								currentImages={imagesData?.images || []}
+								mutateImages={mutateImages}
 								mutateLinks={mutateLinks}
 								mutateSections={mutateSections}
 								mutateTexts={mutateTexts}
 								mutateVideos={mutateVideos}
-								mutateImages={mutateImages}
 								session={session}
 							/>
 						</TabsContent>
