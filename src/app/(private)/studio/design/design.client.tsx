@@ -1,6 +1,7 @@
 // src/app/(private)/studio/design/design.client.tsx
 "use client";
 
+import { Eye, EyeOff } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import LoadingPage from "@/components/layout/LoadingPage";
@@ -216,35 +217,23 @@ const PersonalizarClient = () => {
 
 	return (
 		<div className="min-h-screen w-full bg-white text-black transition-colors dark:bg-neutral-800 dark:text-white">
-			{/* Navbar Mobile - Visível apenas em telas menores que md */}
-			<div className="md:hidden">
-				<div className="fixed top-0 right-0 left-0 z-50 border-gray-200 border-b bg-white dark:border-gray-700 dark:bg-neutral-800">
-					<div className="flex">
-						<button
-							className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
-								mobileView === "design"
-									? "border-green-600 border-b-2 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400"
-									: "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
-							}`}
-							onClick={() => handleMobileViewChange("design")}
-							type="button"
-						>
-							Design
-						</button>
-						<button
-							className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
-								mobileView === "preview"
-									? "border-green-600 border-b-2 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400"
-									: "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
-							}`}
-							onClick={() => handleMobileViewChange("preview")}
-							type="button"
-						>
-							Preview
-						</button>
-					</div>
-				</div>
-			</div>
+			{/* Botão flutuante mobile substitui navbar */}
+			<button
+				aria-label={
+					mobileView === "design" ? "Ver preview" : "Voltar ao design"
+				}
+				className="fixed right-6 bottom-24 z-50 rounded-full bg-lime-400 p-3 text-white shadow-lg transition-colors hover:bg-lime-500 active:scale-95 md:hidden"
+				onClick={() =>
+					handleMobileViewChange(mobileView === "design" ? "preview" : "design")
+				}
+				type="button"
+			>
+				{mobileView === "design" ? (
+					<Eye className="h-6 w-6 text-black" />
+				) : (
+					<EyeOff className="h-6 w-6 text-black" />
+				)}
+			</button>
 
 			{/* Conteúdo Principal */}
 			<div className="md:flex">
@@ -255,7 +244,7 @@ const PersonalizarClient = () => {
 					}`}
 					ref={designContainerRef}
 				>
-					<section className="flex min-h-screen flex-col gap-6 px-6 py-8 pt-20 pb-24 md:pt-8 md:pr-8 xl:pr-100">
+					<section className="flex min-h-screen flex-col gap-6 px-6 pt-10 pb-24 md:pt-8 md:pr-8 xl:pr-100">
 						<ProfileSection
 							bioValidationError={bioValidationError}
 							isCheckingUsername={isCheckingUsername}
@@ -292,16 +281,16 @@ const PersonalizarClient = () => {
 
 				{/* Preview Mobile - Visível apenas quando selecionado no mobile */}
 				<div
-					className={`fixed inset-0 z-10 bg-gray-100 md:hidden dark:bg-neutral-900 ${
+					className={`fixed inset-0 z-40 bg-gray-100 md:hidden dark:bg-neutral-900 ${
 						mobileView === "design" ? "hidden" : "block"
 					}`}
 					ref={previewContainerRef}
 				>
-					<div className="flex h-full justify-center overflow-y-auto px-6 pt-20 pb-20">
+					<div className="flex h-full justify-center overflow-y-auto px-6 pt-10 pb-24">
 						<div
 							className="mx-auto h-full w-full overflow-hidden rounded-3xl bg-white shadow-lg dark:bg-neutral-800"
 							style={{
-								height: "calc(100vh - 10rem)",
+								height: "calc(100vh - 8rem)",
 								maxWidth: "365px",
 							}}
 						>

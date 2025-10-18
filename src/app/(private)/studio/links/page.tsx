@@ -1,7 +1,7 @@
 // app/studio/links/page.tsx
 
 import type { Metadata } from "next";
-import UnifiedLinksManager from "./components/links.UnifiedLinksManager";
+import LinksStudioClient from "./links.client";
 
 export const metadata: Metadata = {
 	title: "Bionk Links",
@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 
 export default function LinksPage() {
 	return (
-			<div className="bg-white dark:bg-neutral-800">
-			<UnifiedLinksManager />
+		<div className="bg-white dark:bg-neutral-800">
+			<LinksStudioClient />
 		</div>
 	);
 }
