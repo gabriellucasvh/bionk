@@ -76,11 +76,15 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 		Array.isArray((formData as any).images) &&
 		(formData as any).images.length > 0;
 	const computedDisabled = useMemo(() => {
+		const count = Array.isArray(formData.images) ? formData.images.length : 0;
 		if (formData.layout === "column") {
-			return !(hasImages && formData.title.trim().length > 0);
+			return !(count > 0 && formData.title.trim().length > 0);
 		}
-		return !hasImages;
-	}, [formData.layout, hasImages, formData.title]);
+		if (formData.layout === "carousel") {
+			return count < 2;
+		}
+		return count === 0;
+	}, [formData.layout, formData.images, formData.title]);
 	const isSaveDisabled =
 		typeof propIsSaveDisabled === "boolean"
 			? propIsSaveDisabled

@@ -75,12 +75,16 @@ const validateVideoForm = (videoFormData: VideoFormData): boolean => {
 };
 
 const validateImageForm = (imageFormData: ImageFormData): boolean => {
-	const hasImages =
-		Array.isArray(imageFormData.images) && imageFormData.images.length > 0;
+	const count = Array.isArray(imageFormData.images)
+		? imageFormData.images.length
+		: 0;
 	if (imageFormData.layout === "column") {
-		return hasImages && imageFormData.title.trim().length > 0;
+		return count > 0 && imageFormData.title.trim().length > 0;
 	}
-	return hasImages;
+	if (imageFormData.layout === "carousel") {
+		return count >= 2;
+	}
+	return count > 0;
 };
 
 const isVideoOption = (selectedOption: string | null): boolean => {

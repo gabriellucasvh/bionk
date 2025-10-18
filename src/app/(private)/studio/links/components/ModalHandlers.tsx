@@ -148,8 +148,12 @@ export const useModalHandlers = ({
     };
 
     const handleImageSubmit = async () => {
-        const hasImages = Array.isArray((imageFormData as any).images) && (imageFormData as any).images.length > 0;
-        if (!hasImages) {
+        const count = Array.isArray((imageFormData as any).images)
+            ? (imageFormData as any).images.length
+            : 0;
+        const layout = (imageFormData as any).layout;
+        const isValid = layout === "carousel" ? count >= 2 : count > 0;
+        if (!isValid) {
             return;
         }
 
