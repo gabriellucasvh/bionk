@@ -23,9 +23,9 @@ import CategorySelector from "./CategorySelector";
 import ContentOptions from "./ContentOptions";
 import FormRenderer from "./FormRenderer";
 import ImageOptions from "./ImageOptions";
-import MediaOptions from "./MediaOptions";
 import MobileBottomSheet from "./MobileBottomSheet";
 import { useModalHandlers } from "./ModalHandlers";
+import VideoOptions from "./VideoOptions";
 
 interface AddContentModalProps {
 	isOpen: boolean;
@@ -327,7 +327,7 @@ const AddContentModal = ({
 									/>
 								)}
 								{selectedCategory === "video" && (
-									<MediaOptions onOptionSelect={handleOptionSelectWithState} />
+									<VideoOptions onOptionSelect={handleOptionSelectWithState} />
 								)}
 								{selectedCategory === "image" && (
 									<ImageOptions onOptionSelect={handleImageOptionSelect} />
@@ -401,7 +401,7 @@ const AddContentModal = ({
 											/>
 										)}
 										{selectedCategory === "video" && (
-											<MediaOptions
+											<VideoOptions
 												onOptionSelect={handleOptionSelectWithState}
 											/>
 										)}

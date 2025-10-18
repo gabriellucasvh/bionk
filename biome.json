@@ -23,7 +23,8 @@
         "noEmptyBlockStatements": "off"
       },
       "complexity": {
-        "useOptionalChain": "off"
+        "useOptionalChain": "off",
+        "noExcessiveCognitiveComplexity": "off"
       }
     }
   },

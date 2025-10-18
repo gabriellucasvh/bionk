@@ -2,15 +2,15 @@
 
 import CategorySelector from "./CategorySelector";
 import ContentOptions from "./ContentOptions";
-import MediaOptions from "./MediaOptions";
 import ImageOptions from "./ImageOptions";
+import VideoOptions from "./VideoOptions";
 
 interface ContentRendererProps {
-    selectedCategory: "content" | "video" | "image" | null;
-    selectedOption: string | null;
-    onCategorySelect: (category: "content" | "video" | "image") => void;
-    onOptionSelect: (option: string) => void;
-    showCategorySelector?: boolean;
+	selectedCategory: "content" | "video" | "image" | null;
+	selectedOption: string | null;
+	onCategorySelect: (category: "content" | "video" | "image") => void;
+	onOptionSelect: (option: string) => void;
+	showCategorySelector?: boolean;
 }
 
 const ContentRenderer = ({
@@ -41,21 +41,21 @@ const ContentRenderer = ({
 				<ContentOptions onOptionSelect={onOptionSelect} />
 			)}
 
-            {selectedCategory === "video" && !selectedOption && (
-                <MediaOptions onOptionSelect={onOptionSelect} />
-            )}
+			{selectedCategory === "video" && !selectedOption && (
+				<VideoOptions onOptionSelect={onOptionSelect} />
+			)}
 
-            {selectedCategory === "image" && !selectedOption && (
-                <ImageOptions
-                    onOptionSelect={(option) => {
-                        // ContentRenderer não controla formulários;
-                        // apenas repassa a opção selecionada
-                        onOptionSelect(option);
-                    }}
-                />
-            )}
-        </>
-    );
+			{selectedCategory === "image" && !selectedOption && (
+				<ImageOptions
+					onOptionSelect={(option) => {
+						// ContentRenderer não controla formulários;
+						// apenas repassa a opção selecionada
+						onOptionSelect(option);
+					}}
+				/>
+			)}
+		</>
+	);
 };
 
 export default ContentRenderer;

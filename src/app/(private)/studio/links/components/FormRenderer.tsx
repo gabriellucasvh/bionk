@@ -11,6 +11,7 @@ import type {
 } from "../hooks/useLinksManager";
 import type { SectionItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
+import { isValidVideoUrl } from "../utils/video.helpers";
 import AddNewImageCarouselForm from "./links.AddNewImageCarouselForm";
 import AddNewImageColumnForm from "./links.AddNewImageColumnForm";
 import AddNewImageSingleForm from "./links.AddNewImageSingleForm";
@@ -69,7 +70,8 @@ const validateTextForm = (textFormData: TextFormData): boolean => {
 };
 
 const validateVideoForm = (videoFormData: VideoFormData): boolean => {
-	return videoFormData.url.trim().length > 0;
+	const { valid } = isValidVideoUrl(videoFormData.url || "");
+	return valid;
 };
 
 const validateImageForm = (imageFormData: ImageFormData): boolean => {

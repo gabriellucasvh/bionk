@@ -1,50 +1,76 @@
 "use client";
 
-import { GalleryVerticalEnd, Image as ImageIcon, Images } from "lucide-react";
+import Image from "next/image";
 
 interface ImageOptionsProps {
-  onOptionSelect: (option: "image_single" | "image_column" | "image_carousel") => void;
+	onOptionSelect: (
+		option: "image_single" | "image_column" | "image_carousel"
+	) => void;
 }
 
 const ImageOptions = ({ onOptionSelect }: ImageOptionsProps) => {
-  return (
-    <div>
-      <div className="grid grid-cols-3 gap-4">
-        <button
-          type="button"
-          onClick={() => onOptionSelect("image_single")}
-          className="flex flex-col items-center gap-2 rounded-lg p-6 transition-colors hover:bg-muted"
-        >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500">
-            <ImageIcon className="h-6 w-6 text-white" />
-          </div>
-          <span className="font-medium text-sm">Única</span>
-        </button>
+	return (
+		<div>
+			<div className="grid grid-cols-3 gap-4">
+				<button
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					onClick={() => onOptionSelect("image_single")}
+					type="button"
+				>
+					<div
+						className="relative w-20 overflow-hidden rounded-2xl border"
+						style={{ aspectRatio: "6 / 7" }}
+					>
+						<Image
+							alt="Imagem Única"
+							className="object-cover"
+							fill
+							src="/images/única.png"
+						/>
+					</div>
+					<span className="font-medium text-sm">Única</span>
+				</button>
 
-        <button
-          type="button"
-          onClick={() => onOptionSelect("image_column")}
-          className="flex flex-col items-center gap-2 rounded-lg p-6 transition-colors hover:bg-muted"
-        >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-500">
-            <Images className="h-6 w-6 text-white" />
-          </div>
-          <span className="font-medium text-sm">Coluna</span>
-        </button>
+				<button
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					onClick={() => onOptionSelect("image_column")}
+					type="button"
+				>
+					<div
+						className="relative w-20 overflow-hidden rounded-2xl border"
+						style={{ aspectRatio: "6 / 7" }}
+					>
+						<Image
+							alt="Imagem em Coluna"
+							className="object-cover"
+							fill
+							src="/images/coluna.png"
+						/>
+					</div>
+					<span className="font-medium text-sm">Coluna</span>
+				</button>
 
-        <button
-          type="button"
-          onClick={() => onOptionSelect("image_carousel")}
-          className="flex flex-col items-center gap-2 rounded-lg p-6 transition-colors hover:bg-muted"
-        >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500">
-            <GalleryVerticalEnd className="h-6 w-6 text-white" />
-          </div>
-          <span className="font-medium text-sm">Carrossel</span>
-        </button>
-      </div>
-    </div>
-  );
+				<button
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					onClick={() => onOptionSelect("image_carousel")}
+					type="button"
+				>
+					<div
+						className="relative w-20 overflow-hidden rounded-2xl border"
+						style={{ aspectRatio: "6 / 7" }}
+					>
+						<Image
+							alt="Imagem em Carrossel"
+							className="object-cover"
+							fill
+							src="/images/carrossel.png"
+						/>
+					</div>
+					<span className="font-medium text-sm">Carrossel</span>
+				</button>
+			</div>
+		</div>
+	);
 };
 
 export default ImageOptions;

@@ -27,7 +27,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { VideoItem } from "../types/links.types";
-import { getVideoPlatform } from "../utils/video.helpers";
+import { getVideoPlatform, isValidVideoUrl } from "../utils/video.helpers";
 
 interface VideoCardProps {
 	video: VideoItem;
@@ -69,29 +69,35 @@ const EditingView = ({
 	| "onCancelEditingVideo"
 	| "originalVideo"
 >) => {
-	const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [urlError, setUrlError] = useState<string | null>(null);
 
-	const hasChanges = originalVideo
-		? video.title !== originalVideo.title ||
-			video.description !== originalVideo.description ||
-			video.url !== originalVideo.url
-		: true;
+     const hasChanges = originalVideo
+         ? video.title !== originalVideo.title ||
+             video.description !== originalVideo.description ||
+             video.url !== originalVideo.url
+         : true;
 
-	const handleSave = async () => {
-		if (video.title && video.url) {
-			setIsLoading(true);
-			try {
-				await onSaveEditingVideo?.(
-					video.id,
-					video.title,
-					video.description || "",
-					video.url
-				);
-			} finally {
-				setIsLoading(false);
-			}
-		}
-	};
+     const handleSave = async () => {
+        const { valid, error } = isValidVideoUrl(video.url || "");
+        if (!valid) {
+            setUrlError(error || null);
+            return;
+        }
+        if (video.title && video.url) {
+            setIsLoading(true);
+            try {
+                await onSaveEditingVideo?.(
+                    video.id,
+                    video.title,
+                    video.description || "",
+                    video.url
+                );
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
 
 	const handleCancel = () => {
 		onCancelEditingVideo?.(video.id);
@@ -135,30 +141,39 @@ const EditingView = ({
 					</Label>
 					<Input
 						id="video-url"
-						onChange={(e) => onVideoChange?.(video.id, "url", e.target.value)}
-						placeholder="Cole a URL do vídeo aqui"
-						value={video.url}
-					/>
-				</div>
-			</div>
+                        onChange={(e) => {
+                            const nextUrl = e.target.value;
+                            const { valid, error } = isValidVideoUrl(nextUrl);
+                            setUrlError(valid ? null : error || null);
+                            onVideoChange?.(video.id, "url", nextUrl);
+                        }}
+                        placeholder="Cole a URL do vídeo (YouTube, Vimeo, TikTok, Twitch ou arquivo .mp4/.webm/.ogg)"
+                        value={video.url}
+                        aria-invalid={!!urlError}
+                    />
+                    {urlError && (
+                        <p className="text-destructive text-xs">{urlError}</p>
+                    )}
+                 </div>
+             </div>
 
-			<div className="flex justify-end gap-2">
-				<BaseButton onClick={handleCancel}  variant="white">
-					<X className="mr-2 h-4 w-4" />
-					Cancelar
-				</BaseButton>
-				<BaseButton
-					disabled={!(video.title && video.url && hasChanges)}
-					loading={isLoading}
-					onClick={handleSave}
-				>
-					<Save className="mr-2 h-4 w-4" />
-					Salvar
-				</BaseButton>
-			</div>
-		</div>
-	);
-};
+             <div className="flex justify-end gap-2">
+                 <BaseButton onClick={handleCancel}  variant="white">
+                     <X className="mr-2 h-4 w-4" />
+                     Cancelar
+                 </BaseButton>
+                 <BaseButton
+                    disabled={!(video.title && video.url && hasChanges) || !!urlError}
+                    loading={isLoading}
+                    onClick={handleSave}
+                 >
+                     <Save className="mr-2 h-4 w-4" />
+                     Salvar
+                 </BaseButton>
+             </div>
+         </div>
+     );
+ };
 
 const DisplayView = ({
 	video,

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { SectionItem } from "../types/links.types";
+import { isValidVideoUrl } from "../utils/video.helpers";
 
 type VideoFormData = {
 	title: string;
@@ -67,6 +68,7 @@ const AddNewVideoForm = (props: AddNewVideoFormProps) => {
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [activeSection, setActiveSection] = useState<string>("");
+	const [urlError, setUrlError] = useState<string | null>(null);
 
 	const handleSave = async () => {
 		setIsLoading(true);
@@ -103,17 +105,24 @@ const AddNewVideoForm = (props: AddNewVideoFormProps) => {
 						<Label htmlFor="url">URL do Vídeo *</Label>
 						<Input
 							id="url"
-							onChange={(e) =>
+							onChange={(e) => {
+								const nextUrl = e.target.value;
+								const { valid, error } = isValidVideoUrl(nextUrl);
+								setUrlError(valid ? null : error || null);
 								setFormData({
 									...formData,
-									url: e.target.value,
+									url: nextUrl,
 									type: formData.type || "direct",
-								})
-							}
+								});
+							}}
 							placeholder="Cole a URL do vídeo (YouTube, Vimeo, TikTok, Twitch ou arquivo .mp4/.webm/.ogg)"
 							type="url"
 							value={formData.url}
+							aria-invalid={!!urlError}
 						/>
+						{urlError && (
+							<p className="text-destructive text-xs">{urlError}</p>
+						)}
 						<p className="text-muted-foreground text-xs">
 							Suportamos YouTube, Vimeo, TikTok, Twitch e arquivos de vídeo
 							diretos
