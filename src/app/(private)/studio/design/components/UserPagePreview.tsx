@@ -995,12 +995,12 @@ export default function UserPagePreview() {
 			return (
 				<div
 					aria-hidden
-					className="pointer-events-none absolute top-0 right-0 left-0 z-0 w-full rounded-[inherit]"
+					className="pointer-events-none absolute inset-0 z-0 h-full w-full rounded-[inherit]"
 					style={{
-						height: "100dvh",
 						backgroundImage: `url("${imageUrl}")`,
 						backgroundSize: "cover",
 						backgroundPosition: "center",
+						backgroundRepeat: "no-repeat",
 					}}
 				/>
 			);
@@ -1011,14 +1011,13 @@ export default function UserPagePreview() {
 				<video
 					aria-hidden
 					autoPlay
-					className="pointer-events-none absolute top-0 right-0 left-0 z-0 w-full rounded-[inherit] object-cover"
+					className="pointer-events-none absolute inset-0 z-0 h-full w-full rounded-[inherit] object-cover"
 					controls={false}
 					key={videoUrl}
 					loop
 					muted
 					playsInline
 					src={videoUrl}
-					style={{ height: "100dvh" }}
 				/>
 			);
 		}
@@ -1027,15 +1026,15 @@ export default function UserPagePreview() {
 	};
 
 	return (
-		<div className="h-full w-full">
+		<div className="relative h-full w-full">
+			{renderFixedBackground()}
 			<div
-				className={`relative h-full w-full overflow-y-auto overflow-x-hidden ${
+				className={`relative z-10 h-full w-full overflow-y-auto overflow-x-hidden ${
 					customizations.headerStyle === "hero" ? "" : "px-4 sm:px-6 sm:pt-4"
 				}`}
 				style={wrapperStyle}
-			>
-				{renderFixedBackground()}
-				<div className="relative z-10 flex h-full flex-col">
+		>
+			<div className="relative flex flex-col">
 					{customizations.headerStyle === "hero" ? (
 						<>
 							<UserHeader
