@@ -4,6 +4,7 @@ import { HelpCircle, Save, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import LoadingSpinner from "@/components/buttons/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -105,6 +106,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 	const fileInputMultipleRef = useRef<HTMLInputElement>(null);
 	const [activeSection, setActiveSection] = useState<string>("");
 	const [uploadError, setUploadError] = useState<string>("");
+	const [isUploading, setIsUploading] = useState(false);
 
 	const ACCEPTED_IMAGE_TYPES = [
 		"image/jpeg",
@@ -141,34 +143,35 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 
 	const uploadFiles = async (files: FileList) => {
 		setUploadError("");
-		const arr = Array.from(files);
-		const accepted = arr.filter((file) => {
-			if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-				setUploadError("Formato não suportado");
-				return false;
-			}
-			if (file.size > MAX_IMAGE_SIZE_BYTES) {
-				setUploadError("Imagem muito grande (máx. 10MB)");
-				return false;
-			}
-			return true;
-		});
-
-		const requests = accepted.map((file) => {
-			const fd = new FormData();
-			fd.append("file", file);
-			return fetch("/api/images/upload", { method: "POST", body: fd }).then(
-				async (res) => {
-					const json = await res.json();
-					if (!(res.ok && json.url)) {
-						throw new Error(json.error || "Falha no upload");
-					}
-					return { url: json.url } as { url: string; linkUrl?: string };
-				}
-			);
-		});
-
+		setIsUploading(true);
 		try {
+			const arr = Array.from(files);
+			const accepted = arr.filter((file) => {
+				if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+					setUploadError("Formato não suportado");
+					return false;
+				}
+				if (file.size > MAX_IMAGE_SIZE_BYTES) {
+					setUploadError("Imagem muito grande (máx. 10MB)");
+					return false;
+				}
+				return true;
+			});
+
+			const requests = accepted.map((file) => {
+				const fd = new FormData();
+				fd.append("file", file);
+				return fetch("/api/images/upload", { method: "POST", body: fd }).then(
+					async (res) => {
+						const json = await res.json();
+						if (!(res.ok && json.url)) {
+							throw new Error(json.error || "Falha no upload");
+						}
+						return { url: json.url } as { url: string; linkUrl?: string };
+					}
+				);
+			});
+
 			const results = await Promise.allSettled(requests);
 			const toAdd = results
 				.filter((r) => r.status === "fulfilled")
@@ -211,6 +214,8 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 			});
 		} catch (e) {
 			setUploadError("Erro no upload");
+		} finally {
+			setIsUploading(false);
 		}
 	};
 
@@ -322,6 +327,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 										<input
 											accept={ACCEPTED_IMAGE_TYPES.join(",")}
 											className="hidden"
+											disabled={isUploading}
 											onChange={(e) => {
 												const files = e.target.files;
 												if (files) {
@@ -332,22 +338,39 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 											type="file"
 										/>
 										<div
-											className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+											aria-busy={isUploading}
+											aria-disabled={isUploading}
+											className={`rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+												isUploading
+													? "pointer-events-none cursor-not-allowed opacity-60"
+													: "cursor-pointer"
+											} ${
 												isDragOverSingle
 													? accentDragClass
 													: "border-gray-300 hover:bg-muted/30"
 											}`}
-											onClick={() => fileInputSingleRef.current?.click()}
+											onClick={() =>
+												!isUploading && fileInputSingleRef.current?.click()
+											}
 											onDragLeave={(e) => {
 												e.preventDefault();
+												if (isUploading) {
+													return;
+												}
 												setIsDragOverSingle(false);
 											}}
 											onDragOver={(e) => {
 												e.preventDefault();
+												if (isUploading) {
+													return;
+												}
 												setIsDragOverSingle(true);
 											}}
 											onDrop={(e) => {
 												e.preventDefault();
+												if (isUploading) {
+													return;
+												}
 												setIsDragOverSingle(false);
 												const files = e.dataTransfer.files;
 												if (files && files.length > 0) {
@@ -356,7 +379,13 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 											}}
 											role="none"
 										>
-											<Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+											{isUploading ? (
+												<div className="mx-auto mt-1 flex justify-center">
+													<LoadingSpinner />
+												</div>
+											) : (
+												<Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+											)}
 											<p className="mt-2 font-medium">
 												Arraste uma imagem ou clique para selecionar
 											</p>
@@ -390,6 +419,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 									<input
 										accept={ACCEPTED_IMAGE_TYPES.join(",")}
 										className="hidden"
+										disabled={isUploading}
 										multiple
 										onChange={(e) => {
 											const files = e.target.files;
@@ -401,22 +431,39 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 										type="file"
 									/>
 									<div
-										className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+										aria-busy={isUploading}
+										aria-disabled={isUploading}
+										className={`rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+											isUploading
+												? "pointer-events-none cursor-not-allowed opacity-60"
+												: "cursor-pointer"
+										} ${
 											isDragOverMultiple
 												? accentDragClass
 												: "border-gray-300 hover:bg-muted/30"
 										}`}
-										onClick={() => fileInputMultipleRef.current?.click()}
+										onClick={() =>
+											!isUploading && fileInputMultipleRef.current?.click()
+										}
 										onDragLeave={(e) => {
 											e.preventDefault();
+											if (isUploading) {
+												return;
+											}
 											setIsDragOverMultiple(false);
 										}}
 										onDragOver={(e) => {
 											e.preventDefault();
+											if (isUploading) {
+												return;
+											}
 											setIsDragOverMultiple(true);
 										}}
 										onDrop={(e) => {
 											e.preventDefault();
+											if (isUploading) {
+												return;
+											}
 											setIsDragOverMultiple(false);
 											const files = e.dataTransfer.files;
 											if (files && files.length > 0) {
@@ -425,7 +472,13 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 										}}
 										role="none"
 									>
-										<Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+										{isUploading ? (
+											<div className="mx-auto mt-1 flex justify-center">
+												<LoadingSpinner />
+											</div>
+										) : (
+											<Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+										)}
 										<p className="mt-2 font-medium">
 											Arraste imagens ou clique para selecionar
 										</p>
@@ -441,7 +494,6 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 							{/* Removido: opção de adicionar múltiplas imagens por URL */}
 						</div>
 					)}
-
 					{formData.images && formData.images.length > 0 && (
 						<div className="grid gap-3">
 							<Label>Imagens adicionadas</Label>

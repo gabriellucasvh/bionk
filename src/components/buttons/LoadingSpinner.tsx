@@ -1,5 +1,5 @@
 export default function LoadingSpinner() {
-    return (
-        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
-    )
+	return (
+		<div className="h-5 w-5 animate-spin rounded-full border-gray-900 border-b-2" />
+	);
 }

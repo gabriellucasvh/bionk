@@ -280,11 +280,21 @@ export const useLinksManager = (
 			try {
 				// Separar itens por tipo para usar as APIs corretas
 				const linkItems = items
-					.filter((item) => !(item.isSection || item.isText || item.isVideo))
+					.filter(
+						(item) =>
+							!(
+								item.isSection ||
+								item.isText ||
+								item.isVideo ||
+								(item as any).isImage
+							)
+					)
 					.filter((item) => !(item as any).isDraft)
 					.map((item) => ({
 						id: item.id,
 						order: items.indexOf(item),
+						type: "link",
+						sectionId: (item as any).sectionId ?? null,
 					}));
 
 				const sectionItems = items
@@ -292,6 +302,7 @@ export const useLinksManager = (
 					.map((item) => ({
 						id: item.id,
 						order: items.indexOf(item),
+						type: "section",
 					}));
 
 				const textItems = items
@@ -321,22 +332,13 @@ export const useLinksManager = (
 				// Fazer chamadas para as APIs específicas
 				const promises: Promise<Response>[] = [];
 
-				if (linkItems.length > 0) {
+				const linkAndSectionPayload = [...linkItems, ...sectionItems];
+				if (linkAndSectionPayload.length > 0) {
 					promises.push(
 						fetch("/api/links/reorder", {
 							method: "PUT",
 							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({ items: linkItems }),
-						})
-					);
-				}
-
-				if (sectionItems.length > 0) {
-					promises.push(
-						fetch("/api/sections/reorder", {
-							method: "PUT",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({ items: sectionItems }),
+							body: JSON.stringify({ items: linkAndSectionPayload }),
 						})
 					);
 				}
@@ -411,33 +413,24 @@ export const useLinksManager = (
 			return;
 		}
 
-		setUnifiedItems((prevItems) => {
-			// Encontrar os índices dos itens
-			const activeIndex = prevItems.findIndex((item) => {
-				if (item.isSection) {
-					return item.id.toString() === draggedItemId;
-				}
-				if (item.isText) {
-					return `item-${item.id}` === draggedItemId;
-				}
-				if (item.isVideo) {
-					return `item-${item.id}` === draggedItemId;
-				}
-				return `item-${item.id}` === draggedItemId;
-			});
+		// Helper que reflete exatamente os IDs usados no LinkList
+		const getSortableId = (item: UnifiedItem) => {
+			if (item.isSection) return `section-${item.id}`;
+			if (item.isText) return `text-${item.id}`;
+			if (item.isVideo) return `video-${item.id}`;
+			if ((item as any).isImage) return `image-${item.id}`;
+			return `link-${item.id}`;
+		};
 
-			const overIndex = prevItems.findIndex((item) => {
-				if (item.isSection) {
-					return item.id.toString() === overId;
-				}
-				if (item.isText) {
-					return `item-${item.id}` === overId;
-				}
-				if (item.isVideo) {
-					return `item-${item.id}` === overId;
-				}
-				return `item-${item.id}` === overId;
-			});
+		setUnifiedItems((prevItems) => {
+			// Encontrar os índices dos itens com base nos IDs corretos
+			const activeIndex = prevItems.findIndex(
+				(item) => getSortableId(item) === draggedItemId
+			);
+
+			const overIndex = prevItems.findIndex(
+				(item) => getSortableId(item) === overId
+			);
 
 			if (activeIndex === -1 || overIndex === -1) {
 				return prevItems;
@@ -517,7 +510,11 @@ export const useLinksManager = (
 			const cleaned = prev
 				.filter((item) => !(item as any).isDraft)
 				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
-			const next = [draft, ...cleaned];
+			// Calcula o menor 'order' atual e garante que o rascunho fique acima de todos
+			const lowest =
+				cleaned.length > 0 ? Math.min(...cleaned.map((i) => i.order)) : 0;
+			const draftAtTop = { ...draft, order: lowest - 1 } as UnifiedItem;
+			const next = [draftAtTop, ...cleaned];
 			return next.sort((a, b) => a.order - b.order);
 		});
 		setOriginalLink(null);
@@ -1198,11 +1195,11 @@ export const useLinksManager = (
 							children: (item as any).children.map((link: any) =>
 								link.id === id
 									? {
-										...(link as any),
-										...newLink,
-										isDraft: false,
-										isEditing: false,
-									}
+											...(link as any),
+											...newLink,
+											isDraft: false,
+											isEditing: false,
+										}
 									: link
 							),
 						} as UnifiedItem;
