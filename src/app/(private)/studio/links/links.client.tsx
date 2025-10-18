@@ -124,7 +124,7 @@ const LinksStudioClient = () => {
 				aria-label={
 					mobileView === "content" ? "Ver preview" : "Voltar ao conteúdo"
 				}
-				className="fixed right-6 bottom-30 z-50 rounded-full bg-lime-400 p-3 text-white shadow-lg transition-colors hover:bg-lime-500 active:scale-95 md:hidden"
+				className="preview-toggle fixed right-6 bottom-30 z-50 rounded-full bg-lime-400 p-3 text-white shadow-lg transition-colors hover:bg-lime-500 active:scale-95 md:hidden"
 				onClick={handleToggleView}
 				type="button"
 			>

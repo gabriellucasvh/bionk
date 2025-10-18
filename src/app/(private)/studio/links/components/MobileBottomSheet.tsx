@@ -31,16 +31,19 @@ const MobileBottomSheet = ({
 			document.body.style.overflow = "hidden";
 			document.body.style.position = "fixed";
 			document.body.style.width = "100%";
+			document.body.classList.add("bottom-sheet-open");
 		} else {
 			document.body.style.overflow = "";
 			document.body.style.position = "";
 			document.body.style.width = "";
+			document.body.classList.remove("bottom-sheet-open");
 		}
 
 		return () => {
 			document.body.style.overflow = "";
 			document.body.style.position = "";
 			document.body.style.width = "";
+			document.body.classList.remove("bottom-sheet-open");
 		};
 	}, [isOpen, isClosing]);
 
@@ -49,7 +52,7 @@ const MobileBottomSheet = ({
 	}
 
 	return (
-		<div className="fixed inset-0 z-50" style={{ margin: 0, padding: 0 }}>
+		<div className="fixed inset-0 z-[60]" style={{ margin: 0, padding: 0 }}>
 			<div
 				className="fixed inset-0 bg-black/50 backdrop-blur-sm"
 				onClick={onClose}

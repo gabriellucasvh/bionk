@@ -101,7 +101,7 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 							alt="Twitch"
 							className="object-cover"
 							fill
-							src="/images/twitch.png"
+							src="/images/twitch-content.png"
 						/>
 					</div>
 					<span className="font-medium text-sm">Twitch</span>

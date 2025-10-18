@@ -503,3 +503,8 @@ button {
 		display: none;
 	}
 }
+
+/* Oculta o botão de preview (olho) quando o bottom sheet estiver ativo */
+body.bottom-sheet-open .preview-toggle {
+  display: none;
+}
