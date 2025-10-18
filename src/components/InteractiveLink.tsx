@@ -81,54 +81,58 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 
 	// Função para determinar qual ícone e tooltip mostrar
 	const getLinkIcon = () => {
-	const hasClicks = !!link.deleteOnClicks;
-	const hasExpiry = !!link.expiresAt;
-	if (link.password) {
-		return {
-			icon: <Lock className="size-5" />,
-			tooltip: "Link protegido por senha",
-		};
-	}
-	// Se ambos (expiração e cliques) estiverem ativos, usar ícone de mais opções
-	if (hasClicks && hasExpiry) {
+		const hasClicks = !!link.deleteOnClicks;
+		const hasExpiry = !!link.expiresAt;
+		const isShare = !!link.shareAllowed;
+		if (link.password) {
+			return {
+				icon: <Lock className="size-5" />,
+				tooltip: "Link protegido por senha",
+				kind: "lock",
+			};
+		}
+		// Compartilhamento: mostra três pontos e abre modal
+		if (isShare) {
+			if (hasExpiry) {
+				const expirationDate = new Date(link.expiresAt!);
+				const formattedDate = expirationDate.toLocaleDateString("pt-BR");
+				return {
+					icon: <MoreVertical className="size-5" />,
+					tooltip: `Expira em ${formattedDate} — compartilhável`,
+					kind: "more",
+				};
+			}
+			return {
+				icon: <MoreVertical className="size-5" />,
+				tooltip: hasClicks ? "Compartilhamento permitido" : "Mais opções",
+				kind: "more",
+			};
+		}
+		// Sem compartilhamento: prioriza ícones específicos
+		if (hasClicks) {
+			return {
+				icon: <MousePointerClick className="size-5" />,
+				tooltip: `Será excluído após ${link.deleteOnClicks} cliques`,
+				kind: "click",
+			};
+		}
+		if (hasExpiry) {
+			const expirationDate = new Date(link.expiresAt!);
+			const formattedDate = expirationDate.toLocaleDateString("pt-BR");
+			return {
+				icon: <Clock className="size-5" />,
+				tooltip: `Expira em ${formattedDate}`,
+				kind: "clock",
+			};
+		}
 		return {
 			icon: <MoreVertical className="size-5" />,
-			tooltip: "Expiração e limite de cliques ativos",
+			tooltip: "Mais opções",
+			kind: "more",
 		};
-	}
-	if (hasClicks) {
-		if (link.shareAllowed) {
-			return {
-				icon: <MoreVertical className="size-5" />,
-				tooltip: "Compartilhamento permitido",
-			};
-		}
-		return {
-			icon: <MousePointerClick className="size-5" />,
-			tooltip: `Será excluído após ${link.deleteOnClicks} cliques`,
-		};
-	}
-	if (hasExpiry) {
-		const expirationDate = new Date(link.expiresAt!);
-		const formattedDate = expirationDate.toLocaleDateString("pt-BR");
-		if (link.shareAllowed) {
-			return {
-				icon: <MoreVertical className="size-5" />,
-				tooltip: `Expira em ${formattedDate} — compartilhável`,
-			};
-		}
-		return {
-			icon: <Clock className="size-5" />,
-			tooltip: `Expira em ${formattedDate}`,
-		};
-	}
-	return {
-		icon: <MoreVertical className="size-5" />,
-		tooltip: "Mais opções",
-	};
 	};
 
-	const { icon, tooltip } = getLinkIcon();
+	const { icon, tooltip, kind } = getLinkIcon();
 
 	// Função auxiliar para enviar dados de clique
 	const sendClickData = () => {
@@ -159,22 +163,24 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		e.preventDefault();
 		e.stopPropagation();
 
-		// Se for um link especial (não o MoreVertical), mostrar tooltip no mobile
-		const isSpecialLink =
-			link.password || link.deleteOnClicks || link.expiresAt;
-		if (isSpecialLink) {
-			setShowTooltip(!showTooltip);
-		} else {
+		// Se o ícone for três pontinhos, abrir modal; caso contrário, mostrar tooltip
+		if (kind === "more") {
 			setIsModalOpen(true);
+		} else {
+			setShowTooltip(!showTooltip);
 		}
 	};
 
 	const handleMouseEnter = () => {
-		setShowTooltip(true);
+		if (kind !== "more") {
+			setShowTooltip(true);
+		}
 	};
 
 	const handleMouseLeave = () => {
-		setShowTooltip(false);
+		if (kind !== "more") {
+			setShowTooltip(false);
+		}
 	};
 
 	return (
