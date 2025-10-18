@@ -451,13 +451,23 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 										className="flex items-center gap-3"
 										key={`${img.url}-${idx}`}
 									>
-										<div className="relative h-28 w-28 overflow-hidden rounded">
+										<div
+											className="relative w-28 overflow-hidden rounded"
+											style={{
+												aspectRatio:
+													formData.ratio === "square"
+														? "1 / 1"
+														: formData.ratio?.includes(":")
+															? (formData.ratio as string).replace(":", " / ")
+															: "1 / 1",
+											}}
+										>
 											<Image
 												alt={`Imagem ${idx + 1}`}
-												className="h-28 w-28 object-cover"
-												height={48}
+												className="object-cover"
+												fill
+												sizes="112px"
 												src={img.url}
-												width={48}
 											/>
 										</div>
 										<Input
