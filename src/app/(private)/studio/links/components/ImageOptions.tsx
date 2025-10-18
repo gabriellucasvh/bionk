@@ -25,7 +25,7 @@ const ImageOptions = ({ onOptionSelect }: ImageOptionsProps) => {
 							alt="Imagem Única"
 							className="object-cover"
 							fill
-							src="/images/única.png"
+							src="/images/única-content.png"
 						/>
 					</div>
 					<span className="font-medium text-sm">Única</span>
@@ -44,7 +44,7 @@ const ImageOptions = ({ onOptionSelect }: ImageOptionsProps) => {
 							alt="Imagem em Coluna"
 							className="object-cover"
 							fill
-							src="/images/coluna.png"
+							src="/images/coluna-content.png"
 						/>
 					</div>
 					<span className="font-medium text-sm">Coluna</span>
@@ -63,7 +63,7 @@ const ImageOptions = ({ onOptionSelect }: ImageOptionsProps) => {
 							alt="Imagem em Carrossel"
 							className="object-cover"
 							fill
-							src="/images/carrossel.png"
+							src="/images/carrossel-content.png"
 						/>
 					</div>
 					<span className="font-medium text-sm">Carrossel</span>

@@ -25,7 +25,7 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 							alt="Vídeo"
 							className="object-cover"
 							fill
-							src="/images/video.png"
+							src="/images/video-content.png"
 						/>
 					</div>
 					<span className="font-medium text-sm">Vídeo</span>
@@ -42,10 +42,9 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 					>
 						<Image
 							alt="YouTube"
-							className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 brightness-0 invert"
-							height={24}
-							src="/icons/youtube.svg"
-							width={24}
+							className="object-cover"
+							fill
+							src="/images/youtube-content.png"
 						/>
 					</div>
 					<span className="font-medium text-sm">YouTube</span>
@@ -62,10 +61,9 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 					>
 						<Image
 							alt="Vimeo"
-							className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 brightness-0 invert"
-							height={24}
-							src="/icons/vimeo.svg"
-							width={24}
+							className="object-cover"
+							fill
+							src="/images/vimeo-content.png"
 						/>
 					</div>
 					<span className="font-medium text-sm">Vimeo</span>
@@ -82,10 +80,9 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 					>
 						<Image
 							alt="TikTok"
-							className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 brightness-0 invert"
-							height={24}
-							src="/icons/tiktok.svg"
-							width={24}
+							className="object-cover"
+							fill
+							src="/images/tiktok-content.png"
 						/>
 					</div>
 					<span className="font-medium text-sm">TikTok</span>
@@ -102,10 +99,9 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 					>
 						<Image
 							alt="Twitch"
-							className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 brightness-0 invert"
-							height={24}
-							src="/icons/twitch.svg"
-							width={24}
+							className="object-cover"
+							fill
+							src="/images/twitch.png"
 						/>
 					</div>
 					<span className="font-medium text-sm">Twitch</span>
