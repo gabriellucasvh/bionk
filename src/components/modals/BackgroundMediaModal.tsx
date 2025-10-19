@@ -319,7 +319,7 @@ export default function BackgroundMediaModal({
 			}}
 			open={isOpen}
 		>
-			<DialogContent className="w-full max-w-[90vw] rounded-2xl border bg-background p-6 shadow-xl sm:max-w-2xl">
+			<DialogContent className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 shadow-xl sm:max-w-2xl">
 				<DialogHeader>
 					<DialogTitle className="text-center font-bold text-gray-900 text-xl dark:text-white">
 						{type === "image"

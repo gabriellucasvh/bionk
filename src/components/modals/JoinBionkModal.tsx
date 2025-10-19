@@ -36,7 +36,7 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="w-full max-w-[90vw] rounded-2xl border bg-background p-6 shadow-xl sm:max-w-lg">
+			<DialogContent className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 shadow-xl sm:max-w-lg">
 				<div className="flex justify-center pb-2">
 					<Image
 						alt="Bionk Logo"

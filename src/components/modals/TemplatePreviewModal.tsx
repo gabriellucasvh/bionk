@@ -1,5 +1,9 @@
 "use client";
 
+import { ArrowRight, Globe, LinkIcon, Share2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import type React from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -9,10 +13,6 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { ArrowRight, Globe, LinkIcon, Share2 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import type React from "react";
 
 interface Template {
 	id: string;
@@ -38,7 +38,7 @@ const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
 	return (
 		<Dialog onOpenChange={onOpenChange} open={isOpen}>
 			{/* CHANGED: padding movido do conteúdo para o DialogContent e classes padronizadas */}
-			<DialogContent className="w-full max-w-[90vw] rounded-2xl border bg-background p-6 shadow-xl sm:max-w-lg">
+			<DialogContent className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 shadow-xl sm:max-w-lg">
 				{/* CHANGED: Tamanho do logo ajustado para consistência */}
 				<div className="flex justify-center pb-2">
 					<Image

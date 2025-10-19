@@ -67,7 +67,7 @@ const VerPerfilMobile = () => {
 					</span>
 				</BaseButton>
 			</DialogTrigger>
-			<DialogContent className="w-full max-w-[90vw] rounded-2xl border bg-background p-6 text-center shadow-xl sm:max-w-lg">
+			<DialogContent className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 text-center shadow-xl sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle className="text-center font-bold text-2xl text-black dark:text-white">
 						Compartilhar Perfil
