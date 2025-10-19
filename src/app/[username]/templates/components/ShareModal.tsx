@@ -12,7 +12,8 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import type { TemplateComponentProps } from "@/types/user-profile";
-import { useSession } from "next-auth/react";
+// Removido: useSession — não precisamos da sessão para visitantes
+// import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import type { FC } from "react";
@@ -25,8 +26,8 @@ interface ShareModalProps {
 }
 
 const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
-	const { data: session } = useSession();
-	const username = session?.user?.username;
+	// const { data: session } = useSession();
+	// const username = session?.user?.username;
 	const profileUrl = `${
 		process.env.NEXT_PUBLIC_BASE_URL || "https://bionk.me"
 	}/${user.username}`;
@@ -67,7 +68,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 								value={profileUrl}
 							/>
 							<span className="mt-px break-all text-xs">
-								bionk.me/{username}
+								bionk.me/{user.username}
 							</span>
 						</div>
 					)}

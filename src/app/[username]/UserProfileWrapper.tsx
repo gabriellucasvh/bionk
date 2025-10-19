@@ -3,9 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BannedUserWarning from "@/components/BannedUserWarning";
-import ProfileViewTracker from "@/components/ProfileViewTracker";
+// Removido: ProfileViewTracker para evitar duplicidade (já é usado no BaseTemplate)
+// import ProfileViewTracker from "@/components/ProfileViewTracker";
+// Removido: LinkAnimationProvider (já está no layout global)
+// import { LinkAnimationProvider } from "@/providers/linkAnimationProvider";
 import SensitiveContentWarning from "@/components/SensitiveContentWarning";
-import { LinkAnimationProvider } from "@/providers/linkAnimationProvider";
 import type { UserProfile as UserProfileData } from "@/types/user-profile";
 
 interface UserProfileWrapperProps {
@@ -68,9 +70,7 @@ export function UserProfileWrapper({
 	}
 
 	return (
-		<LinkAnimationProvider>
-			<ProfileViewTracker userId={user.id} />
-			{children}
-		</LinkAnimationProvider>
+		// Removido LinkAnimationProvider para evitar montagem duplicada
+		<>{children}</>
 	);
 }

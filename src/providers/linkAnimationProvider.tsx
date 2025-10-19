@@ -22,16 +22,17 @@ export function LinkAnimationProvider({
 	const [animatedLinks, setAnimatedLinks] = useState<Set<string>>(new Set());
 	const pathname = usePathname();
 
-	// Carregar estado inicial dos links animados (pulando rotas privadas do Studio)
+	// Carregar estado inicial dos links animados SOMENTE nas rotas do Studio
 	useEffect(() => {
-		// Evita requisições desnecessárias nas páginas do Studio
-		if (pathname?.startsWith("/studio")) {
+		// Evita requisições em páginas públicas; só roda no Studio
+		if (!pathname?.startsWith("/studio")) {
+			setAnimatedLinks(new Set());
 			return;
 		}
 
 		const loadAnimatedLinks = async () => {
 			try {
-				// Primeiro, obter a sessão do usuário
+				// Obtém a sessão do usuário apenas no Studio
 				const sessionResponse = await fetch("/api/auth/session");
 				if (!sessionResponse.ok) {
 					return;

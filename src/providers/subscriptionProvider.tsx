@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import type React from "react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
@@ -56,13 +57,16 @@ export function SubscriptionProvider({
 	children: React.ReactNode;
 }) {
 	const { data: session } = useSession();
+	const pathname = usePathname();
 	const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const lastSessionId = useRef<string | null>(null);
 	const hasInitialized = useRef(false);
 
 	const fetchSubscriptionPlan = async (): Promise<string> => {
-		if (!session?.user?.id) {
+		// Busca o plano apenas dentro do Studio
+		const isStudioRoute = pathname?.startsWith("/studio") === true;
+		if (!(isStudioRoute && session?.user?.id)) {
 			return "free";
 		}
 
@@ -124,13 +128,11 @@ export function SubscriptionProvider({
 	};
 
 	const refreshSubscriptionPlan = async () => {
-		if (!session?.user?.id) {
+		if (!(session?.user?.id && pathname?.startsWith("/studio"))) {
 			return;
 		}
 
 		setIsLoading(true);
-
-		// Limpa o cache para forçar nova busca
 		subscriptionCache.delete(session.user.id);
 
 		try {
@@ -143,18 +145,26 @@ export function SubscriptionProvider({
 		}
 	};
 
-	// Efeito para inicializar o plano quando a sessão muda
+	// Efeito para inicializar o plano quando a sessão muda (apenas no Studio)
 	useEffect(() => {
 		const currentSessionId = session?.user?.id;
 		const previousSessionId = lastSessionId.current;
+		const isStudioRoute = pathname?.startsWith("/studio") === true;
+
+		// Fora do Studio: não buscar plano
+		if (!isStudioRoute) {
+			setSubscriptionPlan("free");
+			setIsLoading(false);
+			lastSessionId.current = currentSessionId || null;
+			hasInitialized.current = false;
+			return;
+		}
 
 		// Se não há sessão, limpa o estado
 		if (!currentSessionId) {
-			// Se havia uma sessão anterior, limpa o cache dela (logout)
 			if (previousSessionId) {
 				invalidateUserSubscriptionCache(previousSessionId);
 			}
-
 			setSubscriptionPlan(null);
 			setIsLoading(false);
 			lastSessionId.current = null;
@@ -162,9 +172,7 @@ export function SubscriptionProvider({
 			return;
 		}
 
-		// Se a sessão mudou ou ainda não inicializou, busca o plano
 		if (currentSessionId !== previousSessionId || !hasInitialized.current) {
-			// Se mudou de usuário, limpa o cache do usuário anterior
 			if (previousSessionId && previousSessionId !== currentSessionId) {
 				invalidateUserSubscriptionCache(previousSessionId);
 			}
@@ -184,7 +192,7 @@ export function SubscriptionProvider({
 					setIsLoading(false);
 				});
 		}
-	}, [session?.user?.id]);
+	}, [session?.user?.id, pathname]);
 
 	return (
 		<SubscriptionContext.Provider
