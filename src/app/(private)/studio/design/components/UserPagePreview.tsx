@@ -794,12 +794,14 @@ function ContentList({
 						style={wrapperStyle}
 					>
 						{header}
-						<div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
+						<div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-3">
 							{(image?.items || []).map((img: any, idx: number) => (
 								<div
-									className="w-64 flex-shrink-0 snap-center overflow-hidden border p-1"
+									className="w-64 flex-shrink-0 snap-center overflow-hidden"
 									key={`img-${image.id}-${idx}`}
-									style={buttonStyle}
+									style={{
+										borderRadius: `${customizations?.customButtonCorners || "12"}px`,
+									}}
 								>
 									{renderImageItem(img, image?.ratio, image?.id, idx)}
 								</div>
@@ -1033,8 +1035,8 @@ export default function UserPagePreview() {
 					customizations.headerStyle === "hero" ? "" : "px-4 sm:px-6 sm:pt-4"
 				}`}
 				style={wrapperStyle}
-		>
-			<div className="relative flex flex-col">
+			>
+				<div className="relative flex flex-col">
 					{customizations.headerStyle === "hero" ? (
 						<>
 							<UserHeader
