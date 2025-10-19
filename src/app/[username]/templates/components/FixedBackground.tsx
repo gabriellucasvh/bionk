@@ -61,7 +61,7 @@ export default function FixedBackground({
 			<div
 				aria-hidden
 				className={
-					"pointer-events-none fixed top-5 right-0 left-0 z-0 mx-auto w-full max-w-[575px] rounded-[inherit]"
+					"pointer-events-none fixed right-0 left-0 z-0 mx-auto w-full max-w-[575px] rounded-[inherit] sm:top-5"
 				}
 				ref={bgRef as any}
 				style={{
