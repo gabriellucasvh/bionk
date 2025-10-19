@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import type { SocialLinkItem } from "@/types/social";
 import type {
-    SocialLink,
-    UserLink,
-    UserText,
-    UserVideo,
-    UserImage,
+	UserImage,
+	UserLink,
+	UserText,
+	UserVideo,
 } from "@/types/user-profile";
 
 interface User {
@@ -16,17 +15,17 @@ interface User {
 }
 
 interface UserData {
-    id: string;
-    name: string;
-    username: string;
-    bio: string;
-    image: string;
-    socialLinks: SocialLinkItem[];
-    Link: UserLink[];
-    Text: UserText[];
-    Video: UserVideo[];
-    SocialLink: SocialLink[];
-    Image: UserImage[];
+	id: string;
+	name: string;
+	username: string;
+	bio: string;
+	image: string;
+	socialLinks: SocialLinkItem[];
+	Link: UserLink[];
+	Text: UserText[];
+	Video: UserVideo[];
+	SocialLink: SocialLinkItem[];
+	Image: UserImage[];
 }
 
 interface ProfileState {
@@ -35,7 +34,11 @@ interface ProfileState {
 	bio: string;
 }
 
-export const useProfileData = (userId?: string, sessionImage?: string) => {
+export const useProfileData = (
+	userId?: string,
+	sessionImage?: string,
+	options?: { profileOnly?: boolean }
+) => {
 	const [profile, setProfile] = useState<ProfileState>({
 		name: "",
 		username: "",
@@ -75,29 +78,34 @@ export const useProfileData = (userId?: string, sessionImage?: string) => {
 				sessionImage ||
 				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 
-			const socialRes = await fetch(`/api/social-links?userId=${userId}`);
-			const socialData = await socialRes.json();
-			const socialLinks = socialData?.socialLinks || [];
+			let socialLinks: SocialLinkItem[] = [];
+			let userLinks: UserLink[] = [];
+			let userTexts: UserText[] = [];
+			let userVideos: UserVideo[] = [];
+			let userImages: UserImage[] = [];
 
-			// Carregar links do usuário
-			const linksRes = await fetch(`/api/links?userId=${userId}`);
-			const linksData = await linksRes.json();
-			const userLinks = linksData?.links || [];
+			// When not in profile-only mode, fetch additional user content
+			if (!options?.profileOnly) {
+				const socialRes = await fetch(`/api/social-links?userId=${userId}`);
+				const socialData = await socialRes.json();
+				socialLinks = socialData?.socialLinks || [];
 
-			// Carregar textos do usuário
-			const textsRes = await fetch("/api/texts");
-			const textsData = await textsRes.json();
-			const userTexts = textsData?.texts || [];
+				const linksRes = await fetch(`/api/links?userId=${userId}`);
+				const linksData = await linksRes.json();
+				userLinks = linksData?.links || [];
 
-			// Carregar vídeos do usuário
-			const videosRes = await fetch("/api/videos");
-			const videosData = await videosRes.json();
-			const userVideos = videosData?.videos || [];
+				const textsRes = await fetch("/api/texts");
+				const textsData = await textsRes.json();
+				userTexts = textsData?.texts || [];
 
-			// Carregar imagens do usuário
-			const imagesRes = await fetch("/api/images");
-			const imagesData = await imagesRes.json();
-			const userImages = imagesData?.images || [];
+				const videosRes = await fetch("/api/videos");
+				const videosData = await videosRes.json();
+				userVideos = videosData?.videos || [];
+
+				const imagesRes = await fetch("/api/images");
+				const imagesData = await imagesRes.json();
+				userImages = imagesData?.images || [];
+			}
 
 			const profileData = { name, username, bio: bio || "" };
 			setProfile(profileData);
@@ -141,7 +149,7 @@ export const useProfileData = (userId?: string, sessionImage?: string) => {
 		} finally {
 			setIsProfileLoading(false);
 		}
-	}, [userId, sessionImage]);
+	}, [userId, sessionImage, options?.profileOnly]);
 
 	const updateProfileText = useCallback(async (): Promise<User | null> => {
 		if (!userId) {

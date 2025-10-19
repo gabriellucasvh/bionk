@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 interface LinkAnimationContextType {
 	animatedLinks: Set<string>;
@@ -19,9 +20,15 @@ export function LinkAnimationProvider({
 	children: React.ReactNode;
 }) {
 	const [animatedLinks, setAnimatedLinks] = useState<Set<string>>(new Set());
+	const pathname = usePathname();
 
-	// Carregar estado inicial dos links animados
+	// Carregar estado inicial dos links animados (pulando rotas privadas do Studio)
 	useEffect(() => {
+		// Evita requisições desnecessárias nas páginas do Studio
+		if (pathname?.startsWith("/studio")) {
+			return;
+		}
+
 		const loadAnimatedLinks = async () => {
 			try {
 				// Primeiro, obter a sessão do usuário
@@ -51,7 +58,7 @@ export function LinkAnimationProvider({
 		};
 
 		loadAnimatedLinks();
-	}, []);
+	}, [pathname]);
 
 	const toggleAnimation = async (linkId: number) => {
 		try {
