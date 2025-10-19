@@ -1,5 +1,11 @@
 "use client";
 
+import {
+	Image as ImageIcon,
+	Paintbrush,
+	SwatchBook,
+	Video,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingSpinner from "@/components/buttons/LoadingSpinner";
@@ -194,7 +200,7 @@ export function DesignPanel() {
 							}
 							text="Tipo de Fundo"
 						/>
-						<div className="mt-2 flex flex-wrap gap-2">
+						<div className="mt-2 flex flex-wrap gap-4">
 							{(
 								[
 									{ key: "color", label: "Cor sólida" },
@@ -202,20 +208,98 @@ export function DesignPanel() {
 									{ key: "image", label: "Imagem" },
 									{ key: "video", label: "Vídeo" },
 								] as const
-							).map((opt) => (
-								<button
-									className={`rounded-xl border px-3 py-5 text-sm transition-all ${
-										backgroundType === opt.key
-											? "border-lime-700 text-lime-700 dark:border-lime-600 dark:text-lime-400"
-											: "border-zinc-200 text-zinc-700 hover:border-green-500 hover:text-green-600 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-green-400 dark:hover:text-green-300"
-									}`}
-									key={opt.key}
-									onClick={() => handleBackgroundTypeChange(opt.key)}
-									type="button"
-								>
-									{opt.label}
-								</button>
-							))}
+							).map((opt) => {
+								const isSelected = backgroundType === opt.key;
+								const previewStyle: React.CSSProperties = (() => {
+									switch (opt.key) {
+										case "color":
+											return {
+												backgroundColor:
+													customizations.customBackgroundColor || "##e3e8e5",
+											};
+										case "gradient":
+											return customizations.customBackgroundGradient
+												? {
+														backgroundImage:
+															customizations.customBackgroundGradient,
+													}
+												: {
+														backgroundImage:
+															"linear-gradient(135deg, #c026d3 0%, #7c3aed 50%, #2563eb 100%)",
+													};
+										case "image":
+											return customizations.customBackgroundImageUrl
+												? {
+														backgroundImage: `url("${customizations.customBackgroundImageUrl}")`,
+														backgroundSize: "cover",
+														backgroundPosition: "top",
+														backgroundRepeat: "no-repeat",
+													}
+												: { backgroundColor: "##e3e8e5" };
+										case "video":
+											return { backgroundColor: "##e3e8e5" };
+										default:
+											return { backgroundColor: "##e3e8e5" };
+									}
+								})();
+
+								const Icon =
+									opt.key === "color"
+										? Paintbrush
+										: opt.key === "gradient"
+											? SwatchBook
+											: opt.key === "image"
+												? ImageIcon
+												: Video;
+
+								return (
+									<div
+										className="flex w-24 flex-col items-center"
+										key={opt.key}
+									>
+										<button
+											className={`relative w-full overflow-hidden rounded-xl border transition-all ${
+												isSelected
+													? "border-lime-700 ring-2 ring-lime-700 dark:border-lime-600 dark:ring-lime-600"
+													: "border-zinc-300 hover:border-green-500 dark:border-zinc-600 dark:hover:border-green-400"
+											}`}
+											onClick={() => handleBackgroundTypeChange(opt.key)}
+											style={{ aspectRatio: "6 / 7", ...previewStyle }}
+											type="button"
+										>
+											{opt.key === "video" &&
+											customizations.customBackgroundVideoUrl ? (
+												<video
+													autoPlay
+													className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+													loop
+													muted
+													playsInline
+													src={customizations.customBackgroundVideoUrl}
+												/>
+											) : null}
+											<div className="absolute inset-0 flex items-center justify-center">
+												<Icon
+													className={`h-6 w-6 ${
+														isSelected
+															? "text-lime-700 dark:text-lime-400"
+															: "text-white drop-shadow-sm"
+													}`}
+												/>
+											</div>
+										</button>
+										<span
+											className={`mt-1 text-center text-xs ${
+												isSelected
+													? "text-lime-700 dark:text-lime-400"
+													: "text-zinc-700 dark:text-zinc-300"
+											}`}
+										>
+											{opt.label}
+										</span>
+									</div>
+								);
+							})}
 						</div>
 						<p className="mt-2 text-muted-foreground text-xs">
 							Apenas uma opção de fundo é usada por vez. Alternar o tipo não
