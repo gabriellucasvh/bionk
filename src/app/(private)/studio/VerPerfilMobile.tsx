@@ -73,10 +73,11 @@ const VerPerfilMobile = () => {
 						Compartilhar Perfil
 					</DialogTitle>
 					<DialogDescription className="pt-2 text-center text-muted-foreground text-sm dark:text-white/80">
-						<p>Compartilhe seu perfil Bionk com o mundo.</p>
-						<p className="break-all text-black text-sm dark:text-white">
+						<span>Compartilhe seu perfil Bionk com o mundo.</span>
+						<br />
+						<span className="break-all text-black text-sm dark:text-white">
 							bionk.me/{username}
-						</p>
+						</span>
 					</DialogDescription>
 				</DialogHeader>
 
