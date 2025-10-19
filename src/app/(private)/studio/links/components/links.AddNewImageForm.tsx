@@ -406,12 +406,6 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 										{uploadError && (
 											<p className="text-destructive text-xs">{uploadError}</p>
 										)}
-										{formData.layout === "carousel" &&
-											(formData.images?.length ?? 0) < 2 && (
-												<p className="text-muted-foreground text-xs">
-													Para carrossel, adicione pelo menos 2 imagens.
-												</p>
-											)}
 									</div>
 									{/* Removido: opção de adicionar por URL */}
 								</>
@@ -505,6 +499,12 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 									{uploadError && (
 										<p className="text-destructive text-xs">{uploadError}</p>
 									)}
+									{formData.layout === "carousel" &&
+										(formData.images?.length ?? 0) < 2 && (
+											<p className="text-muted-foreground text-xs">
+												Para carrossel, adicione pelo menos 2 imagens.
+											</p>
+										)}
 								</div>
 							)}
 							{/* Removido: opção de adicionar múltiplas imagens por URL */}
