@@ -215,7 +215,7 @@ export function DesignPanel() {
 										case "color":
 											return {
 												backgroundColor:
-													customizations.customBackgroundColor || "##e3e8e5",
+													customizations.customBackgroundColor || "#e3e8e5",
 											};
 										case "gradient":
 											return customizations.customBackgroundGradient
@@ -225,7 +225,7 @@ export function DesignPanel() {
 													}
 												: {
 														backgroundImage:
-															"linear-gradient(135deg, #c026d3 0%, #7c3aed 50%, #2563eb 100%)",
+															"linear-gradient(135deg, #e3e8e5 0%, #e3e8e5 100%)",
 													};
 										case "image":
 											return customizations.customBackgroundImageUrl
@@ -235,11 +235,11 @@ export function DesignPanel() {
 														backgroundPosition: "top",
 														backgroundRepeat: "no-repeat",
 													}
-												: { backgroundColor: "##e3e8e5" };
+												: { backgroundColor: "#e3e8e5" };
 										case "video":
-											return { backgroundColor: "##e3e8e5" };
+											return { backgroundColor: "#e3e8e5" };
 										default:
-											return { backgroundColor: "##e3e8e5" };
+											return { backgroundColor: "#e3e8e5" };
 									}
 								})();
 
