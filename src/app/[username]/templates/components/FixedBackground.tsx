@@ -69,7 +69,7 @@ export default function FixedBackground({
 					backgroundImage: `url("${imageUrl}")`,
 					backgroundAttachment: "fixed",
 					backgroundSize: "cover",
-					backgroundPosition: "center",
+					backgroundPosition: "top",
 				}}
 			/>
 		);

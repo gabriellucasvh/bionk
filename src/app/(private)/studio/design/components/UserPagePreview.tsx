@@ -1136,7 +1136,7 @@ export default function UserPagePreview() {
 					style={{
 						backgroundImage: `url("${imageUrl}")`,
 						backgroundSize: "cover",
-						backgroundPosition: "center",
+						backgroundPosition: "top",
 						backgroundRepeat: "no-repeat",
 					}}
 				/>
