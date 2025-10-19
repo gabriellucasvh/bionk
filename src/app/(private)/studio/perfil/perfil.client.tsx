@@ -80,7 +80,8 @@ const PerfilClient = () => {
 				setProfilePreview(currentImage);
 				setOriginalProfileImageUrl(currentImage);
 			} catch {
-				const fallbackUrl = "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
+				const fallbackUrl =
+					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 				setProfilePreview(fallbackUrl);
 				setOriginalProfileImageUrl(fallbackUrl);
 			} finally {
@@ -308,7 +309,7 @@ const PerfilClient = () => {
 				<VerPerfilMobile />
 			</header>
 
-			<Card className="border-none shadow-none dark:bg-neutral-800">
+			<Card className="border-none shadow-none dark:bg-zinc-800">
 				<CardHeader>
 					<CardTitle className="dark:text-white">
 						Informações do perfil
@@ -355,7 +356,7 @@ const PerfilClient = () => {
 									Nome
 								</Label>
 								<Input
-									className="text-neutral-700 dark:bg-neutral-700 dark:text-white"
+									className="text-zinc-700 dark:bg-zinc-700 dark:text-white"
 									disabled={loading || isUploadingImage}
 									id="name"
 									maxLength={44}
@@ -378,7 +379,7 @@ const PerfilClient = () => {
 										className={
 											validationError
 												? "border-red-500 dark:border-red-400"
-												: "text-neutral-700 dark:bg-neutral-700 dark:text-white"
+												: "text-zinc-700 dark:bg-zinc-700 dark:text-white"
 										}
 										disabled={loading || isUploadingImage}
 										id="username"
@@ -405,7 +406,7 @@ const PerfilClient = () => {
 							Biografia
 						</Label>
 						<Textarea
-							className={`min-h-32 text-neutral-700 dark:bg-neutral-700 dark:text-white ${
+							className={`min-h-32 text-zinc-700 dark:bg-zinc-700 dark:text-white ${
 								bioValidationError ? "border-red-500 dark:border-red-400" : ""
 							}`}
 							disabled={loading || isUploadingImage}

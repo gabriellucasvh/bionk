@@ -9,9 +9,8 @@ export const metadata: Metadata = {
 
 export default function Perfil() {
 	return (
-	<main className="container bg-white dark:bg-neutral-800">
-	<PerfilClient />
-	</main>
-
+		<main className="container bg-white dark:bg-zinc-800">
+			<PerfilClient />
+		</main>
 	);
 }

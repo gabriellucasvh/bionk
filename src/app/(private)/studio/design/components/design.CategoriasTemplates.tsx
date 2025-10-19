@@ -182,7 +182,7 @@ export default function TemplateSettings({
 										className={`min-w-[150px] cursor-pointer rounded-lg border transition-all ${
 											selectedTemplate === template.id
 												? "border-green-600 bg-green-50"
-												: "border-neutral-300 hover:border-green-400 hover:bg-neutral-50 dark:border-neutral-600 dark:hover:border-green-400 dark:hover:bg-neutral-600"
+												: "border-zinc-300 hover:border-green-400 hover:bg-zinc-50 dark:border-zinc-600 dark:hover:border-green-400 dark:hover:bg-zinc-600"
 										}`}
 										key={template.id}
 									>
@@ -191,7 +191,7 @@ export default function TemplateSettings({
 											onClick={() => handleTemplateSelect(template.id)}
 											variant="ghost"
 										>
-											<div className="relative h-[266px] w-[150px] overflow-hidden rounded-lg bg-neutral-200 dark:bg-neutral-700">
+											<div className="relative h-[266px] w-[150px] overflow-hidden rounded-lg bg-zinc-200 dark:bg-zinc-700">
 												<Image
 													alt={template.name}
 													className="object-cover"
@@ -207,10 +207,10 @@ export default function TemplateSettings({
 							)}
 						</div>
 						{showLeftGradient && (
-							<div className="pointer-events-none absolute top-0 left-0 h-full w-8 bg-gradient-to-r from-white to-transparent sm:hidden dark:from-neutral-800" />
+							<div className="pointer-events-none absolute top-0 left-0 h-full w-8 bg-gradient-to-r from-white to-transparent sm:hidden dark:from-zinc-800" />
 						)}
 						{showRightGradient && (
-							<div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent sm:hidden dark:from-neutral-800" />
+							<div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent sm:hidden dark:from-zinc-800" />
 						)}
 					</div>
 				</div>

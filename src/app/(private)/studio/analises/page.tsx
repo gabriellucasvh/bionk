@@ -1,8 +1,8 @@
 // app/analises/page.tsx
 
-import { authOptions } from "@/lib/auth";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import AnalisesClient from "./analises.client";
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export default async function Analises() {
 	const userId = session?.user?.id;
 
 	return (
-		<main className="bg-white dark:bg-neutral-800">
+		<main className="bg-white dark:bg-zinc-800">
 			{userId ? (
 				<AnalisesClient userId={userId} />
 			) : (

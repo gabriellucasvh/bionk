@@ -30,7 +30,7 @@ function ColorPreviewItem({
 	setActiveColorPicker,
 	handleChange,
 	debouncedHandleChange,
-	fieldName
+	fieldName,
 }: ColorPreviewItemProps) {
 	const pickerRef = useRef<HTMLDivElement>(null);
 	const previewColorKey = `preview-${colorKey}`;
@@ -39,7 +39,7 @@ function ColorPreviewItem({
 		<div className="rounded-lg p-2">
 			<div className="flex items-center gap-3">
 				<button
-					className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-neutral-200 transition-colors hover:border-blue-500 dark:border-neutral-600"
+					className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full border-2 border-zinc-200 transition-colors hover:border-blue-500 dark:border-zinc-600"
 					data-color-button
 					onClick={() =>
 						setActiveColorPicker(
@@ -51,25 +51,19 @@ function ColorPreviewItem({
 				/>
 				<div className="flex-1">
 					<p className="font-medium text-sm">{label}</p>
-					<p className="text-neutral-600 text-xs dark:text-neutral-400">
-						{color}
-					</p>
+					<p className="text-xs text-zinc-600 dark:text-zinc-400">{color}</p>
 				</div>
 			</div>
 			{activeColorPicker === previewColorKey && (
 				<div className="mt-3 w-min" data-color-picker ref={pickerRef}>
 					<HexColorPicker
 						color={color}
-						onChange={(newColor) =>
-							debouncedHandleChange(fieldName, newColor)
-						}
+						onChange={(newColor) => debouncedHandleChange(fieldName, newColor)}
 					/>
 					<HexColorInput
-						className="mt-2 w-full rounded border border-neutral-300 p-2 text-center dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
+						className="mt-2 w-full rounded border border-zinc-300 p-2 text-center dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
 						color={color}
-						onChange={(newColor) =>
-							handleChange(fieldName, newColor)
-						}
+						onChange={(newColor) => handleChange(fieldName, newColor)}
 						placeholder="#000000"
 					/>
 				</div>
@@ -83,7 +77,7 @@ export function ColorPreviews({
 	activeColorPicker,
 	setActiveColorPicker,
 	handleChange,
-	debouncedHandleChange
+	debouncedHandleChange,
 }: ColorPreviewsProps) {
 	const hasCustomColors = !!(
 		customizations.customBackgroundColor ||
@@ -95,7 +89,7 @@ export function ColorPreviews({
 
 	if (!hasCustomColors) {
 		return (
-			<div className="py-8 text-center text-neutral-500 dark:text-neutral-400">
+			<div className="py-8 text-center text-zinc-500 dark:text-zinc-400">
 				<p className="text-sm">Nenhuma cor personalizada selecionada</p>
 				<p className="mt-1 text-xs">
 					Configure suas cores nas seções acima para vê-las aqui
@@ -109,56 +103,56 @@ export function ColorPreviews({
 			{/* Cor de Fundo */}
 			{customizations.customBackgroundColor && (
 				<ColorPreviewItem
-					label="Cor de Fundo"
+					activeColorPicker={activeColorPicker}
 					color={customizations.customBackgroundColor}
 					colorKey="customBackgroundColor"
-					activeColorPicker={activeColorPicker}
-					setActiveColorPicker={setActiveColorPicker}
-					handleChange={handleChange}
 					debouncedHandleChange={debouncedHandleChange}
 					fieldName="customBackgroundColor"
+					handleChange={handleChange}
+					label="Cor de Fundo"
+					setActiveColorPicker={setActiveColorPicker}
 				/>
 			)}
 
 			{/* Cor do Texto */}
 			{customizations.customTextColor && (
 				<ColorPreviewItem
-					label="Cor do Texto e Ícones"
+					activeColorPicker={activeColorPicker}
 					color={customizations.customTextColor}
 					colorKey="customTextColor"
-					activeColorPicker={activeColorPicker}
-					setActiveColorPicker={setActiveColorPicker}
-					handleChange={handleChange}
 					debouncedHandleChange={debouncedHandleChange}
 					fieldName="customTextColor"
+					handleChange={handleChange}
+					label="Cor do Texto e Ícones"
+					setActiveColorPicker={setActiveColorPicker}
 				/>
 			)}
 
 			{/* Cor do Botão */}
 			{customizations.customButtonColor && (
 				<ColorPreviewItem
-					label="Cor do Botão"
+					activeColorPicker={activeColorPicker}
 					color={customizations.customButtonColor}
 					colorKey="customButtonColor"
-					activeColorPicker={activeColorPicker}
-					setActiveColorPicker={setActiveColorPicker}
-					handleChange={handleChange}
 					debouncedHandleChange={debouncedHandleChange}
 					fieldName="customButtonColor"
+					handleChange={handleChange}
+					label="Cor do Botão"
+					setActiveColorPicker={setActiveColorPicker}
 				/>
 			)}
 
 			{/* Cor do Texto do Botão */}
 			{customizations.customButtonTextColor && (
 				<ColorPreviewItem
-					label="Cor do Texto do Botão"
+					activeColorPicker={activeColorPicker}
 					color={customizations.customButtonTextColor}
 					colorKey="customButtonTextColor"
-					activeColorPicker={activeColorPicker}
-					setActiveColorPicker={setActiveColorPicker}
-					handleChange={handleChange}
 					debouncedHandleChange={debouncedHandleChange}
 					fieldName="customButtonTextColor"
+					handleChange={handleChange}
+					label="Cor do Texto do Botão"
+					setActiveColorPicker={setActiveColorPicker}
 				/>
 			)}
 		</div>

@@ -345,7 +345,7 @@ const OnboardingModal = ({
 						<div className="space-y-2">
 							<Label htmlFor="bio">Biografia</Label>
 							<Textarea
-								className="min-h-32 text-neutral-700 dark:bg-neutral-700 dark:text-white"
+								className="min-h-32 text-zinc-700 dark:bg-zinc-700 dark:text-white"
 								id="bio"
 								maxLength={150}
 								onChange={(e) => setData({ ...data, bio: e.target.value })}

@@ -28,7 +28,7 @@ const SensitiveContentWarning: React.FC<SensitiveContentWarningProps> = ({
 	const themeClasses = {
 		container: "bg-black text-white",
 		button: "bg-white text-black hover:bg-gray-200",
-		secondaryButton: "text-white border border-white hover:bg-neutral-900",
+		secondaryButton: "text-white border border-white hover:bg-zinc-900",
 	};
 
 	return (

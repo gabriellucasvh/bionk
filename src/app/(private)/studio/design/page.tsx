@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function Perfil() {
 	return (
-		<main className="bg-white dark:bg-neutral-800">
+		<main className="bg-white dark:bg-zinc-800">
 			<PersonalizarClient />
 		</main>
 	);

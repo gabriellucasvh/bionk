@@ -41,25 +41,25 @@ export default function BannedUserWarning({
 						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641014/bionk-logo-icon_ya5kbp.svg"
 						width={110}
 					/>
-					<h1 className="mb-4 font-bold text-2xl text-neutral-900">
+					<h1 className="mb-4 font-bold text-2xl text-zinc-900">
 						Usuário Suspenso
 					</h1>
-					<p className="text-neutral-600">
+					<p className="text-zinc-600">
 						O perfil de <strong>@{username}</strong> foi suspenso por violação
 						dos nossos termos de uso.
 					</p>
 				</div>
 
-				<div className="mb-6 rounded-lg bg-neutral-50 p-4">
-					<div className="mb-2 text-neutral-700 text-sm">
+				<div className="mb-6 rounded-lg bg-zinc-50 p-4">
+					<div className="mb-2 text-sm text-zinc-700">
 						<strong>Motivo:</strong> {banReason || "Violação dos termos de uso"}
 					</div>
-					<div className="text-neutral-700 text-sm">
+					<div className="text-sm text-zinc-700">
 						<strong>Data da suspensão:</strong> {formattedDate}
 					</div>
 				</div>
 
-				<div className="mb-6 text-neutral-600 text-sm">
+				<div className="mb-6 text-sm text-zinc-600">
 					<p className="mb-3">
 						Se você é o proprietário desta conta e acredita que isso foi um
 						erro, entre em contato conosco.
@@ -80,13 +80,13 @@ export default function BannedUserWarning({
 
 				<div className="space-y-3">
 					<Link
-						className="inline-block w-full rounded-full bg-black px-4 py-2 text-white transition-colors hover:bg-neutral-800"
+						className="inline-block w-full rounded-full bg-black px-4 py-2 text-white transition-colors hover:bg-zinc-800"
 						href="/contato"
 					>
 						Entrar em Contato
 					</Link>
 					<button
-						className="w-full rounded-full bg-neutral-200 px-4 py-2 text-neutral-800 transition-colors hover:bg-neutral-300"
+						className="w-full rounded-full bg-zinc-200 px-4 py-2 text-zinc-800 transition-colors hover:bg-zinc-300"
 						onClick={handleGoBack}
 						type="button"
 					>

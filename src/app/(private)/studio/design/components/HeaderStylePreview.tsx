@@ -30,7 +30,7 @@ export function HeaderStylePreview({
 }: HeaderStylePreviewProps) {
 	const renderDefaultStyle = () => (
 		<div
-			className="flex h-full w-full flex-col items-center justify-center rounded-lg bg-neutral-800 p-4 dark:bg-neutral-900"
+			className="flex h-full w-full flex-col items-center justify-center rounded-lg bg-zinc-800 p-4 dark:bg-zinc-900"
 			style={{
 				backgroundImage: backgroundImage || undefined,
 				backgroundSize: "cover",
@@ -43,26 +43,26 @@ export function HeaderStylePreview({
 				<AvatarImage alt={name} src={image} />
 				<AvatarFallback>{name.charAt(0)}</AvatarFallback>
 			</Avatar>
-			<h3 className="mb-1 font-semibold text-neutral-100 text-sm">
+			<h3 className="mb-1 font-semibold text-sm text-zinc-100">
 				{name.length > 13 ? `${name.substring(0, 13)}...` : name}
 			</h3>
-			<p className="mb-2 text-neutral-300 text-xs">
+			<p className="mb-2 text-xs text-zinc-300">
 				@{username.length > 13 ? `${username.substring(0, 13)}...` : username}
 			</p>
-			<p className="mb-3 text-center text-neutral-300 text-xs">
+			<p className="mb-3 text-center text-xs text-zinc-300">
 				{bio.length > 13 ? `${bio.substring(0, 13)}...` : bio}
 			</p>
 			<div className="mb-2 flex space-x-1">
-				<div className="h-3 w-3 rounded-full bg-neutral-400" />
-				<div className="h-3 w-3 rounded-full bg-neutral-400" />
-				<div className="h-3 w-3 rounded-full bg-neutral-400" />
+				<div className="h-3 w-3 rounded-full bg-zinc-400" />
+				<div className="h-3 w-3 rounded-full bg-zinc-400" />
+				<div className="h-3 w-3 rounded-full bg-zinc-400" />
 			</div>
 		</div>
 	);
 
 	const renderHorizontalStyle = () => (
 		<div
-			className="flex h-full w-full items-center rounded-lg bg-neutral-800 p-4 dark:bg-neutral-900"
+			className="flex h-full w-full items-center rounded-lg bg-zinc-800 p-4 dark:bg-zinc-900"
 			style={{
 				backgroundImage: backgroundImage || undefined,
 				backgroundSize: "cover",
@@ -76,19 +76,19 @@ export function HeaderStylePreview({
 				<AvatarFallback>{name.charAt(0)}</AvatarFallback>
 			</Avatar>
 			<div className="min-w-0 flex-1">
-				<h3 className="truncate font-semibold text-neutral-100 text-xs">
+				<h3 className="truncate font-semibold text-xs text-zinc-100">
 					{name.length > 10 ? `${name.substring(0, 10)}...` : name}
 				</h3>
-				<p className="truncate text-neutral-300 text-xs">
+				<p className="truncate text-xs text-zinc-300">
 					@{username.length > 10 ? `${username.substring(0, 10)}...` : username}
 				</p>
-				<p className="truncate text-neutral-300 text-xs">
+				<p className="truncate text-xs text-zinc-300">
 					{bio.length > 15 ? `${bio.substring(0, 15)}...` : bio}
 				</p>
 				<div className="mt-1 flex space-x-1">
-					<div className="h-2 w-2 rounded-full bg-neutral-400" />
-					<div className="h-2 w-2 rounded-full bg-neutral-400" />
-					<div className="h-2 w-2 rounded-full bg-neutral-400" />
+					<div className="h-2 w-2 rounded-full bg-zinc-400" />
+					<div className="h-2 w-2 rounded-full bg-zinc-400" />
+					<div className="h-2 w-2 rounded-full bg-zinc-400" />
 				</div>
 			</div>
 		</div>
@@ -174,7 +174,7 @@ export function HeaderStyleButtons({
 						className={`relative w-32 flex-shrink-0 snap-start rounded-lg border-2 p-2 transition-all duration-200 md:w-36 lg:w-40 ${
 							selectedStyle === style.value
 								? "border-green-500 bg-green-50 dark:bg-green-950"
-								: "border-neutral-200 hover:border-neutral-300 dark:border-neutral-700 dark:hover:border-neutral-600"
+								: "border-zinc-200 hover:border-zinc-300 dark:border-zinc-700 dark:hover:border-zinc-600"
 						}`}
 						key={style.value}
 						onClick={() => onStyleChange(style.value)}
@@ -196,7 +196,7 @@ export function HeaderStyleButtons({
 								username={username}
 							/>
 						</div>
-						<p className="mt-2 text-center font-medium text-neutral-700 text-xs dark:text-neutral-300">
+						<p className="mt-2 text-center font-medium text-xs text-zinc-700 dark:text-zinc-300">
 							{style.label}
 						</p>
 					</button>

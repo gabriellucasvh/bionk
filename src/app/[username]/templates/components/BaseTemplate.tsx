@@ -214,7 +214,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 			{/* Container principal com aspect ratio de celular em telas maiores */}
 			<div
 				className={`relative min-h-dvh sm:flex sm:items-start sm:justify-center sm:pt-4 ${
-					shouldUseBlurredBackground ? "" : "bg-neutral-900"
+					shouldUseBlurredBackground ? "" : "bg-zinc-900"
 				}`}
 				style={{
 					backgroundColor: shouldUseBlurredBackground ? "#1a1a1a" : undefined,

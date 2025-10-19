@@ -65,8 +65,8 @@ export function FontSelector({
 					<button
 						className={`flex h-16 w-full items-center justify-center rounded border px-2 py-1 text-center text-xs leading-tight transition-colors ${
 							customizations.customFont === font.value
-								? "border-neutral-300 bg-neutral-200 dark:border-neutral-600 dark:bg-neutral-700"
-								: "border-neutral-200 hover:bg-neutral-200 dark:border-neutral-600 dark:text-white dark:hover:bg-neutral-700"
+								? "border-zinc-300 bg-zinc-200 dark:border-zinc-600 dark:bg-zinc-700"
+								: "border-zinc-200 hover:bg-zinc-200 dark:border-zinc-600 dark:text-white dark:hover:bg-zinc-700"
 						}`}
 						key={font.value}
 						onClick={() => handleChange("customFont", font.value)}
@@ -98,7 +98,7 @@ export function ButtonStyleSelector({
 					return (
 						<div
 							className={`relative min-h-12 w-full cursor-pointer rounded-lg transition-all ${
-								isActive ? "" : "hover:bg-neutral-50 dark:hover:bg-neutral-600"
+								isActive ? "" : "hover:bg-zinc-50 dark:hover:bg-zinc-600"
 							}`}
 							key={style.value}
 							onClick={() => handleChange("customButtonStyle", style.value)}
@@ -147,7 +147,7 @@ export function ButtonCornersSelector({
 						Number.parseInt(customizations.customButtonCorners || "12", 10),
 					]}
 				/>
-				<span className="w-20 text-center font-semibold text-neutral-700 dark:text-neutral-300">
+				<span className="w-20 text-center font-semibold text-zinc-700 dark:text-zinc-300">
 					{getCornerLabel(
 						Number.parseInt(customizations.customButtonCorners || "12", 10)
 					)}

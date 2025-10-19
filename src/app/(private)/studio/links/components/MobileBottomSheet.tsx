@@ -62,7 +62,7 @@ const MobileBottomSheet = ({
 				style={{ touchAction: "none" }}
 			/>
 			<div
-				className="absolute right-0 left-0 w-full bg-neutral-100 shadow-2xl dark:bg-neutral-800"
+				className="absolute right-0 left-0 w-full bg-zinc-100 shadow-2xl dark:bg-zinc-800"
 				style={{
 					bottom: "-1px",
 					borderTopLeftRadius: "24px",

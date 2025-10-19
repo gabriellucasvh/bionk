@@ -310,7 +310,7 @@ const ProfileImageCropModal: FC<ProfileImageCropModalProps> = ({
 												<div className="w-full border-gray-300 border-t" />
 											</div>
 											<div className="relative flex justify-center text-sm">
-												<span className="bg-white px-2 text-gray-500 dark:bg-neutral-950 dark:text-white/80">
+												<span className="bg-white px-2 text-gray-500 dark:bg-zinc-950 dark:text-white/80">
 													ou escolha uma nova
 												</span>
 											</div>

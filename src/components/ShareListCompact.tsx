@@ -65,7 +65,7 @@ const ShareListCompact = ({
 	return (
 		<div className={cn("w-full", className)}>
 			{showHeader && (
-				<h3 className="mb-3 text-left font-medium text-neutral-700 text-sm dark:text-white">
+				<h3 className="mb-3 text-left font-medium text-sm text-zinc-700 dark:text-white">
 					Compartilhar
 				</h3>
 			)}
@@ -76,7 +76,7 @@ const ShareListCompact = ({
 						<button
 							aria-label={copied ? "Copiado!" : "Copiar link"}
 							className={cn(
-								"w-full rounded-xl bg-white px-3 py-2 text-left transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:bg-transparent dark:hover:bg-neutral-800",
+								"w-full rounded-xl bg-white px-3 py-2 text-left transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-transparent dark:hover:bg-zinc-800",
 								copied && "border-green-200 bg-green-50 dark:border-green-900"
 							)}
 							onClick={handleCopyLink}
@@ -104,7 +104,7 @@ const ShareListCompact = ({
 					<li key={platform.key}>
 						<button
 							aria-label={`Compartilhar no ${platform.name}`}
-							className="w-full rounded-xl bg-white px-3 py-2 text-left transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:bg-transparent dark:hover:bg-neutral-800"
+							className="w-full rounded-xl bg-white px-3 py-2 text-left transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-transparent dark:hover:bg-zinc-800"
 							onClick={() => handleSocialShare(platform.key)}
 							title={`Compartilhar no ${platform.name}`}
 							type="button"
@@ -150,7 +150,7 @@ const ShareListCompact = ({
 					<li>
 						<button
 							aria-label="Compartilhar via..."
-							className="w-full rounded-xl bg-white px-3 py-2 text-left transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:bg-transparent dark:hover:bg-neutral-800"
+							className="w-full rounded-xl bg-white px-3 py-2 text-left transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-transparent dark:hover:bg-zinc-800"
 							onClick={handleNativeShare}
 							title="Compartilhar via..."
 							type="button"

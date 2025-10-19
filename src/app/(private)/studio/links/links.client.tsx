@@ -109,7 +109,7 @@ const LinksStudioClient = () => {
 	}
 
 	return (
-		<div className="min-h-[100dvh] w-full bg-white text-black transition-colors md:min-h-screen dark:bg-neutral-800 dark:text-white">
+		<div className="min-h-[100dvh] w-full bg-white text-black transition-colors md:min-h-screen dark:bg-zinc-800 dark:text-white">
 			{/* Conteúdo */}
 			<div
 				className={`w-full ${mobileView === "preview" ? "hidden md:block" : "block"}`}
@@ -137,14 +137,14 @@ const LinksStudioClient = () => {
 
 			{/* Preview Mobile - substitui conteúdo quando ativo */}
 			<div
-				className={`fixed inset-0 z-40 bg-gray-100 md:hidden dark:bg-neutral-900 ${
+				className={`fixed inset-0 z-40 bg-gray-100 md:hidden dark:bg-zinc-900 ${
 					mobileView === "content" ? "hidden" : "block"
 				}`}
 				ref={previewContainerRef}
 			>
 				<div className="flex h-full justify-center overflow-y-auto px-6 pt-10 pb-20">
 					<div
-						className="mx-auto h-full w-full overflow-hidden rounded-3xl bg-white shadow-lg dark:bg-neutral-800"
+						className="mx-auto h-full w-full overflow-hidden rounded-3xl bg-white shadow-lg dark:bg-zinc-800"
 						style={{ height: "calc(100vh - 8rem)", maxWidth: "365px" }}
 					>
 						<UserPagePreview />
@@ -155,7 +155,7 @@ const LinksStudioClient = () => {
 			{/* Preview Desktop - Visível apenas em md+ */}
 			<div className="fixed top-4 right-4 z-50 hidden h-[calc(100vh-2rem)] w-90 rounded-[2.5rem] border-4 border-gray-800 bg-gray-900 shadow-2xl xl:block">
 				<div className="flex h-full flex-col">
-					<div className="flex-1 overflow-y-auto rounded-4xl bg-white dark:bg-neutral-900">
+					<div className="flex-1 overflow-y-auto rounded-4xl bg-white dark:bg-zinc-900">
 						<UserPagePreview />
 					</div>
 				</div>

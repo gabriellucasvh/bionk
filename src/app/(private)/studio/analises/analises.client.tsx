@@ -10,7 +10,7 @@ const AnalyticsHeader = dynamic(
 	() => import("./components/analises.AnalyticsHeader"),
 	{
 		loading: () => (
-			<div className="h-16 w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
+			<div className="h-16 w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
 		),
 	}
 );
@@ -19,9 +19,9 @@ const AnalyticsStatsCards = dynamic(
 	{
 		loading: () => (
 			<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
-				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
+				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
+				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
+				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
 			</div>
 		),
 	}
@@ -30,7 +30,7 @@ const PerformanceChart = dynamic(
 	() => import("./components/analises.PerformanceChart"),
 	{
 		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
+			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
 		),
 	}
 );
@@ -38,7 +38,7 @@ const TopLinksTable = dynamic(
 	() => import("./components/analises.TopLinksTable"),
 	{
 		loading: () => (
-			<div className="h-[200px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
+			<div className="h-[200px] w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
 		),
 	}
 );
@@ -46,7 +46,7 @@ const DeviceAnalytics = dynamic(
 	() => import("./components/analises.DeviceAnalytics"),
 	{
 		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-neutral-700" />
+			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
 		),
 	}
 );
@@ -140,7 +140,9 @@ interface AnalisesClientProps {
 
 // Componente para renderizar seções com loading
 const LoadingSection: React.FC<{ className: string }> = ({ className }) => (
-	<div className={`animate-pulse rounded-md bg-muted dark:bg-neutral-700 ${className}`} />
+	<div
+		className={`animate-pulse rounded-md bg-muted dark:bg-zinc-700 ${className}`}
+	/>
 );
 
 // Componente para renderizar o conteúdo das análises
@@ -155,7 +157,7 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 	isLoading,
 	data,
 	memoizedChartData,
-	memoizedTopLinks
+	memoizedTopLinks,
 }) => {
 	if (isLoading || !data) {
 		return (
@@ -193,7 +195,10 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 					isLoading={false}
 				/>
 			</div>
-			<ReferrerAnalytics data={data.referrerAnalytics || []} isLoading={false} />
+			<ReferrerAnalytics
+				data={data.referrerAnalytics || []}
+				isLoading={false}
+			/>
 		</main>
 	);
 };
@@ -222,7 +227,8 @@ const useAnalyticsData = (userId: string | null) => {
 };
 
 const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
-	const { data, error, isLoading, memoizedChartData, memoizedTopLinks } = useAnalyticsData(userId);
+	const { data, error, isLoading, memoizedChartData, memoizedTopLinks } =
+		useAnalyticsData(userId);
 
 	const exportToExcel = useCallback(async () => {
 		if (!data) {
@@ -278,19 +284,19 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 	}
 
 	return (
-			<section className="w-full max-w-full overflow-x-hidden p-3 pb-24 sm:p-4 sm:pb-8 lg:p-6 lg:pb-8 dark:text-white">
-				<AnalyticsHeader
-					onExportToExcel={exportToExcel}
-					onExportToPDF={exportToPDF}
-				/>
-				<AnalyticsContent 
-					isLoading={isLoading}
-					data={data}
-					memoizedChartData={memoizedChartData}
-					memoizedTopLinks={memoizedTopLinks}
-				/>
-			</section>
-		);
+		<section className="w-full max-w-full overflow-x-hidden p-3 pb-24 sm:p-4 sm:pb-8 lg:p-6 lg:pb-8 dark:text-white">
+			<AnalyticsHeader
+				onExportToExcel={exportToExcel}
+				onExportToPDF={exportToPDF}
+			/>
+			<AnalyticsContent
+				data={data}
+				isLoading={isLoading}
+				memoizedChartData={memoizedChartData}
+				memoizedTopLinks={memoizedTopLinks}
+			/>
+		</section>
+	);
 };
 
 const MemoizedAnalisesClient = React.memo(AnalisesClient);

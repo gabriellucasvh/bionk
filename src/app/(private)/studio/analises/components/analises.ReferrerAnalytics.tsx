@@ -300,7 +300,7 @@ export default function ReferrerAnalytics({
 }: ReferrerAnalyticsProps) {
 	if (isLoading) {
 		return (
-			<Card className="dark:border-white/40 dark:bg-neutral-900">
+			<Card className="dark:border-white/40 dark:bg-zinc-900">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
 						<Radar className="h-5 w-5" />
@@ -318,7 +318,7 @@ export default function ReferrerAnalytics({
 
 	if (!data || data.length === 0) {
 		return (
-			<Card className="dark:border-white/40 dark:bg-neutral-900">
+			<Card className="dark:border-white/40 dark:bg-zinc-900">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
 						<Radar className="h-5 w-5" />
@@ -366,7 +366,7 @@ export default function ReferrerAnalytics({
 	const useBarChart = data.length > 6;
 
 	return (
-		<Card className="dark:border-white/40 dark:bg-neutral-900">
+		<Card className="dark:border-white/40 dark:bg-zinc-900">
 			<CardHeader>
 				<CardTitle className="flex items-center justify-between">
 					<div className="flex items-center gap-2">

@@ -311,8 +311,8 @@ const Sidebar = () => {
 					<Button
 						className={`h-10 w-full justify-start rounded-lg px-3 font-medium text-sm transition-all ${
 							isActive
-								? "bg-neutral-200 text-black shadow-sm dark:bg-neutral-700 dark:text-white"
-								: "text-neutral-700 hover:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700"
+								? "bg-zinc-200 text-black shadow-sm dark:bg-zinc-700 dark:text-white"
+								: "text-zinc-700 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-700"
 						}`}
 						key={link.key}
 						onClick={() => !isActive && handleNavClick(link.href)}
@@ -329,8 +329,8 @@ const Sidebar = () => {
 	return (
 		<>
 			{/* Sidebar desktop */}
-			<aside className="hidden px-3 transition-colors md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-r md:bg-neutral-50/70 md:backdrop-blur-lg dark:md:border-neutral-700 dark:md:bg-neutral-900">
-				<header className="flex h-16 items-center justify-between border-b pr-2 pl-2 dark:border-neutral-700">
+			<aside className="hidden px-3 transition-colors md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-r md:bg-zinc-50/70 md:backdrop-blur-lg dark:md:border-zinc-700 dark:md:bg-zinc-900">
+				<header className="flex h-16 items-center justify-between border-b pr-2 pl-2 dark:border-zinc-700">
 					<Link className="flex items-center gap-2 font-semibold" href="/">
 						<Image
 							alt="logo"
@@ -351,21 +351,21 @@ const Sidebar = () => {
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button
-								className="flex h-12 w-full items-center justify-between rounded-lg border border-neutral-200 bg-neutral-100 px-4 transition hover:bg-neutral-200 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600"
+								className="flex h-12 w-full items-center justify-between rounded-lg border border-zinc-200 bg-zinc-100 px-4 transition hover:bg-zinc-200 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white dark:hover:bg-zinc-600"
 								variant="outline"
 							>
 								<div className="flex min-w-0 flex-1 flex-col items-start justify-center overflow-hidden text-left">
 									<p className="flex items-center gap-2 font-medium text-sm">
 										Compartilhar
 									</p>
-									<span className="truncate text-neutral-500 text-xs dark:text-neutral-400">
+									<span className="truncate text-xs text-zinc-500 dark:text-zinc-400">
 										bionk.me/
 										{username && username.length > 20
 											? `${username.slice(0, 20)}...`
 											: username}
 									</span>
 								</div>
-								<ExternalLink className="h-5 w-5 flex-shrink-0 text-neutral-400 dark:text-neutral-300" />
+								<ExternalLink className="h-5 w-5 flex-shrink-0 text-zinc-400 dark:text-zinc-300" />
 							</Button>
 						</DropdownMenuTrigger>
 						<ProfileActionsDropdown
@@ -376,14 +376,14 @@ const Sidebar = () => {
 				</div>
 
 				<div>
-					<h3 className="mb-2 px-3 font-semibold text-neutral-400 text-xs tracking-wider dark:text-neutral-300">
+					<h3 className="mb-2 px-3 font-semibold text-xs text-zinc-400 tracking-wider dark:text-zinc-300">
 						Studio
 					</h3>
 					<nav className="space-y-1">{renderNavLinks(mainLinks)}</nav>
 				</div>
 
 				<div className="mt-5">
-					<h3 className="mb-2 px-3 font-semibold text-neutral-400 text-xs tracking-wider dark:text-neutral-300">
+					<h3 className="mb-2 px-3 font-semibold text-xs text-zinc-400 tracking-wider dark:text-zinc-300">
 						Ferramentas
 					</h3>
 					<nav className="space-y-1">{renderNavLinks(toolsLinks)}</nav>
@@ -391,7 +391,7 @@ const Sidebar = () => {
 
 				{/* Perfil */}
 				<div
-					className="mt-auto mb-3 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors duration-200 hover:bg-neutral-200 dark:hover:bg-neutral-600 "
+					className="mt-auto mb-3 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-600 "
 					onClick={() => router.push("/studio/configs")}
 					role="none"
 				>
@@ -435,14 +435,14 @@ const Sidebar = () => {
 									</span>
 								)}
 							</div>
-							<GalleryHorizontalEnd className="h-5 w-5 text-neutral-500 dark:text-neutral-300" />
+							<GalleryHorizontalEnd className="h-5 w-5 text-zinc-500 dark:text-zinc-300" />
 						</>
 					)}
 				</div>
 			</aside>
 
 			{/* Navbar mobile */}
-			<nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-white transition-colors md:hidden dark:border-neutral-700 dark:bg-neutral-800">
+			<nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-white transition-colors md:hidden dark:border-zinc-700 dark:bg-zinc-800">
 				<ul className="grid grid-cols-5 py-3">
 					{mainLinks.map((link) => {
 						const isActive = pathname === link.href;
@@ -452,7 +452,7 @@ const Sidebar = () => {
 									className={`flex flex-col items-center gap-1 px-1 text-[10px] sm:text-xs ${
 										isActive
 											? "text-green-600 dark:text-green-400"
-											: "text-neutral-500 dark:text-neutral-400"
+											: "text-zinc-500 dark:text-zinc-400"
 									}`}
 									onClick={() => !isActive && handleNavClick(link.href)}
 									variant="ghost"
@@ -466,7 +466,7 @@ const Sidebar = () => {
 					{/* Perfil mobile */}
 					<li className="flex items-center justify-center">
 						<Button
-							className="flex flex-col items-center gap-1 px-1 text-[10px] text-neutral-500 sm:text-xs dark:text-neutral-400"
+							className="flex flex-col items-center gap-1 px-1 text-[10px] text-zinc-500 sm:text-xs dark:text-zinc-400"
 							onClick={() => router.push("/studio/configs")}
 							variant="ghost"
 						>

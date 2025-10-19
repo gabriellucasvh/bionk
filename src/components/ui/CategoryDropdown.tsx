@@ -48,11 +48,13 @@ export default function CategoryDropdown({
 
 			{/* Dropdown Menu */}
 			{isOpen && (
-				<div className="absolute top-full right-0 left-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-md border bg-white shadow-lg dark:bg-neutral-800">
+				<div className="absolute top-full right-0 left-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-md border bg-white shadow-lg dark:bg-zinc-800">
 					{categories.map((category) => (
 						<button
-							className={`w-full px-4 py-3 text-left text-sm capitalize transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 ${
-								selectedCategory === category ? "bg-gray-100 font-medium dark:bg-neutral-700" : ""
+							className={`w-full px-4 py-3 text-left text-sm capitalize transition-colors hover:bg-gray-100 dark:hover:bg-zinc-700 ${
+								selectedCategory === category
+									? "bg-gray-100 font-medium dark:bg-zinc-700"
+									: ""
 							}`}
 							key={category}
 							onClick={() => handleCategorySelect(category)}

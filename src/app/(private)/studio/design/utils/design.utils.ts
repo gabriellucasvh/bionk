@@ -5,25 +5,25 @@ const HEX_REGEX = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
 export function getButtonStyleClasses(buttonStyle: string): string {
 	switch (buttonStyle) {
 		case "solid":
-			return "bg-neutral-500 text-white border-none";
+			return "bg-zinc-500 text-white border-none";
 		case "outline":
-			return "bg-transparent text-neutral-700 dark:text-white border-neutral-500 border-2";
+			return "bg-transparent text-zinc-700 dark:text-white border-zinc-500 border-2";
 		case "soft":
-			return "bg-neutral-100 text-neutral-700 border-neutral-200";
+			return "bg-zinc-100 text-zinc-700 border-zinc-200";
 		case "shadow":
-			return "bg-neutral-100 text-neutral-700 border-neutral-300 shadow-lg dark:shadow-white/20";
+			return "bg-zinc-100 text-zinc-700 border-zinc-300 shadow-lg dark:shadow-white/20";
 		case "neon":
-			return "bg-transparent text-neutral-700 dark:text-white border-neutral-500 border-2 shadow-[0_0_8px_rgba(0,0,0,0.3)]";
+			return "bg-transparent text-zinc-700 dark:text-white border-zinc-500 border-2 shadow-[0_0_8px_rgba(0,0,0,0.3)]";
 		case "dashed":
-			return "bg-transparent text-neutral-700 dark:text-white border-neutral-500 border-2 border-dashed";
+			return "bg-transparent text-zinc-700 dark:text-white border-zinc-500 border-2 border-dashed";
 		case "double":
-			return "bg-transparent text-neutral-700 dark:text-white border-neutral-600 border-4 border-double";
+			return "bg-transparent text-zinc-700 dark:text-white border-zinc-600 border-4 border-double";
 		case "raised":
-			return "bg-neutral-200 text-neutral-700 border-neutral-400 border-t-2 border-l-2 border-r border-b shadow-inner";
+			return "bg-zinc-200 text-zinc-700 border-zinc-400 border-t-2 border-l-2 border-r border-b shadow-inner";
 		case "inset":
-			return "bg-neutral-200 text-neutral-700 border-neutral-400 border-b-2 border-r-2 border-t border-l shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]";
+			return "bg-zinc-200 text-zinc-700 border-zinc-400 border-b-2 border-r-2 border-t border-l shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]";
 		default:
-			return "bg-neutral-500 text-white border-none";
+			return "bg-zinc-500 text-white border-none";
 	}
 }
 

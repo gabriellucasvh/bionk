@@ -216,7 +216,7 @@ const PersonalizarClient = () => {
 	}
 
 	return (
-		<div className="min-h-screen w-full bg-white text-black transition-colors dark:bg-neutral-800 dark:text-white">
+		<div className="min-h-screen w-full bg-white text-black transition-colors dark:bg-zinc-800 dark:text-white">
 			{/* Botão flutuante mobile substitui navbar */}
 			<button
 				aria-label={
@@ -239,7 +239,7 @@ const PersonalizarClient = () => {
 			<div className="md:flex">
 				{/* Painel de Edição */}
 				<div
-					className={`h-screen w-full overflow-y-auto bg-white md:h-auto md:flex-1 md:overflow-visible dark:bg-neutral-800 ${
+					className={`h-screen w-full overflow-y-auto bg-white md:h-auto md:flex-1 md:overflow-visible dark:bg-zinc-800 ${
 						mobileView === "preview" ? "hidden xl:block" : "block"
 					}`}
 					ref={designContainerRef}
@@ -281,14 +281,14 @@ const PersonalizarClient = () => {
 
 				{/* Preview Mobile - Visível apenas quando selecionado no mobile */}
 				<div
-					className={`fixed inset-0 z-40 bg-gray-100 md:hidden dark:bg-neutral-900 ${
+					className={`fixed inset-0 z-40 bg-gray-100 md:hidden dark:bg-zinc-900 ${
 						mobileView === "design" ? "hidden" : "block"
 					}`}
 					ref={previewContainerRef}
 				>
 					<div className="flex h-full justify-center overflow-y-auto px-6 pt-10 pb-24">
 						<div
-							className="mx-auto h-full w-full overflow-hidden rounded-3xl bg-white shadow-lg dark:bg-neutral-800"
+							className="mx-auto h-full w-full overflow-hidden rounded-3xl bg-white shadow-lg dark:bg-zinc-800"
 							style={{
 								height: "calc(100vh - 8rem)",
 								maxWidth: "365px",
@@ -303,7 +303,7 @@ const PersonalizarClient = () => {
 			{/* Preview Desktop - Visível apenas em md+ */}
 			<div className="fixed top-4 right-4 z-50 hidden h-[calc(100vh-2rem)] w-90 rounded-[2.5rem] border-4 border-gray-800 bg-gray-900 shadow-2xl xl:block">
 				<div className="flex h-full flex-col">
-					<div className="flex-1 overflow-y-auto rounded-4xl bg-white dark:bg-neutral-900">
+					<div className="flex-1 overflow-y-auto rounded-4xl bg-white dark:bg-zinc-900">
 						<UserPagePreview />
 					</div>
 				</div>

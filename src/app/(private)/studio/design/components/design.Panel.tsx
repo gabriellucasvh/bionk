@@ -63,8 +63,8 @@ export function DesignPanel() {
 				: "color"
 	);
 
- // Não sincronizar automaticamente o tipo ao mudar valores,
- // para evitar que alternar a aba mude o preview sem seleção.
+	// Não sincronizar automaticamente o tipo ao mudar valores,
+	// para evitar que alternar a aba mude o preview sem seleção.
 
 	const handleChange = (field: string, value: string | boolean) => {
 		updateCustomization(field as any, value);
@@ -72,18 +72,18 @@ export function DesignPanel() {
 
 	const debouncedHandleChange = handleChange;
 
- const handleBackgroundTypeChange = (
-     type: "color" | "gradient" | "image" | "video"
- ) => {
-     // Alternar apenas a aba exibida; não limpar valores existentes.
-     setBackgroundType(type);
+	const handleBackgroundTypeChange = (
+		type: "color" | "gradient" | "image" | "video"
+	) => {
+		// Alternar apenas a aba exibida; não limpar valores existentes.
+		setBackgroundType(type);
 
-     // Para imagem/vídeo, abrir modal de seleção sem alterar o preview atual.
-     if (type === "image" || type === "video") {
-         setBackgroundModalType(type);
-         setIsBackgroundModalOpen(true);
-     }
- };
+		// Para imagem/vídeo, abrir modal de seleção sem alterar o preview atual.
+		if (type === "image" || type === "video") {
+			setBackgroundModalType(type);
+			setIsBackgroundModalOpen(true);
+		}
+	};
 
 	const handleSavePending = async () => {
 		try {
@@ -207,7 +207,7 @@ export function DesignPanel() {
 									className={`rounded-xl border px-3 py-5 text-sm transition-all ${
 										backgroundType === opt.key
 											? "border-lime-700 text-lime-700 dark:border-lime-600 dark:text-lime-400"
-											: "border-neutral-200 text-neutral-700 hover:border-green-500 hover:text-green-600 dark:border-neutral-600 dark:text-neutral-300 dark:hover:border-green-400 dark:hover:text-green-300"
+											: "border-zinc-200 text-zinc-700 hover:border-green-500 hover:text-green-600 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-green-400 dark:hover:text-green-300"
 									}`}
 									key={opt.key}
 									onClick={() => handleBackgroundTypeChange(opt.key)}
@@ -217,10 +217,10 @@ export function DesignPanel() {
 								</button>
 							))}
 						</div>
-                        <p className="mt-2 text-muted-foreground text-xs">
-                            Apenas uma opção de fundo é usada por vez. Alternar o tipo não altera
-                            o fundo atual; a mudança ocorre ao selecionar uma opção.
-                        </p>
+						<p className="mt-2 text-muted-foreground text-xs">
+							Apenas uma opção de fundo é usada por vez. Alternar o tipo não
+							altera o fundo atual; a mudança ocorre ao selecionar uma opção.
+						</p>
 					</div>
 
 					{/* Cor de Fundo */}
@@ -245,26 +245,26 @@ export function DesignPanel() {
 								text="Gradiente de Fundo"
 							/>
 							<div className="mt-2 flex flex-wrap gap-1">
-                                {GRADIENTS.map((gradient) => (
-                                    <button
-                                        className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
-                                            customizations.customBackgroundGradient === gradient
-                                                ? "border-2 border-lime-700"
-                                                : "border-2 border-neutral-200 hover:border-green-500 dark:border-neutral-600 dark:hover:border-green-400"
-                                        }`}
-                                        key={gradient}
-                                        onClick={() => {
-                                            // Selecionar gradiente e limpar opções conflitantes
-                                            handleChange("customBackgroundGradient", gradient);
-                                            handleChange("customBackgroundColor", "");
-                                            handleChange("customBackgroundMediaType", "");
-                                            handleChange("customBackgroundImageUrl", "");
-                                            handleChange("customBackgroundVideoUrl", "");
-                                        }}
-                                        style={{ background: gradient }}
-                                        type="button"
-                                    />
-                                ))}
+								{GRADIENTS.map((gradient) => (
+									<button
+										className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
+											customizations.customBackgroundGradient === gradient
+												? "border-2 border-lime-700"
+												: "border-2 border-zinc-200 hover:border-green-500 dark:border-zinc-600 dark:hover:border-green-400"
+										}`}
+										key={gradient}
+										onClick={() => {
+											// Selecionar gradiente e limpar opções conflitantes
+											handleChange("customBackgroundGradient", gradient);
+											handleChange("customBackgroundColor", "");
+											handleChange("customBackgroundMediaType", "");
+											handleChange("customBackgroundImageUrl", "");
+											handleChange("customBackgroundVideoUrl", "");
+										}}
+										style={{ background: gradient }}
+										type="button"
+									/>
+								))}
 							</div>
 						</div>
 					)}
@@ -464,8 +464,8 @@ export function DesignPanel() {
 
 			{/* Salvar e Cancelar pendências */}
 			{hasUnsavedChanges && (
-				<div className="-translate-x-1/2 fixed bottom-16 left-1/2 z-50 mx-auto flex w-max transform items-center gap-2 rounded-full border bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm transition-all duration-300 ease-out md:bottom-6 dark:bg-neutral-800/90">
-					<span className="hidden font-medium text-neutral-600 text-sm sm:inline-block dark:text-neutral-400">
+				<div className="-translate-x-1/2 fixed bottom-16 left-1/2 z-50 mx-auto flex w-max transform items-center gap-2 rounded-full border bg-white/90 p-2 px-4 shadow-lg backdrop-blur-sm transition-all duration-300 ease-out md:bottom-6 dark:bg-zinc-800/90">
+					<span className="hidden font-medium text-sm text-zinc-600 sm:inline-block dark:text-zinc-400">
 						Deseja salvar as alterações pendentes?
 					</span>
 					<BaseButton

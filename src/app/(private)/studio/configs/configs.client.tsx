@@ -103,7 +103,7 @@ function CancelSubscriptionButton() {
 			<AlertDialog onOpenChange={setShowCancelDialog} open={showCancelDialog}>
 				<AlertDialogTrigger asChild>
 					<Button
-						className="w-full text-red-800 hover:text-red-600 sm:w-auto dark:border-neutral-600 dark:text-red-400 dark:hover:text-red-300"
+						className="w-full text-red-800 hover:text-red-600 sm:w-auto dark:border-zinc-600 dark:text-red-400 dark:hover:text-red-300"
 						disabled={isLoading}
 						size="sm"
 						variant="outline"
@@ -112,12 +112,12 @@ function CancelSubscriptionButton() {
 						{isLoading ? "Cancelando..." : "Cancelar Assinatura"}
 					</Button>
 				</AlertDialogTrigger>
-				<AlertDialogContent className="dark:border-neutral-700 dark:bg-neutral-800">
+				<AlertDialogContent className="dark:border-zinc-700 dark:bg-zinc-800">
 					<AlertDialogHeader>
 						<AlertDialogTitle className="dark:text-white">
 							Cancelar Assinatura
 						</AlertDialogTitle>
-						<AlertDialogDescription className="dark:text-neutral-400">
+						<AlertDialogDescription className="dark:text-zinc-400">
 							Você tem certeza? Sua assinatura será cancelada e seus benefícios
 							removidos no final do ciclo atual.
 						</AlertDialogDescription>
@@ -201,13 +201,13 @@ function SubscriptionManagement({
 
 	if (subscription.status === "active") {
 		return (
-			<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+			<Card className="dark:border-zinc-700 dark:bg-zinc-800">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2 dark:text-white">
 						<CreditCard className="h-5 w-5" />
 						Gerenciar Assinatura
 					</CardTitle>
-					<CardDescription className="dark:text-neutral-400">
+					<CardDescription className="dark:text-zinc-400">
 						Visualize os detalhes do seu plano e forma de pagamento.
 					</CardDescription>
 				</CardHeader>
@@ -215,7 +215,7 @@ function SubscriptionManagement({
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
 						<div className="space-y-1">
 							<p className="font-medium text-sm dark:text-white">Plano Atual</p>
-							<p className="text-muted-foreground text-sm capitalize dark:text-neutral-400">
+							<p className="text-muted-foreground text-sm capitalize dark:text-zinc-400">
 								{subscription.plan}
 							</p>
 						</div>
@@ -223,7 +223,7 @@ function SubscriptionManagement({
 							<p className="font-medium text-sm dark:text-white">
 								Próxima Cobrança
 							</p>
-							<p className="text-muted-foreground text-sm dark:text-neutral-400">
+							<p className="text-muted-foreground text-sm dark:text-zinc-400">
 								{subscription.renewsOn
 									? new Date(subscription.renewsOn).toLocaleDateString("pt-BR")
 									: "-"}
@@ -240,13 +240,13 @@ function SubscriptionManagement({
 
 	// Default para status 'cancelled' ou outros
 	return (
-		<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+		<Card className="dark:border-zinc-700 dark:bg-zinc-800">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2 text-destructive dark:text-red-400">
 					<XOctagon className="h-5 w-5" />
 					Assinatura Cancelada
 				</CardTitle>
-				<CardDescription className="dark:text-neutral-400">
+				<CardDescription className="dark:text-zinc-400">
 					Sua assinatura não está mais ativa. Para reativar, escolha um novo
 					plano.
 				</CardDescription>
@@ -345,7 +345,7 @@ export default function ConfigsClient() {
 				<h1 className="font-bold text-xl sm:text-2xl lg:text-3xl dark:text-white">
 					Configurações
 				</h1>
-				<p className="text-muted-foreground text-xs sm:text-sm lg:text-base dark:text-neutral-400">
+				<p className="text-muted-foreground text-xs sm:text-sm lg:text-base dark:text-zinc-400">
 					Gerencie sua conta e preferências
 				</p>
 			</header>
@@ -355,20 +355,20 @@ export default function ConfigsClient() {
 			</article>
 
 			<article>
-				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<SunMoon className="h-5 w-5" />
 							Tema da Interface
 						</CardTitle>
-						<CardDescription className="dark:text-neutral-400">
+						<CardDescription className="dark:text-zinc-400">
 							Escolha entre modo claro, escuro ou automático
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-3 sm:space-y-4">
 						<div className="grid grid-cols-3 gap-2 sm:gap-3">
 							<Button
-								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
+								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-700 ${
 									theme === "light" ? "border-green-500" : ""
 								}
 								${isAutoMode ? "border-input" : ""}
@@ -380,10 +380,10 @@ export default function ConfigsClient() {
 								<span className="xs:inline hidden sm:inline">Modo </span>Claro
 							</Button>
 							<Button
-								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
+								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-700 ${
 									theme === "dark" ? "dark:border-green-500" : ""
 								}
-								${isAutoMode ? "dark:border-neutral-600" : ""}
+								${isAutoMode ? "dark:border-zinc-600" : ""}
 								`}
 								onClick={() => setTheme("dark")}
 								variant={"outline"}
@@ -392,7 +392,7 @@ export default function ConfigsClient() {
 								<span className="xs:inline hidden sm:inline">Modo </span>Escuro
 							</Button>
 							<Button
-								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-700 ${
+								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-700 ${
 									isAutoMode ? "border-green-500 dark:border-green-500" : ""
 								}`}
 								onClick={() => setAutoMode()}
@@ -403,7 +403,7 @@ export default function ConfigsClient() {
 								<span className="xs:hidden sm:hidden lg:hidden">Auto</span>
 							</Button>
 						</div>
-						<p className="text-muted-foreground text-sm dark:text-neutral-400">
+						<p className="text-muted-foreground text-sm dark:text-zinc-400">
 							O modo automático segue a preferência do seu sistema operacional.
 						</p>
 					</CardContent>
@@ -411,13 +411,13 @@ export default function ConfigsClient() {
 			</article>
 
 			<article>
-				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<User className="h-5 w-5" />
 							Informações da Conta
 						</CardTitle>
-						<CardDescription className="dark:text-neutral-400">
+						<CardDescription className="dark:text-zinc-400">
 							Gerencie suas informações de conta e opções de login
 						</CardDescription>
 					</CardHeader>
@@ -425,7 +425,7 @@ export default function ConfigsClient() {
 						<div className="space-y-4">
 							<div className="space-y-1">
 								<p className="font-medium text-sm dark:text-white">Email</p>
-								<p className="break-all text-muted-foreground text-sm dark:text-neutral-400">
+								<p className="break-all text-muted-foreground text-sm dark:text-zinc-400">
 									{profile.email}
 								</p>
 							</div>
@@ -445,13 +445,13 @@ export default function ConfigsClient() {
 				</Card>
 			</article>
 			<article>
-				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<Archive className="h-5 w-5" />
 							Links Arquivados
 						</CardTitle>
-						<CardDescription className="dark:text-neutral-400">
+						<CardDescription className="dark:text-zinc-400">
 							Visualize e restaure links que você arquivou
 						</CardDescription>
 					</CardHeader>
@@ -468,7 +468,7 @@ export default function ConfigsClient() {
 			</article>
 
 			<article>
-				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<EyeOff className="h-5 w-5" />
@@ -480,13 +480,13 @@ export default function ConfigsClient() {
 								onCheckedChange={handleSensitiveProfileToggle}
 							/>
 						</CardTitle>
-						<CardDescription className="mt-2 dark:text-neutral-400">
+						<CardDescription className="mt-2 dark:text-zinc-400">
 							Se ativado, seu perfil exibirá um aviso antes que outros usuários
 							vejam seu conteúdo.
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<p className="text-muted-foreground text-xs dark:text-neutral-500">
+						<p className="text-muted-foreground text-xs dark:text-zinc-500">
 							Use esta opção apenas se você acredita que seu perfil pode não ser
 							apropriado para todos os públicos.
 						</p>
@@ -496,13 +496,13 @@ export default function ConfigsClient() {
 
 			{isCredentialsUser && (
 				<article>
-					<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+					<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 dark:text-white">
 								<Mail className="h-5 w-5" />
 								Alterar E-mail
 							</CardTitle>
-							<CardDescription className="dark:text-neutral-400">
+							<CardDescription className="dark:text-zinc-400">
 								Atualize o e-mail associado à sua conta
 							</CardDescription>
 						</CardHeader>
@@ -518,13 +518,13 @@ export default function ConfigsClient() {
 			)}
 			{isCredentialsUser && (
 				<article>
-					<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+					<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 dark:text-white">
 								<Lock className="h-5 w-5" />
 								Alterar Senha
 							</CardTitle>
-							<CardDescription className="dark:text-neutral-400">
+							<CardDescription className="dark:text-zinc-400">
 								Atualize sua senha de acesso
 							</CardDescription>
 						</CardHeader>
@@ -539,13 +539,13 @@ export default function ConfigsClient() {
 				</article>
 			)}
 			<article>
-				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 text-destructive dark:text-red-500">
 							<Trash2 className="h-5 w-5" />
 							Excluir Conta
 						</CardTitle>
-						<CardDescription className="dark:text-neutral-400">
+						<CardDescription className="dark:text-zinc-400">
 							Exclua permanentemente sua conta e todos os seus dados
 						</CardDescription>
 					</CardHeader>
@@ -559,12 +559,12 @@ export default function ConfigsClient() {
 									Excluir Conta
 								</Button>
 							</AlertDialogTrigger>
-							<AlertDialogContent className="mx-auto w-[calc(100vw-2rem)] max-w-md sm:mx-auto sm:w-full dark:border-neutral-700 dark:bg-neutral-800">
+							<AlertDialogContent className="mx-auto w-[calc(100vw-2rem)] max-w-md sm:mx-auto sm:w-full dark:border-zinc-700 dark:bg-zinc-800">
 								<AlertDialogHeader className="space-y-2">
 									<AlertDialogTitle className="text-base sm:text-lg dark:text-white">
 										Tem certeza?
 									</AlertDialogTitle>
-									<AlertDialogDescription className="text-xs sm:text-sm dark:text-neutral-400">
+									<AlertDialogDescription className="text-xs sm:text-sm dark:text-zinc-400">
 										Esta ação não pode ser desfeita. Sua conta e dados serão
 										removidos permanentemente.
 									</AlertDialogDescription>
@@ -587,13 +587,13 @@ export default function ConfigsClient() {
 			</article>
 			<Separator />
 			<article>
-				<Card className="dark:border-neutral-700 dark:bg-neutral-800">
+				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<HelpCircle className="h-5 w-5" />
 							Central de Ajuda
 						</CardTitle>
-						<CardDescription className="dark:text-neutral-400">
+						<CardDescription className="dark:text-zinc-400">
 							Acesse nossa documentação e perguntas frequentes
 						</CardDescription>
 					</CardHeader>

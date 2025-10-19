@@ -113,54 +113,54 @@ export const BUTTON_STYLES = [
 	{
 		value: "solid",
 		label: "Sólido",
-		preview: "bg-neutral-500 text-white border-none",
+		preview: "bg-zinc-500 text-white border-none",
 	},
 	{
 		value: "outline",
 		label: "Contorno",
 		preview:
-			"bg-transparent text-neutral-700 dark:text-white border-neutral-500 border-2",
+			"bg-transparent text-zinc-700 dark:text-white border-zinc-500 border-2",
 	},
 	{
 		value: "soft",
 		label: "Suave",
-		preview: "bg-neutral-100 text-neutral-700 border-neutral-200",
+		preview: "bg-zinc-100 text-zinc-700 border-zinc-200",
 	},
 	{
 		value: "shadow",
 		label: "Sombra",
 		preview:
-			"bg-neutral-100 text-neutral-700 border-neutral-300 shadow-lg dark:shadow-white/20",
+			"bg-zinc-100 text-zinc-700 border-zinc-300 shadow-lg dark:shadow-white/20",
 	},
 	{
 		value: "neon",
 		label: "Neon",
 		preview:
-			"bg-transparent text-neutral-700 dark:text-white border-neutral-500 border-2 shadow-[0_0_8px_rgba(0,0,0,0.3)]",
+			"bg-transparent text-zinc-700 dark:text-white border-zinc-500 border-2 shadow-[0_0_8px_rgba(0,0,0,0.3)]",
 	},
 	{
 		value: "dashed",
 		label: "Tracejado",
 		preview:
-			"bg-transparent text-neutral-700 dark:text-white border-neutral-500 border-2 border-dashed",
+			"bg-transparent text-zinc-700 dark:text-white border-zinc-500 border-2 border-dashed",
 	},
 	{
 		value: "double",
 		label: "Dupla",
 		preview:
-			"bg-transparent text-neutral-700 dark:text-white border-neutral-600 border-4 border-double",
+			"bg-transparent text-zinc-700 dark:text-white border-zinc-600 border-4 border-double",
 	},
 	{
 		value: "raised",
 		label: "Elevado",
 		preview:
-			"bg-neutral-200 text-neutral-700 border-neutral-400 border-t-2 border-l-2 border-r border-b shadow-inner",
+			"bg-zinc-200 text-zinc-700 border-zinc-400 border-t-2 border-l-2 border-r border-b shadow-inner",
 	},
 	{
 		value: "inset",
 		label: "Interno",
 		preview:
-			"bg-neutral-200 text-neutral-700 border-neutral-400 border-b-2 border-r-2 border-t border-l shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]",
+			"bg-zinc-200 text-zinc-700 border-zinc-400 border-b-2 border-r-2 border-t border-l shadow-[inset_2px_2px_4px_rgba(0,0,0,0.2)]",
 	},
 ];
 

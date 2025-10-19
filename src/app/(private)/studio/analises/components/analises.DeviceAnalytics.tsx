@@ -89,7 +89,9 @@ const CustomTooltip = ({ active, payload }: any) => {
 					</div>
 					<div className="flex justify-between gap-4">
 						<span>Cliques:</span>
-						<span className="font-medium">{(data.clicks || 0).toLocaleString()}</span>
+						<span className="font-medium">
+							{(data.clicks || 0).toLocaleString()}
+						</span>
 					</div>
 					<div className="flex justify-between gap-4 border-t pt-1">
 						<span>Total:</span>
@@ -192,7 +194,7 @@ export default function DeviceAnalytics({
 	}
 
 	return (
-		<Card className="dark:border-white/40 dark:bg-neutral-900">
+		<Card className="dark:border-white/40 dark:bg-zinc-900">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
 					<PictureInPicture2 className="h-5 w-5" />

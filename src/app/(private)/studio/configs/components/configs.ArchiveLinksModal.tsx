@@ -138,11 +138,11 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-50">
-			<section className="w-11/12 max-w-md rounded-lg bg-white shadow-lg dark:bg-neutral-800">
+			<section className="w-11/12 max-w-md rounded-lg bg-white shadow-lg dark:bg-zinc-800">
 				<header className="flex items-center justify-between border-b px-4 py-2">
 					<h2 className="font-bold text-xl">Itens Arquivados</h2>
 					<Button
-						className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-neutral-700"
+						className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-zinc-700"
 						onClick={onClose}
 						size="sm"
 						variant="ghost"

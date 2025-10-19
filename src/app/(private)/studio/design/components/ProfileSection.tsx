@@ -97,7 +97,7 @@ const ProfileSection = ({
 			<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
 				Header
 			</h2>
-			<Card className="border-none py-0 shadow-none dark:bg-neutral-800">
+			<Card className="border-none py-0 shadow-none dark:bg-zinc-800">
 				<CardContent className="space-y-6 px-0">
 					<article className="flex flex-col gap-4 sm:flex-row sm:items-center">
 						<div className="relative flex items-center justify-center">
@@ -136,7 +136,7 @@ const ProfileSection = ({
 									Nome
 								</Label>
 								<Input
-									className="text-neutral-700 dark:bg-neutral-700 dark:text-white"
+									className="text-zinc-700 dark:bg-zinc-700 dark:text-white"
 									disabled={loading || isUploadingImage}
 									id="name"
 									maxLength={44}
@@ -157,7 +157,7 @@ const ProfileSection = ({
 										className={
 											validationError
 												? "border-red-500 dark:border-red-400"
-												: "text-neutral-700 dark:bg-neutral-700 dark:text-white"
+												: "text-zinc-700 dark:bg-zinc-700 dark:text-white"
 										}
 										disabled={loading || isUploadingImage}
 										id="username"
@@ -181,7 +181,7 @@ const ProfileSection = ({
 							className={`min-h-32 ${
 								bioValidationError
 									? "border-red-500 dark:border-red-400"
-									: "text-neutral-700 dark:bg-neutral-700 dark:text-white"
+									: "text-zinc-700 dark:bg-zinc-700 dark:text-white"
 							}`}
 							disabled={loading || isUploadingImage}
 							id="bio"
