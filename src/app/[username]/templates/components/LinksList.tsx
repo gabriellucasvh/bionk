@@ -525,7 +525,7 @@ export default function LinksList({
 								carouselStates[String(image.id)]?.canLeft && (
 									<button
 										aria-label="Voltar"
-										className="-translate-y-1/2 absolute top-1/2 left-2 rounded-full bg-white/80 p-2 shadow-md"
+										className="-translate-y-1/2 absolute top-1/2 left-2 rounded-full bg-black/50 p-2 shadow-md"
 										onClick={() => {
 											const el = document.getElementById(
 												`carousel-${image.id}`
@@ -534,14 +534,14 @@ export default function LinksList({
 										}}
 										type="button"
 									>
-										<ChevronLeft className="h-5 w-5 text-black" />
+										<ChevronLeft className="h-5 w-5 text-white" />
 									</button>
 								)}
 							{carouselStates[String(image.id)]?.isOverflowing &&
 								carouselStates[String(image.id)]?.canRight && (
 									<button
 										aria-label="Avançar"
-										className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-white/80 p-2 shadow-md"
+										className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-black/50 p-2 shadow-md"
 										onClick={() => {
 											const el = document.getElementById(
 												`carousel-${image.id}`
@@ -550,7 +550,7 @@ export default function LinksList({
 										}}
 										type="button"
 									>
-										<ChevronRight className="h-5 w-5 text-black" />
+										<ChevronRight className="h-5 w-5 text-white" />
 									</button>
 								)}
 						</div>
