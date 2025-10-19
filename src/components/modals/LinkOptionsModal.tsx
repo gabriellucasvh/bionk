@@ -53,7 +53,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						{link.title}
 					</DialogTitle>
 					<DialogDescription className="mb-4 line-clamp-2 max-w-md truncate text-gray-600 text-sm">
-						{link.url || 'URL não disponível'}
+						{link.url || "URL não disponível"}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -68,11 +68,10 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						Abrir Link
 					</BaseButton>
 
-					<ShareSheet title={link.title} url={link.url || ''} />
+					<ShareSheet title={link.title} url={link.url || ""} />
 
 					<BaseButton
-						className="justify-center text-red-500 hover:bg-red-50 hover:text-red-600"
-						fullWidth
+						className="mx-auto justify-center border-none hover:bg-transparent hover:text-red-500"
 						variant="white"
 					>
 						<Flag className="mr-2 size-4" />
