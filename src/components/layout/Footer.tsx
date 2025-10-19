@@ -17,6 +17,7 @@ const navigation = {
 	legal: [
 		{ name: "Termos e Condições", href: "/termos" },
 		{ name: "Política de Privacidade", href: "/privacidade" },
+		{ name: "Diretrizes da Comunidade", href: "/comunidade" },
 	],
 	social: [
 		{
