@@ -141,13 +141,18 @@
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://www.bionk.me/comunidade</loc>
-  <lastmod>2025-10-19T00:00:00+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://www.bionk.me/cookies</loc>
-  <lastmod>2025-10-19T00:00:00+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
+    <loc>https://www.bionk.me/comunidade</loc>
+    <lastmod>2025-10-19T00:00:00+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://www.bionk.me/cookies</loc>
+    <lastmod>2025-10-19T00:00:00+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://www.bionk.me/reportar-violacao</loc>
+    <lastmod>2025-10-19T00:00:00+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
 </urlset>

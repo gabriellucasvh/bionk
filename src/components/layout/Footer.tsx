@@ -19,6 +19,7 @@ const navigation = {
 		{ name: "Política de Privacidade", href: "/privacidade" },
 		{ name: "Uso de Cookies", href: "/cookies" },
 		{ name: "Diretrizes da Comunidade", href: "/comunidade" },
+		{ name: "Reportar Violação", href: "/reportar-violacao" },
 	],
 	social: [
 		{

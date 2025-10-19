@@ -574,9 +574,9 @@ export default function DiretrizesDaComunidade() {
 										ou via{" "}
 										<a
 											className="underline hover:text-foreground"
-											href="/contato"
+											href="/reportar-violacao"
 										>
-											/contato
+											/reportar-violacao
 										</a>
 										.
 									</li>
