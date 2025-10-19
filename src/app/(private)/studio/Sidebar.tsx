@@ -20,7 +20,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import React, { useCallback, useEffect, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
-import ShareSheet from "@/components/ShareSheet";
+import ShareListCompact from "@/components/ShareListCompact";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -64,12 +64,12 @@ const ProfileActionsDropdown = ({
 	}, [username]);
 
 	return (
-		<DropdownMenuContent align="end" className="ml-3 grid w-xs gap-2 p-2">
-			<DropdownMenuLabel>Ações do Perfil</DropdownMenuLabel>
+		<DropdownMenuContent align="end" className="ml-3 grid w-60 gap-2 p-2">
+			<DropdownMenuLabel>Compartilhe seu Bionk</DropdownMenuLabel>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem asChild>
 				<Link
-					className="flex items-center"
+					className="flex h-10 cursor-pointer items-center"
 					href={profileUrl}
 					rel="noopener noreferrer"
 					target="_blank"
@@ -80,13 +80,13 @@ const ProfileActionsDropdown = ({
 			</DropdownMenuItem>
 
 			<DropdownMenuSub onOpenChange={setIsQrOpen}>
-				<DropdownMenuSubTrigger>
+				<DropdownMenuSubTrigger className="h-10 cursor-pointer">
 					<QrCode className="mr-2 h-4 w-4" />
 					<span>QR Code</span>
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent className="p-4">
 					{isQrOpen && profileUrl !== "#" ? (
-						<div className="flex flex-col items-center gap-3">
+						<div className="flex flex-col items-center gap-3 ">
 							<QRCode
 								id="sidebar-qrcode"
 								logoImage={logoUrl}
@@ -97,7 +97,7 @@ const ProfileActionsDropdown = ({
 								value={profileUrl}
 							/>
 							<Button
-								className="w-full"
+								className="w-full "
 								onClick={handleDownloadQrCode}
 								size="sm"
 							>
@@ -114,12 +114,12 @@ const ProfileActionsDropdown = ({
 			</DropdownMenuSub>
 
 			<DropdownMenuSub>
-				<DropdownMenuSubTrigger>
+				<DropdownMenuSubTrigger className="h-10 cursor-pointer">
 					<Share2 className="mr-2 h-4 w-4" />
 					<span>Compartilhar por...</span>
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent className="p-2 md:max-w-md lg:max-w-full">
-					<ShareSheet title={shareText} url={profileUrl} />
+					<ShareListCompact title={shareText} url={profileUrl} />
 				</DropdownMenuSubContent>
 			</DropdownMenuSub>
 		</DropdownMenuContent>
@@ -359,7 +359,10 @@ const Sidebar = () => {
 										Compartilhar
 									</p>
 									<span className="truncate text-neutral-500 text-xs dark:text-neutral-400">
-										bionk.me/{username && username.length > 20 ? `${username.slice(0, 20)}...` : username}
+										bionk.me/
+										{username && username.length > 20
+											? `${username.slice(0, 20)}...`
+											: username}
 									</span>
 								</div>
 								<ExternalLink className="h-5 w-5 flex-shrink-0 text-neutral-400 dark:text-neutral-300" />
@@ -475,7 +478,7 @@ const Sidebar = () => {
 									className="rounded-full"
 									height={24}
 									src={
-										(userImageUrl || session?.user?.image)
+										userImageUrl || session?.user?.image
 											? `${userImageUrl || session?.user?.image}?t=${imageKey}`
 											: "/default-avatar.png"
 									}
