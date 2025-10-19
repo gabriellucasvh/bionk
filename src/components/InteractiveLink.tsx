@@ -91,7 +91,14 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 				kind: "lock",
 			};
 		}
-		// Hierarquia: cadeado > clock > click > três pontos
+		// Nova hierarquia: cadeado > compartilhamento > clock > click
+		if (isShare) {
+			return {
+				icon: <MoreVertical className="size-5" />,
+				tooltip: "Compartilhamento permitido",
+				kind: "more",
+			};
+		}
 		if (hasExpiry) {
 			const expirationDate = new Date(link.expiresAt!);
 			const formattedDate = expirationDate.toLocaleDateString("pt-BR");
@@ -106,14 +113,6 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 				icon: <MousePointerClick className="size-5" />,
 				tooltip: `Será excluído após ${link.deleteOnClicks} cliques`,
 				kind: "click",
-			};
-		}
-		// Três pontos se for compartilhável ou sem atribuições
-		if (isShare) {
-			return {
-				icon: <MoreVertical className="size-5" />,
-				tooltip: "Compartilhamento permitido",
-				kind: "more",
 			};
 		}
 		return {

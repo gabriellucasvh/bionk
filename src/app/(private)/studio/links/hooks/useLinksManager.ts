@@ -3,6 +3,7 @@
 import type { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useDesignStore } from "@/stores/designStore";
 // import useSWR from "swr";
 import type {
 	ImageItem,
@@ -146,9 +147,9 @@ export const useLinksManager = (
 	const [_originalImage, setOriginalImage] = useState<ImageItem | null>(null);
 	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
 	const [togglingLinkId, setTogglingLinkId] = useState<number | null>(null);
-	const [togglingTextId] = useState<number | null>(null);
-	const [togglingVideoId] = useState<number | null>(null);
-	const [togglingImageId] = useState<number | null>(null);
+	const [togglingTextId, setTogglingTextId] = useState<number | null>(null);
+	const [togglingVideoId, setTogglingVideoId] = useState<number | null>(null);
+	const [togglingImageId, setTogglingImageId] = useState<number | null>(null);
 	const [togglingSectionId, setTogglingSectionId] = useState<number | null>(
 		null
 	);
@@ -988,6 +989,62 @@ export const useLinksManager = (
 
 	// Link handlers adicionados
 	const toggleActive = async (id: number, active: boolean) => {
+		const target = unifiedItems.find((item) => item.id === id);
+
+		// Vídeo
+		if (target?.isVideo) {
+			// Atualização otimista no estado local
+			setUnifiedItems((prev) =>
+				prev.map((item) =>
+					item.id === id && (item as any).isVideo
+						? ({ ...(item as any), active } as any)
+						: item
+				)
+			);
+
+			// Atualização otimista no preview (designStore)
+			const store = useDesignStore.getState();
+			const user = store.userData;
+			if (user) {
+				const nextVideos = (user.videos || []).map((v: any) => {
+					const vidId = typeof v.id === "number" ? v.id : Number(v.id);
+					return vidId === id ? { ...v, active } : v;
+				});
+				store.setUserData({ ...user, videos: nextVideos } as any);
+			}
+
+			setTogglingVideoId(id);
+			try {
+				await handleVideoUpdate(id, { active });
+			} finally {
+				setTogglingVideoId(null);
+			}
+			return;
+		}
+
+		// Texto
+		if (target?.isText) {
+			setTogglingTextId(id);
+			try {
+				await handleTextUpdate(id, { active });
+			} finally {
+				setTogglingTextId(null);
+			}
+			return;
+		}
+
+		// Imagem
+		if ((target as any)?.isImage) {
+			setTogglingImageId(id);
+			try {
+				await handleImageUpdate(id, { active });
+			} finally {
+				setTogglingImageId(null);
+			}
+			return;
+		}
+
+		// Link (default)
 		setTogglingLinkId(id);
 		try {
 			await handleLinkUpdate(id, { active });

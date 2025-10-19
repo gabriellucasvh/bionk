@@ -3,9 +3,11 @@
 import {
 	ChevronLeft,
 	ChevronRight,
+	Clock,
 	Images,
 	Lock,
 	MoreVertical,
+	MousePointerClick,
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useReducer, useState } from "react";
@@ -380,6 +382,24 @@ function ContentList({
 				: null;
 		const showImage = customImageUrl !== null;
 
+		const href = normalizeExternalUrl(item?.url);
+		const indicatorIcon = (() => {
+			if (item?.password) {
+				return <Lock className="h-4 w-4" />;
+			}
+			// Prioridade: compartilhamento > cliques > expiração
+			if (item?.shareAllowed) {
+				return <MoreVertical className="h-4 w-4" />;
+			}
+			if (item?.deleteOnClicks) {
+				return <MousePointerClick className="h-4 w-4" />;
+			}
+			if (item?.expiresAt) {
+				return <Clock className="h-4 w-4" />;
+			}
+			return null;
+		})();
+
 		const linkContent = (
 			<>
 				{/* Espaço reservado para imagem personalizada */}
@@ -402,9 +422,13 @@ function ContentList({
 					</h3>
 				</div>
 				<div className="flex w-10 flex-shrink-0 justify-center">
-					<div className="rounded-full p-2 text-current opacity-70">
-						<MoreVertical className="h-4 w-4" />
-					</div>
+					{indicatorIcon ? (
+						<div className="rounded-full p-2 text-current opacity-70">
+							{indicatorIcon}
+						</div>
+					) : (
+						<div className="w-6" />
+					)}
 				</div>
 			</>
 		);
@@ -417,18 +441,32 @@ function ContentList({
 						style={buttonStyle}
 						type="button"
 					>
-						<div className="mr-3 flex-shrink-0">
-							<Lock className="h-4 w-4" />
-						</div>
+						{/* Espaço à esquerda para balancear o centro */}
+						<div className="ml-1 size-8 flex-shrink-0" />
 						<div className="flex flex-1 justify-center">
 							<h3 className="line-clamp-2 px-2 font-medium leading-tight">
 								{item.title}
 							</h3>
 						</div>
+						<div className="flex w-10 flex-shrink-0 justify-center">
+							<div className="rounded-full p-2 text-current opacity-70">
+								<Lock className="h-4 w-4" />
+							</div>
+						</div>
 					</button>
+				) : href ? (
+					<a
+						className="group relative flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200"
+						href={href}
+						rel="noopener noreferrer"
+						style={buttonStyle}
+						target="_blank"
+					>
+						{linkContent}
+					</a>
 				) : (
 					<div
-						className="group relative flex w-full items-center rounded-lg border p-1 text-left transition-all duration-200"
+						className="group relative flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200"
 						style={buttonStyle}
 					>
 						{linkContent}
@@ -1016,7 +1054,9 @@ function convertUserDataToUserProfile(userData: any): UserProfile {
 		...userData,
 		Link: regularLinks,
 		Text: userData.texts || [],
-		Video: userData.videos || [],
+		Video: (userData.videos || []).filter(
+			(video: any) => video?.active !== false && video?.archived !== true
+		),
 		Image: userData.images || [],
 		SocialLink: socialLinks,
 	} as UserProfile;
