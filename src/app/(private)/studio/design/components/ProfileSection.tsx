@@ -97,7 +97,7 @@ const ProfileSection = ({
 			<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
 				Header
 			</h2>
-			<Card className="border-none shadow-none dark:bg-neutral-800">
+			<Card className="border-none py-0 shadow-none dark:bg-neutral-800">
 				<CardContent className="space-y-6 px-0">
 					<article className="flex flex-col gap-4 sm:flex-row sm:items-center">
 						<div className="relative flex items-center justify-center">
@@ -199,7 +199,7 @@ const ProfileSection = ({
 							</p>
 						</div>
 					</div>
-					<div className="mt-4 flex h-10 items-start justify-start gap-2">
+					<div className="flex h-10 items-start justify-start gap-2">
 						{showButtons && (
 							<>
 								<BaseButton

@@ -1,6 +1,12 @@
 "use client";
 
-import { Images, Lock, MoreVertical } from "lucide-react";
+import {
+	ChevronLeft,
+	ChevronRight,
+	Images,
+	Lock,
+	MoreVertical,
+} from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useReducer, useState } from "react";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
@@ -323,6 +329,49 @@ function ContentList({
 	textStyle?: React.CSSProperties;
 }) {
 	const buttonStyle = getButtonStyle(customizations);
+
+	const [carouselStates, setCarouselStates] = useState<
+		Record<
+			string,
+			{ canLeft: boolean; canRight: boolean; isOverflowing: boolean }
+		>
+	>({});
+
+	const updateCarouselStateFor = (el: HTMLElement | null) => {
+		if (!el) {
+			return;
+		}
+		const id = el.id.replace("carousel-", "");
+		const maxScrollLeft = el.scrollWidth - el.clientWidth;
+		const canLeft = Math.ceil(el.scrollLeft) > 0;
+		const canRight = Math.floor(el.scrollLeft) < maxScrollLeft;
+		const isOverflowing = el.scrollWidth > el.clientWidth;
+		setCarouselStates((prev) => {
+			const current = prev[id];
+			if (
+				current &&
+				current.canLeft === canLeft &&
+				current.canRight === canRight &&
+				current.isOverflowing === isOverflowing
+			) {
+				return prev;
+			}
+			return { ...prev, [id]: { canLeft, canRight, isOverflowing } };
+		});
+	};
+
+	useEffect(() => {
+		const updateAll = () => {
+			const elements =
+				document.querySelectorAll<HTMLElement>('[id^="carousel-"]');
+			for (const el of elements) {
+				updateCarouselStateFor(el);
+			}
+		};
+		updateAll();
+		window.addEventListener("resize", updateAll);
+		return () => window.removeEventListener("resize", updateAll);
+	}, [user, customizations]);
 
 	const renderLink = (item: UserLink) => {
 		const customImageUrl =
@@ -794,18 +843,64 @@ function ContentList({
 						style={wrapperStyle}
 					>
 						{header}
-						<div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-3">
-							{(image?.items || []).map((img: any, idx: number) => (
-								<div
-									className="w-64 flex-shrink-0 snap-center overflow-hidden"
-									key={`img-${image.id}-${idx}`}
-									style={{
-										borderRadius: `${customizations?.customButtonCorners || "12"}px`,
-									}}
-								>
-									{renderImageItem(img, image?.ratio, image?.id, idx)}
-								</div>
-							))}
+						<div className="relative">
+							<div
+								className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-3"
+								id={`carousel-${image.id}`}
+								onScroll={(e) =>
+									updateCarouselStateFor(e.currentTarget as HTMLElement)
+								}
+							>
+								{(image?.items || []).map((img: any, idx: number) => (
+									<div
+										className="w-64 flex-shrink-0 snap-center overflow-hidden"
+										key={`img-${image.id}-${idx}`}
+										style={{
+											borderRadius: `${customizations?.customButtonCorners || "12"}px`,
+										}}
+									>
+										{renderImageItem(img, image?.ratio, image?.id, idx)}
+									</div>
+								))}
+							</div>
+
+							{carouselStates[String(image.id)]?.isOverflowing &&
+								carouselStates[String(image.id)]?.canLeft && (
+									<button
+										aria-label="Anterior"
+										className="-translate-y-1/2 absolute top-1/2 left-2 rounded-full bg-black/50 p-2 text-white"
+										onClick={() => {
+											const el = document.getElementById(
+												`carousel-${image.id}`
+											);
+											if (el) {
+												el.scrollBy({ left: -240, behavior: "smooth" });
+											}
+										}}
+										type="button"
+									>
+										<ChevronLeft className="h-4 w-4" />
+									</button>
+								)}
+
+							{carouselStates[String(image.id)]?.isOverflowing &&
+								carouselStates[String(image.id)]?.canRight && (
+									<button
+										aria-label="Próximo"
+										className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-black/50 p-2 text-white"
+										onClick={() => {
+											const el = document.getElementById(
+												`carousel-${image.id}`
+											);
+											if (el) {
+												el.scrollBy({ left: 240, behavior: "smooth" });
+											}
+										}}
+										type="button"
+									>
+										<ChevronRight className="h-4 w-4" />
+									</button>
+								)}
 						</div>
 					</div>
 				);
