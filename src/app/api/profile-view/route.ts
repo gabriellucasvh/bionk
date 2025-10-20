@@ -1,6 +1,6 @@
 // app/api/profile-view/route.ts
 import { type NextRequest, NextResponse } from "next/server";
-import { getCookiePreferencesFromRequest } from "@/lib/cookie-server";
+import { getCookiePreferencesFromHeaders } from "@/lib/cookie-server";
 import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 			);
 		}
 
-		const cookiePreferences = getCookiePreferencesFromRequest(request);
+		const cookiePreferences = await getCookiePreferencesFromHeaders();
 		if (!cookiePreferences.analytics) {
 			return NextResponse.json({ message: "Analytics disabled" });
 		}

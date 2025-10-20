@@ -360,7 +360,7 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 						</CardContent>
 					</Card>
 
-					<div className="flex flex-col gap-3 pt-4 sm:flex-row">
+					<div className="flex flex-row gap-3 pt-4">
 						<BaseButton
 							className="flex-1 rounded-lg sm:flex-none"
 							onClick={() => setShowCustomization(false)}

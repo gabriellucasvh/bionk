@@ -1,15 +1,17 @@
 "use client";
 
+import { SquareArrowOutUpRight } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { FONT_OPTIONS } from "@/app/(private)/studio/design/constants/design.constants";
 import CookieConsent from "@/components/CookieConsent";
+import BionkActionsModal from "@/components/modals/BionkActionsModal";
 import JoinBionkModal from "@/components/modals/JoinBionkModal";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
 import type { TemplateComponentProps } from "@/types/user-profile";
 import { getTemplatePreset } from "@/utils/templatePresets";
 import FixedBackground from "./FixedBackground";
 import LinksList from "./LinksList";
-import ShareButton from "./ShareButton";
 import ShareModal from "./ShareModal";
 import UserHeader from "./UserHeader";
 
@@ -24,6 +26,7 @@ interface BaseTemplateProps extends TemplateComponentProps {
 
 export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 	const [isShareModalOpen, setShareModalOpen] = useState(false);
+	const [isActionsModalOpen, setActionsModalOpen] = useState(false);
 	const [hasScrolled, setHasScrolled] = useState(false);
 	const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -240,8 +243,32 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					<FixedBackground customPresets={customPresets} />
 					<ProfileViewTracker userId={user.id} />
 
-					<div className="absolute top-4 right-4 z-50 sm:top-6 sm:right-6">
-						<ShareButton onClick={() => setShareModalOpen(true)} />
+					{/* Top-right actions */}
+					<div className="absolute top-4 right-4 z-50 flex items-center gap-2 sm:top-6 sm:right-6">
+						<button
+							aria-label="Opções do Bionk"
+							className="flex items-center justify-center rounded-full border border-white/20 bg-white/80 p-2 shadow shadow-black/10 backdrop-blur-md transition-colors hover:bg-white/90"
+							onClick={() => setActionsModalOpen(true)}
+							type="button"
+						>
+							<Image
+								alt="Bionk"
+								height={18}
+								src="/icons/b-icon.svg"
+								width={18}
+							/>
+						</button>
+						<button
+							aria-label="Compartilhar perfil"
+							className="flex items-center justify-center rounded-full border border-white/20 bg-white/80 p-2 shadow shadow-black/10 backdrop-blur-md transition-colors hover:bg-white/90"
+							onClick={() => setShareModalOpen(true)}
+							type="button"
+						>
+							<SquareArrowOutUpRight
+								className="size-4.5 text-black"
+								strokeWidth={1.5}
+							/>
+						</button>
 					</div>
 
 					{/* Renderizar header hero fora do container com padding */}
@@ -300,7 +327,11 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 				onOpenChange={setShareModalOpen}
 				user={user}
 			/>
-
+			<BionkActionsModal
+				isOpen={isActionsModalOpen}
+				onOpenChange={setActionsModalOpen}
+				username={user.username}
+			/>
 			<CookieConsent userId={user.id} />
 		</>
 	);

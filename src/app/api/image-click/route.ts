@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCookiePreferencesFromRequest } from "@/lib/cookie-server";
+import { getCookiePreferencesFromHeaders } from "@/lib/cookie-server";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const cookiePreferences = getCookiePreferencesFromRequest(req);
+		const { analytics } = await getCookiePreferencesFromHeaders();
 		const normalizedReferrer = trafficSource || "direct";
 
 		// Always increment per-item clicks (essential functionality), regardless of analytics preference
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 		itemsArray[itemIndex] = {
 			...currentItem,
 			clicks: currentClicks + 1,
-			...(cookiePreferences.analytics ? { referrer: normalizedReferrer } : {}),
+			...(analytics ? { referrer: normalizedReferrer } : {}),
 		};
 
 		const updated = await prisma.image.update({

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCookiePreferencesFromRequest } from "@/lib/cookie-server";
+import { getCookiePreferencesFromHeaders } from "@/lib/cookie-server";
 import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 		}
 
 		// Verificar preferências de cookies
-		const cookiePreferences = getCookiePreferencesFromRequest(req);
+		const cookiePreferences = await getCookiePreferencesFromHeaders();
 
 		// Se analytics não estão permitidos, não processar o tracking detalhado
 		if (!cookiePreferences.analytics) {
