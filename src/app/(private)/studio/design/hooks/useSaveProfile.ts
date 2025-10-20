@@ -103,6 +103,7 @@ export const useSaveProfile = ({
 		setLoading(true);
 
 		let newImageUrl: string | null = null;
+		let updatedUserData: any = null;
 
 		if (selectedProfileFile) {
 			newImageUrl = await uploadImage(selectedProfileFile, session.user.id);
@@ -110,14 +111,43 @@ export const useSaveProfile = ({
 				setLoading(false);
 				return;
 			}
+			// Atualiza os campos de texto após upload de imagem
+			updatedUserData = await updateProfileText(
+				session?.user?.id,
+				profile,
+				originalProfile,
+				profileImageChanged
+			);
+		} else if (profileImageChanged) {
+			// Remoção de imagem: define imagem para a URL padrão
+			const defaultImageUrl =
+				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
+			try {
+				const res = await fetch(`/api/profile/${session.user.id}`, {
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ ...profile, image: defaultImageUrl }),
+				});
+				const data = await res.json();
+				if (!res.ok) {
+					setLoading(false);
+					return;
+				}
+				updatedUserData = data;
+				newImageUrl = defaultImageUrl;
+			} catch {
+				setLoading(false);
+				return;
+			}
+		} else {
+			// Apenas campos de texto
+			updatedUserData = await updateProfileText(
+				session?.user?.id,
+				profile,
+				originalProfile,
+				profileImageChanged
+			);
 		}
-
-		const updatedUserData = await updateProfileText(
-			session?.user?.id,
-			profile,
-			originalProfile,
-			profileImageChanged
-		);
 
 		if (updatedUserData) {
 			setOriginalProfile({
