@@ -284,7 +284,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 	}
 
 	return (
-		<section className="w-full max-w-full overflow-x-hidden p-3 pb-24 sm:p-4 sm:pb-8 lg:p-6 lg:pb-8 dark:text-white">
+		<section className="mb-14 w-full max-w-full overflow-x-hidden p-3 pb-24 sm:p-4 md:mb-0 lg:p-6 lg:pb-8 dark:text-white">
 			<AnalyticsHeader
 				onExportToExcel={exportToExcel}
 				onExportToPDF={exportToPDF}
