@@ -272,7 +272,7 @@ export default function BionkActionsModal({
 								em 60 segundos e compartilhe tudo que importa em um só lugar.
 							</p>
 
-							<Link className="my-6 block" href="/onboarding" prefetch={false}>
+							<Link className="my-6 block" href="/registro" prefetch={false}>
 								<BaseButton className="w-full rounded-full bg-lime-400 text-black hover:bg-lime-500">
 									<span className="flex items-center justify-center gap-2">
 										Começar gratuitamente <ArrowRight className="h-4 w-4" />
