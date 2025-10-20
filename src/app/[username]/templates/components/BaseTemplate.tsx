@@ -243,31 +243,25 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 					<FixedBackground customPresets={customPresets} />
 					<ProfileViewTracker userId={user.id} />
 
-					{/* Top-right actions */}
-					<div className="absolute top-4 right-4 z-50 flex items-center gap-2 sm:top-6 sm:right-6">
+					{/* Top-left and top-right actions */}
+					<div className="absolute top-4 left-4 z-50 sm:top-6 sm:left-6">
 						<button
 							aria-label="Opções do Bionk"
 							className="flex items-center justify-center rounded-full border border-white/20 bg-white/80 p-2 shadow shadow-black/10 backdrop-blur-md transition-colors hover:bg-white/90"
 							onClick={() => setActionsModalOpen(true)}
 							type="button"
 						>
-							<Image
-								alt="Bionk"
-								height={18}
-								src="/icons/b-icon.svg"
-								width={18}
-							/>
+							<Image alt="Bionk" height={18} src="/icons/b-icon.svg" width={18} />
 						</button>
+					</div>
+					<div className="absolute top-4 right-4 z-50 sm:top-6 sm:right-6">
 						<button
 							aria-label="Compartilhar perfil"
 							className="flex items-center justify-center rounded-full border border-white/20 bg-white/80 p-2 shadow shadow-black/10 backdrop-blur-md transition-colors hover:bg-white/90"
 							onClick={() => setShareModalOpen(true)}
 							type="button"
 						>
-							<SquareArrowOutUpRight
-								className="size-4.5 text-black"
-								strokeWidth={1.5}
-							/>
+							<SquareArrowOutUpRight className="size-4.5 text-black" strokeWidth={1.5} />
 						</button>
 					</div>
 
