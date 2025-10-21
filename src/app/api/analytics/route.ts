@@ -3,36 +3,48 @@ import prisma from "@/lib/prisma";
 
 // Função para detectar sistema operacional baseado no user-agent
 function detectOS(userAgent: string): string {
-	if (!userAgent) return "unknown";
-	
+	if (!userAgent) {
+		return "unknown";
+	}
+
 	const ua = userAgent.toLowerCase();
-	
+
 	// iOS (iPhone, iPad, iPod)
-	if (ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod') || (ua.includes('mac os x') && ua.includes('mobile'))) {
-		return 'ios';
+	if (
+		ua.includes("iphone") ||
+		ua.includes("ipad") ||
+		ua.includes("ipod") ||
+		(ua.includes("mac os x") && ua.includes("mobile"))
+	) {
+		return "ios";
 	}
-	
+
 	// Android
-	if (ua.includes('android')) {
-		return 'android';
+	if (ua.includes("android")) {
+		return "android";
 	}
-	
+
 	// Windows
-	if (ua.includes('windows nt') || ua.includes('win32') || ua.includes('win64') || ua.includes('windows')) {
-		return 'windows';
+	if (
+		ua.includes("windows nt") ||
+		ua.includes("win32") ||
+		ua.includes("win64") ||
+		ua.includes("windows")
+	) {
+		return "windows";
 	}
-	
+
 	// macOS (desktop)
-	if (ua.includes('macintosh') || ua.includes('mac os x')) {
-		return 'macos';
+	if (ua.includes("macintosh") || ua.includes("mac os x")) {
+		return "macos";
 	}
-	
+
 	// Linux
-	if (ua.includes('linux') || ua.includes('x11')) {
-		return 'linux';
+	if (ua.includes("linux") || ua.includes("x11")) {
+		return "linux";
 	}
-	
-	return 'unknown';
+
+	return "unknown";
 }
 
 export async function GET(request: Request) {
@@ -72,7 +84,7 @@ export async function GET(request: Request) {
 	]);
 
 	const performanceRate =
-		totalClicks > 0 ? (totalProfileViews / totalClicks) * 100 : 0;
+		totalProfileViews > 0 ? (totalClicks / totalProfileViews) * 100 : 0;
 
 	// Agrupamento por dia dos últimos 30 dias
 	const clicksByDay = await prisma.linkClick.groupBy({
@@ -111,14 +123,18 @@ export async function GET(request: Request) {
 	for (const entry of clicksByDay) {
 		const date = formatDate(entry.createdAt);
 		const existing = dailyMap.get(date);
-		if (existing) existing.clicks += entry._count;
+		if (existing) {
+			existing.clicks += entry._count;
+		}
 	}
 
 	// Preencher views
 	for (const entry of viewsByDay) {
 		const date = formatDate(entry.createdAt);
 		const existing = dailyMap.get(date);
-		if (existing) existing.views += entry._count;
+		if (existing) {
+			existing.views += entry._count;
+		}
 	}
 
 	const chartData = Array.from(dailyMap.entries()).map(([day, data]) => ({
@@ -159,7 +175,7 @@ export async function GET(request: Request) {
 
 	// Normalizar dados de dispositivos
 	const deviceData = new Map<string, { clicks: number; views: number }>();
-	
+
 	// Inicializar com dispositivos padrão
 	const defaultDevices = ["mobile", "desktop", "tablet", "unknown"];
 	for (const device of defaultDevices) {
@@ -188,13 +204,20 @@ export async function GET(request: Request) {
 			device: device === "unknown" ? "unknown" : device,
 			clicks: data.clicks || 0,
 			views: data.views || 0,
-			totalInteractions: (data.clicks || 0) + (data.views || 0)
+			totalInteractions: (data.clicks || 0) + (data.views || 0),
 		}))
-		.filter(item => item.totalInteractions > 0)
+		.filter((item) => item.totalInteractions > 0)
 		.sort((a, b) => b.totalInteractions - a.totalInteractions);
 
 	// Agrupar dados por sistema operacional, país e referrer
-	const [clicksByOS, viewsByOS, clicksByCountry, viewsByCountry, clicksByReferrer, viewsByReferrer] = await Promise.all([
+	const [
+		clicksByOS,
+		viewsByOS,
+		clicksByCountry,
+		viewsByCountry,
+		clicksByReferrer,
+		viewsByReferrer,
+	] = await Promise.all([
 		prisma.linkClick.findMany({
 			where: {
 				linkId: { in: linkIds },
@@ -241,12 +264,12 @@ export async function GET(request: Request) {
 
 	// Processar dados de OS
 	const osData = new Map<string, { clicks: number; views: number }>();
-	
+
 	// Inicializar com sistemas operacionais padrão
-		const defaultOS = ["ios", "android", "windows", "macos", "linux", "unknown"];
-		for (const os of defaultOS) {
-			osData.set(os, { clicks: 0, views: 0 });
-		}
+	const defaultOS = ["ios", "android", "windows", "macos", "linux", "unknown"];
+	for (const os of defaultOS) {
+		osData.set(os, { clicks: 0, views: 0 });
+	}
 
 	// Processar cliques por OS
 	for (const click of clicksByOS) {
@@ -267,12 +290,12 @@ export async function GET(request: Request) {
 	// Converter para array
 	const osAnalytics = Array.from(osData.entries())
 		.map(([os, data]) => ({
-			os: os,
+			os,
 			clicks: data.clicks || 0,
 			views: data.views || 0,
-			totalInteractions: (data.clicks || 0) + (data.views || 0)
+			totalInteractions: (data.clicks || 0) + (data.views || 0),
 		}))
-		.filter(item => item.totalInteractions > 0)
+		.filter((item) => item.totalInteractions > 0)
 		.sort((a, b) => b.totalInteractions - a.totalInteractions);
 
 	// Processar dados por país
@@ -281,7 +304,10 @@ export async function GET(request: Request) {
 	// Processar cliques por país
 	for (const click of clicksByCountry) {
 		if (click.country) {
-			const existing = countryData.get(click.country) || { clicks: 0, views: 0 };
+			const existing = countryData.get(click.country) || {
+				clicks: 0,
+				views: 0,
+			};
 			existing.clicks += 1;
 			countryData.set(click.country, existing);
 		}
@@ -299,12 +325,12 @@ export async function GET(request: Request) {
 	// Converter para array
 	const countryAnalytics = Array.from(countryData.entries())
 		.map(([country, data]) => ({
-			country: country,
+			country,
 			clicks: data.clicks || 0,
 			views: data.views || 0,
-			totalInteractions: (data.clicks || 0) + (data.views || 0)
+			totalInteractions: (data.clicks || 0) + (data.views || 0),
 		}))
-		.filter(item => item.totalInteractions > 0)
+		.filter((item) => item.totalInteractions > 0)
 		.sort((a, b) => b.totalInteractions - a.totalInteractions);
 
 	// Processar dados por referrer
@@ -313,7 +339,10 @@ export async function GET(request: Request) {
 	// Processar cliques por referrer
 	for (const click of clicksByReferrer) {
 		if (click.referrer) {
-			const existing = referrerData.get(click.referrer) || { clicks: 0, views: 0 };
+			const existing = referrerData.get(click.referrer) || {
+				clicks: 0,
+				views: 0,
+			};
 			existing.clicks += 1;
 			referrerData.set(click.referrer, existing);
 		}
@@ -322,7 +351,10 @@ export async function GET(request: Request) {
 	// Processar views por referrer
 	for (const view of viewsByReferrer) {
 		if (view.referrer) {
-			const existing = referrerData.get(view.referrer) || { clicks: 0, views: 0 };
+			const existing = referrerData.get(view.referrer) || {
+				clicks: 0,
+				views: 0,
+			};
 			existing.views += 1;
 			referrerData.set(view.referrer, existing);
 		}
@@ -331,12 +363,12 @@ export async function GET(request: Request) {
 	// Converter para array
 	const referrerAnalytics = Array.from(referrerData.entries())
 		.map(([referrer, data]) => ({
-			referrer: referrer,
+			referrer,
 			clicks: data.clicks || 0,
 			views: data.views || 0,
-			totalInteractions: (data.clicks || 0) + (data.views || 0)
+			totalInteractions: (data.clicks || 0) + (data.views || 0),
 		}))
-		.filter(item => item.totalInteractions > 0)
+		.filter((item) => item.totalInteractions > 0)
 		.sort((a, b) => b.totalInteractions - a.totalInteractions);
 
 	// Associar cliques com os links
