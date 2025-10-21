@@ -132,9 +132,9 @@ const UnifiedLinksManager = () => {
 								Organize seus links e redes sociais em um só lugar.
 							</CardDescription>
 						</div>
-						<TabsList>
-							<TabsTrigger value="links">Meus Links</TabsTrigger>
-							<TabsTrigger value="socials">Redes Sociais</TabsTrigger>
+						<TabsList className="rounded-full">
+							<TabsTrigger value="links" className="rounded-full">Meus Links</TabsTrigger>
+							<TabsTrigger value="socials" className="rounded-full">Redes Sociais</TabsTrigger>
 						</TabsList>
 					</CardHeader>
 					<CardContent className="space-y-4 p-2 sm:p-6">

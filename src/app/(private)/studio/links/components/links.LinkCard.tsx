@@ -210,7 +210,7 @@ const EditingView = ({
 					</div>
 
 					{/* Proteger com Senha */}
-					<div className="rounded-md border p-3">
+					<div className="rounded-2xl border p-3">
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300">
@@ -255,7 +255,7 @@ const EditingView = ({
 					</div>
 
 					{/* Data de Expiração */}
-					<div className="rounded-md border p-3">
+					<div className="rounded-2xl border p-3">
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
@@ -321,7 +321,7 @@ const EditingView = ({
 					</div>
 
 					{/* Limite de Cliques */}
-					<div className="rounded-md border p-3">
+					<div className="rounded-2xl border p-3">
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
@@ -388,7 +388,7 @@ const EditingView = ({
 					</div>
 
 					{/* Adicionar Badge */}
-					<div className="rounded-md border p-3">
+					<div className="rounded-2xl border p-3">
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
@@ -435,7 +435,7 @@ const EditingView = ({
 					</div>
 
 					{/* Lançamento */}
-					<div className="rounded-md border p-3">
+					<div className="rounded-2xl border p-3">
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
@@ -618,15 +618,15 @@ const LinkActionButtons = ({
 					</AlertDialogTitle>
 					<AlertDialogDescription>
 						{isLinkAnimated
-							? `Esta ação desativará a animação do link "${link.title || link.url}".`
-							: `Esta ação fará o link "${link.title || link.url}" dar uma tremidinha infinita na sua página para chamar atenção dos visitantes.`}
+							? `Esta ação desativará a animação do link.`
+							: `Esta ação fará o link dar uma tremidinha infinita na sua página para chamar atenção dos visitantes.`}
 						Deseja continuar?
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel>Cancelar</AlertDialogCancel>
+					<AlertDialogCancel className="rounded-full ">Cancelar</AlertDialogCancel>
 					<AlertDialogAction
-						className="bg-green-600 hover:bg-green-700"
+						className="bg-lime-400 hover:bg-lime-500 rounded-full text-black"
 						onClick={async () => {
 							if (isExpired) {
 								return;
@@ -680,7 +680,7 @@ const DisplayView = (props: LinkCardProps) => {
 	return (
 		<article
 			className={cn(
-				"relative flex flex-col gap-3 rounded-lg border bg-white p-3 transition-all sm:p-4 dark:bg-zinc-900",
+				"relative flex flex-col gap-3 rounded-3xl border bg-white p-3 transition-all sm:p-4 dark:bg-zinc-900",
 				isArchiving && "pointer-events-none"
 			)}
 		>

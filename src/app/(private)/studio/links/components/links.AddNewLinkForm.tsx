@@ -226,7 +226,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					</div>
 
 					{/* Proteger com Senha */}
-					<div className="rounded-md border p-3">
+					<div className="rounded-2xl border p-3">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
 								<Lock className="mt-0.5 h-5 w-5" />
@@ -255,7 +255,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					</div>
 
 					{/* Data de Expiração */}
-					<div className="rounded-md border p-3">
+					<div className="rounded-2xl border p-3">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
 								<Clock className="mt-0.5 h-5 w-5" />
@@ -300,7 +300,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					</div>
 
 					{/* Limite de Cliques */}
-					<div className="rounded-md border p-3">
+					<div className="rounded-2xl border p-3">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
 								<Tags className="mt-0.5 h-5 w-5" />
@@ -345,7 +345,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					</div>
 
 					{/* Adicionar Badge */}
-					<div className="rounded-md border p-3">
+					<div className="rounded-2xl border p-3">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
 								<Tags className="mt-0.5 h-5 w-5" />
@@ -383,7 +383,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					loading={isLoading}
 					onClick={handleSave}
 				>
-					Salvar 
+					Salvar
 				</BaseButton>
 			</div>
 		</div>

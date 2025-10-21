@@ -69,7 +69,7 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
 	return (
 		<div
 			className={cn(
-				"flex items-center gap-3 rounded-lg border bg-white p-3 shadow-lg dark:bg-zinc-800",
+				"flex items-center gap-3 rounded-full border bg-white p-3 shadow-lg dark:bg-zinc-800",
 				"min-w-[200px] max-w-4xl",
 				className
 			)}

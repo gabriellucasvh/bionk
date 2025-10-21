@@ -179,7 +179,7 @@ const SocialLinksTabContent = ({
 							);
 							return (
 								<Button
-									className={`flex h-20 w-full flex-col items-center justify-center p-1 transition-colors hover:bg-muted/50 sm:p-2 ${
+									className={`flex h-20 w-full flex-col items-center justify-center p-1 transition-colors hover:bg-muted/50 sm:p-2 rounded-xl ${
 										existingLink
 											? "border-green-400 hover:border-green-500"
 											: ""
