@@ -151,6 +151,26 @@ export default async function UserPage({ params }: PageProps) {
 					},
 				},
 			},
+			Music: {
+				where: { active: true, archived: false },
+				orderBy: { order: "asc" },
+				select: {
+					id: true,
+					title: true,
+					url: true,
+					usePreview: true,
+					order: true,
+					active: true,
+					userId: true,
+					sectionId: true,
+					section: {
+						select: {
+							id: true,
+							title: true,
+						},
+					},
+				},
+			},
 			Section: {
 				where: { active: true },
 				orderBy: { order: "asc" },

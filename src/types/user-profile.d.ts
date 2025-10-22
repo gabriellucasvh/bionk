@@ -7,6 +7,7 @@ import type {
 	Text as PrismaText,
 	Video as PrismaVideo,
 	Image as PrismaImage,
+	Music as PrismaMusic,
 	User as PrismaUser,
 } from "@prisma/client";
 
@@ -93,6 +94,14 @@ export interface UserImage extends PrismaImage {
     } | null;
 }
 
+// --- Músicas ---
+export interface UserMusic extends PrismaMusic {
+	section?: {
+		id: number;
+		title: string;
+	} | null;
+}
+
 // --- Customização ---
 export interface CustomPresets extends PrismaCustomPresets {
     customBackgroundColor: string;
@@ -121,6 +130,7 @@ export type UserProfile = PrismaUser & {
 	Text: UserText[];
 	Video: UserVideo[];
 	Image: UserImage[];
+	Music: UserMusic[];
 	CustomPresets?: CustomPresets | null;
 
 	template?: string;

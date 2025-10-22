@@ -5,6 +5,7 @@ import Image from "next/image";
 import * as React from "react";
 import InteractiveLink from "@/components/InteractiveLink";
 import VideoCard from "@/components/VideoCard";
+import MusicCard from "@/components/MusicCard";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
@@ -174,12 +175,12 @@ export default function LinksList({
 
 	const addContentToArray = (
 		contentArray: Array<{
-			type: "link" | "text" | "video" | "image";
+			type: "link" | "text" | "video" | "image" | "music";
 			item: any;
 			order: number;
 		}>,
 		items: any[] | undefined,
-		type: "link" | "text" | "video" | "image"
+		type: "link" | "text" | "video" | "image" | "music"
 	) => {
 		if (items && items.length > 0) {
 			for (const item of items) {
@@ -190,7 +191,7 @@ export default function LinksList({
 
 	const createContentArray = () => {
 		const contentArray: Array<{
-			type: "link" | "text" | "video" | "image";
+			type: "link" | "text" | "video" | "image" | "music";
 			item: any;
 			order: number;
 		}> = [];
@@ -199,6 +200,7 @@ export default function LinksList({
 		addContentToArray(contentArray, user.Text, "text");
 		addContentToArray(contentArray, user.Video, "video");
 		addContentToArray(contentArray, (user as any).Image, "image");
+		addContentToArray(contentArray, (user as any).Music, "music");
 
 		return contentArray.sort((a, b) => a.order - b.order);
 	};
@@ -290,6 +292,36 @@ export default function LinksList({
 				customPresets={customPresets}
 				key={`video-${video.id}`}
 				{...video}
+			/>
+		);
+		return result;
+	};
+
+	const renderMusicContent = (
+		music: any,
+		index: number,
+		sectionIdRef: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const musicSectionId = music.sectionId || null;
+
+		if (musicSectionId !== sectionIdRef.value && musicSectionId !== null) {
+			sectionIdRef.value = musicSectionId;
+			const sectionHeader = renderSectionHeader(music, musicSectionId, index);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		result.push(
+			<MusicCard
+				buttonStyle={buttonStyle}
+				customPresets={customPresets}
+				id={music.id}
+				key={`music-${music.id}`}
+				title={music.title}
+				url={music.url}
+				usePreview={!!music.usePreview}
 			/>
 		);
 		return result;
@@ -621,6 +653,8 @@ export default function LinksList({
 							return renderVideoContent(content.item, index, currentSectionId);
 						case "image":
 							return renderImageContent(content.item, index, currentSectionId);
+						case "music":
+							return renderMusicContent(content.item, index, currentSectionId);
 						default:
 							return null;
 					}
