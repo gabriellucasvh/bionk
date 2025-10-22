@@ -5,6 +5,7 @@ import { BaseButton } from "@/components/buttons/BaseButton";
 import type {
 	ImageFormData,
 	LinkFormData,
+	MusicFormData,
 	SectionFormData,
 	TextFormData,
 	VideoFormData,
@@ -12,6 +13,7 @@ import type {
 import type { SectionItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
 import { isValidVideoUrl } from "../utils/video.helpers";
+import { isValidMusicUrl } from "../utils/music.helpers";
 import AddNewImageCarouselForm from "./links.AddNewImageCarouselForm";
 import AddNewImageColumnForm from "./links.AddNewImageColumnForm";
 import AddNewImageSingleForm from "./links.AddNewImageSingleForm";
@@ -19,6 +21,7 @@ import AddNewLinkForm from "./links.AddNewLinkForm";
 import AddNewSectionForm from "./links.AddNewSectionForm";
 import AddNewTextForm from "./links.AddNewTextForm";
 import AddNewVideoForm from "./links.AddNewVideoForm";
+import AddNewMusicForm from "./links.AddNewMusicForm";
 
 interface FormRendererProps {
 	selectedOption: string | null;
@@ -28,23 +31,27 @@ interface FormRendererProps {
 	isAddingText: boolean;
 	isAddingVideo: boolean;
 	isAddingImage: boolean;
+	isAddingMusic: boolean;
 	formData: LinkFormData;
 	sectionFormData: SectionFormData;
 	textFormData: TextFormData;
 	videoFormData: VideoFormData;
 	imageFormData: ImageFormData;
+	musicFormData: MusicFormData;
 	existingSections: SectionItem[];
 	setFormData: (data: LinkFormData) => void;
 	setSectionFormData: (data: SectionFormData) => void;
 	setTextFormData: (data: TextFormData) => void;
 	setVideoFormData: (data: VideoFormData) => void;
 	setImageFormData: (data: ImageFormData) => void;
+	setMusicFormData: (data: MusicFormData) => void;
 	onCancel: () => void;
 	onLinkSubmit: () => void;
 	onSectionSubmit: () => void;
 	onTextSubmit: () => void;
 	onVideoSubmit: () => void;
 	onImageSubmit: () => void;
+	onMusicSubmit: () => void;
 	onBack: () => void;
 }
 
@@ -74,6 +81,11 @@ const validateVideoForm = (videoFormData: VideoFormData): boolean => {
 	return valid;
 };
 
+const validateMusicForm = (musicFormData: MusicFormData): boolean => {
+	const { valid } = isValidMusicUrl(musicFormData.url || "");
+	return valid;
+};
+
 const validateImageForm = (imageFormData: ImageFormData): boolean => {
 	const count = Array.isArray(imageFormData.images)
 		? imageFormData.images.length
@@ -88,8 +100,18 @@ const validateImageForm = (imageFormData: ImageFormData): boolean => {
 };
 
 const isVideoOption = (selectedOption: string | null): boolean => {
-	const videoOptions = ["video", "youtube", "vimeo", "tiktok", "twitch"];
+	const videoOptions = [
+		"video",
+		"youtube",
+		"vimeo",
+		"tiktok",
+		"twitch",
+	];
 	return videoOptions.includes(selectedOption || "");
+};
+
+const isMusicOption = (selectedOption: string | null): boolean => {
+	return (selectedOption || "") === "spotify";
 };
 
 const FormHeader = ({
@@ -225,6 +247,38 @@ const VideoFormRenderer = ({
 	</div>
 );
 
+const MusicFormRenderer = ({
+	musicFormData,
+	isMobile,
+	existingSections,
+	onMusicSubmit,
+	setMusicFormData,
+	onCancel,
+	onBack,
+}: {
+	musicFormData: MusicFormData;
+	isMobile: boolean;
+	existingSections: SectionItem[];
+	onMusicSubmit: () => void;
+	setMusicFormData: (data: MusicFormData) => void;
+	onCancel: () => void;
+	onBack: () => void;
+}) => (
+	<div className="flex h-full flex-col p-4">
+		<FormHeader onBack={onBack} title="Adicionar Música" />
+		<div className="min-h-0 flex-1">
+			<AddNewMusicForm
+				existingSections={isMobile ? undefined : existingSections}
+				formData={musicFormData}
+				isSaveDisabled={!validateMusicForm(musicFormData)}
+				onCancel={onCancel}
+				onSave={onMusicSubmit}
+				setFormData={setMusicFormData}
+			/>
+		</div>
+	</div>
+);
+
 const ImageSingleFormRenderer = ({
 	imageFormData,
 	isMobile,
@@ -335,23 +389,27 @@ const FormRenderer = ({
 	isAddingText,
 	isAddingVideo,
 	isAddingImage,
+	isAddingMusic,
 	formData,
 	sectionFormData,
 	textFormData,
 	videoFormData,
 	imageFormData,
+	musicFormData,
 	existingSections,
 	setFormData,
 	setSectionFormData,
 	setTextFormData,
 	setVideoFormData,
 	setImageFormData,
+	setMusicFormData,
 	onCancel,
 	onLinkSubmit,
 	onSectionSubmit,
 	onTextSubmit,
 	onVideoSubmit,
 	onImageSubmit,
+	onMusicSubmit,
 	onBack,
 }: FormRendererProps) => {
 	if (selectedOption === "link" && (isMobile || isAdding)) {
@@ -402,6 +460,20 @@ const FormRenderer = ({
 				onVideoSubmit={onVideoSubmit}
 				setVideoFormData={setVideoFormData}
 				videoFormData={videoFormData}
+			/>
+		);
+	}
+
+	if (isMusicOption(selectedOption)) {
+		return (
+			<MusicFormRenderer
+				existingSections={existingSections}
+				isMobile={isMobile}
+				onBack={onBack}
+				onCancel={onCancel}
+				onMusicSubmit={onMusicSubmit}
+				setMusicFormData={setMusicFormData}
+				musicFormData={musicFormData}
 			/>
 		);
 	}

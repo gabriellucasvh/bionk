@@ -10,6 +10,7 @@ import type {
 	TextItem,
 	VideoItem,
 	ImageItem,
+	MusicItem,
 } from "../types/links.types";
 import AddContentModal from "./links.AddContentModal";
 import AddNewSectionForm from "./links.AddNewSectionForm";
@@ -21,11 +22,13 @@ interface LinksTabContentProps {
 	currentTexts: TextItem[];
 	currentVideos: VideoItem[];
 	currentImages: ImageItem[];
+	currentMusics: MusicItem[];
 	mutateLinks: () => Promise<any>;
 	mutateSections: () => Promise<any>;
 	mutateTexts: () => Promise<any>;
 	mutateVideos: () => Promise<any>;
 	mutateImages: () => Promise<any>;
+	mutateMusics: () => Promise<any>;
 	session: Session | null;
 }
 
@@ -35,26 +38,31 @@ const LinksTabContent = ({
 	currentTexts,
 	currentVideos,
 	currentImages,
+	currentMusics,
 	mutateLinks,
 	mutateSections,
 	mutateTexts,
 	mutateVideos,
 	mutateImages,
+	mutateMusics,
 }: LinksTabContentProps) => {
 	const {
 		unifiedItems,
 		isAdding,
 		isAddingVideo,
 		isAddingImage,
+		isAddingMusic,
 		formData,
 		videoFormData,
 		imageFormData,
+		musicFormData,
 		existingSections,
 		activeId,
 		archivingLinkId,
 		isModalOpen,
 		togglingVideoId,
 		togglingImageId,
+		togglingMusicId,
 		togglingLinkId,
 		togglingTextId,
 		togglingSectionId,
@@ -62,13 +70,16 @@ const LinksTabContent = ({
 		originalText,
 		originalVideo,
 		originalImage,
+		originalMusic,
 		setActiveId,
 		setIsAdding,
 		setIsAddingVideo,
 		setIsAddingImage,
+		setIsAddingMusic,
 		setFormData,
 		setVideoFormData,
 		setImageFormData,
+		setMusicFormData,
 		setIsModalOpen,
 		handleDragEnd,
 		...handlers
@@ -78,11 +89,13 @@ const LinksTabContent = ({
 		currentTexts,
 		currentVideos,
 		currentImages,
+		currentMusics,
 		mutateLinks,
 		mutateSections,
 		mutateTexts,
 		mutateVideos,
-		mutateImages
+		mutateImages,
+		mutateMusics
 	);
 
 	const handleDragStart = (event: DragStartEvent) => {
@@ -96,16 +109,19 @@ const LinksTabContent = ({
 				formData={formData}
 				handleAddNewImage={handlers.handleAddNewImage}
 				handleAddNewLink={handlers.handleAddNewLink}
+				handleAddNewMusic={handlers.handleAddNewMusic}
 				handleAddNewSection={handlers.handleAddNewSection}
 				handleAddNewText={handlers.handleAddNewText}
 				handleAddNewVideo={handlers.handleAddNewVideo}
 				imageFormData={imageFormData}
 				isAdding={isAdding}
 				isAddingImage={isAddingImage}
+				isAddingMusic={isAddingMusic}
 				isAddingSection={handlers.isAddingSection}
 				isAddingText={handlers.isAddingText}
 				isAddingVideo={isAddingVideo}
 				isOpen={isModalOpen}
+				musicFormData={musicFormData}
 				onClose={() => setIsModalOpen(false)}
 				onOpen={() => setIsModalOpen(true)}
 				sectionFormData={handlers.sectionFormData}
@@ -113,9 +129,11 @@ const LinksTabContent = ({
 				setImageFormData={setImageFormData}
 				setIsAdding={setIsAdding}
 				setIsAddingImage={setIsAddingImage}
+				setIsAddingMusic={setIsAddingMusic}
 				setIsAddingSection={handlers.setIsAddingSection}
 				setIsAddingText={handlers.setIsAddingText}
 				setIsAddingVideo={setIsAddingVideo}
+				setMusicFormData={setMusicFormData}
 				setSectionFormData={handlers.setSectionFormData}
 				setTextFormData={handlers.setTextFormData}
 				setVideoFormData={setVideoFormData}
@@ -154,15 +172,18 @@ const LinksTabContent = ({
 				onAddLinkToSection={handlers.handleAddLinkToSection}
 				onArchiveImage={handlers.handleArchiveImage}
 				onArchiveLink={handlers.handleArchiveLink}
+				onArchiveMusic={handlers.handleArchiveMusic}
 				onArchiveText={handlers.handleArchiveText}
 				onArchiveVideo={handlers.handleArchiveVideo}
 				onCancelEditing={handlers.handleCancelEditing}
 				onCancelEditingImage={handlers.handleCancelEditingImage}
+				onCancelEditingMusic={handlers.handleCancelEditingMusic}
 				onCancelEditingText={handlers.handleCancelEditingText}
 				onCancelEditingVideo={handlers.handleCancelEditingVideo}
 				onClickLink={handlers.handleClickLink}
 				onDeleteImage={handlers.handleDeleteImage}
 				onDeleteLink={handlers.handleDeleteLink}
+				onDeleteMusic={handlers.handleDeleteMusic}
 				onDeleteText={handlers.handleDeleteText}
 				onDeleteVideo={handlers.handleDeleteVideo}
 				onDragEnd={handleDragEnd}
@@ -170,9 +191,11 @@ const LinksTabContent = ({
 				onImageChange={handlers.handleImageChange}
 				onLinkAdvancedChange={handlers.handleLinkAdvancedChange}
 				onLinkChange={handlers.handleLinkChange}
+				onMusicChange={handlers.handleMusicChange}
 				onRemoveCustomImage={handlers.handleRemoveCustomImage}
 				onSaveEditing={handlers.saveEditing}
 				onSaveEditingImage={handlers.handleSaveEditingImage}
+				onSaveEditingMusic={handlers.handleSaveEditingMusic}
 				onSaveEditingText={handlers.handleSaveEditingText}
 				onSaveEditingVideo={handlers.handleSaveEditingVideo}
 				onSectionDelete={handlers.handleSectionDelete}
@@ -180,6 +203,7 @@ const LinksTabContent = ({
 				onSectionUpdate={handlers.handleSectionUpdate}
 				onStartEditing={handlers.handleStartEditing}
 				onStartEditingImage={handlers.handleStartEditingImage}
+				onStartEditingMusic={handlers.handleStartEditingMusic}
 				onStartEditingText={handlers.handleStartEditingText}
 				onStartEditingVideo={handlers.handleStartEditingVideo}
 				onTextChange={handlers.handleTextChange}
@@ -188,10 +212,12 @@ const LinksTabContent = ({
 				onVideoChange={handlers.handleVideoChange}
 				originalImage={originalImage}
 				originalLink={originalLink}
+				originalMusic={originalMusic}
 				originalText={originalText}
 				originalVideo={originalVideo}
 				togglingImageId={togglingImageId}
 				togglingLinkId={togglingLinkId}
+				togglingMusicId={togglingMusicId}
 				togglingSectionId={togglingSectionId}
 				togglingTextId={togglingTextId}
 				togglingVideoId={togglingVideoId}

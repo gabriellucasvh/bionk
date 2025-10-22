@@ -111,5 +111,26 @@ export type ImageItem = {
 	dbId?: number;
 };
 
+export type MusicItem = {
+	id: number;
+	title: string;
+	url: string;
+	usePreview: boolean;
+	active: boolean;
+	order: number;
+	userId: number;
+	isEditing?: boolean;
+	isDraft?: boolean;
+	archived?: boolean;
+	sectionId?: number | null;
+	// Propriedades para unificação
+	isMusic?: boolean;
+	isSection?: boolean;
+	isText?: boolean;
+	isVideo?: boolean;
+	children?: never;
+	dbId?: number;
+};
+
 // Tipo unificado para drag and drop
-export type UnifiedDragItem = LinkItem | TextItem | VideoItem | ImageItem;
+export type UnifiedDragItem = LinkItem | TextItem | VideoItem | ImageItem | MusicItem;

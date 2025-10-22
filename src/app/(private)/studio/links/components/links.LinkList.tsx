@@ -20,6 +20,7 @@ import type { UnifiedItem } from "../hooks/useLinksManager";
 import type {
 	ImageItem,
 	LinkItem,
+	MusicItem,
 	SectionItem,
 	TextItem,
 	VideoItem,
@@ -27,6 +28,7 @@ import type {
 import DragPreview from "./links.DragPreview";
 import ImageCard from "./links.ImageCard";
 import LinkCard from "./links.LinkCard";
+import MusicCard from "./links.MusicCard";
 import SectionCard from "./links.SectionCard";
 import SortableItem from "./links.SortableItem";
 import TextCard from "./links.TextCard";
@@ -111,6 +113,24 @@ interface LinkListProps {
 	originalText?: TextItem | null;
 	originalVideo?: VideoItem | null;
 	originalImage?: ImageItem | null;
+	// Props para músicas
+	onDeleteMusic?: (id: number) => void;
+	onArchiveMusic?: (id: number) => void;
+	onStartEditingMusic?: (id: number) => void;
+	onMusicChange?: (
+		id: number,
+		field: "title" | "url" | "usePreview",
+		value: string | boolean
+	) => void;
+	onSaveEditingMusic?: (
+		id: number,
+		title: string,
+		url: string,
+		usePreview: boolean
+	) => void;
+	onCancelEditingMusic?: (id: number) => void;
+	togglingMusicId?: number | null;
+	originalMusic?: MusicItem | null;
 	existingSections?: SectionItem[];
 }
 
@@ -147,6 +167,15 @@ const LinkList = (props: LinkListProps) => {
 		originalVideo,
 		originalImage,
 		existingSections,
+		// Handlers e estados de Música (antes ausentes)
+		onArchiveMusic,
+		onCancelEditingMusic,
+		onDeleteMusic,
+		onMusicChange,
+		onSaveEditingMusic,
+		onStartEditingMusic,
+		originalMusic,
+		togglingMusicId,
 		...cardProps
 	} = props;
 
@@ -203,6 +232,14 @@ const LinkList = (props: LinkListProps) => {
 			);
 		}
 
+		if (type === "music") {
+			return (
+				(items.find(
+					(i) => (i as any).isMusic && i.id === idNum
+				) as MusicItem) || null
+			);
+		}
+
 		if (type === "link") {
 			const topLevelLink = items.find(
 				(i) => !(i.isSection || i.isText || i.isVideo) && i.id === idNum
@@ -249,6 +286,9 @@ const LinkList = (props: LinkListProps) => {
 						if ((item as any).isImage) {
 							return `image-${item.id}`;
 						}
+						if ((item as any).isMusic) {
+							return `music-${item.id}`;
+						}
 						return `link-${item.id}`;
 					})}
 					strategy={verticalListSortingStrategy}
@@ -270,6 +310,9 @@ const LinkList = (props: LinkListProps) => {
 							} else if ((item as any).isImage) {
 								key = `image-${item.id}`;
 								sortableId = `image-${item.id}`;
+							} else if ((item as any).isMusic) {
+								key = `music-${item.id}`;
+								sortableId = `music-${item.id}`;
 							} else {
 								key = `link-${item.id}`;
 								sortableId = `link-${item.id}`;
@@ -360,6 +403,26 @@ const LinkList = (props: LinkListProps) => {
 													onStartEditingImage={cardProps.onStartEditingImage}
 													onToggleActive={cardProps.onToggleActive}
 													originalImage={originalImage}
+													setActivatorNodeRef={setActivatorNodeRef}
+												/>
+											);
+										}
+
+										if ((item as any).isMusic) {
+											return (
+												<MusicCard
+													isDragging={isDragging}
+													isTogglingActive={togglingMusicId === item.id}
+													listeners={listeners}
+													music={item as MusicItem}
+													onArchiveMusic={onArchiveMusic}
+													onCancelEditingMusic={onCancelEditingMusic}
+													onDeleteMusic={onDeleteMusic}
+													onMusicChange={onMusicChange}
+													onSaveEditingMusic={onSaveEditingMusic}
+													onStartEditingMusic={onStartEditingMusic}
+													onToggleActive={cardProps.onToggleActive}
+													originalMusic={originalMusic}
 													setActivatorNodeRef={setActivatorNodeRef}
 												/>
 											);

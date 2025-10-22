@@ -6,6 +6,7 @@ import type {
     TextFormData,
     VideoFormData,
     ImageFormData,
+    MusicFormData,
 } from "../hooks/useLinksManager";
 import { isValidUrl } from "../utils/links.helpers";
 
@@ -15,21 +16,25 @@ interface UseModalHandlersProps {
     textFormData: TextFormData;
     videoFormData: VideoFormData;
     imageFormData: ImageFormData;
+    musicFormData: MusicFormData;
     setFormData: (data: LinkFormData) => void;
     setSectionFormData: (data: SectionFormData) => void;
     setTextFormData: (data: TextFormData) => void;
     setVideoFormData: (data: VideoFormData) => void;
     setImageFormData: (data: ImageFormData) => void;
+    setMusicFormData: (data: MusicFormData) => void;
     setIsAdding: (value: boolean) => void;
     setIsAddingSection: (value: boolean) => void;
     setIsAddingText: (value: boolean) => void;
     setIsAddingVideo: (value: boolean) => void;
     setIsAddingImage: (value: boolean) => void;
+    setIsAddingMusic: (value: boolean) => void;
     handleAddNewLink: () => Promise<void>;
     handleAddNewSection: () => Promise<void>;
     handleAddNewText: () => Promise<void>;
     handleAddNewVideo: () => Promise<void>;
     handleAddNewImage: (override?: Partial<ImageFormData>) => Promise<void>;
+    handleAddNewMusic: () => Promise<void>;
     onClose: () => void;
 }
 
@@ -39,21 +44,25 @@ export const useModalHandlers = ({
     textFormData,
     videoFormData,
     imageFormData,
+    musicFormData,
     setFormData,
     setSectionFormData,
     setTextFormData,
     setVideoFormData,
     setImageFormData,
+    setMusicFormData,
     setIsAdding,
     setIsAddingSection,
     setIsAddingText,
     setIsAddingVideo,
     setIsAddingImage,
+    setIsAddingMusic,
     handleAddNewLink,
     handleAddNewSection,
     handleAddNewText,
     handleAddNewVideo,
     handleAddNewImage,
+    handleAddNewMusic,
     onClose,
 }: UseModalHandlersProps) => {
 	const handleLinkSubmit = async () => {
@@ -175,12 +184,34 @@ export const useModalHandlers = ({
         }
     };
 
+    const handleMusicSubmit = async () => {
+        if (musicFormData.url.trim().length === 0) {
+            return;
+        }
+
+        setIsAddingMusic(true);
+        try {
+            await handleAddNewMusic();
+            setMusicFormData({
+                title: "",
+                description: "",
+                url: "",
+                type: "spotify",
+                sectionId: null,
+            });
+            onClose();
+        } finally {
+            setIsAddingMusic(false);
+        }
+    };
+
     const handleCancelWithState = () => {
         setIsAdding(false);
         setIsAddingSection(false);
         setIsAddingText(false);
         setIsAddingVideo(false);
         setIsAddingImage(false);
+        setIsAddingMusic(false);
     };
 
     return {
@@ -189,6 +220,7 @@ export const useModalHandlers = ({
         handleTextSubmit,
         handleVideoSubmit,
         handleImageSubmit,
+        handleMusicSubmit,
         handleCancelWithState,
     };
 };

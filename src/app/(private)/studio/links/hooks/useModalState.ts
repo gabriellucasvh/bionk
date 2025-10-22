@@ -6,8 +6,8 @@ export const useModalState = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isAnimating, setIsAnimating] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<
-        "content" | "video" | "image" | null
-    >("content");
+        "content" | "video" | "image" | "music" | null
+     >("content");
 	const [selectedOption, setSelectedOption] = useState<
 		| "link"
 		| "section"
@@ -17,6 +17,7 @@ export const useModalState = () => {
 		| "vimeo"
 		| "tiktok"
 		| "twitch"
+		| "spotify"
         | "image_single"
         | "image_column"
         | "image_carousel"
@@ -96,7 +97,7 @@ export const useModalState = () => {
 		setSelectedOption(null);
 	};
 
-    const handleCategorySelect = (category: "content" | "video" | "image") => {
+    const handleCategorySelect = (category: "content" | "video" | "image" | "music") => {
         setSelectedCategory(category);
         setSelectedOption(null);
     };
@@ -111,6 +112,7 @@ export const useModalState = () => {
 			| "vimeo"
 			| "tiktok"
 			| "twitch"
+			| "spotify"
 	) => {
 		setSelectedOption(option);
 	};

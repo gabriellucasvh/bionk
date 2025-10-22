@@ -8,6 +8,7 @@ import { useDesignStore } from "@/stores/designStore";
 import type {
 	ImageItem,
 	LinkItem,
+	MusicItem,
 	SectionItem,
 	TextItem,
 	UnifiedDragItem,
@@ -59,6 +60,13 @@ export type ImageFormData = {
 	sectionId?: number | null;
 };
 
+export type MusicFormData = {
+	title: string;
+	url: string;
+	usePreview: boolean;
+	sectionId?: number | null;
+};
+
 export type UnifiedItem = UnifiedDragItem;
 
 const initialFormData: LinkFormData = {
@@ -104,6 +112,13 @@ const initialImageFormData: ImageFormData = {
 	sectionId: null,
 };
 
+const initialMusicFormData: MusicFormData = {
+	title: "",
+	url: "",
+	usePreview: true,
+	sectionId: null,
+};
+
 const urlProtocolRegex = /^(https?:\/\/)/;
 
 // --- FUNÇÕES AUXILIARES PARA DRAG AND DROP ---
@@ -115,11 +130,13 @@ export const useLinksManager = (
 	currentTexts: TextItem[],
 	currentVideos: VideoItem[],
 	currentImages: ImageItem[],
+	currentMusics: MusicItem[],
 	mutateLinks: () => Promise<any>,
 	mutateSections: () => Promise<any>,
 	mutateTexts: () => Promise<any>,
 	mutateVideos: () => Promise<any>,
-	mutateImages: () => Promise<any>
+	mutateImages: () => Promise<any>,
+	mutateMusics: () => Promise<any>
 ) => {
 	// ... (useState, useEffect, useMemo, findContainerId, etc. continuam iguais)
 	const [unifiedItems, setUnifiedItems] = useState<UnifiedItem[]>([]);
@@ -130,6 +147,7 @@ export const useLinksManager = (
 	const [isAddingText, setIsAddingText] = useState(false);
 	const [isAddingVideo, setIsAddingVideo] = useState(false);
 	const [isAddingImage, setIsAddingImage] = useState(false);
+	const [isAddingMusic, setIsAddingMusic] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
 	const [sectionFormData, setSectionFormData] = useState<SectionFormData>(
@@ -141,15 +159,19 @@ export const useLinksManager = (
 		useState<VideoFormData>(initialVideoFormData);
 	const [imageFormData, setImageFormData] =
 		useState<ImageFormData>(initialImageFormData);
+	const [musicFormData, setMusicFormData] =
+		useState<MusicFormData>(initialMusicFormData);
 	const [_originalLink, setOriginalLink] = useState<LinkItem | null>(null);
 	const [_originalText, setOriginalText] = useState<TextItem | null>(null);
 	const [_originalVideo, setOriginalVideo] = useState<VideoItem | null>(null);
 	const [_originalImage, setOriginalImage] = useState<ImageItem | null>(null);
+	const [_originalMusic, setOriginalMusic] = useState<MusicItem | null>(null);
 	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
 	const [togglingLinkId, setTogglingLinkId] = useState<number | null>(null);
 	const [togglingTextId, setTogglingTextId] = useState<number | null>(null);
 	const [togglingVideoId, setTogglingVideoId] = useState<number | null>(null);
 	const [togglingImageId, setTogglingImageId] = useState<number | null>(null);
+	const [togglingMusicId, setTogglingMusicId] = useState<number | null>(null);
 	const [togglingSectionId, setTogglingSectionId] = useState<number | null>(
 		null
 	);
@@ -224,18 +246,33 @@ export const useLinksManager = (
 			} as any;
 		});
 
+		// Converter músicas em UnifiedItems
+		const musicItems: UnifiedItem[] = (currentMusics ?? []).map((music) => {
+			const existingItem = unifiedItems.find(
+				(item) => (item as any).isMusic && item.id === music.id
+			);
+			return {
+				...(music as any),
+				clicks: 0,
+				sensitive: false,
+				isMusic: true as any,
+				isEditing: existingItem?.isEditing,
+			} as any;
+		});
+
 		// Links gerais (sem seção)
 		const generalLinks: UnifiedItem[] = currentLinks
 			.filter((link) => !link.sectionId)
 			.map((link) => ({ ...link }));
 
-		// Combinar todos os itens (seções, links gerais, textos, vídeos e imagens) em uma única lista
+		// Combinar todos os itens (seções, links gerais, textos, vídeos, imagens e músicas) em uma única lista
 		const allItems: UnifiedItem[] = [
 			...sectionItems,
 			...generalLinks,
 			...textItems,
 			...videoItems,
 			...imageItems,
+			...musicItems,
 		];
 
 		// Ordenar todos os itens juntos por order
@@ -247,6 +284,7 @@ export const useLinksManager = (
 		currentTexts,
 		currentVideos,
 		currentImages,
+		currentMusics,
 	]);
 
 	const existingSections = useMemo(() => {
@@ -280,7 +318,8 @@ export const useLinksManager = (
 								item.isSection ||
 								item.isText ||
 								item.isVideo ||
-								(item as any).isImage
+								(item as any).isImage ||
+								(item as any).isMusic
 							)
 					)
 					.filter((item) => !(item as any).isDraft)
@@ -317,6 +356,14 @@ export const useLinksManager = (
 
 				const imageItems = items
 					.filter((item) => (item as any).isImage)
+					.filter((item) => !(item as any).isDraft)
+					.map((item) => ({
+						id: item.id,
+						order: items.indexOf(item),
+					}));
+
+				const musicItems = items
+					.filter((item) => (item as any).isMusic)
 					.filter((item) => !(item as any).isDraft)
 					.map((item) => ({
 						id: item.id,
@@ -958,6 +1005,164 @@ export const useLinksManager = (
 		setOriginalImage(null);
 	};
 
+	const handleAddNewMusic = () => {
+		const id = Date.now();
+		const order = -1;
+		const draft: MusicItem = {
+			id,
+			title: "",
+			url: "",
+			usePreview: true,
+			active: true,
+			archived: false,
+			order,
+			sectionId: null,
+			userId: 0,
+			isDraft: true,
+			isMusic: true,
+			isEditing: true,
+		};
+		setUnifiedItems((prev) => {
+			const cleaned = prev
+				.filter((item) => !(item as any).isDraft)
+				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
+			const next = [draft, ...cleaned];
+			return next.sort((a, b) => a.order - b.order);
+		});
+		setOriginalMusic(null);
+		setIsAddingMusic(false);
+		setIsModalOpen(false);
+	};
+
+	const handleMusicUpdate = async (id: number, payload: Partial<MusicItem>) => {
+		const response = await fetch(`/api/musics/${id}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.error || "Erro ao atualizar música");
+		}
+
+		await mutateMusics();
+	};
+
+	const handleDeleteMusic = async (id: number) => {
+		const target = unifiedItems.find(
+			(item) => (item as any).isMusic && item.id === id
+		) as MusicItem | undefined;
+		if (target?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			return;
+		}
+		await fetch(`/api/musics/${id}`, { method: "DELETE" });
+		await mutateMusics();
+		await mutateSections();
+	};
+
+	const handleArchiveMusic = async (id: number) => {
+		await handleMusicUpdate(id, { archived: true });
+	};
+
+	const handleStartEditingMusic = (id: number) => {
+		const musicToEdit = unifiedItems.find(
+			(item) => (item as any).isMusic && item.id === id
+		) as MusicItem;
+		if (musicToEdit) {
+			setOriginalMusic(musicToEdit);
+		}
+
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if (item.isEditing && item.id !== id) {
+					return { ...item, isEditing: false };
+				}
+				if ((item as any).isMusic && item.id === id) {
+					return { ...item, isEditing: true };
+				}
+				return item;
+			})
+		);
+	};
+
+	const handleMusicChange = (
+		id: number,
+		field: "title" | "url" | "usePreview",
+		value: string | boolean
+	) => {
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if ((item as any).isMusic && item.id === id) {
+					return { ...item, [field]: value };
+				}
+				return item;
+			})
+		);
+	};
+
+	const handleSaveEditingMusic = async (
+		id: number,
+		title: string,
+		url: string,
+		usePreview: boolean
+	) => {
+		const target = unifiedItems.find(
+			(item) => (item as any).isMusic && item.id === id
+		) as MusicItem | undefined;
+		if (target?.isDraft) {
+			await fetch("/api/musics", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					title: title?.trim() || null,
+					url,
+					usePreview,
+					sectionId: target.sectionId ?? null,
+				}),
+			});
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			await mutateMusics();
+			await mutateSections();
+			setOriginalMusic(null);
+			return;
+		}
+		await handleMusicUpdate(id, {
+			title,
+			url,
+			usePreview,
+			isEditing: false,
+		});
+	};
+
+	const handleCancelEditingMusic = (id: number) => {
+		const target = unifiedItems.find(
+			(item) => (item as any).isMusic && item.id === id
+		) as MusicItem | undefined;
+		if (target?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			setOriginalMusic(null);
+			return;
+		}
+		const musicToRestore = currentMusics.find((m) => m.id === id);
+		if (musicToRestore) {
+			setUnifiedItems((prevItems) =>
+				prevItems.map((item) => {
+					if ((item as any).isMusic && item.id === id) {
+						return {
+							...musicToRestore,
+							isMusic: true,
+							isEditing: false,
+						};
+					}
+					return item;
+				})
+			);
+		}
+		setOriginalMusic(null);
+	};
+
 	const handleAddLinkToSection = async (sectionId: number) => {
 		let formattedUrl = formData.url.trim();
 		if (!urlProtocolRegex.test(formattedUrl)) {
@@ -1040,6 +1245,17 @@ export const useLinksManager = (
 				await handleImageUpdate(id, { active });
 			} finally {
 				setTogglingImageId(null);
+			}
+			return;
+		}
+
+		// Música
+		if ((target as any)?.isMusic) {
+			setTogglingMusicId(id);
+			try {
+				await handleMusicUpdate(id, { active });
+			} finally {
+				setTogglingMusicId(null);
 			}
 			return;
 		}
@@ -1462,12 +1678,14 @@ export const useLinksManager = (
 		isAddingText,
 		isAddingVideo,
 		isAddingImage,
+		isAddingMusic,
 		isModalOpen,
 		formData,
 		sectionFormData,
 		textFormData,
 		videoFormData,
 		imageFormData,
+		musicFormData,
 		existingSections,
 		archivingLinkId,
 		setActiveId,
@@ -1476,12 +1694,14 @@ export const useLinksManager = (
 		setIsAddingText,
 		setIsAddingVideo,
 		setIsAddingImage,
+		setIsAddingMusic,
 		setIsModalOpen,
 		setFormData,
 		setSectionFormData,
 		setTextFormData,
 		setVideoFormData,
 		setImageFormData,
+		setMusicFormData,
 		handleDragEnd,
 		handleSectionUpdate,
 		handleSectionDelete,
@@ -1491,6 +1711,7 @@ export const useLinksManager = (
 		handleAddNewText,
 		handleAddNewVideo,
 		handleAddNewImage,
+		handleAddNewMusic,
 		handleAddLinkToSection,
 		saveEditing,
 		handleDeleteLink,
@@ -1524,14 +1745,23 @@ export const useLinksManager = (
 		handleImageChange,
 		handleSaveEditingImage,
 		handleCancelEditingImage,
+		handleMusicUpdate,
+		handleDeleteMusic,
+		handleArchiveMusic,
+		handleStartEditingMusic,
+		handleMusicChange,
+		handleSaveEditingMusic,
+		handleCancelEditingMusic,
 		togglingLinkId,
 		togglingTextId,
 		togglingVideoId,
 		togglingImageId,
+		togglingMusicId,
 		togglingSectionId,
 		originalLink: _originalLink,
 		originalText: _originalText,
 		originalVideo: _originalVideo,
 		originalImage: _originalImage,
+		originalMusic: _originalMusic,
 	};
 };

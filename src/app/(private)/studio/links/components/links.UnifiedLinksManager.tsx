@@ -22,6 +22,7 @@ import type {
 	SectionItem,
 	TextItem,
 	VideoItem,
+	MusicItem,
 } from "../types/links.types";
 import { fetcher } from "../utils/links.helpers";
 
@@ -86,6 +87,16 @@ const UnifiedLinksManager = () => {
 		isLoading: isLoadingImages,
 	} = useSWR<{ images: ImageItem[] }>(userId ? "/api/images" : null, fetcher);
 
+	// Hook SWR para músicas
+	const {
+		data: musicsData,
+		mutate: mutateMusics,
+		isLoading: isLoadingMusics,
+	} = useSWR<{ musics: MusicItem[] }>(
+		userId ? `/api/musics?userId=${userId}` : null,
+		fetcher
+	);
+
 	// Sincroniza o preview em tempo real com os dados do SWR
 	useEffect(() => {
 		const storeUser = useDesignStore.getState().userData;
@@ -104,8 +115,9 @@ const UnifiedLinksManager = () => {
 			texts: (textsData?.texts || []) as any,
 			videos: (videosData?.videos || []) as any,
 			images: (imagesData?.images || []) as any,
+			// musics: (musicsData?.musics || []) as any, // opcional: habilitar se preview precisar
 		});
-	}, [linksData, socialLinksData, textsData, videosData, imagesData]);
+	}, [linksData, socialLinksData, textsData, videosData, imagesData /*, musicsData*/]);
 
 	if (
 		status === "loading" ||
@@ -114,7 +126,8 @@ const UnifiedLinksManager = () => {
 		isLoadingSections ||
 		isLoadingTexts ||
 		isLoadingVideos ||
-		isLoadingImages
+		isLoadingImages ||
+		isLoadingMusics
 	) {
 		return <LoadingPage />;
 	}
@@ -145,11 +158,13 @@ const UnifiedLinksManager = () => {
 								currentSections={sectionsData || []}
 								currentTexts={textsData?.texts || []}
 								currentVideos={videosData?.videos || []}
+								currentMusics={musicsData?.musics || []}
 								mutateImages={mutateImages}
 								mutateLinks={mutateLinks}
 								mutateSections={mutateSections}
 								mutateTexts={mutateTexts}
 								mutateVideos={mutateVideos}
+								mutateMusics={mutateMusics}
 								session={session}
 							/>
 						</TabsContent>

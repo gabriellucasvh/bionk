@@ -64,6 +64,7 @@ model User {
   Text                          Text[]
   Video                         Video[]
   Image                         Image[]
+  Music                         Music[]
 
   @@index([subscriptionStatus])
   @@index([createdAt])
@@ -248,6 +249,7 @@ model Section {
   texts     Text[]
   videos    Video[]
   images    Image[]
+  musics    Music[]
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -293,6 +295,27 @@ model Image {
   updatedAt   DateTime @updatedAt
   section     Section? @relation(fields: [sectionId], references: [id])
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId])
+  @@index([userId])
+  @@index([userId, order])
+}
+
+model Music {
+  id         Int      @id @default(autoincrement())
+  title      String
+  url        String
+  usePreview Boolean  @default(true)
+  order      Int      @default(0)
+  userId     String
+  active     Boolean  @default(true)
+  sectionId  Int?
+  isCompact  Boolean  @default(false)
+  archived   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  section    Section? @relation(fields: [sectionId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([sectionId])
   @@index([userId])

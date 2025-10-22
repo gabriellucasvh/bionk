@@ -13,6 +13,7 @@ import { useDragGesture } from "../hooks/useDragGesture";
 import type {
 	ImageFormData,
 	LinkFormData,
+	MusicFormData,
 	SectionFormData,
 	TextFormData,
 	VideoFormData,
@@ -25,6 +26,7 @@ import FormRenderer from "./FormRenderer";
 import ImageOptions from "./ImageOptions";
 import MobileBottomSheet from "./MobileBottomSheet";
 import { useModalHandlers } from "./ModalHandlers";
+import MusicOptions from "./MusicOptions";
 import VideoOptions from "./VideoOptions";
 
 interface AddContentModalProps {
@@ -36,27 +38,32 @@ interface AddContentModalProps {
 	isAddingText: boolean;
 	isAddingVideo: boolean;
 	isAddingImage: boolean;
+	isAddingMusic: boolean;
 	formData: LinkFormData;
 	sectionFormData: SectionFormData;
 	textFormData: TextFormData;
 	videoFormData: VideoFormData;
 	imageFormData: ImageFormData;
+	musicFormData: MusicFormData;
 	existingSections: SectionItem[];
 	setIsAdding: (value: boolean) => void;
 	setIsAddingSection: (value: boolean) => void;
 	setIsAddingText: (value: boolean) => void;
 	setIsAddingVideo: (value: boolean) => void;
 	setIsAddingImage: (value: boolean) => void;
+	setIsAddingMusic: (value: boolean) => void;
 	setFormData: (data: LinkFormData) => void;
 	setSectionFormData: (data: SectionFormData) => void;
 	setTextFormData: (data: TextFormData) => void;
 	setVideoFormData: (data: VideoFormData) => void;
 	setImageFormData: (data: ImageFormData) => void;
+	setMusicFormData: (data: MusicFormData) => void;
 	handleAddNewLink: () => Promise<void>;
 	handleAddNewSection: () => Promise<void>;
 	handleAddNewText: () => Promise<void>;
 	handleAddNewVideo: () => Promise<void>;
 	handleAddNewImage: (override?: Partial<ImageFormData>) => Promise<void>;
+	handleAddNewMusic: () => Promise<void>;
 }
 
 const AddContentModal = ({
@@ -68,27 +75,32 @@ const AddContentModal = ({
 	isAddingText,
 	isAddingVideo,
 	isAddingImage,
+	isAddingMusic,
 	formData,
 	sectionFormData,
 	textFormData,
 	videoFormData,
 	imageFormData,
+	musicFormData,
 	existingSections,
 	setIsAdding,
 	setIsAddingSection,
 	setIsAddingText,
 	setIsAddingVideo,
 	setIsAddingImage,
+	setIsAddingMusic,
 	setFormData,
 	setSectionFormData,
 	setTextFormData,
 	setVideoFormData,
 	setImageFormData,
+	setMusicFormData,
 	handleAddNewLink,
 	handleAddNewSection,
 	handleAddNewText,
 	handleAddNewVideo,
 	handleAddNewImage,
+	handleAddNewMusic,
 }: AddContentModalProps) => {
 	const {
 		isAnimating,
@@ -124,6 +136,7 @@ const AddContentModal = ({
 		handleTextSubmit,
 		handleVideoSubmit,
 		handleImageSubmit,
+		handleMusicSubmit,
 		handleCancelWithState,
 	} = useModalHandlers({
 		formData,
@@ -131,21 +144,25 @@ const AddContentModal = ({
 		textFormData,
 		videoFormData,
 		imageFormData,
+		musicFormData,
 		setFormData,
 		setSectionFormData,
 		setTextFormData,
 		setVideoFormData,
 		setImageFormData,
+		setMusicFormData,
 		setIsAdding,
 		setIsAddingSection,
 		setIsAddingText,
 		setIsAddingVideo,
 		setIsAddingImage,
+		setIsAddingMusic,
 		handleAddNewLink,
 		handleAddNewSection,
 		handleAddNewText,
 		handleAddNewVideo,
 		handleAddNewImage,
+		handleAddNewMusic,
 		onClose,
 	});
 
@@ -186,6 +203,7 @@ const AddContentModal = ({
 			"vimeo",
 			"tiktok",
 			"twitch",
+			"spotify",
 		] as const;
 
 		if (!validOptions.includes(option as any)) {
@@ -206,9 +224,9 @@ const AddContentModal = ({
 		// Para demais opções, fechar o modal antes de criar o rascunho inline
 		// e garantir que o formulário de seção seja fechado
 		setIsAddingSection(false);
-		onClose();
 
 		if (validOption === "link") {
+			onClose();
 			setTimeout(() => {
 				handleAddNewLink();
 			}, 0);
@@ -216,6 +234,7 @@ const AddContentModal = ({
 		}
 
 		if (validOption === "text") {
+			onClose();
 			setTimeout(() => {
 				handleAddNewText();
 			}, 0);
@@ -223,9 +242,16 @@ const AddContentModal = ({
 		}
 
 		if (
-			["video", "youtube", "vimeo", "tiktok", "twitch"].includes(validOption)
+			["video", "youtube", "vimeo", "tiktok", "twitch"].includes(
+				validOption
+			)
 		) {
-			const videoType: "direct" | "youtube" | "vimeo" | "tiktok" | "twitch" =
+			const videoType:
+				| "direct"
+				| "youtube"
+				| "vimeo"
+				| "tiktok"
+				| "twitch" =
 				validOption === "video"
 					? "direct"
 					: (validOption as "youtube" | "vimeo" | "tiktok" | "twitch");
@@ -233,8 +259,17 @@ const AddContentModal = ({
 				...videoFormData,
 				type: videoType,
 			});
+			onClose();
 			setTimeout(() => {
 				handleAddNewVideo();
+			}, 0);
+			return;
+		}
+
+		if (validOption === "spotify") {
+			onClose();
+			setTimeout(() => {
+				handleAddNewMusic();
 			}, 0);
 			return;
 		}
@@ -287,8 +322,10 @@ const AddContentModal = ({
 						existingSections={existingSections}
 						formData={formData}
 						imageFormData={imageFormData}
+						musicFormData={musicFormData}
 						isAdding={isAdding}
 						isAddingImage={isAddingImage}
+						isAddingMusic={isAddingMusic}
 						isAddingSection={isAddingSection}
 						isAddingText={isAddingText}
 						isAddingVideo={isAddingVideo}
@@ -297,6 +334,7 @@ const AddContentModal = ({
 						onCancel={handleCancelWithState}
 						onImageSubmit={handleImageSubmit}
 						onLinkSubmit={handleLinkSubmit}
+						onMusicSubmit={handleMusicSubmit}
 						onSectionSubmit={handleSectionSubmit}
 						onTextSubmit={handleTextSubmit}
 						onVideoSubmit={handleVideoSubmit}
@@ -304,6 +342,7 @@ const AddContentModal = ({
 						selectedOption={selectedOption}
 						setFormData={setFormData}
 						setImageFormData={setImageFormData}
+						setMusicFormData={setMusicFormData}
 						setSectionFormData={setSectionFormData}
 						setTextFormData={setTextFormData}
 						setVideoFormData={setVideoFormData}
@@ -328,6 +367,9 @@ const AddContentModal = ({
 								)}
 								{selectedCategory === "video" && (
 									<VideoOptions onOptionSelect={handleOptionSelectWithState} />
+								)}
+								{selectedCategory === "music" && (
+									<MusicOptions onOptionSelect={handleOptionSelectWithState} />
 								)}
 								{selectedCategory === "image" && (
 									<ImageOptions onOptionSelect={handleImageOptionSelect} />
@@ -361,8 +403,10 @@ const AddContentModal = ({
 										existingSections={existingSections}
 										formData={formData}
 										imageFormData={imageFormData}
+										musicFormData={musicFormData}
 										isAdding={isAdding}
 										isAddingImage={isAddingImage}
+										isAddingMusic={isAddingMusic}
 										isAddingSection={isAddingSection}
 										isAddingText={isAddingText}
 										isAddingVideo={isAddingVideo}
@@ -371,6 +415,7 @@ const AddContentModal = ({
 										onCancel={handleCancelWithState}
 										onImageSubmit={handleImageSubmit}
 										onLinkSubmit={handleLinkSubmit}
+										onMusicSubmit={handleMusicSubmit}
 										onSectionSubmit={handleSectionSubmit}
 										onTextSubmit={handleTextSubmit}
 										onVideoSubmit={handleVideoSubmit}
@@ -378,6 +423,7 @@ const AddContentModal = ({
 										selectedOption={selectedOption}
 										setFormData={setFormData}
 										setImageFormData={setImageFormData}
+										setMusicFormData={setMusicFormData}
 										setSectionFormData={setSectionFormData}
 										setTextFormData={setTextFormData}
 										setVideoFormData={setVideoFormData}
@@ -404,6 +450,9 @@ const AddContentModal = ({
 											<VideoOptions
 												onOptionSelect={handleOptionSelectWithState}
 											/>
+										)}
+										{selectedCategory === "music" && (
+											<MusicOptions onOptionSelect={handleOptionSelectWithState} />
 										)}
 										{selectedCategory === "image" && (
 											<ImageOptions onOptionSelect={handleImageOptionSelect} />

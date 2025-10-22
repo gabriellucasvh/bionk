@@ -7,6 +7,7 @@ import {
 	Link as LinkIcon,
 	Type,
 	Video,
+	Music2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
@@ -15,10 +16,11 @@ import type {
 	SectionItem,
 	TextItem,
 	VideoItem,
+	MusicItem,
 } from "../types/links.types";
 
 interface DragPreviewProps {
-	item: LinkItem | SectionItem | TextItem | VideoItem | ImageItem;
+	item: LinkItem | SectionItem | TextItem | VideoItem | ImageItem | MusicItem;
 	className?: string;
 }
 
@@ -54,6 +56,14 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
 				label: "Imagem",
 				color: "text-indigo-600",
 				title: item.title || "Imagem sem título",
+			};
+		}
+		if ("isMusic" in item && item.isMusic) {
+			return {
+				icon: Music2,
+				label: "Música",
+				color: "text-green-600",
+				title: item.title || "Música sem título",
 			};
 		}
 		return {
