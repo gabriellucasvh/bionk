@@ -4,8 +4,8 @@ import { ChevronLeft, ChevronRight, Images, Lock } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
 import InteractiveLink from "@/components/InteractiveLink";
-import VideoCard from "@/components/VideoCard";
 import MusicCard from "@/components/MusicCard";
+import VideoCard from "@/components/VideoCard";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
@@ -315,10 +315,12 @@ export default function LinksList({
 
 		result.push(
 			<MusicCard
+				authorName={music.authorName}
 				buttonStyle={buttonStyle}
 				customPresets={customPresets}
 				id={music.id}
 				key={`music-${music.id}`}
+				thumbnailUrl={music.thumbnailUrl}
 				title={music.title}
 				url={music.url}
 				usePreview={!!music.usePreview}

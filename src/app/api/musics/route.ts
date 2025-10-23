@@ -10,7 +10,7 @@ const SPOTIFY_REGEX = /open\.spotify\.com\/(?:[a-z-]+\/)?(track|album|playlist|e
 function validateAndNormalizeSpotifyUrl(
   url: string,
   usePreview: boolean
-): { normalizedUrl: string } | null {
+): { normalizedUrl: string; canonicalUrl: string } | null {
   const trimmed = (url || "").trim();
   const match = trimmed.match(SPOTIFY_REGEX);
   if (!match) {
@@ -18,10 +18,11 @@ function validateAndNormalizeSpotifyUrl(
   }
   const kind = match[1];
   const id = match[2];
-  if (usePreview) {
-    return { normalizedUrl: `https://open.spotify.com/embed/${kind}/${id}` };
-  }
-  return { normalizedUrl: `https://open.spotify.com/${kind}/${id}` };
+  const canonicalUrl = `https://open.spotify.com/${kind}/${id}`;
+  const normalizedUrl = usePreview
+    ? `https://open.spotify.com/embed/${kind}/${id}`
+    : canonicalUrl;
+  return { normalizedUrl, canonicalUrl };
 }
 
 export async function POST(request: Request) {
@@ -81,15 +82,38 @@ export async function POST(request: Request) {
       }),
     ]);
 
+    // Buscar metadados via oEmbed (apenas uma vez na criação)
+    let authorName: string | undefined;
+    let thumbnailUrl: string | undefined;
+    let finalTitle: string = (title?.trim() || "");
+    try {
+      const metaRes = await fetch(
+        `https://open.spotify.com/oembed?url=${encodeURIComponent(validation.canonicalUrl)}`
+      );
+      if (metaRes.ok) {
+        const data = await metaRes.json();
+        const t = (data?.title || "").toString();
+        const a = (data?.author_name || "").toString();
+        const th = (data?.thumbnail_url || "").toString();
+        if (!finalTitle && t.trim().length > 0) {finalTitle = t};
+        authorName = a.trim().length > 0 ? a : undefined;
+        thumbnailUrl = th.trim().length > 0 ? th : undefined;
+      }
+    } catch {
+      // silent
+    }
+
     const music = await prisma.music.create({
       data: {
-        title: title?.trim() || "",
+        title: finalTitle,
         url: validation.normalizedUrl,
         usePreview: !!usePreview,
         active: true,
         order: 0,
         userId: session.user.id,
         sectionId: sectionId || null,
+        authorName,
+        thumbnailUrl,
       },
     });
 

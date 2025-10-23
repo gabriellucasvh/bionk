@@ -305,6 +305,8 @@ model Music {
   id         Int      @id @default(autoincrement())
   title      String
   url        String
+  authorName String?
+  thumbnailUrl String?
   usePreview Boolean  @default(true)
   order      Int      @default(0)
   userId     String
