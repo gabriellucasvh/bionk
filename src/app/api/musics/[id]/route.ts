@@ -2,29 +2,13 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-
-// Aceita URLs oficiais com segmento de idioma opcional (ex: intl-pt)
-// Suporta: track, album, playlist, episode, show
-const SPOTIFY_REGEX =
-	/open\.spotify\.com\/(?:[a-z-]+\/)?(track|album|playlist|episode|show)\/([a-zA-Z0-9]+)/;
-
-function validateAndNormalizeSpotifyUrl(
-	url: string,
-	usePreview: boolean
-): { normalizedUrl: string; canonicalUrl: string } | null {
-	const trimmed = (url || "").trim();
-	const match = trimmed.match(SPOTIFY_REGEX);
-	if (!match) {
-		return null;
-	}
-	const kind = match[1];
-	const id = match[2];
-	const canonicalUrl = `https://open.spotify.com/${kind}/${id}`;
-	const normalizedUrl = usePreview
-		? `https://open.spotify.com/embed/${kind}/${id}`
-		: canonicalUrl;
-	return { normalizedUrl, canonicalUrl };
-}
+import {
+	fetchMetadataFromProvider,
+	getCanonicalUrl,
+	getEmbedUrl,
+	parseMusicUrl,
+	resolveDeezerShortUrl,
+} from "@/utils/music";
 
 export async function PUT(
 	request: NextRequest,
@@ -79,33 +63,40 @@ export async function PUT(
 		}
 
 		if (url && url !== music.url) {
-			const validation = validateAndNormalizeSpotifyUrl(
-				url,
-				updateData.usePreview ?? music.usePreview
-			);
-			if (!validation) {
+			// Resolver link curto do Deezer, se necessário
+			const inputUrl: string = url;
+			const maybeResolvedUrl = inputUrl
+				.toLowerCase()
+				.includes("link.deezer.com")
+				? await resolveDeezerShortUrl(inputUrl)
+				: inputUrl;
+
+			const parsed = parseMusicUrl(maybeResolvedUrl);
+			if (
+				!parsed.id ||
+				parsed.type === "unknown" ||
+				parsed.platform === "unknown"
+			) {
 				return NextResponse.json(
-					{ error: "URL de música inválida. Aceitos: Spotify" },
+					{ error: "URL de música inválida. Aceitos: Spotify e Deezer" },
 					{ status: 400 }
 				);
 			}
-			updateData.url = validation.normalizedUrl;
+			const normalizedUrl =
+				(updateData.usePreview ?? music.usePreview)
+					? getEmbedUrl(maybeResolvedUrl)
+					: getCanonicalUrl(maybeResolvedUrl);
+			updateData.url = normalizedUrl;
+			// updateData.platform = parsed.platform;
 
 			// Atualiza metadados quando URL muda
 			try {
-				const metaRes = await fetch(
-					`https://open.spotify.com/oembed?url=${encodeURIComponent(validation.canonicalUrl)}`
-				);
-				if (metaRes.ok) {
-					const data = await metaRes.json();
-					const a = (data?.author_name || "").toString();
-					const th = (data?.thumbnail_url || "").toString();
-					if (a.trim().length > 0) {
-						updateData.authorName = a;
-					}
-					if (th.trim().length > 0) {
-						updateData.thumbnailUrl = th;
-					}
+				const meta = await fetchMetadataFromProvider(parsed);
+				if ((meta.authorName || "").trim().length > 0) {
+					updateData.authorName = meta.authorName;
+				}
+				if ((meta.thumbnailUrl || "").trim().length > 0) {
+					updateData.thumbnailUrl = meta.thumbnailUrl;
 				}
 			} catch {
 				// silent

@@ -36,6 +36,11 @@ module.exports = {
 				hostname: "image-cdn-ak.spotifycdn.com",
 				pathname: "/**",
 			},
+			{
+				protocol: "https",
+				hostname: "cdn-images.dzcdn.net",
+				pathname: "/**",
+			},
 		],
 		qualities: [25, 50, 75, 90, 95, 100],
 	},

@@ -12,16 +12,16 @@ import type {
 } from "../hooks/useLinksManager";
 import type { SectionItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
-import { isValidVideoUrl } from "../utils/video.helpers";
 import { isValidMusicUrl } from "../utils/music.helpers";
+import { isValidVideoUrl } from "../utils/video.helpers";
 import AddNewImageCarouselForm from "./links.AddNewImageCarouselForm";
 import AddNewImageColumnForm from "./links.AddNewImageColumnForm";
 import AddNewImageSingleForm from "./links.AddNewImageSingleForm";
 import AddNewLinkForm from "./links.AddNewLinkForm";
+import AddNewMusicForm from "./links.AddNewMusicForm";
 import AddNewSectionForm from "./links.AddNewSectionForm";
 import AddNewTextForm from "./links.AddNewTextForm";
 import AddNewVideoForm from "./links.AddNewVideoForm";
-import AddNewMusicForm from "./links.AddNewMusicForm";
 
 interface FormRendererProps {
 	selectedOption: string | null;
@@ -100,18 +100,13 @@ const validateImageForm = (imageFormData: ImageFormData): boolean => {
 };
 
 const isVideoOption = (selectedOption: string | null): boolean => {
-	const videoOptions = [
-		"video",
-		"youtube",
-		"vimeo",
-		"tiktok",
-		"twitch",
-	];
+	const videoOptions = ["video", "youtube", "vimeo", "tiktok", "twitch"];
 	return videoOptions.includes(selectedOption || "");
 };
 
 const isMusicOption = (selectedOption: string | null): boolean => {
-	return (selectedOption || "") === "spotify";
+	const musicOptions = ["spotify", "deezer"];
+	return musicOptions.includes(selectedOption || "");
 };
 
 const FormHeader = ({
@@ -389,7 +384,6 @@ const FormRenderer = ({
 	isAddingText,
 	isAddingVideo,
 	isAddingImage,
-	isAddingMusic,
 	formData,
 	sectionFormData,
 	textFormData,
@@ -469,11 +463,11 @@ const FormRenderer = ({
 			<MusicFormRenderer
 				existingSections={existingSections}
 				isMobile={isMobile}
+				musicFormData={musicFormData}
 				onBack={onBack}
 				onCancel={onCancel}
 				onMusicSubmit={onMusicSubmit}
 				setMusicFormData={setMusicFormData}
-				musicFormData={musicFormData}
 			/>
 		);
 	}

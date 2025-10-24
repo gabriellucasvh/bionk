@@ -6,6 +6,7 @@ import * as React from "react";
 import LinkOptionsModal from "@/components/modals/LinkOptionsModal";
 import { cn } from "@/lib/utils";
 import type { UserLink } from "@/types/user-profile";
+import { ensureHttps, getCanonicalUrl, getEmbedUrl } from "@/utils/music";
 
 interface MusicCardProps {
 	id: number;
@@ -29,100 +30,6 @@ interface MusicCardProps {
 	buttonStyle?: React.CSSProperties;
 }
 
-// --- Helpers ---
-
-// Garante que a URL tenha protocolo (https) para evitar iframes relativos
-const ensureHttps = (url: string): string => {
-	const trimmed = (url || "").trim();
-	if (trimmed.length === 0) {
-		return url;
-	}
-	if (/^https?:\/\//i.test(trimmed)) {
-		return trimmed;
-	}
-	return `https://${trimmed}`;
-};
-
-// Extrai URL canônica (sem /embed) para uso em oEmbed e links diretos
-const getSpotifyCanonicalUrl = (url: string): string => {
-	try {
-		const normalized = ensureHttps(url);
-		const u = new URL(normalized);
-		if (!u.hostname.includes("spotify.com")) {
-			return normalized;
-		}
-		const parts = u.pathname.split("/").filter(Boolean);
-
-		const supported = new Set([
-			"track",
-			"album",
-			"playlist",
-			"episode",
-			"show",
-		]);
-		let type: string | undefined;
-		let id: string | undefined;
-
-		// Se começar com "embed", ignora esse segmento
-		const startIdx = parts[0] === "embed" ? 1 : 0;
-		for (let i = startIdx; i < parts.length - 1; i++) {
-			if (supported.has(parts[i])) {
-				type = parts[i];
-				id = parts[i + 1];
-				break;
-			}
-		}
-
-		if (!(type && id)) {
-			return normalized;
-		}
-		return `https://open.spotify.com/${type}/${id}`;
-	} catch {
-		return ensureHttps(url);
-	}
-};
-
-const getSpotifyEmbedUrl = (url: string): string => {
-	try {
-		const normalized = ensureHttps(url);
-		const u = new URL(normalized);
-		if (!u.hostname.includes("spotify.com")) {
-			return normalized;
-		}
-		const parts = u.pathname.split("/").filter(Boolean);
-
-		// If it is already an embed URL, keep it as-is
-		if (parts[0] === "embed" && parts.length >= 3) {
-			return normalized;
-		}
-
-		// Robustly find the resource type segment and the following id
-		const supported = new Set([
-			"track",
-			"album",
-			"playlist",
-			"episode",
-			"show",
-		]);
-		let type: string | undefined;
-		let id: string | undefined;
-		for (let i = 0; i < parts.length - 1; i++) {
-			if (supported.has(parts[i])) {
-				type = parts[i];
-				id = parts[i + 1];
-				break;
-			}
-		}
-
-		if (!(type && id)) {
-			return normalized;
-		}
-		return `https://open.spotify.com/embed/${type}/${id}`;
-	} catch {
-		return ensureHttps(url);
-	}
-};
-
 export default function MusicCard({
 	id,
 	title,
@@ -145,7 +52,7 @@ export default function MusicCard({
 		: {};
 
 	if (usePreview) {
-		const embedUrl = getSpotifyEmbedUrl(url);
+		const embedUrl = getEmbedUrl(url);
 		return (
 			<div className={cn("w-full space-y-2 pb-2", className)}>
 				{/* Opcionalmente mostra o título acima do player */}
@@ -167,7 +74,7 @@ export default function MusicCard({
 							width: "100%",
 							border: 0,
 						}}
-						title={`spotify-${id}`}
+						title={`music-${id}`}
 					/>
 				</div>
 			</div>
@@ -197,7 +104,7 @@ export default function MusicCard({
 			>
 				<a
 					className="relative z-10 flex h-full w-full items-center"
-					href={getSpotifyCanonicalUrl(url)}
+					href={getCanonicalUrl(url)}
 					rel="noopener noreferrer"
 					target="_blank"
 				>
@@ -244,7 +151,7 @@ export default function MusicCard({
 
 				<button
 					aria-label="Opções"
-					className="-translate-y-1/2 absolute top-[50%] right-3 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
+					className="-translate-y-1/2 dark:hover:bg.white/10 absolute top-[50%] right-3 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100"
 					onClick={(e) => {
 						e.preventDefault();
 						e.stopPropagation();

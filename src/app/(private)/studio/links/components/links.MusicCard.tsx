@@ -5,9 +5,8 @@ import {
 	Edit,
 	Grip,
 	MoreVertical,
-	Save,
-	Trash2,
 	Music2,
+	Trash2,
 	X,
 } from "lucide-react";
 import Image from "next/image";
@@ -23,9 +22,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { fetchMetadataFromProvider, parseMusicUrl } from "@/utils/music";
 import type { MusicItem } from "../types/links.types";
 import { getMusicPlatform, isValidMusicUrl } from "../utils/music.helpers";
 
@@ -81,12 +81,15 @@ const EditingView = ({
 	const tryAutoFillTitle = async (url: string) => {
 		try {
 			const { valid } = isValidMusicUrl(url);
-			if (!valid) return;
-			if ((music.title || "").trim().length > 0) return;
-			const res = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`);
-			if (!res.ok) return;
-			const data = await res.json();
-			const nextTitle = (data?.title || "").toString();
+			if (!valid) {
+				return;
+			}
+			if ((music.title || "").trim().length > 0) {
+				return;
+			}
+			const parsed = parseMusicUrl(url);
+			const meta = await fetchMetadataFromProvider(parsed);
+			const nextTitle = (meta?.title || "").toString();
 			if (nextTitle.trim().length > 0) {
 				onMusicChange?.(music.id, "title", nextTitle);
 			}
@@ -136,15 +139,15 @@ const EditingView = ({
 					<Input
 						aria-invalid={!!urlError}
 						id="music-url"
+						onBlur={async (e) => {
+							const nextUrl = e.target.value;
+							await tryAutoFillTitle(nextUrl);
+						}}
 						onChange={(e) => {
 							const nextUrl = e.target.value;
 							const { valid, error } = isValidMusicUrl(nextUrl);
 							setUrlError(valid ? null : error || null);
 							onMusicChange?.(music.id, "url", nextUrl);
-						}}
-						onBlur={async (e) => {
-							const nextUrl = e.target.value;
-							await tryAutoFillTitle(nextUrl);
 						}}
 						placeholder="Cole a URL da música (Spotify)"
 						value={music.url}
@@ -156,19 +159,29 @@ const EditingView = ({
 					<Label className="text-sm">Como exibir</Label>
 					<div className="flex items-center gap-4">
 						<RadioGroup
-							value={music.usePreview ? "preview" : "direct"}
+							className="flex gap-6"
 							onValueChange={(value) =>
 								onMusicChange?.(music.id, "usePreview", value === "preview")
 							}
-							className="flex gap-6"
+							value={music.usePreview ? "preview" : "direct"}
 						>
 							<div className="flex items-center gap-2">
-								<RadioGroupItem id={`music-opt-preview-${music.id}`} value="preview" />
-								<Label htmlFor={`music-opt-preview-${music.id}`}>Preview (padrão)</Label>
+								<RadioGroupItem
+									id={`music-opt-preview-${music.id}`}
+									value="preview"
+								/>
+								<Label htmlFor={`music-opt-preview-${music.id}`}>
+									Preview (padrão)
+								</Label>
 							</div>
 							<div className="flex items-center gap-2">
-								<RadioGroupItem id={`music-opt-direct-${music.id}`} value="direct" />
-								<Label htmlFor={`music-opt-direct-${music.id}`}>Link Direto</Label>
+								<RadioGroupItem
+									id={`music-opt-direct-${music.id}`}
+									value="direct"
+								/>
+								<Label htmlFor={`music-opt-direct-${music.id}`}>
+									Link Direto
+								</Label>
 							</div>
 						</RadioGroup>
 					</div>
@@ -176,7 +189,12 @@ const EditingView = ({
 			</div>
 
 			<div className="flex justify-end gap-2">
-				<BaseButton className="px-4" disabled={!hasChanges || !!urlError} loading={isLoading} onClick={handleSave}>
+				<BaseButton
+					className="px-4"
+					disabled={!hasChanges || !!urlError}
+					loading={isLoading}
+					onClick={handleSave}
+				>
 					Salvar
 				</BaseButton>
 				<Button onClick={handleCancel} variant="outline">

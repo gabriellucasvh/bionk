@@ -2,28 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-
-// Aceita URLs oficiais com segmento de idioma opcional (ex: intl-pt)
-// Suporta: track, album, playlist, episode, show
-const SPOTIFY_REGEX = /open\.spotify\.com\/(?:[a-z-]+\/)?(track|album|playlist|episode|show)\/([a-zA-Z0-9]+)/;
-
-function validateAndNormalizeSpotifyUrl(
-  url: string,
-  usePreview: boolean
-): { normalizedUrl: string; canonicalUrl: string } | null {
-  const trimmed = (url || "").trim();
-  const match = trimmed.match(SPOTIFY_REGEX);
-  if (!match) {
-    return null;
-  }
-  const kind = match[1];
-  const id = match[2];
-  const canonicalUrl = `https://open.spotify.com/${kind}/${id}`;
-  const normalizedUrl = usePreview
-    ? `https://open.spotify.com/embed/${kind}/${id}`
-    : canonicalUrl;
-  return { normalizedUrl, canonicalUrl };
-}
+import { parseMusicUrl, getCanonicalUrl, getEmbedUrl, fetchMetadataFromProvider, resolveDeezerShortUrl } from "@/utils/music";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -46,13 +25,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const validation = validateAndNormalizeSpotifyUrl(url, !!usePreview);
-    if (!validation) {
+    // Resolver link curto do Deezer, se necessário
+    const inputUrl: string = url;
+    const maybeResolvedUrl = inputUrl.toLowerCase().includes("link.deezer.com")
+      ? await resolveDeezerShortUrl(inputUrl)
+      : inputUrl;
+
+    const parsed = parseMusicUrl(maybeResolvedUrl);
+    if (!parsed.id || parsed.type === "unknown" || parsed.platform === "unknown") {
       return NextResponse.json(
-        { error: "URL de música inválida. Aceitos: Spotify" },
+        { error: "URL de música inválida. Aceitos: Spotify e Deezer" },
         { status: 400 }
       );
     }
+
+    const normalizedUrl = usePreview ? getEmbedUrl(maybeResolvedUrl) : getCanonicalUrl(maybeResolvedUrl);
 
     // Ao criar um novo item, empurra os outros para baixo mantendo o order
     await prisma.$transaction([
@@ -82,23 +69,17 @@ export async function POST(request: Request) {
       }),
     ]);
 
-    // Buscar metadados via oEmbed (apenas uma vez na criação)
+    // Buscar metadados (Spotify via oEmbed, Deezer via API)
     let authorName: string | undefined;
     let thumbnailUrl: string | undefined;
     let finalTitle: string = (title?.trim() || "");
     try {
-      const metaRes = await fetch(
-        `https://open.spotify.com/oembed?url=${encodeURIComponent(validation.canonicalUrl)}`
-      );
-      if (metaRes.ok) {
-        const data = await metaRes.json();
-        const t = (data?.title || "").toString();
-        const a = (data?.author_name || "").toString();
-        const th = (data?.thumbnail_url || "").toString();
-        if (!finalTitle && t.trim().length > 0) {finalTitle = t};
-        authorName = a.trim().length > 0 ? a : undefined;
-        thumbnailUrl = th.trim().length > 0 ? th : undefined;
+      const meta = await fetchMetadataFromProvider(parsed);
+      if (!finalTitle && (meta.title || "").trim().length > 0) {
+        finalTitle = meta.title as string;
       }
+      authorName = (meta.authorName || "").trim() || undefined;
+      thumbnailUrl = (meta.thumbnailUrl || "").trim() || undefined;
     } catch {
       // silent
     }
@@ -106,7 +87,8 @@ export async function POST(request: Request) {
     const music = await prisma.music.create({
       data: {
         title: finalTitle,
-        url: validation.normalizedUrl,
+        url: normalizedUrl,
+        // platform: parsed.platform,
         usePreview: !!usePreview,
         active: true,
         order: 0,
