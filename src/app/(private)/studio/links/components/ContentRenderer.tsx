@@ -4,11 +4,12 @@ import CategorySelector from "./CategorySelector";
 import ContentOptions from "./ContentOptions";
 import ImageOptions from "./ImageOptions";
 import VideoOptions from "./VideoOptions";
+import MusicOptions from "./MusicOptions";
 
 interface ContentRendererProps {
-	selectedCategory: "content" | "video" | "image" | null;
+	selectedCategory: "content" | "video" | "image" | "music" | null;
 	selectedOption: string | null;
-	onCategorySelect: (category: "content" | "video" | "image") => void;
+	onCategorySelect: (category: "content" | "video" | "image" | "music") => void;
 	onOptionSelect: (option: string) => void;
 	showCategorySelector?: boolean;
 }
@@ -43,6 +44,10 @@ const ContentRenderer = ({
 
 			{selectedCategory === "video" && !selectedOption && (
 				<VideoOptions onOptionSelect={onOptionSelect} />
+			)}
+
+			{selectedCategory === "music" && !selectedOption && (
+				<MusicOptions onOptionSelect={onOptionSelect} />
 			)}
 
 			{selectedCategory === "image" && !selectedOption && (

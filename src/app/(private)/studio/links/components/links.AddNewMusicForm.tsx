@@ -15,16 +15,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import type { SectionItem } from "../types/links.types";
 import { isValidMusicUrl } from "../utils/music.helpers";
-
-// Local form type for Music only
-type MusicFormData = {
-  title: string;
-  description: string;
-  url: string;
-  type: "spotify";
-  usePreview: boolean;
-  sectionId?: number | null;
-};
+import type { MusicFormData } from "../hooks/useLinksManager";
 
 interface AddNewMusicFormProps {
   formData?: MusicFormData;
@@ -57,12 +48,10 @@ const AddNewMusicForm = (props: AddNewMusicFormProps) => {
   const formData =
     propFormData ||
     (videoManager?.videoFormData
-      ? { ...videoManager.videoFormData, type: "spotify" as const }
+      ? { ...videoManager.videoFormData }
       : {
           title: "",
-          description: "",
           url: "",
-          type: "spotify" as const,
           usePreview: true,
           sectionId: null,
         });
@@ -85,6 +74,7 @@ const AddNewMusicForm = (props: AddNewMusicFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("");
   const [urlError, setUrlError] = useState<string | null>(null);
+  const [description, setDescription] = useState<string>("");
 
   const tryAutoFillTitle = async (url: string) => {
     try {
@@ -118,7 +108,6 @@ const AddNewMusicForm = (props: AddNewMusicFormProps) => {
                 setFormData({
                   ...formData,
                   url: nextUrl,
-                  type: "spotify",
                 });
               }}
               onBlur={async (e) => {
@@ -181,12 +170,10 @@ const AddNewMusicForm = (props: AddNewMusicFormProps) => {
             <Textarea
               id="description"
               maxLength={200}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Digite uma descrição"
               rows={3}
-              value={formData.description}
+              value={description}
             />
           </div>
 

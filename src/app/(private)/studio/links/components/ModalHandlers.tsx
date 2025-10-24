@@ -194,9 +194,8 @@ export const useModalHandlers = ({
             await handleAddNewMusic();
             setMusicFormData({
                 title: "",
-                description: "",
                 url: "",
-                type: "spotify",
+                usePreview: true,
                 sectionId: null,
             });
             onClose();

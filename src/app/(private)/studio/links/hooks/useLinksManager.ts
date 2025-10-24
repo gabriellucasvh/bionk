@@ -1005,7 +1005,7 @@ export const useLinksManager = (
 		setOriginalImage(null);
 	};
 
-	const handleAddNewMusic = () => {
+	const handleAddNewMusic = async () => {
 		const id = Date.now();
 		const order = -1;
 		const draft: MusicItem = {
