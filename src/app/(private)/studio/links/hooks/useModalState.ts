@@ -19,6 +19,7 @@ export const useModalState = () => {
 		| "twitch"
 		| "spotify"
         | "deezer"
+        | "apple"
         | "image_single"
         | "image_column"
         | "image_carousel"
@@ -114,7 +115,8 @@ export const useModalState = () => {
 			| "tiktok"
 			| "twitch"
 			| "spotify"
-            | "deezer"
+			| "deezer"
+			| "apple"
 	) => {
 		setSelectedOption(option);
 	};

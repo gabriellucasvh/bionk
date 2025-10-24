@@ -131,14 +131,14 @@ const AddNewMusicForm = (props: AddNewMusicFormProps) => {
 									url: nextUrl,
 								});
 							}}
-							placeholder="Cole a URL do Spotify ou Deezer (track, album, playlist, episódio ou show; aceita link curto do Deezer)"
+							placeholder="Cole a URL do Spotify, Deezer ou Apple Music (track, album, playlist; Spotify também episódio e show; aceita link curto do Deezer)"
 							type="url"
 							value={formData.url}
 						/>
 						{urlError && <p className="text-destructive text-xs">{urlError}</p>}
 						<p className="text-muted-foreground text-xs">
-							Suportamos links do Spotify e Deezer (track, album, playlist;
-							Spotify também episódio e show). Links curtos do Deezer
+							Suportamos links do Spotify, Deezer e Apple Music (track, album,
+							playlist; Spotify também episódio e show). Links curtos do Deezer
 							(link.deezer.com) são aceitos.
 						</p>
 					</div>

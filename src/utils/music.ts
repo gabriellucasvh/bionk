@@ -1,4 +1,4 @@
-export type MusicPlatform = "spotify" | "deezer" | "unknown";
+export type MusicPlatform = "spotify" | "deezer" | "apple" | "unknown";
 export type MusicType =
 	| "track"
 	| "album"
@@ -24,12 +24,19 @@ export interface MusicMetadata {
 	thumbnailUrl?: string;
 }
 
+// Precompiled regex (top-level) to avoid per-call construction
+const REGEX_HTTP_PROTOCOL = /^https?:\/\//i;
+const REGEX_DEEZER_LOCALE = /^[a-z]{2}(-[a-z]{2})?$/i;
+const REGEX_APPLE_LOCALE = /^(?:[a-z]{2}(?:-[a-z]{2})?|geo)$/i;
+const REGEX_NUMERIC_ID = /^\d+$/;
+const REGEX_APPLE_PL_PREFIX = /^pl\./i;
+
 export const ensureHttps = (url: string): string => {
 	const trimmed = (url || "").trim();
 	if (trimmed.length === 0) {
 		return url;
 	}
-	if (/^https?:\/\//i.test(trimmed)) {
+	if (REGEX_HTTP_PROTOCOL.test(trimmed)) {
 		return trimmed;
 	}
 	return `https://${trimmed}`;
@@ -43,6 +50,7 @@ const SPOTIFY_TYPES = new Set([
 	"show",
 ]);
 const DEEZER_TYPES = new Set(["track", "album", "playlist"]);
+const APPLE_TYPES = new Set(["song", "album", "playlist"]);
 
 export const detectPlatform = (url: string): MusicPlatform => {
 	const u = (url || "").toLowerCase();
@@ -51,6 +59,9 @@ export const detectPlatform = (url: string): MusicPlatform => {
 	}
 	if (u.includes("deezer.com")) {
 		return "deezer";
+	}
+	if (u.includes("music.apple.com") || u.includes("itunes.apple.com")) {
+		return "apple";
 	}
 	return "unknown";
 };
@@ -74,7 +85,7 @@ export const parseMusicUrl = (url: string): ParsedMusicUrl => {
 		if (u.hostname.includes("deezer.com")) {
 			const parts = u.pathname.split("/").filter(Boolean);
 			// Deezer may have optional locale segment: /br/, /en/, etc.
-			const startIdx = /^[a-z]{2}(-[a-z]{2})?$/i.test(parts[0] || "") ? 1 : 0;
+			const startIdx = REGEX_DEEZER_LOCALE.test(parts[0] || "") ? 1 : 0;
 			for (let i = startIdx; i < parts.length - 1; i++) {
 				const t = parts[i];
 				const id = parts[i + 1];
@@ -83,6 +94,49 @@ export const parseMusicUrl = (url: string): ParsedMusicUrl => {
 				}
 			}
 			return { platform: "deezer", type: "unknown", id: null };
+		}
+		if (
+			u.hostname.includes("music.apple.com") ||
+			u.hostname.includes("itunes.apple.com")
+		) {
+			const parts = u.pathname.split("/").filter(Boolean);
+			// Apple may have country/locale as first segment (e.g., /us/, /br/, /geo)
+			const first = parts[0] || "";
+			const startIdx = REGEX_APPLE_LOCALE.test(first) ? 1 : 0;
+			for (let i = startIdx; i < parts.length; i++) {
+				const t = parts[i];
+				if (APPLE_TYPES.has(t)) {
+					// Find the best candidate ID in subsequent segments
+					let candidateId: string | null = null;
+					for (let j = i + 1; j < parts.length; j++) {
+						const seg = parts[j];
+						if (REGEX_NUMERIC_ID.test(seg)) {
+							candidateId = seg;
+							break;
+						}
+						if (t === "playlist" && REGEX_APPLE_PL_PREFIX.test(seg)) {
+							candidateId = seg;
+							break;
+						}
+					}
+					// Fall back to track id in query for album pages
+					const trackQueryId = u.searchParams.get("i");
+					const mappedType = t === "song" ? "track" : (t as MusicType);
+					if (candidateId) {
+						return { platform: "apple", type: mappedType, id: candidateId };
+					}
+					if (trackQueryId) {
+						return { platform: "apple", type: "track", id: trackQueryId };
+					}
+					return { platform: "apple", type: mappedType, id: null };
+				}
+			}
+			// Handle album path with track param (?i=trackId) even if types not detected
+			const trackId = u.searchParams.get("i");
+			if (trackId) {
+				return { platform: "apple", type: "track", id: trackId };
+			}
+			return { platform: "apple", type: "unknown", id: null };
 		}
 		return { platform: "unknown", type: "unknown", id: null };
 	} catch {
@@ -101,6 +155,10 @@ export const getCanonicalUrl = (url: string): string => {
 	if (parsed.platform === "deezer") {
 		return `https://www.deezer.com/${parsed.type}/${parsed.id}`;
 	}
+	if (parsed.platform === "apple") {
+		// Apple canonical URLs are often sluggified; return original
+		return ensureHttps(url);
+	}
 	return ensureHttps(url);
 };
 
@@ -117,6 +175,22 @@ export const getEmbedUrl = (
 	}
 	if (parsed.platform === "deezer") {
 		return `https://widget.deezer.com/widget/${theme}/${parsed.type}/${parsed.id}`;
+	}
+	if (parsed.platform === "apple") {
+		// Default to US if locale not determinable from URL
+		let country = "us";
+		try {
+			const u = new URL(ensureHttps(url));
+			const parts = u.pathname.split("/").filter(Boolean);
+			const first = parts[0] || "";
+			if (REGEX_APPLE_LOCALE.test(first)) {
+				country = first.toLowerCase() === "geo" ? "us" : first.toLowerCase();
+			}
+		} catch {
+			// keep default
+		}
+		const appleType = parsed.type === "track" ? "song" : parsed.type;
+		return `https://embed.music.apple.com/${country}/${appleType}/${parsed.id}`;
 	}
 	return ensureHttps(url);
 };
@@ -163,15 +237,18 @@ export async function fetchMetadataFromProvider(
 				};
 			}
 			if (parsed.type === "album") {
+				const contributorName =
+					Array.isArray(data?.contributors) && data.contributors.length > 0
+						? (data.contributors[0]?.name ?? "")
+						: "";
+				const authorNameSafe = data?.artist?.name ?? contributorName;
+				const authorNameStr =
+					typeof authorNameSafe === "string" ? authorNameSafe : "";
 				return {
 					title: (data?.title || "").toString() || undefined,
-					authorName:
-						(
-							data?.artist?.name ||
-							data?.contributors?.[0]?.name ||
-							""
-						).toString() || undefined,
-					thumbnailUrl: (data?.cover_medium || "").toString() || undefined,
+					authorName: authorNameStr.trim() || undefined,
+					thumbnailUrl:
+						(data?.cover_medium || data?.cover || "").toString() || undefined,
 				};
 			}
 			if (parsed.type === "playlist") {
@@ -180,6 +257,65 @@ export async function fetchMetadataFromProvider(
 					authorName: (data?.creator?.name || "").toString() || undefined,
 					thumbnailUrl: (data?.picture_medium || "").toString() || undefined,
 				};
+			}
+			return {};
+		}
+		if (parsed.platform === "apple") {
+			// Use iTunes Search API for Apple Music metadata when possible
+			// Track
+			if (parsed.type === "track") {
+				const res = await fetch(
+					`https://itunes.apple.com/lookup?id=${encodeURIComponent(parsed.id)}`
+				);
+				if (!res.ok) {
+					return {};
+				}
+				const data = await res.json();
+				const item = Array.isArray(data?.results) ? data.results[0] : undefined;
+				const title = (
+					item?.trackName ||
+					item?.collectionName ||
+					""
+				).toString();
+				const authorName = (item?.artistName || "").toString();
+				let thumb = (item?.artworkUrl100 || "").toString();
+				if (thumb) {
+					thumb = thumb.replace("100x100bb", "300x300bb");
+				}
+				return {
+					title: title.trim() || undefined,
+					authorName: authorName.trim() || undefined,
+					thumbnailUrl: thumb.trim() || undefined,
+				};
+			}
+			// Album
+			if (parsed.type === "album") {
+				const res = await fetch(
+					`https://itunes.apple.com/lookup?id=${encodeURIComponent(parsed.id)}&entity=song`
+				);
+				if (!res.ok) {
+					return {};
+				}
+				const data = await res.json();
+				// First result is the album, subsequent are tracks
+				const album = Array.isArray(data?.results)
+					? data.results[0]
+					: undefined;
+				const title = (album?.collectionName || "").toString();
+				const authorName = (album?.artistName || "").toString();
+				let thumb = (album?.artworkUrl100 || "").toString();
+				if (thumb) {
+					thumb = thumb.replace("100x100bb", "300x300bb");
+				}
+				return {
+					title: title.trim() || undefined,
+					authorName: authorName.trim() || undefined,
+					thumbnailUrl: thumb.trim() || undefined,
+				};
+			}
+			// Playlist: limited metadata without Apple auth; return empty
+			if (parsed.type === "playlist") {
+				return {};
 			}
 			return {};
 		}

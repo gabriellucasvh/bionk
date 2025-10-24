@@ -41,6 +41,11 @@ module.exports = {
 				hostname: "cdn-images.dzcdn.net",
 				pathname: "/**",
 			},
+			{
+				protocol: "https",
+				hostname: "is1-ssl.mzstatic.com",
+				pathname: "/**",
+			},
 		],
 		qualities: [25, 50, 75, 90, 95, 100],
 	},
