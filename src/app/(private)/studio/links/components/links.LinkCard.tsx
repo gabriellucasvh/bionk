@@ -9,10 +9,8 @@ import {
 	Lock,
 	MoreVertical,
 	MousePointerClick,
-	Save,
 	Tags,
 	Trash2,
-	X,
 	Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -485,7 +483,6 @@ const EditingView = ({
 
 				<div className="flex justify-end gap-2">
 					<BaseButton onClick={() => onCancelEditing(link.id)} variant="white">
-						<X className="mr-2 h-4 w-4" />
 						Cancelar
 					</BaseButton>
 					<BaseButton
@@ -493,7 +490,6 @@ const EditingView = ({
 						loading={isLoading}
 						onClick={handleSave}
 					>
-						<Save className="mr-2 h-4 w-4" />
 						Salvar
 					</BaseButton>
 				</div>
@@ -618,15 +614,17 @@ const LinkActionButtons = ({
 					</AlertDialogTitle>
 					<AlertDialogDescription>
 						{isLinkAnimated
-							? `Esta ação desativará a animação do link.`
-							: `Esta ação fará o link dar uma tremidinha infinita na sua página para chamar atenção dos visitantes.`}
+							? "Esta ação desativará a animação do link."
+							: "Esta ação fará o link dar uma tremidinha infinita na sua página para chamar atenção dos visitantes."}
 						Deseja continuar?
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel className="rounded-full ">Cancelar</AlertDialogCancel>
+					<AlertDialogCancel className="rounded-full ">
+						Cancelar
+					</AlertDialogCancel>
 					<AlertDialogAction
-						className="bg-lime-400 hover:bg-lime-500 rounded-full text-black"
+						className="rounded-full bg-lime-400 text-black hover:bg-lime-500"
 						onClick={async () => {
 							if (isExpired) {
 								return;

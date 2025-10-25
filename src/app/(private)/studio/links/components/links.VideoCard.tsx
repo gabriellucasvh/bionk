@@ -5,10 +5,8 @@ import {
 	Edit,
 	Grip,
 	MoreVertical,
-	Save,
 	Trash2,
 	Video,
-	X,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -157,7 +155,6 @@ const EditingView = ({
 
 			<div className="flex justify-end gap-2">
 				<BaseButton onClick={handleCancel} variant="white">
-					<X className="mr-2 h-4 w-4" />
 					Cancelar
 				</BaseButton>
 				<BaseButton
@@ -165,7 +162,6 @@ const EditingView = ({
 					loading={isLoading}
 					onClick={handleSave}
 				>
-					<Save className="mr-2 h-4 w-4" />
 					Salvar
 				</BaseButton>
 			</div>

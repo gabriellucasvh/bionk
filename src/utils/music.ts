@@ -1,4 +1,10 @@
-export type MusicPlatform = "spotify" | "deezer" | "apple" | "soundcloud" | "audiomack" | "unknown";
+export type MusicPlatform =
+	| "spotify"
+	| "deezer"
+	| "apple"
+	| "soundcloud"
+	| "audiomack"
+	| "unknown";
 export type MusicType =
 	| "track"
 	| "album"
@@ -51,6 +57,7 @@ const SPOTIFY_TYPES = new Set([
 ]);
 const DEEZER_TYPES = new Set(["track", "album", "playlist"]);
 const APPLE_TYPES = new Set(["song", "album", "playlist"]);
+
 
 export const detectPlatform = (url: string): MusicPlatform => {
 	const u = (url || "").toLowerCase();
@@ -145,13 +152,19 @@ export const parseMusicUrl = (url: string): ParsedMusicUrl => {
 			return { platform: "apple", type: "unknown", id: null };
 		}
 		// SoundCloud embed URL: w.soundcloud.com/player/?url=<canonical>
-		if (u.hostname.includes("w.soundcloud.com") && u.pathname.includes("/player")) {
+		if (
+			u.hostname.includes("w.soundcloud.com") &&
+			u.pathname.includes("/player")
+		) {
 			const inner = u.searchParams.get("url") || "";
 			try {
 				const decoded = decodeURIComponent(inner);
 				const innerUrl = ensureHttps(decoded);
 				const innerHost = new URL(innerUrl).hostname;
-				if (innerHost.includes("soundcloud.com") || innerHost.includes("on.soundcloud.com")) {
+				if (
+					innerHost.includes("soundcloud.com") ||
+					innerHost.includes("on.soundcloud.com")
+				) {
 					const parts = new URL(innerUrl).pathname.split("/").filter(Boolean);
 					const isPlaylist = parts.includes("sets");
 					const type: MusicType = isPlaylist ? "playlist" : "track";
@@ -163,7 +176,10 @@ export const parseMusicUrl = (url: string): ParsedMusicUrl => {
 				return { platform: "soundcloud", type: "track", id: normalized };
 			}
 		}
-		if (u.hostname.includes("soundcloud.com") || u.hostname.includes("on.soundcloud.com")) {
+		if (
+			u.hostname.includes("soundcloud.com") ||
+			u.hostname.includes("on.soundcloud.com")
+		) {
 			const parts = u.pathname.split("/").filter(Boolean);
 			// Tipo: playlist se conter /sets/, senão presumimos track
 			const isPlaylist = parts.includes("sets");
@@ -180,21 +196,39 @@ export const parseMusicUrl = (url: string): ParsedMusicUrl => {
 				const t = parts[1];
 				const artist = parts[2];
 				const slug = parts[3];
-				if (t && artist && slug && (t === "song" || t === "album" || t === "playlist")) {
-					const mappedType: MusicType = t === "song" ? "track" : (t as MusicType);
-					return { platform: "audiomack", type: mappedType, id: `${artist}/${slug}` };
-				}
-				return { platform: "audiomack", type: "unknown", id: null };
-			} else {
-				const artist = parts[0];
-				const t = parts[1];
-				const slug = parts[2];
-				if (artist && t && slug && (t === "song" || t === "album" || t === "playlist")) {
-					const mappedType: MusicType = t === "song" ? "track" : (t as MusicType);
-					return { platform: "audiomack", type: mappedType, id: `${artist}/${slug}` };
+				if (
+					t &&
+					artist &&
+					slug &&
+					(t === "song" || t === "album" || t === "playlist")
+				) {
+					const mappedType: MusicType =
+						t === "song" ? "track" : (t as MusicType);
+					return {
+						platform: "audiomack",
+						type: mappedType,
+						id: `${artist}/${slug}`,
+					};
 				}
 				return { platform: "audiomack", type: "unknown", id: null };
 			}
+			const artist = parts[0];
+			const t = parts[1];
+			const slug = parts[2];
+			if (
+				artist &&
+				t &&
+				slug &&
+				(t === "song" || t === "album" || t === "playlist")
+			) {
+				const mappedType: MusicType = t === "song" ? "track" : (t as MusicType);
+				return {
+					platform: "audiomack",
+					type: mappedType,
+					id: `${artist}/${slug}`,
+				};
+			}
+			return { platform: "audiomack", type: "unknown", id: null };
 		}
 		return { platform: "unknown", type: "unknown", id: null };
 	} catch {
@@ -283,9 +317,9 @@ function extractMetaContent(html: string, property: string): string | null {
 		"i"
 	);
 	const propMatch = html.match(propRegex);
-	if (propMatch && propMatch[1]) return propMatch[1];
+	if (propMatch && propMatch[1]) {return propMatch[1]};
 	const nameMatch = html.match(nameRegex);
-	if (nameMatch && nameMatch[1]) return nameMatch[1];
+	if (nameMatch && nameMatch[1]) {return nameMatch[1]};
 	return null;
 }
 
@@ -415,7 +449,7 @@ export async function fetchMetadataFromProvider(
 		}
 		if (parsed.platform === "soundcloud") {
 			const canonical = parsed.id ? ensureHttps(parsed.id) : "";
-			if (!canonical) return {};
+			if (!canonical) {return {}};
 			const res = await fetch(
 				`https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(canonical)}`
 			);
@@ -448,7 +482,10 @@ export async function fetchMetadataFromProvider(
 				return { authorName: artist || undefined };
 			}
 			const html = await res.text();
-			const title = extractMetaContent(html, "og:title") || extractMetaContent(html, "twitter:title") || undefined;
+			const title =
+				extractMetaContent(html, "og:title") ||
+				extractMetaContent(html, "twitter:title") ||
+				undefined;
 			const thumbnail =
 				extractMetaContent(html, "og:image") ||
 				extractMetaContent(html, "twitter:image") ||
@@ -463,6 +500,41 @@ export async function fetchMetadataFromProvider(
 		return {};
 	} catch {
 		return {};
+	}
+}
+
+// Função de autocomplete para Deezer - busca sugestões baseadas no título
+export async function searchDeezerTracks(
+	query: string,
+	limit = 5
+): Promise<
+	Array<{
+		title: string;
+		artist: string;
+		url: string;
+		type: "track" | "album" | "playlist";
+	}>
+> {
+	if (!query.trim()) {return []};
+
+	try {
+		const searchUrl = `https://api.deezer.com/search?q=${encodeURIComponent(query)}&limit=${limit}`;
+		const res = await fetch(searchUrl);
+		if (!res.ok) {return []};
+
+		const data = await res.json();
+		const tracks = Array.isArray(data?.data) ? data.data : [];
+
+		return tracks
+			.map((track: any) => ({
+				title: track.title || "",
+				artist: track.artist?.name || "",
+				url: track.link || "",
+				type: "track" as const,
+			}))
+			.filter((item: any) => item.title && item.artist && item.url);
+	} catch {
+		return [];
 	}
 }
 

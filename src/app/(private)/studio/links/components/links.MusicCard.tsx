@@ -7,7 +7,6 @@ import {
 	MoreVertical,
 	Music2,
 	Trash2,
-	X,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -25,7 +24,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { fetchMetadataFromProvider, parseMusicUrl } from "@/utils/music";
+// Removido imports não utilizados após remoção do tryAutoFillTitle
 import type { MusicItem } from "../types/links.types";
 import { getMusicPlatform, isValidMusicUrl } from "../utils/music.helpers";
 
@@ -78,25 +77,8 @@ const EditingView = ({
 			music.usePreview !== (originalMusic.usePreview ?? false)
 		: true;
 
-	const tryAutoFillTitle = async (url: string) => {
-		try {
-			const { valid } = isValidMusicUrl(url);
-			if (!valid) {
-				return;
-			}
-			if ((music.title || "").trim().length > 0) {
-				return;
-			}
-			const parsed = parseMusicUrl(url);
-			const meta = await fetchMetadataFromProvider(parsed);
-			const nextTitle = (meta?.title || "").toString();
-			if (nextTitle.trim().length > 0) {
-				onMusicChange?.(music.id, "title", nextTitle);
-			}
-		} catch {
-			// silent
-		}
-	};
+	// Removido tryAutoFillTitle para evitar requisições desnecessárias durante edição
+	// Os metadados são buscados apenas na criação via API
 
 	const handleSave = async () => {
 		setIsLoading(true);
@@ -139,17 +121,13 @@ const EditingView = ({
 					<Input
 						aria-invalid={!!urlError}
 						id="music-url"
-						onBlur={async (e) => {
-							const nextUrl = e.target.value;
-							await tryAutoFillTitle(nextUrl);
-						}}
 						onChange={(e) => {
 							const nextUrl = e.target.value;
 							const { valid, error } = isValidMusicUrl(nextUrl);
 							setUrlError(valid ? null : error || null);
 							onMusicChange?.(music.id, "url", nextUrl);
 						}}
-						placeholder="Cole a URL da música (Spotify)"
+						placeholder="Cole a URL da música"
 						value={music.url}
 					/>
 					{urlError && <p className="text-destructive text-xs">{urlError}</p>}
@@ -189,17 +167,16 @@ const EditingView = ({
 			</div>
 
 			<div className="flex justify-end gap-2">
+				<BaseButton onClick={handleCancel} variant="white">
+					Cancelar
+				</BaseButton>
 				<BaseButton
-					className="px-4"
 					disabled={!hasChanges || !!urlError}
 					loading={isLoading}
 					onClick={handleSave}
 				>
 					Salvar
 				</BaseButton>
-				<Button onClick={handleCancel} variant="outline">
-					<X className="mr-2 h-4 w-4" /> Cancelar
-				</Button>
 			</div>
 		</div>
 	);
