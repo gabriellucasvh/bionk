@@ -306,19 +306,28 @@ async function createPreapprovalWithRetry(
 			// biome-ignore lint/nursery/noAwaitInLoop: Sequential retry is intentional
 			return await preapproval.create({ body: preapprovalData });
 		} catch (error: any) {
-			if (
-				error.message?.includes("does not exist") &&
-				retryCount < maxRetries - 1
-			) {
+			const message = error?.message || "";
+			if (message.includes("does not exist") && retryCount < maxRetries - 1) {
+				const delayMs = 2000 * 2 ** retryCount;
 				logInfo(`Plan not found, retrying (${retryCount + 1}/${maxRetries})`, {
 					preapprovalPlanId,
-					error: error.message,
+					error: message,
+					delayMs,
 				});
-				// Aguardar mais tempo antes do retry
-				await new Promise((resolve) => setTimeout(resolve, 2000));
-			} else {
-				throw error;
+				await new Promise((resolve) => setTimeout(resolve, delayMs));
+				continue;
 			}
+
+			// Fallback: se plano não existir, tentar criar sem preapproval_plan_id
+			if (message.includes("does not exist") && preapprovalData?.preapproval_plan_id) {
+				logInfo("Plan still not available; falling back without preapproval_plan_id", {
+					preapprovalPlanId,
+				});
+				const { preapproval_plan_id: _, ...fallbackData } = preapprovalData;
+				return await preapproval.create({ body: fallbackData });
+			}
+
+			throw error;
 		}
 	}
 
@@ -358,8 +367,8 @@ async function createPlanIfNeeded(
 			);
 			logInfo("Preapproval plan created for production", { preapprovalPlanId });
 
-			// Aguardar um pouco para o plano ser ativado no MP
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			// Aguardar mais tempo para o plano ser ativado no MP (propagação)
+			await new Promise((resolve) => setTimeout(resolve, 5000));
 			logInfo("Waited for plan activation", { preapprovalPlanId });
 			return preapprovalPlanId;
 		} catch (planError) {
