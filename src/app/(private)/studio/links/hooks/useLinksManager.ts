@@ -275,8 +275,27 @@ export const useLinksManager = (
 			...musicItems,
 		];
 
-		// Ordenar todos os itens juntos por order
-		allItems.sort((a, b) => a.order - b.order);
+		// Ordenar todos os itens juntos por order, com fallback estável
+		const getOrder = (item: any) =>
+			typeof item.order === "number" && Number.isFinite(item.order)
+				? item.order
+				: 0;
+		const typeRank = (item: UnifiedItem) =>
+			item.isSection
+				? 0
+				: item.isText
+					? 1
+					: item.isVideo
+						? 2
+						: (item as any).isImage
+							? 3
+							: (item as any).isMusic
+								? 4
+								: 5;
+		allItems.sort(
+			(a, b) =>
+				getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
+		);
 		setUnifiedItems(allItems);
 	}, [
 		currentLinks,
@@ -414,6 +433,16 @@ export const useLinksManager = (
 					);
 				}
 
+				if (musicItems.length > 0) {
+					promises.push(
+						fetch("/api/musics/reorder", {
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ items: musicItems }),
+						})
+					);
+				}
+
 				await Promise.all(promises);
 
 				// Atualizar o estado local imediatamente para refletir as mudanças
@@ -456,10 +485,11 @@ export const useLinksManager = (
 
 		// Helper que reflete exatamente os IDs usados no LinkList
 		const getSortableId = (item: UnifiedItem) => {
-			if (item.isSection) return `section-${item.id}`;
-			if (item.isText) return `text-${item.id}`;
-			if (item.isVideo) return `video-${item.id}`;
-			if ((item as any).isImage) return `image-${item.id}`;
+			if (item.isSection){ return `section-${item.id}`};
+			if (item.isText) {return `text-${item.id}`};
+			if (item.isVideo) {return `video-${item.id}`};
+			if ((item as any).isImage) {return `image-${item.id}`};
+			if ((item as any).isMusic) {return `music-${item.id}`};
 			return `link-${item.id}`;
 		};
 
@@ -1026,7 +1056,11 @@ export const useLinksManager = (
 			const cleaned = prev
 				.filter((item) => !(item as any).isDraft)
 				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
-			const next = [draft, ...cleaned];
+			// Garante que o rascunho de música vá para o topo, como nos links
+			const lowest =
+				cleaned.length > 0 ? Math.min(...cleaned.map((i) => i.order)) : 0;
+			const draftAtTop = { ...draft, order: lowest - 1 } as UnifiedItem;
+			const next = [draftAtTop, ...cleaned];
 			return next.sort((a, b) => a.order - b.order);
 		});
 		setOriginalMusic(null);

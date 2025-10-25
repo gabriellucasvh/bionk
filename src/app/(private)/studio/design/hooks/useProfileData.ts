@@ -63,6 +63,7 @@ export const useProfileData = (
 		Video: [],
 		SocialLink: [],
 		Image: [],
+		Music: [],
 	});
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
 
