@@ -232,7 +232,7 @@ const EditingView = ({
 					Cancelar
 				</BaseButton>
 				<BaseButton
-					disabled={!hasChanges || !!urlError}
+					disabled={!music.url.trim() || !!urlError || !hasChanges}
 					loading={isLoading}
 					onClick={handleSave}
 				>

@@ -679,7 +679,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 						type="button"
 						variant="white"
 					>
-						<X className="mr-2 h-4 w-4" /> Cancelar
+						Cancelar
 					</BaseButton>
 					<BaseButton
 						className="px-4"
@@ -688,7 +688,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 						onClick={handleSave}
 						type="button"
 					>
-						<Save className="mr-2 h-4 w-4" /> Salvar
+						Salvar
 					</BaseButton>
 				</div>
 			</div>

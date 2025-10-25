@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,7 +70,7 @@ const AddNewSectionForm = ({
                         type="button"
                         variant="white"
                     >
-                        <X className="mr-2 h-4 w-4" /> Cancelar
+                        Cancelar
                     </BaseButton>
                     <BaseButton
                         className="px-4"
@@ -80,7 +79,7 @@ const AddNewSectionForm = ({
                         onClick={handleSave}
                         type="button"
                     >
-                        Criar Seção
+                        Salvar
                     </BaseButton>
                 </div>
             </div>
