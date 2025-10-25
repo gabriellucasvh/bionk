@@ -260,11 +260,7 @@ async function createPreapprovalPlan(
 				transaction_amount: transactionAmount / 100,
 				currency_id: "BRL",
 			},
-			back_urls: {
-				success: `${baseUrl}/checkout/success`,
-				failure: `${baseUrl}/checkout/failure`,
-				pending: `${baseUrl}/checkout/pending`,
-			},
+			back_url: `${baseUrl}/checkout/success`,
 		};
 
 		logInfo("Creating preapproval plan", { planData });
@@ -402,11 +398,7 @@ function buildPreapprovalData(
 			start_date: startDate.toISOString(),
 			end_date: endDate.toISOString(),
 		},
-		back_urls: {
-			success: `${baseUrl}/checkout/success`,
-			failure: `${baseUrl}/checkout/failure`,
-			pending: `${baseUrl}/checkout/pending`,
-		},
+		back_url: `${baseUrl}/checkout/success`,
 		external_reference: userId,
 		notification_url: `${baseUrl}/api/mercadopago/webhook`,
 	};
