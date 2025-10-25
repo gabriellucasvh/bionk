@@ -1,6 +1,6 @@
 "use client";
 
-import { Image as ImageIcon, Plus, Video, Music } from "lucide-react";
+import { Image as ImageIcon, Music, Plus, Video } from "lucide-react";
 
 interface CategorySelectorProps {
 	selectedCategory: "content" | "video" | "image" | "music" | null;
@@ -15,7 +15,7 @@ const CategorySelector = ({
 		<div className="space-y-2">
 			<button
 				aria-pressed={selectedCategory === "content"}
-				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 ${
+				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-900/30 ${
 					selectedCategory === "content"
 						? "bg-zinc-200 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300"
 						: ""
@@ -29,7 +29,7 @@ const CategorySelector = ({
 
 			<button
 				aria-pressed={selectedCategory === "video"}
-				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 ${
+				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-900/30 ${
 					selectedCategory === "video"
 						? "bg-zinc-200 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300"
 						: ""
@@ -43,7 +43,7 @@ const CategorySelector = ({
 
 			<button
 				aria-pressed={selectedCategory === "music"}
-				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 ${
+				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-900/30 ${
 					selectedCategory === "music"
 						? "bg-zinc-200 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300"
 						: ""
@@ -57,7 +57,7 @@ const CategorySelector = ({
 
 			<button
 				aria-pressed={selectedCategory === "image"}
-				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 ${
+				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-900/30 ${
 					selectedCategory === "image"
 						? "bg-zinc-200 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300"
 						: ""
