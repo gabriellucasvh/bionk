@@ -12,7 +12,7 @@ const HeaderProps = [
 	{ label: "Templates", href: "/templates" },
 	{ label: "Planos", href: "/planos" },
 	{ label: "Descubra", href: "/descubra" },
-	{ label: "Ajuda", href: "/ajuda" },
+	{ label: "Ajuda", href: "https://ajuda.bionk.me" },
 ];
 
 const Header: React.FC = () => {

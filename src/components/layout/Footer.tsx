@@ -5,7 +5,7 @@ import React from "react";
 
 const navigation = {
 	resources: [
-		{ name: "Ajuda", href: "/ajuda" },
+		{ name: "Ajuda", href: "https://ajuda.bionk.me" },
 		{ name: "Descubra", href: "/descubra" },
 		{ name: "Templates", href: "/templates" },
 		{ name: "Preços e Planos", href: "/planos" },

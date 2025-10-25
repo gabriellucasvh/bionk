@@ -28,7 +28,7 @@ export default function ContactPage() {
 							Você também pode consultar na{" "}
 							<Link
 								className="text-green-600 underline"
-								href={"/ajuda"}
+								href="https://ajuda.bionk.me"
 								rel="noopener noreferrer"
 								target="_blank"
 							>
