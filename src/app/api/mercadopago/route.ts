@@ -299,39 +299,20 @@ async function createPreapprovalWithRetry(
 	preapprovalData: any,
 	preapprovalPlanId?: string
 ): Promise<any> {
-	const maxRetries = 3;
-
-	for (let retryCount = 0; retryCount < maxRetries; retryCount++) {
-		try {
-			// biome-ignore lint/nursery/noAwaitInLoop: Sequential retry is intentional
-			return await preapproval.create({ body: preapprovalData });
-		} catch (error: any) {
-			const message = error?.message || "";
-			if (message.includes("does not exist") && retryCount < maxRetries - 1) {
-				const delayMs = 2000 * 2 ** retryCount;
-				logInfo(`Plan not found, retrying (${retryCount + 1}/${maxRetries})`, {
-					preapprovalPlanId,
-					error: message,
-					delayMs,
-				});
-				await new Promise((resolve) => setTimeout(resolve, delayMs));
-				continue;
-			}
-
-			// Fallback: se plano não existir, tentar criar sem preapproval_plan_id
-			if (message.includes("does not exist") && preapprovalData?.preapproval_plan_id) {
-				logInfo("Plan still not available; falling back without preapproval_plan_id", {
-					preapprovalPlanId,
-				});
-				const { preapproval_plan_id: _, ...fallbackData } = preapprovalData;
-				return await preapproval.create({ body: fallbackData });
-			}
-
-			throw error;
+	try {
+		return await preapproval.create({ body: preapprovalData });
+	} catch (error: any) {
+		const message = error?.message || "";
+		// Se o template do plano ainda não estiver disponível, cair para fallback sem esperas
+		if (message.includes("does not exist") && preapprovalData?.preapproval_plan_id) {
+			logInfo("Plan not available; falling back without preapproval_plan_id", {
+				preapprovalPlanId,
+			});
+			const { preapproval_plan_id: _, ...fallbackData } = preapprovalData;
+			return await preapproval.create({ body: fallbackData });
 		}
+		throw error;
 	}
-
-	throw new Error("Failed to create preapproval after all retries");
 }
 
 // Função para detectar ambiente de teste
@@ -367,8 +348,8 @@ async function createPlanIfNeeded(
 			);
 			logInfo("Preapproval plan created for production", { preapprovalPlanId });
 
-			// Aguardar mais tempo para o plano ser ativado no MP (propagação)
-			await new Promise((resolve) => setTimeout(resolve, 5000));
+			// Aguardar breve tempo para o plano ser ativado no MP (limitar total < 10s)
+			await new Promise((resolve) => setTimeout(resolve, 1000));
 			logInfo("Waited for plan activation", { preapprovalPlanId });
 			return preapprovalPlanId;
 		} catch (planError) {
