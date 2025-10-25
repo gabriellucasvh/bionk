@@ -2,7 +2,7 @@
 
 import { MoreVertical } from "lucide-react";
 import Image from "next/image";
-import * as React from "react";
+import React from "react";
 import LinkOptionsModal from "@/components/modals/LinkOptionsModal";
 import { cn } from "@/lib/utils";
 import type { UserLink } from "@/types/user-profile";

@@ -22,10 +22,10 @@ import { useModalState } from "../hooks/useModalState";
 import type { SectionItem } from "../types/links.types";
 import CategorySelector from "./CategorySelector";
 import ContentOptions from "./ContentOptions";
-import FormRenderer from "./FormRenderer";
+
 import ImageOptions from "./ImageOptions";
 import MobileBottomSheet from "./MobileBottomSheet";
-import { useModalHandlers } from "./ModalHandlers";
+
 import MusicOptions from "./MusicOptions";
 import VideoOptions from "./VideoOptions";
 
@@ -70,33 +70,11 @@ const AddContentModal = ({
 	isOpen,
 	onClose,
 	onOpen,
-	isAdding,
-	isAddingSection,
-	isAddingText,
-	isAddingVideo,
-	isAddingImage,
-	isAddingMusic,
-	formData,
-	sectionFormData,
-	textFormData,
 	videoFormData,
-	imageFormData,
-	musicFormData,
-	existingSections,
-	setIsAdding,
 	setIsAddingSection,
-	setIsAddingText,
-	setIsAddingVideo,
 	setIsAddingImage,
-	setIsAddingMusic,
-	setFormData,
-	setSectionFormData,
-	setTextFormData,
 	setVideoFormData,
-	setImageFormData,
-	setMusicFormData,
 	handleAddNewLink,
-	handleAddNewSection,
 	handleAddNewText,
 	handleAddNewVideo,
 	handleAddNewImage,
@@ -105,7 +83,6 @@ const AddContentModal = ({
 	const {
 		isAnimating,
 		selectedCategory,
-		selectedOption,
 		isMobile,
 		handleCategorySelect,
 		setIsAnimating,
@@ -130,41 +107,7 @@ const AddContentModal = ({
 		handleTouchEnd,
 	} = useDragGesture(onClose);
 
-	const {
-		handleLinkSubmit,
-		handleSectionSubmit,
-		handleTextSubmit,
-		handleVideoSubmit,
-		handleImageSubmit,
-		handleMusicSubmit,
-		handleCancelWithState,
-	} = useModalHandlers({
-		formData,
-		sectionFormData,
-		textFormData,
-		videoFormData,
-		imageFormData,
-		musicFormData,
-		setFormData,
-		setSectionFormData,
-		setTextFormData,
-		setVideoFormData,
-		setImageFormData,
-		setMusicFormData,
-		setIsAdding,
-		setIsAddingSection,
-		setIsAddingText,
-		setIsAddingVideo,
-		setIsAddingImage,
-		setIsAddingMusic,
-		handleAddNewLink,
-		handleAddNewSection,
-		handleAddNewText,
-		handleAddNewVideo,
-		handleAddNewImage,
-		handleAddNewMusic,
-		onClose,
-	});
+
 
 	useEffect(() => {
 		if (isOpen && isMobile) {
@@ -246,16 +189,9 @@ const AddContentModal = ({
 		}
 
 		if (
-			["video", "youtube", "vimeo", "tiktok", "twitch"].includes(
-				validOption
-			)
+			["video", "youtube", "vimeo", "tiktok", "twitch"].includes(validOption)
 		) {
-			const videoType:
-				| "direct"
-				| "youtube"
-				| "vimeo"
-				| "tiktok"
-				| "twitch" =
+			const videoType: "direct" | "youtube" | "vimeo" | "tiktok" | "twitch" =
 				validOption === "video"
 					? "direct"
 					: (validOption as "youtube" | "vimeo" | "tiktok" | "twitch");
@@ -270,7 +206,13 @@ const AddContentModal = ({
 			return;
 		}
 
-		if (validOption === "spotify" || validOption === "deezer" || validOption === "apple" || validOption === "soundcloud" || validOption === "audiomack") {
+		if (
+			validOption === "spotify" ||
+			validOption === "deezer" ||
+			validOption === "apple" ||
+			validOption === "soundcloud" ||
+			validOption === "audiomack"
+		) {
 			onClose();
 			setTimeout(() => {
 				handleAddNewMusic();
@@ -322,65 +264,27 @@ const AddContentModal = ({
 					onMouseDown={handleMouseDown}
 					onTouchStart={handleTouchStart}
 				>
-					<FormRenderer
-						existingSections={existingSections}
-						formData={formData}
-						imageFormData={imageFormData}
-						musicFormData={musicFormData}
-						isAdding={isAdding}
-						isAddingImage={isAddingImage}
-						isAddingMusic={isAddingMusic}
-						isAddingSection={isAddingSection}
-						isAddingText={isAddingText}
-						isAddingVideo={isAddingVideo}
-						isMobile={true}
-						onBack={() => setSelectedOption(null)}
-						onCancel={handleCancelWithState}
-						onImageSubmit={handleImageSubmit}
-						onLinkSubmit={handleLinkSubmit}
-						onMusicSubmit={handleMusicSubmit}
-						onSectionSubmit={handleSectionSubmit}
-						onTextSubmit={handleTextSubmit}
-						onVideoSubmit={handleVideoSubmit}
-						sectionFormData={sectionFormData}
-						selectedOption={selectedOption}
-						setFormData={setFormData}
-						setImageFormData={setImageFormData}
-						setMusicFormData={setMusicFormData}
-						setSectionFormData={setSectionFormData}
-						setTextFormData={setTextFormData}
-						setVideoFormData={setVideoFormData}
-						textFormData={textFormData}
-						videoFormData={videoFormData}
-					/>
-
-					{!selectedOption && (
-						<>
-							<h2 className="mb-6 text-center font-semibold text-xl">
-								Adicionar Conteúdo
-							</h2>
-							<div className="flex flex-col space-y-4">
-								<CategorySelector
-									onCategorySelect={handleCategorySelect}
-									selectedCategory={selectedCategory}
-								/>
-								{selectedCategory === "content" && (
-									<ContentOptions
-										onOptionSelect={handleOptionSelectWithState}
-									/>
-								)}
-								{selectedCategory === "video" && (
-									<VideoOptions onOptionSelect={handleOptionSelectWithState} />
-								)}
-								{selectedCategory === "music" && (
-									<MusicOptions onOptionSelect={handleOptionSelectWithState} />
-								)}
-								{selectedCategory === "image" && (
-									<ImageOptions onOptionSelect={handleImageOptionSelect} />
-								)}
-							</div>
-						</>
-					)}
+						<h2 className="mb-6 text-center font-semibold text-xl">
+							Adicionar Conteúdo
+						</h2>
+						<div className="flex flex-col space-y-4">
+							<CategorySelector
+								onCategorySelect={handleCategorySelect}
+								selectedCategory={selectedCategory}
+							/>
+							{selectedCategory === "content" && (
+								<ContentOptions onOptionSelect={handleOptionSelectWithState} />
+							)}
+							{selectedCategory === "video" && (
+								<VideoOptions onOptionSelect={handleOptionSelectWithState} />
+							)}
+							{selectedCategory === "music" && (
+								<MusicOptions onOptionSelect={handleOptionSelectWithState} />
+							)}
+							{selectedCategory === "image" && (
+								<ImageOptions onOptionSelect={handleImageOptionSelect} />
+							)}
+						</div>
 				</MobileBottomSheet>
 			</>
 		);
@@ -401,74 +305,40 @@ const AddContentModal = ({
 						</DialogHeader>
 
 						<div className="flex-1 overflow-y-auto">
-							{selectedOption ? (
-								<div className="h-full">
-									<FormRenderer
-										existingSections={existingSections}
-										formData={formData}
-										imageFormData={imageFormData}
-										musicFormData={musicFormData}
-										isAdding={isAdding}
-										isAddingImage={isAddingImage}
-										isAddingMusic={isAddingMusic}
-										isAddingSection={isAddingSection}
-										isAddingText={isAddingText}
-										isAddingVideo={isAddingVideo}
-										isMobile={false}
-										onBack={() => setSelectedOption(null)}
-										onCancel={handleCancelWithState}
-										onImageSubmit={handleImageSubmit}
-										onLinkSubmit={handleLinkSubmit}
-										onMusicSubmit={handleMusicSubmit}
-										onSectionSubmit={handleSectionSubmit}
-										onTextSubmit={handleTextSubmit}
-										onVideoSubmit={handleVideoSubmit}
-										sectionFormData={sectionFormData}
-										selectedOption={selectedOption}
-										setFormData={setFormData}
-										setImageFormData={setImageFormData}
-										setMusicFormData={setMusicFormData}
-										setSectionFormData={setSectionFormData}
-										setTextFormData={setTextFormData}
-										setVideoFormData={setVideoFormData}
-										textFormData={textFormData}
-										videoFormData={videoFormData}
+							<div className="flex h-full">
+								<div className="w-48 border-r p-2">
+									<CategorySelector
+										onCategorySelect={handleCategorySelect}
+										selectedCategory={selectedCategory}
 									/>
 								</div>
-							) : (
-								<div className="flex h-full">
-									<div className="w-48 border-r p-2">
-										<CategorySelector
-											onCategorySelect={handleCategorySelect}
-											selectedCategory={selectedCategory}
-										/>
-									</div>
 
-									<div className="flex-1 p-4">
-										{selectedCategory === "content" && (
-											<ContentOptions
-												onOptionSelect={handleOptionSelectWithState}
-											/>
-										)}
-										{selectedCategory === "video" && (
-											<VideoOptions
-												onOptionSelect={handleOptionSelectWithState}
-											/>
-										)}
-										{selectedCategory === "music" && (
-											<MusicOptions onOptionSelect={handleOptionSelectWithState} />
-										)}
-										{selectedCategory === "image" && (
-											<ImageOptions onOptionSelect={handleImageOptionSelect} />
-										)}
-										{!selectedCategory && (
-											<div className="flex items-start justify-center pt-8 text-muted-foreground">
-												Selecione uma categoria para ver as opções
-											</div>
-										)}
-									</div>
+								<div className="flex-1 p-4">
+									{selectedCategory === "content" && (
+										<ContentOptions
+											onOptionSelect={handleOptionSelectWithState}
+										/>
+									)}
+									{selectedCategory === "video" && (
+										<VideoOptions
+											onOptionSelect={handleOptionSelectWithState}
+										/>
+									)}
+									{selectedCategory === "music" && (
+										<MusicOptions
+											onOptionSelect={handleOptionSelectWithState}
+										/>
+									)}
+									{selectedCategory === "image" && (
+										<ImageOptions onOptionSelect={handleImageOptionSelect} />
+									)}
+									{!selectedCategory && (
+										<div className="flex items-start justify-center pt-8 text-muted-foreground">
+											Selecione uma categoria para ver as opções
+										</div>
+									)}
 								</div>
-							)}
+							</div>
 						</div>
 					</div>
 				</DialogContent>
