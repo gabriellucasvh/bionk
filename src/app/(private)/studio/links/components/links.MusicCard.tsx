@@ -9,7 +9,7 @@ import {
 	Trash2,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import {
@@ -77,8 +77,48 @@ const EditingView = ({
 			music.usePreview !== (originalMusic.usePreview ?? false)
 		: true;
 
-	// Removido tryAutoFillTitle para evitar requisições desnecessárias durante edição
-	// Os metadados são buscados apenas na criação via API
+	// Debounce de 500ms para auto-preencher título quando a URL for válida e o título estiver vazio
+	const lastAutoFillUrlRef = useRef<string | null>(null);
+	useEffect(() => {
+		const currentTitle = (music.title || "").trim();
+		const currentUrl = (music.url || "").trim();
+		if (!currentUrl || currentTitle.length > 0) {
+			return;
+		}
+		const { valid } = isValidMusicUrl(currentUrl);
+		if (!valid) {
+			return;
+		}
+
+		let cancelled = false;
+		const timer = setTimeout(async () => {
+			try {
+				// Evitar repetição para mesma URL
+				if (lastAutoFillUrlRef.current === currentUrl) {
+					return;
+				}
+
+				// Buscar no servidor para evitar CORS (Deezer/Audiomack)
+				const resp = await fetch(`/api/music/metadata?url=${encodeURIComponent(currentUrl)}`);
+				if (!resp.ok) {
+					return;
+				}
+				const json = await resp.json();
+				const nextTitle = (json?.metadata?.title || "").trim();
+				if (!cancelled && nextTitle) {
+					onMusicChange?.(music.id, "title", nextTitle);
+					lastAutoFillUrlRef.current = currentUrl;
+				}
+			} catch {
+				// Silencioso: não bloquear edição caso meta falhe
+			}
+		}, 500);
+
+		return () => {
+			cancelled = true;
+			clearTimeout(timer);
+		};
+	}, [music.title, music.url, onMusicChange, music.id]);
 
 	const handleSave = async () => {
 		setIsLoading(true);
