@@ -4,6 +4,8 @@
 
 import { ExternalLink, Flag } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { FC } from "react";
 import {
 	Dialog,
@@ -19,12 +21,22 @@ import ShareSheet from "../ShareSheet";
 interface LinkOptionsModalProps {
 	link: UserLink | null;
 	onOpenChange: (isOpen: boolean) => void;
+	username?: string;
 }
 
 const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 	link,
 	onOpenChange,
+	username,
 }) => {
+	// Hooks devem ser chamados no topo do componente
+	const pathname = usePathname();
+	const usernameFromPath = (pathname || "")
+		.split("/")
+		.filter(Boolean)[0] || "";
+	const ownerUsername = username || usernameFromPath || "";
+	const reportHref = `/reportar-violacao?ref=linkoptionsmodal&u=${encodeURIComponent(ownerUsername)}`;
+
 	if (!link) {
 		return null;
 	}
@@ -70,13 +82,16 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 
 					<ShareSheet title={link.title} url={link.url || ""} />
 
-					<BaseButton
-						className="mx-auto justify-center border-none hover:bg-transparent hover:text-red-500"
-						variant="white"
+					<Link
+						className="mx-auto inline-flex justify-center rounded-xl px-4 py-2 text-red-500 hover:text-red-600"
+						href={reportHref}
+						prefetch={false}
+						rel="noopener noreferrer"
+						target="_blank"
 					>
 						<Flag className="mr-2 size-4" />
 						Denunciar Link
-					</BaseButton>
+					</Link>
 				</div>
 			</DialogContent>
 		</Dialog>
