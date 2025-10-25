@@ -1,4 +1,4 @@
-export type MusicPlatform = "spotify" | "deezer" | "apple" | "unknown";
+export type MusicPlatform = "spotify" | "deezer" | "apple" | "soundcloud" | "unknown";
 export type MusicType =
 	| "track"
 	| "album"
@@ -62,6 +62,9 @@ export const detectPlatform = (url: string): MusicPlatform => {
 	}
 	if (u.includes("music.apple.com") || u.includes("itunes.apple.com")) {
 		return "apple";
+	}
+	if (u.includes("soundcloud.com") || u.includes("on.soundcloud.com")) {
+		return "soundcloud";
 	}
 	return "unknown";
 };
@@ -138,6 +141,34 @@ export const parseMusicUrl = (url: string): ParsedMusicUrl => {
 			}
 			return { platform: "apple", type: "unknown", id: null };
 		}
+		// SoundCloud embed URL: w.soundcloud.com/player/?url=<canonical>
+		if (u.hostname.includes("w.soundcloud.com") && u.pathname.includes("/player")) {
+			const inner = u.searchParams.get("url") || "";
+			try {
+				const decoded = decodeURIComponent(inner);
+				const innerUrl = ensureHttps(decoded);
+				const innerHost = new URL(innerUrl).hostname;
+				if (innerHost.includes("soundcloud.com") || innerHost.includes("on.soundcloud.com")) {
+					const parts = new URL(innerUrl).pathname.split("/").filter(Boolean);
+					const isPlaylist = parts.includes("sets");
+					const type: MusicType = isPlaylist ? "playlist" : "track";
+					return { platform: "soundcloud", type, id: innerUrl };
+				}
+				// if inner URL not soundcloud, treat unknown
+				return { platform: "unknown", type: "unknown", id: null };
+			} catch {
+				return { platform: "soundcloud", type: "track", id: normalized };
+			}
+		}
+		if (u.hostname.includes("soundcloud.com") || u.hostname.includes("on.soundcloud.com")) {
+			const parts = u.pathname.split("/").filter(Boolean);
+			// Tipo: playlist se conter /sets/, senão presumimos track
+			const isPlaylist = parts.includes("sets");
+			const type: MusicType = isPlaylist ? "playlist" : "track";
+			// Para SoundCloud, usar a URL canônica como id para o oEmbed
+			const canonical = ensureHttps(url);
+			return { platform: "soundcloud", type, id: canonical };
+		}
 		return { platform: "unknown", type: "unknown", id: null };
 	} catch {
 		return { platform: "unknown", type: "unknown", id: null };
@@ -156,7 +187,11 @@ export const getCanonicalUrl = (url: string): string => {
 		return `https://www.deezer.com/${parsed.type}/${parsed.id}`;
 	}
 	if (parsed.platform === "apple") {
-		// Apple canonical URLs are often sluggified; return original
+		// Apple canonical URLs são sluggificadas; retornamos original
+		return ensureHttps(url);
+	}
+	if (parsed.platform === "soundcloud") {
+		// Para SoundCloud, manter a URL original
 		return ensureHttps(url);
 	}
 	return ensureHttps(url);
@@ -191,6 +226,10 @@ export const getEmbedUrl = (
 		}
 		const appleType = parsed.type === "track" ? "song" : parsed.type;
 		return `https://embed.music.apple.com/${country}/${appleType}/${parsed.id}`;
+	}
+	if (parsed.platform === "soundcloud") {
+		const canonical = parsed.id ? ensureHttps(parsed.id) : ensureHttps(url);
+		return `https://w.soundcloud.com/player/?url=${encodeURIComponent(canonical)}`;
 	}
 	return ensureHttps(url);
 };
@@ -318,6 +357,27 @@ export async function fetchMetadataFromProvider(
 				return {};
 			}
 			return {};
+		}
+		if (parsed.platform === "soundcloud") {
+			const canonical = parsed.id ? ensureHttps(parsed.id) : "";
+			if (!canonical) {
+				return {};
+			}
+			const res = await fetch(
+				`https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(canonical)}`
+			);
+			if (!res.ok) {
+				return {};
+			}
+			const data = await res.json();
+			const title = (data?.title || "").toString();
+			const authorName = (data?.author_name || "").toString();
+			const thumbnailUrl = (data?.thumbnail_url || "").toString();
+			return {
+				title: title.trim() || undefined,
+				authorName: authorName.trim() || undefined,
+				thumbnailUrl: thumbnailUrl.trim() || undefined,
+			};
 		}
 		return {};
 	} catch {

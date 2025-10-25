@@ -46,6 +46,11 @@ module.exports = {
 				hostname: "is1-ssl.mzstatic.com",
 				pathname: "/**",
 			},
+			{
+				protocol: "https",
+				hostname: "i1.sndcdn.com",
+				pathname: "/**",
+			},
 		],
 		qualities: [25, 50, 75, 90, 95, 100],
 	},

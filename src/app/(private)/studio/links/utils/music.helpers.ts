@@ -6,7 +6,6 @@ export interface MusicPlatform {
 
 export const getMusicPlatform = (url: string): MusicPlatform => {
 	const urlLower = (url || "").toLowerCase();
-
 	if (urlLower.includes("spotify.com")) {
 		return {
 			name: "Spotify",
@@ -14,7 +13,6 @@ export const getMusicPlatform = (url: string): MusicPlatform => {
 			bgColor: "bg-green-600",
 		};
 	}
-
 	if (urlLower.includes("deezer.com")) {
 		return {
 			name: "Deezer",
@@ -22,7 +20,6 @@ export const getMusicPlatform = (url: string): MusicPlatform => {
 			bgColor: "bg-purple-500",
 		};
 	}
-
 	if (
 		urlLower.includes("music.apple.com") ||
 		urlLower.includes("itunes.apple.com")
@@ -33,16 +30,22 @@ export const getMusicPlatform = (url: string): MusicPlatform => {
 			bgColor: "bg-[#FA243C]",
 		};
 	}
-
-	return {
-		name: "Música",
-		iconPath: "",
-		bgColor: "bg-gray-500",
-	};
+	if (
+		urlLower.includes("soundcloud.com") ||
+		urlLower.includes("on.soundcloud.com") ||
+		urlLower.includes("w.soundcloud.com")
+	) {
+		return {
+			name: "SoundCloud",
+			iconPath: "/icons/soundcloud.svg",
+			bgColor: "bg-[#ff5500]",
+		};
+	}
+	return { name: "Música", iconPath: "", bgColor: "bg-gray-500" };
 };
 
 export const MUSIC_URL_ERROR_MESSAGE =
-	"URL de música inválida. Aceitos: Spotify, Deezer e Apple Music (inclui link curto do Deezer)";
+	"Por favor, informe uma URL válida de Spotify, Deezer, Apple Music ou SoundCloud.";
 
 // Aceita URLs oficiais com segmento de idioma opcional (ex: intl-pt)
 // Suporta: track, album, playlist, episode, show
@@ -65,6 +68,16 @@ const APPLE_REGEX =
 // Apple Music: caso especial de álbum com parâmetro ?i=trackId
 const APPLE_ALBUM_TRACK_PARAM_REGEX = /music\.apple\.com\/.+album\/.+\?i=\d+/;
 
+// SoundCloud: track (user/track) e playlist (user/sets/playlist)
+const SOUNDCLOUD_TRACK_REGEX =
+	/soundcloud\.com\/[A-Za-z0-9-_]+\/(?!sets\/)[A-Za-z0-9-_.]+/;
+const SOUNDCLOUD_PLAYLIST_REGEX =
+	/soundcloud\.com\/[A-Za-z0-9-_]+\/sets\/[A-Za-z0-9-_.]+/;
+// SoundCloud short links
+const SOUNDCLOUD_SHORT_REGEX = /on\.soundcloud\.com\/[A-Za-z0-9]+/;
+// SoundCloud embed player URLs
+const SOUNDCLOUD_EMBED_REGEX = /https?:\/\/w\.soundcloud\.com\/player\/?/i;
+
 export function isValidMusicUrl(url: string): {
 	valid: boolean;
 	error?: string;
@@ -78,7 +91,12 @@ export function isValidMusicUrl(url: string): {
 	const deezerShort = DEEZER_SHORT_REGEX.test(trimmed);
 	const apple =
 		APPLE_REGEX.test(trimmed) || APPLE_ALBUM_TRACK_PARAM_REGEX.test(trimmed);
-	return spotify || deezer || deezerShort || apple
+	const soundcloud =
+		SOUNDCLOUD_TRACK_REGEX.test(trimmed) ||
+		SOUNDCLOUD_PLAYLIST_REGEX.test(trimmed) ||
+		SOUNDCLOUD_SHORT_REGEX.test(trimmed) ||
+		SOUNDCLOUD_EMBED_REGEX.test(trimmed);
+	return spotify || deezer || deezerShort || apple || soundcloud
 		? { valid: true }
 		: { valid: false, error: MUSIC_URL_ERROR_MESSAGE };
 }

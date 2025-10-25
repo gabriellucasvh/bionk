@@ -206,6 +206,7 @@ const AddContentModal = ({
 			"spotify",
 			"deezer",
 			"apple",
+			"soundcloud",
 		] as const;
 
 		if (!validOptions.includes(option as any)) {
@@ -268,7 +269,7 @@ const AddContentModal = ({
 			return;
 		}
 
-		if (validOption === "spotify" || validOption === "deezer" || validOption === "apple") {
+		if (validOption === "spotify" || validOption === "deezer" || validOption === "apple" || validOption === "soundcloud") {
 			onClose();
 			setTimeout(() => {
 				handleAddNewMusic();
