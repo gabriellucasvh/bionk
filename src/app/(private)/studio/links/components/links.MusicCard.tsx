@@ -108,7 +108,7 @@ const EditingView = ({
 				const json = await resp.json();
 				const nextTitle = (json?.metadata?.title || "").trim();
 				if (!cancelled && nextTitle) {
-					onMusicChange?.(music.id, "title", nextTitle);
+					onMusicChange?.(music.id, "title", nextTitle.slice(0, 70));
 					lastAutoFillUrlRef.current = currentUrl;
 				}
 			} catch {
@@ -127,7 +127,7 @@ const EditingView = ({
 		try {
 			await onSaveEditingMusic?.(
 				music.id,
-				music.title || "",
+				(music.title || "").slice(0, 70),
 				music.url,
 				!!music.usePreview
 			);
@@ -149,7 +149,7 @@ const EditingView = ({
 					</Label>
 					<Input
 						id="music-title"
-						maxLength={100}
+						maxLength={70}
 						onChange={(e) => onMusicChange?.(music.id, "title", e.target.value)}
 						placeholder="Digite o título da música"
 						value={music.title || ""}
