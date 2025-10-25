@@ -2,6 +2,13 @@
 
 "use client";
 
+// Removido: useSession — não precisamos da sessão para visitantes
+// import { useSession } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
+import type { FC } from "react";
+import React from "react";
+import { QRCode } from "react-qrcode-logo";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import ShareSheet from "@/components/ShareSheet";
 import {
@@ -12,12 +19,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import type { TemplateComponentProps } from "@/types/user-profile";
-// Removido: useSession — não precisamos da sessão para visitantes
-// import { useSession } from "next-auth/react";
-import Image from "next/image";
-import Link from "next/link";
-import type { FC } from "react";
-import { QRCode } from "react-qrcode-logo";
+import ShareBottomSheet from "./ShareBottomSheet";
 
 interface ShareModalProps {
 	user: TemplateComponentProps["user"];
@@ -34,8 +36,26 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 	const shareText = `Confira meu perfil na Bionk: ${user.username || user.name}`;
 	const logoUrl = "/bionk-logo-quadrado-pb.svg";
 
+	const [isMobile, setIsMobile] = React.useState(false);
+	React.useEffect(() => {
+		const check = () => setIsMobile(window.innerWidth < 640);
+		check();
+		window.addEventListener("resize", check);
+		return () => window.removeEventListener("resize", check);
+	}, []);
+
+	if (isMobile) {
+		return (
+			<ShareBottomSheet
+				isOpen={isOpen}
+				onOpenChange={onOpenChange}
+				user={user}
+			/>
+		);
+	}
+
 	return (
-		<Dialog onOpenChange={onOpenChange} open={isOpen}>
+		<Dialog onOpenChange={onOpenChange} open={isOpen && !isMobile}>
 			<DialogContent className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 text-center shadow-xl sm:max-w-lg">
 				<div className="flex justify-center pb-2">
 					<Image
