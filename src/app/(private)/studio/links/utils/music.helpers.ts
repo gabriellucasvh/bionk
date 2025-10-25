@@ -41,11 +41,18 @@ export const getMusicPlatform = (url: string): MusicPlatform => {
 			bgColor: "bg-[#ff5500]",
 		};
 	}
+	if (urlLower.includes("audiomack.com")) {
+		return {
+			name: "Audiomack",
+			iconPath: "/icons/audiomack.svg",
+			bgColor: "bg-[#F6A623]",
+		};
+	}
 	return { name: "Música", iconPath: "", bgColor: "bg-gray-500" };
 };
 
 export const MUSIC_URL_ERROR_MESSAGE =
-	"Por favor, informe uma URL válida de Spotify, Deezer, Apple Music ou SoundCloud.";
+	"Por favor, informe uma URL válida de Spotify, Deezer, Apple Music, SoundCloud ou Audiomack.";
 
 // Aceita URLs oficiais com segmento de idioma opcional (ex: intl-pt)
 // Suporta: track, album, playlist, episode, show
@@ -78,6 +85,10 @@ const SOUNDCLOUD_SHORT_REGEX = /on\.soundcloud\.com\/[A-Za-z0-9]+/;
 // SoundCloud embed player URLs
 const SOUNDCLOUD_EMBED_REGEX = /https?:\/\/w\.soundcloud\.com\/player\/?/i;
 
+// Audiomack: canonical and embed
+const AUDIOMACK_CANONICAL_REGEX = /(?:https?:\/\/)?(?:www\.)?audiomack\.com\/[A-Za-z0-9-_]+\/(song|album|playlist)\/[A-Za-z0-9-_.]+/i;
+const AUDIOMACK_EMBED_REGEX = /(?:https?:\/\/)?(?:www\.)?audiomack\.com\/embed\/(song|album|playlist)\/[A-Za-z0-9-_]+\/[A-Za-z0-9-_.]+/i;
+
 export function isValidMusicUrl(url: string): {
 	valid: boolean;
 	error?: string;
@@ -96,7 +107,8 @@ export function isValidMusicUrl(url: string): {
 		SOUNDCLOUD_PLAYLIST_REGEX.test(trimmed) ||
 		SOUNDCLOUD_SHORT_REGEX.test(trimmed) ||
 		SOUNDCLOUD_EMBED_REGEX.test(trimmed);
-	return spotify || deezer || deezerShort || apple || soundcloud
+	const audiomack = AUDIOMACK_CANONICAL_REGEX.test(trimmed) || AUDIOMACK_EMBED_REGEX.test(trimmed);
+	return spotify || deezer || deezerShort || apple || soundcloud || audiomack
 		? { valid: true }
 		: { valid: false, error: MUSIC_URL_ERROR_MESSAGE };
 }

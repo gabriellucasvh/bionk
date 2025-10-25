@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     const parsed = parseMusicUrl(maybeResolvedUrl);
     if (!parsed.id || parsed.type === "unknown" || parsed.platform === "unknown") {
       return NextResponse.json(
-        { error: "URL de música inválida. Aceitos: Spotify e Deezer" },
+        { error: "URL de música inválida. Aceitos: Spotify, Deezer, Apple Music, SoundCloud e Audiomack" },
         { status: 400 }
       );
     }

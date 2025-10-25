@@ -3,7 +3,7 @@
 import Image from "next/image";
 
 interface MusicOptionsProps {
-	onOptionSelect: (option: "spotify" | "deezer" | "apple" | "soundcloud") => void;
+	onOptionSelect: (option: "spotify" | "deezer" | "apple" | "soundcloud" | "audiomack") => void;
 }
 
 const MusicOptions = ({ onOptionSelect }: MusicOptionsProps) => {
@@ -81,13 +81,33 @@ const MusicOptions = ({ onOptionSelect }: MusicOptionsProps) => {
 					>
 						<Image
 							alt="SoundCloud"
-							className="object-cover brightness-0 invert"
+							className="object-cover"
 							height={40}
 							src="/icons/soundcloud.svg"
 							width={40}
 						/>
 					</div>
 					<span className="font-medium text-sm">SoundCloud</span>
+				</button>
+
+				<button
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					onClick={() => onOptionSelect("audiomack")}
+					type="button"
+				>
+					<div
+						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-[#F6A623]"
+						style={{ aspectRatio: "6 / 7" }}
+					>
+						<Image
+							alt="Audiomack"
+							className="object-cover"
+							height={40}
+							src="/icons/audiomack.svg"
+							width={40}
+						/>
+					</div>
+					<span className="font-medium text-sm">Audiomack</span>
 				</button>
 			</div>
 		</div>

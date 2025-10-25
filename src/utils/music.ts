@@ -1,4 +1,4 @@
-export type MusicPlatform = "spotify" | "deezer" | "apple" | "soundcloud" | "unknown";
+export type MusicPlatform = "spotify" | "deezer" | "apple" | "soundcloud" | "audiomack" | "unknown";
 export type MusicType =
 	| "track"
 	| "album"
@@ -65,6 +65,9 @@ export const detectPlatform = (url: string): MusicPlatform => {
 	}
 	if (u.includes("soundcloud.com") || u.includes("on.soundcloud.com")) {
 		return "soundcloud";
+	}
+	if (u.includes("audiomack.com")) {
+		return "audiomack";
 	}
 	return "unknown";
 };
@@ -169,6 +172,30 @@ export const parseMusicUrl = (url: string): ParsedMusicUrl => {
 			const canonical = ensureHttps(url);
 			return { platform: "soundcloud", type, id: canonical };
 		}
+		// Audiomack canonical: /<artist>/(song|album|playlist)/<slug>
+		// Audiomack embed: /embed/(song|album|playlist)/<artist>/<slug>
+		if (u.hostname.includes("audiomack.com")) {
+			const parts = u.pathname.split("/").filter(Boolean);
+			if (parts[0] === "embed") {
+				const t = parts[1];
+				const artist = parts[2];
+				const slug = parts[3];
+				if (t && artist && slug && (t === "song" || t === "album" || t === "playlist")) {
+					const mappedType: MusicType = t === "song" ? "track" : (t as MusicType);
+					return { platform: "audiomack", type: mappedType, id: `${artist}/${slug}` };
+				}
+				return { platform: "audiomack", type: "unknown", id: null };
+			} else {
+				const artist = parts[0];
+				const t = parts[1];
+				const slug = parts[2];
+				if (artist && t && slug && (t === "song" || t === "album" || t === "playlist")) {
+					const mappedType: MusicType = t === "song" ? "track" : (t as MusicType);
+					return { platform: "audiomack", type: mappedType, id: `${artist}/${slug}` };
+				}
+				return { platform: "audiomack", type: "unknown", id: null };
+			}
+		}
 		return { platform: "unknown", type: "unknown", id: null };
 	} catch {
 		return { platform: "unknown", type: "unknown", id: null };
@@ -192,6 +219,14 @@ export const getCanonicalUrl = (url: string): string => {
 	}
 	if (parsed.platform === "soundcloud") {
 		// Para SoundCloud, manter a URL original
+		return ensureHttps(url);
+	}
+	if (parsed.platform === "audiomack") {
+		const [artist, slug] = (parsed.id || "").split("/");
+		const typePath = parsed.type === "track" ? "song" : parsed.type;
+		if (artist && slug) {
+			return `https://audiomack.com/${artist}/${typePath}/${slug}`;
+		}
 		return ensureHttps(url);
 	}
 	return ensureHttps(url);
@@ -231,8 +266,28 @@ export const getEmbedUrl = (
 		const canonical = parsed.id ? ensureHttps(parsed.id) : ensureHttps(url);
 		return `https://w.soundcloud.com/player/?url=${encodeURIComponent(canonical)}`;
 	}
+	if (parsed.platform === "audiomack") {
+		const typePath = parsed.type === "track" ? "song" : parsed.type;
+		return `https://audiomack.com/embed/${typePath}/${parsed.id}`;
+	}
 	return ensureHttps(url);
 };
+
+function extractMetaContent(html: string, property: string): string | null {
+	const propRegex = new RegExp(
+		`<meta[^>]+property=["']${property}["'][^>]*content=["']([^"']+)["']`,
+		"i"
+	);
+	const nameRegex = new RegExp(
+		`<meta[^>]+name=["']${property}["'][^>]*content=["']([^"']+)["']`,
+		"i"
+	);
+	const propMatch = html.match(propRegex);
+	if (propMatch && propMatch[1]) return propMatch[1];
+	const nameMatch = html.match(nameRegex);
+	if (nameMatch && nameMatch[1]) return nameMatch[1];
+	return null;
+}
 
 export async function fetchMetadataFromProvider(
 	parsed: ParsedMusicUrl
@@ -360,9 +415,7 @@ export async function fetchMetadataFromProvider(
 		}
 		if (parsed.platform === "soundcloud") {
 			const canonical = parsed.id ? ensureHttps(parsed.id) : "";
-			if (!canonical) {
-				return {};
-			}
+			if (!canonical) return {};
 			const res = await fetch(
 				`https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(canonical)}`
 			);
@@ -377,6 +430,34 @@ export async function fetchMetadataFromProvider(
 				title: title.trim() || undefined,
 				authorName: authorName.trim() || undefined,
 				thumbnailUrl: thumbnailUrl.trim() || undefined,
+			};
+		}
+		// Audiomack: sem oEmbed oficial conhecido; retornar vazio
+		if (parsed.platform === "audiomack") {
+			const artist = parsed.id.split("/")[0] || "";
+			const slug = parsed.id.split("/")[1] || "";
+			const typePath = parsed.type === "track" ? "song" : parsed.type;
+			const canonical = `https://audiomack.com/${artist}/${typePath}/${slug}`;
+			const res = await fetch(canonical, {
+				headers: {
+					"user-agent":
+						"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123 Safari/537.36",
+				},
+			});
+			if (!res.ok) {
+				return { authorName: artist || undefined };
+			}
+			const html = await res.text();
+			const title = extractMetaContent(html, "og:title") || extractMetaContent(html, "twitter:title") || undefined;
+			const thumbnail =
+				extractMetaContent(html, "og:image") ||
+				extractMetaContent(html, "twitter:image") ||
+				extractMetaContent(html, "twitter:image:src") ||
+				undefined;
+			return {
+				title: title?.trim() || undefined,
+				authorName: artist?.trim() || undefined,
+				thumbnailUrl: thumbnail?.trim() || undefined,
 			};
 		}
 		return {};

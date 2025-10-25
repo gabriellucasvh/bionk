@@ -21,6 +21,7 @@ export const useModalState = () => {
         | "deezer"
         | "apple"
         | "soundcloud"
+        | "audiomack"
         | "image_single"
         | "image_column"
         | "image_carousel"
@@ -119,6 +120,7 @@ export const useModalState = () => {
 			| "deezer"
 			| "apple"
 			| "soundcloud"
+			| "audiomack"
 	) => {
 		setSelectedOption(option);
 	};

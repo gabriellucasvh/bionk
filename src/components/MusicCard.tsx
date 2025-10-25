@@ -53,9 +53,10 @@ export default function MusicCard({
 
 	if (usePreview) {
 		const embedUrl = getEmbedUrl(url);
+		const isAudiomack = (url || "").toLowerCase().includes("audiomack.com");
+		const iframeHeight = isAudiomack ? 252 : 152;
 		return (
 			<div className={cn("w-full space-y-2 pb-2", className)}>
-				{/* Opcionalmente mostra o título acima do player */}
 				{title && (
 					<h3
 						className={cn("text-center font-extrabold text-lg")}
@@ -67,7 +68,8 @@ export default function MusicCard({
 				<div className="flex justify-center">
 					<iframe
 						allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-						height="152"
+						height={iframeHeight}
+						scrolling={isAudiomack ? "no" : undefined}
 						src={embedUrl}
 						style={{
 							borderRadius: `${cornerValue}px`,

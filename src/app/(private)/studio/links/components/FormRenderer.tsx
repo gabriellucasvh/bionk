@@ -105,7 +105,7 @@ const isVideoOption = (selectedOption: string | null): boolean => {
 };
 
 const isMusicOption = (selectedOption: string | null): boolean => {
-	const musicOptions = ["spotify", "deezer", "apple", "soundcloud"];
+	const musicOptions = ["spotify", "deezer", "apple", "soundcloud", "audiomack"];
 	return musicOptions.includes(selectedOption || "");
 };
 
