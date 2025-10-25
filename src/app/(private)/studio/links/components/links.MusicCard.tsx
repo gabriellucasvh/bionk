@@ -99,7 +99,9 @@ const EditingView = ({
 				}
 
 				// Buscar no servidor para evitar CORS (Deezer/Audiomack)
-				const resp = await fetch(`/api/music/metadata?url=${encodeURIComponent(currentUrl)}`);
+				const resp = await fetch(
+					`/api/music/metadata?url=${encodeURIComponent(currentUrl)}`
+				);
 				if (!resp.ok) {
 					return;
 				}
@@ -202,6 +204,25 @@ const EditingView = ({
 								</Label>
 							</div>
 						</RadioGroup>
+					</div>
+					<div className="mt-2">
+						{music.usePreview ? (
+							<Image
+								alt="Preview de música"
+								className="h-auto max-h-20 object-contain"
+								height={100}
+								src="/images/preview-music.svg"
+								width={200}
+							/>
+						) : (
+							<Image
+								alt="Link direto de música"
+								className="h-auto max-h-20 object-contain"
+								height={100}
+								src="/images/direct-music.svg"
+								width={200}
+							/>
+						)}
 					</div>
 				</div>
 			</div>
