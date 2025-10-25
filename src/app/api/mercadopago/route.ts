@@ -308,7 +308,8 @@ async function createPreapprovalWithRetry(
 			logInfo("Plan not available; falling back without preapproval_plan_id", {
 				preapprovalPlanId,
 			});
-			const { preapproval_plan_id: _, ...fallbackData } = preapprovalData;
+			// No fallback, também remover card_token_id para evitar erro de payment_method pendente
+			const { preapproval_plan_id: _preapprovalPlanId, card_token_id: _cardTokenId, ...fallbackData } = preapprovalData;
 			return await preapproval.create({ body: fallbackData });
 		}
 		throw error;
