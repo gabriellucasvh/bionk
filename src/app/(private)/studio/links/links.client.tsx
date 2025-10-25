@@ -73,6 +73,7 @@ const LinksStudioClient = () => {
 					order: video.order,
 					type: video.type || "direct",
 				})) || [],
+			musics: userDataInput.Music || [],
 		};
 	};
 

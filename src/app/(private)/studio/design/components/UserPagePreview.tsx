@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useReducer, useState } from "react";
+import MusicCard from "@/components/MusicCard";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
 import VideoCard from "@/components/VideoCard";
 import { cn } from "@/lib/utils";
@@ -478,12 +479,12 @@ function ContentList({
 
 	const addContentToArray = (
 		contentArray: Array<{
-			type: "link" | "text" | "video" | "image";
+			type: "link" | "text" | "video" | "image" | "music";
 			item: any;
 			order: number;
 		}>,
 		items: any[] | undefined,
-		type: "link" | "text" | "video" | "image"
+		type: "link" | "text" | "video" | "image" | "music"
 	) => {
 		if (items && items.length > 0) {
 			for (const item of items) {
@@ -494,7 +495,7 @@ function ContentList({
 
 	const createContentArray = () => {
 		const contentArray: Array<{
-			type: "link" | "text" | "video" | "image";
+			type: "link" | "text" | "video" | "image" | "music";
 			item: any;
 			order: number;
 		}> = [];
@@ -503,6 +504,7 @@ function ContentList({
 		addContentToArray(contentArray, user.Text, "text");
 		addContentToArray(contentArray, user.Video, "video");
 		addContentToArray(contentArray, (user as any).Image, "image");
+		addContentToArray(contentArray, user.Music, "music");
 
 		return contentArray.sort((a, b) => a.order - b.order);
 	};
@@ -975,6 +977,38 @@ function ContentList({
 		return result;
 	};
 
+	const renderMusicContent = (
+		music: any,
+		index: number,
+		sectionIdRef: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const musicSectionId = music.sectionId || null;
+
+		if (musicSectionId !== sectionIdRef.value && musicSectionId !== null) {
+			sectionIdRef.value = musicSectionId;
+			const sectionHeader = renderSectionHeader(music, musicSectionId, index);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		result.push(
+			<MusicCard
+				authorName={music.authorName}
+				buttonStyle={buttonStyle}
+				customPresets={customizations}
+				id={music.id}
+				key={`music-${music.id}`}
+				thumbnailUrl={music.thumbnailUrl}
+				title={music.title}
+				url={music.url}
+				usePreview={!!music.usePreview}
+			/>
+		);
+		return result;
+	};
+
 	const allContent = createContentArray();
 	const currentSectionId = { value: null };
 
@@ -1006,6 +1040,8 @@ function ContentList({
 							return renderVideoContent(content.item, index, currentSectionId);
 						case "image":
 							return renderImageContent(content.item, index, currentSectionId);
+						case "music":
+							return renderMusicContent(content.item, index, currentSectionId);
 						default:
 							return null;
 					}
@@ -1058,6 +1094,9 @@ function convertUserDataToUserProfile(userData: any): UserProfile {
 			(video: any) => video?.active !== false && video?.archived !== true
 		),
 		Image: userData.images || [],
+		Music: (userData.musics || []).filter(
+			(music: any) => music?.active !== false && music?.archived !== true
+		),
 		SocialLink: socialLinks,
 	} as UserProfile;
 }

@@ -168,6 +168,7 @@ const PersonalizarClient = () => {
 					order: video.order,
 					type: video.type || "direct",
 				})) || [],
+			musics: userDataInput.Music || [],
 		};
 	};
 

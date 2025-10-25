@@ -115,9 +115,9 @@ const UnifiedLinksManager = () => {
 			texts: (textsData?.texts || []) as any,
 			videos: (videosData?.videos || []) as any,
 			images: (imagesData?.images || []) as any,
-			// musics: (musicsData?.musics || []) as any, // opcional: habilitar se preview precisar
+			musics: (musicsData?.musics || []) as any,
 		});
-	}, [linksData, socialLinksData, textsData, videosData, imagesData /*, musicsData*/]);
+	}, [linksData, socialLinksData, textsData, videosData, imagesData, musicsData]);
 
 	if (
 		status === "loading" ||

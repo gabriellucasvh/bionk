@@ -5,6 +5,7 @@ import type {
 	UserLink,
 	UserText,
 	UserVideo,
+	UserMusic,
 } from "@/types/user-profile";
 
 interface User {
@@ -26,6 +27,7 @@ interface UserData {
 	Video: UserVideo[];
 	SocialLink: SocialLinkItem[];
 	Image: UserImage[];
+	Music: UserMusic[];
 }
 
 interface ProfileState {
@@ -83,6 +85,7 @@ export const useProfileData = (
 			let userTexts: UserText[] = [];
 			let userVideos: UserVideo[] = [];
 			let userImages: UserImage[] = [];
+			let userMusics: UserMusic[] = [];
 
 			// When not in profile-only mode, fetch additional user content
 			if (!options?.profileOnly) {
@@ -105,6 +108,10 @@ export const useProfileData = (
 				const imagesRes = await fetch("/api/images");
 				const imagesData = await imagesRes.json();
 				userImages = imagesData?.images || [];
+
+				const musicsRes = await fetch(`/api/musics?userId=${userId}`);
+				const musicsData = await musicsRes.json();
+				userMusics = musicsData?.musics || [];
 			}
 
 			const profileData = { name, username, bio: bio || "" };
@@ -123,6 +130,7 @@ export const useProfileData = (
 				Video: userVideos,
 				SocialLink: socialLinks,
 				Image: userImages,
+				Music: userMusics,
 			});
 
 			return currentImage;
@@ -143,6 +151,7 @@ export const useProfileData = (
 				Video: [],
 				SocialLink: [],
 				Image: [],
+				Music: [],
 			});
 
 			return fallbackUrl;

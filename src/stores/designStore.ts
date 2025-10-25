@@ -39,6 +39,18 @@ export interface UserData {
 		order: number;
 		sectionId?: number | null;
 	}>;
+	musics?: Array<{
+		id: number;
+		title?: string | null;
+		url: string;
+		usePreview?: boolean;
+		order: number;
+		sectionId?: number | null;
+		authorName?: string;
+		thumbnailUrl?: string;
+		active?: boolean;
+		archived?: boolean;
+	}>;
 }
 
 export interface Customizations {
