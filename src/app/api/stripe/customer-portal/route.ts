@@ -18,19 +18,17 @@ export async function POST() {
 
 		const user = await prisma.user.findUnique({
 			where: { id: session.user.id },
-			select: { email: true /*, stripeCustomerId: true*/ },
+			select: { email: true, stripeCustomerId: true },
 		});
 
 		if (!user?.email) {
 			return NextResponse.json({ error: "Usuário sem email" }, { status: 400 });
 		}
 
-		// Tenta recuperar o customer na Stripe
-		let customerId: string | undefined;
+		// Preferir o customerId já persistido
+		let customerId: string | undefined = user.stripeCustomerId || undefined;
 
-		// Se existir no banco, use (desativado por tipagem até gerar Prisma)
-		// customerId = (user as any).stripeCustomerId || undefined;
-
+		// Fallback: buscar Customer por e-mail
 		if (!customerId) {
 			const customers = await stripe.customers.list({
 				email: user.email,
@@ -39,26 +37,39 @@ export async function POST() {
 			customerId = customers.data[0]?.id;
 		}
 
+		// Fallback definitivo: criar Customer e persistir no banco
 		if (!customerId) {
-			// Como fallback, cria um customer
 			const created = await stripe.customers.create({ email: user.email });
 			customerId = created.id;
+			await prisma.user.update({
+				where: { id: session.user.id },
+				data: { stripeCustomerId: customerId },
+			});
 		}
 
 		const origin = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 		const returnUrl = `${origin}/studio`;
 
-		const portal = await stripe.billingPortal.sessions.create({
+		// Se houver uma configuração específica do portal no .env, usar
+		const configurationId =
+			process.env.STRIPE_BILLING_PORTAL_CONFIGURATION_ID || undefined;
+
+		const params: Stripe.BillingPortal.SessionCreateParams = {
+			locale: "pt-BR",
 			customer: customerId,
 			return_url: returnUrl,
-		});
+		};
+		if (configurationId) {
+			(params as any).configuration = configurationId;
+		}
+
+		const portal = await stripe.billingPortal.sessions.create(params);
 
 		return NextResponse.json({ url: portal.url });
 	} catch (error: any) {
 		console.error("Erro ao criar sessão do Customer Portal:", error);
-		return NextResponse.json(
-			{ error: error?.message || "Erro interno" },
-			{ status: 500 }
-		);
+		const message =
+			typeof error?.message === "string" ? error.message : "Erro interno";
+		return NextResponse.json({ error: message }, { status: 500 });
 	}
 }

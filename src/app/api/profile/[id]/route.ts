@@ -3,9 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import Stripe from "stripe";
 import { authOptions } from "@/lib/auth";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+	apiVersion: "2025-09-30.clover",
+});
 
 // FUNÇÃO GET ADICIONADA
 export async function GET(
@@ -54,7 +59,7 @@ export async function PATCH(
 ) {
 	const session = await getServerSession(authOptions);
 	const { id } = await params;
-	
+
 	if (session?.user?.id !== id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 	}
@@ -112,7 +117,7 @@ export async function DELETE(
 	}
 
 	try {
-		// Buscar dados do usuário antes da exclusão para notificação
+		// Buscar dados do usuário antes da exclusão para notificação e cancelamento do Stripe
 		const user = await prisma.user.findUnique({
 			where: { id },
 			select: {
@@ -120,6 +125,9 @@ export async function DELETE(
 				username: true,
 				email: true,
 				name: true,
+				stripeCustomerId: true,
+				stripeSubscriptionId: true,
+				subscriptionStatus: true,
 			},
 		});
 
@@ -128,6 +136,21 @@ export async function DELETE(
 				{ error: "Usuário não encontrado" },
 				{ status: 404 }
 			);
+		}
+
+		// Cancelar assinatura do Stripe se existir
+		let stripeCancellationStatus = "no_subscription";
+		if (user.stripeSubscriptionId && user.subscriptionStatus === "active") {
+			try {
+				await stripe.subscriptions.cancel(user.stripeSubscriptionId);
+				stripeCancellationStatus = "cancelled_successfully";
+			} catch {
+				stripeCancellationStatus = "cancellation_failed";
+				// Continua com a exclusão mesmo se o cancelamento falhar
+				// O usuário pode cancelar manualmente via Customer Portal se necessário
+			}
+		} else if (user.stripeSubscriptionId) {
+			stripeCancellationStatus = "subscription_inactive";
 		}
 
 		// Excluir o usuário
@@ -149,6 +172,10 @@ export async function DELETE(
 					userAgent: request.headers.get("user-agent") || "unknown",
 					ip: request.headers.get("x-forwarded-for") || "unknown",
 					source: "user_settings",
+					stripeSubscriptionId: user.stripeSubscriptionId || undefined,
+					stripeCustomerId: user.stripeCustomerId || undefined,
+					stripeCancellationStatus,
+					subscriptionStatus: user.subscriptionStatus || undefined,
 				},
 			});
 		} catch {

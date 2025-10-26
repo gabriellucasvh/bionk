@@ -15,6 +15,7 @@ import {
 	Trash2,
 	User,
 	XOctagon,
+	// RefreshCcw,
 } from "lucide-react";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
@@ -44,6 +45,10 @@ import { Switch } from "@/components/ui/switch";
 import { useSubscription } from "@/providers/subscriptionProvider";
 import { useTheme } from "@/providers/themeProvider";
 import ArchivedLinksModal from "./components/configs.ArchiveLinksModal";
+// (Troca de plano desativada) Dialog imports removidos
+
+// (Troca de plano desativada) Select imports removidos
+// (Troca de plano desativada) Label import removido
 
 type Profile = { email: string };
 type SubscriptionDetails = {
@@ -218,8 +223,8 @@ function SubscriptionManagement({
 							</p>
 						</div>
 					</div>
-					{/* Seção de pagamento removida por enquanto, pois os dados não estão disponíveis */}
 					<Separator />
+					{/* Removido PlanChangeButton */}
 					<CancelSubscriptionButton />
 				</CardContent>
 			</Card>
@@ -606,3 +611,7 @@ export default function ConfigsClient() {
 		</div>
 	);
 }
+
+
+
+// Troca de plano desativada; componente PlanChangeButton removido temporariamente
