@@ -12,31 +12,19 @@ import { invalidateUserSubscriptionCache } from "@/providers/subscriptionProvide
 const MERCADO_PAGO_WEBHOOK_SECRET = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
 
 // --- Funções de Validação de Assinatura (Sem alterações) ---
-
 function parseSignatureParts(xSignature: string): {
 	timestamp?: string;
 	hash?: string;
 } {
-	const parts = xSignature.split(",");
-	let timestamp: string | undefined;
-	let hash: string | undefined;
-
+	const parts = xSignature.split(",").map((p) => p.trim());
+	const map = new Map<string, string>();
 	for (const part of parts) {
 		const [key, value] = part.split("=");
-
 		if (key && value) {
-			const trimmedKey = key.trim();
-			const trimmedValue = value.trim();
-
-			if (trimmedKey === "ts") {
-				timestamp = trimmedValue;
-			} else if (trimmedKey === "v1") {
-				hash = trimmedValue;
-			}
+			map.set(key, value);
 		}
 	}
-
-	return { timestamp, hash };
+	return { timestamp: map.get("ts"), hash: map.get("v1") };
 }
 
 function validateSignatureHeaders(
@@ -44,76 +32,33 @@ function validateSignatureHeaders(
 	xRequestId: string | null,
 	dataId: string
 ): boolean {
-	if (!MERCADO_PAGO_WEBHOOK_SECRET) {
-		console.error("Webhook: Chave secreta não configurada");
+	if (!xSignature || !xRequestId) {
+		console.error("Webhook: Assinatura ou request-id ausente", { xSignature, xRequestId });
 		return false;
 	}
 
-	if (!(xSignature && xRequestId && dataId)) {
-		console.error("Webhook: Headers de validação ausentes", {
-			xSignature: !!xSignature,
-			xRequestId: !!xRequestId,
-			dataId: !!dataId,
-		});
+	const { timestamp, hash } = parseSignatureParts(xSignature);
+	if (!timestamp || !hash) {
+		console.error("Webhook: Assinatura inválida (partes ausentes)", { xSignature });
 		return false;
 	}
 
-	return true;
+	const manifest = `id:${dataId};request-id:${xRequestId};ts:${timestamp};`;
+	const expectedHash = crypto
+		.createHmac("sha256", MERCADO_PAGO_WEBHOOK_SECRET || "")
+		.update(manifest)
+		.digest("hex");
+
+	const isValid = expectedHash === hash;
+	console.log("Webhook: Validação de assinatura", { manifest, expectedHash, receivedHash: hash, isValid });
+	return isValid;
 }
 
-function validateWebhookSignature(
-	request: NextRequest,
-	dataId: string
-): boolean {
+function validateWebhookSignature(request: NextRequest, dataId: string): boolean {
 	const xSignature = request.headers.get("x-signature");
 	const xRequestId = request.headers.get("x-request-id");
-
-	if (!validateSignatureHeaders(xSignature, xRequestId, dataId)) {
-		return false;
-	}
-
-	try {
-		if (!xSignature) {
-			return false;
-		}
-		const { timestamp, hash } = parseSignatureParts(xSignature);
-
-		if (!(timestamp && hash)) {
-			console.error("Webhook: Formato de assinatura inválido", {
-				xSignature,
-				timestamp: !!timestamp,
-				hash: !!hash,
-			});
-			return false;
-		}
-
-		const manifest = `id:${dataId};request-id:${xRequestId};ts:${timestamp};`;
-
-		if (!MERCADO_PAGO_WEBHOOK_SECRET) {
-			return false;
-		}
-		const expectedHash = crypto
-			.createHmac("sha256", MERCADO_PAGO_WEBHOOK_SECRET)
-			.update(manifest)
-			.digest("hex");
-
-		const isValid = expectedHash === hash;
-
-		console.log("Webhook: Validação de assinatura", {
-			manifest,
-			expectedHash,
-			receivedHash: hash,
-			isValid,
-		});
-
-		return isValid;
-	} catch (error) {
-		console.error("Webhook: Erro na validação da assinatura", error);
-		return false;
-	}
+	return validateSignatureHeaders(xSignature, xRequestId, dataId);
 }
-
-// --- Funções de Lógica de Negócio (Sem alterações) ---
 
 function calculateEndDate(
 	startDate: Date,
@@ -175,9 +120,7 @@ async function processSubscriptionUpdate(subDetails: PreApprovalResponse) {
 		});
 
 		if (!existingUser) {
-			console.error("Webhook: Usuário não encontrado para atualização", {
-				userId,
-			});
+			console.error("Webhook: Usuário não encontrado para atualização", { userId });
 			return;
 		}
 
@@ -227,10 +170,12 @@ async function processSubscriptionUpdate(subDetails: PreApprovalResponse) {
 	}
 }
 
-// --- Funções de Processamento de Webhook (COM CORREÇÕES) ---
+// --- Funções de Processamento de Webhook (ATUALIZADAS) ---
 
 /**
  * Processa webhooks de pagamento. Esta é a fonte de verdade para ativar assinaturas.
+ * Agora faz fallback: se o pagamento aprovado vier sem external_reference,
+ * usa o preapproval_id para buscar a assinatura e obter o external_reference.
  */
 async function processPaymentWebhook(body: any): Promise<NextResponse> {
 	const paymentId = body.data.id;
@@ -243,38 +188,45 @@ async function processPaymentWebhook(body: any): Promise<NextResponse> {
 		const payment = new Payment(client);
 		const paymentDetails = await payment.get({ id: paymentId });
 
-		// CORREÇÃO 1: Cast para 'any' para acessar 'preapproval_id' sem erro de tipo.
-		// A SDK pode não ter a tipagem mais recente da API.
 		const typedPaymentDetails = paymentDetails as any;
-		const userId = typedPaymentDetails.external_reference;
-		const preapprovalId = typedPaymentDetails.preapproval_id;
+		const status: string | undefined = typedPaymentDetails.status;
+		const statusDetail: string | undefined = typedPaymentDetails.status_detail;
+		const userId: string | undefined = typedPaymentDetails.external_reference;
+		const preapprovalId: string | undefined = typedPaymentDetails.preapproval_id;
 
-		if (typedPaymentDetails.status === "approved" && userId && preapprovalId) {
-			console.log("Pagamento aprovado, ativando assinatura para o usuário:", {
-				userId,
-				preapprovalId,
-			});
+		if (status === "approved") {
+			if (userId && preapprovalId) {
+				console.log("Pagamento aprovado, ativando assinatura para o usuário:", {
+					userId,
+					preapprovalId,
+				});
 
-			const user = await prisma.user.findUnique({ where: { id: userId } });
-
-			if (user) {
+				const preapproval = new PreApproval(client);
+				const subDetails = await preapproval.get({ id: preapprovalId });
+				await processSubscriptionUpdate(subDetails);
+			} else if (!userId && preapprovalId) {
+				console.log(
+					"Pagamento aprovado sem external_reference; buscando referência via preapproval",
+					{ paymentId, preapprovalId }
+				);
 				const preapproval = new PreApproval(client);
 				const subDetails = await preapproval.get({ id: preapprovalId });
 				await processSubscriptionUpdate(subDetails);
 			} else {
-				console.error("Usuário não encontrado para o pagamento aprovado:", {
+				console.log("Pagamento aprovado, mas informações insuficientes para ativar", {
+					paymentId,
 					userId,
+					preapprovalId,
 				});
 			}
 		} else {
-			console.log(
-				"Pagamento não aprovado ou sem referência externa, ignorando:",
-				{
-					paymentId,
-					status: typedPaymentDetails.status,
-					userId,
-				}
-			);
+			console.log("Pagamento não aprovado", {
+				paymentId,
+				status,
+				statusDetail,
+				userId: userId ?? null,
+				preapprovalId: preapprovalId ?? null,
+			});
 		}
 	} catch (error) {
 		console.error("Erro fatal ao processar webhook de payment:", error);
@@ -288,15 +240,41 @@ async function processPaymentWebhook(body: any): Promise<NextResponse> {
 }
 
 /**
- * CORREÇÃO 2: Removido 'async' pois não há 'await' dentro da função.
- * Processa webhooks de assinatura para outros eventos (ex: cancelamento).
+ * Processa webhooks de preapproval: ativa quando a assinatura está autorizada/ativa.
  */
-function processPreapprovalWebhook(body: any): NextResponse | null {
+async function processPreapprovalWebhook(body: any): Promise<NextResponse> {
 	const preapprovalId = body.data.id;
-	console.log(
-		`Webhook de preapproval recebido para ${preapprovalId}, mas a ativação é feita pelo webhook de pagamento.`
-	);
-	// Lógica futura para cancelamentos pode ser adicionada aqui.
+	console.log("Webhook de preapproval recebido:", { preapprovalId, action: body.action, type: body.type });
+
+	try {
+		const client = new MercadoPagoConfig({
+			accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN || "",
+		});
+		const preapproval = new PreApproval(client);
+		const subDetails = await preapproval.get({ id: preapprovalId });
+
+		// Somente ativa quando realmente autorizado/ativo
+		if (subDetails.status === "authorized" || subDetails.status === "active") {
+			console.log("Preapproval autorizado/ativo, ativando assinatura", {
+				preapprovalId,
+				status: subDetails.status,
+				external_reference: subDetails.external_reference,
+			});
+			await processSubscriptionUpdate(subDetails as any);
+		} else {
+			console.log("Preapproval não autorizado/ativo ainda; aguardando fluxo de pagamento", {
+				preapprovalId,
+				status: subDetails.status,
+			});
+		}
+	} catch (error) {
+		console.error("Erro ao processar webhook de preapproval:", error);
+		return NextResponse.json(
+			{ error: "Erro interno ao processar webhook de preapproval" },
+			{ status: 500 }
+		);
+	}
+
 	return NextResponse.json({ success: true });
 }
 
@@ -373,31 +351,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 		});
 
 		if (!signatureValid) {
-			console.error(
-				"Webhook: Assinatura inválida - possível tentativa de fraude"
-			);
+			console.error("Webhook: Assinatura inválida - possível tentativa de fraude");
 			return NextResponse.json(
 				{ error: "Assinatura inválida" },
 				{ status: 401 }
 			);
 		}
 
-		if (
-			body.type === "preapproval" ||
-			body.type === "subscription_preapproval"
-		) {
-			const result = processPreapprovalWebhook(body);
-			if (result) {
-				return result;
-			}
-		} else if (body.type === "payment") {
-			const result = await processPaymentWebhook(body);
-			if (result) {
-				return result;
-			}
-		} else {
-			console.log("Tipo de webhook ignorado:", { type: body.type });
+		if (body.type === "preapproval" || body.type === "subscription_preapproval") {
+			return await processPreapprovalWebhook(body);
 		}
+		if (body.type === "payment") {
+			return await processPaymentWebhook(body);
+		}
+		console.log("Tipo de webhook ignorado:", { type: body.type });
 
 		return NextResponse.json({ success: true });
 	} catch (error) {
