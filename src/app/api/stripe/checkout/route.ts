@@ -37,17 +37,17 @@ export async function POST(request: Request) {
 		const billingCycle: BillingCycle = body.billingCycle || "monthly";
 		const explicitPriceId: string | undefined = body.priceId;
 
-		let priceId = explicitPriceId;
 		const selectedPlan = plan;
-
-		if (!priceId) {
-			if (!(PRICE_IDS[selectedPlan] && PRICE_IDS[selectedPlan][billingCycle])) {
-				return NextResponse.json(
-					{ error: "Plano ou ciclo de cobrança inválido" },
-					{ status: 400 }
-				);
-			}
-			priceId = PRICE_IDS[selectedPlan][billingCycle];
+		const finalPriceId =
+			explicitPriceId ??
+			(PRICE_IDS[selectedPlan] && PRICE_IDS[selectedPlan][billingCycle]
+				? PRICE_IDS[selectedPlan][billingCycle]
+				: undefined);
+		if (!finalPriceId) {
+			return NextResponse.json(
+				{ error: "Plano ou ciclo de cobrança inválido" },
+				{ status: 400 }
+			);
 		}
 
 		// URLs de sucesso/cancelamento
@@ -57,10 +57,9 @@ export async function POST(request: Request) {
 
 		const sessionCheckout = await stripe.checkout.sessions.create({
 			mode: "subscription",
-			// customer_creation só é permitido em mode: 'payment'; remova-o para subscrição.
-			// Em subscrição, associe o cliente via 'customer_email' ou deixe o Checkout criar automaticamente.
+			locale: "pt-BR",
 			customer_email: session.user.email || undefined,
-			line_items: [{ price: priceId!, quantity: 1 }],
+			line_items: [{ price: finalPriceId, quantity: 1 }],
 			success_url: successUrl,
 			cancel_url: cancelUrl,
 			client_reference_id: session.user.id,
@@ -68,6 +67,14 @@ export async function POST(request: Request) {
 				userId: session.user.id,
 				plan: selectedPlan || "unknown",
 				billingCycle,
+			},
+			// Propaga metadata para a Subscription (usado no webhook)
+			subscription_data: {
+				metadata: {
+					userId: session.user.id,
+					plan: selectedPlan || "unknown",
+					billingCycle,
+				},
 			},
 		});
 

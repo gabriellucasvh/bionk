@@ -7,179 +7,276 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 	apiVersion: "2025-09-30.clover",
 });
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
-
-type BillingCycle = "monthly" | "annual";
-
-const PRICE_TO_PLAN: Record<
-	string,
-	{ plan: string; billingCycle: BillingCycle }
-> = {
-	// basic
-	price_1SMJfgAFJoTCLcKxPpIET44r: { plan: "basic", billingCycle: "monthly" },
-	price_1SMJgFAFJoTCLcKxi1Lz0mjw: { plan: "basic", billingCycle: "annual" },
-	// pro
-	price_1SMJgaAFJoTCLcKxjlhtrwTD: { plan: "pro", billingCycle: "monthly" },
-	price_1SMJh8AFJoTCLcKxz315eFWB: { plan: "pro", billingCycle: "annual" },
-	// ultra
-	price_1SMJhRAFJoTCLcKxv0ON75lt: { plan: "ultra", billingCycle: "monthly" },
-	price_1SMJhoAFJoTCLcKxFnOVycso: { plan: "ultra", billingCycle: "annual" },
-};
-
-function toStatus(status: string): string {
-	switch (status) {
-		case "active":
-		case "trialing":
-			return "active";
-		case "canceled":
-			return "canceled";
-		case "incomplete":
-		case "past_due":
-		case "unpaid":
-			return status;
-		default:
-			return status || "inactive";
+function mapPriceToPlan(
+	priceId?: string | null
+): "basic" | "pro" | "ultra" | null {
+	const PRICE_TO_PLAN: Record<string, "basic" | "pro" | "ultra"> = {
+		price_1SMJfgAFJoTCLcKxPpIET44r: "basic",
+		price_1SMJgFAFJoTCLcKxi1Lz0mjw: "basic",
+		price_1SMJgaAFJoTCLcKxjlhtrwTD: "pro",
+		price_1SMJh8AFJoTCLcKxz315eFWB: "pro",
+		price_1SMJhRAFJoTCLcKxv0ON75lt: "ultra",
+		price_1SMJhoAFJoTCLcKxFnOVycso: "ultra",
+	};
+	if (!priceId) {
+		return null;
 	}
+	return PRICE_TO_PLAN[priceId] || null;
 }
 
-export async function POST(request: Request) {
-	const payload = await request.text();
-	const sig = request.headers.get("stripe-signature");
+export async function POST(req: Request) {
+	const sig = req.headers.get("stripe-signature");
+	const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
+
+	if (!(sig && webhookSecret)) {
+		return NextResponse.json({ error: "Webhook inválido" }, { status: 400 });
+	}
 
 	let event: Stripe.Event;
-
 	try {
-		if (!(sig && webhookSecret)) {
-			return NextResponse.json(
-				{ error: "Webhook não configurado" },
-				{ status: 400 }
-			);
-		}
+		const payload = await req.text();
 		event = stripe.webhooks.constructEvent(payload, sig, webhookSecret);
 	} catch (err: any) {
-		console.error("Erro ao validar webhook:", err.message);
-		return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
+		console.error("Falha ao validar webhook:", err?.message);
+		return NextResponse.json({ error: "Assinatura inválida" }, { status: 400 });
 	}
 
-	try {
-		switch (event.type) {
-			case "checkout.session.completed": {
-				const session = event.data.object as Stripe.Checkout.Session;
-				const userId = (session.metadata?.userId ||
-					session.client_reference_id) as string | undefined;
+	switch (event.type) {
+		case "customer.subscription.created":
+		case "customer.subscription.updated":
+		case "customer.subscription.deleted": {
+			const subscription = event.data.object as Stripe.Subscription;
 
-				if (userId) {
-					// Atualiza método de pagamento se disponível
-					// Em geral, brand/last4 só ficam disponíveis via PaymentMethod vinculado à subscrição/fatura
-					// Aqui não garantimos, mas tentamos enriquecer via invoice se existir
-					await prisma.user.update({
-						where: { id: userId },
-						data: {
-							subscriptionStatus: "active",
-						},
-					});
-				}
-				break;
-			}
+			// Tenta obter userId do metadata
+			let userId: string | undefined =
+				(subscription.metadata?.userId as string | undefined) || undefined;
 
-			case "customer.subscription.created":
-			case "customer.subscription.updated":
-			case "customer.subscription.deleted": {
-				const subscription = event.data.object as Stripe.Subscription;
-				const status = toStatus(subscription.status);
-				// Remover duplicação e usar nome claro para o fim do período
-				const currentPeriodEndEpoch = (subscription as any)?.current_period_end as number | undefined;
-				const currentPeriodEndDate =
-					typeof currentPeriodEndEpoch === "number"
-						? new Date(currentPeriodEndEpoch * 1000)
-						: null;
-
-				// Determinar plano a partir do price
-				const item = subscription.items?.data?.[0];
-				const priceId = item?.price?.id || "";
-				const mapped = PRICE_TO_PLAN[priceId];
-				const plan = mapped?.plan || undefined;
-
-				// Encontrar userId por metadata do checkout/session associada
-				const userId = subscription.metadata?.userId as string | undefined;
-
-				if (userId) {
-					await prisma.user.update({
-						where: { id: userId },
-						data: {
-							subscriptionPlan: plan || undefined,
-							billingCycle: mapped?.billingCycle || undefined,
-							subscriptionStatus: status,
-							subscriptionEndDate: currentPeriodEndDate || undefined,
-						},
-					});
-				}
-				break;
-			}
-
-			case "invoice.payment_succeeded": {
-				const invoice = event.data.object as Stripe.Invoice;
-				const userId = invoice.metadata?.userId as string | undefined;
-				let brand: string | undefined;
-				let last4: string | undefined;
-				try {
-					const paymentIntentId = (invoice as any)?.payment_intent as string | undefined;
-					if (paymentIntentId) {
-						const pi = await stripe.paymentIntents.retrieve(paymentIntentId, {
-							expand: ["payment_method"],
-						});
-						const pm = pi.payment_method as Stripe.PaymentMethod | null;
-						const card = pm?.card;
-						brand = card?.brand || undefined;
-						last4 = card?.last4 || undefined;
+			// Fallback: buscar usuário pelo e-mail do Customer
+			if (!userId) {
+				const customerId = subscription.customer as string | undefined;
+				if (customerId) {
+					try {
+						const customer = await stripe.customers.retrieve(customerId);
+						if (
+							typeof (customer as any).deleted === "boolean" &&
+							(customer as any).deleted
+						) {
+							// Cliente deletado, não há e-mail
+						} else {
+							const email = (customer as Stripe.Customer).email || undefined;
+							if (email) {
+								const user = await prisma.user.findUnique({ where: { email } });
+								if (user) {
+									userId = user.id;
+								}
+							}
+						}
+					} catch (e) {
+						console.warn(
+							"Falha ao recuperar Customer para fallback de userId:",
+							(e as any)?.message
+						);
 					}
-				} catch {}
+				}
+			}
 
-				if (userId) {
+			// Determina plano via price da subscription
+			let plan: "basic" | "pro" | "ultra" | null = null;
+			try {
+				const priceId =
+					(subscription.items?.data?.[0]?.price?.id as string | undefined) ||
+					undefined;
+				plan = mapPriceToPlan(priceId);
+			} catch {}
+
+			const status = subscription.status;
+			const currentPeriodEndUnix =
+				(subscription as any).current_period_end || undefined;
+			const currentPeriodEndDate = currentPeriodEndUnix
+				? new Date(currentPeriodEndUnix * 1000)
+				: undefined;
+
+			if (userId) {
+				try {
 					await prisma.user.update({
 						where: { id: userId },
 						data: {
-							subscriptionStatus: "active",
-							paymentMethodBrand: brand,
-							paymentMethodLastFour: last4,
-							// Atualiza período a partir da invoice (geralmente igual ao da subscrição)
-							subscriptionEndDate: (() => {
-								const endTs = invoice.lines?.data?.[0]?.period?.end;
-								return typeof endTs === "number"
-									? new Date(endTs * 1000)
-									: undefined;
-							})(),
+							subscriptionStatus: status,
+							subscriptionPlan: plan || undefined,
+							subscriptionEndDate: currentPeriodEndDate,
 						},
 					});
+				} catch (e) {
+					console.error(
+						"Erro ao atualizar usuário por subscription:",
+						(e as any)?.message
+					);
 				}
-				break;
+			} else {
+				console.warn(
+					"Subscription event sem userId identificável; ignorando atualização."
+				);
 			}
 
-			case "invoice.payment_failed": {
-				const invoice = event.data.object as Stripe.Invoice;
-				const userId = invoice.metadata?.userId as string | undefined;
-				if (userId) {
-					await prisma.user.update({
-						where: { id: userId },
-						data: {
-							subscriptionStatus: "past_due",
-						},
-					});
-				}
-				break;
-			}
-
-			default:
-				// Ignora outros eventos por enquanto
-				break;
+			break;
 		}
 
-		return NextResponse.json({ received: true });
-	} catch (error: any) {
-		console.error("Erro ao processar webhook:", error);
-		return NextResponse.json(
-			{ error: error?.message || "Erro interno" },
-			{ status: 500 }
-		);
+		case "invoice.payment_succeeded": {
+			const invoice = event.data.object as Stripe.Invoice;
+
+			// Recupera dados do cartão via PaymentIntent
+			let brand: string | undefined;
+			let last4: string | undefined;
+			try {
+				const paymentIntentId = (invoice as any).payment_intent as
+					| string
+					| undefined;
+				if (paymentIntentId) {
+					const paymentIntent = await stripe.paymentIntents.retrieve(
+						paymentIntentId,
+						{ expand: ["payment_method"] }
+					);
+					const card = (paymentIntent.payment_method as Stripe.PaymentMethod)
+						?.card;
+					brand = card?.brand;
+					last4 = card?.last4;
+				}
+			} catch (e) {
+				console.warn(
+					"Falha ao obter PaymentIntent para invoice:",
+					(e as any)?.message
+				);
+			}
+
+			// Tenta identificar o userId
+			let userId: string | undefined =
+				(invoice.metadata?.userId as string | undefined) || undefined;
+
+			// Fallback 1: invoice.customer_email
+			if (!userId && invoice.customer_email) {
+				const user = await prisma.user.findUnique({
+					where: { email: invoice.customer_email },
+				});
+				if (user) {
+					userId = user.id;
+				}
+			}
+
+			// Fallback 2: recuperar Customer e usar o e-mail
+			if (!userId && invoice.customer) {
+				try {
+					const customer = await stripe.customers.retrieve(
+						invoice.customer as string
+					);
+					if (
+						!(
+							typeof (customer as any).deleted === "boolean" &&
+							(customer as any).deleted
+						)
+					) {
+						const email = (customer as Stripe.Customer).email || undefined;
+						if (email) {
+							const user = await prisma.user.findUnique({ where: { email } });
+							if (user) {
+								userId = user.id;
+							}
+						}
+					}
+				} catch (e) {
+					console.warn(
+						"Falha ao recuperar Customer para fallback em invoice:",
+						(e as any)?.message
+					);
+				}
+			}
+
+			// Determina plano via linha da fatura
+			let plan: "basic" | "pro" | "ultra" | null = null;
+			try {
+				const line = invoice.lines?.data?.[0];
+				const priceId =
+					((line as any)?.price?.id as string | undefined) || undefined;
+				plan = mapPriceToPlan(priceId);
+			} catch {}
+
+			// Deriva período de fim a partir da fatura (quando disponível)
+			let subscriptionEndDate: Date | undefined;
+			try {
+				const line = invoice.lines?.data?.[0];
+				const periodEnd = line?.period?.end;
+				if (typeof periodEnd === "number") {
+					subscriptionEndDate = new Date(periodEnd * 1000);
+				}
+			} catch {}
+
+			if (userId) {
+				try {
+					await prisma.user.update({
+						where: { id: userId },
+						data: {
+							subscriptionStatus: "active",
+							subscriptionPlan: plan || undefined,
+							subscriptionEndDate,
+							paymentMethodBrand: brand,
+							paymentMethodLastFour: last4,
+						},
+					});
+				} catch (e) {
+					console.error(
+						"Erro ao atualizar usuário por invoice:",
+						(e as any)?.message
+					);
+				}
+			} else {
+				console.warn(
+					"Invoice sem userId identificável; ignorando atualização."
+				);
+			}
+
+			break;
+		}
+
+		case "checkout.session.completed": {
+			const cs = event.data.object as Stripe.Checkout.Session;
+			let userId: string | undefined =
+				(cs.metadata?.userId as string | undefined) ||
+				(cs.client_reference_id as string | undefined) ||
+				undefined;
+
+			// Fallback por e-mail do Checkout Session
+			if (!userId) {
+				const email =
+					cs.customer_details?.email || cs.customer_email || undefined;
+				if (email) {
+					const user = await prisma.user.findUnique({ where: { email } });
+					if (user) {
+						userId = user.id;
+					}
+				}
+			}
+
+			if (userId) {
+				try {
+					await prisma.user.update({
+						where: { id: userId },
+						data: {
+							subscriptionStatus: "active",
+						},
+					});
+				} catch (e) {
+					console.error(
+						"Erro ao atualizar usuário por checkout.session.completed:",
+						(e as any)?.message
+					);
+				}
+			}
+			break;
+		}
+
+		default:
+			// Outros eventos podem ser ignorados
+			break;
 	}
+
+	return NextResponse.json({ received: true });
 }
