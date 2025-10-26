@@ -11,13 +11,11 @@ function mapPriceToPlan(
 	priceId?: string | null
 ): "basic" | "pro" | "ultra" | null {
 	const PRICE_TO_PLAN: Record<string, "basic" | "pro" | "ultra"> = {
-		// price_1SMJfgAFJoTCLcKxPpIET44r: "basic",
-		price_1SMZw7AFJoTCLcKxNLG0yeuQ: "basic",
+		price_1SMJfgAFJoTCLcKxPpIET44r: "basic",
 		price_1SMJgFAFJoTCLcKxi1Lz0mjw: "basic",
 		price_1SMJgaAFJoTCLcKxjlhtrwTD: "pro",
 		price_1SMJh8AFJoTCLcKxz315eFWB: "pro",
-		// price_1SMJhRAFJoTCLcKxv0ON75lt: "ultra",
-		price_1SMczsAFJoTCLcKxwdR1R8Of: "ultra",
+		price_1SMJhRAFJoTCLcKxv0ON75lt: "ultra",
 		price_1SMJhoAFJoTCLcKxFnOVycso: "ultra",
 	};
 	if (!priceId) {

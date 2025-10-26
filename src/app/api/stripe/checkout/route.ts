@@ -13,8 +13,7 @@ type BillingCycle = "monthly" | "annual";
 
 const PRICE_IDS: Record<string, Record<BillingCycle, string>> = {
 	basic: {
-		// monthly: "price_1SMJfgAFJoTCLcKxPpIET44r",
-		monthly: "price_1SMZw7AFJoTCLcKxNLG0yeuQ",
+		monthly: "price_1SMJfgAFJoTCLcKxPpIET44r",
 		annual: "price_1SMJgFAFJoTCLcKxi1Lz0mjw",
 	},
 	pro: {
@@ -22,8 +21,7 @@ const PRICE_IDS: Record<string, Record<BillingCycle, string>> = {
 		annual: "price_1SMJh8AFJoTCLcKxz315eFWB",
 	},
 	ultra: {
-		// monthly: "price_1SMJhRAFJoTCLcKxv0ON75lt",
-		monthly: "price_1SMczsAFJoTCLcKxwdR1R8Of",
+		monthly: "price_1SMJhRAFJoTCLcKxv0ON75lt",
 		annual: "price_1SMJhoAFJoTCLcKxFnOVycso",
 	},
 };
