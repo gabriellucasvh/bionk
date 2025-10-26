@@ -387,7 +387,7 @@ button {
 
 /*---break--- */
 
-/* Animações personalizadas para o card premium */
+/* Animações personalizadas para o card ultra */
 @keyframes gradient-x {
 	0%,
 	100% {
@@ -456,7 +456,7 @@ button {
 	25% {
 		transform: scale(0.95) skew(0deg, 0deg);
 	}
-	
+
 	/* Fase 2: Movimento dos cantos (25-100%) = 1.5s de 2s total */
 	40% {
 		transform: scale(1) skew(1deg, -0.5deg);
@@ -506,5 +506,5 @@ button {
 
 /* Oculta o botão de preview (olho) quando o bottom sheet estiver ativo */
 body.bottom-sheet-open .preview-toggle {
-  display: none;
+	display: none;
 }

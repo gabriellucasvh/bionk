@@ -60,7 +60,7 @@ const pricingPlans = [
 		isBest: true,
 	},
 	{
-		name: "Premium",
+		name: "Ultra",
 		nameColor: "text-blue-500",
 		buttonColor:
 			"bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 transition-colors duration-500",
@@ -113,7 +113,7 @@ const plansWithAllFeatures = [
 	{ name: "Free", features: featureList.slice(0, 4) },
 	{ name: "Basic", features: featureList.slice(0, 8) },
 	{ name: "Pro", features: featureList.slice(0, 12) },
-	{ name: "Premium", features: featureList.slice(0, 15) },
+	{ name: "Ultra", features: featureList.slice(0, 15) },
 ];
 
 // --- COMPONENTES DA PÁGINA ---

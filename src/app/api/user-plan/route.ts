@@ -17,7 +17,6 @@ export async function GET() {
 			select: {
 				subscriptionPlan: true,
 				subscriptionStatus: true,
-				mercadopagoSubscriptionId: true,
 				subscriptionEndDate: true,
 			},
 		});
@@ -35,24 +34,11 @@ export async function GET() {
 		}
 
 		// Para planos pagos, validar se realmente está ativo
-		const isPaidPlan = ["basic", "pro", "premium"].includes(
+		const isPaidPlan = ["basic", "pro", "ultra"].includes(
 			user.subscriptionPlan
 		);
 
 		if (isPaidPlan) {
-			// Verificar se tem mercadopagoSubscriptionId válido
-			if (!user.mercadopagoSubscriptionId) {
-				console.log(
-					"User with paid plan but no mercadopagoSubscriptionId, reverting to free",
-					{
-						userId: session.user.id,
-						plan: user.subscriptionPlan,
-						status: user.subscriptionStatus,
-					}
-				);
-				return NextResponse.json({ subscriptionPlan: "free" });
-			}
-
 			// Verificar se o status é ativo
 			if (user.subscriptionStatus !== "active") {
 				console.log(

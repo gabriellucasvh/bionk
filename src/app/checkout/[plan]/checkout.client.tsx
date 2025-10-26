@@ -30,24 +30,13 @@ const pricingPlans = [
 		description: "Para quem quer personalização total e insights.",
 	},
 	{
-		name: "Premium",
+		name: "Ultra",
 		monthlyPrice: 60,
 		description: "Suporte prioritário e insights completos.",
 	},
 ];
 type BillingCycle = "monthly" | "annual";
 
-interface CardFormData {
-	token: string;
-	issuer_id: string;
-	payment_method_id: string;
-	transaction_amount: number;
-	installments: number;
-	payer: {
-		email: string;
-		identification: { type: string; number: string };
-	};
-}
 
 function BillingToggle({
 	billingCycle,
@@ -198,125 +187,10 @@ export default function PaymentPage() {
 				cardPaymentBrickController.current = null;
 			}
 		};
-
-		const initBrick = async () => {
-			if (
-				sdkReady &&
-				session?.user?.email &&
-				process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY &&
-				selectedPlan
-			) {
-				await cleanupBrick();
-				const mp = new window.MercadoPago(
-					process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY,
-					{ locale: "pt-BR" }
-				);
-				const bricksBuilder = mp.bricks();
-				const totalDue =
-					billingCycle === "monthly"
-						? selectedPlan.monthlyPrice
-						: Math.round(selectedPlan.monthlyPrice * 0.8) * 12;
-
-				const customization = {
-					visual: {
-						font: "https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap",
-						style: {
-							theme: "flat",
-							customVariables: {
-								theme: "dark",
-								baseColor: "#99e600",
-								contrastColor: "#FFFFFF",
-								formBackgroundColor: "#f5f5f5",
-								inputBorderColor: "#e5e5e5",
-								inputFocusBorderColor: "#99e600",
-								borderRadius: "0.5rem",
-								textColor: "#1e293b",
-								placeholderColor: "#a1a1aa",
-								errorColor: "#ef4444",
-							},
-						},
-					},
-				};
-
-				const controller = await bricksBuilder.create(
-					"cardPayment",
-					"cardPaymentBrick_container",
-					{
-						initialization: { amount: totalDue },
-						customization,
-						callbacks: {
-							onReady: () => {
-								/* Brick pronto */
-							},
-							// --- CORREÇÃO 1: Assinatura da função onSubmit ---
-							// O objeto com os dados do formulário é passado diretamente como o primeiro argumento.
-							onSubmit: async (formData: CardFormData) => {
-								setLoading(true);
-								setError(null);
-								try {
-									// Adicionamos uma verificação extra para garantir que formData e formData.payer existem
-									if (!formData?.payer?.email) {
-										throw new Error(
-											"Não foi possível obter os dados do pagador. Tente novamente."
-										);
-									}
-
-									const response = await fetch("/api/mercadopago", {
-										method: "POST",
-										headers: { "Content-Type": "application/json" },
-										body: JSON.stringify({
-											plan: selectedPlan.name.toLowerCase(),
-											billingCycle,
-											email: formData.payer.email,
-											userId: session?.user?.id,
-											card_token_id: formData.token,
-										}),
-									});
-									const data = await response.json();
-									if (!response.ok) {
-										throw new Error(data.details || "Erro ao criar assinatura");
-									}
-
-									// Redireciona conforme a resposta do backend/Mercado Pago
-									if (data?.init_point) {
-										// URL externa do Mercado Pago para concluir a autorização
-										window.location.href = data.init_point;
-										return;
-									}
-
-									const status = String(data?.status || "").toLowerCase();
-									if (status === "authorized" || status === "active") {
-										// Assinatura confirmada imediatamente
-										router.push("/checkout/success");
-									} else if (status === "pending") {
-										// Aguardando aprovação/pagamento
-										router.push("/checkout/pending");
-									} else {
-										// Falha ou status inesperado
-										router.push("/checkout/failure");
-									}
-								} catch (err: any) {
-									setError(err.message || "Ocorreu um erro. Tente novamente.");
-									setLoading(false);
-								}
-							},
-							onError: (_err: any) => {
-								setError(
-									"Dados do cartão inválidos. Verifique as informações."
-								);
-							},
-						},
-					}
-				);
-				cardPaymentBrickController.current = controller;
-			}
-		};
-		initBrick();
 		return () => {
 			cleanupBrick();
 		};
 	}, [
-		sdkReady,
 		billingCycle,
 		session?.user?.id,
 		session?.user?.email,
@@ -332,6 +206,32 @@ export default function PaymentPage() {
 	const annualPricePerMonth = Math.round(selectedPlan.monthlyPrice * 0.8);
 	const totalAnnualPrice = annualPricePerMonth * 12;
 	const totalMonthlyPrice = selectedPlan.monthlyPrice;
+
+	// Define o handler dentro do componente para acessar estados/variáveis corretamente
+	const handleStripeCheckout = async () => {
+		try {
+			setLoading(true);
+			setError(null);
+			const res = await fetch("/api/stripe/checkout", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					plan: selectedPlan?.name.toLowerCase(),
+					billingCycle,
+				}),
+			});
+			const data = await res.json();
+			if (!(res.ok && data?.url)) {
+				throw new Error(data?.error || "Falha ao criar sessão de checkout");
+			}
+			router.push(data.url);
+		} catch (e: any) {
+			setError(e?.message || "Erro ao iniciar checkout");
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	const savings = totalMonthlyPrice * 12 - totalAnnualPrice;
 	const totalDue =
 		billingCycle === "monthly" ? totalMonthlyPrice : totalAnnualPrice;
@@ -437,21 +337,32 @@ export default function PaymentPage() {
 					) : (
 						<>
 							<h2 className="mb-6 flex items-center gap-2 font-bold text-xl">
-								Pagamento seguro e garantido pelo Mercado Pago
-								<Image
-									alt="logo"
-									height={30}
-									priority
-									src="/mercado-pago-wordmark.svg"
-									width={90}
-								/>
+								Pagamento via Stripe
 							</h2>
 							{error && (
 								<div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-red-600">
 									{error}
 								</div>
 							)}
-							<div id="cardPaymentBrick_container" />
+							<div className="rounded-md border bg-gray-50 p-4 text-gray-600">
+								Você será redirecionado ao Checkout seguro da Stripe.
+							</div>
+							<div className="mt-4">
+								<Button
+									className="w-full"
+									disabled={loading}
+									onClick={handleStripeCheckout}
+								>
+									{loading ? (
+										<>
+											<Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+											Iniciando checkout...
+										</>
+									) : (
+										<>Continuar com Stripe</>
+									)}
+								</Button>
+							</div>
 							{loading && (
 								<div className="mt-4 flex items-center justify-center gap-2 text-gray-600">
 									<Loader2 className="h-5 w-5 animate-spin" /> Processando sua
@@ -465,3 +376,5 @@ export default function PaymentPage() {
 		</>
 	);
 }
+
+// Removed global handleStripeCheckout definition to avoid scope issues

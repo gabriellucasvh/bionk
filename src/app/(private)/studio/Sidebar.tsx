@@ -424,7 +424,7 @@ const Sidebar = () => {
 													return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
 												case "pro":
 													return "bg-radial-[at_50%_75%] from-yellow-500 via-purple-500 to-blue-500 text-white";
-												case "premium":
+												case "ultra":
 													return "bg-gradient-to-r from-blue-600 to-blue-500 text-white";
 												default:
 													return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";

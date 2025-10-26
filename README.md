@@ -58,9 +58,10 @@ Bionk é uma plataforma **Link in Bio** moderna e personalizável, desenvolvida 
     - `CLOUDINARY_CLOUD_NAME=...`
     - `CLOUDINARY_API_KEY=...`
     - `CLOUDINARY_API_SECRET=...`
-  - Mercado Pago:
-    - `MERCADO_PAGO_ACCESS_TOKEN=...`
-    - `MERCADO_PAGO_WEBHOOK_SECRET=...`
+  - Pagamentos (Stripe):
+    - `STRIPE_SECRET_KEY=...`
+    - `STRIPE_WEBHOOK_SECRET=...`
+    - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=...`
   - Emails (Resend):
     - `RESEND_API_KEY=...`
   - Biblioteca de Mídias (novo):
@@ -73,20 +74,9 @@ Bionk é uma plataforma **Link in Bio** moderna e personalizável, desenvolvida 
    npm run dev
    ```
 
-## 💳 Integração com Mercado Pago
+## 💳 Pagamentos
 
-O projeto inclui integração completa com o Mercado Pago para processamento de pagamentos de assinaturas. Para configurar:
-
-1. Crie uma conta no [Mercado Pago](https://www.mercadopago.com.br/)
-2. Obtenha suas credenciais de acesso no painel de desenvolvedores
-3. Configure o token de acesso no arquivo `.env`
-4. Para testes, use o ambiente de sandbox do Mercado Pago
-
-A integração suporta:
-- Pagamentos de assinaturas mensais e anuais
-- Webhooks para notificações de pagamento
-- Redirecionamento após pagamento (sucesso, falha, pendente)
-
+Estamos migrando para Stripe para simplificar a configuração. Consulte `STRIPE_SETUP.md` para os passos que você deve seguir na plataforma da Stripe após criar sua conta.
 6. Acesse no navegador:
 
    ```

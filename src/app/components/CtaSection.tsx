@@ -1,9 +1,9 @@
 "use client";
 
-import { BaseButton } from "@/components/buttons/BaseButton";
 import { ArrowRight, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { BaseButton } from "@/components/buttons/BaseButton";
 
 export default function CtaSection() {
 	const router = useRouter();
@@ -43,7 +43,7 @@ export default function CtaSection() {
 							onClick={() => handleClick("/planos")}
 						>
 							<span className="flex items-center">
-								Ver Planos Premium <Users className="ml-2 h-5 w-5" />
+								Ver Planos Ultra <Users className="ml-2 h-5 w-5" />
 							</span>
 						</BaseButton>
 					</div>

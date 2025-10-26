@@ -1,5 +1,15 @@
 "use client";
 
+import {
+	Blend,
+	ChartNoAxesCombined,
+	Globe,
+	PartyPopper,
+	Plus,
+	Rocket,
+} from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
@@ -17,16 +27,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import {
-	Blend,
-	ChartNoAxesCombined,
-	Globe,
-	PartyPopper,
-	Plus,
-	Rocket,
-} from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 const featureCards = [
 	{
@@ -92,7 +92,7 @@ const faqItems = [
 		value: "item-5",
 		trigger: "Qual é o modelo de monetização da Bionk?",
 		content:
-			"A Bionk disponibiliza um modelo freemium, permitindo que você utilize funcionalidades básicas gratuitamente. Para acessar recursos avançados, como análises detalhadas e opções de customização extras, são oferecidos planos premium. Assim, você pode escolher a solução que melhor se adapta às suas necessidades e objetivos de crescimento.",
+			"A Bionk disponibiliza um modelo freemium, permitindo que você utilize funcionalidades básicas gratuitamente. Para acessar recursos avançados, como análises detalhadas e opções de customização extras, são oferecidos planos ultra. Assim, você pode escolher a solução que melhor se adapta às suas necessidades e objetivos de crescimento.",
 	},
 	{
 		value: "item-6",

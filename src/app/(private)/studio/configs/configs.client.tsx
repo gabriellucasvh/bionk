@@ -68,29 +68,17 @@ function CancelSubscriptionButton() {
 		setMessage("");
 		setShowCancelDialog(false);
 		try {
-			console.log("Iniciando cancelamento da assinatura...");
-
-			const response = await fetch("/api/mercadopago/cancel-subscription", {
+			const res = await fetch("/api/stripe/customer-portal", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
 			});
-
-			console.log("Response status:", response.status);
-			console.log("Response URL:", response.url);
-
-			const data = await response.json();
-			console.log("Response data:", data);
-
-			if (!response.ok) {
-				throw new Error(data.details || data.error || "Falha ao cancelar.");
+			const data = await res.json();
+			if (!(res.ok && data?.url)) {
+				throw new Error(data?.error || "Falha ao abrir o Customer Portal");
 			}
-
-			setMessage(data.message);
-			// Atualiza o subscription plan no contexto
+			// Redireciona o usuário para o Customer Portal da Stripe
+			window.location.href = data.url;
+			// Opcionalmente atualiza estado local após retorno
 			await refreshSubscriptionPlan();
-			setTimeout(() => window.location.reload(), 2000);
 		} catch (err: any) {
 			console.error("Erro ao cancelar assinatura:", err);
 			setError(err.message);
@@ -118,8 +106,8 @@ function CancelSubscriptionButton() {
 							Cancelar Assinatura
 						</AlertDialogTitle>
 						<AlertDialogDescription className="dark:text-zinc-400">
-							Você tem certeza? Sua assinatura será cancelada e seus benefícios
-							removidos no final do ciclo atual.
+							Você tem certeza? Você será levado ao Customer Portal para
+							gerenciar ou cancelar sua assinatura.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
@@ -158,7 +146,7 @@ function UpgradeSubscriptionCard() {
 
 				<CardHeader className="relative z-10">
 					<CardTitle className="flex items-center gap-3 font-bold text-white text-xl">
-						Desbloqueie o Poder Premium!
+						Desbloqueie o Poder Ultra!
 					</CardTitle>
 					<CardDescription className="text-base text-green-50/90 leading-relaxed">
 						Você está a um passo da{" "}

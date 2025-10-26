@@ -18,10 +18,22 @@ model User {
   emailVerified                 DateTime?
   image                         String?        @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png")
   bannerUrl                     String?
+  googleId                      String?
   hashedPassword                String?
   createdAt                     DateTime       @default(now())
+  onboardingCompleted           Boolean        @default(false)
   template                      String         @default("default")
   templateCategory              String         @default("classicos")
+  sensitiveProfile              Boolean        @default(false)
+  isBanned                      Boolean        @default(false)
+  banReason                     String?        @default("violation")
+  pendingSubscriptionPlan       String?
+  status                        String         @default("pending")
+  subscriptionPlan              String?
+  subscriptionStatus            String?
+  billingCycle                  String?
+  subscriptionEndDate           DateTime?
+  subscriptionStartDate         DateTime?
   passwordResetExpires          DateTime?
   passwordResetToken            String?        @unique
   emailVerificationToken        String?        @unique
@@ -39,21 +51,11 @@ model User {
   verificationTokenExpiry       DateTime?
   usernameReservedAt            DateTime?
   usernameReservationExpiry     DateTime?
-  googleId                      String?
-  subscriptionPlan              String?
-  subscriptionStatus            String?
-  billingCycle                  String?
-  subscriptionEndDate           DateTime?
-  subscriptionStartDate         DateTime?
-  mercadopagoSubscriptionId     String?
+  stripeCustomerId              String?
+  stripeSubscriptionId          String?
+  stripePriceId                 String?
   paymentMethodBrand            String?
   paymentMethodLastFour         String?
-  pendingSubscriptionPlan       String?
-  onboardingCompleted           Boolean        @default(false)
-  status                        String         @default("pending")
-  sensitiveProfile              Boolean        @default(false)
-  isBanned                      Boolean        @default(false)
-  banReason                     String?        @default("violation")
   bannedAt                      DateTime?
   accounts                      Account[]
   CustomPresets                 CustomPresets?
@@ -302,23 +304,23 @@ model Image {
 }
 
 model Music {
-  id         Int      @id @default(autoincrement())
-  title      String
-  url        String
-  platform   String   @default("spotify")
-  authorName String?
+  id           Int      @id @default(autoincrement())
+  title        String
+  url          String
+  platform     String   @default("spotify")
+  authorName   String?
   thumbnailUrl String?
-  usePreview Boolean  @default(true)
-  order      Int      @default(0)
-  userId     String
-  active     Boolean  @default(true)
-  sectionId  Int?
-  isCompact  Boolean  @default(false)
-  archived   Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  section    Section? @relation(fields: [sectionId], references: [id])
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usePreview   Boolean  @default(true)
+  order        Int      @default(0)
+  userId       String
+  active       Boolean  @default(true)
+  sectionId    Int?
+  isCompact    Boolean  @default(false)
+  archived     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  section      Section? @relation(fields: [sectionId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([sectionId])
   @@index([userId])
