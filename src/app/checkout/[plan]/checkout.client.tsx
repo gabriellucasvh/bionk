@@ -276,10 +276,27 @@ export default function PaymentPage() {
 									if (!response.ok) {
 										throw new Error(data.details || "Erro ao criar assinatura");
 									}
-									router.push("/studio?subscription=success");
+
+									// Redireciona conforme a resposta do backend/Mercado Pago
+									if (data?.init_point) {
+										// URL externa do Mercado Pago para concluir a autorização
+										window.location.href = data.init_point;
+										return;
+									}
+
+									const status = String(data?.status || "").toLowerCase();
+									if (status === "authorized" || status === "active") {
+										// Assinatura confirmada imediatamente
+										router.push("/checkout/success");
+									} else if (status === "pending") {
+										// Aguardando aprovação/pagamento
+										router.push("/checkout/pending");
+									} else {
+										// Falha ou status inesperado
+										router.push("/checkout/failure");
+									}
 								} catch (err: any) {
 									setError(err.message || "Ocorreu um erro. Tente novamente.");
-								} finally {
 									setLoading(false);
 								}
 							},
