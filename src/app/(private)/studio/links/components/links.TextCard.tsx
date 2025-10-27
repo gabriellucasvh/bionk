@@ -8,9 +8,7 @@ import {
 	Edit,
 	Grip,
 	MoreVertical,
-	Save,
 	Trash2,
-	X,
 } from "lucide-react";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -138,18 +136,11 @@ const TextCard = ({
 	if (text.isEditing) {
 		return (
 			<article
-				className={`relative flex flex-col gap-3 rounded-3xl border bg-white p-3 transition-all sm:p-4 dark:bg-zinc-900 ${
+				className={`flex flex-col gap-3 rounded-lg border-2 border-foreground/20 p-3 sm:p-4 ${
 					isDragging ? "opacity-50" : ""
 				}`}
 			>
 				<div className="flex items-start gap-2 sm:gap-4">
-					<div
-						ref={setActivatorNodeRef}
-						{...listeners}
-						className="cursor-grab touch-none pt-1"
-					>
-						<Grip className="h-5 w-5 text-muted-foreground" />
-					</div>
 					<div className="flex-1 space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor={`title-${text.id}`}>Título</Label>
@@ -240,7 +231,6 @@ const TextCard = ({
 				</div>
 				<div className="flex items-center justify-end gap-2 border-t pt-3">
 					<BaseButton onClick={handleCancel} variant="white">
-						<X className="mr-2 h-4 w-4" />
 						Cancelar
 					</BaseButton>
 					<BaseButton
@@ -249,7 +239,6 @@ const TextCard = ({
 						onClick={handleSave}
 						variant="default"
 					>
-						<Save className="mr-2 h-4 w-4" />
 						Salvar
 					</BaseButton>
 				</div>
