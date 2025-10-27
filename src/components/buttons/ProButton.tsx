@@ -30,7 +30,7 @@ export function ProButton({
 }: ProButtonProps) {
 	const baseClasses = cn(
 		"inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-semibold text-xs",
-		"bg-black/70 text-white transition-all duration-700 hover:bg-black/80",
+		"bg-black/80 text-white",
 		"shadow-sm transition-shadow hover:shadow-md",
 		size === "xs" && "px-2 py-0.5 text-xs",
 		size === "md" && "px-3 py-1.5 text-sm",
@@ -44,19 +44,6 @@ export function ProButton({
 			{/* Botão */}
 			<span
 				className={baseClasses}
-				onMouseEnter={(e) => {
-					e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.8)";
-				}}
-				onMouseLeave={(e) => {
-					e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.7)";
-				}}
-				role="none"
-				style={{
-					backgroundColor: "rgba(0,0,0,0.7)",
-					color: "white",
-					border: "none",
-					transition: "background-color 400ms ease",
-				}}
 			>
 				<Sparkle className="h-3.5 w-3.5" />
 				<span>{label}</span>
