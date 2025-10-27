@@ -8,8 +8,9 @@ import {
 	MoreVertical,
 	Tags,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import { ProButton } from "@/components/buttons/ProButton";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,8 @@ import {
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { useSubscription } from "@/providers/subscriptionProvider";
+import { useFeatureStore } from "@/stores/featureStore";
 import type { SectionItem } from "../types/links.types";
 
 // Tipos e Interfaces
@@ -123,6 +126,8 @@ const ExpirePanel = ({ formData, setFormData }: PanelProps) => (
 						"w-full justify-start text-left font-normal",
 						!formData.expiresAt && "text-muted-foreground"
 					)}
+					disabled={false}
+					// Desabilita interação quando plano não permite
 					variant="outline"
 				>
 					<CalendarIcon className="mr-2 h-4 w-4" />
@@ -140,6 +145,41 @@ const ExpirePanel = ({ formData, setFormData }: PanelProps) => (
 					mode="single"
 					onSelect={(date) => setFormData({ ...formData, expiresAt: date })}
 					selected={formData.expiresAt}
+				/>
+			</PopoverContent>
+		</Popover>
+	</div>
+);
+
+// Painel de Lançamento
+const LaunchPanel = ({ formData, setFormData }: PanelProps) => (
+	<div className="grid gap-2 rounded-md border bg-background/50 p-3">
+		<Label className="mb-2">Data de Lançamento</Label>
+		<Popover>
+			<PopoverTrigger asChild>
+				<Button
+					className={cn(
+						"w-full justify-start text-left font-normal",
+						!formData.launchesAt && "text-muted-foreground"
+					)}
+					disabled={false}
+					variant="outline"
+				>
+					<CalendarIcon className="mr-2 h-4 w-4" />
+					{formData.launchesAt ? (
+						format(formData.launchesAt, "PPP")
+					) : (
+						<span>Escolha uma data</span>
+					)}
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className="z-[60] w-auto p-0">
+				<Calendar
+					disabled={{ before: new Date() }}
+					initialFocus
+					mode="single"
+					onSelect={(date) => setFormData({ ...formData, launchesAt: date })}
+					selected={formData.launchesAt}
 				/>
 			</PopoverContent>
 		</Popover>
@@ -164,10 +204,22 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 		(() => Promise.resolve());
 	const isSaveDisabled = props.isSaveDisabled ?? false;
 
+	const { subscriptionPlan } = useSubscription();
+	const { setSubscriptionPlan } = useFeatureStore();
+	useEffect(() => {
+		if (subscriptionPlan) {
+			setSubscriptionPlan(subscriptionPlan as any);
+		}
+	}, [subscriptionPlan, setSubscriptionPlan]);
+	const canUseAdvancedDates = ["basic", "pro", "ultra"].includes(
+		subscriptionPlan ?? "free"
+	);
+
 	const [isLoading, setIsLoading] = useState(false);
 	// Estados de toggle das opções avançadas
 	const [passwordEnabled, setPasswordEnabled] = useState(false);
 	const [expiresEnabled, setExpiresEnabled] = useState(false);
+	const [launchEnabled, setLaunchEnabled] = useState(false);
 	const [deleteClicksEnabled, setDeleteClicksEnabled] = useState(false);
 	const [badgeEnabled, setBadgeEnabled] = useState(false);
 
@@ -260,7 +312,12 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 							<div className="flex items-start gap-3">
 								<Clock className="mt-0.5 h-5 w-5" />
 								<div>
-									<div className="font-medium">Data de Expiração</div>
+									<div className="flex items-center gap-2">
+										<div className="font-medium">Data de Expiração</div>
+										{!canUseAdvancedDates && (
+											<ProButton href="/studio/plans" label="PRO" size="xs" />
+										)}
+									</div>
 									<div className="text-muted-foreground text-sm">
 										Link ficará inativo automaticamente
 									</div>
@@ -268,6 +325,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 							</div>
 							<Switch
 								checked={expiresEnabled}
+								disabled={!canUseAdvancedDates}
 								onCheckedChange={(v) => {
 									setExpiresEnabled(v);
 									if (!v) {
@@ -276,7 +334,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 								}}
 							/>
 						</div>
-						{expiresEnabled && (
+						{expiresEnabled && canUseAdvancedDates && (
 							<div className="mt-2">
 								<ExpirePanel formData={formData} setFormData={setFormData} />
 								<div className="mt-3 flex items-start justify-between gap-3 rounded-md border bg-background/50 p-3">
@@ -295,6 +353,41 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 										}}
 									/>
 								</div>
+							</div>
+						)}
+					</div>
+
+					{/* Lançamento */}
+					<div className="rounded-2xl border p-3">
+						<div className="flex items-start justify-between gap-3">
+							<div className="flex items-start gap-3">
+								<Clock className="mt-0.5 h-5 w-5" />
+								<div>
+									<div className="flex items-center gap-2">
+										<div className="font-medium">Lançamento</div>
+										{!canUseAdvancedDates && (
+											<ProButton href="/studio/plans" label="PRO" size="xs" />
+										)}
+									</div>
+									<div className="text-muted-foreground text-sm">
+										Link será lançado automaticamente
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={launchEnabled}
+								disabled={!canUseAdvancedDates}
+								onCheckedChange={(v) => {
+									setLaunchEnabled(v);
+									if (!v) {
+										setFormData({ ...formData, launchesAt: undefined });
+									}
+								}}
+							/>
+						</div>
+						{launchEnabled && canUseAdvancedDates && (
+							<div className="mt-2">
+								<LaunchPanel formData={formData} setFormData={setFormData} />
 							</div>
 						)}
 					</div>

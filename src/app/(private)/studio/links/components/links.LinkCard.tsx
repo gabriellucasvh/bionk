@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useState } from "react";
 import ArchivingLoader from "@/components/animations/ArchivingLoader";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import { ProButton } from "@/components/buttons/ProButton";
 import ImageCropModal from "@/components/modals/ImageCropModal";
 import {
 	AlertDialog,
@@ -43,6 +44,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
+import { useSubscription } from "@/providers/subscriptionProvider";
 import type { LinkItem } from "../types/links.types";
 import { isValidUrl } from "../utils/links.helpers";
 import { useCountdown } from "../utils/useCountdown";
@@ -114,6 +116,12 @@ const EditingView = ({
 	| "onClickLink"
 >) => {
 	const [isLoading, setIsLoading] = useState(false);
+
+	// Determina se o usuário pode usar datas avançadas com base no plano
+	const { subscriptionPlan } = useSubscription();
+	const canUseAdvancedDates = ["basic", "pro", "ultra"].includes(
+		subscriptionPlan ?? "free"
+	);
 
 	const toInputValue = (iso?: string | null) => {
 		if (!iso) {
@@ -255,19 +263,25 @@ const EditingView = ({
 					{/* Data de Expiração */}
 					<div className="rounded-2xl border p-3">
 						<div className="flex items-center justify-between gap-3">
-							<div className="flex items-center gap-3">
-								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-									<Clock className="h-5 w-5" />
-								</div>
-								<div>
+						<div className="flex items-center gap-3">
+							<div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+								<Clock className="h-5 w-5" />
+							</div>
+							<div>
+								<div className="flex items-center gap-2">
 									<div className="font-medium">Data de Expiração</div>
-									<div className="text-muted-foreground text-sm">
-										Link ficará inativo automaticamente
-									</div>
+									{!canUseAdvancedDates && (
+										<ProButton href="/studio/plans" label="PRO" size="xs" />
+									)}
+								</div>
+								<div className="text-muted-foreground text-sm">
+									Link ficará inativo automaticamente
 								</div>
 							</div>
+						</div>
 							<Switch
 								checked={expiresEnabled}
+								disabled={!canUseAdvancedDates}
 								onCheckedChange={(v) => {
 									setExpiresEnabled(v);
 									if (!v) {
@@ -276,7 +290,7 @@ const EditingView = ({
 								}}
 							/>
 						</div>
-						{expiresEnabled && (
+						{expiresEnabled && canUseAdvancedDates && (
 							<div className="mt-2 space-y-2">
 								<div className="grid gap-2">
 									<Label htmlFor="expiresAt">Expira em</Label>
@@ -435,19 +449,25 @@ const EditingView = ({
 					{/* Lançamento */}
 					<div className="rounded-2xl border p-3">
 						<div className="flex items-center justify-between gap-3">
-							<div className="flex items-center gap-3">
-								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
-									<Clock className="h-5 w-5" />
-								</div>
-								<div>
+						<div className="flex items-center gap-3">
+							<div className="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+								<Clock className="h-5 w-5" />
+							</div>
+							<div>
+								<div className="flex items-center gap-2">
 									<div className="font-medium">Lançamento</div>
-									<div className="text-muted-foreground text-sm">
-										Link será lançado automaticamente
-									</div>
+									{!canUseAdvancedDates && (
+										<ProButton href="/studio/plans" label="PRO" size="xs" />
+									)}
+								</div>
+								<div className="text-muted-foreground text-sm">
+									Link será lançado automaticamente
 								</div>
 							</div>
+						</div>
 							<Switch
 								checked={launchEnabled}
+								disabled={!canUseAdvancedDates}
 								onCheckedChange={(v) => {
 									setLaunchEnabled(v);
 									if (!v) {
@@ -456,7 +476,7 @@ const EditingView = ({
 								}}
 							/>
 						</div>
-						{launchEnabled && (
+						{launchEnabled && canUseAdvancedDates && (
 							<div className="mt-2">
 								<div className="grid gap-2">
 									<Label htmlFor="launchesAt">Lançamento Agendado</Label>
