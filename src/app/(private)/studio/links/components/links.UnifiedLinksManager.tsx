@@ -34,6 +34,27 @@ const UnifiedLinksManager = () => {
 	const userId = session?.user?.id;
 	const [activeTab, setActiveTab] = useState<"links" | "socials">("links");
 	const hasLoadedSocials = useRef(false);
+	const hasLoadedVideos = useRef(false);
+	const hasLoadedImages = useRef(false);
+	const hasLoadedMusics = useRef(false);
+	const hasLoadedLinks = useRef(false);
+	const hasLoadedTexts = useRef(false);
+	const hasLoadedSections = useRef(false);
+
+	// Resumo de conteúdo para decidir carregamentos sob demanda
+	const { data: summaryData, isLoading: isLoadingSummary } = useSWR<{
+		linksCount: number;
+		textsCount: number;
+		videosCount: number;
+		imagesCount: number;
+		musicsCount: number;
+		socialLinksCount: number;
+		sectionsCount: number;
+	}>(userId ? `/api/content-summary?userId=${userId}` : null, fetcher, {
+		revalidateOnFocus: false,
+		revalidateOnReconnect: false,
+		revalidateIfStale: false,
+	});
 
 	// Hook SWR para links padrão
 	const {
@@ -42,7 +63,13 @@ const UnifiedLinksManager = () => {
 		isLoading: isLoadingLinks,
 	} = useSWR<{ links: LinkItem[] }>(
 		userId ? `/api/links?userId=${userId}` : null,
-		fetcher
+		fetcher,
+		{
+			revalidateOnMount: false,
+			revalidateOnFocus: false,
+			revalidateIfStale: false,
+			revalidateOnReconnect: false,
+		}
 	);
 
 	// Hook SWR para links sociais (mantido montado; busca apenas na primeira entrada da aba)
@@ -61,20 +88,34 @@ const UnifiedLinksManager = () => {
 		}
 	);
 
-	// Dispara a primeira busca de socials apenas quando a aba é ativada
+	// Dispara a primeira busca de socials apenas quando há redes existentes e a aba é ativada
 	useEffect(() => {
-		if (activeTab === "socials" && userId && !hasLoadedSocials.current) {
+		if (
+			activeTab === "socials" &&
+			userId &&
+			!hasLoadedSocials.current &&
+			(summaryData?.socialLinksCount ?? 0) > 0
+		) {
 			hasLoadedSocials.current = true;
 			mutateSocialLinks();
 		}
-	}, [activeTab, userId, mutateSocialLinks]);
+	}, [activeTab, userId, summaryData?.socialLinksCount, mutateSocialLinks]);
 
 	// Hook SWR para seções
 	const {
 		data: sectionsData,
 		mutate: mutateSections,
 		isLoading: isLoadingSections,
-	} = useSWR<SectionItem[]>(userId ? "/api/sections" : null, fetcher);
+	} = useSWR<SectionItem[]>(
+		userId ? "/api/sections" : null,
+		fetcher,
+		{
+			revalidateOnMount: false,
+			revalidateOnFocus: false,
+			revalidateIfStale: false,
+			revalidateOnReconnect: false,
+		}
+	);
 
 	// Hook SWR para textos
 	const {
@@ -83,35 +124,131 @@ const UnifiedLinksManager = () => {
 		isLoading: isLoadingTexts,
 	} = useSWR<{ texts: TextItem[] }>(
 		userId ? `/api/texts?userId=${userId}` : null,
-		fetcher
+		fetcher,
+		{
+			revalidateOnMount: false,
+			revalidateOnFocus: false,
+			revalidateIfStale: false,
+			revalidateOnReconnect: false,
+		}
 	);
 
-	// Hook SWR para vídeos
+	// Hooks SWR para vídeos / imagens / músicas (montados sem revalidação automática)
 	const {
 		data: videosData,
 		mutate: mutateVideos,
 		isLoading: isLoadingVideos,
 	} = useSWR<{ videos: VideoItem[] }>(
 		userId ? `/api/videos?userId=${userId}` : null,
-		fetcher
+		fetcher,
+		{
+			revalidateOnMount: false,
+			revalidateOnFocus: false,
+			revalidateIfStale: false,
+			revalidateOnReconnect: false,
+		}
 	);
 
-	// Hook SWR para imagens (unificado com os demais)
 	const {
 		data: imagesData,
 		mutate: mutateImages,
 		isLoading: isLoadingImages,
-	} = useSWR<{ images: ImageItem[] }>(userId ? "/api/images" : null, fetcher);
+	} = useSWR<{ images: ImageItem[] }>(
+		userId ? "/api/images" : null,
+		fetcher,
+		{
+			revalidateOnMount: false,
+			revalidateOnFocus: false,
+			revalidateIfStale: false,
+			revalidateOnReconnect: false,
+		}
+	);
 
-	// Hook SWR para músicas
 	const {
 		data: musicsData,
 		mutate: mutateMusics,
 		isLoading: isLoadingMusics,
 	} = useSWR<{ musics: MusicItem[] }>(
 		userId ? `/api/musics?userId=${userId}` : null,
-		fetcher
+		fetcher,
+		{
+			revalidateOnMount: false,
+			revalidateOnFocus: false,
+			revalidateIfStale: false,
+			revalidateOnReconnect: false,
+		}
 	);
+
+	// Carregar mídias apenas se existir motivo (contagem > 0) ou ação do usuário
+	useEffect(() => {
+		if (
+			activeTab === "links" &&
+			!hasLoadedVideos.current &&
+			(summaryData?.videosCount ?? 0) > 0
+		) {
+			hasLoadedVideos.current = true;
+			mutateVideos();
+		}
+	}, [activeTab, summaryData?.videosCount, mutateVideos]);
+
+	useEffect(() => {
+		if (
+			activeTab === "links" &&
+			!hasLoadedImages.current &&
+			(summaryData?.imagesCount ?? 0) > 0
+		) {
+			hasLoadedImages.current = true;
+			mutateImages();
+		}
+	}, [activeTab, summaryData?.imagesCount, mutateImages]);
+
+	useEffect(() => {
+		if (
+			activeTab === "links" &&
+			!hasLoadedMusics.current &&
+			(summaryData?.musicsCount ?? 0) > 0
+		) {
+			hasLoadedMusics.current = true;
+			mutateMusics();
+		}
+	}, [activeTab, summaryData?.musicsCount, mutateMusics]);
+
+	// Carregar links/textos/seções apenas se houver itens e estiver na aba
+	useEffect(() => {
+		if (
+			activeTab === "links" &&
+			userId &&
+			!hasLoadedLinks.current &&
+			(summaryData?.linksCount ?? 0) > 0
+		) {
+			hasLoadedLinks.current = true;
+			mutateLinks();
+		}
+	}, [activeTab, userId, summaryData?.linksCount, mutateLinks]);
+
+	useEffect(() => {
+		if (
+			activeTab === "links" &&
+			userId &&
+			!hasLoadedSections.current &&
+			(summaryData?.sectionsCount ?? 0) > 0
+		) {
+			hasLoadedSections.current = true;
+			mutateSections();
+		}
+	}, [activeTab, userId, summaryData?.sectionsCount, mutateSections]);
+
+	useEffect(() => {
+		if (
+			activeTab === "links" &&
+			userId &&
+			!hasLoadedTexts.current &&
+			(summaryData?.textsCount ?? 0) > 0
+		) {
+			hasLoadedTexts.current = true;
+			mutateTexts();
+		}
+	}, [activeTab, userId, summaryData?.textsCount, mutateTexts]);
 
 	// Sincroniza o preview em tempo real com os dados do SWR
 	useEffect(() => {
@@ -142,15 +279,33 @@ const UnifiedLinksManager = () => {
 		musicsData,
 	]);
 
+	const showSocialsLoader =
+		activeTab === "socials" &&
+		(summaryData?.socialLinksCount ?? 0) > 0 &&
+		isLoadingSocialLinks;
+	const showLinksLoader =
+		activeTab === "links" && (summaryData?.linksCount ?? 0) > 0 && isLoadingLinks;
+	const showSectionsLoader =
+		activeTab === "links" && (summaryData?.sectionsCount ?? 0) > 0 && isLoadingSections;
+	const showTextsLoader =
+		activeTab === "links" && (summaryData?.textsCount ?? 0) > 0 && isLoadingTexts;
+	const showVideosLoader =
+		activeTab === "links" && (summaryData?.videosCount ?? 0) > 0 && isLoadingVideos;
+	const showImagesLoader =
+		activeTab === "links" && (summaryData?.imagesCount ?? 0) > 0 && isLoadingImages;
+	const showMusicsLoader =
+		activeTab === "links" && (summaryData?.musicsCount ?? 0) > 0 && isLoadingMusics;
+
 	if (
 		status === "loading" ||
-		isLoadingLinks ||
-		(activeTab === "socials" && isLoadingSocialLinks) ||
-		isLoadingSections ||
-		isLoadingTexts ||
-		isLoadingVideos ||
-		isLoadingImages ||
-		isLoadingMusics
+		isLoadingSummary ||
+		showLinksLoader ||
+		showSocialsLoader ||
+		showSectionsLoader ||
+		showTextsLoader ||
+		showVideosLoader ||
+		showImagesLoader ||
+		showMusicsLoader
 	) {
 		return <LoadingPage />;
 	}
