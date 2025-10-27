@@ -3,7 +3,6 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
 import type * as React from "react";
-
 import { cn } from "@/lib/utils";
 
 function Dialog({
@@ -50,9 +49,13 @@ function DialogContent({
 	className,
 	children,
 	showCloseButton = true,
+	preventCloseOnInteractOutside = false,
+	preventCloseOnEscape = false,
 	...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
 	showCloseButton?: boolean;
+	preventCloseOnInteractOutside?: boolean;
+	preventCloseOnEscape?: boolean;
 }) {
 	return (
 		<DialogPortal data-slot="dialog-portal">
@@ -63,6 +66,12 @@ function DialogContent({
 					className
 				)}
 				data-slot="dialog-content"
+				onEscapeKeyDown={
+					preventCloseOnEscape ? (e) => e.preventDefault() : undefined
+				}
+				onInteractOutside={
+					preventCloseOnInteractOutside ? (e) => e.preventDefault() : undefined
+				}
 				{...props}
 			>
 				{children}

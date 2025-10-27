@@ -216,7 +216,11 @@ const ProfileImageCropModal: FC<ProfileImageCropModalProps> = ({
 
 	return (
 		<Dialog onOpenChange={isProcessing ? undefined : handleClose} open={isOpen}>
-			<DialogContent className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 shadow-xl sm:max-w-lg">
+			<DialogContent
+				className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 shadow-xl sm:max-w-lg"
+				preventCloseOnInteractOutside
+				preventCloseOnEscape
+			>
 				<DialogHeader>
 					<DialogTitle className="text-center font-bold text-gray-900 text-xl dark:text-white">
 						Personalizar Foto de Perfil

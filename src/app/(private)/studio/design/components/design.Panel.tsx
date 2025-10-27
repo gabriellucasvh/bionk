@@ -39,23 +39,26 @@ const convertCustomizationsToRecord = (
 });
 
 export function DesignPanel() {
-	const {
-		userData,
-		customizations,
-		updateCustomization,
-		hasUnsavedChanges,
-		saveChanges,
-		discardChanges,
-	} = useDesignStore();
+    const {
+        userData,
+        customizations,
+        updateCustomization,
+        hasUnsavedChanges,
+        saveChanges,
+        discardChanges,
+        // UI store
+        isBackgroundModalOpen,
+        backgroundModalType,
+        isFontModalOpen,
+        setIsBackgroundModalOpen,
+        setBackgroundModalType,
+        setIsFontModalOpen,
+    } = useDesignStore();
 
 	const [activeColorPicker, setActiveColorPicker] = useState<string | null>(
 		null
 	);
-	const [isFontModalOpen, setIsFontModalOpen] = useState(false);
-	const [isBackgroundModalOpen, setIsBackgroundModalOpen] = useState(false);
-	const [backgroundModalType, setBackgroundModalType] = useState<
-		"image" | "video"
-	>("image");
+    // Estado de UI agora vem do store para persistência
 	const [isSavingPending, setIsSavingPending] = useState(false);
 
 	// Tipo de fundo selecionado (apenas um por vez)
@@ -85,11 +88,11 @@ export function DesignPanel() {
 		setBackgroundType(type);
 
 		// Para imagem/vídeo, abrir modal de seleção sem alterar o preview atual.
-		if (type === "image" || type === "video") {
-			setBackgroundModalType(type);
-			setIsBackgroundModalOpen(true);
-		}
-	};
+        if (type === "image" || type === "video") {
+            setBackgroundModalType(type);
+            setIsBackgroundModalOpen(true);
+        }
+    };
 
 	const handleSavePending = async () => {
 		try {

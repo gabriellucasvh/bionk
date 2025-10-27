@@ -75,6 +75,11 @@ interface DesignStore {
 	userData: UserData | null;
 	customizations: Customizations;
 
+	// Estado de UI (persistência de modais)
+	isBackgroundModalOpen: boolean;
+	backgroundModalType: "image" | "video";
+	isFontModalOpen: boolean;
+
 	// Estado original (do banco)
 	originalUserData: UserData | null;
 	originalCustomizations: Customizations;
@@ -98,6 +103,11 @@ interface DesignStore {
 	// Ações de controle
 	setLoading: (loading: boolean) => void;
 	setSaving: (saving: boolean) => void;
+
+	// Ações de UI
+	setIsBackgroundModalOpen: (open: boolean) => void;
+	setBackgroundModalType: (type: "image" | "video") => void;
+	setIsFontModalOpen: (open: boolean) => void;
 
 	// Ações de persistência
 	loadInitialData: (userData: UserData, customizations: Customizations) => void;
@@ -134,6 +144,11 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
 	isLoading: false,
 	isSaving: false,
 	hasUnsavedChanges: false,
+
+	// UI inicial
+	isBackgroundModalOpen: false,
+	backgroundModalType: "image",
+	isFontModalOpen: false,
 
 	// Ações para dados do usuário
 	setUserData: (userData) => {
@@ -180,6 +195,17 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
 
 	setSaving: (saving) => {
 		set({ isSaving: saving });
+	},
+
+	// Ações de UI
+	setIsBackgroundModalOpen: (open) => {
+		set({ isBackgroundModalOpen: open });
+	},
+	setBackgroundModalType: (type) => {
+		set({ backgroundModalType: type });
+	},
+	setIsFontModalOpen: (open) => {
+		set({ isFontModalOpen: open });
 	},
 
 	// Carregamento inicial
