@@ -3,7 +3,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
@@ -19,10 +19,10 @@ import type { SocialLinkItem } from "@/types/social";
 import type {
 	ImageItem,
 	LinkItem,
+	MusicItem,
 	SectionItem,
 	TextItem,
 	VideoItem,
-	MusicItem,
 } from "../types/links.types";
 import { fetcher } from "../utils/links.helpers";
 
@@ -32,6 +32,8 @@ import SocialLinksTabContent from "./links.SocialLinksTabContent";
 const UnifiedLinksManager = () => {
 	const { data: session, status } = useSession();
 	const userId = session?.user?.id;
+	const [activeTab, setActiveTab] = useState<"links" | "socials">("links");
+	const hasLoadedSocials = useRef(false);
 
 	// Hook SWR para links padrão
 	const {
@@ -43,15 +45,29 @@ const UnifiedLinksManager = () => {
 		fetcher
 	);
 
-	// Hook SWR para links sociais
+	// Hook SWR para links sociais (mantido montado; busca apenas na primeira entrada da aba)
 	const {
 		data: socialLinksData,
 		mutate: mutateSocialLinks,
 		isLoading: isLoadingSocialLinks,
 	} = useSWR<{ socialLinks: SocialLinkItem[] }>(
 		userId ? `/api/social-links?userId=${userId}` : null,
-		fetcher
+		fetcher,
+		{
+			revalidateOnMount: false,
+			revalidateOnFocus: false,
+			revalidateIfStale: false,
+			revalidateOnReconnect: false,
+		}
 	);
+
+	// Dispara a primeira busca de socials apenas quando a aba é ativada
+	useEffect(() => {
+		if (activeTab === "socials" && userId && !hasLoadedSocials.current) {
+			hasLoadedSocials.current = true;
+			mutateSocialLinks();
+		}
+	}, [activeTab, userId, mutateSocialLinks]);
 
 	// Hook SWR para seções
 	const {
@@ -117,12 +133,19 @@ const UnifiedLinksManager = () => {
 			images: (imagesData?.images || []) as any,
 			musics: (musicsData?.musics || []) as any,
 		});
-	}, [linksData, socialLinksData, textsData, videosData, imagesData, musicsData]);
+	}, [
+		linksData,
+		socialLinksData,
+		textsData,
+		videosData,
+		imagesData,
+		musicsData,
+	]);
 
 	if (
 		status === "loading" ||
 		isLoadingLinks ||
-		isLoadingSocialLinks ||
+		(activeTab === "socials" && isLoadingSocialLinks) ||
 		isLoadingSections ||
 		isLoadingTexts ||
 		isLoadingVideos ||
@@ -134,7 +157,11 @@ const UnifiedLinksManager = () => {
 
 	return (
 		<section className="mx-auto min-h-dvh w-full max-w-4xl touch-manipulation pb-4">
-			<Tabs className="w-full" defaultValue="links">
+			<Tabs
+				className="w-full"
+				onValueChange={(v) => setActiveTab(v as "links" | "socials")}
+				value={activeTab}
+			>
 				<Card className="border-none px-4 shadow-none dark:bg-zinc-800">
 					<CardHeader className="flex flex-col items-start justify-between px-2 sm:px-6 lg:flex-row lg:items-center">
 						<div className="mb-4 sm:mb-0">
@@ -146,8 +173,12 @@ const UnifiedLinksManager = () => {
 							</CardDescription>
 						</div>
 						<TabsList className="rounded-full">
-							<TabsTrigger value="links" className="rounded-full">Meus Links</TabsTrigger>
-							<TabsTrigger value="socials" className="rounded-full">Redes Sociais</TabsTrigger>
+							<TabsTrigger className="rounded-full" value="links">
+								Meus Links
+							</TabsTrigger>
+							<TabsTrigger className="rounded-full" value="socials">
+								Redes Sociais
+							</TabsTrigger>
 						</TabsList>
 					</CardHeader>
 					<CardContent className="space-y-4 p-2 sm:p-6">
@@ -155,16 +186,16 @@ const UnifiedLinksManager = () => {
 							<LinksTabContent
 								currentImages={imagesData?.images || []}
 								currentLinks={linksData?.links || []}
+								currentMusics={musicsData?.musics || []}
 								currentSections={sectionsData || []}
 								currentTexts={textsData?.texts || []}
 								currentVideos={videosData?.videos || []}
-								currentMusics={musicsData?.musics || []}
 								mutateImages={mutateImages}
 								mutateLinks={mutateLinks}
+								mutateMusics={mutateMusics}
 								mutateSections={mutateSections}
 								mutateTexts={mutateTexts}
 								mutateVideos={mutateVideos}
-								mutateMusics={mutateMusics}
 								session={session}
 							/>
 						</TabsContent>
