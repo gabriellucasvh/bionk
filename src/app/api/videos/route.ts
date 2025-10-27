@@ -93,24 +93,32 @@ export async function POST(request: Request) {
 			);
 		}
 
-		await prisma.$transaction([
-			prisma.link.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.text.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.section.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.video.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-		]);
+        await prisma.$transaction([
+            prisma.link.updateMany({
+                where: { userId: session.user.id },
+                data: { order: { increment: 1 } },
+            }),
+            prisma.text.updateMany({
+                where: { userId: session.user.id },
+                data: { order: { increment: 1 } },
+            }),
+            prisma.section.updateMany({
+                where: { userId: session.user.id },
+                data: { order: { increment: 1 } },
+            }),
+            prisma.video.updateMany({
+                where: { userId: session.user.id },
+                data: { order: { increment: 1 } },
+            }),
+            prisma.image.updateMany({
+                where: { userId: session.user.id },
+                data: { order: { increment: 1 } },
+            }),
+            prisma.music.updateMany({
+                where: { userId: session.user.id },
+                data: { order: { increment: 1 } },
+            }),
+        ]);
 
 		const video = await prisma.video.create({
 			data: {

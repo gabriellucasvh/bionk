@@ -485,11 +485,21 @@ export const useLinksManager = (
 
 		// Helper que reflete exatamente os IDs usados no LinkList
 		const getSortableId = (item: UnifiedItem) => {
-			if (item.isSection){ return `section-${item.id}`};
-			if (item.isText) {return `text-${item.id}`};
-			if (item.isVideo) {return `video-${item.id}`};
-			if ((item as any).isImage) {return `image-${item.id}`};
-			if ((item as any).isMusic) {return `music-${item.id}`};
+			if (item.isSection) {
+				return `section-${item.id}`;
+			}
+			if (item.isText) {
+				return `text-${item.id}`;
+			}
+			if (item.isVideo) {
+				return `video-${item.id}`;
+			}
+			if ((item as any).isImage) {
+				return `image-${item.id}`;
+			}
+			if ((item as any).isMusic) {
+				return `music-${item.id}`;
+			}
 			return `link-${item.id}`;
 		};
 
@@ -578,14 +588,17 @@ export const useLinksManager = (
 			shareAllowed: formData.shareAllowed ?? false,
 		};
 		setUnifiedItems((prev) => {
-			const cleaned = prev
-				.filter((item) => !(item as any).isDraft)
-				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
-			// Calcula o menor 'order' atual e garante que o rascunho fique acima de todos
+			const cleaned = prev.map((item) =>
+				item.isEditing ? { ...item, isEditing: false } : item
+			);
+			// Calcula o menor 'order' considerando também rascunhos existentes
 			const lowest =
 				cleaned.length > 0 ? Math.min(...cleaned.map((i) => i.order)) : 0;
 			const draftAtTop = { ...draft, order: lowest - 1 } as UnifiedItem;
-			const next = [draftAtTop, ...cleaned];
+			const next = [
+				draftAtTop,
+				...cleaned.filter((item) => !(item as any).isDraft),
+			];
 			return next.sort((a, b) => a.order - b.order);
 		});
 		setOriginalLink(null);
@@ -604,10 +617,14 @@ export const useLinksManager = (
 			body: JSON.stringify({ title: sectionFormData.title.trim() }),
 		});
 
-		await mutateLinks();
-		await mutateSections();
-		await mutateTexts();
-		await mutateVideos();
+		await Promise.all([
+			mutateLinks(),
+			mutateSections(),
+			mutateTexts(),
+			mutateVideos(),
+			mutateImages(),
+			mutateMusics(),
+		]);
 		setSectionFormData(initialSectionFormData);
 		setIsAddingSection(false);
 	};
@@ -637,10 +654,16 @@ export const useLinksManager = (
 			children: undefined as never,
 		};
 		setUnifiedItems((prev) => {
-			const cleaned = prev
-				.filter((item) => !(item as any).isDraft)
-				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
-			const next = [draft, ...cleaned];
+			const cleaned = prev.map((item) =>
+				item.isEditing ? { ...item, isEditing: false } : item
+			);
+			const lowest =
+				cleaned.length > 0 ? Math.min(...cleaned.map((i) => i.order)) : 0;
+			const draftAtTop = { ...draft, order: lowest - 1 } as UnifiedItem;
+			const next = [
+				draftAtTop,
+				...cleaned.filter((item) => !(item as any).isDraft),
+			];
 			return next.sort((a, b) => a.order - b.order);
 		});
 		setOriginalText(null);
@@ -672,10 +695,16 @@ export const useLinksManager = (
 			children: undefined as never,
 		};
 		setUnifiedItems((prev) => {
-			const cleaned = prev
-				.filter((item) => !(item as any).isDraft)
-				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
-			const next = [draft, ...cleaned];
+			const cleaned = prev.map((item) =>
+				item.isEditing ? { ...item, isEditing: false } : item
+			);
+			const lowest =
+				cleaned.length > 0 ? Math.min(...cleaned.map((i) => i.order)) : 0;
+			const draftAtTop = { ...draft, order: lowest - 1 } as UnifiedItem;
+			const next = [
+				draftAtTop,
+				...cleaned.filter((item) => !(item as any).isDraft),
+			];
 			return next.sort((a, b) => a.order - b.order);
 		});
 		setOriginalVideo(null);
@@ -731,10 +760,16 @@ export const useLinksManager = (
 			children: undefined as never,
 		};
 		setUnifiedItems((prev) => {
-			const cleaned = prev
-				.filter((item) => !(item as any).isDraft)
-				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
-			const next = [draft, ...cleaned];
+			const cleaned = prev.map((item) =>
+				item.isEditing ? { ...item, isEditing: false } : item
+			);
+			const lowest =
+				cleaned.length > 0 ? Math.min(...cleaned.map((i) => i.order)) : 0;
+			const draftAtTop = { ...draft, order: lowest - 1 } as UnifiedItem;
+			const next = [
+				draftAtTop,
+				...cleaned.filter((item) => !(item as any).isDraft),
+			];
 			return next.sort((a, b) => a.order - b.order);
 		});
 		setOriginalImage(null);
@@ -832,8 +867,14 @@ export const useLinksManager = (
 				}),
 			});
 			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
-			await mutateVideos();
-			await mutateSections();
+			await Promise.all([
+				mutateLinks(),
+				mutateSections(),
+				mutateTexts(),
+				mutateVideos(),
+				mutateImages(),
+				mutateMusics(),
+			]);
 			setOriginalVideo(null);
 			return;
 		}
@@ -991,8 +1032,14 @@ export const useLinksManager = (
 					}),
 				});
 				setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
-				await mutateImages();
-				await mutateSections();
+				await Promise.all([
+					mutateLinks(),
+					mutateSections(),
+					mutateTexts(),
+					mutateVideos(),
+					mutateImages(),
+					mutateMusics(),
+				]);
 				setOriginalImage(null);
 				return;
 			}
@@ -1053,14 +1100,17 @@ export const useLinksManager = (
 			isEditing: true,
 		};
 		setUnifiedItems((prev) => {
-			const cleaned = prev
-				.filter((item) => !(item as any).isDraft)
-				.map((item) => (item.isEditing ? { ...item, isEditing: false } : item));
-			// Garante que o rascunho de música vá para o topo, como nos links
+			const cleaned = prev.map((item) =>
+				item.isEditing ? { ...item, isEditing: false } : item
+			);
+			// Garante que o rascunho de música vá para o topo
 			const lowest =
 				cleaned.length > 0 ? Math.min(...cleaned.map((i) => i.order)) : 0;
 			const draftAtTop = { ...draft, order: lowest - 1 } as UnifiedItem;
-			const next = [draftAtTop, ...cleaned];
+			const next = [
+				draftAtTop,
+				...cleaned.filter((item) => !(item as any).isDraft),
+			];
 			return next.sort((a, b) => a.order - b.order);
 		});
 		setOriginalMusic(null);
@@ -1157,8 +1207,14 @@ export const useLinksManager = (
 				}),
 			});
 			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
-			await mutateMusics();
-			await mutateSections();
+			await Promise.all([
+				mutateLinks(),
+				mutateSections(),
+				mutateTexts(),
+				mutateVideos(),
+				mutateImages(),
+				mutateMusics(),
+			]);
 			setOriginalMusic(null);
 			return;
 		}
@@ -1212,7 +1268,14 @@ export const useLinksManager = (
 			body: JSON.stringify({ ...formData, url: formattedUrl, sectionId }),
 		});
 
-		await mutateLinks();
+		await Promise.all([
+			mutateLinks(),
+			mutateSections(),
+			mutateTexts(),
+			mutateVideos(),
+			mutateImages(),
+			mutateMusics(),
+		]);
 		setFormData(initialFormData);
 		setIsAdding(false);
 	};
@@ -1482,7 +1545,14 @@ export const useLinksManager = (
 			}
 
 			const newLink = await res.json();
-			await mutateLinks();
+			await Promise.all([
+				mutateLinks(),
+				mutateSections(),
+				mutateTexts(),
+				mutateVideos(),
+				mutateImages(),
+				mutateMusics(),
+			]);
 
 			setUnifiedItems((prev) =>
 				prev.map((item) => {
@@ -1646,21 +1716,54 @@ export const useLinksManager = (
 			| TextItem
 			| undefined;
 		if (target?.isDraft) {
-			await fetch("/api/texts", {
+			// Validação mínima no cliente para evitar 400
+			const trimmedTitle = (title || "").trim();
+			const trimmedDescription = (description || "").trim();
+			if (
+				!(trimmedTitle && trimmedDescription) ||
+				trimmedDescription.length > 1500
+			) {
+				// Mantém em edição para o usuário corrigir os dados
+				setUnifiedItems((prev) =>
+					prev.map((item) =>
+						item.id === id && item.isText ? { ...item, isEditing: true } : item
+					)
+				);
+				return;
+			}
+
+			const response = await fetch("/api/texts", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					title,
-					description,
+					title: trimmedTitle,
+					description: trimmedDescription,
 					position,
 					hasBackground,
 					isCompact,
 					sectionId: target.sectionId ?? null,
 				}),
 			});
+			if (!response.ok) {
+				// Em caso de erro, NÃO remove o rascunho
+				setUnifiedItems((prev) =>
+					prev.map((item) =>
+						item.id === id && item.isText ? { ...item, isEditing: true } : item
+					)
+				);
+				return;
+			}
 			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
-			await mutateTexts();
-			await mutateSections();
+			// Após criar texto, o backend incrementa 'order' de TODOS os tipos.
+			// Para manter a ordenação consistente no cliente, atualize todas as listas.
+			await Promise.all([
+				mutateLinks(),
+				mutateSections(),
+				mutateTexts(),
+				mutateVideos(),
+				mutateImages(),
+				mutateMusics(),
+			]);
 			setOriginalText(null);
 			return;
 		}

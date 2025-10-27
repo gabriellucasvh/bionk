@@ -53,24 +53,32 @@ export async function POST(req: Request): Promise<NextResponse> {
 
 	const { title } = await req.json();
 	
-	await Promise.all([
-		prisma.link.updateMany({
-			where: { userId: session.user.id },
-			data: { order: { increment: 1 } },
-		}),
-		prisma.section.updateMany({
-			where: { userId: session.user.id },
-			data: { order: { increment: 1 } },
-		}),
-		prisma.text.updateMany({
-			where: { userId: session.user.id },
-			data: { order: { increment: 1 } },
-		}),
-		prisma.video.updateMany({
-			where: { userId: session.user.id },
-			data: { order: { increment: 1 } },
-		}),
-	]);
+    await Promise.all([
+        prisma.link.updateMany({
+            where: { userId: session.user.id },
+            data: { order: { increment: 1 } },
+        }),
+        prisma.section.updateMany({
+            where: { userId: session.user.id },
+            data: { order: { increment: 1 } },
+        }),
+        prisma.text.updateMany({
+            where: { userId: session.user.id },
+            data: { order: { increment: 1 } },
+        }),
+        prisma.video.updateMany({
+            where: { userId: session.user.id },
+            data: { order: { increment: 1 } },
+        }),
+        prisma.image.updateMany({
+            where: { userId: session.user.id },
+            data: { order: { increment: 1 } },
+        }),
+        prisma.music.updateMany({
+            where: { userId: session.user.id },
+            data: { order: { increment: 1 } },
+        }),
+    ]);
 	
 	const newSection = await prisma.section.create({
 		data: {
