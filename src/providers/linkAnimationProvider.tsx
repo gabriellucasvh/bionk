@@ -1,8 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import type React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 
 interface LinkAnimationContextType {
 	animatedLinks: Set<string>;
@@ -43,9 +43,7 @@ export function LinkAnimationProvider({
 					return;
 				}
 
-				const response = await fetch(
-					`/api/links?userId=${sessionData.user.id}`
-				);
+				const response = await fetch("/api/links");
 				if (response.ok) {
 					const data = await response.json();
 					const animatedLinkIds = data.links

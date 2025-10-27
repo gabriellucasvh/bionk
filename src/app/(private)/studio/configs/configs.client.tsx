@@ -45,6 +45,7 @@ import { Switch } from "@/components/ui/switch";
 import { useSubscription } from "@/providers/subscriptionProvider";
 import { useTheme } from "@/providers/themeProvider";
 import ArchivedLinksModal from "./components/configs.ArchiveLinksModal";
+
 // (Troca de plano desativada) Dialog imports removidos
 
 // (Troca de plano desativada) Select imports removidos
@@ -275,7 +276,7 @@ export default function ConfigsClient() {
 			}
 			try {
 				const [profileRes, subRes] = await Promise.all([
-					fetch(`/api/profile/${session.user.id}`),
+					fetch("/api/profile"),
 					fetch("/api/subscription-details"),
 				]);
 				const profileData = await profileRes.json();
@@ -611,7 +612,5 @@ export default function ConfigsClient() {
 		</div>
 	);
 }
-
-
 
 // Troca de plano desativada; componente PlanChangeButton removido temporariamente

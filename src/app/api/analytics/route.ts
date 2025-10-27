@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 // Função para detectar sistema operacional baseado no user-agent
 function detectOS(userAgent: string): string {
@@ -47,13 +49,12 @@ function detectOS(userAgent: string): string {
 	return "unknown";
 }
 
-export async function GET(request: Request) {
-	const { searchParams } = new URL(request.url);
-	const userId = searchParams.get("userId");
-
-	if (!userId) {
-		return NextResponse.json({ error: "UserId is required" }, { status: 400 });
-	}
+export async function GET(_request: Request) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
+    const userId = session.user.id;
 
 	const now = new Date();
 	const last30Days = new Date();

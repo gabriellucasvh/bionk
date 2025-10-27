@@ -36,8 +36,8 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 		if (isOpen && session?.user?.id) {
 			const fetchArchivedItems = async () => {
 				const [linksRes, textsRes] = await Promise.all([
-					fetch(`/api/links?userId=${session.user.id}&status=archived`),
-					fetch(`/api/texts?userId=${session.user.id}&status=archived`),
+					fetch("/api/links?status=archived"),
+					fetch("/api/texts?status=archived"),
 				]);
 
 				const linksData = await linksRes.json();

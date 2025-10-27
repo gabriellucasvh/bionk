@@ -3,9 +3,9 @@ import type { SocialLinkItem } from "@/types/social";
 import type {
 	UserImage,
 	UserLink,
+	UserMusic,
 	UserText,
 	UserVideo,
-	UserMusic,
 } from "@/types/user-profile";
 
 interface User {
@@ -74,7 +74,7 @@ export const useProfileData = (
 
 		setIsProfileLoading(true);
 		try {
-			const res = await fetch(`/api/profile/${userId}`);
+			const res = await fetch("/api/profile");
 			const { name = "", username = "", bio = "", image } = await res.json();
 			const currentImage =
 				image ||
@@ -90,11 +90,11 @@ export const useProfileData = (
 
 			// When not in profile-only mode, fetch additional user content
 			if (!options?.profileOnly) {
-				const socialRes = await fetch(`/api/social-links?userId=${userId}`);
+				const socialRes = await fetch("/api/social-links");
 				const socialData = await socialRes.json();
 				socialLinks = socialData?.socialLinks || [];
 
-				const linksRes = await fetch(`/api/links?userId=${userId}`);
+				const linksRes = await fetch("/api/links");
 				const linksData = await linksRes.json();
 				userLinks = linksData?.links || [];
 
@@ -110,7 +110,7 @@ export const useProfileData = (
 				const imagesData = await imagesRes.json();
 				userImages = imagesData?.images || [];
 
-				const musicsRes = await fetch(`/api/musics?userId=${userId}`);
+				const musicsRes = await fetch("/api/musics");
 				const musicsData = await musicsRes.json();
 				userMusics = musicsData?.musics || [];
 			}

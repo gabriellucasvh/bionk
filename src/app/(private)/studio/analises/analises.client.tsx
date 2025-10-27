@@ -206,7 +206,7 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 // Hook customizado para lógica de dados
 const useAnalyticsData = (userId: string | null) => {
 	const { data, error, isLoading } = useSWR<AnalyticsData>(
-		userId ? `/api/analytics?userId=${userId}` : null,
+		userId ? "/api/analytics" : null,
 		fetcher,
 		{
 			revalidateOnFocus: false,

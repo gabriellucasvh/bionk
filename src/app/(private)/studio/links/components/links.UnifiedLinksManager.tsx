@@ -50,7 +50,7 @@ const UnifiedLinksManager = () => {
 		musicsCount: number;
 		socialLinksCount: number;
 		sectionsCount: number;
-	}>(userId ? `/api/content-summary?userId=${userId}` : null, fetcher, {
+	}>(userId ? "/api/content-summary" : null, fetcher, {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: false,
 		revalidateIfStale: false,
@@ -61,16 +61,12 @@ const UnifiedLinksManager = () => {
 		data: linksData,
 		mutate: mutateLinks,
 		isLoading: isLoadingLinks,
-	} = useSWR<{ links: LinkItem[] }>(
-		userId ? `/api/links?userId=${userId}` : null,
-		fetcher,
-		{
-			revalidateOnMount: false,
-			revalidateOnFocus: false,
-			revalidateIfStale: false,
-			revalidateOnReconnect: false,
-		}
-	);
+	} = useSWR<{ links: LinkItem[] }>(userId ? "/api/links" : null, fetcher, {
+		revalidateOnMount: false,
+		revalidateOnFocus: false,
+		revalidateIfStale: false,
+		revalidateOnReconnect: false,
+	});
 
 	// Hook SWR para links sociais (mantido montado; busca apenas na primeira entrada da aba)
 	const {
@@ -78,7 +74,7 @@ const UnifiedLinksManager = () => {
 		mutate: mutateSocialLinks,
 		isLoading: isLoadingSocialLinks,
 	} = useSWR<{ socialLinks: SocialLinkItem[] }>(
-		userId ? `/api/social-links?userId=${userId}` : null,
+		userId ? "/api/social-links" : null,
 		fetcher,
 		{
 			revalidateOnMount: false,
@@ -106,78 +102,58 @@ const UnifiedLinksManager = () => {
 		data: sectionsData,
 		mutate: mutateSections,
 		isLoading: isLoadingSections,
-	} = useSWR<SectionItem[]>(
-		userId ? "/api/sections" : null,
-		fetcher,
-		{
-			revalidateOnMount: false,
-			revalidateOnFocus: false,
-			revalidateIfStale: false,
-			revalidateOnReconnect: false,
-		}
-	);
+	} = useSWR<SectionItem[]>(userId ? "/api/sections" : null, fetcher, {
+		revalidateOnMount: false,
+		revalidateOnFocus: false,
+		revalidateIfStale: false,
+		revalidateOnReconnect: false,
+	});
 
 	// Hook SWR para textos
 	const {
 		data: textsData,
 		mutate: mutateTexts,
 		isLoading: isLoadingTexts,
-	} = useSWR<{ texts: TextItem[] }>(
-		userId ? `/api/texts?userId=${userId}` : null,
-		fetcher,
-		{
-			revalidateOnMount: false,
-			revalidateOnFocus: false,
-			revalidateIfStale: false,
-			revalidateOnReconnect: false,
-		}
-	);
+	} = useSWR<{ texts: TextItem[] }>(userId ? "/api/texts" : null, fetcher, {
+		revalidateOnMount: false,
+		revalidateOnFocus: false,
+		revalidateIfStale: false,
+		revalidateOnReconnect: false,
+	});
 
 	// Hooks SWR para vídeos / imagens / músicas (montados sem revalidação automática)
 	const {
 		data: videosData,
 		mutate: mutateVideos,
 		isLoading: isLoadingVideos,
-	} = useSWR<{ videos: VideoItem[] }>(
-		userId ? `/api/videos?userId=${userId}` : null,
-		fetcher,
-		{
-			revalidateOnMount: false,
-			revalidateOnFocus: false,
-			revalidateIfStale: false,
-			revalidateOnReconnect: false,
-		}
-	);
+	} = useSWR<{ videos: VideoItem[] }>(userId ? "/api/videos" : null, fetcher, {
+		revalidateOnMount: false,
+		revalidateOnFocus: false,
+		revalidateIfStale: false,
+		revalidateOnReconnect: false,
+	});
 
 	const {
 		data: imagesData,
 		mutate: mutateImages,
 		isLoading: isLoadingImages,
-	} = useSWR<{ images: ImageItem[] }>(
-		userId ? "/api/images" : null,
-		fetcher,
-		{
-			revalidateOnMount: false,
-			revalidateOnFocus: false,
-			revalidateIfStale: false,
-			revalidateOnReconnect: false,
-		}
-	);
+	} = useSWR<{ images: ImageItem[] }>(userId ? "/api/images" : null, fetcher, {
+		revalidateOnMount: false,
+		revalidateOnFocus: false,
+		revalidateIfStale: false,
+		revalidateOnReconnect: false,
+	});
 
 	const {
 		data: musicsData,
 		mutate: mutateMusics,
 		isLoading: isLoadingMusics,
-	} = useSWR<{ musics: MusicItem[] }>(
-		userId ? `/api/musics?userId=${userId}` : null,
-		fetcher,
-		{
-			revalidateOnMount: false,
-			revalidateOnFocus: false,
-			revalidateIfStale: false,
-			revalidateOnReconnect: false,
-		}
-	);
+	} = useSWR<{ musics: MusicItem[] }>(userId ? "/api/musics" : null, fetcher, {
+		revalidateOnMount: false,
+		revalidateOnFocus: false,
+		revalidateIfStale: false,
+		revalidateOnReconnect: false,
+	});
 
 	// Carregar mídias apenas se existir motivo (contagem > 0) ou ação do usuário
 	useEffect(() => {
@@ -284,17 +260,29 @@ const UnifiedLinksManager = () => {
 		(summaryData?.socialLinksCount ?? 0) > 0 &&
 		isLoadingSocialLinks;
 	const showLinksLoader =
-		activeTab === "links" && (summaryData?.linksCount ?? 0) > 0 && isLoadingLinks;
+		activeTab === "links" &&
+		(summaryData?.linksCount ?? 0) > 0 &&
+		isLoadingLinks;
 	const showSectionsLoader =
-		activeTab === "links" && (summaryData?.sectionsCount ?? 0) > 0 && isLoadingSections;
+		activeTab === "links" &&
+		(summaryData?.sectionsCount ?? 0) > 0 &&
+		isLoadingSections;
 	const showTextsLoader =
-		activeTab === "links" && (summaryData?.textsCount ?? 0) > 0 && isLoadingTexts;
+		activeTab === "links" &&
+		(summaryData?.textsCount ?? 0) > 0 &&
+		isLoadingTexts;
 	const showVideosLoader =
-		activeTab === "links" && (summaryData?.videosCount ?? 0) > 0 && isLoadingVideos;
+		activeTab === "links" &&
+		(summaryData?.videosCount ?? 0) > 0 &&
+		isLoadingVideos;
 	const showImagesLoader =
-		activeTab === "links" && (summaryData?.imagesCount ?? 0) > 0 && isLoadingImages;
+		activeTab === "links" &&
+		(summaryData?.imagesCount ?? 0) > 0 &&
+		isLoadingImages;
 	const showMusicsLoader =
-		activeTab === "links" && (summaryData?.musicsCount ?? 0) > 0 && isLoadingMusics;
+		activeTab === "links" &&
+		(summaryData?.musicsCount ?? 0) > 0 &&
+		isLoadingMusics;
 
 	if (
 		status === "loading" ||

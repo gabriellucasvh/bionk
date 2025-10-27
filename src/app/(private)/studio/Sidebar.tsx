@@ -197,7 +197,7 @@ const Sidebar = () => {
 		}
 
 		try {
-			const response = await fetch(`/api/profile/${session.user.id}`);
+			const response = await fetch("/api/profile");
 			if (response.ok) {
 				const userData = await response.json();
 				setUserName(userData.name || "");

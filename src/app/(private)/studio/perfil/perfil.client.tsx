@@ -69,7 +69,7 @@ const PerfilClient = () => {
 		const fetchProfile = async () => {
 			setIsProfileLoading(true);
 			try {
-				const res = await fetch(`/api/profile/${session.user.id}`);
+				const res = await fetch("/api/profile");
 				const { name = "", username = "", bio = "", image } = await res.json();
 				const currentImage =
 					image ||
