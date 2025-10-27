@@ -319,7 +319,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 										)}
 									</div>
 									<div className="text-muted-foreground text-sm">
-										Link ficará inativo automaticamente
+										O link ficará inativo automaticamente
 									</div>
 								</div>
 							</div>
@@ -364,13 +364,13 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 								<Clock className="mt-0.5 h-5 w-5" />
 								<div>
 									<div className="flex items-center gap-2">
-										<div className="font-medium">Lançamento</div>
+										<div className="font-medium">Data de Lançamento</div>
 										{!canUseAdvancedDates && (
 											<ProButton href="/studio/plans" label="PRO" size="xs" />
 										)}
 									</div>
 									<div className="text-muted-foreground text-sm">
-										Link será lançado automaticamente
+										O link será lançado automaticamente
 									</div>
 								</div>
 							</div>

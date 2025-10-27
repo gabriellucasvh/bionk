@@ -1,6 +1,6 @@
 "use client";
 
-import { Crown } from "lucide-react";
+import { Sparkle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,7 @@ type ProButtonProps = {
 
 /**
  * Botão global para indicar funcionalidades PRO.
- * Use em locais onde um recurso é exclusivo para planos pagos.
+ * Usa um tooltip estilizado em Tailwind acima do botão.
  */
 export function ProButton({
 	href = "/planos",
@@ -25,12 +25,12 @@ export function ProButton({
 	className,
 	size = "sm",
 	disabled = false,
-	label = "PRO",
-	tooltip = "Disponível no plano Básico ou superior",
+	label = "Pro",
+	tooltip = "Saiba mais sobre as funcionalidades PRO",
 }: ProButtonProps) {
 	const baseClasses = cn(
 		"inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-semibold text-xs",
-		"bg-gradient-to-r from-purple-600 via-fuchsia-600 to-pink-600 text-white",
+		"bg-black/70 text-white transition-all duration-700 hover:bg-black/80",
 		"shadow-sm transition-shadow hover:shadow-md",
 		size === "xs" && "px-2 py-0.5 text-xs",
 		size === "md" && "px-3 py-1.5 text-sm",
@@ -40,9 +40,38 @@ export function ProButton({
 	);
 
 	const content = (
-		<span aria-label={tooltip} className={baseClasses} title={tooltip}>
-			<Crown className="h-3.5 w-3.5" />
-			<span>{label}</span>
+		<span className="group relative inline-block">
+			{/* Botão */}
+			<span
+				className={baseClasses}
+				onMouseEnter={(e) => {
+					e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.8)";
+				}}
+				onMouseLeave={(e) => {
+					e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.7)";
+				}}
+				role="none"
+				style={{
+					backgroundColor: "rgba(0,0,0,0.7)",
+					color: "white",
+					border: "none",
+					transition: "background-color 400ms ease",
+				}}
+			>
+				<Sparkle className="h-3.5 w-3.5" />
+				<span>{label}</span>
+			</span>
+
+			{/* Tooltip */}
+			<span
+				className={cn(
+					"-translate-x-1/2 -top-10 absolute left-1/2",
+					"whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white",
+					"pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+				)}
+			>
+				{tooltip}
+			</span>
 		</span>
 	);
 
@@ -59,7 +88,6 @@ export function ProButton({
 			className="h-auto p-0"
 			disabled={disabled}
 			onClick={onClick}
-			title={tooltip}
 			variant="ghost"
 		>
 			{content}

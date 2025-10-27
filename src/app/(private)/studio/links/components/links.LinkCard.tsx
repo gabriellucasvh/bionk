@@ -263,22 +263,22 @@ const EditingView = ({
 					{/* Data de Expiração */}
 					<div className="rounded-2xl border p-3">
 						<div className="flex items-center justify-between gap-3">
-						<div className="flex items-center gap-3">
-							<div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-								<Clock className="h-5 w-5" />
-							</div>
-							<div>
-								<div className="flex items-center gap-2">
-									<div className="font-medium">Data de Expiração</div>
-									{!canUseAdvancedDates && (
-										<ProButton href="/studio/plans" label="PRO" size="xs" />
-									)}
+							<div className="flex items-center gap-3">
+								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+									<Clock className="h-5 w-5" />
 								</div>
-								<div className="text-muted-foreground text-sm">
-									Link ficará inativo automaticamente
+								<div>
+									<div className="flex items-center gap-2">
+										<div className="font-medium">Data de Expiração</div>
+										{!canUseAdvancedDates && (
+											<ProButton href="/studio/plans" label="PRO" size="xs" />
+										)}
+									</div>
+									<div className="text-muted-foreground text-sm">
+										O link ficará inativo automaticamente
+									</div>
 								</div>
 							</div>
-						</div>
 							<Switch
 								checked={expiresEnabled}
 								disabled={!canUseAdvancedDates}
@@ -449,22 +449,22 @@ const EditingView = ({
 					{/* Lançamento */}
 					<div className="rounded-2xl border p-3">
 						<div className="flex items-center justify-between gap-3">
-						<div className="flex items-center gap-3">
-							<div className="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
-								<Clock className="h-5 w-5" />
-							</div>
-							<div>
-								<div className="flex items-center gap-2">
-									<div className="font-medium">Lançamento</div>
-									{!canUseAdvancedDates && (
-										<ProButton href="/studio/plans" label="PRO" size="xs" />
-									)}
+							<div className="flex items-center gap-3">
+								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+									<Clock className="h-5 w-5" />
 								</div>
-								<div className="text-muted-foreground text-sm">
-									Link será lançado automaticamente
+								<div>
+									<div className="flex items-center gap-2">
+										<div className="font-medium">Data de Lançamento</div>
+										{!canUseAdvancedDates && (
+											<ProButton href="/studio/plans" label="PRO" size="xs" />
+										)}
+									</div>
+									<div className="text-muted-foreground text-sm">
+										O link será lançado automaticamente
+									</div>
 								</div>
 							</div>
-						</div>
 							<Switch
 								checked={launchEnabled}
 								disabled={!canUseAdvancedDates}
@@ -479,7 +479,7 @@ const EditingView = ({
 						{launchEnabled && canUseAdvancedDates && (
 							<div className="mt-2">
 								<div className="grid gap-2">
-									<Label htmlFor="launchesAt">Lançamento Agendado</Label>
+									<Label htmlFor="launchesAt">Data de Lançamento</Label>
 									<Input
 										id="launchesAt"
 										min={nowInputValue()}
