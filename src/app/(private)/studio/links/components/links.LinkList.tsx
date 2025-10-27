@@ -265,7 +265,7 @@ const LinkList = (props: LinkListProps) => {
 	})();
 
 	return (
-		<div className="space-y-6 border-t pt-6">
+		<div className="space-y-6 pt-6">
 			<DndContext
 				collisionDetection={closestCenter}
 				onDragEnd={onDragEnd}

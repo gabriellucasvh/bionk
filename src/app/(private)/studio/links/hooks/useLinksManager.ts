@@ -180,6 +180,29 @@ export const useLinksManager = (
 
 	// Imagens são fornecidas via props: currentImages e mutateImages
 
+	// Fecha qualquer criação ativa e remove rascunhos de unifiedItems
+	const closeAllActiveCreations = useCallback(() => {
+		setIsAdding(false);
+		setIsAddingSection(false);
+		setIsAddingText(false);
+		setIsAddingVideo(false);
+		setIsAddingImage(false);
+		setIsAddingMusic(false);
+		setIsModalOpen(false);
+		setFormData(initialFormData);
+		setSectionFormData(initialSectionFormData);
+		setTextFormData(initialTextFormData);
+		setVideoFormData(initialVideoFormData);
+		setImageFormData(initialImageFormData);
+		setMusicFormData(initialMusicFormData);
+		setOriginalLink(null);
+		setOriginalText(null);
+		setOriginalVideo(null);
+		setOriginalImage(null);
+		setOriginalMusic(null);
+		setUnifiedItems((prev) => prev.filter((item) => !(item as any).isDraft));
+	}, []);
+
 	// biome-ignore lint/correctness/useExhaustiveDependencies: depende de unifiedItems.find para preservar isEditing; adicionar unifiedItems causaria loops
 	useEffect(() => {
 		// Se estamos reordenando, não atualizar o estado para evitar conflitos visuais
@@ -296,7 +319,15 @@ export const useLinksManager = (
 			(a, b) =>
 				getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
 		);
-		setUnifiedItems(allItems);
+
+		// Preservar rascunhos (isDraft) durante revalidações para evitar perda de dados
+		const draftItems = unifiedItems.filter((item) => (item as any).isDraft);
+		const combinedItems = [...draftItems, ...allItems];
+		combinedItems.sort(
+			(a, b) =>
+				getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
+		);
+		setUnifiedItems(combinedItems);
 	}, [
 		currentLinks,
 		currentSections,
@@ -1923,6 +1954,7 @@ export const useLinksManager = (
 		setVideoFormData,
 		setImageFormData,
 		setMusicFormData,
+		closeAllActiveCreations,
 		handleDragEnd,
 		handleSectionUpdate,
 		handleSectionDelete,

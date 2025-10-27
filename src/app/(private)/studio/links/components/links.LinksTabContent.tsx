@@ -5,12 +5,12 @@ import type { DragStartEvent } from "@dnd-kit/core";
 import type { Session } from "next-auth";
 import { useLinksManager } from "../hooks/useLinksManager";
 import type {
+	ImageItem,
 	LinkItem,
+	MusicItem,
 	SectionItem,
 	TextItem,
 	VideoItem,
-	ImageItem,
-	MusicItem,
 } from "../types/links.types";
 import AddContentModal from "./links.AddContentModal";
 import AddNewSectionForm from "./links.AddNewSectionForm";
@@ -130,7 +130,12 @@ const LinksTabContent = ({
 				setIsAdding={setIsAdding}
 				setIsAddingImage={setIsAddingImage}
 				setIsAddingMusic={setIsAddingMusic}
-				setIsAddingSection={handlers.setIsAddingSection}
+				setIsAddingSection={(value: boolean) => {
+					if (value) {
+						handlers.closeAllActiveCreations();
+					}
+					handlers.setIsAddingSection(value);
+				}}
 				setIsAddingText={handlers.setIsAddingText}
 				setIsAddingVideo={setIsAddingVideo}
 				setMusicFormData={setMusicFormData}
@@ -142,18 +147,16 @@ const LinksTabContent = ({
 			/>
 
 			{handlers.isAddingSection && (
-				<div className="rounded-lg border bg-muted/20 p-4">
-					<AddNewSectionForm
-						formData={handlers.sectionFormData}
-						isSaveDisabled={!handlers.sectionFormData.title.trim()}
-						onCancel={() => {
-							handlers.setSectionFormData({ title: "" });
-							handlers.setIsAddingSection(false);
-						}}
-						onSave={handlers.handleAddNewSection}
-						setFormData={handlers.setSectionFormData}
-					/>
-				</div>
+				<AddNewSectionForm
+					formData={handlers.sectionFormData}
+					isSaveDisabled={!handlers.sectionFormData.title.trim()}
+					onCancel={() => {
+						handlers.setSectionFormData({ title: "" });
+						handlers.setIsAddingSection(false);
+					}}
+					onSave={handlers.handleAddNewSection}
+					setFormData={handlers.setSectionFormData}
+				/>
 			)}
 
 			<LinkList
