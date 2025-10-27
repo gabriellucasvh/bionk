@@ -2,8 +2,8 @@
 
 import { format } from "date-fns";
 import {
-	Calendar as CalendarIcon,
-	Clock,
+	CalendarArrowDown,
+	CalendarArrowUp,
 	Lock,
 	MoreVertical,
 	Tags,
@@ -130,7 +130,7 @@ const ExpirePanel = ({ formData, setFormData }: PanelProps) => (
 					// Desabilita interação quando plano não permite
 					variant="outline"
 				>
-					<CalendarIcon className="mr-2 h-4 w-4" />
+					<CalendarArrowDown className="mr-2 h-4 w-4" />
 					{formData.expiresAt ? (
 						format(formData.expiresAt, "PPP")
 					) : (
@@ -165,7 +165,7 @@ const LaunchPanel = ({ formData, setFormData }: PanelProps) => (
 					disabled={false}
 					variant="outline"
 				>
-					<CalendarIcon className="mr-2 h-4 w-4" />
+					<CalendarArrowUp className="mr-2 h-4 w-4" />
 					{formData.launchesAt ? (
 						format(formData.launchesAt, "PPP")
 					) : (
@@ -310,7 +310,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					<div className="rounded-2xl border p-3">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
-								<Clock className="mt-0.5 h-5 w-5" />
+								<CalendarArrowDown className="mt-0.5 h-5 w-5" />
 								<div>
 									<div className="flex items-center gap-2">
 										<div className="font-medium">Data de Expiração</div>
@@ -361,7 +361,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					<div className="rounded-2xl border p-3">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
-								<Clock className="mt-0.5 h-5 w-5" />
+								<CalendarArrowUp className="mt-0.5 h-5 w-5" />
 								<div>
 									<div className="flex items-center gap-2">
 										<div className="font-medium">Data de Lançamento</div>

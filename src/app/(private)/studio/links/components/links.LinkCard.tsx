@@ -2,6 +2,8 @@
 
 import {
 	Archive as ArchiveBox,
+	CalendarArrowDown,
+	CalendarArrowUp,
 	Clock,
 	Edit,
 	Grip,
@@ -260,78 +262,6 @@ const EditingView = ({
 						)}
 					</div>
 
-					{/* Data de Expiração */}
-					<div className="rounded-2xl border p-3">
-						<div className="flex items-center justify-between gap-3">
-							<div className="flex items-center gap-3">
-								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-									<Clock className="h-5 w-5" />
-								</div>
-								<div>
-									<div className="flex items-center gap-2">
-										<div className="font-medium">Data de Expiração</div>
-										{!canUseAdvancedDates && (
-											<ProButton href="/studio/plans" label="PRO" size="xs" />
-										)}
-									</div>
-									<div className="text-muted-foreground text-sm">
-										O link ficará inativo automaticamente
-									</div>
-								</div>
-							</div>
-							<Switch
-								checked={expiresEnabled}
-								disabled={!canUseAdvancedDates}
-								onCheckedChange={(v) => {
-									setExpiresEnabled(v);
-									if (!v) {
-										onLinkAdvancedChange?.(link.id, { expiresAt: null });
-									}
-								}}
-							/>
-						</div>
-						{expiresEnabled && canUseAdvancedDates && (
-							<div className="mt-2 space-y-2">
-								<div className="grid gap-2">
-									<Label htmlFor="expiresAt">Expira em</Label>
-									<Input
-										id="expiresAt"
-										min={nowInputValue()}
-										onChange={(e) => {
-											const v = e.target.value;
-											if (v && new Date(v).getTime() < Date.now()) {
-												return;
-											}
-											onLinkAdvancedChange?.(link.id, {
-												expiresAt: v || null,
-											});
-										}}
-										type="datetime-local"
-										value={toInputValue(link.expiresAt)}
-									/>
-								</div>
-								<div className="flex items-center justify-between gap-3 rounded-md border bg-background/50 p-3">
-									<div className="flex items-center gap-3">
-										<div className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
-											<MoreVertical className="h-5 w-5" />
-										</div>
-										<div>
-											<div className="font-medium">
-												Permitir compartilhamento
-											</div>
-										</div>
-									</div>
-									<Switch
-										checked={!!link.shareAllowed}
-										onCheckedChange={(v) => {
-											onLinkAdvancedChange?.(link.id, { shareAllowed: v });
-										}}
-									/>
-								</div>
-							</div>
-						)}
-					</div>
-
 					{/* Limite de Cliques */}
 					<div className="rounded-2xl border p-3">
 						<div className="flex items-center justify-between gap-3">
@@ -451,7 +381,7 @@ const EditingView = ({
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
-									<Clock className="h-5 w-5" />
+									<CalendarArrowUp className="h-5 w-5" />
 								</div>
 								<div>
 									<div className="flex items-center gap-2">
@@ -494,6 +424,78 @@ const EditingView = ({
 										}}
 										type="datetime-local"
 										value={toInputValue(link.launchesAt)}
+									/>
+								</div>
+							</div>
+						)}
+					</div>
+
+					{/* Data de Expiração */}
+					<div className="rounded-2xl border p-3">
+						<div className="flex items-center justify-between gap-3">
+							<div className="flex items-center gap-3">
+								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+									<CalendarArrowDown className="h-5 w-5" />
+								</div>
+								<div>
+									<div className="flex items-center gap-2">
+										<div className="font-medium">Data de Expiração</div>
+										{!canUseAdvancedDates && (
+											<ProButton href="/studio/plans" label="PRO" size="xs" />
+										)}
+									</div>
+									<div className="text-muted-foreground text-sm">
+										O link ficará inativo automaticamente
+									</div>
+								</div>
+							</div>
+							<Switch
+								checked={expiresEnabled}
+								disabled={!canUseAdvancedDates}
+								onCheckedChange={(v) => {
+									setExpiresEnabled(v);
+									if (!v) {
+										onLinkAdvancedChange?.(link.id, { expiresAt: null });
+									}
+								}}
+							/>
+						</div>
+						{expiresEnabled && canUseAdvancedDates && (
+							<div className="mt-2 space-y-2">
+								<div className="grid gap-2">
+									<Label htmlFor="expiresAt">Expira em</Label>
+									<Input
+										id="expiresAt"
+										min={nowInputValue()}
+										onChange={(e) => {
+											const v = e.target.value;
+											if (v && new Date(v).getTime() < Date.now()) {
+												return;
+											}
+											onLinkAdvancedChange?.(link.id, {
+												expiresAt: v || null,
+											});
+										}}
+										type="datetime-local"
+										value={toInputValue(link.expiresAt)}
+									/>
+								</div>
+								<div className="flex items-center justify-between gap-3 rounded-md border bg-background/50 p-3">
+									<div className="flex items-center gap-3">
+										<div className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
+											<MoreVertical className="h-5 w-5" />
+										</div>
+										<div>
+											<div className="font-medium">
+												Permitir compartilhamento
+											</div>
+										</div>
+									</div>
+									<Switch
+										checked={!!link.shareAllowed}
+										onCheckedChange={(v) => {
+											onLinkAdvancedChange?.(link.id, { shareAllowed: v });
+										}}
 									/>
 								</div>
 							</div>
