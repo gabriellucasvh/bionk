@@ -7,7 +7,7 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Edit, Loader2, Plus, Save, Trash2, X } from "lucide-react";
+import { Edit, Loader2, Trash2 } from "lucide-react";
 import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -36,6 +36,7 @@ const SocialLinksTabContent = ({
 	const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
 	const [deletingLinkId, setDeletingLinkId] = useState<string | null>(null);
 	const [isSaving, setIsSaving] = useState(false);
+	const [originalUsername, setOriginalUsername] = useState<string>("");
 
 	useEffect(() => {
 		const sorted = [...initialSocialLinks].sort(
@@ -76,6 +77,7 @@ const SocialLinksTabContent = ({
 		setSelectedPlatform(platform);
 		setUsernameInput("");
 		setEditingLinkId(null);
+		setOriginalUsername("");
 	};
 
 	const handleAddOrUpdateSocialLink = async () => {
@@ -121,6 +123,7 @@ const SocialLinksTabContent = ({
 			setSelectedPlatform(platform);
 			setUsernameInput(link.username || "");
 			setEditingLinkId(link.id);
+			setOriginalUsername(link.username || "");
 		}
 	};
 
@@ -148,6 +151,22 @@ const SocialLinksTabContent = ({
 		setSelectedPlatform(null);
 		setUsernameInput("");
 		setEditingLinkId(null);
+		setOriginalUsername("");
+	};
+
+	// Validação para habilitar/desabilitar o botão Salvar
+	const isSaveButtonDisabled = () => {
+		// Campo vazio
+		if (!usernameInput.trim()) {
+			return true;
+		}
+
+		// Durante edição, verificar se houve mudança
+		if (editingLinkId && usernameInput.trim() === originalUsername.trim()) {
+			return true;
+		}
+
+		return false;
 	};
 
 	const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -179,7 +198,7 @@ const SocialLinksTabContent = ({
 							);
 							return (
 								<Button
-									className={`flex h-20 w-full flex-col items-center justify-center p-1 transition-colors hover:bg-muted/50 sm:p-2 rounded-xl ${
+									className={`flex h-20 w-full flex-col items-center justify-center rounded-xl p-1 transition-colors hover:bg-muted/50 sm:p-2 ${
 										existingLink
 											? "border-green-400 hover:border-green-500"
 											: ""
@@ -267,24 +286,15 @@ const SocialLinksTabContent = ({
 							onClick={handleCancel}
 							variant="white"
 						>
-							<span className="flex items-center justify-center">
-								<X className="mr-2 h-4 w-4" />
-								Cancelar
-							</span>
+							<span className="flex items-center justify-center">Cancelar</span>
 						</BaseButton>
 						<BaseButton
 							className="w-full sm:w-auto"
+							disabled={isSaveButtonDisabled()}
 							loading={isSaving}
 							onClick={handleAddOrUpdateSocialLink}
 						>
-							<span className="flex items-center justify-center">
-								{editingLinkId ? (
-									<Save className="mr-2 h-4 w-4" />
-								) : (
-									<Plus className="mr-2 h-4 w-4" />
-								)}
-								{editingLinkId ? "Salvar Alterações" : "Adicionar"}
-							</span>
+							<span className="flex items-center justify-center">Salvar</span>
 						</BaseButton>
 					</div>
 				</div>
