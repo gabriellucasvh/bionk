@@ -552,6 +552,10 @@ export const useLinksManager = (
 	};
 
 	const handleSectionDelete = async (id: number) => {
+		// Remoção otimista do card de seção
+		setUnifiedItems((prev) =>
+			prev.filter((item) => !(item.isSection && item.id === id))
+		);
 		await fetch(`/api/sections/${id}`, { method: "DELETE" });
 		await mutateLinks();
 		await mutateSections();
@@ -800,11 +804,19 @@ export const useLinksManager = (
 			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
 			return;
 		}
+		// Remoção otimista do card de vídeo
+		setUnifiedItems((prev) =>
+			prev.filter((item) => !(item.isVideo && item.id === id))
+		);
 		await fetch(`/api/videos/${id}`, { method: "DELETE" });
 		await mutateVideos();
 	};
 
 	const handleArchiveVideo = async (id: number) => {
+		// Remoção otimista do card de vídeo
+		setUnifiedItems((prev) =>
+			prev.filter((item) => !(item.isVideo && item.id === id))
+		);
 		await handleVideoUpdate(id, { archived: true });
 	};
 
@@ -936,12 +948,20 @@ export const useLinksManager = (
 			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
 			return;
 		}
+		// Remoção otimista do card de imagem
+		setUnifiedItems((prev) =>
+			prev.filter((item) => !((item as any).isImage && item.id === id))
+		);
 		await fetch(`/api/images/${id}`, { method: "DELETE" });
 		await mutateImages();
 		await mutateSections();
 	};
 
 	const handleArchiveImage = async (id: number) => {
+		// Remoção otimista do card de imagem
+		setUnifiedItems((prev) =>
+			prev.filter((item) => !((item as any).isImage && item.id === id))
+		);
 		await handleImageUpdate(id, { archived: true });
 	};
 
@@ -1141,12 +1161,20 @@ export const useLinksManager = (
 			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
 			return;
 		}
+		// Remoção otimista do card de música
+		setUnifiedItems((prev) =>
+			prev.filter((item) => !((item as any).isMusic && item.id === id))
+		);
 		await fetch(`/api/musics/${id}`, { method: "DELETE" });
 		await mutateMusics();
 		await mutateSections();
 	};
 
 	const handleArchiveMusic = async (id: number) => {
+		// Remoção otimista do card de música
+		setUnifiedItems((prev) =>
+			prev.filter((item) => !((item as any).isMusic && item.id === id))
+		);
 		await handleMusicUpdate(id, { archived: true });
 	};
 
@@ -1368,6 +1396,30 @@ export const useLinksManager = (
 
 	const handleArchiveLink = async (id: number) => {
 		setArchivingLinkId(id);
+		// Remoção otimista do card de link (top-level e dentro de seção)
+		setUnifiedItems((prev) =>
+			prev.reduce<UnifiedItem[]>((acc, item) => {
+				if ((item as any).isSection && Array.isArray((item as any).children)) {
+					const nextChildren = ((item as any).children as any[]).filter(
+						(child) => child.id !== id
+					);
+					acc.push({ ...(item as any), children: nextChildren } as any);
+					return acc;
+				}
+				if (
+					!(
+						(item as any).isSection ||
+						(item as any).isText ||
+						(item as any).isVideo
+					) &&
+					item.id === id
+				) {
+					return acc; // remove top-level link
+				}
+				acc.push(item);
+				return acc;
+			}, [])
+		);
 		try {
 			await handleLinkUpdate(id, { archived: true });
 		} finally {
@@ -1508,6 +1560,30 @@ export const useLinksManager = (
 			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
 			return;
 		}
+		// Remoção otimista do card de link (top-level e dentro de seção)
+		setUnifiedItems((prev) =>
+			prev.reduce<UnifiedItem[]>((acc, item) => {
+				if ((item as any).isSection && Array.isArray((item as any).children)) {
+					const nextChildren = ((item as any).children as any[]).filter(
+						(child) => child.id !== id
+					);
+					acc.push({ ...(item as any), children: nextChildren } as any);
+					return acc;
+				}
+				if (
+					!(
+						(item as any).isSection ||
+						(item as any).isText ||
+						(item as any).isVideo
+					) &&
+					item.id === id
+				) {
+					return acc; // remove top-level link
+				}
+				acc.push(item);
+				return acc;
+			}, [])
+		);
 		await fetch(`/api/links/${id}`, { method: "DELETE" });
 		await mutateLinks();
 	};
@@ -1658,11 +1734,19 @@ export const useLinksManager = (
 			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
 			return;
 		}
+		// Remoção otimista do card de texto
+		setUnifiedItems((prev) =>
+			prev.filter((item) => !(item.isText && item.id === id))
+		);
 		await fetch(`/api/texts/${id}`, { method: "DELETE" });
 		await mutateTexts();
 	};
 
 	const handleArchiveText = async (id: number) => {
+		// Remoção otimista do card de texto
+		setUnifiedItems((prev) =>
+			prev.filter((item) => !(item.isText && item.id === id))
+		);
 		await handleTextUpdate(id, { archived: true });
 	};
 
