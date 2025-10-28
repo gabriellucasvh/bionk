@@ -197,7 +197,7 @@ export const OTPInputCustom = React.forwardRef<
 							autoComplete="one-time-code"
 							autoCorrect="off"
 							className={cn(
-								"h-12 w-10 rounded-md border text-center font-medium text-xl caret-black outline-none transition-colors",
+								"h-14 w-11 rounded-md border text-center font-medium text-xl caret-black outline-none transition-colors",
 								"placeholder:text-muted-foreground focus:placeholder-transparent focus:ring-2 focus:ring-lime-500",
 								i === activeIndex ? "" : "border-muted-foreground/30",
 								(disabled || i > maxEnabledIndex) &&
