@@ -467,13 +467,13 @@ export default function ReferrerAnalytics({
 												</div>
 											</div>
 										</TableCell>
-										<TableCell className="text-right font-mono">
+										<TableCell className="text-right">
 											{item.views.toLocaleString()}
 										</TableCell>
-										<TableCell className="text-right font-mono">
+										<TableCell className="text-right">
 											{(item.clicks || 0).toLocaleString()}
 										</TableCell>
-										<TableCell className="text-right font-medium font-mono">
+										<TableCell className="text-right font-medium">
 											{item.totalInteractions.toLocaleString()}
 										</TableCell>
 										<TableCell className="text-right">

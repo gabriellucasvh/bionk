@@ -15,7 +15,6 @@ import {
 	ResponsiveContainer,
 	Tooltip,
 } from "recharts";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	Table,
@@ -282,20 +281,10 @@ export default function DeviceAnalytics({
 											</div>
 										</TableCell>
 										<TableCell className="hidden text-right sm:table-cell">
-											<Badge
-												className="border-blue-200 bg-blue-50 text-blue-700"
-												variant="secondary"
-											>
 												{item.views.toLocaleString()}
-											</Badge>
 										</TableCell>
 										<TableCell className="hidden text-right sm:table-cell">
-											<Badge
-												className="border-green-200 bg-green-50 text-green-700"
-												variant="secondary"
-											>
 												{(item.clicks || 0).toLocaleString()}
-											</Badge>
 										</TableCell>
 										<TableCell className="text-right font-semibold">
 											{item.totalInteractions.toLocaleString()}
