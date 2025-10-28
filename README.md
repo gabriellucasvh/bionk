@@ -101,6 +101,78 @@ O Bionk pode ser implantado facilmente em plataformas como **Vercel** ou **Railw
 - Ao importar, imagens são automaticamente recortadas para 9:16 e vídeos são ajustados para 1080×1920 via Cloudinary.
 - É necessário configurar `PEXELS_API_KEY` e `COVERR_API_KEY` no `.env`.
 
+## 📈 Analíticas, Rollups e Idempotência
+
+Este projeto consolida eventos diários (views e cliques) em rollups mensais para reduzir custo de leitura e melhorar performance dos gráficos.
+
+- Endpoint de cron: `GET /api/cron/rollups`
+- Agendamento (Vercel): conforme `vercel.json`, diariamente às `02:00` UTC.
+- Proteção de idempotência: um ledger diário garante que cada dia seja consolidado no máximo uma vez.
+
+### Modelos e Migrações
+
+- Modelo: `DailyRollup` (Prisma) com chave única `dayStart` (UTC).
+  - Campos: `id`, `dayStart` (unique), `status` (`pending` | `completed`), `source` (`vercel` | `manual`), `createdAt`, `updatedAt`.
+- Tabelas mensais existentes:
+  - `MonthlyUserAnalytics` com unique em `(userId, monthStart)`.
+  - `MonthlyLinkAnalytics` com unique em `(userId, linkId, monthStart)`.
+
+### Funcionamento do Cron e Idempotência
+
+- Autorização:
+  - Produção: chamado pela Vercel com o header `x-vercel-cron`.
+  - Desenvolvimento/Manual: use `token` via query string que deve bater com `CRON_SECRET` no `.env`.
+- Parâmetros suportados:
+  - `token`: obrigatório para execução manual. Define autorização quando igual a `CRON_SECRET`.
+  - `date`: apenas em desenvolvimento, formato `YYYY-MM-DD` (UTC). Ignorado em produção.
+- Intervalo consolidado: por padrão, o dia anterior (UTC). Com `date`, consolida aquele dia.
+- Ledger diário `DailyRollup`:
+  - Antes de consolidar, marca o dia como `pending`.
+  - Se já existir `completed`, retorna `alreadyProcessed: true` e não duplica.
+  - Se estiver `pending`, retorna `inProgress: true` e não começa uma segunda consolidação.
+- Agregações feitas:
+  - Cliques por `userId/linkId` (tabela `LinkClick`).
+  - Views por `userId` (tabela `ProfileView`).
+  - Cliques por `userId` (tabela `LinkClick`).
+- Upserts paralelos:
+  - `MonthlyLinkAnalytics` e `MonthlyUserAnalytics` são atualizados em paralelo via `Promise.all`.
+
+### Testes rápidos (desenvolvimento)
+
+Assumindo `.env` com `CRON_SECRET=seu-segredo`, execute:
+
+```sh
+# Consolida ontem em dev
+curl "http://localhost:3000/api/cron/rollups?token=seu-segredo"
+
+# Consolida um dia específico (UTC)
+curl "http://localhost:3000/api/cron/rollups?token=seu-segredo&date=2025-10-27"
+
+# Segunda chamada do mesmo dia retorna idempotente
+curl "http://localhost:3000/api/cron/rollups?token=seu-segredo&date=2025-10-27"
+```
+
+Respostas esperadas:
+
+- `alreadyProcessed: true` quando o ledger está `completed` para o dia.
+- `inProgress: true` quando uma execução está marcada como `pending`.
+- `ok: true` com `updatedLinkRollups` e `updatedUserRollups` quando consolidação completou.
+
+### Observações de Segurança e Operação
+
+- Em produção, o parâmetro `date` é ignorado; apenas o dia anterior é consolidado.
+- O ledger diário protege de duplicação por dia, sem alterar as garantias únicas mensais já existentes.
+
+### Falhas e Retentativas
+
+- Estados de execução: `pending` (em andamento), `completed` (concluído) e `failed` (falhou).
+- Retentativas automáticas: 2–3 tentativas com backoff exponencial curto.
+  - Exemplo de agenda: `5min` → `15min`.
+- Persistência parcial: se parte dos dados do dia foi consolidada, não duplicar reprocessamentos — a idempotência garante consistência.
+- Alerta: enviar notificação para `contato@bionk.me` caso todas as tentativas falhem.
+- Reexecução manual em desenvolvimento: use `token` + `date` para tentar novamente o dia específico.
+  - `curl "http://localhost:3000/api/cron/rollups?token=seu-segredo&date=YYYY-MM-DD"`
+
 ## 🛡️ Licença
 
 Este projeto está licenciado sob a **CC BY-NC**. Sinta-se à vontade para contribuir e testar, o **uso comercial não é permitido**.

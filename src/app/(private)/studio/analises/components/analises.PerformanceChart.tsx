@@ -44,10 +44,9 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 							<ChartPie className="h-5 w-5" />
 							Visão Geral de Desempenho
 						</CardTitle>
-						<CardDescription className="dark:text-gray-400">
-							Visualize os cliques e as visualizações diárias dos últimos 30
-							dias.
-						</CardDescription>
+                        <CardDescription className="dark:text-gray-400">
+                            Visualize cliques e visualizações diárias no período selecionado.
+                        </CardDescription>
 					</CardHeader>
 					<CardContent className="px-3">
 						<div className="h-[300px] w-full overflow-hidden sm:h-[350px] md:h-[400px]">

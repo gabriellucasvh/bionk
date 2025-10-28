@@ -67,6 +67,8 @@ model User {
   Video                         Video[]
   Image                         Image[]
   Music                         Music[]
+  MonthlyUserAnalytics          MonthlyUserAnalytics[]
+  MonthlyLinkAnalytics          MonthlyLinkAnalytics[]
 
   @@index([subscriptionStatus])
   @@index([createdAt])
@@ -135,6 +137,7 @@ model Link {
   user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   LinkClick       LinkClick[]
   LinkView        LinkView[]
+  MonthlyLinkAnalytics MonthlyLinkAnalytics[]
 
   @@index([sectionId])
   @@index([userId])
@@ -195,6 +198,51 @@ model ProfileView {
   @@index([userId, createdAt])
   @@index([device])
   @@index([referrer])
+}
+
+// Rollups mensais para baixo custo em consultas de vida toda
+model MonthlyUserAnalytics {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  monthStart DateTime // primeiro dia do mês (UTC)
+  clicks     Int      @default(0)
+  views      Int      @default(0)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, monthStart])
+  @@index([monthStart])
+}
+
+model MonthlyLinkAnalytics {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  linkId     Int
+  monthStart DateTime // primeiro dia do mês (UTC)
+  clicks     Int      @default(0)
+  link       Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, linkId, monthStart])
+  @@index([userId])
+  @@index([linkId])
+  @@index([monthStart])
+}
+
+// Ledger de execuções diárias do cron para garantir idempotência
+model DailyRollup {
+  id        Int      @id @default(autoincrement())
+  dayStart  DateTime // início do dia (UTC) consolidado
+  status    String   @default("pending") // valores: pending | completed | failed
+  source    String?
+  attempts  Int      @default(0)
+  nextRetryAt DateTime?
+  lastError String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([dayStart])
+  @@index([status])
+  @@index([nextRetryAt])
 }
 
 model CustomPresets {
