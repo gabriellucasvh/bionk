@@ -166,8 +166,8 @@ Respostas esperadas:
 ### Falhas e Retentativas
 
 - Estados de execução: `pending` (em andamento), `completed` (concluído) e `failed` (falhou).
-- Retentativas automáticas: 2–3 tentativas com backoff exponencial curto.
-  - Exemplo de agenda: `5min` → `15min`.
+- Retentativas automáticas: 1-2 tentativas com backoff exponencial curto.
+  - Exemplo de agenda: `2:00` → `2:05`.
 - Persistência parcial: se parte dos dados do dia foi consolidada, não duplicar reprocessamentos — a idempotência garante consistência.
 - Alerta: enviar notificação para `contato@bionk.me` caso todas as tentativas falhem.
 - Reexecução manual em desenvolvimento: use `token` + `date` para tentar novamente o dia específico.

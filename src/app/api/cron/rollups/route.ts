@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import prisma from "@/lib/prisma";
 
-const MAX_ATTEMPTS = 3; // tentativa principal + 2 retentativas
-const BACKOFF_MINUTES = [5, 10]; // 02:05 e 02:15 como janelas de retry
+const MAX_ATTEMPTS = 2; // tentativa principal + 1 retentativa
+const BACKOFF_MINUTES = [5]; // 02:05 como janela de retry
 
 function computeNextRetryAt(now: Date, nextAttempt: number): Date | null {
 	const delayMinutes = BACKOFF_MINUTES[nextAttempt - 1];
@@ -332,35 +332,11 @@ export async function GET(request: Request) {
 						to: ["contato@bionk.me"],
 						subject: "Falha inicial na consolidação diária de rollups",
 						html: `
-              <h2>Falha inicial ao consolidar rollups diários (1)</h2>
+              <h2>Falha inicial ao consolidar rollups diários</h2>
               <p><strong>Dia:</strong> ${startOfTarget.toISOString()}</p>
               <p><strong>Tentativas:</strong> ${nextAttempt}</p>
               <p><strong>Erro:</strong> ${errText}</p>
               <p><strong>Próximo retry:</strong> ${nextRetryAt ? nextRetryAt.toISOString() : "n/a"}</p>
-              <p>Fonte: ${source}</p>
-            `,
-					});
-				}
-			} catch {
-				// Não bloquear resposta se alerta falhar
-			}
-		}
-
-		// Se excedeu tentativas, enviar alerta por e-mail
-		if (nextAttempt >= MAX_ATTEMPTS) {
-			try {
-				const resendApiKey = process.env.RESEND_API_KEY;
-				if (resendApiKey) {
-					const resend = new Resend(resendApiKey);
-					await resend.emails.send({
-						from: process.env.RESEND_FROM_EMAIL || "contato@bionk.me",
-						to: ["contato@bionk.me"],
-						subject: "Falha na consolidação diária de rollups",
-						html: `
-              <h2>Falha ao consolidar rollups diários (3)</h2>
-              <p><strong>Dia:</strong> ${startOfTarget.toISOString()}</p>
-              <p><strong>Tentativas:</strong> ${nextAttempt}</p>
-              <p><strong>Erro:</strong> ${errText}</p>
               <p>Fonte: ${source}</p>
             `,
 					});
