@@ -61,16 +61,6 @@ function validateEmail(email: unknown): NextResponse | null {
 	return null;
 }
 
-function validateUsername(username: unknown): NextResponse | null {
-	if (!username || typeof username !== "string") {
-		return NextResponse.json(
-			{ error: "Username é obrigatório" },
-			{ status: 400 }
-		);
-	}
-	return null;
-}
-
 function validateToken(token: unknown): NextResponse | null {
 	if (!token || typeof token !== "string") {
 		return NextResponse.json({ error: "Token inválido" }, { status: 400 });
@@ -100,9 +90,52 @@ async function handleRequestOtpStage(
 		return emailValidation;
 	}
 
-	const usernameValidation = validateUsername(username);
-	if (usernameValidation) {
-		return usernameValidation;
+	// Permitir reenvio apenas com e-mail: se username não vier,
+	// tentar reaproveitar o username já reservado para este e-mail.
+	let effectiveUsername: string | null = null;
+	if (typeof username === "string" && username.trim()) {
+		effectiveUsername = username;
+	} else {
+		// Buscar usuário existente para reaproveitar username salvo
+		const existing = await prisma.user.findUnique({
+			where: { email: email as string },
+			select: {
+				username: true,
+				emailVerified: true,
+				usernameReservationExpiry: true,
+			},
+		});
+
+		if (existing?.username && existing.emailVerified === null) {
+			// Se a reserva expirou, o cleanup pode ter removido o usuário;
+			// se ainda existir mas sem reserva válida, exigir reinício do fluxo.
+			if (
+				existing.usernameReservationExpiry &&
+				existing.usernameReservationExpiry < new Date()
+			) {
+				return NextResponse.json(
+					{
+						error:
+							"Sessão expirada. Inicie o registro novamente para solicitar um novo código.",
+						code: "restart-required",
+					},
+					{ status: 400 }
+				);
+			}
+			effectiveUsername = existing.username;
+		}
+	}
+
+	if (!effectiveUsername) {
+		// Caso não seja possível inferir o username, manter mensagem clara
+		return NextResponse.json(
+			{
+				error:
+					"Username é obrigatório para solicitar código. Reinicie o registro.",
+				code: "restart-required",
+			},
+			{ status: 400 }
+		);
 	}
 
 	const rateLimitResponse = await applyRateLimit();
@@ -110,7 +143,7 @@ async function handleRequestOtpStage(
 		return rateLimitResponse;
 	}
 
-	return await handleOtpRequest(email as string, username as string);
+	return await handleOtpRequest(email as string, effectiveUsername as string);
 }
 
 async function handleVerifyOtpStage(
@@ -135,7 +168,11 @@ async function handleCreateUserStage(
 		return tokenValidation;
 	}
 
-	return await handleUserCreation(token as string, password as string, name as string);
+	return await handleUserCreation(
+		token as string,
+		password as string,
+		name as string
+	);
 }
 
 export async function POST(req: Request) {
@@ -461,10 +498,9 @@ async function handleOtpVerification(email: string, otp: string) {
 			},
 		});
 
-		const remainingAttempts = MAX_OTP_ATTEMPTS - newAttemptCount;
 		return NextResponse.json(
 			{
-				error: `Código OTP inválido. Você tem ${remainingAttempts} tentativa(s) restante(s).`,
+				error: "Código OTP inválido.",
 			},
 			{ status: 400 }
 		);
@@ -547,26 +583,26 @@ async function handleUserCreation(
 
 	const hashedPassword = await bcrypt.hash(password, 10);
 
-  const updatedUser = await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      name: name.trim(),
-      hashedPassword,
-      // Ativar a conta e marcar onboarding como concluído para fluxo de credenciais
-      status: "active",
-      onboardingCompleted: true,
-      provider: "credentials",
-      passwordSetupToken: null,
-      passwordSetupTokenExpiry: null,
-      usernameReservedAt: null,
-      usernameReservationExpiry: null,
-      subscriptionPlan: "free",
-      subscriptionStatus: "active",
-      CustomPresets: {
-        create: getDefaultCustomPresets(),
-      },
-    },
-  });
+	const updatedUser = await prisma.user.update({
+		where: { id: user.id },
+		data: {
+			name: name.trim(),
+			hashedPassword,
+			// Ativar a conta e marcar onboarding como concluído para fluxo de credenciais
+			status: "active",
+			onboardingCompleted: true,
+			provider: "credentials",
+			passwordSetupToken: null,
+			passwordSetupTokenExpiry: null,
+			usernameReservedAt: null,
+			usernameReservationExpiry: null,
+			subscriptionPlan: "free",
+			subscriptionStatus: "active",
+			CustomPresets: {
+				create: getDefaultCustomPresets(),
+			},
+		},
+	});
 
 	// Notificar Discord sobre novo registro
 	try {

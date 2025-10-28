@@ -23,7 +23,8 @@ const otpSchema = z.object({
 type OtpFormData = z.infer<typeof otpSchema>;
 
 const OTP_EXPIRY_MINUTES = 2;
-const OTP_COOLDOWN_MINUTES = 1;
+// Cooldown de reenvio reduzido para 30s
+const OTP_COOLDOWN_MINUTES = 0.5;
 const MINUTES_REGEX = /(\d+) minutos/;
 const ATTEMPTS_REGEX = /(\d+) tentativas? restantes?/;
 
@@ -33,6 +34,7 @@ function OtpRegistrationPageContent() {
 		type: "success" | "error";
 		text: string;
 	} | null>(null);
+	const [restartRequired, setRestartRequired] = useState(false);
 	const [otpTimer, setOtpTimer] = useState<number>(OTP_EXPIRY_MINUTES * 60);
 	const [otpCooldownTimer, setOtpCooldownTimer] = useState<number>(0);
 	const [isOtpInputDisabled, setIsOtpInputDisabled] = useState<boolean>(false);
@@ -70,7 +72,6 @@ function OtpRegistrationPageContent() {
 			setTokenValid(true);
 		} catch {
 			setTokenValid(false);
-			router.replace("/registro");
 		} finally {
 			setValidatingToken(false);
 		}
@@ -171,13 +172,18 @@ function OtpRegistrationPageContent() {
 		resolver: zodResolver(otpSchema),
 	});
 
-	// Iniciar timer de cooldown
-	const startOtpCooldownTimer = (minutes: number) => {
+	// Iniciar timer de cooldown (opcionalmente desabilitando o input)
+	const startOtpCooldownTimer = (
+		minutes: number,
+		options?: { disableInput?: boolean }
+	) => {
 		if (cooldownTimerIntervalRef.current) {
 			clearInterval(cooldownTimerIntervalRef.current);
 		}
 		setOtpCooldownTimer(minutes * 60);
-		setIsOtpInputDisabled(true);
+		if (options?.disableInput) {
+			setIsOtpInputDisabled(true);
+		}
 		cooldownTimerIntervalRef.current = setInterval(() => {
 			setOtpCooldownTimer((prev) => {
 				if (prev <= 1) {
@@ -185,7 +191,9 @@ function OtpRegistrationPageContent() {
 						clearInterval(cooldownTimerIntervalRef.current);
 						cooldownTimerIntervalRef.current = null;
 					}
-					setIsOtpInputDisabled(false);
+					if (options?.disableInput) {
+						setIsOtpInputDisabled(false);
+					}
 					return 0;
 				}
 				return prev - 1;
@@ -207,7 +215,8 @@ function OtpRegistrationPageContent() {
 		const cooldownMinutes = match
 			? Number.parseInt(match[1], 10)
 			: OTP_COOLDOWN_MINUTES;
-		startOtpCooldownTimer(cooldownMinutes);
+		// Em caso de rate limit, desabilitar o input durante o cooldown
+		startOtpCooldownTimer(cooldownMinutes, { disableInput: true });
 		setRemainingAttempts(0);
 	};
 
@@ -257,8 +266,8 @@ function OtpRegistrationPageContent() {
 					stage: "request-otp",
 				});
 				startOtpTimer(OTP_EXPIRY_MINUTES * 60);
-				setOtpCooldownTimer(0);
-				setIsOtpInputDisabled(false);
+				// Iniciar cooldown de 30s após reenvio sem bloquear o input
+				startOtpCooldownTimer(OTP_COOLDOWN_MINUTES, { disableInput: false });
 				setRemainingAttempts(undefined); // Reset tentativas restantes
 				setMessage({
 					type: "success",
@@ -266,10 +275,12 @@ function OtpRegistrationPageContent() {
 				});
 			} catch (error) {
 				if (error instanceof AxiosError) {
-					setMessage({
-						type: "error",
-						text: error.response?.data?.error || "Erro ao reenviar código.",
-					});
+					const text =
+						error.response?.data?.error || "Erro ao reenviar código.";
+					setMessage({ type: "error", text });
+					if (error.response?.data?.code === "restart-required") {
+						setRestartRequired(true);
+					}
 				} else {
 					setMessage({ type: "error", text: "Erro ao reenviar código." });
 				}
@@ -293,6 +304,14 @@ function OtpRegistrationPageContent() {
 				<div className="text-center">
 					<h1 className="font-bold text-2xl text-red-600">Acesso Negado</h1>
 					<p className="mt-2 text-gray-600">Token inválido ou expirado.</p>
+					<div className="mt-6">
+						<Link
+							className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+							href="/registro"
+						>
+							Iniciar novo registro
+						</Link>
+					</div>
 				</div>
 			</div>
 		);
@@ -308,7 +327,7 @@ function OtpRegistrationPageContent() {
 							<h1 className="font-bold text-4xl text-black">
 								Verifique seu E-mail
 							</h1>
-							<p className="text-lg text-muted-foreground">
+							<p className="text-base text-muted-foreground">
 								Enviamos um código de 6 dígitos para {userEmail}. Verifique sua
 								caixa de entrada (e spam).
 							</p>
@@ -320,6 +339,16 @@ function OtpRegistrationPageContent() {
 								>
 									{message.text}
 								</p>
+							)}
+							{restartRequired && (
+								<div className="mt-4">
+									<Link
+										className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+										href="/registro"
+									>
+										Iniciar novo registro
+									</Link>
+								</div>
 							)}
 						</div>
 

@@ -46,7 +46,8 @@ type PasswordFormData = z.infer<typeof passwordSchema>;
 type Stage = "email" | "otp" | "password" | "success";
 
 const OTP_EXPIRY_MINUTES = 2;
-const OTP_COOLDOWN_MINUTES = 1;
+// Cooldown de reenvio reduzido para 30 segundos
+const OTP_COOLDOWN_MINUTES = 0.5;
 const MINUTES_REGEX = /(\d+) minutos/;
 
 // Funções utilitárias extraídas para reduzir complexidade cognitiva
@@ -214,9 +215,10 @@ function Register() {
 			setEmail(data.email);
 			setUsername(data.username);
 			setStage("otp");
-			startOtpTimer();
-			setOtpCooldownTimer(0);
-			setIsOtpInputDisabled(false);
+            startOtpTimer();
+            // Iniciar cooldown de 30s para reenvio
+            startOtpCooldownTimer(OTP_COOLDOWN_MINUTES);
+            setIsOtpInputDisabled(false);
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				setMessage({
