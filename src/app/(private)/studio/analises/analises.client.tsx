@@ -128,7 +128,8 @@ interface AnalyticsData {
 	referrerAnalytics: ReferrerAnalytics[];
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) =>
+    fetch(url, { cache: "no-store" }).then((res) => res.json());
 
 // Função auxiliar para formatação de datas
 const formatDate = (dateStr: string, pattern = "dd/MM/yyyy") =>

@@ -561,9 +561,10 @@ export async function GET(request: Request) {
 			},
 		};
 
-		const response = NextResponse.json(responseBody);
-		response.headers.set("Cache-Control", "private, max-age=120");
-		return response;
+        const response = NextResponse.json(responseBody);
+        response.headers.set("Cache-Control", "no-store");
+        response.headers.set("Pragma", "no-cache");
+        return response;
 	}
 
 	// Agrupamento por dia do período selecionado
@@ -888,17 +889,8 @@ export async function GET(request: Request) {
 		},
 	};
 
-	const response = NextResponse.json(responseBody);
-	const maxAge =
-		rangeParam === "7d"
-			? 30
-			: rangeParam === "30d"
-				? 60
-				: rangeParam === "90d"
-					? 120
-					: rangeParam === "365d"
-						? 180
-						: 60;
-	response.headers.set("Cache-Control", `private, max-age=${maxAge}`);
-	return response;
+    const response = NextResponse.json(responseBody);
+    response.headers.set("Cache-Control", "no-store");
+    response.headers.set("Pragma", "no-cache");
+    return response;
 }
