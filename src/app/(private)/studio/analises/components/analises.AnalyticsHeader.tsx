@@ -394,7 +394,7 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 								Exportar
 							</Button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="w-36 sm:w-40">
+						<DropdownMenuContent align="end" className="w-36 sm:w-50">
 							<DropdownMenuItem
 								className="cursor-pointer text-xs sm:text-sm"
 								onClick={onExportToExcel}
