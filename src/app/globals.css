@@ -486,15 +486,11 @@ button {
 	body {
 		@apply bg-background text-foreground;
 		overflow-x: hidden;
-		width: 100%;
-		/* Mantém o espaço reservado da barra de rolagem para evitar "empurrar" o layout */
-		scrollbar-gutter: stable both-edges;
+		width: 100vw;
 	}
 	html {
 		overflow-x: hidden;
-		width: 100%;
-		/* Evita deslocamento lateral quando a barra de rolagem aparece/desaparece */
-		scrollbar-gutter: stable both-edges;
+		width: 100vw;
 	}
 }
 

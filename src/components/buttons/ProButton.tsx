@@ -13,6 +13,7 @@ type ProButtonProps = {
 	disabled?: boolean;
 	label?: string;
 	tooltip?: string;
+	showOverlayTooltip?: boolean;
 };
 
 /**
@@ -27,6 +28,7 @@ export function ProButton({
 	disabled = false,
 	label = "Pro",
 	tooltip = "Saiba mais sobre as funcionalidades PRO",
+	showOverlayTooltip = true,
 }: ProButtonProps) {
 	const baseClasses = cn(
 		"inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-semibold text-xs",
@@ -42,29 +44,34 @@ export function ProButton({
 	const content = (
 		<span className="group relative inline-block">
 			{/* Botão */}
-			<span
-				className={baseClasses}
-			>
-				<Sparkle className="h-3.5 w-3.5" />
+			<span className={baseClasses}>
+				<Sparkle className="h-3.5 w-3.5 text-white" />
 				<span>{label}</span>
 			</span>
 
 			{/* Tooltip */}
-			<span
-				className={cn(
-					"-translate-x-1/2 -top-10 absolute left-1/2",
-					"whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white",
-					"pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-				)}
-			>
-				{tooltip}
-			</span>
+			{showOverlayTooltip && tooltip && (
+				<span
+					className={cn(
+						"-translate-x-1/2 -top-10 absolute left-1/2",
+						"whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white",
+						"pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100",
+						"z-50"
+					)}
+				>
+					{tooltip}
+				</span>
+			)}
 		</span>
 	);
 
 	if (href && !disabled) {
 		return (
-			<Link aria-disabled={disabled} href={href} onClick={onClick}>
+			<Link
+				aria-disabled={disabled}
+				href={href}
+				onClick={onClick}
+			>
 				{content}
 			</Link>
 		);
