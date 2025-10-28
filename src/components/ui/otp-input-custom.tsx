@@ -197,13 +197,11 @@ export const OTPInputCustom = React.forwardRef<
 							autoComplete="one-time-code"
 							autoCorrect="off"
 							className={cn(
-								"h-12 w-10 rounded-md border bg-background text-center font-medium text-xl caret-black shadow-sm transition-colors",
-								"placeholder:text-muted-foreground focus:placeholder-transparent focus:ring-2 focus:ring-lime-400",
-								i === activeIndex
-									? "border-lime-500"
-									: "border-muted-foreground/30",
+								"h-12 w-10 rounded-md border text-center font-medium text-xl caret-black outline-none transition-colors",
+								"placeholder:text-muted-foreground focus:placeholder-transparent focus:ring-2 focus:ring-lime-500",
+								i === activeIndex ? "" : "border-muted-foreground/30",
 								(disabled || i > maxEnabledIndex) &&
-									"cursor-not-allowed opacity-50"
+									"cursor-not-allowed bg-zinc-200 opacity-50"
 							)}
 							disabled={disabled || i > maxEnabledIndex}
 							inputMode="numeric"
