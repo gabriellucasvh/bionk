@@ -32,7 +32,7 @@ export function ProButton({
 }: ProButtonProps) {
 	const baseClasses = cn(
 		"inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-semibold text-xs",
-		"bg-black/80 text-white",
+		"bg-black/80 dark:bg-white dark:text-black",
 		"shadow-sm transition-shadow hover:shadow-md",
 		size === "xs" && "px-2 py-0.5 text-xs",
 		size === "md" && "px-3 py-1.5 text-sm",
@@ -45,7 +45,7 @@ export function ProButton({
 		<span className="group relative inline-block">
 			{/* Botão */}
 			<span className={baseClasses}>
-				<Sparkle className="h-3.5 w-3.5 text-white" />
+				<Sparkle className="h-3.5 w-3.5 text-white dark:text-black" />
 				<span>{label}</span>
 			</span>
 
