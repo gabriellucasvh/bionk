@@ -39,9 +39,10 @@ export interface OnboardingData {
 	username: string;
 	bio: string;
 	profileImage?: File;
+	template: string;
 }
 
-type Step = 1 | 2 | 3 | 4;
+type Step = 1 | 2 | 3 | 4 | 5;
 
 const STEPS = [
 	{
@@ -61,22 +62,28 @@ const STEPS = [
 	},
 	{
 		id: 4,
+		title: "Template",
+		description: "Selecione um visual para sua página",
+	},
+	{
+		id: 5,
 		title: "Biografia",
 		description: "Conte um pouco sobre você",
 	},
 ];
 
 export default function OnboardingPageComponent({
-    onComplete,
-    initialData,
-    loading = false,
+	onComplete,
+	initialData,
+	loading = false,
 }: OnboardingPageProps) {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [currentStep, setCurrentStep] = useState<Step>(1);
-    const [data, setData] = useState({
-        name: initialData?.name || "",
-        username: initialData?.username || "",
-        bio: "",
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [currentStep, setCurrentStep] = useState<Step>(1);
+	const [data, setData] = useState({
+		name: initialData?.name || "",
+		username: initialData?.username || "",
+		bio: "",
+		template: "",
 	});
 	const [profilePreview, setProfilePreview] = useState<string>(
 		"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
@@ -206,6 +213,8 @@ export default function OnboardingPageComponent({
 					!usernameValidation.isChecking
 				);
 			case 4:
+				return data.template.trim().length > 0; // Template é obrigatório
+			case 5:
 				return true; // Bio é opcional
 			default:
 				return false;
@@ -213,7 +222,7 @@ export default function OnboardingPageComponent({
 	};
 
 	const handleNext = () => {
-		if (currentStep < 4) {
+		if (currentStep < (STEPS.length as Step)) {
 			setCurrentStep((prev) => (prev + 1) as Step);
 		}
 	};
@@ -224,16 +233,18 @@ export default function OnboardingPageComponent({
 		}
 	};
 
-    const handleComplete = () => {
-        if (isSubmitting) return;
-        setIsSubmitting(true);
-        onComplete({
-            ...data,
-            profileImage: selectedProfileFile || undefined,
-        });
-        // Fallback: if parent doesn't toggle loading, re-enable after a delay
-        setTimeout(() => setIsSubmitting(false), 5000);
-    };
+	const handleComplete = () => {
+		if (isSubmitting) {
+			return;
+		}
+		setIsSubmitting(true);
+		onComplete({
+			...data,
+			profileImage: selectedProfileFile || undefined,
+		});
+		// Fallback: if parent doesn't toggle loading, re-enable after a delay
+		setTimeout(() => setIsSubmitting(false), 5000);
+	};
 
 	const renderStepContent = () => {
 		switch (currentStep) {
@@ -360,6 +371,28 @@ export default function OnboardingPageComponent({
 						key="step4"
 						transition={{ duration: 0.3 }}
 					>
+						<TemplateSelector
+							onSelect={(id) => setData({ ...data, template: id })}
+							selectedTemplateId={data.template}
+						/>
+						{!data.template && (
+							<p className="text-red-500 text-xs">
+								Selecione um template para continuar
+							</p>
+						)}
+					</motion.div>
+				);
+
+			case 5:
+				return (
+					<motion.div
+						animate={{ opacity: 1, x: 0 }}
+						className="space-y-4"
+						exit={{ opacity: 0, x: -20 }}
+						initial={{ opacity: 0, x: 20 }}
+						key="step5"
+						transition={{ duration: 0.3 }}
+					>
 						<div className="space-y-2">
 							<Label htmlFor="bio">Biografia</Label>
 							<Textarea
@@ -437,7 +470,7 @@ export default function OnboardingPageComponent({
 						<div />
 					)}
 
-					{currentStep < 4 ? (
+					{currentStep < STEPS.length ? (
 						<BaseButton
 							className="flex items-center gap-2"
 							disabled={!canProceedToNext()}
@@ -447,18 +480,18 @@ export default function OnboardingPageComponent({
 							<ArrowRight className="h-4 w-4" />
 						</BaseButton>
 					) : (
-                        <BaseButton
-                            className="flex items-center gap-2"
-                            disabled={loading || isSubmitting || !canProceedToNext()}
-                            onClick={handleComplete}
-                        >
-                            {loading ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <Check className="h-4 w-4" />
-                            )}
-                            Concluir
-                        </BaseButton>
+						<BaseButton
+							className="flex items-center gap-2"
+							disabled={loading || isSubmitting || !canProceedToNext()}
+							onClick={handleComplete}
+						>
+							{loading ? (
+								<Loader2 className="h-4 w-4 animate-spin" />
+							) : (
+								<Check className="h-4 w-4" />
+							)}
+							Concluir
+						</BaseButton>
 					)}
 				</div>
 			</div>
@@ -469,6 +502,53 @@ export default function OnboardingPageComponent({
 				onClose={() => setIsImageCropModalOpen(false)}
 				onImageSave={handleProfileImageSave}
 			/>
+		</div>
+	);
+}
+
+// Auxiliar de seleção de template para o onboarding
+import { ALL_TEMPLATES } from "@/app/(public)/templates/templates.constants";
+
+function TemplateSelector({
+	selectedTemplateId,
+	onSelect,
+}: {
+	selectedTemplateId: string;
+	onSelect: (templateId: string) => void;
+}) {
+	return (
+		<div>
+			<Label className="mb-2 block">Escolha um template *</Label>
+			<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+				{ALL_TEMPLATES.map((tpl) => {
+					const isActive = tpl.id === selectedTemplateId;
+					return (
+						<button
+							className={`group relative overflow-hidden rounded-lg border text-left transition ${
+								isActive
+									? "border-lime-500 ring-2 ring-lime-400"
+									: "border-gray-200 hover:border-gray-300 dark:border-gray-700"
+							}`}
+							key={tpl.id}
+							onClick={() => onSelect(tpl.id)}
+							type="button"
+						>
+							<div className="aspect-[3/4] w-full bg-gray-100 dark:bg-gray-800">
+								<Image
+									alt={tpl.name}
+									className="h-full w-full object-cover"
+									height={320}
+									src={tpl.image}
+									width={240}
+								/>
+							</div>
+							<div className="p-2">
+								<p className="font-medium text-sm">{tpl.name}</p>
+							</div>
+						</button>
+					);
+				})}
+			</div>
 		</div>
 	);
 }

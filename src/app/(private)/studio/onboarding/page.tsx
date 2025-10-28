@@ -6,8 +6,9 @@ import { useState } from "react";
 import LoadingPage from "@/components/layout/LoadingPage";
 import { Button } from "@/components/ui/button";
 import OnboardingPageComponent, {
-	type OnboardingData,
+    type OnboardingData,
 } from "./onboarding-page";
+import { getTemplateInfo } from "@/utils/templatePresets";
 
 export default function OnboardingPage() {
 	const { data: session, update } = useSession();
@@ -15,39 +16,56 @@ export default function OnboardingPage() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const handleOnboardingComplete = async (data: OnboardingData) => {
-		setLoading(true);
-		setError(null);
+    const handleOnboardingComplete = async (data: OnboardingData) => {
+        setLoading(true);
+        setError(null);
 
-		try {
-			const formData = new FormData();
-			formData.append("name", data.name);
-			formData.append("username", data.username);
-			formData.append("bio", data.bio);
+        try {
+            const formData = new FormData();
+            formData.append("name", data.name);
+            formData.append("username", data.username);
+            formData.append("bio", data.bio);
 
 			if (data.profileImage) {
 				formData.append("profileImage", data.profileImage);
 			}
 
-			const response = await fetch("/api/auth/complete-onboarding", {
-				method: "POST",
-				body: formData,
-			});
+            const response = await fetch("/api/auth/complete-onboarding", {
+                method: "POST",
+                body: formData,
+            });
 
 			if (!response.ok) {
 				const errorData = await response.json();
 				throw new Error(errorData.error || "Erro ao completar onboarding");
 			}
 
-			// Atualizar a sessão
-			await update();
+            // Atualizar a sessão
+            await update();
 
-			// Redirecionar para o studio
-			router.push("/studio");
-		} finally {
-			setLoading(false);
-		}
-	};
+            // Aplicar template escolhido
+            if (data.template) {
+                try {
+                    const info = getTemplateInfo(data.template);
+                    await fetch("/api/update-template", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            template: data.template,
+                            templateCategory: info.category,
+                        }),
+                    });
+                } catch {
+                    // Ignora falhas silenciosamente
+                }
+            }
+
+            // Redirecionar para o studio
+            router.push("/studio");
+        } finally {
+            setLoading(false);
+        }
+    };
 
 	const handleLogout = async () => {
 		await signOut({ callbackUrl: "/" });

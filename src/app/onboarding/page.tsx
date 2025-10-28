@@ -5,8 +5,9 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import LoadingPage from "@/components/layout/LoadingPage";
 import OnboardingPageComponent, {
-	type OnboardingData,
+    type OnboardingData,
 } from "../(private)/studio/onboarding/onboarding-page";
+import { getTemplateInfo } from "@/utils/templatePresets";
 
 export default function OnboardingPage() {
 	const { data: session, status, update } = useSession();
@@ -24,12 +25,12 @@ export default function OnboardingPage() {
 		});
 	};
 
-	const handleOnboardingComplete = async (data: OnboardingData) => {
-		setIsLoading(true);
-		setError(null);
+    const handleOnboardingComplete = async (data: OnboardingData) => {
+        setIsLoading(true);
+        setError(null);
 
-		try {
-			// Verificar se o username já existe
+        try {
+            // Verificar se o username já existe
 			const checkResponse = await fetch(
 				`/api/auth/check-username?username=${encodeURIComponent(data.username)}`
 			);
@@ -40,14 +41,14 @@ export default function OnboardingPage() {
 			}
 
 			// Prepara payload JSON e converte imagem para base64, se existir
-			const payload: any = {
-				name: data.name,
-				username: data.username,
-				bio: data.bio,
-			};
-			if (data.profileImage) {
-				payload.profileImage = await fileToDataUrl(data.profileImage);
-			}
+            const payload: any = {
+                name: data.name,
+                username: data.username,
+                bio: data.bio,
+            };
+            if (data.profileImage) {
+                payload.profileImage = await fileToDataUrl(data.profileImage);
+            }
 
 			const response = await fetch("/api/onboarding/complete", {
 				method: "POST",
@@ -64,24 +65,41 @@ export default function OnboardingPage() {
 
 			const result = await response.json();
 
-			// Atualizar a sessão com os novos dados
-			await update({
-				user: {
-					...session?.user,
-					username: result.user.username,
-					name: result.user.name,
-					image: result.user.image,
-					onboardingCompleted: result.user.onboardingCompleted,
-					status: result.user.status,
-				},
-			});
+            // Atualizar a sessão com os novos dados
+            await update({
+                user: {
+                    ...session?.user,
+                    username: result.user.username,
+                    name: result.user.name,
+                    image: result.user.image,
+                    onboardingCompleted: result.user.onboardingCompleted,
+                    status: result.user.status,
+                },
+            });
 
-			// Redirecionar para o perfil
-			router.push("/studio/perfil");
-		} finally {
-			setIsLoading(false);
-		}
-	};
+            // Aplicar template escolhido
+            if (data.template) {
+                try {
+                    const info = getTemplateInfo(data.template);
+                    await fetch("/api/update-template", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            template: data.template,
+                            templateCategory: info.category,
+                        }),
+                    });
+                } catch {
+                    // Não bloquear o fluxo caso falhe a aplicação do template
+                }
+            }
+
+            // Redirecionar para o perfil
+            router.push("/studio/perfil");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
 	// Redirecionar se não estiver autenticado
 	useEffect(() => {
