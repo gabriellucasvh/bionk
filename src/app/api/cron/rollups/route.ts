@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 
 const MAX_ATTEMPTS = 2; // tentativa principal + 1 retentativa
 const BACKOFF_MINUTES = [5]; // 02:05 como janela de retry
+const REJEX_VERCEL_USERAGENT = /vercel-cron/i;
 
 function computeNextRetryAt(now: Date, nextAttempt: number): Date | null {
 	const delayMinutes = BACKOFF_MINUTES[nextAttempt - 1];
@@ -61,10 +62,19 @@ export async function GET(request: Request) {
 	const token = url.searchParams.get("token") || "";
 	const secret = process.env.CRON_SECRET || "";
 	const vercelCronHeader = request.headers.get("x-vercel-cron");
+	const userAgent = request.headers.get("user-agent") || "";
 	const isVercelCron = vercelCronHeader === "1" || vercelCronHeader === "true";
+	const isVercelUserAgent = REJEX_VERCEL_USERAGENT.test(userAgent);
 
 	// Autoriza se for chamada de Cron da Vercel (header presente) OU se o token bater com o segredo
-	if (!(isVercelCron || (secret && token === secret))) {
+	if (!(isVercelCron || isVercelUserAgent || (secret && token === secret))) {
+		console.warn("[cron/rollups] Não autorizado", {
+			hasVercelHeader: !!vercelCronHeader,
+			vercelCronHeader,
+			userAgent,
+			hasToken: !!token,
+			tokenMatches: !!secret && token === secret,
+		});
 		return NextResponse.json({ error: "Não autorizado" }, { status: 403 });
 	}
 
