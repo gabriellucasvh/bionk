@@ -20,22 +20,29 @@ interface OtpFormProps {
 	otpCooldownTimer: number;
 	isOtpInputDisabled: boolean;
 	remainingAttempts?: number;
+    // Quando em modo "restart", o botão principal vira "Iniciar novo registro"
+    // e os inputs permanecem desabilitados.
+    mode?: "verify" | "restart";
+    onStartNewRegistration?: () => void;
 }
 
-export function OtpForm({
-	form,
-	onSubmit,
-	onResendOtp,
-	onBackToEmail,
-	loading,
-	otpTimer,
-	otpCooldownTimer,
-	isOtpInputDisabled,
-	remainingAttempts,
-}: OtpFormProps) {
+	export function OtpForm({
+		form,
+		onSubmit,
+		onResendOtp,
+		onBackToEmail,
+		loading,
+		otpTimer,
+		otpCooldownTimer,
+		isOtpInputDisabled,
+		remainingAttempts,
+        mode = "verify",
+        onStartNewRegistration,
+	}: OtpFormProps) {
 	const otpValue = (useWatch({ control: form.control, name: "otp" }) ??
 		"") as string;
-	const isOtpEmpty = otpValue.replace(/\D/g, "").length === 0;
+	const otpDigitsCount = otpValue.replace(/\D/g, "").length;
+	const isOtpComplete = otpDigitsCount === 6;
 	return (
 		<form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
 			<div>
@@ -45,8 +52,9 @@ export function OtpForm({
 				<div className="flex justify-center">
 					<OTPInputCustom
 						aria-label="Código de verificação"
-						autoFocus={!(loading || isOtpInputDisabled) && otpTimer > 0}
-						disabled={loading || isOtpInputDisabled || otpTimer === 0}
+						autoFocus={!(loading || isOtpInputDisabled)}
+						disabled={loading || isOtpInputDisabled}
+						separatorIndex={-1}
 						onChange={(value) =>
 							form.setValue("otp", value, {
 								shouldValidate: true,
@@ -82,25 +90,28 @@ export function OtpForm({
 					</div>
 				)}
 			</div>
-			<BaseButton
-				className="w-full"
-				disabled={
-					loading ||
-					isOtpInputDisabled ||
-					otpTimer === 0 ||
-					otpCooldownTimer > 0 ||
-					isOtpEmpty
-				}
-				loading={
-					loading ||
-					isOtpInputDisabled ||
-					otpTimer === 0 ||
-					otpCooldownTimer > 0
-				}
-				type="submit"
-			>
-				Verificar Código
-			</BaseButton>
+			{mode === "restart" ? (
+				<BaseButton
+					className="w-full"
+					disabled={loading}
+					loading={false}
+					onClick={onStartNewRegistration}
+					type="button"
+				>
+					Iniciar novo registro
+				</BaseButton>
+			) : (
+				<BaseButton
+					className="w-full"
+						disabled={
+							loading || isOtpInputDisabled || otpTimer === 0 || !isOtpComplete
+						}
+					loading={loading || isOtpInputDisabled || otpTimer === 0}
+					type="submit"
+				>
+					Verificar Código
+				</BaseButton>
+			)}
 			<div className="flex items-center justify-between">
 				<BaseButton
 					className="rounded-md px-4 py-2"
@@ -113,7 +124,7 @@ export function OtpForm({
 				</BaseButton>
 				<BaseButton
 					className="rounded-md px-4 py-2"
-					disabled={loading || otpCooldownTimer > 0}
+					disabled={loading || otpCooldownTimer > 0 || mode === "restart"}
 					loading={loading}
 					onClick={onResendOtp}
 					type="button"

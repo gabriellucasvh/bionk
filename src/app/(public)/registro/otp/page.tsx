@@ -72,6 +72,9 @@ function OtpRegistrationPageContent() {
 			setTokenValid(true);
 		} catch {
 			setTokenValid(false);
+			// Exibir mensagem inline e manter na mesma página
+			setMessage({ type: "error", text: "Token inválido ou expirado." });
+			setIsOtpInputDisabled(true);
 		} finally {
 			setValidatingToken(false);
 		}
@@ -298,24 +301,7 @@ function OtpRegistrationPageContent() {
 		return <LoadingPage />;
 	}
 
-	if (!tokenValid) {
-		return (
-			<div className="flex min-h-screen items-center justify-center">
-				<div className="text-center">
-					<h1 className="font-bold text-2xl text-red-600">Acesso Negado</h1>
-					<p className="mt-2 text-gray-600">Token inválido ou expirado.</p>
-					<div className="mt-6">
-						<Link
-							className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-							href="/registro"
-						>
-							Iniciar novo registro
-						</Link>
-					</div>
-				</div>
-			</div>
-		);
-	}
+	// Não usa mais tela de bloqueio; renderiza UI padrão com inputs desabilitados
 
 	return (
 		<div className="flex min-h-screen">
@@ -331,15 +317,15 @@ function OtpRegistrationPageContent() {
 								Enviamos um código de 6 dígitos para {userEmail}. Verifique sua
 								caixa de entrada (e spam).
 							</p>
-							{message && (
-								<p
-									className={`text-sm ${
-										message.type === "error" ? "text-red-600" : "text-green-600"
-									}`}
-								>
-									{message.text}
-								</p>
-							)}
+						{message && (
+							<p
+								className={`text-sm ${
+									message.type === "error" ? "text-red-600" : "text-green-600"
+								}`}
+							>
+								{message.text}
+							</p>
+						)}
 							{restartRequired && (
 								<div className="mt-4">
 									<Link
@@ -353,17 +339,19 @@ function OtpRegistrationPageContent() {
 						</div>
 
 						<div className="space-y-6">
-							<OtpForm
-								form={otpForm}
-								isOtpInputDisabled={isOtpInputDisabled}
-								loading={loading}
-								onBackToEmail={handleBackToEmail}
-								onResendOtp={handleResendOtp}
-								onSubmit={handleOtpSubmit}
-								otpCooldownTimer={otpCooldownTimer}
-								otpTimer={otpTimer}
-								remainingAttempts={remainingAttempts}
-							/>
+						<OtpForm
+							form={otpForm}
+							isOtpInputDisabled={isOtpInputDisabled || !tokenValid}
+							loading={loading}
+							onBackToEmail={handleBackToEmail}
+							onResendOtp={handleResendOtp}
+							onSubmit={handleOtpSubmit}
+							otpCooldownTimer={otpCooldownTimer}
+							otpTimer={otpTimer}
+							remainingAttempts={remainingAttempts}
+							mode={tokenValid ? "verify" : "restart"}
+							onStartNewRegistration={() => router.push("/registro")}
+						/>
 
 							<div className="text-center">
 								<span className="text-gray-600">
