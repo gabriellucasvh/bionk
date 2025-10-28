@@ -65,7 +65,7 @@ const ProfileActionsDropdown = ({
 
 	return (
 		<DropdownMenuContent align="end" className="ml-3 grid w-60 gap-2 p-2">
-			<DropdownMenuLabel>Compartilhe seu Bionk</DropdownMenuLabel>
+			<DropdownMenuLabel className="py-1">Compartilhar</DropdownMenuLabel>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem asChild>
 				<Link
