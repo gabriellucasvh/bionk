@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import LoadingPage from "@/components/layout/LoadingPage";
-import OnboardingPageComponent, {
-    type OnboardingData,
-} from "../(private)/studio/onboarding/onboarding-page";
+import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 import { getTemplateInfo } from "@/utils/templatePresets";
+import OnboardingPageComponent, {
+	type OnboardingData,
+} from "../(private)/studio/onboarding/onboarding-page";
 
 export default function OnboardingPage() {
 	const { data: session, status, update } = useSession();
@@ -25,12 +26,12 @@ export default function OnboardingPage() {
 		});
 	};
 
-    const handleOnboardingComplete = async (data: OnboardingData) => {
-        setIsLoading(true);
-        setError(null);
+	const handleOnboardingComplete = async (data: OnboardingData) => {
+		setIsLoading(true);
+		setError(null);
 
-        try {
-            // Verificar se o username já existe
+		try {
+			// Verificar se o username já existe
 			const checkResponse = await fetch(
 				`/api/auth/check-username?username=${encodeURIComponent(data.username)}`
 			);
@@ -41,14 +42,16 @@ export default function OnboardingPage() {
 			}
 
 			// Prepara payload JSON e converte imagem para base64, se existir
-            const payload: any = {
-                name: data.name,
-                username: data.username,
-                bio: data.bio,
-            };
-            if (data.profileImage) {
-                payload.profileImage = await fileToDataUrl(data.profileImage);
-            }
+			const payload: any = {
+				name: data.name,
+				username: data.username,
+				bio: data.bio,
+				userType: data.userType,
+				plan: data.plan,
+			};
+			if (data.profileImage) {
+				payload.profileImage = await fileToDataUrl(data.profileImage);
+			}
 
 			const response = await fetch("/api/onboarding/complete", {
 				method: "POST",
@@ -65,41 +68,101 @@ export default function OnboardingPage() {
 
 			const result = await response.json();
 
-            // Atualizar a sessão com os novos dados
-            await update({
-                user: {
-                    ...session?.user,
-                    username: result.user.username,
-                    name: result.user.name,
-                    image: result.user.image,
-                    onboardingCompleted: result.user.onboardingCompleted,
-                    status: result.user.status,
-                },
-            });
+			// Atualizar a sessão com os novos dados
+			await update({
+				user: {
+					...session?.user,
+					username: result.user.username,
+					name: result.user.name,
+					image: result.user.image,
+					onboardingCompleted: result.user.onboardingCompleted,
+					status: result.user.status,
+				},
+			});
 
-            // Aplicar template escolhido
-            if (data.template) {
-                try {
-                    const info = getTemplateInfo(data.template);
-                    await fetch("/api/update-template", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            template: data.template,
-                            templateCategory: info.category,
-                        }),
-                    });
-                } catch {
-                    // Não bloquear o fluxo caso falhe a aplicação do template
-                }
-            }
+			// Aplicar template escolhido
+			if (data.template) {
+				try {
+					const info = getTemplateInfo(data.template);
+					await fetch("/api/update-template", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							template: data.template,
+							templateCategory: info.category,
+						}),
+					});
+				} catch {
+					// Não bloquear o fluxo caso falhe a aplicação do template
+				}
+			}
 
-            // Redirecionar para o perfil
-            router.push("/studio/perfil");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+			if (data.socialLinks && data.socialLinks.length > 0) {
+				const platformMap = new Map(SOCIAL_PLATFORMS.map((p) => [p.key, p]));
+				const socialPromises = data.socialLinks
+					.map((item) => {
+						const cfg = platformMap.get(item.platform);
+						if (!cfg) {
+							return null;
+						}
+						const base = cfg.baseUrl || "";
+						const url = `${base}${item.username}`;
+						return fetch("/api/social-links", {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({
+								platform: item.platform,
+								username: item.username,
+								url,
+							}),
+						});
+					})
+					.filter(Boolean) as Promise<Response>[];
+
+				if (socialPromises.length > 0) {
+					const results = await Promise.all(socialPromises);
+					const failed = results.filter((r) => !r.ok);
+					if (failed.length > 0) {
+						const errors = await Promise.all(
+							failed.map((r) => r.json().catch(() => ({})))
+						);
+						const msg =
+							(errors[0] as any)?.error || "Erro ao salvar rede social";
+						throw new Error(msg);
+					}
+				}
+			}
+
+			if (data.customLinks && data.customLinks.length > 0) {
+				const linkPromises = data.customLinks.map((link) =>
+					fetch("/api/links", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							title: link.title,
+							url: link.url,
+							active: true,
+						}),
+					})
+				);
+				const results = await Promise.all(linkPromises);
+				const failed = results.filter((r) => !r.ok);
+				if (failed.length > 0) {
+					const errors = await Promise.all(
+						failed.map((r) => r.json().catch(() => ({})))
+					);
+					const msg =
+						(errors[0] as any)?.error || "Erro ao salvar link personalizado";
+					throw new Error(msg);
+				}
+			}
+
+			// Redirecionar para o perfil
+			router.push("/studio/perfil");
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	// Redirecionar se não estiver autenticado
 	useEffect(() => {

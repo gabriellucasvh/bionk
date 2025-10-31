@@ -1,8 +1,14 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
 	try {
+		const cookieStore = await cookies();
+		const regCsrfCookie = cookieStore.get("reg_csrf");
+		if (!(regCsrfCookie && regCsrfCookie.value)) {
+			return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
+		}
 		const { token } = await req.json();
 
 		if (!token) {
@@ -19,6 +25,19 @@ export async function POST(req: Request) {
 
 		if (!user) {
 			return NextResponse.json({ error: "Token inválido." }, { status: 404 });
+		}
+
+		if (
+			!user.registrationCsrfState ||
+			user.registrationCsrfState !== regCsrfCookie.value
+		) {
+			return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
+		}
+		if (
+			!user.registrationCsrfExpiry ||
+			user.registrationCsrfExpiry < new Date()
+		) {
+			return NextResponse.json({ error: "CSRF expirado." }, { status: 410 });
 		}
 
 		// Verificar se o token expirou

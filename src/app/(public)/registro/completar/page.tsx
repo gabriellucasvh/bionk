@@ -3,41 +3,66 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSession, signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { Suspense, useEffect, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import LoadingPage from "@/components/layout/LoadingPage";
-import { PasswordForm } from "../components/PasswordForm";
+import { CompletionForm } from "../components/CompletionForm";
 
-const passwordSchema = z
-	.object({
-		name: z
-			.string()
-			.min(1, "Nome é obrigatório")
-			.min(2, "Nome deve ter pelo menos 2 caracteres")
-			.max(50, "Nome deve ter no máximo 50 caracteres")
-			.regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Nome deve conter apenas letras e espaços"),
-		password: z
-			.string()
-			.min(8, "A senha deve ter pelo menos 8 caracteres")
-			.regex(
-				/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-				"A senha deve conter pelo menos: 1 letra minúscula, 1 maiúscula, 1 número e 1 caractere especial"
-			),
-		confirmPassword: z.string(),
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: "As senhas não coincidem",
-		path: ["confirmPassword"],
-	});
+const REJEX_REPEAT = /([A-Za-z0-9])\1{3,}/;
 
-type PasswordFormData = z.infer<typeof passwordSchema>;
+const isObviousSequence = (pwd: string) => {
+	const seqs = [
+		"123456",
+		"234567",
+		"345678",
+		"456789",
+		"012345",
+		"abcdef",
+		"bcdefg",
+		"cdefgh",
+		"defghi",
+		"uvwxyz",
+		"qwerty",
+		"asdfgh",
+		"zxcvbn",
+	];
+	const lower = pwd.toLowerCase();
+	return seqs.some((s) => lower.includes(s));
+};
 
-function PasswordRegistrationPageContent() {
+const hasExcessiveRepeat = (pwd: string) => REJEX_REPEAT.test(pwd);
+
+const completionSchema = z.object({
+	username: z
+		.string()
+		.min(3, "Username deve ter pelo menos 3 caracteres")
+		.max(30, "Username deve ter no máximo 30 caracteres")
+		.regex(
+			/^[a-z0-9._-]+$/,
+			"Username deve conter apenas letras minúsculas, números, pontos, hífens e underscores"
+		),
+	password: z
+		.string()
+		.min(9, "A senha deve ter pelo menos 9 caracteres")
+		.max(64, "A senha deve ter no máximo 64 caracteres")
+		.regex(/(?=.*[a-z])/, "Inclua pelo menos 1 letra minúscula")
+		.regex(/(?=.*[A-Z])/, "Inclua pelo menos 1 letra maiúscula")
+		.regex(/(?=.*\d)/, "Inclua pelo menos 1 número")
+		.refine((pwd) => !isObviousSequence(pwd), {
+			message: "Evite sequências óbvias (ex.: 123456, abcdef)",
+		})
+		.refine((pwd) => !hasExcessiveRepeat(pwd), {
+			message: "Evite repetição excessiva de caracteres",
+		}),
+});
+
+type CompletionFormData = z.infer<typeof completionSchema>;
+
+function CompletionRegistrationPageContent() {
 	const [loading, setLoading] = useState(false);
 	const [validatingToken, setValidatingToken] = useState(true);
 	const [tokenValid, setTokenValid] = useState(false);
@@ -51,6 +76,7 @@ function PasswordRegistrationPageContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
+	const sig = searchParams.get("sig");
 
 	useEffect(() => {
 		if (status === "authenticated") {
@@ -74,14 +100,12 @@ function PasswordRegistrationPageContent() {
 				setUserEmail(response.data.email);
 			} catch (error) {
 				if (error instanceof AxiosError) {
-					setMessage({
-						type: "error",
-						text: error.response?.data?.error || "Token inválido ou expirado.",
-					});
+					const email = error.response?.data?.email || "";
+					const emailParam = email ? `?email=${encodeURIComponent(email)}` : "";
+					router.replace(`/registro/erro${emailParam}`);
+				} else {
+					router.replace("/registro/erro");
 				}
-				setTimeout(() => {
-					router.replace("/registro");
-				}, 3000);
 			} finally {
 				setValidatingToken(false);
 			}
@@ -90,11 +114,11 @@ function PasswordRegistrationPageContent() {
 		validateToken();
 	}, [token, router]);
 
-	const passwordForm = useForm<PasswordFormData>({
-		resolver: zodResolver(passwordSchema),
+	const completionForm = useForm<CompletionFormData>({
+		resolver: zodResolver(completionSchema),
 	});
 
-	const handlePasswordSubmit: SubmitHandler<PasswordFormData> = async (
+	const handleCompletionSubmit: SubmitHandler<CompletionFormData> = async (
 		data
 	) => {
 		setLoading(true);
@@ -102,9 +126,10 @@ function PasswordRegistrationPageContent() {
 		try {
 			await axios.post("/api/auth/register", {
 				token,
-				name: data.name,
+				username: data.username,
 				password: data.password,
 				stage: "create-user",
+				signature: sig || undefined,
 			});
 			// Login automático
 			const result = await signIn("credentials", {
@@ -114,16 +139,26 @@ function PasswordRegistrationPageContent() {
 			});
 			if (result && !result.error) {
 				setMessage({ type: "success", text: "Conta criada e login efetuado!" });
-				router.replace("/studio/perfil");
+				router.replace("/studio/onboarding");
 			} else {
 				setMessage({ type: "success", text: "Conta criada! Faça login." });
 			}
 		} catch (error) {
 			if (error instanceof AxiosError) {
-				setMessage({
-					type: "error",
-					text: error.response?.data?.error || "Erro ao criar conta.",
-				});
+				const text = error.response?.data?.error || "Erro ao criar conta.";
+				const l = text.toLowerCase();
+				if (
+					l.includes("assinatura inválida") ||
+					l.includes("csrf inválido") ||
+					l.includes("csrf expirado")
+				) {
+					const emailParam = userEmail
+						? `?email=${encodeURIComponent(userEmail)}`
+						: "";
+					router.replace(`/registro/erro${emailParam}`);
+					return;
+				}
+				setMessage({ type: "error", text });
 			} else {
 				setMessage({ type: "error", text: "Erro ao criar conta." });
 			}
@@ -132,9 +167,7 @@ function PasswordRegistrationPageContent() {
 		}
 	};
 
-	const handleBackToOtp = () => {
-		router.push(`/registro/otp?email=${encodeURIComponent(userEmail || "")}`);
-	};
+    
 
 	if (status === "loading" || validatingToken) {
 		return <LoadingPage />;
@@ -169,10 +202,12 @@ function PasswordRegistrationPageContent() {
 				<div className="w-full max-w-lg">
 					<div className="space-y-8">
 						<div className="space-y-4 text-center">
-							<h1 className="font-bold text-4xl text-black">Crie sua Senha</h1>
+							<h1 className="font-bold text-4xl text-black">
+								Complete seu Cadastro
+							</h1>
 							<p className="text-lg text-muted-foreground">
-								E-mail verificado com sucesso! Agora crie uma senha segura para
-								sua conta.
+								E-mail verificado com sucesso! Escolha seu username e defina uma
+								senha.
 							</p>
 							{message && (
 								<p
@@ -186,24 +221,11 @@ function PasswordRegistrationPageContent() {
 						</div>
 
 						<div className="space-y-6">
-							<PasswordForm
-								form={passwordForm}
+							<CompletionForm
+								form={completionForm}
 								loading={loading}
-								onBackToOtp={handleBackToOtp}
-								onSubmit={handlePasswordSubmit}
+								onSubmit={handleCompletionSubmit}
 							/>
-
-							<div className="text-center">
-								<span className="text-gray-600">
-									Já possui uma conta?{" "}
-									<Link
-										className="font-medium text-blue-500 hover:underline"
-										href="/login"
-									>
-										Faça login
-									</Link>
-								</span>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -241,10 +263,10 @@ function PasswordRegistrationPageContent() {
 	);
 }
 
-export default function PasswordRegistrationPage() {
+export default function CompletionRegistrationPage() {
 	return (
 		<Suspense fallback={<LoadingPage />}>
-			<PasswordRegistrationPageContent />
+			<CompletionRegistrationPageContent />
 		</Suspense>
 	);
 }

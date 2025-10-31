@@ -16,14 +16,6 @@ import { EmailForm } from "./EmailForm";
 
 const emailSchema = z.object({
 	email: z.string().email("E-mail inválido"),
-	username: z
-		.string()
-		.min(3, "Username deve ter pelo menos 3 caracteres")
-		.max(30, "Username deve ter no máximo 30 caracteres")
-		.regex(
-			/^[a-z0-9._-]+$/,
-			"Username deve conter apenas letras minúsculas, números, pontos, hífens e underscores"
-		),
 });
 
 type EmailFormData = z.infer<typeof emailSchema>;
@@ -49,7 +41,6 @@ export default function PageRegistro() {
 		resolver: zodResolver(emailSchema),
 		defaultValues: {
 			email: searchParams.get("email") || "",
-			username: "",
 		},
 	});
 
@@ -59,7 +50,6 @@ export default function PageRegistro() {
 		try {
 			const response = await axios.post("/api/auth/register", {
 				email: data.email,
-				username: data.username,
 				stage: "request-otp",
 			});
 			// Redirecionar para a página de OTP com o token temporário

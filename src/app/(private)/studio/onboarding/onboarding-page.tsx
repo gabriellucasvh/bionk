@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 
+const REJEX_URL = /^https?:\/\//i;
+
 interface OnboardingPageProps {
 	onComplete: (data: OnboardingData) => void;
 	user?: {
@@ -35,6 +37,10 @@ interface OnboardingPageProps {
 }
 
 export interface OnboardingData {
+	userType: string;
+	plan: string;
+	socialLinks: { platform: string; username: string }[];
+	customLinks: { title: string; url: string }[];
 	name: string;
 	username: string;
 	bio: string;
@@ -42,33 +48,58 @@ export interface OnboardingData {
 	template: string;
 }
 
-type Step = 1 | 2 | 3 | 4 | 5;
+type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 const STEPS = [
 	{
 		id: 1,
-		title: "Foto de Perfil",
-		description: "Adicione uma foto para seu perfil",
+		title: "Tipo de Usuário",
+		description: "Selecione como você pretende usar a plataforma",
 	},
 	{
 		id: 2,
-		title: "Nome de exibição",
-		description: "Como você gostaria de ser chamado?",
+		title: "Plano",
+		description: "Escolha entre Pro ou continuar com Free",
 	},
 	{
 		id: 3,
-		title: "Nome de Usuário",
-		description: "Escolha seu nome de usuário único",
+		title: "Templates",
+		description: "Opcional: selecione um visual para sua página",
 	},
 	{
 		id: 4,
-		title: "Template",
-		description: "Selecione um visual para sua página",
+		title: "Redes Sociais",
+		description: "Opcional: adicione suas redes com usuário",
 	},
 	{
 		id: 5,
+		title: "Links Personalizados",
+		description: "Opcional: adicione links com título e URL",
+	},
+	{
+		id: 6,
+		title: "Foto de Perfil",
+		description: "Opcional: adicione uma foto",
+	},
+	{
+		id: 7,
+		title: "Nome de exibição",
+		description: "Informe seu nome de exibição",
+	},
+	{
+		id: 8,
+		title: "Nome de Usuário",
+		description: "Defina seu nome de usuário",
+	},
+	{
+		id: 9,
 		title: "Biografia",
-		description: "Conte um pouco sobre você",
+		description: "Opcional: escreva uma breve bio",
+	},
+	{
+		id: 10,
+		title: "Finalização",
+		description: "Tudo pronto. Revise e conclua",
 	},
 ];
 
@@ -80,6 +111,10 @@ export default function OnboardingPageComponent({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [currentStep, setCurrentStep] = useState<Step>(1);
 	const [data, setData] = useState({
+		userType: "",
+		plan: "",
+		socialLinks: [] as { platform: string; username: string }[],
+		customLinks: [] as { title: string; url: string }[],
 		name: initialData?.name || "",
 		username: initialData?.username || "",
 		bio: "",
@@ -202,22 +237,43 @@ export default function OnboardingPageComponent({
 
 	const canProceedToNext = () => {
 		switch (currentStep) {
-			case 1:
-				return true; // Foto é opcional
-			case 2:
+			case 1: {
+				return data.userType.trim().length > 0;
+			}
+			case 2: {
+				return data.plan.trim().length > 0;
+			}
+			case 3: {
+				return true;
+			}
+			case 4: {
+				return true;
+			}
+			case 5: {
+				return true;
+			}
+			case 6: {
+				return true;
+			}
+			case 7: {
 				return data.name.trim().length > 0;
-			case 3:
+			}
+			case 8: {
 				return (
 					data.username.trim().length > 0 &&
 					usernameValidation.isValid &&
 					!usernameValidation.isChecking
 				);
-			case 4:
-				return data.template.trim().length > 0; // Template é obrigatório
-			case 5:
-				return true; // Bio é opcional
-			default:
+			}
+			case 9: {
+				return true;
+			}
+			case 10: {
+				return true;
+			}
+			default: {
 				return false;
+			}
 		}
 	};
 
@@ -252,10 +308,123 @@ export default function OnboardingPageComponent({
 				return (
 					<motion.div
 						animate={{ opacity: 1, x: 0 }}
-						className="flex flex-col items-center space-y-2"
+						className="space-y-4"
 						exit={{ opacity: 0, x: -20 }}
 						initial={{ opacity: 0, x: 20 }}
 						key="step1"
+						transition={{ duration: 0.3 }}
+					>
+						<UserTypeSelector
+							onSelect={(v) => setData({ ...data, userType: v })}
+							selected={data.userType}
+						/>
+					</motion.div>
+				);
+
+			case 2:
+				return (
+					<motion.div
+						animate={{ opacity: 1, x: 0 }}
+						className="space-y-4"
+						exit={{ opacity: 0, x: -20 }}
+						initial={{ opacity: 0, x: 20 }}
+						key="step2"
+						transition={{ duration: 0.3 }}
+					>
+						<PlanSelector
+							onSelect={(v) => setData({ ...data, plan: v })}
+							selected={data.plan}
+						/>
+					</motion.div>
+				);
+
+			case 3:
+				return (
+					<motion.div
+						animate={{ opacity: 1, x: 0 }}
+						className="space-y-4"
+						exit={{ opacity: 0, x: -20 }}
+						initial={{ opacity: 0, x: 20 }}
+						key="step3"
+						transition={{ duration: 0.3 }}
+					>
+						<div className="flex items-center justify-between">
+							<Label>Templates</Label>
+							<button
+								className="text-sm underline"
+								onClick={handleNext}
+								type="button"
+							>
+								Pular
+							</button>
+						</div>
+						<TemplateSelector
+							onSelect={(id) => setData({ ...data, template: id })}
+							selectedTemplateId={data.template}
+						/>
+					</motion.div>
+				);
+
+			case 4:
+				return (
+					<motion.div
+						animate={{ opacity: 1, x: 0 }}
+						className="space-y-4"
+						exit={{ opacity: 0, x: -20 }}
+						initial={{ opacity: 0, x: 20 }}
+						key="step4"
+						transition={{ duration: 0.3 }}
+					>
+						<SocialLinksSelector
+							onChange={(v) => setData({ ...data, socialLinks: v })}
+							value={data.socialLinks}
+						/>
+						<div className="flex justify-end">
+							<button
+								className="text-sm underline"
+								onClick={handleNext}
+								type="button"
+							>
+								Pular
+							</button>
+						</div>
+					</motion.div>
+				);
+
+			case 5:
+				return (
+					<motion.div
+						animate={{ opacity: 1, x: 0 }}
+						className="space-y-4"
+						exit={{ opacity: 0, x: -20 }}
+						initial={{ opacity: 0, x: 20 }}
+						key="step5"
+						transition={{ duration: 0.3 }}
+					>
+						<CustomLinksForm
+							onChange={(v) => setData({ ...data, customLinks: v })}
+							value={data.customLinks}
+						/>
+						<div className="flex justify-end">
+							<button
+								className="text-sm underline"
+								onClick={handleNext}
+								type="button"
+							>
+								Pular
+							</button>
+						</div>
+					</motion.div>
+				);
+
+			case 6:
+				return (
+					<motion.div
+						animate={{ opacity: 1, x: 0 }}
+						className="flex flex-col items-center space-y-2"
+						exit={{ opacity: 0, x: -20 }}
+						initial={{ opacity: 0, x: 20 }}
+						key="step6"
 						transition={{ duration: 0.3 }}
 					>
 						<div className="relative">
@@ -288,14 +457,14 @@ export default function OnboardingPageComponent({
 					</motion.div>
 				);
 
-			case 2:
+			case 7:
 				return (
 					<motion.div
 						animate={{ opacity: 1, x: 0 }}
 						className="space-y-4"
 						exit={{ opacity: 0, x: -20 }}
 						initial={{ opacity: 0, x: 20 }}
-						key="step2"
+						key="step7"
 						transition={{ duration: 0.3 }}
 					>
 						<div className="space-y-2">
@@ -315,14 +484,14 @@ export default function OnboardingPageComponent({
 					</motion.div>
 				);
 
-			case 3:
+			case 8:
 				return (
 					<motion.div
 						animate={{ opacity: 1, x: 0 }}
 						className="space-y-4"
 						exit={{ opacity: 0, x: -20 }}
 						initial={{ opacity: 0, x: 20 }}
-						key="step3"
+						key="step8"
 						transition={{ duration: 0.3 }}
 					>
 						<div className="space-y-2">
@@ -330,9 +499,7 @@ export default function OnboardingPageComponent({
 							<div className="flex items-center space-x-2">
 								<span className="text-muted-foreground text-sm">bionk.me/</span>
 								<Input
-									className={`flex-1 py-3 ${
-										usernameValidation.isValid ? "" : "border-red-500"
-									}`}
+									className={`flex-1 py-3 ${usernameValidation.isValid ? "" : "border-red-500"}`}
 									id="username"
 									maxLength={30}
 									onChange={(e) => handleUsernameChange(e.target.value)}
@@ -345,11 +512,7 @@ export default function OnboardingPageComponent({
 							</div>
 							<div className="flex items-center justify-between">
 								<p
-									className={`text-xs ${
-										usernameValidation.isValid
-											? "text-green-600"
-											: "text-red-500"
-									}`}
+									className={`text-xs ${usernameValidation.isValid ? "text-green-600" : "text-red-500"}`}
 								>
 									{usernameValidation.message}
 								</p>
@@ -361,36 +524,14 @@ export default function OnboardingPageComponent({
 					</motion.div>
 				);
 
-			case 4:
+			case 9:
 				return (
 					<motion.div
 						animate={{ opacity: 1, x: 0 }}
 						className="space-y-4"
 						exit={{ opacity: 0, x: -20 }}
 						initial={{ opacity: 0, x: 20 }}
-						key="step4"
-						transition={{ duration: 0.3 }}
-					>
-						<TemplateSelector
-							onSelect={(id) => setData({ ...data, template: id })}
-							selectedTemplateId={data.template}
-						/>
-						{!data.template && (
-							<p className="text-red-500 text-xs">
-								Selecione um template para continuar
-							</p>
-						)}
-					</motion.div>
-				);
-
-			case 5:
-				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="space-y-4"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step5"
+						key="step9"
 						transition={{ duration: 0.3 }}
 					>
 						<div className="space-y-2">
@@ -407,6 +548,54 @@ export default function OnboardingPageComponent({
 							<p className="text-muted-foreground text-xs">
 								{data.bio.length}/150 caracteres
 							</p>
+						</div>
+					</motion.div>
+				);
+
+			case 10:
+				return (
+					<motion.div
+						animate={{ opacity: 1, x: 0 }}
+						className="space-y-4"
+						exit={{ opacity: 0, x: -20 }}
+						initial={{ opacity: 0, x: 20 }}
+						key="step10"
+						transition={{ duration: 0.3 }}
+					>
+						<div className="text-center">
+							<h2 className="mb-2 font-bold text-2xl">Tudo pronto!</h2>
+							<p className="text-muted-foreground">
+								Obrigado por se cadastrar.
+							</p>
+						</div>
+						<div>
+							<Label className="mb-2 block">Compartilhe seu cadastro</Label>
+							<div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+								{SHARING_PLATFORMS.map((sp) => {
+									const origin =
+										typeof window !== "undefined" ? window.location.origin : "";
+									const profileUrl = data.username
+										? `${origin}/${data.username}`
+										: origin;
+									const shareUrl = sp.urlTemplate
+										.replace(
+											"{title}",
+											encodeURIComponent("Meu perfil no Bionk")
+										)
+										.replace("{url}", encodeURIComponent(profileUrl));
+									return (
+										<a
+											className={`flex items-center justify-center rounded-md px-3 py-2 text-sm text-white ${sp.color}`}
+											href={shareUrl}
+											key={sp.key}
+											rel="noopener noreferrer"
+											target="_blank"
+										>
+											{sp.name}
+										</a>
+									);
+								})}
+							</div>
 						</div>
 					</motion.div>
 				);
@@ -508,6 +697,8 @@ export default function OnboardingPageComponent({
 
 // Auxiliar de seleção de template para o onboarding
 import { ALL_TEMPLATES } from "@/app/(public)/templates/templates.constants";
+import { SHARING_PLATFORMS } from "@/config/sharing-platforms";
+import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 
 function TemplateSelector({
 	selectedTemplateId,
@@ -549,6 +740,247 @@ function TemplateSelector({
 					);
 				})}
 			</div>
+		</div>
+	);
+}
+
+function UserTypeSelector({
+	selected,
+	onSelect,
+}: {
+	selected: string;
+	onSelect: (value: string) => void;
+}) {
+	const options = [
+		{
+			key: "creator",
+			title: "Criador",
+			description: "Conteúdo, música, vídeos",
+		},
+		{
+			key: "brand",
+			title: "Marca",
+			description: "Negócios, produtos, campanhas",
+		},
+		{ key: "personal", title: "Pessoal", description: "Uso individual" },
+	];
+	return (
+		<div>
+			<Label className="mb-2 block">Selecione o tipo de usuário</Label>
+			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+				{options.map((opt) => {
+					const active = selected === opt.key;
+					return (
+						<button
+							className={`rounded-lg border p-4 text-left transition ${active ? "border-lime-500 ring-2 ring-lime-400" : "border-gray-200 hover:border-gray-300 dark:border-gray-700"}`}
+							key={opt.key}
+							onClick={() => onSelect(opt.key)}
+							type="button"
+						>
+							<p className="font-semibold">{opt.title}</p>
+							<p className="text-muted-foreground text-sm">{opt.description}</p>
+						</button>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
+function PlanSelector({
+	selected,
+	onSelect,
+}: {
+	selected: string;
+	onSelect: (value: string) => void;
+}) {
+	return (
+		<div>
+			<Label className="mb-2 block">Escolha seu plano</Label>
+			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+				<button
+					className={`rounded-lg border p-4 text-left transition ${selected === "pro" ? "border-lime-500 ring-2 ring-lime-400" : "border-gray-200 hover:border-gray-300 dark:border-gray-700"}`}
+					onClick={() => onSelect("pro")}
+					type="button"
+				>
+					<p className="font-semibold">Plano Pro</p>
+					<ul className="mt-1 space-y-1 text-muted-foreground text-sm">
+						<li>Recursos avançados</li>
+						<li>Personalização extra</li>
+						<li>Prioridade de suporte</li>
+					</ul>
+				</button>
+				<button
+					className={`rounded-lg border p-4 text-left transition ${selected === "free" ? "border-lime-500 ring-2 ring-lime-400" : "border-gray-200 hover:border-gray-300 dark:border-gray-700"}`}
+					onClick={() => onSelect("free")}
+					type="button"
+				>
+					<p className="font-semibold">Continuar com Free</p>
+					<p className="text-muted-foreground text-sm">
+						Funcionalidades essenciais
+					</p>
+				</button>
+			</div>
+		</div>
+	);
+}
+
+function SocialLinksSelector({
+	value,
+	onChange,
+}: {
+	value: { platform: string; username: string }[];
+	onChange: (v: { platform: string; username: string }[]) => void;
+}) {
+	const [selectedPlatform, setSelectedPlatform] = useState<string>("");
+	const [username, setUsername] = useState<string>("");
+	const addLink = () => {
+		if (!(selectedPlatform && username.trim())) {
+			return;
+		}
+		const next = value.filter((v) => v.platform !== selectedPlatform);
+		next.push({ platform: selectedPlatform, username: username.trim() });
+		onChange(next);
+		setUsername("");
+	};
+	const platforms = SOCIAL_PLATFORMS;
+	return (
+		<div className="space-y-3">
+			<Label className="mb-2 block">Adicione redes sociais (opcional)</Label>
+			<div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+				{platforms.map((p) => (
+					<button
+						className={`flex h-20 w-full flex-col items-center justify-center rounded-xl border p-2 transition ${selectedPlatform === p.key ? "border-lime-500" : "border-gray-200 hover:border-gray-300 dark:border-gray-700"}`}
+						key={p.key}
+						onClick={() => setSelectedPlatform(p.key)}
+						title={p.name}
+						type="button"
+					>
+						<div
+							className="mb-1 h-7 w-7"
+							style={{
+								backgroundColor: p.color,
+								maskImage: `url(${p.icon})`,
+								maskSize: "contain",
+								maskRepeat: "no-repeat",
+								maskPosition: "center",
+							}}
+						/>
+						<span className="truncate text-xs">{p.name}</span>
+					</button>
+				))}
+			</div>
+			{selectedPlatform && (
+				<div className="space-y-2">
+					<Label>Usuário</Label>
+					<Input
+						onChange={(e) => setUsername(e.target.value)}
+						placeholder={
+							platforms.find((p) => p.key === selectedPlatform)?.placeholder ||
+							"usuario"
+						}
+						value={username}
+					/>
+					<BaseButton onClick={addLink}>Adicionar</BaseButton>
+				</div>
+			)}
+			{value.length > 0 && (
+				<div className="space-y-2">
+					<Label>Redes adicionadas</Label>
+					<ul className="space-y-1">
+						{value.map((v) => (
+							<li
+								className="flex items-center justify-between rounded border p-2"
+								key={v.platform}
+							>
+								<span className="text-sm">
+									{v.platform}: {v.username}
+								</span>
+								<button
+									className="text-sm underline"
+									onClick={() =>
+										onChange(value.filter((i) => i.platform !== v.platform))
+									}
+									type="button"
+								>
+									Remover
+								</button>
+							</li>
+						))}
+					</ul>
+				</div>
+			)}
+		</div>
+	);
+}
+
+function CustomLinksForm({
+	value,
+	onChange,
+}: {
+	value: { title: string; url: string }[];
+	onChange: (v: { title: string; url: string }[]) => void;
+}) {
+	const [title, setTitle] = useState<string>("");
+	const [url, setUrl] = useState<string>("");
+	const addLink = () => {
+		const t = title.trim();
+		let u = url.trim();
+		if (!(t && u)) {
+			return;
+		}
+		if (t.length > 80) {
+			return;
+		}
+		if (!REJEX_URL.test(u)) {
+			u = `https://${u}`;
+		}
+		const next = [...value, { title: t, url: u }];
+		onChange(next);
+		setTitle("");
+		setUrl("");
+	};
+	return (
+		<div className="space-y-2">
+			<Label>Adicionar links personalizados (opcional)</Label>
+			<div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+				<div className="space-y-1">
+					<Input
+						maxLength={80}
+						onChange={(e) => setTitle(e.target.value)}
+						placeholder="Título"
+						value={title}
+					/>
+					<p className="text-muted-foreground text-xs">{title.length}/80</p>
+				</div>
+				<Input
+					onChange={(e) => setUrl(e.target.value)}
+					placeholder="URL"
+					value={url}
+				/>
+			</div>
+			<BaseButton onClick={addLink}>Adicionar</BaseButton>
+			{value.length > 0 && (
+				<ul className="mt-2 space-y-1">
+					{value.map((v, idx) => (
+						<li
+							className="flex items-center justify-between rounded border p-2"
+							key={`${v.title}-${idx}`}
+						>
+							<span className="truncate text-sm">
+								{v.title} — {v.url}
+							</span>
+							<button
+								className="text-sm underline"
+								onClick={() => onChange(value.filter((_, i) => i !== idx))}
+								type="button"
+							>
+								Remover
+							</button>
+						</li>
+					))}
+				</ul>
+			)}
 		</div>
 	);
 }

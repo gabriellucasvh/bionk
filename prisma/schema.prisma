@@ -43,6 +43,8 @@ model User {
   registrationOtpAttempts       Int            @default(0)
   registrationOtpBlockedUntil   DateTime?
   registrationOtpExpiry         DateTime?
+  registrationCsrfState         String?
+  registrationCsrfExpiry        DateTime?
   passwordSetupToken            String?        @unique
   passwordSetupTokenExpiry      DateTime?
   otpToken                      String?        @unique

@@ -22,7 +22,7 @@ const otpSchema = z.object({
 
 type OtpFormData = z.infer<typeof otpSchema>;
 
-const OTP_EXPIRY_MINUTES = 2;
+const OTP_EXPIRY_MINUTES = 3;
 // Cooldown de reenvio reduzido para 30s
 const OTP_COOLDOWN_MINUTES = 0.5;
 const MINUTES_REGEX = /(\d+) minutos/;
@@ -70,10 +70,23 @@ function OtpRegistrationPageContent() {
 			});
 			setUserEmail(response.data.userEmail);
 			setTokenValid(true);
-		} catch {
+		} catch (error) {
 			setTokenValid(false);
-			// Exibir mensagem inline e manter na mesma página
-			setMessage({ type: "error", text: "Token inválido ou expirado." });
+			if (error instanceof AxiosError) {
+				const text =
+					error.response?.data?.error || "Token inválido ou expirado.";
+				const l = text.toLowerCase();
+				if (l.includes("csrf inválido") || l.includes("csrf expirado")) {
+					const emailParam = userEmail
+						? `?email=${encodeURIComponent(userEmail)}`
+						: "";
+					router.replace(`/registro/erro${emailParam}`);
+					return;
+				}
+				setMessage({ type: "error", text });
+			} else {
+				setMessage({ type: "error", text: "Token inválido ou expirado." });
+			}
 			setIsOtpInputDisabled(true);
 		} finally {
 			setValidatingToken(false);
@@ -228,9 +241,16 @@ function OtpRegistrationPageContent() {
 		if (error instanceof AxiosError) {
 			const errorText =
 				error.response?.data?.error || "Erro ao verificar código.";
+			const l = errorText.toLowerCase();
+			if (l.includes("csrf inválido") || l.includes("csrf expirado")) {
+				const emailParam = userEmail
+					? `?email=${encodeURIComponent(userEmail)}`
+					: "";
+				router.replace(`/registro/erro${emailParam}`);
+				return;
+			}
 			setMessage({ type: "error", text: errorText });
 			extractRemainingAttempts(errorText);
-
 			if (error.response?.status === 429) {
 				handleRateLimitError(errorText);
 			}
@@ -249,8 +269,13 @@ function OtpRegistrationPageContent() {
 				stage: "verify-otp",
 			});
 			// Redirecionar para a página de senha com o token temporário
-			const { passwordSetupToken } = response.data;
-			router.push(`/registro/senha?token=${passwordSetupToken}`);
+			const { passwordSetupToken, signature, nextPath } = response.data;
+			const next =
+				typeof nextPath === "string" && nextPath
+					? nextPath
+					: "/registro/completar";
+			const sig = typeof signature === "string" ? signature : "";
+			router.push(`${next}?token=${passwordSetupToken}&sig=${sig}`);
 		} catch (error) {
 			handleOtpError(error);
 		} finally {
@@ -317,15 +342,15 @@ function OtpRegistrationPageContent() {
 								Enviamos um código de 6 dígitos para {userEmail}. Verifique sua
 								caixa de entrada (e spam).
 							</p>
-						{message && (
-							<p
-								className={`text-sm ${
-									message.type === "error" ? "text-red-600" : "text-green-600"
-								}`}
-							>
-								{message.text}
-							</p>
-						)}
+							{message && (
+								<p
+									className={`text-sm ${
+										message.type === "error" ? "text-red-600" : "text-green-600"
+									}`}
+								>
+									{message.text}
+								</p>
+							)}
 							{restartRequired && (
 								<div className="mt-4">
 									<Link
@@ -339,31 +364,19 @@ function OtpRegistrationPageContent() {
 						</div>
 
 						<div className="space-y-6">
-						<OtpForm
-							form={otpForm}
-							isOtpInputDisabled={isOtpInputDisabled || !tokenValid}
-							loading={loading}
-							onBackToEmail={handleBackToEmail}
-							onResendOtp={handleResendOtp}
-							onSubmit={handleOtpSubmit}
-							otpCooldownTimer={otpCooldownTimer}
-							otpTimer={otpTimer}
-							remainingAttempts={remainingAttempts}
-							mode={tokenValid ? "verify" : "restart"}
-							onStartNewRegistration={() => router.push("/registro")}
-						/>
-
-							<div className="text-center">
-								<span className="text-gray-600">
-									Já possui uma conta?{" "}
-									<Link
-										className="font-medium text-blue-500 hover:underline"
-										href="/login"
-									>
-										Faça login
-									</Link>
-								</span>
-							</div>
+							<OtpForm
+								form={otpForm}
+								isOtpInputDisabled={isOtpInputDisabled || !tokenValid}
+								loading={loading}
+								mode={tokenValid ? "verify" : "restart"}
+								onBackToEmail={handleBackToEmail}
+								onResendOtp={handleResendOtp}
+								onStartNewRegistration={() => router.push("/registro")}
+								onSubmit={handleOtpSubmit}
+								otpCooldownTimer={otpCooldownTimer}
+								otpTimer={otpTimer}
+								remainingAttempts={remainingAttempts}
+							/>
 						</div>
 					</div>
 				</div>

@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
@@ -11,13 +11,17 @@ import { getAuthRateLimiter } from "@/lib/rate-limiter";
 import { getDefaultCustomPresets } from "@/utils/templatePresets";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const OTP_EXPIRY_MINUTES = 2;
+const OTP_EXPIRY_MINUTES = 3;
 const MAX_OTP_ATTEMPTS = 5;
 const BASE_BLOCK_DURATION_MINUTES = 10;
-const PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES = 5;
+const PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES = 15;
 const OTP_TOKEN_EXPIRY_MINUTES = 10;
 const USERNAME_RESERVATION_EXPIRY_MINUTES = 15;
 const USERNAME_REGEX = /^[a-z0-9._-]{3,30}$/;
+const REJEX_UPPERCASE = /[A-Z]/;
+const REJEX_LOWERCASE = /[a-z]/;
+const REJEX_DIGIT = /\d/;
+const REJEX_REPEAT = /([A-Za-z0-9])\1{3,}/;
 
 // Função para calcular o tempo de bloqueio exponencial
 function calculateBlockDuration(attemptCount: number): number {
@@ -89,61 +93,20 @@ async function handleRequestOtpStage(
 	if (emailValidation) {
 		return emailValidation;
 	}
-
-	// Permitir reenvio apenas com e-mail: se username não vier,
-	// tentar reaproveitar o username já reservado para este e-mail.
-	let effectiveUsername: string | null = null;
-	if (typeof username === "string" && username.trim()) {
-		effectiveUsername = username;
-	} else {
-		// Buscar usuário existente para reaproveitar username salvo
-		const existing = await prisma.user.findUnique({
-			where: { email: email as string },
-			select: {
-				username: true,
-				emailVerified: true,
-				usernameReservationExpiry: true,
-			},
-		});
-
-		if (existing?.username && existing.emailVerified === null) {
-			// Se a reserva expirou, o cleanup pode ter removido o usuário;
-			// se ainda existir mas sem reserva válida, exigir reinício do fluxo.
-			if (
-				existing.usernameReservationExpiry &&
-				existing.usernameReservationExpiry < new Date()
-			) {
-				return NextResponse.json(
-					{
-						error:
-							"Sessão expirada. Inicie o registro novamente para solicitar um novo código.",
-						code: "restart-required",
-					},
-					{ status: 400 }
-				);
-			}
-			effectiveUsername = existing.username;
-		}
-	}
-
-	if (!effectiveUsername) {
-		// Caso não seja possível inferir o username, manter mensagem clara
-		return NextResponse.json(
-			{
-				error:
-					"Username é obrigatório para solicitar código. Reinicie o registro.",
-				code: "restart-required",
-			},
-			{ status: 400 }
-		);
-	}
-
 	const rateLimitResponse = await applyRateLimit();
 	if (rateLimitResponse) {
 		return rateLimitResponse;
 	}
 
-	return await handleOtpRequest(email as string, effectiveUsername as string);
+	const providedUsername =
+		typeof username === "string" && username.trim()
+			? (username as string)
+			: null;
+	if (providedUsername) {
+		return await handleOtpRequest(email as string, providedUsername);
+	}
+
+	return await handleOtpRequest(email as string, "");
 }
 
 async function handleVerifyOtpStage(
@@ -154,24 +117,34 @@ async function handleVerifyOtpStage(
 	if (emailValidation) {
 		return emailValidation;
 	}
-
+	const cookieStore = await cookies();
+	const csrfCookie = cookieStore.get("reg_csrf");
+	if (!(csrfCookie && csrfCookie.value)) {
+		return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
+	}
 	return await handleOtpVerification(email as string, otp as string);
 }
 
 async function handleCreateUserStage(
 	token: unknown,
+	username: unknown,
 	password: unknown,
-	name: unknown
+	signature: unknown
 ): Promise<NextResponse> {
 	const tokenValidation = validateToken(token);
 	if (tokenValidation) {
 		return tokenValidation;
 	}
-
+	const cookieStore = await cookies();
+	const csrfCookie = cookieStore.get("reg_csrf");
+	if (!(csrfCookie && csrfCookie.value)) {
+		return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
+	}
 	return await handleUserCreation(
 		token as string,
+		username as string,
 		password as string,
-		name as string
+		typeof signature === "string" ? signature : undefined
 	);
 }
 
@@ -179,7 +152,7 @@ export async function POST(req: Request) {
 	try {
 		await cleanupExpiredUsernameReservations();
 
-		const { email, username, stage, otp, password, token, name } =
+		const { email, username, stage, otp, password, token, signature } =
 			await req.json();
 
 		switch (stage) {
@@ -188,7 +161,12 @@ export async function POST(req: Request) {
 			case "verify-otp":
 				return await handleVerifyOtpStage(email, otp);
 			case "create-user":
-				return await handleCreateUserStage(token, password, name);
+				return await handleCreateUserStage(
+					token,
+					username,
+					password,
+					signature
+				);
 			default:
 				return NextResponse.json(
 					{ error: "Estágio de registro inválido" },
@@ -332,6 +310,15 @@ async function sendOtpEmail(
 	otp: string,
 	otpToken: string
 ): Promise<NextResponse> {
+	const hasApiKey =
+		typeof process.env.RESEND_API_KEY === "string" &&
+		process.env.RESEND_API_KEY.trim().length > 0;
+	if (!hasApiKey) {
+		return NextResponse.json(
+			{ message: "Envio de e-mail indisponível no ambiente.", otpToken },
+			{ status: 200 }
+		);
+	}
 	try {
 		await resend.emails.send({
 			from: "Bionk <contato@bionk.me>",
@@ -339,7 +326,7 @@ async function sendOtpEmail(
 			subject: "Seu código de verificação Bionk",
 			react: OtpEmail({
 				otp,
-				expiryMinutes: 2,
+				expiryMinutes: OTP_EXPIRY_MINUTES,
 			}) as React.ReactElement,
 		});
 		return NextResponse.json(
@@ -348,36 +335,38 @@ async function sendOtpEmail(
 		);
 	} catch {
 		return NextResponse.json(
-			{ error: "Erro ao enviar e-mail." },
-			{ status: 500 }
+			{ message: "Não foi possível enviar o e-mail agora.", otpToken },
+			{ status: 200 }
 		);
 	}
 }
 
 async function handleOtpRequest(email: string, username: string) {
-	const normalizedUsername = username.toLowerCase().trim();
+	const normalizedUsername = (username || "").toLowerCase().trim();
 
-	const formatValidation = validateUsernameFormat(normalizedUsername);
-	if (formatValidation) {
-		return formatValidation;
-	}
+	if (normalizedUsername) {
+		const formatValidation = validateUsernameFormat(normalizedUsername);
+		if (formatValidation) {
+			return formatValidation;
+		}
 
-	const blacklistValidation = validateUsernameBlacklist(normalizedUsername);
-	if (blacklistValidation) {
-		return blacklistValidation;
-	}
+		const blacklistValidation = validateUsernameBlacklist(normalizedUsername);
+		if (blacklistValidation) {
+			return blacklistValidation;
+		}
 
-	const bannedUserCheck = await checkBannedUser(email, normalizedUsername);
-	if (bannedUserCheck) {
-		return bannedUserCheck;
-	}
+		const bannedUserCheck = await checkBannedUser(email, normalizedUsername);
+		if (bannedUserCheck) {
+			return bannedUserCheck;
+		}
 
-	const usernameAvailabilityCheck = await checkUsernameAvailability(
-		email,
-		normalizedUsername
-	);
-	if (usernameAvailabilityCheck) {
-		return usernameAvailabilityCheck;
+		const usernameAvailabilityCheck = await checkUsernameAvailability(
+			email,
+			normalizedUsername
+		);
+		if (usernameAvailabilityCheck) {
+			return usernameAvailabilityCheck;
+		}
 	}
 
 	const emailVerificationCheck = await checkEmailVerification(email);
@@ -391,13 +380,17 @@ async function handleOtpRequest(email: string, username: string) {
 	}
 
 	const otpData = generateOtpData();
+	const csrfState = crypto.randomBytes(32).toString("hex");
+	const tempUsername = normalizedUsername
+		? normalizedUsername
+		: `u_${crypto.randomBytes(12).toString("hex")}`;
 
 	await prisma.user.upsert({
 		where: { email },
 		update: {
-			username: normalizedUsername,
+			username: normalizedUsername || undefined,
 			...otpData,
-			usernameReservedAt: new Date(),
+			usernameReservedAt: normalizedUsername ? new Date() : null,
 			registrationOtpAttempts: user?.registrationOtpBlockedUntil
 				? user.registrationOtpAttempts
 				: 0,
@@ -406,19 +399,41 @@ async function handleOtpRequest(email: string, username: string) {
 				user.registrationOtpBlockedUntil > new Date()
 					? user.registrationOtpBlockedUntil
 					: null,
+			registrationCsrfState: csrfState,
+			registrationCsrfExpiry: new Date(
+				Date.now() + PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES * 60 * 1000
+			),
 		},
 		create: {
 			email,
-			username: normalizedUsername,
+			username: tempUsername,
 			...otpData,
-			usernameReservedAt: new Date(),
+			usernameReservedAt: normalizedUsername ? new Date() : null,
 			emailVerified: null,
 			registrationOtpAttempts: 0,
 			name: "Usuário",
+			registrationCsrfState: csrfState,
+			registrationCsrfExpiry: new Date(
+				Date.now() + PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES * 60 * 1000
+			),
 		},
 	});
 
-	return await sendOtpEmail(email, otpData.registrationOtp, otpData.otpToken);
+	const res = await sendOtpEmail(
+		email,
+		otpData.registrationOtp,
+		otpData.otpToken
+	);
+	try {
+		res.cookies.set("reg_csrf", csrfState, {
+			httpOnly: true,
+			sameSite: "strict",
+			secure: process.env.NODE_ENV === "production",
+			path: "/",
+			maxAge: 15 * 60,
+		});
+	} catch {}
+	return res;
 }
 
 // Função para verificar o OTP
@@ -435,6 +450,24 @@ async function handleOtpVerification(email: string, otp: string) {
 			{ error: "E-mail já verificado." },
 			{ status: 400 }
 		);
+	}
+
+	const cookieStore = await cookies();
+	const csrfCookie = cookieStore.get("reg_csrf");
+	if (!(csrfCookie && csrfCookie.value)) {
+		return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
+	}
+	if (
+		!user.registrationCsrfState ||
+		user.registrationCsrfState !== csrfCookie.value
+	) {
+		return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
+	}
+	if (
+		!user.registrationCsrfExpiry ||
+		user.registrationCsrfExpiry < new Date()
+	) {
+		return NextResponse.json({ error: "CSRF expirado." }, { status: 410 });
 	}
 
 	// Verificar se o usuário está bloqueado
@@ -525,24 +558,96 @@ async function handleOtpVerification(email: string, otp: string) {
 		},
 	});
 
-	return NextResponse.json(
+	function computeHmac(data: string): string | null {
+		const secret = process.env.TOKEN_HMAC_SECRET;
+		if (!secret) {
+			return null;
+		}
+		const h = crypto.createHmac("sha256", secret);
+		h.update(data);
+		return h.digest("hex");
+	}
+	const signature = computeHmac(`${user.email}:${passwordSetupToken}`);
+	const res = NextResponse.json(
 		{
 			message: "Código OTP verificado com sucesso.",
 			passwordSetupToken,
+			signature,
+			nextPath: "/registro/completar",
 		},
 		{ status: 200 }
 	);
+	return res;
 }
 
 // Função para criar o usuário usando token temporário
 async function handleUserCreation(
 	token: string,
+	username: string,
 	password: string,
-	name: string
+	providedSignature?: string
 ) {
-	// Validar se name foi fornecido
-	if (!name || typeof name !== "string" || name.trim().length === 0) {
-		return NextResponse.json({ error: "Nome é obrigatório" }, { status: 400 });
+	const passwordErrors: string[] = [];
+	if (!(password && typeof password === "string")) {
+		return NextResponse.json({ error: "Senha inválida." }, { status: 400 });
+	}
+	if (password.length < 9) {
+		passwordErrors.push("A senha deve ter pelo menos 9 caracteres.");
+	}
+	if (password.length > 64) {
+		passwordErrors.push("A senha deve ter no máximo 64 caracteres.");
+	}
+	if (!REJEX_UPPERCASE.test(password)) {
+		passwordErrors.push("Inclua pelo menos 1 letra maiúscula.");
+	}
+	if (!REJEX_LOWERCASE.test(password)) {
+		passwordErrors.push("Inclua pelo menos 1 letra minúscula.");
+	}
+	if (!REJEX_DIGIT.test(password)) {
+		passwordErrors.push("Inclua pelo menos 1 número.");
+	}
+	const lowerPwd = password.toLowerCase();
+	const seqs = [
+		"123456",
+		"234567",
+		"345678",
+		"456789",
+		"012345",
+		"abcdef",
+		"bcdefg",
+		"cdefgh",
+		"defghi",
+		"uvwxyz",
+		"qwerty",
+		"asdfgh",
+		"zxcvbn",
+	];
+	if (seqs.some((s) => lowerPwd.includes(s))) {
+		passwordErrors.push("Evite sequências óbvias (ex.: 123456, abcdef).");
+	}
+	if (!REJEX_REPEAT.test(password)) {
+		passwordErrors.push("Evite repetição excessiva de caracteres.");
+	}
+	if (passwordErrors.length > 0) {
+		return NextResponse.json(
+			{ error: passwordErrors.join(" ") },
+			{ status: 400 }
+		);
+	}
+	if (!username || typeof username !== "string") {
+		return NextResponse.json(
+			{ error: "Username é obrigatório" },
+			{ status: 400 }
+		);
+	}
+	const normalizedUsername = username.toLowerCase().trim();
+	const formatValidation = validateUsernameFormat(normalizedUsername);
+	if (formatValidation) {
+		return formatValidation;
+	}
+	const blacklistValidation = validateUsernameBlacklist(normalizedUsername);
+	if (blacklistValidation) {
+		return blacklistValidation;
 	}
 
 	// Buscar usuário pelo token
@@ -581,21 +686,58 @@ async function handleUserCreation(
 		);
 	}
 
+	const expectedSignature = (function computeHmac(data: string): string | null {
+		const secret = process.env.TOKEN_HMAC_SECRET;
+		if (!secret) {
+			return null;
+		}
+		const h = crypto.createHmac("sha256", secret);
+		h.update(data);
+		return h.digest("hex");
+	})(`${user.email}:${token}`);
+	if (expectedSignature && providedSignature !== expectedSignature) {
+		return NextResponse.json(
+			{ error: "Assinatura inválida." },
+			{ status: 400 }
+		);
+	}
+
+	const cookieStore = await cookies();
+	const csrfCookie = cookieStore.get("reg_csrf");
+	if (!(csrfCookie && csrfCookie.value)) {
+		return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
+	}
+	if (
+		!user.registrationCsrfState ||
+		user.registrationCsrfState !== csrfCookie.value
+	) {
+		return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
+	}
+	if (
+		!user.registrationCsrfExpiry ||
+		user.registrationCsrfExpiry < new Date()
+	) {
+		return NextResponse.json({ error: "CSRF expirado." }, { status: 410 });
+	}
+
 	const hashedPassword = await bcrypt.hash(password, 10);
+	const normalized = normalizedUsername;
 
 	const updatedUser = await prisma.user.update({
 		where: { id: user.id },
 		data: {
-			name: name.trim(),
+			username: normalized,
+			name: normalized,
 			hashedPassword,
-			// Ativar a conta e marcar onboarding como concluído para fluxo de credenciais
 			status: "active",
-			onboardingCompleted: true,
+			onboardingCompleted: false,
 			provider: "credentials",
 			passwordSetupToken: null,
 			passwordSetupTokenExpiry: null,
 			usernameReservedAt: null,
 			usernameReservationExpiry: null,
+			registrationCsrfState: null,
+			registrationCsrfExpiry: null,
 			subscriptionPlan: "free",
 			subscriptionStatus: "active",
 			CustomPresets: {
@@ -622,8 +764,18 @@ async function handleUserCreation(
 		// Não falha o registro se a notificação Discord falhar
 	}
 
-	return NextResponse.json(
+	const res = NextResponse.json(
 		{ message: "Usuário registrado com sucesso!" },
 		{ status: 201 }
 	);
+	try {
+		res.cookies.set("reg_csrf", "", {
+			httpOnly: true,
+			sameSite: "strict",
+			secure: process.env.NODE_ENV === "production",
+			path: "/",
+			maxAge: 0,
+		});
+	} catch {}
+	return res;
 }
