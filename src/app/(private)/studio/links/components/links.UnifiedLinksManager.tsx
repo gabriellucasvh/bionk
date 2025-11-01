@@ -97,6 +97,18 @@ const UnifiedLinksManager = () => {
 		}
 	}, [activeTab, userId, summaryData?.socialLinksCount, mutateSocialLinks]);
 
+	// Faz pelo menos uma busca inicial de socials quando existir conteúdo, independente da aba ativa
+	useEffect(() => {
+		if (
+			userId &&
+			!hasLoadedSocials.current &&
+			(summaryData?.socialLinksCount ?? 0) > 0
+		) {
+			hasLoadedSocials.current = true;
+			mutateSocialLinks();
+		}
+	}, [userId, summaryData?.socialLinksCount, mutateSocialLinks]);
+
 	// Hook SWR para seções
 	const {
 		data: sectionsData,
