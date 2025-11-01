@@ -73,7 +73,7 @@ const STEPS = [
 	{
 		id: 5,
 		title: "Perfil",
-		description: "Adicione foto, nome e bio; username apenas para Google",
+		description: "Adicione foto, nome e bio",
 	},
 	{
 		id: 6,
@@ -311,7 +311,7 @@ export default function OnboardingPageComponent({
 						/>
 						<div className="pointer-events-none fixed right-0 bottom-0 left-0 z-20">
 							<div className="bg-gradient-to-t from-white/90 to-white/0 px-4 py-3 dark:from-gray-900/90 dark:to-gray-900/0">
-								<div className="pointer-events-auto mx-auto flex w-full max-w-1/2 justify-between">
+								<div className="pointer-events-auto mx-auto flex w-full justify-between lg:max-w-1/2">
 									<BaseButton onClick={handlePrevious} variant="white">
 										Voltar
 									</BaseButton>

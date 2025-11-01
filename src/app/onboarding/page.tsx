@@ -47,14 +47,17 @@ export default function OnboardingPage() {
 				username: data.username,
 				bio: data.bio,
 				userType: data.userType,
-				plan: data.plan,
 			};
 			if (data.profileImage) {
 				payload.profileImage = await fileToDataUrl(data.profileImage);
 			}
 
-			const isGoogle = Boolean(session?.user?.provider === "google" || session?.user?.googleId);
-			const completionEndpoint = isGoogle ? "/api/onboarding/complete" : "/api/auth/complete-onboarding";
+			const isGoogle = Boolean(
+				session?.user?.provider === "google" || session?.user?.googleId
+			);
+			const completionEndpoint = isGoogle
+				? "/api/onboarding/complete"
+				: "/api/auth/complete-onboarding";
 			const response = await fetch(completionEndpoint, {
 				method: "POST",
 				headers: {
@@ -77,7 +80,7 @@ export default function OnboardingPage() {
 					username: result.user.username ?? session?.user?.username,
 					name: result.user.name ?? session?.user?.name,
 					image: result.user.image ?? session?.user?.image,
-					onboardingCompleted: (result.user.onboardingCompleted ?? true),
+					onboardingCompleted: result.user.onboardingCompleted ?? true,
 					status: result.user.status ?? session?.user?.status,
 				},
 			});
@@ -185,28 +188,35 @@ export default function OnboardingPage() {
 		return <LoadingPage />;
 	}
 
-	const canShowOnboarding = Boolean(session) && !session.user.onboardingCompleted;
+	const canShowOnboarding =
+		Boolean(session) && !session?.user?.onboardingCompleted;
 
 	if (!canShowOnboarding) {
 		return <LoadingPage />;
 	}
 
+	const user = session?.user || null;
+
 	return (
 		<OnboardingPageComponent
-			initialData={{
-				name: (session.user.name || session.user.username || ""),
-				username: (session.user.username || ""),
-			}}
 			error={error}
+			initialData={{
+				name: user?.name ?? user?.username ?? "",
+				username: user?.username ?? "",
+			}}
 			isLoading={isLoading}
 			onComplete={handleOnboardingComplete}
-			user={{
-				id: session.user.id,
-				name: session.user.name || "",
-				email: session.user.email || "",
-				image: session.user.image,
-				onboardingCompleted: session.user.onboardingCompleted,
-			}}
+			user={
+				user
+					? {
+							id: user.id,
+							name: user.name || "",
+							email: user.email || "",
+							image: user.image,
+							onboardingCompleted: user.onboardingCompleted,
+						}
+					: undefined
+			}
 		/>
 	);
 }
