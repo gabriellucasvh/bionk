@@ -20,6 +20,7 @@ Bionk é uma plataforma **Link in Bio** moderna e personalizável, desenvolvida 
 - **Recharts** - Visualização de dados interativa.
 - **Zod** - Validação de esquemas com TypeScript.
 - **BiomeJS** - Ferramenta de formatação e linting de código moderna.
+- **Resend** – Plataforma de envio de e-mails transacionais e marketing com alta entregabilidade e integração simplificada para aplicações modernas.
 
 
 ## 🛠️ Instalação e Uso
