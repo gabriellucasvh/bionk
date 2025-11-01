@@ -28,6 +28,7 @@ interface OnboardingPageProps {
 		googleId?: string;
 		onboardingCompleted?: boolean;
 		provider?: string;
+		status?: string;
 	};
 	initialData?: {
 		name?: string;
@@ -98,7 +99,9 @@ export default function OnboardingPageComponent({
 		socialLinks: [] as { platform: string; username: string }[],
 		customLinks: [] as { title: string; url: string }[],
 		name: initialData?.name || "",
-		username: initialData?.username || "",
+		username: initialData?.username?.startsWith("temp_")
+			? ""
+			: initialData?.username || "",
 		bio: "",
 		template: "",
 	});
@@ -114,7 +117,13 @@ export default function OnboardingPageComponent({
 		message: "",
 		isChecking: false,
 	});
-	const isGoogleUser = user?.provider === "google" || Boolean(user?.googleId);
+	const isGoogleUser =
+		user?.provider === "google" ||
+		Boolean(user?.googleId) ||
+		user?.status === "pending" ||
+		user?.isCredentialsUser === false ||
+		(user?.username?.startsWith("temp_") ?? false) ||
+		(initialData?.username?.startsWith("temp_") ?? false);
 
 	// Configurar imagem inicial
 	useEffect(() => {
@@ -125,6 +134,7 @@ export default function OnboardingPageComponent({
 
 	// Debounce timer ref
 	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+	const usernameInputRef = useRef<HTMLInputElement | null>(null);
 
 	// Cleanup timer on unmount
 	useEffect(() => {
@@ -134,6 +144,17 @@ export default function OnboardingPageComponent({
 			}
 		};
 	}, []);
+
+	useEffect(() => {
+		if (
+			isGoogleUser &&
+			currentStep === 5 &&
+			(!data.username || data.username.startsWith("temp_")) &&
+			usernameInputRef.current
+		) {
+			usernameInputRef.current.focus();
+		}
+	}, [isGoogleUser, currentStep, data.username]);
 
 	const validateUsername = useCallback((username: string) => {
 		// Clear previous timer
@@ -204,6 +225,9 @@ export default function OnboardingPageComponent({
 
 	const handleUsernameChange = (value: string) => {
 		const sanitized = value.replace(/[^a-zA-Z0-9_.]/g, "").toLowerCase();
+		if (sanitized === data.username) {
+			return;
+		}
 		setData({ ...data, username: sanitized });
 		if (sanitized) {
 			validateUsername(sanitized);
@@ -410,21 +434,26 @@ export default function OnboardingPageComponent({
 						{isGoogleUser && (
 							<div className="space-y-2">
 								<Label htmlFor="username">Nome de usuário *</Label>
-								<div className="flex items-center space-x-2">
+								<div className="relative flex items-center space-x-2">
 									<span className="text-muted-foreground text-sm">
 										bionk.me/
 									</span>
-									<Input
-										className={`flex-1 py-3 ${usernameValidation.isValid ? "" : "border-red-500"}`}
-										id="username"
-										maxLength={30}
-										onChange={(e) => handleUsernameChange(e.target.value)}
-										placeholder="seuusername"
-										value={data.username}
-									/>
-									{usernameValidation.isChecking && (
-										<Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-									)}
+									<div className="relative flex-1">
+										<Input
+											className={`flex-1 py-3 pr-8 ring ring-zinc-400 ${usernameValidation.isValid ? "" : "border-red-500"}`}
+											id="username"
+											maxLength={30}
+											onChange={(e) => handleUsernameChange(e.target.value)}
+											placeholder="seuusername"
+											ref={usernameInputRef}
+											value={data.username}
+										/>
+										{usernameValidation.isChecking && (
+											<span className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-2">
+												<Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+											</span>
+										)}
+									</div>
 								</div>
 								<div className="flex items-center justify-between">
 									<p
