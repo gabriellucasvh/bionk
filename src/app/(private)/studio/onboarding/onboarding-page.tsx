@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
-import { SHARING_PLATFORMS } from "@/config/sharing-platforms";
+
 import CustomLinksForm from "./components/CustomLinksForm";
 import SocialLinksSelector from "./components/SocialLinksSelector";
 import TemplateSelector from "./components/TemplateSelector";
@@ -248,7 +248,7 @@ export default function OnboardingPageComponent({
 				}
 			} catch (error) {
 				// Don't show error if request was aborted (user typed something else)
-				if (error instanceof Error && error.name === 'AbortError') {
+				if (error instanceof Error && error.name === "AbortError") {
 					return;
 				}
 				setUsernameValidation({
@@ -533,39 +533,19 @@ export default function OnboardingPageComponent({
 						transition={{ duration: 0.3 }}
 					>
 						<div className="text-center">
+							<Image
+								alt="Bionk Logo"
+								className="mx-auto mb-5 h-14 w-auto"
+								height={28}
+								priority
+								src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641014/bionk-logo-icon_ya5kbp.svg"
+								width={110}
+							/>
 							<h2 className="mb-2 font-bold text-2xl">Tudo pronto!</h2>
-							<p className="text-muted-foreground">
-								Obrigado por se cadastrar.
+							<p className="mx-auto max-w-md text-muted-foreground">
+								Cadastro concluído com sucesso! Que bom ter você aqui. Estamos
+								animados para acompanhar o que você vai criar a partir de agora.
 							</p>
-						</div>
-						<div>
-							<Label className="mb-2 block">Compartilhe seu cadastro</Label>
-							<div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-								{SHARING_PLATFORMS.map((sp) => {
-									const origin =
-										typeof window !== "undefined" ? window.location.origin : "";
-									const profileUrl = data.username
-										? `${origin}/${data.username}`
-										: origin;
-									const shareUrl = sp.urlTemplate
-										.replace(
-											"{title}",
-											encodeURIComponent("Meu perfil no Bionk")
-										)
-										.replace("{url}", encodeURIComponent(profileUrl));
-									return (
-										<a
-											className={`flex items-center justify-center rounded-md px-3 py-2 text-sm text-white ${sp.color}`}
-											href={shareUrl}
-											key={sp.key}
-											rel="noopener noreferrer"
-											target="_blank"
-										>
-											{sp.name}
-										</a>
-									);
-								})}
-							</div>
 						</div>
 					</motion.div>
 				);
@@ -578,7 +558,7 @@ export default function OnboardingPageComponent({
 	return (
 		<div className="flex min-h-dvh items-center justify-center bg-white p-6 dark:from-gray-900 dark:to-gray-800">
 			<div className="w-full md:max-w-3xl">
-				{/* Header */}
+			{currentStep === 1 && (
 				<div className="mb-8 text-center">
 					<h1 className="mb-2 font-bold text-3xl text-gray-900 dark:text-white">
 						Bem-vindo ao Bionk!
@@ -587,24 +567,26 @@ export default function OnboardingPageComponent({
 						Vamos configurar seu perfil em alguns passos
 					</p>
 				</div>
+			)}
 
-				{/* Progress */}
-				<div className="mb-8">
-					<div className="mb-2 flex items-center justify-between">
-						<span className="font-medium text-gray-700 text-sm dark:text-gray-300">
-							{STEPS[currentStep - 1].title}
-						</span>
+				{currentStep !== 6 && (
+					<div className="mb-8">
+						<div className="mb-2 flex items-center justify-between">
+							<span className="font-medium text-gray-700 text-sm dark:text-gray-300">
+								{STEPS[currentStep - 1].title}
+							</span>
+						</div>
+						<div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+							<div
+								className="h-2 rounded-full bg-lime-400 transition-all duration-300"
+								style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
+							/>
+						</div>
+						<p className="mt-2 text-gray-600 text-sm dark:text-gray-400">
+							{STEPS[currentStep - 1].description}
+						</p>
 					</div>
-					<div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-						<div
-							className="h-2 rounded-full bg-lime-400 transition-all duration-300"
-							style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
-						/>
-					</div>
-					<p className="mt-2 text-gray-600 text-sm dark:text-gray-400">
-						{STEPS[currentStep - 1].description}
-					</p>
-				</div>
+				)}
 
 				{/* Content */}
 				<div className="mb-6 bg-white py-4 dark:bg-gray-800">
@@ -645,7 +627,7 @@ export default function OnboardingPageComponent({
 								) : (
 									<Check className="h-4 w-4" />
 								)}
-								Concluir
+								Concluir e ir para o Studio
 							</BaseButton>
 						)}
 					</div>
