@@ -132,15 +132,19 @@ export default function OnboardingPageComponent({
 		);
 	}, []);
 
-	// Debounce timer ref
+	// Debounce timer ref and abort controller for API requests
 	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+	const abortControllerRef = useRef<AbortController | null>(null);
 	const usernameInputRef = useRef<HTMLInputElement | null>(null);
 
-	// Cleanup timer on unmount
+	// Cleanup timer and abort controller on unmount
 	useEffect(() => {
 		return () => {
 			if (debounceTimerRef.current) {
 				clearTimeout(debounceTimerRef.current);
+			}
+			if (abortControllerRef.current) {
+				abortControllerRef.current.abort();
 			}
 		};
 	}, []);
@@ -157,9 +161,12 @@ export default function OnboardingPageComponent({
 	}, [isGoogleUser, currentStep, data.username]);
 
 	const validateUsername = useCallback((username: string) => {
-		// Clear previous timer
+		// Clear previous timer and abort any ongoing request
 		if (debounceTimerRef.current) {
 			clearTimeout(debounceTimerRef.current);
+		}
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
 		}
 
 		if (!username.trim()) {
@@ -180,6 +187,7 @@ export default function OnboardingPageComponent({
 			return;
 		}
 
+		// Check blacklist first - this has priority over everything
 		if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
 			setUsernameValidation({
 				isValid: false,
@@ -194,11 +202,36 @@ export default function OnboardingPageComponent({
 
 		// Debounce API call
 		debounceTimerRef.current = setTimeout(async () => {
+			// Create new abort controller for this request
+			const controller = new AbortController();
+			abortControllerRef.current = controller;
+
 			try {
+				// Double-check blacklist before making API call (race condition protection)
+				if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
+					setUsernameValidation({
+						isValid: false,
+						message: "Este nome de usuário não está disponível",
+						isChecking: false,
+					});
+					return;
+				}
+
 				const response = await fetch(
-					`/api/auth/check-username?username=${encodeURIComponent(username)}`
+					`/api/auth/check-username?username=${encodeURIComponent(username)}`,
+					{ signal: controller.signal }
 				);
 				const result = await response.json();
+
+				// Final blacklist check before setting result (ultimate protection)
+				if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
+					setUsernameValidation({
+						isValid: false,
+						message: "Este nome de usuário não está disponível",
+						isChecking: false,
+					});
+					return;
+				}
 
 				if (result.available) {
 					setUsernameValidation({
@@ -213,7 +246,11 @@ export default function OnboardingPageComponent({
 						isChecking: false,
 					});
 				}
-			} catch {
+			} catch (error) {
+				// Don't show error if request was aborted (user typed something else)
+				if (error instanceof Error && error.name === 'AbortError') {
+					return;
+				}
 				setUsernameValidation({
 					isValid: false,
 					message: "Erro ao verificar disponibilidade",

@@ -94,6 +94,7 @@ export default function SocialLinksSelector({
 					<div className="space-y-2">
 						<Label>Usuário</Label>
 						<Input
+							maxLength={50}
 							onChange={(e) => setUsername(e.target.value)}
 							placeholder={
 								platforms.find((p) => p.key === selectedPlatform)
@@ -142,15 +143,16 @@ export default function SocialLinksSelector({
 															maskPosition: "center",
 														}}
 													/>
-													<Input
-														className="w-full min-w-0"
-														onChange={(e) => setEditingUsername(e.target.value)}
-														placeholder={
-															platforms.find((p) => p.key === v.platform)
-																?.placeholder || "usuario"
-														}
-														value={editingUsername}
-													/>
+										<Input
+											className="w-full min-w-0"
+											maxLength={50}
+											onChange={(e) => setEditingUsername(e.target.value)}
+											placeholder={
+												platforms.find((p) => p.key === v.platform)
+													?.placeholder || "usuario"
+											}
+											value={editingUsername}
+										/>
 												</div>
 												<div className="flex items-center justify-end gap-2">
 													<BaseButton onClick={saveEdit}>Salvar</BaseButton>
