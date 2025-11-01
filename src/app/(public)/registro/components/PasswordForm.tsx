@@ -8,9 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface PasswordFormData {
-	name: string;
+	username: string;
 	password: string;
-	confirmPassword: string;
 }
 
 interface PasswordFormProps {
@@ -22,29 +21,30 @@ interface PasswordFormProps {
 
 export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {
 	const [showPassword, setShowPassword] = useState(false);
-	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 	return (
-		<form
-			className="space-y-4"
-			onSubmit={form.handleSubmit(onSubmit)}
-		>
+		<form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
 			<div>
 				<Label className="block font-semibold text-base text-black">
-					Seu nome
+					Seu username
 				</Label>
 				<div className="mt-1">
 					<Input
 						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
-						placeholder="Digite seu nome de exibição"
+						placeholder="Digite seu username"
 						type="text"
-						{...form.register("name")}
+						{...form.register("username", {
+							setValueAs: (v) =>
+								typeof v === "string"
+									? v.replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase()
+									: "",
+						})}
 						disabled={loading}
 					/>
 				</div>
-				{form.formState.errors.name && (
+				{form.formState.errors.username && (
 					<p className="text-red-600 text-sm">
-						{form.formState.errors.name.message}
+						{form.formState.errors.username.message as string}
 					</p>
 				)}
 			</div>
@@ -72,37 +72,6 @@ export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {
 				{form.formState.errors.password && (
 					<p className="text-red-600 text-sm">
 						{form.formState.errors.password.message}
-					</p>
-				)}
-			</div>
-			<div>
-				<Label className="block font-semibold text-base text-black">
-					Confirmar senha
-				</Label>
-				<div className="relative mt-1">
-					<Input
-						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
-						placeholder="Confirme sua senha"
-						type={showConfirmPassword ? "text" : "password"}
-						{...form.register("confirmPassword")}
-						disabled={loading}
-					/>
-					<button
-						className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500"
-						disabled={loading}
-						onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-						type="button"
-					>
-						{showConfirmPassword ? (
-							<EyeOff size={20} />
-						) : (
-							<Eye size={20} />
-						)}
-					</button>
-				</div>
-				{form.formState.errors.confirmPassword && (
-					<p className="text-red-600 text-sm">
-						{form.formState.errors.confirmPassword.message}
 					</p>
 				)}
 			</div>

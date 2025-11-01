@@ -3,10 +3,10 @@
 import axios from "axios";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useState, Suspense } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 
-export default function RegistroErroPage() {
+function RegistroErroContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const [loading, setLoading] = useState(false);
@@ -94,5 +94,13 @@ export default function RegistroErroPage() {
 				</div>
 			</div>
 		</div>
+	);
+}
+
+export default function RegistroErroPage() {
+	return (
+		<Suspense fallback={<div>Carregando...</div>}>
+			<RegistroErroContent />
+		</Suspense>
 	);
 }

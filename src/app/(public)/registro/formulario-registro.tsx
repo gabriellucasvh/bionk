@@ -5,7 +5,7 @@ import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession, signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
@@ -18,7 +18,6 @@ import { PasswordForm } from "./components/PasswordForm";
 
 const emailSchema = z.object({
 	email: z.string().email("E-mail inválido"),
-	username: z.string().min(3, "Username deve ter pelo menos 3 caracteres"),
 });
 
 const otpSchema = z.object({
@@ -28,16 +27,14 @@ const otpSchema = z.object({
 		.regex(/^\d{6}$/, "Código inválido, use apenas números"),
 });
 
-const passwordSchema = z
-	.object({
-		name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres").max(44, "Nome deve ter no máximo 44 caracteres"),
-		password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
-		confirmPassword: z.string(),
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: "As senhas não coincidem",
-		path: ["confirmPassword"],
-	});
+const passwordSchema = z.object({
+    username: z
+        .string()
+        .min(3, "Username deve ter pelo menos 3 caracteres")
+        .max(30, "Username deve ter no máximo 30 caracteres")
+        .regex(/^[a-z0-9_-]{3,30}$/i, "Use apenas letras, números, _ ou - (3-30)"),
+    password: z.string().min(9, "A senha deve ter pelo menos 9 caracteres"),
+});
 
 type EmailFormData = z.infer<typeof emailSchema>;
 type OtpFormData = z.infer<typeof otpSchema>;
@@ -95,8 +92,8 @@ const getStageDescription = (stage: Stage, email: string) => {
 					entrada (e spam).
 				</p>
 			);
-		case "password":
-			return "Escolha uma senha segura para sua conta.";
+    case "password":
+            return "Defina seu username e sua senha.";
 		case "success":
 			return "Você será redirecionado para a página de login em breve.";
 		default:
@@ -107,7 +104,6 @@ const getStageDescription = (stage: Stage, email: string) => {
 function Register() {
 	const [stage, setStage] = useState<Stage>("email");
 	const [email, setEmail] = useState<string>("");
-	const [username, setUsername] = useState<string>("");
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState<{
 		type: "success" | "error";
@@ -130,27 +126,25 @@ function Register() {
 		}
 	}, [status, router]);
 
-    const emailForm = useForm<EmailFormData>({
-        resolver: zodResolver(emailSchema),
-        mode: "onChange",
-        defaultValues: {
-            email: "",
-            username: "",
-        },
-    });
+	const emailForm = useForm<EmailFormData>({
+		resolver: zodResolver(emailSchema),
+		mode: "onChange",
+		defaultValues: {
+			email: "",
+		},
+	});
 
 	const otpForm = useForm<OtpFormData>({
 		resolver: zodResolver(otpSchema),
 	});
 
-	const passwordForm = useForm<PasswordFormData>({
-		resolver: zodResolver(passwordSchema),
-		defaultValues: {
-			name: "",
-			password: "",
-			confirmPassword: "",
-		},
-	});
+    const passwordForm = useForm<PasswordFormData>({
+        resolver: zodResolver(passwordSchema),
+        defaultValues: {
+            username: "",
+            password: "",
+        },
+    });
 
 	useEffect(() => {
 		return () => {
@@ -206,19 +200,17 @@ function Register() {
 		setMessage(null);
 		clearTimers();
 		otpForm.reset();
-	try {
+		try {
 			await axios.post("/api/auth/register", {
 				email: data.email,
-				username: data.username,
 				stage: "request-otp",
 			});
 			setEmail(data.email);
-			setUsername(data.username);
 			setStage("otp");
-            startOtpTimer();
-            // Iniciar cooldown de 30s para reenvio
-            startOtpCooldownTimer(OTP_COOLDOWN_MINUTES);
-            setIsOtpInputDisabled(false);
+			startOtpTimer();
+			// Iniciar cooldown de 30s para reenvio
+			startOtpCooldownTimer(OTP_COOLDOWN_MINUTES);
+			setIsOtpInputDisabled(false);
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				setMessage({
@@ -238,25 +230,35 @@ function Register() {
 	};
 
 	const handleResendOtp = async () => {
-		if (email && username) {
-			await _submitEmailLogic({ email, username }, true);
+		if (email) {
+			await _submitEmailLogic({ email }, true);
 		}
 	};
 
-	const handleOtpSubmit: SubmitHandler<OtpFormData> = async (data) => {
-		setLoading(true);
-		setMessage(null);
-		try {
-			await axios.post("/api/auth/register", {
-				email,
-				otp: data.otp,
-				stage: "verify-otp",
-			});
-			setStage("password");
-			setMessage({
-				type: "success",
-				text: "Código verificado com sucesso! Defina sua senha.",
-			});
+    const [passwordSetupToken, setPasswordSetupToken] = useState<string>("");
+    const [tokenSignature, setTokenSignature] = useState<string>("");
+
+    const handleOtpSubmit: SubmitHandler<OtpFormData> = async (data) => {
+        setLoading(true);
+        setMessage(null);
+        try {
+            const res = await axios.post("/api/auth/register", {
+                email,
+                otp: data.otp,
+                stage: "verify-otp",
+            });
+            const { passwordSetupToken: _token, signature } = res.data || {};
+            if (_token) {
+                setPasswordSetupToken(_token);
+            }
+            if (signature) {
+                setTokenSignature(signature);
+            }
+            setStage("password");
+            setMessage({
+                type: "success",
+                text: "Código verificado com sucesso! Defina sua senha.",
+            });
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				const errorText =
@@ -277,23 +279,25 @@ function Register() {
 		}
 	};
 
-	const handlePasswordSubmit: SubmitHandler<PasswordFormData> = async (
-		data
-	) => {
-		setLoading(true);
-		setMessage(null);
-		try {
-			await axios.post("/api/auth/register", {
-				email,
-				password: data.password,
-				stage: "create-user",
-			});
-			// Tentar login automático com credenciais
-			const result = await signIn("credentials", {
-				email,
-				password: data.password,
-				redirect: false,
-			});
+    const handlePasswordSubmit: SubmitHandler<PasswordFormData> = async (
+        data
+    ) => {
+        setLoading(true);
+        setMessage(null);
+        try {
+            await axios.post("/api/auth/register", {
+                token: passwordSetupToken,
+                username: data.username,
+                password: data.password,
+                signature: tokenSignature,
+                stage: "create-user",
+            });
+            // Tentar login automático com credenciais
+            const result = await signIn("credentials", {
+                email,
+                password: data.password,
+                redirect: false,
+            });
 
 			setStage("success");
 			if (result && !result.error) {
