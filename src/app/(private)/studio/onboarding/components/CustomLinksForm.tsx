@@ -91,7 +91,12 @@ export default function CustomLinksForm({
 					value={url}
 				/>
 			</div>
-			<BaseButton onClick={addLink}>Adicionar</BaseButton>
+			<BaseButton
+				disabled={!(title.trim() && url.trim())}
+				onClick={addLink}
+			>
+				Adicionar
+			</BaseButton>
 			{value.length > 0 && (
 				<ul className="mt-2 space-y-1">
 					{value.map((v, idx) => (

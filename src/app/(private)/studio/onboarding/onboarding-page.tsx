@@ -16,6 +16,8 @@ import SocialLinksSelector from "./components/SocialLinksSelector";
 import TemplateSelector from "./components/TemplateSelector";
 import UserTypeSelector from "./components/UserTypeSelector";
 
+const REGEX_USERNAME = /^[a-z0-9_-]{3,30}$/;
+
 interface OnboardingPageProps {
 	onComplete: (data: OnboardingData) => void;
 	user?: {
@@ -178,20 +180,23 @@ export default function OnboardingPageComponent({
 			return;
 		}
 
-		if (username.length > 30) {
-			setUsernameValidation({
-				isValid: false,
-				message: "Nome de usuário deve ter no máximo 30 caracteres",
-				isChecking: false,
-			});
-			return;
-		}
-
 		// Check blacklist first - this has priority over everything
 		if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
 			setUsernameValidation({
 				isValid: false,
 				message: "Este nome de usuário não está disponível",
+				isChecking: false,
+			});
+			return;
+		}
+
+		// Validate allowed characters and length (3-30)
+		const pattern = REGEX_USERNAME;
+		if (!pattern.test(username)) {
+			setUsernameValidation({
+				isValid: false,
+				message:
+					"Nome de usuário deve conter apenas letras, números, _ ou - e ter entre 3-30 caracteres",
 				isChecking: false,
 			});
 			return;
@@ -261,7 +266,7 @@ export default function OnboardingPageComponent({
 	}, []);
 
 	const handleUsernameChange = (value: string) => {
-		const sanitized = value.replace(/[^a-zA-Z0-9_.]/g, "").toLowerCase();
+		const sanitized = value.replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase();
 		if (sanitized === data.username) {
 			return;
 		}
@@ -558,16 +563,16 @@ export default function OnboardingPageComponent({
 	return (
 		<div className="flex min-h-dvh items-center justify-center bg-white p-6 dark:from-gray-900 dark:to-gray-800">
 			<div className="w-full md:max-w-3xl">
-			{currentStep === 1 && (
-				<div className="mb-8 text-center">
-					<h1 className="mb-2 font-bold text-3xl text-gray-900 dark:text-white">
-						Bem-vindo ao Bionk!
-					</h1>
-					<p className="text-gray-600 dark:text-gray-300">
-						Vamos configurar seu perfil em alguns passos
-					</p>
-				</div>
-			)}
+				{currentStep === 1 && (
+					<div className="mb-8 text-center">
+						<h1 className="mb-2 font-bold text-3xl text-gray-900 dark:text-white">
+							Bem-vindo ao Bionk!
+						</h1>
+						<p className="text-gray-600 dark:text-gray-300">
+							Vamos configurar seu perfil em alguns passos
+						</p>
+					</div>
+				)}
 
 				{currentStep !== 6 && (
 					<div className="mb-8">
