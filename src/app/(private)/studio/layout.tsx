@@ -36,7 +36,7 @@ export default function StudioLayout({ children }: StudioLayoutProps) {
 	}
 
 	if (!session) {
-		return null;
+		return <LoadingPage />;
 	}
 
 	return (

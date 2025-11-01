@@ -28,18 +28,25 @@ function validateOnboardingData(name: string, username: string) {
 
 // Função auxiliar para fazer upload de imagem
 async function uploadProfileImage(profileImage: string, defaultImage: string) {
-	if (!profileImage || typeof profileImage !== 'string' || profileImage.trim() === '') {
+	if (
+		!profileImage ||
+		typeof profileImage !== "string" ||
+		profileImage.trim() === ""
+	) {
 		return defaultImage;
 	}
 
 	try {
 		// Se for uma URL, usar diretamente
-		if (profileImage.startsWith('http')) {
+		if (profileImage.startsWith("http")) {
 			return profileImage;
 		}
 
 		// Se for base64, fazer upload para Cloudinary
-		const buffer = Buffer.from(profileImage.replace(BASE64_IMAGE_REGEX, ''), 'base64');
+		const buffer = Buffer.from(
+			profileImage.replace(BASE64_IMAGE_REGEX, ""),
+			"base64"
+		);
 
 		// Upload para Cloudinary
 		const uploadResponse = await new Promise((resolve, reject) => {
@@ -81,14 +88,15 @@ export async function POST(request: Request) {
 		if (session.user.status !== "pending" || session.user.onboardingCompleted) {
 			return NextResponse.json(
 				{
-					error: "Onboarding já foi concluído ou indisponível para este usuário",
+					error:
+						"Onboarding já foi concluído ou indisponível para este usuário",
 				},
 				{ status: 400 }
 			);
 		}
 
 		const body = await request.json();
-		const { name, username, bio, profileImage } = body;
+		const { name, username, bio, profileImage, userType, plan } = body;
 
 		// Validar dados
 		const validationError = validateOnboardingData(name, username);
@@ -109,9 +117,18 @@ export async function POST(request: Request) {
 		}
 
 		// Upload da imagem
-		const imageUrl = await uploadProfileImage(profileImage, session.user.image || '');
+		const imageUrl = await uploadProfileImage(
+			profileImage,
+			session.user.image || ""
+		);
 
 		// Atualizar usuário no banco e criar presets padrão (idempotente)
+		const selectedType =
+			userType === "creator" || userType === "enterprise" || userType === "personal"
+				? userType
+				: "personal";
+		const selectedPlan = plan === "pro" ? "pro" : "free";
+
 		const updatedUser = await prisma.user.update({
 			where: { id: session.user.id },
 			data: {
@@ -121,12 +138,15 @@ export async function POST(request: Request) {
 				image: imageUrl,
 				onboardingCompleted: true,
 				status: "active",
+				userType: selectedType,
+				pendingSubscriptionPlan: selectedPlan === "pro" ? "pro" : null,
+				subscriptionPlan: selectedPlan === "free" ? "free" : "free",
 				CustomPresets: {
 					upsert: {
 						create: getDefaultCustomPresets(),
 						update: {},
 					},
-				}
+				},
 			},
 		});
 
@@ -143,6 +163,9 @@ export async function POST(request: Request) {
 				image: updatedUser.image,
 				onboardingCompleted: updatedUser.onboardingCompleted,
 				status: updatedUser.status,
+				userType: updatedUser.userType,
+				pendingSubscriptionPlan: updatedUser.pendingSubscriptionPlan,
+				subscriptionPlan: updatedUser.subscriptionPlan,
 			},
 		});
 	} catch (error) {

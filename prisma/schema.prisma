@@ -29,6 +29,7 @@ model User {
   banReason                     String?        @default("violation")
   pendingSubscriptionPlan       String?
   status                        String         @default("pending")
+  userType                      String         @default("personal")
   subscriptionPlan              String?
   subscriptionStatus            String?
   billingCycle                  String?

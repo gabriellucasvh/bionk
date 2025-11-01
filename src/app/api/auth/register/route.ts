@@ -625,7 +625,7 @@ async function handleUserCreation(
 	if (seqs.some((s) => lowerPwd.includes(s))) {
 		passwordErrors.push("Evite sequências óbvias (ex.: 123456, abcdef).");
 	}
-	if (!REJEX_REPEAT.test(password)) {
+	if (REJEX_REPEAT.test(password)) {
 		passwordErrors.push("Evite repetição excessiva de caracteres.");
 	}
 	if (passwordErrors.length > 0) {

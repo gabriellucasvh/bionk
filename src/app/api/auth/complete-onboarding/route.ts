@@ -102,6 +102,8 @@ export async function POST(request: NextRequest) {
 		let username = "";
 		let bio: string | null = null;
 		let profileImageInput: unknown = null;
+    let plan = "";
+    let userType = "";
 
 		if (contentType.includes("multipart/form-data")) {
 			const form = await request.formData();
@@ -109,22 +111,28 @@ export async function POST(request: NextRequest) {
 			username = String(form.get("username") || "");
 			bio = form.get("bio") ? String(form.get("bio")) : null;
 			profileImageInput = form.get("profileImage") ?? null;
-		} else {
-			const body = await request.json().catch(async () => {
-				// Fallback para formData caso .json() falhe
-				const form = await request.formData();
-				return {
-					name: String(form.get("name") || ""),
-					username: String(form.get("username") || ""),
-					bio: form.get("bio") ? String(form.get("bio")) : null,
-					profileImage: form.get("profileImage") ?? null,
-				};
-			});
-			name = body.name || "";
-			username = body.username || "";
-			bio = body.bio ?? null;
-			profileImageInput = body.profileImage ?? null;
-		}
+            plan = String(form.get("plan") || "");
+            userType = String(form.get("userType") || "");
+        } else {
+            const body = await request.json().catch(async () => {
+                // Fallback para formData caso .json() falhe
+                const form = await request.formData();
+                return {
+                    name: String(form.get("name") || ""),
+                    username: String(form.get("username") || ""),
+                    bio: form.get("bio") ? String(form.get("bio")) : null,
+                    profileImage: form.get("profileImage") ?? null,
+                    plan: String(form.get("plan") || ""),
+                    userType: String(form.get("userType") || ""),
+                };
+            });
+            name = body.name || "";
+            username = body.username || "";
+            bio = body.bio ?? null;
+            profileImageInput = body.profileImage ?? null;
+            plan = body.plan || "";
+            userType = body.userType || "";
+        }
 
 		// Validações
 		if (!name || name.trim().length === 0) {
@@ -186,22 +194,31 @@ export async function POST(request: NextRequest) {
 			session.user.image || ""
 		);
 
-		const updatedUser = await prisma.user.update({
-			where: { id: session.user.id },
-			data: {
-				name: name.trim(),
-				username: username.toLowerCase().trim(),
-				bio: bio?.trim() || null,
-				image: imageUrl,
-				onboardingCompleted: true,
-				CustomPresets: {
-					upsert: {
-						create: getDefaultCustomPresets(),
-						update: {},
-					},
-				},
-			},
-		});
+        const selectedPlan = plan === "pro" ? "pro" : "free";
+        const selectedType =
+            userType === "creator" || userType === "enterprise" || userType === "personal"
+                ? userType
+                : "personal";
+
+        const updatedUser = await prisma.user.update({
+            where: { id: session.user.id },
+            data: {
+                name: name.trim(),
+                username: username.toLowerCase().trim(),
+                bio: bio?.trim() || null,
+                image: imageUrl,
+                onboardingCompleted: true,
+                userType: selectedType,
+                pendingSubscriptionPlan: selectedPlan === "pro" ? "pro" : null,
+                subscriptionPlan: selectedPlan === "free" ? "free" : "free",
+                CustomPresets: {
+                    upsert: {
+                        create: getDefaultCustomPresets(),
+                        update: {},
+                    },
+                },
+            },
+        });
 
 		// Limpar cache do token para forçar atualização na próxima requisição
 		clearUserTokenCache(session.user.id);
@@ -209,16 +226,19 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json(
 			{
 				success: true,
-				user: {
-					id: updatedUser.id,
-					name: updatedUser.name,
-					username: updatedUser.username,
-					bio: updatedUser.bio,
-					image: updatedUser.image,
-				},
-			},
-			{ status: 200 }
-		);
+                user: {
+                    id: updatedUser.id,
+                    name: updatedUser.name,
+                    username: updatedUser.username,
+                    bio: updatedUser.bio,
+                    image: updatedUser.image,
+                    userType: updatedUser.userType,
+                    pendingSubscriptionPlan: updatedUser.pendingSubscriptionPlan,
+                    subscriptionPlan: updatedUser.subscriptionPlan,
+                },
+            },
+            { status: 200 }
+        );
 	} catch (error) {
 		console.error("Erro ao completar onboarding:", error);
 		return NextResponse.json(

@@ -27,7 +27,6 @@ export default function OnboardingPage() {
 			formData.append("username", data.username);
 			formData.append("bio", data.bio);
 			formData.append("userType", data.userType);
-			formData.append("plan", data.plan);
 
 			if (data.profileImage) {
 				formData.append("profileImage", data.profileImage);
@@ -46,21 +45,20 @@ export default function OnboardingPage() {
 			// Atualizar a sessão
 			await update();
 
-			// Aplicar template escolhido
-			if (data.template) {
-				try {
-					const info = getTemplateInfo(data.template);
-					await fetch("/api/update-template", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							template: data.template,
-							templateCategory: info.category,
-						}),
-					});
-				} catch {
-					// Ignora falhas silenciosamente
-				}
+			// Aplicar template (fallback para "default" se nada foi escolhido)
+			try {
+				const templateId = data.template || "default";
+				const info = getTemplateInfo(templateId);
+				await fetch("/api/update-template", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						template: templateId,
+						templateCategory: info.category,
+					}),
+				});
+			} catch {
+				// Ignora falhas silenciosamente
 			}
 
 			if (data.socialLinks && data.socialLinks.length > 0) {
@@ -92,7 +90,8 @@ export default function OnboardingPage() {
 						const errors = await Promise.all(
 							failed.map((r) => r.json().catch(() => ({})))
 						);
-						const msg = (errors[0] as any)?.error || "Erro ao salvar rede social";
+						const msg =
+							(errors[0] as any)?.error || "Erro ao salvar rede social";
 						throw new Error(msg);
 					}
 				}
@@ -116,7 +115,8 @@ export default function OnboardingPage() {
 					const errors = await Promise.all(
 						failed.map((r) => r.json().catch(() => ({})))
 					);
-					const msg = (errors[0] as any)?.error || "Erro ao salvar link personalizado";
+					const msg =
+						(errors[0] as any)?.error || "Erro ao salvar link personalizado";
 					throw new Error(msg);
 				}
 			}

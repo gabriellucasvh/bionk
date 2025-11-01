@@ -53,7 +53,9 @@ export default function OnboardingPage() {
 				payload.profileImage = await fileToDataUrl(data.profileImage);
 			}
 
-			const response = await fetch("/api/onboarding/complete", {
+			const isGoogle = Boolean(session?.user?.provider === "google" || session?.user?.googleId);
+			const completionEndpoint = isGoogle ? "/api/onboarding/complete" : "/api/auth/complete-onboarding";
+			const response = await fetch(completionEndpoint, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -72,11 +74,11 @@ export default function OnboardingPage() {
 			await update({
 				user: {
 					...session?.user,
-					username: result.user.username,
-					name: result.user.name,
-					image: result.user.image,
-					onboardingCompleted: result.user.onboardingCompleted,
-					status: result.user.status,
+					username: result.user.username ?? session?.user?.username,
+					name: result.user.name ?? session?.user?.name,
+					image: result.user.image ?? session?.user?.image,
+					onboardingCompleted: (result.user.onboardingCompleted ?? true),
+					status: result.user.status ?? session?.user?.status,
 				},
 			});
 
@@ -173,8 +175,7 @@ export default function OnboardingPage() {
 			router.push("/registro");
 			return;
 		}
-		// Redirecionar se já completou o onboarding
-		if (session.user.status === "active") {
+		if (session.user.onboardingCompleted) {
 			router.push("/studio/perfil");
 			return;
 		}
@@ -184,12 +185,18 @@ export default function OnboardingPage() {
 		return <LoadingPage />;
 	}
 
-	if (!session || session.user.status !== "pending") {
-		return null;
+	const canShowOnboarding = Boolean(session) && !session.user.onboardingCompleted;
+
+	if (!canShowOnboarding) {
+		return <LoadingPage />;
 	}
 
 	return (
 		<OnboardingPageComponent
+			initialData={{
+				name: (session.user.name || session.user.username || ""),
+				username: (session.user.username || ""),
+			}}
 			error={error}
 			isLoading={isLoading}
 			onComplete={handleOnboardingComplete}

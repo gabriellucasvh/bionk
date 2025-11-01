@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Edit, Loader2 } from "lucide-react";
+import { ALargeSmall, Check, Edit, Link2, Loader2, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -38,7 +38,6 @@ interface OnboardingPageProps {
 
 export interface OnboardingData {
 	userType: string;
-	plan: string;
 	socialLinks: { platform: string; username: string }[];
 	customLinks: { title: string; url: string }[];
 	name: string;
@@ -48,7 +47,7 @@ export interface OnboardingData {
 	template: string;
 }
 
-type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+type Step = 1 | 2 | 3 | 4 | 5 | 6;
 
 const STEPS = [
 	{
@@ -58,46 +57,26 @@ const STEPS = [
 	},
 	{
 		id: 2,
-		title: "Plano",
-		description: "Escolha entre Pro ou continuar com Free",
+		title: "Templates",
+		description: "Selecione um visual para sua página",
 	},
 	{
 		id: 3,
-		title: "Templates",
-		description: "Opcional: selecione um visual para sua página",
+		title: "Redes Sociais",
+		description: "Adicione suas redes com usuário",
 	},
 	{
 		id: 4,
-		title: "Redes Sociais",
-		description: "Opcional: adicione suas redes com usuário",
+		title: "Links Personalizados",
+		description: "Adicione links com título e URL",
 	},
 	{
 		id: 5,
-		title: "Links Personalizados",
-		description: "Opcional: adicione links com título e URL",
+		title: "Perfil",
+		description: "Adicione foto, nome e bio; username apenas para Google",
 	},
 	{
 		id: 6,
-		title: "Foto de Perfil",
-		description: "Opcional: adicione uma foto",
-	},
-	{
-		id: 7,
-		title: "Nome de exibição",
-		description: "Informe seu nome de exibição",
-	},
-	{
-		id: 8,
-		title: "Nome de Usuário",
-		description: "Defina seu nome de usuário",
-	},
-	{
-		id: 9,
-		title: "Biografia",
-		description: "Opcional: escreva uma breve bio",
-	},
-	{
-		id: 10,
 		title: "Finalização",
 		description: "Tudo pronto. Revise e conclua",
 	},
@@ -106,13 +85,13 @@ const STEPS = [
 export default function OnboardingPageComponent({
 	onComplete,
 	initialData,
+	user,
 	loading = false,
 }: OnboardingPageProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [currentStep, setCurrentStep] = useState<Step>(1);
 	const [data, setData] = useState({
 		userType: "",
-		plan: "",
 		socialLinks: [] as { platform: string; username: string }[],
 		customLinks: [] as { title: string; url: string }[],
 		name: initialData?.name || "",
@@ -132,6 +111,7 @@ export default function OnboardingPageComponent({
 		message: "",
 		isChecking: false,
 	});
+	const isGoogleUser = user?.provider === "google" || Boolean(user?.googleId);
 
 	// Configurar imagem inicial
 	useEffect(() => {
@@ -241,7 +221,7 @@ export default function OnboardingPageComponent({
 				return data.userType.trim().length > 0;
 			}
 			case 2: {
-				return data.plan.trim().length > 0;
+				return true;
 			}
 			case 3: {
 				return true;
@@ -250,25 +230,17 @@ export default function OnboardingPageComponent({
 				return true;
 			}
 			case 5: {
-				return true;
-			}
-			case 6: {
-				return true;
-			}
-			case 7: {
-				return data.name.trim().length > 0;
-			}
-			case 8: {
-				return (
+				const hasName = data.name.trim().length > 0;
+				if (!isGoogleUser) {
+					return hasName;
+				}
+				const hasValidUsername =
 					data.username.trim().length > 0 &&
 					usernameValidation.isValid &&
-					!usernameValidation.isChecking
-				);
+					!usernameValidation.isChecking;
+				return hasName && hasValidUsername;
 			}
-			case 9: {
-				return true;
-			}
-			case 10: {
+			case 6: {
 				return true;
 			}
 			default: {
@@ -331,10 +303,22 @@ export default function OnboardingPageComponent({
 						key="step2"
 						transition={{ duration: 0.3 }}
 					>
-						<PlanSelector
-							onSelect={(v) => setData({ ...data, plan: v })}
-							selected={data.plan}
+						<Label>Templates</Label>
+
+						<TemplateSelector
+							onSelect={(id) => setData({ ...data, template: id })}
+							selectedTemplateId={data.template}
 						/>
+						<div className="pointer-events-none fixed right-0 bottom-0 left-0 z-20">
+							<div className="bg-gradient-to-t from-white/90 to-white/0 px-4 py-3 dark:from-gray-900/90 dark:to-gray-900/0">
+								<div className="pointer-events-auto mx-auto flex w-full max-w-1/2 justify-between">
+									<BaseButton onClick={handlePrevious} variant="white">
+										Voltar
+									</BaseButton>
+									<BaseButton onClick={handleNext}>Continuar</BaseButton>
+								</div>
+							</div>
+						</div>
 					</motion.div>
 				);
 
@@ -348,19 +332,9 @@ export default function OnboardingPageComponent({
 						key="step3"
 						transition={{ duration: 0.3 }}
 					>
-						<div className="flex items-center justify-between">
-							<Label>Templates</Label>
-							<button
-								className="text-sm underline"
-								onClick={handleNext}
-								type="button"
-							>
-								Pular
-							</button>
-						</div>
-						<TemplateSelector
-							onSelect={(id) => setData({ ...data, template: id })}
-							selectedTemplateId={data.template}
+						<SocialLinksSelector
+							onChange={(v) => setData({ ...data, socialLinks: v })}
+							value={data.socialLinks}
 						/>
 					</motion.div>
 				);
@@ -375,19 +349,10 @@ export default function OnboardingPageComponent({
 						key="step4"
 						transition={{ duration: 0.3 }}
 					>
-						<SocialLinksSelector
-							onChange={(v) => setData({ ...data, socialLinks: v })}
-							value={data.socialLinks}
+						<CustomLinksForm
+							onChange={(v) => setData({ ...data, customLinks: v })}
+							value={data.customLinks}
 						/>
-						<div className="flex justify-end">
-							<button
-								className="text-sm underline"
-								onClick={handleNext}
-								type="button"
-							>
-								Pular
-							</button>
-						</div>
 					</motion.div>
 				);
 
@@ -395,78 +360,36 @@ export default function OnboardingPageComponent({
 				return (
 					<motion.div
 						animate={{ opacity: 1, x: 0 }}
-						className="space-y-4"
+						className="space-y-6"
 						exit={{ opacity: 0, x: -20 }}
 						initial={{ opacity: 0, x: 20 }}
 						key="step5"
 						transition={{ duration: 0.3 }}
 					>
-						<CustomLinksForm
-							onChange={(v) => setData({ ...data, customLinks: v })}
-							value={data.customLinks}
-						/>
-						<div className="flex justify-end">
-							<button
-								className="text-sm underline"
-								onClick={handleNext}
-								type="button"
-							>
-								Pular
-							</button>
-						</div>
-					</motion.div>
-				);
-
-			case 6:
-				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="flex flex-col items-center space-y-2"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step6"
-						transition={{ duration: 0.3 }}
-					>
-						<div className="relative">
-							<div className="h-24 w-24 overflow-hidden rounded-full bg-muted shadow-lg">
-								<Image
-									alt="Foto de perfil"
-									className="h-full w-full object-cover"
-									height={160}
-									key={profilePreview}
-									priority
-									quality={95}
-									src={profilePreview}
-									width={160}
-								/>
+						<div className="flex flex-col items-center space-y-2">
+							<div className="relative">
+								<div className="h-24 w-24 overflow-hidden rounded-full bg-muted shadow-lg">
+									<Image
+										alt="Foto de perfil"
+										className="h-full w-full object-cover"
+										height={160}
+										key={profilePreview}
+										priority
+										quality={95}
+										src={profilePreview}
+										width={160}
+									/>
+								</div>
+								<BaseButton
+									className="absolute right-0 bottom-0 rounded-full"
+									onClick={() => setIsImageCropModalOpen(true)}
+									size="icon"
+									variant="white"
+								>
+									<Edit className="h-4 w-4" />
+								</BaseButton>
 							</div>
-							<BaseButton
-								className="absolute right-0 bottom-0 rounded-full"
-								onClick={() => setIsImageCropModalOpen(true)}
-								size="icon"
-								variant="white"
-							>
-								<Edit className="h-4 w-4" />
-							</BaseButton>
 						</div>
-						<p className="max-w-sm text-center text-muted-foreground text-sm">
-							Adicione uma foto para que as pessoas possam te reconhecer
-							<br />
-							<span className="text-xs">(Opcional)</span>
-						</p>
-					</motion.div>
-				);
-
-			case 7:
-				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="space-y-4"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step7"
-						transition={{ duration: 0.3 }}
-					>
 						<div className="space-y-2">
 							<Label htmlFor="name">Nome de exibição *</Label>
 							<Input
@@ -481,59 +404,37 @@ export default function OnboardingPageComponent({
 								{data.name.length}/44 caracteres
 							</p>
 						</div>
-					</motion.div>
-				);
-
-			case 8:
-				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="space-y-4"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step8"
-						transition={{ duration: 0.3 }}
-					>
-						<div className="space-y-2">
-							<Label htmlFor="username">Nome de usuário *</Label>
-							<div className="flex items-center space-x-2">
-								<span className="text-muted-foreground text-sm">bionk.me/</span>
-								<Input
-									className={`flex-1 py-3 ${usernameValidation.isValid ? "" : "border-red-500"}`}
-									id="username"
-									maxLength={30}
-									onChange={(e) => handleUsernameChange(e.target.value)}
-									placeholder="seuusername"
-									value={data.username}
-								/>
-								{usernameValidation.isChecking && (
-									<Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-								)}
+						{isGoogleUser && (
+							<div className="space-y-2">
+								<Label htmlFor="username">Nome de usuário *</Label>
+								<div className="flex items-center space-x-2">
+									<span className="text-muted-foreground text-sm">
+										bionk.me/
+									</span>
+									<Input
+										className={`flex-1 py-3 ${usernameValidation.isValid ? "" : "border-red-500"}`}
+										id="username"
+										maxLength={30}
+										onChange={(e) => handleUsernameChange(e.target.value)}
+										placeholder="seuusername"
+										value={data.username}
+									/>
+									{usernameValidation.isChecking && (
+										<Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+									)}
+								</div>
+								<div className="flex items-center justify-between">
+									<p
+										className={`text-xs ${usernameValidation.isValid ? "text-green-600" : "text-red-500"}`}
+									>
+										{usernameValidation.message}
+									</p>
+									<p className="text-muted-foreground text-xs">
+										{data.username.length}/30 caracteres
+									</p>
+								</div>
 							</div>
-							<div className="flex items-center justify-between">
-								<p
-									className={`text-xs ${usernameValidation.isValid ? "text-green-600" : "text-red-500"}`}
-								>
-									{usernameValidation.message}
-								</p>
-								<p className="text-muted-foreground text-xs">
-									{data.username.length}/30 caracteres
-								</p>
-							</div>
-						</div>
-					</motion.div>
-				);
-
-			case 9:
-				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="space-y-4"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step9"
-						transition={{ duration: 0.3 }}
-					>
+						)}
 						<div className="space-y-2">
 							<Label htmlFor="bio">Biografia</Label>
 							<Textarea
@@ -552,14 +453,14 @@ export default function OnboardingPageComponent({
 					</motion.div>
 				);
 
-			case 10:
+			case 6:
 				return (
 					<motion.div
 						animate={{ opacity: 1, x: 0 }}
 						className="space-y-4"
 						exit={{ opacity: 0, x: -20 }}
 						initial={{ opacity: 0, x: 20 }}
-						key="step10"
+						key="step6"
 						transition={{ duration: 0.3 }}
 					>
 						<div className="text-center">
@@ -606,8 +507,8 @@ export default function OnboardingPageComponent({
 	};
 
 	return (
-		<div className="flex min-h-dvh items-center justify-center bg-white p-4 dark:from-gray-900 dark:to-gray-800">
-			<div className="w-full max-w-md">
+		<div className="flex min-h-dvh items-center justify-center bg-white p-6 dark:from-gray-900 dark:to-gray-800">
+			<div className="w-full md:max-w-3xl">
 				{/* Header */}
 				<div className="mb-8 text-center">
 					<h1 className="mb-2 font-bold text-3xl text-gray-900 dark:text-white">
@@ -624,9 +525,6 @@ export default function OnboardingPageComponent({
 						<span className="font-medium text-gray-700 text-sm dark:text-gray-300">
 							{STEPS[currentStep - 1].title}
 						</span>
-						<span className="text-gray-500 text-sm dark:text-gray-400">
-							{currentStep} de {STEPS.length}
-						</span>
 					</div>
 					<div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
 						<div
@@ -640,49 +538,49 @@ export default function OnboardingPageComponent({
 				</div>
 
 				{/* Content */}
-				<div className="mb-6 bg-white p-6 dark:bg-gray-800">
+				<div className="mb-6 bg-white py-4 dark:bg-gray-800">
 					<AnimatePresence mode="wait">{renderStepContent()}</AnimatePresence>
 				</div>
 
 				{/* Navigation */}
-				<div className="flex items-center justify-between">
-					{currentStep > 1 ? (
-						<BaseButton
-							className="flex items-center gap-2"
-							onClick={handlePrevious}
-							variant="white"
-						>
-							<ArrowLeft className="h-4 w-4" />
-							Voltar
-						</BaseButton>
-					) : (
-						<div />
-					)}
+				{currentStep !== 2 && (
+					<div className="flex items-center justify-between">
+						{currentStep > 1 ? (
+							<BaseButton
+								className="flex items-center gap-2"
+								onClick={handlePrevious}
+								variant="white"
+							>
+								Voltar
+							</BaseButton>
+						) : (
+							<div />
+						)}
 
-					{currentStep < STEPS.length ? (
-						<BaseButton
-							className="flex items-center gap-2"
-							disabled={!canProceedToNext()}
-							onClick={handleNext}
-						>
-							Próximo
-							<ArrowRight className="h-4 w-4" />
-						</BaseButton>
-					) : (
-						<BaseButton
-							className="flex items-center gap-2"
-							disabled={loading || isSubmitting || !canProceedToNext()}
-							onClick={handleComplete}
-						>
-							{loading ? (
-								<Loader2 className="h-4 w-4 animate-spin" />
-							) : (
-								<Check className="h-4 w-4" />
-							)}
-							Concluir
-						</BaseButton>
-					)}
-				</div>
+						{currentStep < STEPS.length ? (
+							<BaseButton
+								className="flex items-center gap-2"
+								disabled={!canProceedToNext()}
+								onClick={handleNext}
+							>
+								Continuar
+							</BaseButton>
+						) : (
+							<BaseButton
+								className="flex items-center gap-2"
+								disabled={loading || isSubmitting || !canProceedToNext()}
+								onClick={handleComplete}
+							>
+								{loading ? (
+									<Loader2 className="h-4 w-4 animate-spin" />
+								) : (
+									<Check className="h-4 w-4" />
+								)}
+								Concluir
+							</BaseButton>
+						)}
+					</div>
+				)}
 			</div>
 
 			{/* Image Crop Modal */}
@@ -709,7 +607,6 @@ function TemplateSelector({
 }) {
 	return (
 		<div>
-			<Label className="mb-2 block">Escolha um template *</Label>
 			<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 				{ALL_TEMPLATES.map((tpl) => {
 					const isActive = tpl.id === selectedTemplateId;
@@ -724,17 +621,14 @@ function TemplateSelector({
 							onClick={() => onSelect(tpl.id)}
 							type="button"
 						>
-							<div className="aspect-[3/4] w-full bg-gray-100 dark:bg-gray-800">
+							<div className="aspect-[9/16] w-full bg-gray-100 dark:bg-gray-800">
 								<Image
 									alt={tpl.name}
 									className="h-full w-full object-cover"
 									height={320}
 									src={tpl.image}
-									width={240}
+									width={180}
 								/>
-							</div>
-							<div className="p-2">
-								<p className="font-medium text-sm">{tpl.name}</p>
 							</div>
 						</button>
 					);
@@ -755,14 +649,24 @@ function UserTypeSelector({
 		{
 			key: "creator",
 			title: "Criador",
-			description: "Conteúdo, música, vídeos",
+			description:
+				"Mostre seu trabalho, compartilhe conteúdo e conecte-se com seu público.",
+			image: "/images/criador.png",
 		},
 		{
-			key: "brand",
-			title: "Marca",
-			description: "Negócios, produtos, campanhas",
+			key: "enterprise",
+			title: "Empresa",
+			description:
+				"Divulgue sua marca, apresente produtos e destaque suas campanhas.",
+			image: "/images/empresa.png",
 		},
-		{ key: "personal", title: "Pessoal", description: "Uso individual" },
+		{
+			key: "personal",
+			title: "Pessoal",
+			description:
+				"Crie um espaço só seu para reunir links, projetos e redes sociais.",
+			image: "/images/pessoal.png",
+		},
 	];
 	return (
 		<div>
@@ -772,54 +676,29 @@ function UserTypeSelector({
 					const active = selected === opt.key;
 					return (
 						<button
-							className={`rounded-lg border p-4 text-left transition ${active ? "border-lime-500 ring-2 ring-lime-400" : "border-gray-200 hover:border-gray-300 dark:border-gray-700"}`}
+							className={`rounded-xl border p-0 text-left transition ${active ? "border-lime-400 ring-2 ring-lime-400" : "border-gray-200 hover:border-gray-300 dark:border-gray-700"}`}
 							key={opt.key}
 							onClick={() => onSelect(opt.key)}
 							type="button"
 						>
-							<p className="font-semibold">{opt.title}</p>
-							<p className="text-muted-foreground text-sm">{opt.description}</p>
+							<div className="aspect-[4/3] w-full overflow-hidden rounded-t-xl bg-gray-100 dark:bg-gray-800">
+								<Image
+									alt={opt.title}
+									className="h-full w-full object-cover"
+									height={240}
+									src={opt.image}
+									width={320}
+								/>
+							</div>
+							<div className="p-4">
+								<p className="font-semibold">{opt.title}</p>
+								<p className="text-muted-foreground text-sm">
+									{opt.description}
+								</p>
+							</div>
 						</button>
 					);
 				})}
-			</div>
-		</div>
-	);
-}
-
-function PlanSelector({
-	selected,
-	onSelect,
-}: {
-	selected: string;
-	onSelect: (value: string) => void;
-}) {
-	return (
-		<div>
-			<Label className="mb-2 block">Escolha seu plano</Label>
-			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-				<button
-					className={`rounded-lg border p-4 text-left transition ${selected === "pro" ? "border-lime-500 ring-2 ring-lime-400" : "border-gray-200 hover:border-gray-300 dark:border-gray-700"}`}
-					onClick={() => onSelect("pro")}
-					type="button"
-				>
-					<p className="font-semibold">Plano Pro</p>
-					<ul className="mt-1 space-y-1 text-muted-foreground text-sm">
-						<li>Recursos avançados</li>
-						<li>Personalização extra</li>
-						<li>Prioridade de suporte</li>
-					</ul>
-				</button>
-				<button
-					className={`rounded-lg border p-4 text-left transition ${selected === "free" ? "border-lime-500 ring-2 ring-lime-400" : "border-gray-200 hover:border-gray-300 dark:border-gray-700"}`}
-					onClick={() => onSelect("free")}
-					type="button"
-				>
-					<p className="font-semibold">Continuar com Free</p>
-					<p className="text-muted-foreground text-sm">
-						Funcionalidades essenciais
-					</p>
-				</button>
 			</div>
 		</div>
 	);
@@ -834,6 +713,8 @@ function SocialLinksSelector({
 }) {
 	const [selectedPlatform, setSelectedPlatform] = useState<string>("");
 	const [username, setUsername] = useState<string>("");
+	const [editingPlatform, setEditingPlatform] = useState<string>("");
+	const [editingUsername, setEditingUsername] = useState<string>("");
 	const addLink = () => {
 		if (!(selectedPlatform && username.trim())) {
 			return;
@@ -842,71 +723,200 @@ function SocialLinksSelector({
 		next.push({ platform: selectedPlatform, username: username.trim() });
 		onChange(next);
 		setUsername("");
+		setSelectedPlatform("");
+	};
+	const saveEdit = () => {
+		if (!(editingPlatform && editingUsername.trim())) {
+			return;
+		}
+		const next = value.map((i) =>
+			i.platform === editingPlatform
+				? { platform: i.platform, username: editingUsername.trim() }
+				: i
+		);
+		onChange(next);
+		setEditingPlatform("");
+		setEditingUsername("");
 	};
 	const platforms = SOCIAL_PLATFORMS;
 	return (
 		<div className="space-y-3">
-			<Label className="mb-2 block">Adicione redes sociais (opcional)</Label>
 			<div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-				{platforms.map((p) => (
-					<button
-						className={`flex h-20 w-full flex-col items-center justify-center rounded-xl border p-2 transition ${selectedPlatform === p.key ? "border-lime-500" : "border-gray-200 hover:border-gray-300 dark:border-gray-700"}`}
-						key={p.key}
-						onClick={() => setSelectedPlatform(p.key)}
-						title={p.name}
-						type="button"
-					>
-						<div
-							className="mb-1 h-7 w-7"
-							style={{
-								backgroundColor: p.color,
-								maskImage: `url(${p.icon})`,
-								maskSize: "contain",
-								maskRepeat: "no-repeat",
-								maskPosition: "center",
-							}}
-						/>
-						<span className="truncate text-xs">{p.name}</span>
-					</button>
-				))}
+				{platforms.map((p) =>
+					(() => {
+						const isEditing = !!editingPlatform;
+						const isAdded = value.some((v) => v.platform === p.key);
+						const isDisabled =
+							isEditing || (isAdded && selectedPlatform !== p.key);
+						return (
+							<button
+								className={`flex h-20 w-full flex-col items-center justify-center rounded-xl border p-2 transition ${selectedPlatform === p.key ? "border-lime-500" : "border-gray-200 hover:border-gray-300 dark:border-gray-700"} ${isDisabled ? "cursor-not-allowed opacity-50" : ""}`}
+								disabled={isDisabled}
+								key={p.key}
+								onClick={() => {
+									if (isDisabled) {
+										return;
+									}
+									setSelectedPlatform(p.key);
+								}}
+								title={p.name}
+								type="button"
+							>
+								<div
+									className="mb-1 h-7 w-7"
+									style={{
+										backgroundColor: p.color,
+										maskImage: `url(${p.icon})`,
+										maskSize: "contain",
+										maskRepeat: "no-repeat",
+										maskPosition: "center",
+									}}
+								/>
+								<span className="truncate text-xs">{p.name}</span>
+							</button>
+						);
+					})()
+				)}
 			</div>
-			{selectedPlatform && (
-				<div className="space-y-2">
-					<Label>Usuário</Label>
-					<Input
-						onChange={(e) => setUsername(e.target.value)}
-						placeholder={
-							platforms.find((p) => p.key === selectedPlatform)?.placeholder ||
-							"usuario"
-						}
-						value={username}
-					/>
-					<BaseButton onClick={addLink}>Adicionar</BaseButton>
-				</div>
-			)}
+			{selectedPlatform &&
+				!value.some((v) => v.platform === selectedPlatform) && (
+					<div className="space-y-2">
+						<Label>Usuário</Label>
+						<Input
+							onChange={(e) => setUsername(e.target.value)}
+							placeholder={
+								platforms.find((p) => p.key === selectedPlatform)
+									?.placeholder || "usuario"
+							}
+							value={username}
+						/>
+						<div className="flex items-center gap-2">
+							<BaseButton
+								onClick={() => {
+									setSelectedPlatform("");
+									setUsername("");
+								}}
+								variant="white"
+							>
+								Cancelar
+							</BaseButton>
+							<div className="flex justify-end">
+								<BaseButton onClick={addLink}>Adicionar</BaseButton>
+							</div>
+						</div>
+					</div>
+				)}
 			{value.length > 0 && (
 				<div className="space-y-2">
 					<Label>Redes adicionadas</Label>
-					<ul className="space-y-1">
-						{value.map((v) => (
-							<li
-								className="flex items-center justify-between rounded border p-2"
-								key={v.platform}
-							>
-								<span className="text-sm">
-									{v.platform}: {v.username}
-								</span>
-								<button
-									className="text-sm underline"
-									onClick={() =>
-										onChange(value.filter((i) => i.platform !== v.platform))
-									}
-									type="button"
+					<ul className="space-y-2">
+						{value.map((v) => {
+							const cfg = platforms.find((p) => p.key === v.platform);
+							return (
+								<li
+									className="flex items-center justify-between rounded-lg border p-2"
+									key={v.platform}
 								>
-									Remover
-								</button>
-							</li>
-						))}
+									<div className="flex w-full flex-col gap-2">
+										{editingPlatform === v.platform ? (
+											<>
+												<div className="flex w-full items-center gap-3">
+													<div
+														className="h-6 w-6"
+														style={{
+															backgroundColor: cfg?.color,
+															maskImage: cfg ? `url(${cfg.icon})` : undefined,
+															maskSize: "contain",
+															maskRepeat: "no-repeat",
+															maskPosition: "center",
+														}}
+													/>
+													<Input
+														className="w-full min-w-0"
+														onChange={(e) => setEditingUsername(e.target.value)}
+														placeholder={
+															platforms.find((p) => p.key === v.platform)
+																?.placeholder || "usuario"
+														}
+														value={editingUsername}
+													/>
+												</div>
+												<div className="flex items-center justify-end gap-2">
+													<BaseButton onClick={saveEdit}>Salvar</BaseButton>
+													<BaseButton
+														onClick={() => {
+															setEditingPlatform("");
+															setEditingUsername("");
+														}}
+														variant="white"
+													>
+														Cancelar
+													</BaseButton>
+												</div>
+											</>
+										) : (
+											<div className="flex items-center gap-3">
+												<div
+													className="h-6 w-6"
+													style={{
+														backgroundColor: cfg?.color,
+														maskImage: cfg ? `url(${cfg.icon})` : undefined,
+														maskSize: "contain",
+														maskRepeat: "no-repeat",
+														maskPosition: "center",
+													}}
+												/>
+												<span className="text-sm">{v.username}</span>
+											</div>
+										)}
+									</div>
+									<div
+										className={`flex items-center gap-2 ${editingPlatform === v.platform ? "hidden" : ""}`}
+									>
+										{editingPlatform === v.platform ? (
+											<>
+												<BaseButton onClick={saveEdit}>Salvar</BaseButton>
+												<BaseButton
+													onClick={() => {
+														setEditingPlatform("");
+														setEditingUsername("");
+													}}
+													variant="white"
+												>
+													Cancelar
+												</BaseButton>
+											</>
+										) : (
+											<>
+												<button
+													className="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+													onClick={() => {
+														setEditingPlatform(v.platform);
+														setEditingUsername(v.username);
+													}}
+													title="Editar"
+													type="button"
+												>
+													<Edit className="h-4 w-4" />
+												</button>
+												<button
+													className="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+													onClick={() =>
+														onChange(
+															value.filter((i) => i.platform !== v.platform)
+														)
+													}
+													title="Remover"
+													type="button"
+												>
+													<Trash2 className="h-4 w-4" />
+												</button>
+											</>
+										)}
+									</div>
+								</li>
+							);
+						})}
 					</ul>
 				</div>
 			)}
@@ -923,6 +933,9 @@ function CustomLinksForm({
 }) {
 	const [title, setTitle] = useState<string>("");
 	const [url, setUrl] = useState<string>("");
+	const [editedIndex, setEditedIndex] = useState<number | null>(null);
+	const [editedTitle, setEditedTitle] = useState<string>("");
+	const [editedUrl, setEditedUrl] = useState<string>("");
 	const addLink = () => {
 		const t = title.trim();
 		let u = url.trim();
@@ -940,18 +953,48 @@ function CustomLinksForm({
 		setTitle("");
 		setUrl("");
 	};
+	const startEditing = (idx: number, v: { title: string; url: string }) => {
+		setEditedIndex(idx);
+		setEditedTitle(v.title);
+		setEditedUrl(v.url);
+	};
+	const cancelEdited = () => {
+		setEditedIndex(null);
+		setEditedTitle("");
+		setEditedUrl("");
+	};
+	const saveEdited = () => {
+		if (editedIndex === null) {
+			return;
+		}
+		const t = editedTitle.trim();
+		let u = editedUrl.trim();
+		if (!(t && u)) {
+			return;
+		}
+		if (t.length > 80) {
+			return;
+		}
+		if (!REJEX_URL.test(u)) {
+			u = `https://${u}`;
+		}
+		const next = value.map((item, i) =>
+			i === editedIndex ? { title: t, url: u } : item
+		);
+		onChange(next);
+		cancelEdited();
+	};
 	return (
 		<div className="space-y-2">
-			<Label>Adicionar links personalizados (opcional)</Label>
+			<Label>Adicionar links</Label>
 			<div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-				<div className="space-y-1">
+				<div className="mb-2 space-y-1">
 					<Input
 						maxLength={80}
 						onChange={(e) => setTitle(e.target.value)}
 						placeholder="Título"
 						value={title}
 					/>
-					<p className="text-muted-foreground text-xs">{title.length}/80</p>
 				</div>
 				<Input
 					onChange={(e) => setUrl(e.target.value)}
@@ -967,16 +1010,61 @@ function CustomLinksForm({
 							className="flex items-center justify-between rounded border p-2"
 							key={`${v.title}-${idx}`}
 						>
-							<span className="truncate text-sm">
-								{v.title} — {v.url}
-							</span>
-							<button
-								className="text-sm underline"
-								onClick={() => onChange(value.filter((_, i) => i !== idx))}
-								type="button"
-							>
-								Remover
-							</button>
+							<div className="flex min-w-0 flex-1 flex-col items-center gap-4 sm:flex-row">
+								<div className="flex items-center gap-3">
+									<ALargeSmall className="h-4 w-4" />
+									<Input
+										className="w-[220px] overflow-hidden truncate text-ellipsis whitespace-nowrap rounded-full bg-gray-200 px-4 py-2 text-gray-800 text-sm sm:w-[220px] md:w-[300px] dark:bg-gray-800 dark:text-gray-200"
+										id={`title-pill-${idx}`}
+										maxLength={80}
+										onChange={(e) => {
+											if (editedIndex !== idx) {
+												startEditing(idx, v);
+											}
+											setEditedTitle(e.target.value);
+										}}
+										onFocus={() => startEditing(idx, v)}
+										placeholder="Título"
+										value={editedIndex === idx ? editedTitle : v.title}
+									/>
+								</div>
+								<div className="flex items-center gap-3">
+									<Link2 className="h-4 w-4" />
+									<Input
+										className="w-[220px] overflow-hidden truncate text-ellipsis whitespace-nowrap rounded-full bg-gray-200 px-4 py-2 text-gray-800 text-sm sm:w-[220px] md:w-[300px] dark:bg-gray-800 dark:text-gray-200"
+										id={`url-pill-${idx}`}
+										onChange={(e) => {
+											if (editedIndex !== idx) {
+												startEditing(idx, v);
+											}
+											setEditedUrl(e.target.value);
+										}}
+										onFocus={() => startEditing(idx, v)}
+										placeholder="URL"
+										type="url"
+										value={editedIndex === idx ? editedUrl : v.url}
+									/>
+								</div>
+								{editedIndex === idx &&
+									(editedTitle !== v.title || editedUrl !== v.url) && (
+										<div className="mt-2 flex w-full justify-end gap-2">
+											<BaseButton onClick={cancelEdited} variant="white">
+												Cancelar
+											</BaseButton>
+											<BaseButton onClick={saveEdited}>Salvar</BaseButton>
+										</div>
+									)}
+							</div>
+							<div className="flex flex-shrink-0 items-center gap-2">
+								<button
+									className="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+									onClick={() => onChange(value.filter((_, i) => i !== idx))}
+									title="Remover"
+									type="button"
+								>
+									<Trash2 className="h-4 w-4" />
+								</button>
+							</div>
 						</li>
 					))}
 				</ul>
