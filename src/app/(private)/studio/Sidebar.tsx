@@ -406,7 +406,7 @@ const Sidebar = () => {
 								src={
 									userImageUrl || session?.user?.image
 										? `${userImageUrl || session?.user?.image}?t=${imageKey}`
-										: "/default-avatar.png"
+										: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 								}
 								width={42}
 							/>
@@ -480,7 +480,7 @@ const Sidebar = () => {
 									src={
 										userImageUrl || session?.user?.image
 											? `${userImageUrl || session?.user?.image}?t=${imageKey}`
-											: "/default-avatar.png"
+											: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 									}
 									width={24}
 								/>

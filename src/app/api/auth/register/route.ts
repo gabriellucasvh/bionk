@@ -323,7 +323,7 @@ async function sendOtpEmail(
 		await resend.emails.send({
 			from: "Bionk <contato@bionk.me>",
 			to: [email],
-			subject: "Seu código de verificação Bionk",
+			subject: `Seu código de verificação é ${otp}`,
 			react: OtpEmail({
 				otp,
 				expiryMinutes: OTP_EXPIRY_MINUTES,

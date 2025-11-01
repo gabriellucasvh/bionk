@@ -28,14 +28,13 @@ export const OtpEmail: React.FC<Readonly<OtpEmailProps>> = ({
 }) => (
 	<Html lang="pt-BR">
 		<Head />
-		<Preview>Seu código de verificação Bionk</Preview>
+		<Preview>Conclua seu cadastro no Bionk</Preview>
 		<Body style={main}>
 			<Container style={container}>
 				{/* <Section style={logoContainer}>
           <Img src={logoUrl} width="120" height="40" alt="Bionk Logo" />
         </Section> */}
 				<Heading style={heading}>Seu Código de Verificação</Heading>
-				<Text style={paragraph}>Olá,</Text>
 				<Text style={paragraph}>
 					Obrigado por se registrar no Bionk. Use o código abaixo para verificar
 					seu endereço de e-mail e concluir seu cadastro:
