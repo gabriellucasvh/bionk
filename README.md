@@ -13,7 +13,7 @@ Bionk é uma plataforma **Link in Bio** moderna e personalizável, desenvolvida 
 - **Cloudinary** - Armazenamento e otimização de imagens e vídeos na nuvem.
 - **Docker** - Containerização para desenvolvimento e deploy consistentes.
 - **NextAuth.js** - Autenticação segura e integrada.
-- **Mercado Pago** - Integração para processamento de pagamentos.
+- **Stripe** – Plataforma de pagamentos moderna e global para processar transações online com segurança e flexibilidade.
 - **Framer Motion** - Animações suaves e fluidas.
 - **DND Kit** - Drag and Drop interativo.
 - **Radix UI** - Componentes acessíveis e práticos.
