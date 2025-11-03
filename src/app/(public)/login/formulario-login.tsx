@@ -12,7 +12,7 @@ import { z } from "zod";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { GoogleBtn } from "@/components/buttons/button-google";
 import LoadingPage from "@/components/layout/LoadingPage";
-import { ForgotPasswordModal } from "@/components/modals/ForgotPasswordModal";
+ 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,8 +35,7 @@ function Login() {
     const [message, setMessage] = useState("");
     const searchParams = useSearchParams();
     const [showPassword, setShowPassword] = useState(false);
-    const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
-        useState(false);
+    
     const [widgetId, setWidgetId] = useState<string | null>(null);
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
     const widgetRef = useRef<HTMLDivElement | null>(null);
@@ -181,9 +180,7 @@ function Login() {
 		} finally {
 			setLoading(false);
 		}
-	};
-	const openForgotPasswordModal = () => setIsForgotPasswordModalOpen(true);
-    const closeForgotPasswordModal = () => setIsForgotPasswordModalOpen(false);
+    };
 
     return (
         <div className="flex min-h-dvh">
@@ -256,16 +253,14 @@ function Login() {
 								</div>
 							</div>
 
-							<div className="text-left">
-								<Button
-									className="h-auto p-0 text-blue-500 text-sm hover:underline"
-									onClick={openForgotPasswordModal}
-									type="button"
-									variant="link"
-								>
-									Esqueceu a senha?
-								</Button>
-							</div>
+                            <div className="text-left">
+                                <Link
+                                    className="h-auto p-0 text-blue-500 text-sm hover:underline"
+                                    href="/esqueci-senha"
+                                >
+                                    Esqueceu a senha?
+                                </Link>
+                            </div>
 
 							<div className="space-y-4">
 								<BaseButton
@@ -333,12 +328,9 @@ function Login() {
 				</div>
 			</div>
 
-			<ForgotPasswordModal
-				isOpen={isForgotPasswordModalOpen}
-				onClose={closeForgotPasswordModal}
-			/>
-		</div>
-	);
+            
+        </div>
+    );
 }
 
 export default Login;

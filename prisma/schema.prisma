@@ -40,7 +40,7 @@ model User {
   emailVerificationToken        String?        @unique
   emailVerificationTokenExpires DateTime?
   newEmailPending               String?        @unique
-  registrationOtp               String?        @unique
+  registrationOtp               String?
   registrationOtpAttempts       Int            @default(0)
   registrationOtpBlockedUntil   DateTime?
   registrationOtpExpiry         DateTime?
