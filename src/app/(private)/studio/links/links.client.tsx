@@ -4,12 +4,28 @@
 import { Eye, EyeOff } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
-import LoadingPage from "@/components/layout/LoadingPage";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useDesignStore } from "@/stores/designStore";
 import UserPagePreview from "../design/components/UserPagePreview";
 import { useCustomizations } from "../design/hooks/useCustomizations";
 import { useProfileData } from "../design/hooks/useProfileData";
 import UnifiedLinksManager from "./components/links.UnifiedLinksManager";
+
+const PreviewSkeleton = () => (
+	<div className="p-4">
+		<Skeleton className="mx-auto mt-4 h-28 w-28 rounded-full" />
+		<Skeleton className="mx-auto mt-4 h-6 w-44 rounded-full" />
+		<Skeleton className="mx-auto mt-4 h-6 w-44 rounded-full" />
+		<div className="mt-4 space-y-3">
+			{new Array(5).fill(null).map((_, i) => (
+				<div className="rounded-xl p-4 dark:border-zinc-700" key={i}>
+					<Skeleton className="h-4 w-48" />
+					<Skeleton className="mt-3 h-3 w-full" />
+				</div>
+			))}
+		</div>
+	</div>
+);
 
 const LinksStudioClient = () => {
 	const { data: session } = useSession();
@@ -114,10 +130,6 @@ const LinksStudioClient = () => {
 		};
 	}, [fetchProfile]);
 
-	if (isProfileLoading) {
-		return <LoadingPage />;
-	}
-
 	return (
 		<div className="min-h-[100dvh] w-full bg-white text-black transition-colors md:min-h-screen dark:bg-zinc-800 dark:text-white">
 			{/* Conteúdo */}
@@ -157,7 +169,7 @@ const LinksStudioClient = () => {
 						ref={previewContainerRef}
 						style={{ height: "calc(100vh - 8rem)", maxWidth: "390px" }}
 					>
-						<UserPagePreview />
+						{isProfileLoading ? <PreviewSkeleton /> : <UserPagePreview />}
 					</div>
 				</div>
 			</div>
@@ -166,7 +178,7 @@ const LinksStudioClient = () => {
 			<div className="fixed top-4 right-4 z-50 hidden h-[calc(100vh-2rem)] w-[380px] rounded-[2rem] border-4 border-gray-800 bg-gray-900 shadow-2xl xl:block">
 				<div className="flex h-full flex-col">
 					<div className="flex-1 overflow-y-auto rounded-[1.5rem] bg-white dark:bg-zinc-900">
-						<UserPagePreview />
+						{isProfileLoading ? <PreviewSkeleton /> : <UserPagePreview />}
 					</div>
 				</div>
 			</div>

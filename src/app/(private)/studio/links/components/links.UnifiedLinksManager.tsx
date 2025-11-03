@@ -5,7 +5,6 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
-import LoadingPage from "@/components/layout/LoadingPage";
 import {
 	Card,
 	CardContent,
@@ -13,6 +12,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDesignStore } from "@/stores/designStore";
 import type { SocialLinkItem } from "@/types/social";
@@ -28,6 +28,27 @@ import { fetcher } from "../utils/links.helpers";
 
 import LinksTabContent from "./links.LinksTabContent";
 import SocialLinksTabContent from "./links.SocialLinksTabContent";
+
+const LinksSkeleton = () => (
+	<div className="space-y-3">
+		<div className="flex items-center justify-between">
+			<Skeleton className="h-12 w-full rounded-full" />
+		</div>
+		{new Array(4).fill(null).map((_, i) => (
+			<div className="rounded-xl p-4 dark:border-zinc-700" key={i}>
+				<div className="flex items-center gap-3">
+					<Skeleton className="h-5 w-5" />
+					<Skeleton className="h-4 w-48" />
+					<div className="ml-auto flex gap-2">
+						<Skeleton className="h-6 w-16" />
+						<Skeleton className="h-6 w-16" />
+					</div>
+				</div>
+				<Skeleton className="mt-3 h-3 w-full" />
+			</div>
+		))}
+	</div>
+);
 
 const UnifiedLinksManager = () => {
 	const { data: session, status } = useSession();
@@ -70,19 +91,18 @@ const UnifiedLinksManager = () => {
 
 	// Hook SWR para links sociais (mantido montado; busca apenas na primeira entrada da aba)
 	const {
-		data: socialLinksData,
-		mutate: mutateSocialLinks,
-		isLoading: isLoadingSocialLinks,
-	} = useSWR<{ socialLinks: SocialLinkItem[] }>(
-		userId ? "/api/social-links" : null,
-		fetcher,
-		{
-			revalidateOnMount: false,
-			revalidateOnFocus: false,
-			revalidateIfStale: false,
-			revalidateOnReconnect: false,
-		}
-	);
+    data: socialLinksData,
+    mutate: mutateSocialLinks,
+  } = useSWR<{ socialLinks: SocialLinkItem[] }>(
+    userId ? "/api/social-links" : null,
+    fetcher,
+    {
+      revalidateOnMount: false,
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+    }
+  );
 
 	// Dispara a primeira busca de socials apenas quando há redes existentes e a aba é ativada
 	useEffect(() => {
@@ -267,10 +287,7 @@ const UnifiedLinksManager = () => {
 		musicsData,
 	]);
 
-	const showSocialsLoader =
-		activeTab === "socials" &&
-		(summaryData?.socialLinksCount ?? 0) > 0 &&
-		isLoadingSocialLinks;
+
 	const showLinksLoader =
 		activeTab === "links" &&
 		(summaryData?.linksCount ?? 0) > 0 &&
@@ -296,19 +313,38 @@ const UnifiedLinksManager = () => {
 		(summaryData?.musicsCount ?? 0) > 0 &&
 		isLoadingMusics;
 
-	if (
+	const isLinksSkeletonLoading =
 		status === "loading" ||
 		isLoadingSummary ||
 		showLinksLoader ||
-		showSocialsLoader ||
 		showSectionsLoader ||
 		showTextsLoader ||
 		showVideosLoader ||
 		showImagesLoader ||
-		showMusicsLoader
-	) {
-		return <LoadingPage />;
-	}
+		showMusicsLoader;
+
+	const renderLinksContent = () => {
+		if (isLinksSkeletonLoading) {
+			return <LinksSkeleton />;
+		}
+		return (
+			<LinksTabContent
+				currentImages={imagesData?.images || []}
+				currentLinks={linksData?.links || []}
+				currentMusics={musicsData?.musics || []}
+				currentSections={sectionsData || []}
+				currentTexts={textsData?.texts || []}
+				currentVideos={videosData?.videos || []}
+				mutateImages={mutateImages}
+				mutateLinks={mutateLinks}
+				mutateMusics={mutateMusics}
+				mutateSections={mutateSections}
+				mutateTexts={mutateTexts}
+				mutateVideos={mutateVideos}
+				session={session}
+			/>
+		);
+	};
 
 	return (
 		<section className="mx-auto min-h-dvh w-full max-w-4xl touch-manipulation pb-4">
@@ -338,21 +374,7 @@ const UnifiedLinksManager = () => {
 					</CardHeader>
 					<CardContent className="space-y-4 p-2 sm:p-6">
 						<TabsContent className="mt-0" value="links">
-							<LinksTabContent
-								currentImages={imagesData?.images || []}
-								currentLinks={linksData?.links || []}
-								currentMusics={musicsData?.musics || []}
-								currentSections={sectionsData || []}
-								currentTexts={textsData?.texts || []}
-								currentVideos={videosData?.videos || []}
-								mutateImages={mutateImages}
-								mutateLinks={mutateLinks}
-								mutateMusics={mutateMusics}
-								mutateSections={mutateSections}
-								mutateTexts={mutateTexts}
-								mutateVideos={mutateVideos}
-								session={session}
-							/>
+							{renderLinksContent()}
 						</TabsContent>
 
 						<TabsContent className="mt-0" value="socials">
