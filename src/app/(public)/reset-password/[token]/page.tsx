@@ -1,19 +1,19 @@
-import { Suspense } from 'react';
-import ResetPasswordForm from './formulario-reset';
-import LoadingPage from '@/components/layout/LoadingPage';
+import { Suspense } from "react";
+import LoadingPage from "@/components/layout/LoadingPage";
+import ResetPasswordForm from "./formulario-reset";
 
 export default async function ResetPasswordPage({
-  params,
+	params,
 }: {
-  params: Promise<{ token: string }>;
+	params: Promise<{ token: string }>;
 }) {
-  const { token } = await params;
+	const { token } = await params;
 
-  return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <Suspense fallback={<LoadingPage />}>
-        <ResetPasswordForm token={token} />
-      </Suspense>
-    </div>
-  );
+	return (
+		<div className="flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
+			<Suspense fallback={<LoadingPage />}>
+				<ResetPasswordForm token={token} />
+			</Suspense>
+		</div>
+	);
 }
