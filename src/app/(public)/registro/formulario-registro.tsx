@@ -28,12 +28,12 @@ const otpSchema = z.object({
 });
 
 const passwordSchema = z.object({
-    username: z
-        .string()
-        .min(3, "Username deve ter pelo menos 3 caracteres")
-        .max(30, "Username deve ter no máximo 30 caracteres")
-        .regex(/^[a-z0-9_-]{3,30}$/i, "Use apenas letras, números, _ ou - (3-30)"),
-    password: z.string().min(9, "A senha deve ter pelo menos 9 caracteres"),
+	username: z
+		.string()
+		.min(3, "Username deve ter pelo menos 3 caracteres")
+		.max(30, "Username deve ter no máximo 30 caracteres")
+		.regex(/^[a-z0-9_-]{3,30}$/i, "Use apenas letras, números, _ ou - (3-30)"),
+	password: z.string().min(9, "A senha deve ter pelo menos 9 caracteres"),
 });
 
 type EmailFormData = z.infer<typeof emailSchema>;
@@ -81,19 +81,19 @@ const getStageTitle = (stage: Stage) => {
 	}
 };
 
-const getStageDescription = (stage: Stage, email: string) => {
+const getStageDescription = (stage: Stage) => {
 	switch (stage) {
 		case "email":
 			return "Comece grátis e crie seus links em segundos.";
 		case "otp":
 			return (
 				<p>
-					Enviamos um código de 6 dígitos para {email}. Verifique sua caixa de
-					entrada (e spam).
+					Enviamos um código de 6 dígitos para seu e-mail. Verifique sua caixa
+					de entrada (e spam).
 				</p>
 			);
-    case "password":
-            return "Defina seu username e sua senha.";
+		case "password":
+			return "Defina seu username e sua senha.";
 		case "success":
 			return "Você será redirecionado para a página de login em breve.";
 		default:
@@ -138,13 +138,13 @@ function Register() {
 		resolver: zodResolver(otpSchema),
 	});
 
-    const passwordForm = useForm<PasswordFormData>({
-        resolver: zodResolver(passwordSchema),
-        defaultValues: {
-            username: "",
-            password: "",
-        },
-    });
+	const passwordForm = useForm<PasswordFormData>({
+		resolver: zodResolver(passwordSchema),
+		defaultValues: {
+			username: "",
+			password: "",
+		},
+	});
 
 	useEffect(() => {
 		return () => {
@@ -235,30 +235,30 @@ function Register() {
 		}
 	};
 
-    const [passwordSetupToken, setPasswordSetupToken] = useState<string>("");
-    const [tokenSignature, setTokenSignature] = useState<string>("");
+	const [passwordSetupToken, setPasswordSetupToken] = useState<string>("");
+	const [tokenSignature, setTokenSignature] = useState<string>("");
 
-    const handleOtpSubmit: SubmitHandler<OtpFormData> = async (data) => {
-        setLoading(true);
-        setMessage(null);
-        try {
-            const res = await axios.post("/api/auth/register", {
-                email,
-                otp: data.otp,
-                stage: "verify-otp",
-            });
-            const { passwordSetupToken: _token, signature } = res.data || {};
-            if (_token) {
-                setPasswordSetupToken(_token);
-            }
-            if (signature) {
-                setTokenSignature(signature);
-            }
-            setStage("password");
-            setMessage({
-                type: "success",
-                text: "Código verificado com sucesso! Defina sua senha.",
-            });
+	const handleOtpSubmit: SubmitHandler<OtpFormData> = async (data) => {
+		setLoading(true);
+		setMessage(null);
+		try {
+			const res = await axios.post("/api/auth/register", {
+				email,
+				otp: data.otp,
+				stage: "verify-otp",
+			});
+			const { passwordSetupToken: _token, signature } = res.data || {};
+			if (_token) {
+				setPasswordSetupToken(_token);
+			}
+			if (signature) {
+				setTokenSignature(signature);
+			}
+			setStage("password");
+			setMessage({
+				type: "success",
+				text: "Código verificado com sucesso! Defina sua senha.",
+			});
 		} catch (error) {
 			if (error instanceof AxiosError) {
 				const errorText =
@@ -279,25 +279,25 @@ function Register() {
 		}
 	};
 
-    const handlePasswordSubmit: SubmitHandler<PasswordFormData> = async (
-        data
-    ) => {
-        setLoading(true);
-        setMessage(null);
-        try {
-            await axios.post("/api/auth/register", {
-                token: passwordSetupToken,
-                username: data.username,
-                password: data.password,
-                signature: tokenSignature,
-                stage: "create-user",
-            });
-            // Tentar login automático com credenciais
-            const result = await signIn("credentials", {
-                email,
-                password: data.password,
-                redirect: false,
-            });
+	const handlePasswordSubmit: SubmitHandler<PasswordFormData> = async (
+		data
+	) => {
+		setLoading(true);
+		setMessage(null);
+		try {
+			await axios.post("/api/auth/register", {
+				token: passwordSetupToken,
+				username: data.username,
+				password: data.password,
+				signature: tokenSignature,
+				stage: "create-user",
+			});
+			// Tentar login automático com credenciais
+			const result = await signIn("credentials", {
+				email,
+				password: data.password,
+				redirect: false,
+			});
 
 			setStage("success");
 			if (result && !result.error) {
@@ -340,7 +340,7 @@ function Register() {
 							{getStageTitle(stage)}
 						</h1>
 						<div className="text-base text-muted-foreground">
-							{getStageDescription(stage, email)}
+							{getStageDescription(stage)}
 						</div>
 					</div>
 

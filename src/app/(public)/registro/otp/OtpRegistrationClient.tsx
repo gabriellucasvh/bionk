@@ -307,7 +307,7 @@ export default function OtpRegistrationClient({
 								Verifique seu E-mail
 							</h1>
 							<p className="text-base text-muted-foreground">
-								Enviamos um código de 6 dígitos para {userEmail}. Verifique sua
+								Enviamos um código de 6 dígitos para seu e-mail. Verifique sua
 								caixa de entrada (e spam).
 							</p>
 							{message && (
