@@ -4,8 +4,8 @@
 import { Eye, EyeOff } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
-import LoadingPage from "@/components/layout/LoadingPage";
 import ProfileImageCropModal from "@/components/modals/ProfileImageCropModal";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useDesignStore } from "@/stores/designStore";
 import CategoriasTemplates from "./components/design.CategoriasTemplates";
 import { DesignPanel } from "./components/design.Panel";
@@ -17,6 +17,68 @@ import { useProfileData } from "./hooks/useProfileData";
 import { useProfileImage } from "./hooks/useProfileImage";
 import { useProfileValidation } from "./hooks/useProfileValidation";
 import { useSaveProfile } from "./hooks/useSaveProfile";
+
+const DesignPreviewSkeleton = () => (
+	<div className="p-4">
+		<Skeleton className="mx-auto mt-4 h-28 w-28 rounded-full" />
+		<Skeleton className="mx-auto mt-4 h-6 w-44 rounded-full" />
+		<Skeleton className="mx-auto mt-4 h-6 w-60 rounded-full" />
+		<div className="mt-4 space-y-3">
+			{new Array(5).fill(null).map((_, i) => (
+				<div className="rounded-xl p-4 dark:border-zinc-700" key={i}>
+					<Skeleton className="h-4 w-56" />
+					<Skeleton className="mt-3 h-3 w-full" />
+				</div>
+			))}
+		</div>
+	</div>
+);
+
+const ProfileSectionSkeleton = () => (
+	<div className="rounded-2xl border bg-white p-6 dark:border-gray-700 dark:bg-zinc-800">
+		<div className="flex items-center gap-4">
+			<Skeleton className="h-20 w-20 rounded-full" />
+			<div className="flex-1 space-y-3">
+				<Skeleton className="h-6 w-44" />
+				<Skeleton className="h-6 w-32" />
+			</div>
+		</div>
+		<div className="mt-6 space-y-4">
+			<Skeleton className="h-10 w-full" />
+			<Skeleton className="h-10 w-full" />
+			<Skeleton className="h-24 w-full" />
+			<div className="flex gap-3">
+				<Skeleton className="h-10 w-28" />
+				<Skeleton className="h-10 w-28" />
+			</div>
+		</div>
+	</div>
+);
+
+const TemplatesSkeleton = () => (
+	<div className="space-y-4">
+		<Skeleton className="h-6 w-40" />
+		<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			{new Array(6).fill(null).map((_, i) => (
+				<div className="rounded-xl border p-4 dark:border-gray-700" key={i}>
+					<Skeleton className="h-24 w-full" />
+					<Skeleton className="mt-4 h-5 w-24" />
+				</div>
+			))}
+		</div>
+	</div>
+);
+
+const DesignPanelSkeleton = () => (
+	<div className="space-y-4">
+		<Skeleton className="h-6 w-40" />
+		<div className="space-y-3">
+			{new Array(8).fill(null).map((_, i) => (
+				<Skeleton className="h-10 w-full" key={i} />
+			))}
+		</div>
+	</div>
+);
 
 const PersonalizarClient = () => {
 	const { data: session } = useSession();
@@ -212,10 +274,6 @@ const PersonalizarClient = () => {
 		handleCancelChanges();
 	};
 
-	if (isProfileLoading) {
-		return <LoadingPage />;
-	}
-
 	return (
 		<div className="min-h-screen w-full bg-white text-black transition-colors dark:bg-zinc-800 dark:text-white">
 			{/* Botão flutuante mobile substitui navbar */}
@@ -246,37 +304,59 @@ const PersonalizarClient = () => {
 					ref={designContainerRef}
 				>
 					<section className="flex min-h-screen flex-col gap-6 px-6 pt-10 pb-24 md:pt-8 md:pr-8 xl:pr-100">
-						<ProfileSection
-							bioValidationError={bioValidationError}
-							isCheckingUsername={isCheckingUsername}
-							isUploadingImage={isUploadingImage}
-							loading={loading}
-							onBioChange={validateBio}
-							onCancelChanges={handleProfileCancel}
-							onImageEditClick={() => setIsImageCropModalOpen(true)}
-							onProfileChange={handleProfileChange}
-							onSaveProfile={handleSaveProfile}
-							onUsernameChange={debouncedValidateUsername}
-							originalProfile={originalProfile}
-							profile={profile}
-							profilePreview={profilePreview}
-							showButtons={showButtons}
-							validationError={validationError}
-						/>
+						{isProfileLoading ? (
+							<>
+								<ProfileSectionSkeleton />
+								<section className="border-t pt-6 dark:border-gray-700">
+									<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
+										Templates
+									</h2>
+									<TemplatesSkeleton />
+								</section>
+								<section className="border-t pt-6 dark:border-gray-700">
+									<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
+										Personalização
+									</h2>
+									<DesignPanelSkeleton />
+								</section>
+							</>
+						) : (
+							<>
+								<ProfileSection
+									bioValidationError={bioValidationError}
+									isCheckingUsername={isCheckingUsername}
+									isUploadingImage={isUploadingImage}
+									loading={loading}
+									onBioChange={validateBio}
+									onCancelChanges={handleProfileCancel}
+									onImageEditClick={() => setIsImageCropModalOpen(true)}
+									onProfileChange={handleProfileChange}
+									onSaveProfile={handleSaveProfile}
+									onUsernameChange={debouncedValidateUsername}
+									originalProfile={originalProfile}
+									profile={profile}
+									profilePreview={profilePreview}
+									showButtons={showButtons}
+									validationError={validationError}
+								/>
 
-						<section className="border-t pt-6 dark:border-gray-700">
-							<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
-								Templates
-							</h2>
-							<CategoriasTemplates onTemplateChange={handleTemplateChange} />
-						</section>
+								<section className="border-t pt-6 dark:border-gray-700">
+									<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
+										Templates
+									</h2>
+									<CategoriasTemplates
+										onTemplateChange={handleTemplateChange}
+									/>
+								</section>
 
-						<section className="border-t pt-6 dark:border-gray-700">
-							<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
-								Personalização
-							</h2>
-							<DesignPanel />
-						</section>
+								<section className="border-t pt-6 dark:border-gray-700">
+									<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
+										Personalização
+									</h2>
+									<DesignPanel />
+								</section>
+							</>
+						)}
 					</section>
 				</div>
 
@@ -295,7 +375,11 @@ const PersonalizarClient = () => {
 								maxWidth: "365px",
 							}}
 						>
-							<UserPagePreview />
+							{isProfileLoading ? (
+								<DesignPreviewSkeleton />
+							) : (
+								<UserPagePreview />
+							)}
 						</div>
 					</div>
 				</div>
@@ -305,7 +389,7 @@ const PersonalizarClient = () => {
 			<div className="fixed top-4 right-4 z-50 hidden h-[calc(100vh-2rem)] w-90 rounded-[2.5rem] border-4 border-gray-800 bg-gray-900 shadow-2xl xl:block">
 				<div className="flex h-full flex-col">
 					<div className="flex-1 overflow-y-auto rounded-4xl bg-white dark:bg-zinc-900">
-						<UserPagePreview />
+						{isProfileLoading ? <DesignPreviewSkeleton /> : <UserPagePreview />}
 					</div>
 				</div>
 			</div>
