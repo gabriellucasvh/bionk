@@ -6,6 +6,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
+import { headers } from "next/headers";
+import { getAuthRateLimiter } from "@/lib/rate-limiter";
+import { clearFailures, getBlockInfo, registerFailure } from "@/lib/login-throttle";
 
 // Funções auxiliares para JWT
 function setupInitialToken(token: any, user: ExtendedUser, account: any) {
@@ -221,26 +224,169 @@ export const authOptions: NextAuthOptions = {
 		CredentialsProvider({
 			name: "Credentials",
 			credentials: {
-				email: { label: "Email", type: "email" },
+				login: { label: "Login", type: "text" },
 				password: { label: "Password", type: "password" },
 			},
 			async authorize(credentials) {
-				if (!(credentials?.email && credentials?.password)) {
+				const rawLogin = (credentials as any).login ?? (credentials as any).email;
+				if (!(rawLogin && credentials?.password)) {
 					return null;
 				}
 
+				const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				if (rawLogin.includes("@") && !EMAIL_REGEX.test(rawLogin)) {
+					return null;
+				}
+
+				const hdrs = await headers();
+				const ip =
+					hdrs.get("cf-connecting-ip") ||
+					hdrs.get("x-real-ip") ||
+					hdrs.get("x-forwarded-for") ||
+					"unknown";
+
+				const { success } = await getAuthRateLimiter().limit(ip);
+				if (!success) {
+					try {
+						const maskEmail = (e: string) => {
+							const parts = e.split("@");
+							if (parts.length !== 2) {
+								return "masked";
+							}
+							const u = parts[0];
+							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							return `${m}@${parts[1]}`;
+						};
+						await discordWebhook.notifyException({
+							error: "login-block",
+							message: "rate-limit",
+							context: "login_security",
+						metadata: { email: maskEmail(rawLogin), ip },
+					});
+				} catch {}
+				return null;
+			}
+
+				const blockInfo = await getBlockInfo(rawLogin, ip)
+				if (blockInfo.blocked) {
+					try {
+						const maskEmail = (e: string) => {
+							const parts = e.split("@");
+							if (parts.length !== 2) {
+								return "masked";
+							}
+							const u = parts[0];
+							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							return `${m}@${parts[1]}`;
+						};
+						await discordWebhook.notifyException({
+							error: "login-block",
+							message: "cooldown",
+							context: "login_security",
+							metadata: { email: maskEmail(rawLogin), ip },
+						});
+					} catch {}
+					return null;
+				}
+
+				const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+				const captchaToken = (credentials as any).captchaToken as string | undefined;
+				const requireCaptcha = !!turnstileSecret && blockInfo.count >= 2;
+				if (requireCaptcha) {
+					if (!captchaToken) {
+						return null;
+					}
+					const params = new URLSearchParams();
+					params.append("secret", turnstileSecret!);
+					params.append("response", captchaToken);
+					params.append("remoteip", ip);
+					const resp = await fetch(
+						"https://challenges.cloudflare.com/turnstile/v0/siteverify",
+						{
+							method: "POST",
+							headers: { "Content-Type": "application/x-www-form-urlencoded" },
+							body: params.toString(),
+						}
+					);
+					if (!resp.ok) {
+						return null;
+					}
+					const data = await resp.json();
+					if (!(data && data.success)) {
+						return null;
+					}
+				}
+
+				const isEmail = EMAIL_REGEX.test(rawLogin);
 				const user = await prisma.user.findUnique({
-					where: { email: credentials.email },
+					where: isEmail ? { email: rawLogin } : { username: rawLogin },
 				});
 
 				if (!user?.hashedPassword) {
-					return null;
-				}
+					try {
+						const maskEmail = (e: string) => {
+							const parts = e.split("@");
+							if (parts.length !== 2) {
+								return "masked";
+							}
+							const u = parts[0];
+							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							return `${m}@${parts[1]}`;
+						};
+						await discordWebhook.notifyException({
+							error: "login-failure",
+							message: "user-not-found",
+							context: "login_security",
+						metadata: { email: maskEmail(rawLogin), ip },
+					});
+				} catch {}
+				await registerFailure(rawLogin, ip)
+				return null;
+			}
 
-				// Verificar se o usuário está banido
 				if (user.isBanned) {
-					throw new Error("Conta banida");
-				}
+					try {
+						const maskEmail = (e: string) => {
+							const parts = e.split("@");
+							if (parts.length !== 2) {
+								return "masked";
+							}
+							const u = parts[0];
+							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							return `${m}@${parts[1]}`;
+						};
+						await discordWebhook.notifyException({
+							error: "login-failure",
+							message: "account-banned",
+							context: "login_security",
+						metadata: { email: maskEmail(rawLogin), ip },
+					});
+				} catch {}
+				await registerFailure(rawLogin, ip)
+				return null;
+			}
+
+				if (user.provider === "credentials" && user.status !== "active") {
+					try {
+						const maskEmail = (e: string) => {
+							const parts = e.split("@");
+							if (parts.length !== 2) {
+								return "masked";
+							}
+							const u = parts[0];
+							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							return `${m}@${parts[1]}`;
+						};
+						await discordWebhook.notifyException({
+							error: "login-failure",
+							message: "inactive-status",
+							context: "login_security",
+						metadata: { email: maskEmail(rawLogin), ip },
+					});
+				} catch {}
+				await registerFailure(rawLogin, ip)
+				return null;
+			}
 
 				const isValid = await bcrypt.compare(
 					credentials.password,
@@ -248,8 +394,28 @@ export const authOptions: NextAuthOptions = {
 				);
 
 				if (!isValid) {
-					return null;
-				}
+					try {
+						const maskEmail = (e: string) => {
+							const parts = e.split("@");
+							if (parts.length !== 2) {
+								return "masked";
+							}
+							const u = parts[0];
+							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							return `${m}@${parts[1]}`;
+						};
+						await discordWebhook.notifyException({
+							error: "login-failure",
+							message: "invalid-password",
+							context: "login_security",
+						metadata: { email: maskEmail(rawLogin), ip },
+					});
+				} catch {}
+				await registerFailure(rawLogin, ip)
+				return null;
+			}
+
+				await clearFailures(rawLogin, ip)
 
 				return {
 					id: user.id,
