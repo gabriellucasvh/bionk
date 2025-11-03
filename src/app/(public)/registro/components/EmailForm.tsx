@@ -11,17 +11,18 @@ interface EmailFormData {
 }
 
 interface EmailFormProps {
-    form: UseFormReturn<EmailFormData>;
-    onSubmit: (data: EmailFormData) => void;
-    loading: boolean;
+	form: UseFormReturn<EmailFormData>;
+	onSubmit: (data: EmailFormData) => void;
+	loading: boolean;
 }
 
 export function EmailForm({ form, onSubmit, loading }: EmailFormProps) {
-    const canSubmit = () => {
-        const hasErrors = Object.keys(form.formState.errors).length > 0;
-        const emailPresent = !!form.watch("email");
-        return !hasErrors && emailPresent && !loading;
-    };
+	const canSubmit = () => {
+		const hasErrors = Object.keys(form.formState.errors).length > 0;
+		const emailValue = form.watch("email") ?? "";
+		const hasMinChars = emailValue.length >= 3;
+		return !hasErrors && hasMinChars && !loading;
+	};
 
 	return (
 		<form className="space-y-2" onSubmit={form.handleSubmit(onSubmit)}>
@@ -29,19 +30,19 @@ export function EmailForm({ form, onSubmit, loading }: EmailFormProps) {
 				<Label className="mb-2 block font-semibold text-base text-black">
 					Seu email
 				</Label>
-                <Input
-                    className="w-full rounded-md border px-4 py-4 text-base transition-colors duration-400 focus-visible:border-lime-500"
-                    placeholder="Digite seu e-mail"
-                    type="email"
-                    {...form.register("email")}
-                    disabled={loading}
-                    onBlur={() => {
-                        const value = form.getValues("email");
-                        if (value) {
-                            form.trigger("email").catch(() => {});
-                        }
-                    }}
-                />
+				<Input
+					className="w-full rounded-md border px-4 py-4 text-base transition-colors duration-400 focus-visible:border-lime-500"
+					placeholder="Digite seu e-mail"
+					type="email"
+					{...form.register("email")}
+					disabled={loading}
+					onBlur={() => {
+						const value = form.getValues("email");
+						if (value) {
+							form.trigger("email").catch(() => {});
+						}
+					}}
+				/>
 				<div className="mt-2 flex h-2 items-center">
 					{form.formState.errors.email && (
 						<p className="text-red-600 text-sm transition-opacity duration-200">
@@ -64,14 +65,14 @@ export function EmailForm({ form, onSubmit, loading }: EmailFormProps) {
 					.
 				</p>
 			</div>
-            <BaseButton
-                className="mt-2 w-full py-4 text-base"
-                disabled={!canSubmit()}
-                loading={loading}
-                type="submit"
-            >
-                Continuar
-            </BaseButton>
-        </form>
-    );
+			<BaseButton
+				className="mt-2 w-full py-4 text-base"
+				disabled={!canSubmit()}
+				loading={loading}
+				type="submit"
+			>
+				Continuar
+			</BaseButton>
+		</form>
+	);
 }
