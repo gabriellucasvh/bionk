@@ -50,16 +50,40 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ error: "Username inválido" }, { status: 400 });
 		}
 
+		const normalizedLogin = login.toLowerCase();
+		{
+			const redis = getRedis();
+			const rlKey = `fp:rl:start:${normalizedLogin}`;
+			const count = await redis.incr(rlKey);
+			if (count === 1) {
+				await redis.expire(rlKey, 10 * 60);
+			}
+			if (count > 5) {
+				return NextResponse.json(
+					{ error: "Muitas requisições. Tente novamente mais tarde." },
+					{ status: 429 }
+				);
+			}
+		}
+
 		const user = await prisma.user.findUnique({
 			where: isEmail ? { email: login } : { username: login },
 			select: { id: true, email: true },
 		});
 
 		if (!user?.email) {
-			return NextResponse.json(
-				{ error: "Usuário não encontrado" },
-				{ status: 404 }
+			const res = NextResponse.json(
+				{ message: "Se existir uma conta, um código foi enviado." },
+				{ status: 200 }
 			);
+			res.cookies.set("fp_req", "1", {
+				httpOnly: true,
+				sameSite: "lax",
+				path: "/esqueci-senha",
+				maxAge: 10 * 60,
+				secure: process.env.NODE_ENV === "production",
+			});
+			return res;
 		}
 
 		{

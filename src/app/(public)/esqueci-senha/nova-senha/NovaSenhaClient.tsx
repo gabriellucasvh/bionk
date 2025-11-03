@@ -53,7 +53,7 @@ function validatePasswordStrength(pwd: string): string[] {
   return errs;
 }
 
-export default function NovaSenhaClient({ token }: { token: string }) {
+export default function NovaSenhaClient({ token }: { token?: string }) {
   const router = useRouter();
   const [pwd, setPwd] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -63,7 +63,7 @@ export default function NovaSenhaClient({ token }: { token: string }) {
   const [message, setMessage] = useState("");
 
   const strengthErrors = validatePasswordStrength(pwd);
-  const canSubmit = token.length > 0 && strengthErrors.length === 0 && pwd === confirm;
+  const canSubmit = strengthErrors.length === 0 && pwd === confirm;
 
   async function handleReset() {
     if (!canSubmit) {
@@ -75,7 +75,7 @@ export default function NovaSenhaClient({ token }: { token: string }) {
       const res = await fetch("/api/auth/forgot-password/reset", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password: pwd }),
+        body: JSON.stringify(token ? { token, password: pwd } : { password: pwd }),
       });
       const data = await res.json();
       if (res.ok) {
