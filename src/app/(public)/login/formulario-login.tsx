@@ -12,8 +12,7 @@ import { z } from "zod";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { GoogleBtn } from "@/components/buttons/button-google";
 import LoadingPage from "@/components/layout/LoadingPage";
- 
-import { Button } from "@/components/ui/button";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -31,15 +30,15 @@ function Login() {
 		formState: { errors },
 	} = useForm<FormData>({ resolver: zodResolver(schema) });
 
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState("");
-    const searchParams = useSearchParams();
-    const [showPassword, setShowPassword] = useState(false);
-    
-    const [widgetId, setWidgetId] = useState<string | null>(null);
-    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-    const widgetRef = useRef<HTMLDivElement | null>(null);
-    const tokenResolverRef = useRef<((t: string) => void) | null>(null);
+	const [loading, setLoading] = useState(false);
+	const [message, setMessage] = useState("");
+	const searchParams = useSearchParams();
+	const [showPassword, setShowPassword] = useState(false);
+
+	const [widgetId, setWidgetId] = useState<string | null>(null);
+	const [_captchaToken, setCaptchaToken] = useState<string | null>(null);
+	const widgetRef = useRef<HTMLDivElement | null>(null);
+	const tokenResolverRef = useRef<((t: string) => void) | null>(null);
 
 	const { data: session, status } = useSession();
 	useEffect(() => {
@@ -47,24 +46,25 @@ function Login() {
 			// Lógica que não expõe os dados da sessão
 		}
 	}, [session]);
-    const router = useRouter();
+	const router = useRouter();
 
-    useEffect(() => {
-        const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-        if (!siteKey) {
-            return;
-        }
-        const existing = document.querySelector('script[data-turnstile]');
-        if (existing) {
-            return;
-        }
-        const s = document.createElement('script');
-        s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-        s.async = true;
-        s.defer = true;
-        s.setAttribute('data-turnstile', 'true');
-        document.head.appendChild(s);
-    }, []);
+	useEffect(() => {
+		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		if (!siteKey) {
+			return;
+		}
+		const existing = document.querySelector("script[data-turnstile]");
+		if (existing) {
+			return;
+		}
+		const s = document.createElement("script");
+		s.src =
+			"https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+		s.async = true;
+		s.defer = true;
+		s.setAttribute("data-turnstile", "true");
+		document.head.appendChild(s);
+	}, []);
 
 	useEffect(() => {
 		const error = searchParams.get("error");
@@ -82,120 +82,120 @@ function Login() {
 		}
 	}, [status, router, searchParams]);
 
-    if (status === "loading") {
-        return <LoadingPage />;
-    }
+	if (status === "loading") {
+		return <LoadingPage />;
+	}
 
-    const waitForTurnstile = () => {
-        return new Promise<void>((resolve) => {
-            const w = window as unknown as { turnstile?: any };
-            if (w.turnstile) {
-                resolve();
-                return;
-            }
-            const i = setInterval(() => {
-                if (w.turnstile) {
-                    clearInterval(i);
-                    resolve();
-                }
-            }, 50);
-        });
-    };
+	const waitForTurnstile = () => {
+		return new Promise<void>((resolve) => {
+			const w = window as unknown as { turnstile?: any };
+			if (w.turnstile) {
+				resolve();
+				return;
+			}
+			const i = setInterval(() => {
+				if (w.turnstile) {
+					clearInterval(i);
+					resolve();
+				}
+			}, 50);
+		});
+	};
 
-    const renderTurnstile = async () => {
-        const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-        if (!siteKey) {
-            return null;
-        }
-        await waitForTurnstile();
-        const w = window as unknown as { turnstile?: any };
-        if (!widgetRef.current) {
-            return null;
-        }
-        if (widgetId) {
-            return widgetId;
-        }
-        const id = w.turnstile.render(widgetRef.current, {
-            sitekey: siteKey,
-            size: 'invisible',
-            callback: (token: string) => {
-                setCaptchaToken(token);
-                if (tokenResolverRef.current) {
-                    tokenResolverRef.current(token);
-                    tokenResolverRef.current = null;
-                }
-            },
-        });
-        setWidgetId(id);
-        return id;
-    };
+	const renderTurnstile = async () => {
+		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		if (!siteKey) {
+			return null;
+		}
+		await waitForTurnstile();
+		const w = window as unknown as { turnstile?: any };
+		if (!widgetRef.current) {
+			return null;
+		}
+		if (widgetId) {
+			return widgetId;
+		}
+		const id = w.turnstile.render(widgetRef.current, {
+			sitekey: siteKey,
+			size: "invisible",
+			callback: (token: string) => {
+				setCaptchaToken(token);
+				if (tokenResolverRef.current) {
+					tokenResolverRef.current(token);
+					tokenResolverRef.current = null;
+				}
+			},
+		});
+		setWidgetId(id);
+		return id;
+	};
 
-    const getCaptchaToken = async (): Promise<string | null> => {
-        const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-        if (!siteKey) {
-            return null;
-        }
-        const w = window as unknown as { turnstile?: any };
-        const id = widgetId || (await renderTurnstile());
-        if (!id) {
-            return null;
-        }
-        const existing = w.turnstile.getResponse(id);
-        if (existing) {
-            return existing;
-        }
-        const p = new Promise<string>((resolve) => {
-            tokenResolverRef.current = resolve;
-        });
-        w.turnstile.execute(id);
-        const t = await p;
-        return t;
-    };
+	const getCaptchaToken = async (): Promise<string | null> => {
+		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		if (!siteKey) {
+			return null;
+		}
+		const w = window as unknown as { turnstile?: any };
+		const id = widgetId || (await renderTurnstile());
+		if (!id) {
+			return null;
+		}
+		const existing = w.turnstile.getResponse(id);
+		if (existing) {
+			return existing;
+		}
+		const p = new Promise<string>((resolve) => {
+			tokenResolverRef.current = resolve;
+		});
+		w.turnstile.execute(id);
+		const t = await p;
+		return t;
+	};
 
-    const onSubmit = async (data: FormData) => {
-        setLoading(true);
-        setMessage("");
+	const onSubmit = async (data: FormData) => {
+		setLoading(true);
+		setMessage("");
 
-        try {
-            const token = await getCaptchaToken();
-            const payload: Record<string, string> = {
-                login: data.login,
-                password: data.password,
-            };
-            if (token) {
-                payload.captchaToken = token;
-            }
-            const result = await signIn("credentials", {
-                ...payload,
-                redirect: false,
-            });
+		try {
+			const token = await getCaptchaToken();
+			const payload: Record<string, string> = {
+				login: data.login,
+				password: data.password,
+			};
+			if (token) {
+				payload.captchaToken = token;
+			}
+			const result = await signIn("credentials", {
+				...payload,
+				redirect: false,
+			});
 
-            if (result?.error) {
-                setMessage("Credenciais inválidas. Tente novamente.");
-            } else {
-                router.replace("/studio/perfil");
-            }
+			if (result?.error) {
+				setMessage("Credenciais inválidas. Tente novamente.");
+			} else {
+				router.replace("/studio/perfil");
+			}
 		} catch {
 			setMessage("Ocorreu um erro durante o login");
 		} finally {
 			setLoading(false);
 		}
-    };
+	};
 
-    return (
-        <div className="flex min-h-dvh">
-            {/* Lado esquerdo - Formulário */}
-            <div className="flex flex-1 items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
-                <div className="w-full max-w-lg">
-                    <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-                        <div ref={widgetRef} className="hidden" />
-                        <div className="space-y-4 text-center">
-                            <h1 className="font-bold text-3xl text-black">
-                                Bem-vindo de volta!
-                            </h1>
-                            <p className="text-base text-muted-foreground">
-                                Acesse sua conta na Bionk.
-                            </p>
+	return (
+		<div className="flex min-h-dvh">
+			{/* Lado esquerdo - Formulário */}
+			<div className="flex flex-1 items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
+				<div className="w-full max-w-lg">
+					<form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
+						<div className="hidden" ref={widgetRef} />
+						<div className="space-y-4 text-center">
+							<h1 className="font-bold text-3xl text-black">
+								Bem-vindo de volta!
+							</h1>
+							<p className="text-base text-muted-foreground">
+								Acesse sua conta na Bionk.
+							</p>
 							{message && (
 								<p className="rounded-md bg-red-50 p-3 text-red-600 text-sm">
 									{message}
@@ -205,24 +205,24 @@ function Login() {
 
 						<div className="space-y-5">
 							<div>
-				<Label className="mb-2 block text-base text-black">
-					Email ou username
-				</Label>
-				<Input
-					className="w-full rounded-md px-4 py-4 text-base focus-visible:border-lime-500"
-					placeholder="Digite seu e-mail ou username"
-					type="text"
-					{...register("login")}
-				/>
-				{/* Espaço reservado para mensagem de erro do email */}
-				<div className="mt-2 flex h-2 items-center">
-					{errors.login && (
-						<p className="text-red-600 text-sm transition-opacity duration-200">
-							{errors.login.message}
-						</p>
-					)}
-				</div>
-			</div>
+								<Label className="mb-2 block text-base text-black">
+									Email ou username
+								</Label>
+								<Input
+									className="w-full rounded-md px-4 py-4 text-base focus-visible:border-lime-500"
+									placeholder="Digite seu e-mail ou username"
+									type="text"
+									{...register("login")}
+								/>
+								{/* Espaço reservado para mensagem de erro do email */}
+								<div className="mt-2 flex h-2 items-center">
+									{errors.login && (
+										<p className="text-red-600 text-sm transition-opacity duration-200">
+											{errors.login.message}
+										</p>
+									)}
+								</div>
+							</div>
 
 							<div>
 								<Label className="mb-2 block text-base text-black">
@@ -253,14 +253,14 @@ function Login() {
 								</div>
 							</div>
 
-                            <div className="text-left">
-                                <Link
-                                    className="h-auto p-0 text-blue-500 text-sm hover:underline"
-                                    href="/esqueci-senha"
-                                >
-                                    Esqueceu a senha?
-                                </Link>
-                            </div>
+							<div className="text-left">
+								<Link
+									className="h-auto p-0 text-blue-500 text-sm hover:underline"
+									href="/esqueci-senha"
+								>
+									Esqueceu a senha?
+								</Link>
+							</div>
 
 							<div className="space-y-4">
 								<BaseButton
@@ -327,10 +327,8 @@ function Login() {
 					</div>
 				</div>
 			</div>
-
-            
-        </div>
-    );
+		</div>
+	);
 }
 
 export default Login;
