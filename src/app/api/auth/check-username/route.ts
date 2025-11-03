@@ -3,7 +3,7 @@ import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
 
-const USERNAME_REGEX = /^[a-z0-9._-]{3,30}$/;
+const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
 // Função para limpar usernames reservados expirados
 async function cleanupExpiredUsernameReservations() {
 	try {
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 				{
 					available: false,
 					error:
-						"Username deve ter entre 3-30 caracteres e conter apenas letras minúsculas, números, pontos, hífens e underscores",
+						"Username deve ter entre 3-30 caracteres e conter apenas letras minúsculas, números, pontos(.) e underscores(_)",
 				},
 				{ status: 400 }
 			);

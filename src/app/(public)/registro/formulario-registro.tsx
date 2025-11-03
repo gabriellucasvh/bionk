@@ -32,7 +32,10 @@ const passwordSchema = z.object({
 		.string()
 		.min(3, "Username deve ter pelo menos 3 caracteres")
 		.max(30, "Username deve ter no máximo 30 caracteres")
-		.regex(/^[a-z0-9_-]{3,30}$/i, "Use apenas letras, números, _ ou - (3-30)"),
+		.regex(
+			/^[a-z0-9._]{3,30}$/i,
+			"Use apenas letras minúsculas, números, pontos(.) e underscores(_)"
+		),
 	password: z.string().min(9, "A senha deve ter pelo menos 9 caracteres"),
 });
 

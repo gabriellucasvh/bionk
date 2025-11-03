@@ -17,7 +17,7 @@ const BASE_BLOCK_DURATION_MINUTES = 10;
 const PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES = 15;
 const OTP_TOKEN_EXPIRY_MINUTES = 10;
 const USERNAME_RESERVATION_EXPIRY_MINUTES = 15;
-const USERNAME_REGEX = /^[a-z0-9._-]{3,30}$/;
+const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
 const REJEX_UPPERCASE = /[A-Z]/;
 const REJEX_LOWERCASE = /[a-z]/;
 const REJEX_DIGIT = /\d/;
@@ -243,7 +243,7 @@ function validateUsernameFormat(
 		return NextResponse.json(
 			{
 				error:
-					"Username deve conter apenas letras minúsculas, números, pontos, hífens e underscores (3-30 caracteres)",
+					"Username deve conter apenas letras minúsculas, números, pontos(.) e underscores(_)",
 			},
 			{ status: 400 }
 		);

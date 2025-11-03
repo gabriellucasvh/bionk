@@ -6,17 +6,17 @@ import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { getDefaultCustomPresets } from "@/utils/templatePresets";
 
-const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,30}$/;
+const USERNAME_REGEX = /^[a-zA-Z0-9._]{3,30}$/;
 const BASE64_IMAGE_REGEX = /^data:image\/\w+;base64,/;
 
 // Função auxiliar para validar dados do onboarding
 function validateOnboardingData(name: string, username: string) {
 	if (!name || name.trim().length < 2 || name.length > 44) {
-		return "Nome deve ter entre 2 e 44 caracteres";
+		return "Nome deve ter pelo menos 2 caracteres";
 	}
 
 	if (!(username && USERNAME_REGEX.test(username))) {
-		return "Username deve conter apenas letras, números, _ ou - e ter entre 3-30 caracteres";
+		return "Username deve conter apenas letras minúsculas, números, pontos(.) e underscores(_)";
 	}
 
 	if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {

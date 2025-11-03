@@ -42,8 +42,8 @@ const completionSchema = z.object({
 		.min(3, "Username deve ter pelo menos 3 caracteres")
 		.max(30, "Username deve ter no máximo 30 caracteres")
 		.regex(
-			/^[a-z0-9._-]+$/,
-			"Username deve conter apenas letras minúsculas, números, pontos, hífens e underscores"
+			/^[a-z0-9._]+$/,
+			"Username deve conter apenas letras minúsculas, números, pontos(.) e underscores(_)"
 		),
 	password: z
 		.string()

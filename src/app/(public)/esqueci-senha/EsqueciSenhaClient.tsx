@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const usernameRegex = /^[a-zA-Z0-9._-]{3,30}$/;
+const usernameRegex = /^[a-zA-Z0-9._]{3,30}$/;
 
 export default function EsqueciSenhaClient() {
   const router = useRouter();

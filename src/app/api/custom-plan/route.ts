@@ -7,7 +7,7 @@ import { z } from "zod";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Regex patterns moved to top level for performance
-const USERNAME_REGEX = /^[a-zA-Z0-9_-]{3,30}$/;
+const USERNAME_REGEX = /^[a-zA-Z0-9._]{3,30}$/;
 const SUSPICIOUS_PATTERNS = [
 	/\b(viagra|casino|poker|loan|credit|debt)\b/i,
 	/\b(click here|free money|make money fast)\b/i,
@@ -31,7 +31,7 @@ const customPlanSchema = z.object({
 				return true;
 			}
 			return USERNAME_REGEX.test(val);
-		}, "Username deve conter apenas letras, números, _ ou - e ter entre 3-30 caracteres"),
+		}, "Username deve conter apenas letras minúsculas, números, pontos(.) e underscores(_)"),
 	companyName: z
 		.string()
 		.min(2, "Nome da empresa deve ter pelo menos 2 caracteres")
