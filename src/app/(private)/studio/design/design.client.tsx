@@ -38,19 +38,7 @@ const ProfileSectionSkeleton = () => (
 	<div className="rounded-2xl border bg-white p-6 dark:border-gray-700 dark:bg-zinc-800">
 		<div className="flex items-center gap-4">
 			<Skeleton className="h-20 w-20 rounded-full" />
-			<div className="flex-1 space-y-3">
-				<Skeleton className="h-6 w-44" />
-				<Skeleton className="h-6 w-32" />
-			</div>
-		</div>
-		<div className="mt-6 space-y-4">
-			<Skeleton className="h-10 w-full" />
-			<Skeleton className="h-10 w-full" />
-			<Skeleton className="h-24 w-full" />
-			<div className="flex gap-3">
-				<Skeleton className="h-10 w-28" />
-				<Skeleton className="h-10 w-28" />
-			</div>
+			<Skeleton className="h-10 w-28 rounded-full" />
 		</div>
 	</div>
 );
@@ -81,7 +69,7 @@ const DesignPanelSkeleton = () => (
 );
 
 const PersonalizarClient = () => {
-	const { data: session } = useSession();
+	const { data: session, update } = useSession();
 	const { loadInitialData, updateUserField } = useDesignStore();
 	const [mobileView, setMobileView] = useState<"design" | "preview">("design");
 	const previewContainerRef = useRef<HTMLDivElement>(null);
@@ -118,7 +106,6 @@ const PersonalizarClient = () => {
 		isImageCropModalOpen,
 		setIsImageCropModalOpen,
 		uploadImage,
-		handleProfileImageSave,
 		handleProfileImageRemove,
 		resetImageState,
 		updateOriginalImageUrl,
@@ -399,7 +386,27 @@ const PersonalizarClient = () => {
 				isOpen={isImageCropModalOpen}
 				onClose={() => setIsImageCropModalOpen(false)}
 				onImageRemove={handleProfileImageRemove}
-				onImageSave={handleProfileImageSave}
+				onImageSave={async (file) => {
+					if (!session?.user?.id) {
+						return;
+					}
+					setIsImageCropModalOpen(false);
+					const url = await uploadImage(file, session.user.id);
+					if (!url) {
+						return;
+					}
+					updateOriginalImageUrl(url);
+					resetImageState();
+					if (session?.user) {
+						await update({ user: { ...session.user, image: url } });
+					}
+					window.dispatchEvent(
+						new CustomEvent("profileImageUpdated", {
+							detail: { imageUrl: url },
+						})
+					);
+					window.dispatchEvent(new CustomEvent("reloadIframePreview"));
+				}}
 			/>
 		</div>
 	);
