@@ -1,30 +1,63 @@
+import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getAuthRateLimiter } from "@/lib/rate-limiter";
 
 export async function GET(req: Request) {
 	try {
+		const headersList = await headers();
+		const ip =
+			headersList.get("cf-connecting-ip") ||
+			headersList.get("x-real-ip") ||
+			headersList.get("x-forwarded-for") ||
+			"127.0.0.1";
+		const { success } = await getAuthRateLimiter().limit(ip);
+		if (!success) {
+			return NextResponse.json(
+				{ error: "Muitas requisições. Tente novamente mais tarde." },
+				{ status: 429 }
+			);
+		}
+
 		const { searchParams } = new URL(req.url);
 		const email = searchParams.get("email");
 
-		if (!email || typeof email !== "string") {
-			return NextResponse.json({ error: "E-mail inválido" }, { status: 400 });
+		const cookieStore = await cookies();
+		const regCsrfCookie = cookieStore.get("reg_csrf");
+		if (!(regCsrfCookie && regCsrfCookie.value)) {
+			return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
 		}
 
-		const user = await prisma.user.findUnique({ 
-			where: { email },
+		const user = await prisma.user.findFirst({
+			where: { registrationCsrfState: regCsrfCookie.value },
 			select: {
 				registrationOtpExpiry: true,
 				registrationOtpBlockedUntil: true,
 				registrationOtpAttempts: true,
-				emailVerified: true
-			}
+				emailVerified: true,
+				registrationCsrfState: true,
+			},
 		});
 
 		if (!user) {
 			return NextResponse.json(
-				{ error: "Usuário não encontrado." },
-				{ status: 404 }
+				{
+					remainingAttempts: 5,
+					isBlocked: false,
+					blockTimeRemaining: 0,
+					otpTimeRemaining: 0,
+					isOtpExpired: true,
+					canRequestNewOtp: true,
+				},
+				{ status: 200 }
 			);
+		}
+
+		if (
+			!user.registrationCsrfState ||
+			user.registrationCsrfState !== regCsrfCookie.value
+		) {
+			return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
 		}
 
 		if (user.emailVerified) {
@@ -36,13 +69,17 @@ export async function GET(req: Request) {
 
 		const now = new Date();
 		const response: any = {
-			remainingAttempts: Math.max(0, 5 - (user.registrationOtpAttempts ?? 0))
+			remainingAttempts: Math.max(0, 5 - (user.registrationOtpAttempts ?? 0)),
 		};
 
 		// Verificar se está bloqueado
-		if (user.registrationOtpBlockedUntil && user.registrationOtpBlockedUntil > now) {
+		if (
+			user.registrationOtpBlockedUntil &&
+			user.registrationOtpBlockedUntil > now
+		) {
 			const remainingBlockTime = Math.ceil(
-				(user.registrationOtpBlockedUntil.getTime() - now.getTime()) / (1000 * 60)
+				(user.registrationOtpBlockedUntil.getTime() - now.getTime()) /
+					(1000 * 60)
 			);
 			response.isBlocked = true;
 			response.blockTimeRemaining = remainingBlockTime;
@@ -50,7 +87,7 @@ export async function GET(req: Request) {
 		} else {
 			response.isBlocked = false;
 			response.blockTimeRemaining = 0;
-			
+
 			// Verificar se o OTP expirou
 			if (user.registrationOtpExpiry && user.registrationOtpExpiry > now) {
 				const remainingOtpTime = Math.ceil(

@@ -73,16 +73,25 @@ function validateToken(token: unknown): NextResponse | null {
 }
 
 async function applyRateLimit(): Promise<NextResponse | null> {
-	const headersList = await headers();
-	const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
-	const { success } = await getAuthRateLimiter().limit(ip);
-	if (!success) {
-		return NextResponse.json(
-			{ error: "Muitas requisições. Tente novamente mais tarde." },
-			{ status: 429 }
-		);
-	}
-	return null;
+    const headersList = await headers();
+    const ip =
+        headersList.get("cf-connecting-ip") ||
+        headersList.get("x-real-ip") ||
+        headersList.get("x-forwarded-for") ||
+        "127.0.0.1";
+    try {
+        const limiter = getAuthRateLimiter();
+        const { success } = await limiter.limit(ip);
+        if (!success) {
+            return NextResponse.json(
+                { error: "Muitas requisições. Tente novamente mais tarde." },
+                { status: 429 }
+            );
+        }
+    } catch {
+        return null;
+    }
+    return null;
 }
 
 async function handleRequestOtpStage(
@@ -148,16 +157,61 @@ async function handleCreateUserStage(
 	);
 }
 
-export async function POST(req: Request) {
-	try {
-		await cleanupExpiredUsernameReservations();
+async function verifyCaptcha(token: string | undefined): Promise<NextResponse | null> {
+    const secret = process.env.TURNSTILE_SECRET_KEY;
+    if (!secret) {
+        return null;
+    }
+    const headersList = await headers();
+    const ip =
+        headersList.get("cf-connecting-ip") ||
+        headersList.get("x-real-ip") ||
+        headersList.get("x-forwarded-for") ||
+        null;
+    if (!token) {
+        return NextResponse.json({ error: "Verificação humana obrigatória." }, { status: 400 });
+    }
+    try {
+        const params = new URLSearchParams({ secret, response: token });
+        if (ip) {
+            params.append("remoteip", ip);
+        }
+        const r = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params.toString(),
+        });
+        if (!r.ok) {
+            return NextResponse.json({ error: "Verificação humana indisponível no momento." }, { status: 400 });
+        }
+        const data = await r.json();
+        if (!(data && data.success)) {
+            return NextResponse.json({ error: "Verificação humana falhou." }, { status: 400 });
+        }
+        return null;
+    } catch {
+        return NextResponse.json({ error: "Não foi possível verificar a ação humana." }, { status: 400 });
+    }
+}
 
-		const { email, username, stage, otp, password, token, signature } =
-			await req.json();
+export async function POST(req: Request) {
+    try {
+        await cleanupExpiredUsernameReservations();
+
+        const { email, username, stage, otp, password, token, signature, captchaToken } =
+            await req.json();
 
 		switch (stage) {
-			case "request-otp":
-				return await handleRequestOtpStage(email, username);
+            case "request-otp":
+                {
+                    const captchaResponse = await verifyCaptcha(
+                        typeof captchaToken === "string" ? captchaToken : undefined
+                    );
+                    if (captchaResponse) {
+                        return captchaResponse;
+                    }
+                    return await handleRequestOtpStage(email, username);
+                }
 			case "verify-otp":
 				return await handleVerifyOtpStage(email, otp);
 			case "create-user":
@@ -210,15 +264,23 @@ function validateUsernameBlacklist(
 }
 
 async function checkBannedUser(
-	email: string,
-	normalizedUsername: string
+    email: string,
+    normalizedUsername: string
 ): Promise<NextResponse | null> {
-	const bannedUser = await prisma.user.findFirst({
-		where: {
-			OR: [{ email }, { username: normalizedUsername }],
-			isBanned: true,
-		},
-	});
+    let bannedUser = null as any;
+    try {
+        bannedUser = await prisma.user.findFirst({
+            where: {
+                OR: [{ email }, { username: normalizedUsername }],
+                isBanned: true,
+            },
+        });
+    } catch {
+        return NextResponse.json(
+            { error: "Serviço indisponível no momento." },
+            { status: 400 }
+        );
+    }
 
 	if (bannedUser) {
 		return NextResponse.json(
@@ -230,12 +292,20 @@ async function checkBannedUser(
 }
 
 async function checkUsernameAvailability(
-	email: string,
-	normalizedUsername: string
+    email: string,
+    normalizedUsername: string
 ): Promise<NextResponse | null> {
-	const existingUsername = await prisma.user.findUnique({
-		where: { username: normalizedUsername },
-	});
+    let existingUsername = null as any;
+    try {
+        existingUsername = await prisma.user.findUnique({
+            where: { username: normalizedUsername },
+        });
+    } catch {
+        return NextResponse.json(
+            { error: "Serviço indisponível no momento." },
+            { status: 400 }
+        );
+    }
 
 	if (
 		existingUsername &&
@@ -254,9 +324,17 @@ async function checkUsernameAvailability(
 }
 
 async function checkEmailVerification(
-	email: string
+    email: string
 ): Promise<NextResponse | null> {
-	const user = await prisma.user.findUnique({ where: { email } });
+    let user = null as any;
+    try {
+        user = await prisma.user.findUnique({ where: { email } });
+    } catch {
+        return NextResponse.json(
+            { error: "Serviço indisponível no momento." },
+            { status: 400 }
+        );
+    }
 	if (user?.emailVerified) {
 		return NextResponse.json(
 			{ error: "E-mail já verificado." },
@@ -267,9 +345,14 @@ async function checkEmailVerification(
 }
 
 async function checkUserBlocked(
-	email: string
+    email: string
 ): Promise<{ response: NextResponse | null; user: any }> {
-	const user = await prisma.user.findUnique({ where: { email } });
+    let user = null as any;
+    try {
+        user = await prisma.user.findUnique({ where: { email } });
+    } catch {
+        return { response: NextResponse.json({ error: "Serviço indisponível no momento." }, { status: 400 }), user };
+    }
 
 	if (
 		user?.registrationOtpBlockedUntil &&
@@ -306,9 +389,9 @@ function generateOtpData() {
 }
 
 async function sendOtpEmail(
-	email: string,
-	otp: string,
-	otpToken: string
+    email: string,
+    otp: string,
+    otpToken: string
 ): Promise<NextResponse> {
 	const hasApiKey =
 		typeof process.env.RESEND_API_KEY === "string" &&
@@ -319,16 +402,16 @@ async function sendOtpEmail(
 			{ status: 200 }
 		);
 	}
-	try {
-		await resend.emails.send({
-			from: "Bionk <contato@bionk.me>",
-			to: [email],
-			subject: `Seu código de verificação é ${otp}`,
-			react: OtpEmail({
-				otp,
-				expiryMinutes: OTP_EXPIRY_MINUTES,
-			}) as React.ReactElement,
-		});
+    try {
+        await resend.emails.send({
+            from: "Bionk <contato@bionk.me>",
+            to: [email],
+            subject: "Código de verificação",
+            react: OtpEmail({
+                otp,
+                expiryMinutes: OTP_EXPIRY_MINUTES,
+            }) as React.ReactElement,
+        });
 		return NextResponse.json(
 			{ message: "Código de verificação enviado.", otpToken },
 			{ status: 200 }
@@ -385,39 +468,46 @@ async function handleOtpRequest(email: string, username: string) {
 		? normalizedUsername
 		: `u_${crypto.randomBytes(12).toString("hex")}`;
 
-	await prisma.user.upsert({
-		where: { email },
-		update: {
-			username: normalizedUsername || undefined,
-			...otpData,
-			usernameReservedAt: normalizedUsername ? new Date() : null,
-			registrationOtpAttempts: user?.registrationOtpBlockedUntil
-				? user.registrationOtpAttempts
-				: 0,
-			registrationOtpBlockedUntil:
-				user?.registrationOtpBlockedUntil &&
-				user.registrationOtpBlockedUntil > new Date()
-					? user.registrationOtpBlockedUntil
-					: null,
-			registrationCsrfState: csrfState,
-			registrationCsrfExpiry: new Date(
-				Date.now() + PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES * 60 * 1000
-			),
-		},
-		create: {
-			email,
-			username: tempUsername,
-			...otpData,
-			usernameReservedAt: normalizedUsername ? new Date() : null,
-			emailVerified: null,
-			registrationOtpAttempts: 0,
-			name: "Usuário",
-			registrationCsrfState: csrfState,
-			registrationCsrfExpiry: new Date(
-				Date.now() + PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES * 60 * 1000
-			),
-		},
-	});
+    try {
+        await prisma.user.upsert({
+            where: { email },
+            update: {
+                username: normalizedUsername || undefined,
+                ...otpData,
+                usernameReservedAt: normalizedUsername ? new Date() : null,
+                registrationOtpAttempts: user?.registrationOtpBlockedUntil
+                    ? user.registrationOtpAttempts
+                    : 0,
+                registrationOtpBlockedUntil:
+                    user?.registrationOtpBlockedUntil &&
+                    user.registrationOtpBlockedUntil > new Date()
+                        ? user.registrationOtpBlockedUntil
+                        : null,
+                registrationCsrfState: csrfState,
+                registrationCsrfExpiry: new Date(
+                    Date.now() + PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES * 60 * 1000
+                ),
+            },
+            create: {
+                email,
+                username: tempUsername,
+                ...otpData,
+                usernameReservedAt: normalizedUsername ? new Date() : null,
+                emailVerified: null,
+                registrationOtpAttempts: 0,
+                name: "Usuário",
+                registrationCsrfState: csrfState,
+                registrationCsrfExpiry: new Date(
+                    Date.now() + PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES * 60 * 1000
+                ),
+            },
+        });
+    } catch {
+        return NextResponse.json(
+            { error: "Não foi possível iniciar a verificação agora." },
+            { status: 400 }
+        );
+    }
 
 	const res = await sendOtpEmail(
 		email,
@@ -567,7 +657,10 @@ async function handleOtpVerification(email: string, otp: string) {
 		h.update(data);
 		return h.digest("hex");
 	}
-	const signature = computeHmac(`${user.email}:${passwordSetupToken}`);
+    const signature = computeHmac(`${user.email}:${passwordSetupToken}`);
+    if (!signature) {
+        return NextResponse.json({ error: "Configuração de segurança ausente." }, { status: 500 });
+    }
 	const res = NextResponse.json(
 		{
 			message: "Código OTP verificado com sucesso.",
@@ -582,10 +675,10 @@ async function handleOtpVerification(email: string, otp: string) {
 
 // Função para criar o usuário usando token temporário
 async function handleUserCreation(
-	token: string,
-	username: string,
-	password: string,
-	providedSignature?: string
+  token: string,
+  username: string,
+  password: string,
+  providedSignature?: string
 ) {
 	const passwordErrors: string[] = [];
 	if (!(password && typeof password === "string")) {
@@ -686,21 +779,24 @@ async function handleUserCreation(
 		);
 	}
 
-	const expectedSignature = (function computeHmac(data: string): string | null {
-		const secret = process.env.TOKEN_HMAC_SECRET;
-		if (!secret) {
-			return null;
-		}
-		const h = crypto.createHmac("sha256", secret);
-		h.update(data);
-		return h.digest("hex");
-	})(`${user.email}:${token}`);
-	if (expectedSignature && providedSignature !== expectedSignature) {
-		return NextResponse.json(
-			{ error: "Assinatura inválida." },
-			{ status: 400 }
-		);
-	}
+    const expectedSignature = (function computeHmac(data: string): string | null {
+        const secret = process.env.TOKEN_HMAC_SECRET;
+        if (!secret) {
+            return null;
+        }
+        const h = crypto.createHmac("sha256", secret);
+        h.update(data);
+        return h.digest("hex");
+    })(`${user.email}:${token}`);
+    if (!expectedSignature) {
+        return NextResponse.json({ error: "Configuração de segurança ausente." }, { status: 500 });
+    }
+    if (providedSignature !== expectedSignature) {
+        return NextResponse.json(
+          { error: "Assinatura inválida." },
+          { status: 400 }
+        );
+    }
 
 	const cookieStore = await cookies();
 	const csrfCookie = cookieStore.get("reg_csrf");

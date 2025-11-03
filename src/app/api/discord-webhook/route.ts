@@ -3,20 +3,25 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 // Configuração do webhook do Discord bot
-const DISCORD_BOT_URL =
-	process.env.DISCORD_BOT_WEBHOOK_URL || "http://localhost:3001";
-const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "your_webhook_secret_here";
+const DISCORD_BOT_URL = process.env.DISCORD_BOT_WEBHOOK_URL;
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 
 // Função para validar o secret do webhook
 function validateWebhookSecret(request: NextRequest): boolean {
 	const authHeader = request.headers.get("authorization");
 	const providedSecret = authHeader?.replace("Bearer ", "");
+	if (!(WEBHOOK_SECRET && providedSecret)) {
+		return false;
+	}
 	return providedSecret === WEBHOOK_SECRET;
 }
 
 // Função para enviar dados para o Discord bot
 async function sendToDiscordBot(endpoint: string, data: any) {
 	try {
+		if (!(DISCORD_BOT_URL && WEBHOOK_SECRET)) {
+			return { success: false, error: "Serviço indisponível" };
+		}
 		const response = await fetch(`${DISCORD_BOT_URL}${endpoint}`, {
 			method: "POST",
 			headers: {
@@ -41,28 +46,24 @@ async function sendToDiscordBot(endpoint: string, data: any) {
 }
 
 // Processadores de webhook por tipo
-function processRegistrationWebhook(data: any, request: NextRequest) {
+function processRegistrationWebhook(data: any, _request: NextRequest) {
 	return {
 		endpoint: "/webhook/new-registration",
 		processedData: {
 			userId: data.userId || data.id,
 			username: data.username,
-			email: data.email,
+			maskedEmail:
+				typeof data.email === "string"
+					? `${data.email.split("@")[0].slice(0, 1)}***@${data.email.split("@")[1]}`
+					: undefined,
 			name: data.name || data.username,
 			source: data.source || "website",
 			provider: data.source === "google_oauth" ? "Google" : "Email",
 			plan: data.plan || "free",
-			ip:
-				request.headers.get("x-forwarded-for") ||
-				request.headers.get("x-real-ip") ||
-				"unknown",
-			userAgent: request.headers.get("user-agent") || "unknown",
 			timestamp: new Date().toISOString(),
 			metadata: {
 				registrationMethod:
 					data.metadata?.registrationMethod || data.source || "website",
-				googleId: data.metadata?.googleId,
-				...data.metadata,
 			},
 		},
 	};
@@ -190,6 +191,12 @@ const WEBHOOK_PROCESSORS: Record<string, WebhookProcessor> = {
 // Endpoint principal para receber webhooks
 export async function POST(request: NextRequest) {
 	try {
+		if (!(DISCORD_BOT_URL && WEBHOOK_SECRET)) {
+			return NextResponse.json(
+				{ error: "Serviço de webhook indisponível" },
+				{ status: 503 }
+			);
+		}
 		// Validar secret do webhook
 		if (!validateWebhookSecret(request)) {
 			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });

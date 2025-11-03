@@ -43,7 +43,7 @@ function OtpRegistrationPageContent() {
 	>(undefined);
 	const [validatingToken, setValidatingToken] = useState(true);
 	const [tokenValid, setTokenValid] = useState(false);
-	const [userEmail, setUserEmail] = useState<string>("");
+	const [userEmail, _setUserEmail] = useState<string>("");
 
 	const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 	const cooldownTimerIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -65,10 +65,9 @@ function OtpRegistrationPageContent() {
 		}
 
 		try {
-			const response = await axios.post("/api/auth/validate-otp-token", {
+			await axios.post("/api/auth/validate-otp-token", {
 				token,
 			});
-			setUserEmail(response.data.userEmail);
 			setTokenValid(true);
 		} catch (error) {
 			setTokenValid(false);
@@ -119,20 +118,11 @@ function OtpRegistrationPageContent() {
 	}, []);
 
 	const fetchOtpStatus = useCallback(async () => {
-		if (!userEmail) {
-			return;
-		}
-
 		try {
-			const response = await axios.get(
-				`/api/auth/otp-status?email=${encodeURIComponent(userEmail)}`
-			);
+			const response = await axios.get("/api/auth/otp-status");
 			const data = response.data;
-
 			setRemainingAttempts(data.remainingAttempts);
-
 			if (data.isBlocked) {
-				// Usuário está bloqueado
 				setIsOtpInputDisabled(true);
 				setOtpTimer(0);
 				setMessage({
@@ -140,7 +130,6 @@ function OtpRegistrationPageContent() {
 					text: `Muitas tentativas incorretas. Tente novamente em ${data.blockTimeRemaining} minutos.`,
 				});
 			} else if (data.isOtpExpired) {
-				// OTP expirado
 				setIsOtpInputDisabled(true);
 				setOtpTimer(0);
 				setMessage({
@@ -148,15 +137,13 @@ function OtpRegistrationPageContent() {
 					text: "Código OTP expirado. Solicite um novo código.",
 				});
 			} else {
-				// OTP ainda válido
 				setIsOtpInputDisabled(false);
 				startOtpTimer(data.otpTimeRemaining);
 			}
 		} catch {
-			// Em caso de erro, usar comportamento padrão
 			startOtpTimer(OTP_EXPIRY_MINUTES * 60);
 		}
-	}, [userEmail, startOtpTimer]);
+	}, [startOtpTimer]);
 
 	// Validar token ao carregar a página
 	useEffect(() => {
@@ -243,10 +230,7 @@ function OtpRegistrationPageContent() {
 				error.response?.data?.error || "Erro ao verificar código.";
 			const l = errorText.toLowerCase();
 			if (l.includes("csrf inválido") || l.includes("csrf expirado")) {
-				const emailParam = userEmail
-					? `?email=${encodeURIComponent(userEmail)}`
-					: "";
-				router.replace(`/registro/erro${emailParam}`);
+				router.replace("/registro/erro");
 				return;
 			}
 			setMessage({ type: "error", text: errorText });
