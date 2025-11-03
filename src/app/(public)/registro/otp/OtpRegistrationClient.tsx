@@ -1,0 +1,380 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios, { AxiosError } from "axios";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import LoadingPage from "@/components/layout/LoadingPage";
+import { OtpForm } from "../components/OtpForm";
+
+const otpSchema = z.object({
+	otp: z
+		.string()
+		.length(6, "O código deve ter 6 dígitos")
+		.regex(/^\d{6}$/, "Código inválido, use apenas números"),
+});
+
+type OtpFormData = z.infer<typeof otpSchema>;
+
+const OTP_EXPIRY_MINUTES = 3;
+const OTP_COOLDOWN_MINUTES = 0.5;
+const MINUTES_REGEX = /(\d+) minutos/;
+const ATTEMPTS_REGEX = /(\d+) tentativas? restantes?/;
+
+export default function OtpRegistrationClient({
+	token,
+}: {
+	token?: string | null;
+}) {
+	const [loading, setLoading] = useState(false);
+	const [message, setMessage] = useState<{
+		type: "success" | "error";
+		text: string;
+	} | null>(null);
+	const [restartRequired, setRestartRequired] = useState(false);
+	const [otpTimer, setOtpTimer] = useState<number>(OTP_EXPIRY_MINUTES * 60);
+	const [otpCooldownTimer, setOtpCooldownTimer] = useState<number>(0);
+	const [isOtpInputDisabled, setIsOtpInputDisabled] = useState<boolean>(false);
+	const [remainingAttempts, setRemainingAttempts] = useState<
+		number | undefined
+	>(undefined);
+	const [validatingToken, setValidatingToken] = useState(true);
+	const [tokenValid, setTokenValid] = useState(false);
+	const [userEmail, _setUserEmail] = useState<string>("");
+
+	const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+	const cooldownTimerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+	const { data: _session, status } = useSession();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (status === "authenticated") {
+			router.replace("/studio");
+		}
+	}, [status, router]);
+
+	const validateToken = useCallback(async () => {
+		if (!token) {
+			return;
+		}
+
+		try {
+			await axios.post("/api/auth/validate-otp-token", { token });
+			setTokenValid(true);
+		} catch (error) {
+			setTokenValid(false);
+			if (error instanceof AxiosError) {
+				const text =
+					error.response?.data?.error || "Token inválido ou expirado.";
+				const l = text.toLowerCase();
+				if (l.includes("csrf inválido") || l.includes("csrf expirado")) {
+					const emailParam = userEmail
+						? `?email=${encodeURIComponent(userEmail)}`
+						: "";
+					router.replace(`/registro/erro${emailParam}`);
+					return;
+				}
+				setMessage({ type: "error", text });
+			} else {
+				setMessage({ type: "error", text: "Token inválido ou expirado." });
+			}
+			setIsOtpInputDisabled(true);
+		} finally {
+			setValidatingToken(false);
+		}
+	}, [token, router, userEmail]);
+
+	const startOtpTimer = useCallback((initialTime?: number) => {
+		const timeInSeconds = initialTime ?? OTP_EXPIRY_MINUTES * 60;
+		setOtpTimer(timeInSeconds);
+		setIsOtpInputDisabled(false);
+
+		if (timerIntervalRef.current) {
+			clearInterval(timerIntervalRef.current);
+		}
+
+		timerIntervalRef.current = setInterval(() => {
+			setOtpTimer((prev) => {
+				if (prev <= 1) {
+					setIsOtpInputDisabled(true);
+					if (timerIntervalRef.current) {
+						clearInterval(timerIntervalRef.current);
+						timerIntervalRef.current = null;
+					}
+					return 0;
+				}
+				return prev - 1;
+			});
+		}, 1000);
+	}, []);
+
+	const fetchOtpStatus = useCallback(async () => {
+		try {
+			const response = await axios.get("/api/auth/otp-status");
+			const data = response.data;
+			setRemainingAttempts(data.remainingAttempts);
+			if (data.isBlocked) {
+				setIsOtpInputDisabled(true);
+				setOtpTimer(0);
+				setMessage({
+					type: "error",
+					text: `Muitas tentativas incorretas. Tente novamente em ${data.blockTimeRemaining} minutos.`,
+				});
+			} else if (data.isOtpExpired) {
+				setIsOtpInputDisabled(true);
+				setOtpTimer(0);
+				setMessage({
+					type: "error",
+					text: "Código OTP expirado. Solicite um novo código.",
+				});
+			} else {
+				setIsOtpInputDisabled(false);
+				startOtpTimer(data.otpTimeRemaining);
+			}
+		} catch {
+			startOtpTimer(OTP_EXPIRY_MINUTES * 60);
+		}
+	}, [startOtpTimer]);
+
+	useEffect(() => {
+		if (!token) {
+			router.replace("/registro");
+			return;
+		}
+
+		validateToken();
+
+		return () => {
+			if (timerIntervalRef.current) {
+				clearInterval(timerIntervalRef.current);
+			}
+			if (cooldownTimerIntervalRef.current) {
+				clearInterval(cooldownTimerIntervalRef.current);
+			}
+		};
+	}, [token, router, validateToken]);
+
+	useEffect(() => {
+		if (tokenValid && userEmail) {
+			fetchOtpStatus();
+		}
+	}, [tokenValid, userEmail, fetchOtpStatus]);
+
+	const otpForm = useForm<OtpFormData>({ resolver: zodResolver(otpSchema) });
+
+	const startOtpCooldownTimer = (
+		minutes: number,
+		options?: { disableInput?: boolean }
+	) => {
+		if (cooldownTimerIntervalRef.current) {
+			clearInterval(cooldownTimerIntervalRef.current);
+		}
+		setOtpCooldownTimer(minutes * 60);
+		if (options?.disableInput) {
+			setIsOtpInputDisabled(true);
+		}
+		cooldownTimerIntervalRef.current = setInterval(() => {
+			setOtpCooldownTimer((prev) => {
+				if (prev <= 1) {
+					if (cooldownTimerIntervalRef.current) {
+						clearInterval(cooldownTimerIntervalRef.current);
+						cooldownTimerIntervalRef.current = null;
+					}
+					if (options?.disableInput) {
+						setIsOtpInputDisabled(false);
+					}
+					return 0;
+				}
+				return prev - 1;
+			});
+		}, 1000);
+	};
+
+	const extractRemainingAttempts = (errorText: string) => {
+		const attemptsMatch = errorText.match(ATTEMPTS_REGEX);
+		if (attemptsMatch) {
+			setRemainingAttempts(Number.parseInt(attemptsMatch[1], 10));
+		}
+	};
+
+	const handleRateLimitError = (errorText: string) => {
+		const match = errorText.match(MINUTES_REGEX);
+		const cooldownMinutes = match
+			? Number.parseInt(match[1], 10)
+			: OTP_COOLDOWN_MINUTES;
+		startOtpCooldownTimer(cooldownMinutes, { disableInput: true });
+		setRemainingAttempts(0);
+	};
+
+	const handleOtpError = (error: unknown) => {
+		if (error instanceof AxiosError) {
+			const errorText =
+				error.response?.data?.error || "Erro ao verificar código.";
+			const l = errorText.toLowerCase();
+			if (l.includes("csrf inválido") || l.includes("csrf expirado")) {
+				router.replace("/registro/erro");
+				return;
+			}
+			setMessage({ type: "error", text: errorText });
+			extractRemainingAttempts(errorText);
+			if (error.response?.status === 429) {
+				handleRateLimitError(errorText);
+			}
+		} else {
+			setMessage({ type: "error", text: "Erro ao verificar código." });
+		}
+	};
+
+	const handleOtpSubmit: SubmitHandler<OtpFormData> = async (data) => {
+		setLoading(true);
+		setMessage(null);
+		try {
+			const response = await axios.post("/api/auth/register", {
+				email: userEmail,
+				otp: data.otp,
+				stage: "verify-otp",
+			});
+			const { passwordSetupToken, signature, nextPath } = response.data;
+			const next =
+				typeof nextPath === "string" && nextPath
+					? nextPath
+					: "/registro/completar";
+			const sig = typeof signature === "string" ? signature : "";
+			router.push(`${next}?token=${passwordSetupToken}&sig=${sig}`);
+		} catch (error) {
+			handleOtpError(error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleResendOtp = async () => {
+		if (userEmail) {
+			setLoading(true);
+			setMessage(null);
+			otpForm.reset();
+			try {
+				await axios.post("/api/auth/register", {
+					email: userEmail,
+					stage: "request-otp",
+				});
+				startOtpTimer(OTP_EXPIRY_MINUTES * 60);
+				startOtpCooldownTimer(OTP_COOLDOWN_MINUTES, { disableInput: false });
+				setRemainingAttempts(undefined);
+				setMessage({
+					type: "success",
+					text: "Novo código enviado com sucesso!",
+				});
+			} catch (error) {
+				if (error instanceof AxiosError) {
+					const text =
+						error.response?.data?.error || "Erro ao reenviar código.";
+					setMessage({ type: "error", text });
+					if (error.response?.data?.code === "restart-required") {
+						setRestartRequired(true);
+					}
+				} else {
+					setMessage({ type: "error", text: "Erro ao reenviar código." });
+				}
+			} finally {
+				setLoading(false);
+			}
+		}
+	};
+
+	const handleBackToEmail = () => {
+		router.push(`/registro?email=${encodeURIComponent(userEmail || "")}`);
+	};
+
+	if (status === "loading" || validatingToken) {
+		return <LoadingPage />;
+	}
+
+	return (
+		<div className="flex min-h-screen">
+			<div className="flex flex-1 items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
+				<div className="w-full max-w-lg">
+					<div className="space-y-8">
+						<div className="space-y-4 text-center">
+							<h1 className="font-bold text-4xl text-black">
+								Verifique seu E-mail
+							</h1>
+							<p className="text-base text-muted-foreground">
+								Enviamos um código de 6 dígitos para {userEmail}. Verifique sua
+								caixa de entrada (e spam).
+							</p>
+							{message && (
+								<p
+									className={`text-sm ${message.type === "error" ? "text-red-600" : "text-green-600"}`}
+								>
+									{message.text}
+								</p>
+							)}
+							{restartRequired && (
+								<div className="mt-4">
+									<Link
+										className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+										href="/registro"
+									>
+										Iniciar novo registro
+									</Link>
+								</div>
+							)}
+						</div>
+
+						<div className="space-y-6">
+							<OtpForm
+								form={otpForm}
+								isOtpInputDisabled={isOtpInputDisabled || !tokenValid}
+								loading={loading}
+								mode={tokenValid ? "verify" : "restart"}
+								onBackToEmail={handleBackToEmail}
+								onResendOtp={handleResendOtp}
+								onStartNewRegistration={() => router.push("/registro")}
+								onSubmit={handleOtpSubmit}
+								otpCooldownTimer={otpCooldownTimer}
+								otpTimer={otpTimer}
+								remainingAttempts={remainingAttempts}
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div className="relative hidden flex-1 bg-black lg:flex">
+				<div className="absolute inset-0 bg-black/20" />
+				<Image
+					alt="Cosmic Background"
+					className="object-cover"
+					fill
+					priority
+					src="/abstract-wave-image.png"
+				/>
+				<div className="absolute inset-0 flex items-center justify-center">
+					<div className="flex flex-col items-center justify-center gap-4 p-8 text-center text-white">
+						<Image
+							alt="Bionk Logo"
+							className="object-contain"
+							height={200}
+							priority
+							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755640991/bionk-logo-white_ld4dzs.svg"
+							width={200}
+						/>
+						<p className="max-w-md text-lg opacity-90">
+							Sua plataforma completa para gerenciar e personalizar seus links,
+							criar páginas exclusivas, destacar o essencial e aumentar sua
+							presença digital de forma profissional.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
