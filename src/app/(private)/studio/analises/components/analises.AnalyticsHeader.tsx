@@ -2,6 +2,7 @@
 
 import {
 	CalendarRange,
+	ChevronDown,
 	FileSpreadsheet,
 	FileText,
 	LayoutDashboard as LayoutStudio,
@@ -28,6 +29,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import "react-day-picker/dist/style.css";
+import { BaseButton } from "@/components/buttons/BaseButton";
 import { ProButton } from "@/components/buttons/ProButton";
 import { cn } from "@/lib/utils";
 
@@ -126,18 +128,15 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 		return (
 			<header className="mb-3 flex flex-col items-start justify-between gap-3 sm:mb-4 sm:flex-row sm:items-center sm:gap-4">
 				<h2 className="font-bold text-xl sm:text-2xl">Análises</h2>
-				<div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+				<div className="flex w-full flex-row justify-between gap-2 sm:w-auto">
 					{/* Seletor de intervalo */}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button
-								className="select-none text-xs sm:text-sm"
-								size="sm"
-								variant="outline"
-							>
+							<BaseButton className="select-none rounded-xl bg-black text-white text-xs hover:bg-black/80 sm:text-sm dark:bg-white dark:text-black">
 								<CalendarRange className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
 								{RANGE_LABEL[range]}
-							</Button>
+								<ChevronDown className="mr-1 ml-2 h-4 w-4" />
+							</BaseButton>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-48 sm:w-56">
 							{/* 7d */}
@@ -280,10 +279,10 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 										{!enabled && (
 											<ProButton
 												href="/planos"
-                                                label="Pro"
+												label="Pro"
 												showOverlayTooltip={false}
 												size="xs"
-                                                tooltip={`Disponível no plano ${labelFromPlan(PLAN_BY_RANK[PERIOD_REQUIRED_RANK.custom])}`}
+												tooltip={`Disponível no plano ${labelFromPlan(PLAN_BY_RANK[PERIOD_REQUIRED_RANK.custom])}`}
 											/>
 										)}
 									</DropdownMenuItem>
@@ -385,14 +384,10 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 					{/* Exportações */}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button
-								className="select-none text-xs sm:text-sm"
-								size="sm"
-								variant="outline"
-							>
+							<BaseButton className="select-none rounded-xl bg-black text-white text-xs hover:bg-black/80 sm:text-sm dark:bg-white dark:text-black">
 								<LayoutStudio className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
 								Exportar
-							</Button>
+							</BaseButton>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-36 sm:w-50">
 							<DropdownMenuItem

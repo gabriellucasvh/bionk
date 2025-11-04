@@ -14,6 +14,13 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,6 +58,22 @@ const PerfilClient = () => {
 	const [isImageCropModalOpen, setIsImageCropModalOpen] = useState(false);
 	const [validationError, setValidationError] = useState<string>("");
 	const [bioValidationError, setBioValidationError] = useState<string>("");
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+	const [stats, setStats] = useState<{
+		views: number;
+		clicks: number;
+		rate: string;
+	} | null>(null);
+	const [notifications, setNotifications] = useState<
+		Array<{
+			id: string;
+			type: "info" | "warning" | "error";
+			title: string;
+			message: string;
+			createdAt: string;
+		}>
+	>([]);
 
 	const validateBio = useCallback((bio: string): boolean => {
 		if (bio.length > 150) {
@@ -91,6 +114,37 @@ const PerfilClient = () => {
 
 		fetchProfile();
 	}, [session?.user?.id]);
+
+	useEffect(() => {
+		let active = true;
+		const run = async () => {
+			try {
+				const res = await fetch("/api/analytics?range=30d", {
+					cache: "no-store",
+				});
+				const json = await res.json();
+				if (active && json && !json.error) {
+					setStats({
+						views: json.totalProfileViews || 0,
+						clicks: json.totalClicks || 0,
+						rate: String(json.performanceRate || 0),
+					});
+				}
+			} catch {}
+
+			try {
+				const res = await fetch("/api/notifications", { cache: "no-store" });
+				const json = await res.json();
+				if (active && Array.isArray(json)) {
+					setNotifications(json);
+				}
+			} catch {}
+		};
+		run();
+		return () => {
+			active = false;
+		};
+	}, []);
 
 	const updateProfileText = useCallback(async (): Promise<User | null> => {
 		const textChanged =
@@ -276,6 +330,8 @@ const PerfilClient = () => {
 		syncLocalProfile(updatedUserData, newImageUrl);
 
 		setLoading(false);
+
+		setIsEditModalOpen(false);
 	};
 
 	const handleCancelChanges = () => {
@@ -303,159 +359,267 @@ const PerfilClient = () => {
 	};
 
 	return (
-		<section className="mx-auto min-h-dvh w-full space-y-4 p-4 pb-24 xl:w-1/2">
-			<header className="flex items-center justify-between">
+		<section className="mx-auto min-h-dvh w-full p-4 pb-24">
+			<header className="mb-4 flex items-center justify-between">
 				<h2 className="font-bold text-2xl dark:text-white">Perfil</h2>
 				<VerPerfilMobile />
 			</header>
 
-			<Card className="border-none shadow-none dark:bg-zinc-800">
-				<CardHeader>
-					<CardTitle className="dark:text-white">
-						Informações do perfil
-					</CardTitle>
-					<CardDescription className="dark:text-gray-400">
-						Atualize as informações do seu perfil e personalize sua página.
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="space-y-6">
-					<article className="flex flex-col gap-4 sm:flex-row sm:items-center">
-						<div className="relative flex items-center justify-center">
-							<div
-								className={`h-26 w-26 overflow-hidden rounded-full bg-muted shadow-black/20 shadow-md ${
-									isUploadingImage ? "opacity-50" : ""
-								}`}
-							>
-								<Image
-									alt="Foto de perfil"
-									className="h-full w-full object-cover"
-									height={96}
-									key={profilePreview}
-									src={profilePreview}
-									width={96}
-								/>
-								{isUploadingImage && (
-									<div className="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50">
-										<Loader2 className="h-6 w-6 animate-spin text-white" />
+			<div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+				<div className="space-y-4 lg:col-span-2">
+					<Card className="shadow-none dark:bg-zinc-900">
+						<CardHeader>
+							<CardTitle className="dark:text-white">
+								Informações do perfil
+							</CardTitle>
+							<CardDescription className="dark:text-gray-400">
+								Atualize as informações do seu perfil e personalize sua página.
+							</CardDescription>
+						</CardHeader>
+						<CardContent className="space-y-6">
+							<article className="flex flex-col gap-4 sm:flex-row sm:items-center">
+								<div className="relative flex items-center justify-center">
+									<div
+										className={`h-26 w-26 overflow-hidden rounded-full bg-muted shadow-black/20 shadow-md ${isUploadingImage ? "opacity-50" : ""}`}
+									>
+										<Image
+											alt="Foto de perfil"
+											className="h-full w-full object-cover"
+											height={96}
+											key={profilePreview}
+											src={profilePreview}
+											width={96}
+										/>
+										{isUploadingImage && (
+											<div className="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50">
+												<Loader2 className="h-6 w-6 animate-spin text-white" />
+											</div>
+										)}
 									</div>
-								)}
+									<BaseButton
+										className="absolute right-0 bottom-0 rounded-full"
+										disabled={isUploadingImage}
+										onClick={() => setIsImageCropModalOpen(true)}
+										size="icon"
+										variant="white"
+									>
+										<Edit className="h-4 w-4" />
+									</BaseButton>
+								</div>
+								<div className="flex-1 space-y-2 text-center md:text-start">
+									<p className="font-semibold text-xl dark:text-white">
+										{profile.name || "Seu nome"}
+									</p>
+									<p className="text-muted-foreground dark:text-gray-300">
+										<span className="text-muted-foreground/80 dark:text-gray-400">
+											bionk.me/
+										</span>
+										{profile.username || "username"}
+									</p>
+									<p className="text-sm dark:text-gray-200">
+										{profile.bio || "Bio"}
+									</p>
+								</div>
+							</article>
+							<div className="flex justify-center md:justify-end">
+								<BaseButton onClick={() => setIsEditModalOpen(true)}>
+									Editar Perfil
+								</BaseButton>
 							</div>
-							<BaseButton
-								className="absolute right-0 bottom-0 rounded-full"
-								disabled={isUploadingImage}
-								onClick={() => setIsImageCropModalOpen(true)}
-								size="icon"
-								variant="white"
-							>
-								<Edit className="h-4 w-4" />
-							</BaseButton>
-						</div>
-						<div className="flex-1 space-y-4">
-							<div className="grid gap-1">
-								<Label className="dark:text-white" htmlFor="name">
-									Nome
-								</Label>
-								<Input
-									className="text-zinc-700 dark:bg-zinc-700 dark:text-white"
-									disabled={loading || isUploadingImage}
-									id="name"
-									maxLength={44}
-									onChange={(e) => {
-										setProfile({ ...profile, name: e.target.value });
-									}}
-									placeholder="Seu nome de exibição"
-									value={profile.name}
-								/>
-							</div>
-							<div className="grid gap-1">
-								<Label className="dark:text-white" htmlFor="username">
-									Nome de usuário
-								</Label>
-								<div className="flex items-center gap-2">
-									<span className="text-muted-foreground dark:text-gray-400">
-										bionk.me/
-									</span>
+						</CardContent>
+					</Card>
+
+					<ProfileImageCropModal
+						currentImageUrl={profilePreview}
+						isOpen={isImageCropModalOpen}
+						onClose={() => setIsImageCropModalOpen(false)}
+						onImageRemove={handleProfileImageRemove}
+						onImageSave={handleProfileImageSave}
+					/>
+
+					<Dialog onOpenChange={setIsEditModalOpen} open={isEditModalOpen}>
+						<DialogContent className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 shadow-xl sm:max-w-lg">
+							<DialogHeader>
+								<DialogTitle className="text-center">Editar Perfil</DialogTitle>
+							</DialogHeader>
+							<div className="space-y-4">
+								<div className="grid gap-1">
+									<Label className="dark:text-white" htmlFor="edit-name">
+										Nome
+									</Label>
 									<Input
-										className={
-											validationError
-												? "border-red-500 dark:border-red-400"
-												: "text-zinc-700 dark:bg-zinc-700 dark:text-white"
-										}
+										className="text-zinc-700 dark:bg-zinc-700 dark:text-white"
 										disabled={loading || isUploadingImage}
-										id="username"
-										maxLength={30}
+										id="edit-name"
+										maxLength={44}
 										onChange={(e) => {
-											const sanitizedUsername = e.target.value
-												.replace(/[^a-zA-Z0-9_.]/g, "")
-												.toLowerCase();
-											setProfile({ ...profile, username: sanitizedUsername });
-											validateUsername(sanitizedUsername);
+											setProfile({ ...profile, name: e.target.value });
 										}}
-										placeholder="username"
-										value={profile.username}
+										placeholder="Seu nome de exibição"
+										value={profile.name}
 									/>
 								</div>
-								<p className="min-h-[1.25rem] text-red-500 text-sm">
-									{validationError || " "}
-								</p>
+								<div className="grid gap-1">
+									<Label className="dark:text-white" htmlFor="edit-username">
+										Nome de usuário
+									</Label>
+									<div className="flex items-center gap-2">
+										<span className="text-muted-foreground dark:text-gray-400">
+											bionk.me/
+										</span>
+										<Input
+											className={
+												validationError
+													? "border-red-500 dark:border-red-400"
+													: "text-zinc-700 dark:bg-zinc-700 dark:text-white"
+											}
+											disabled={loading || isUploadingImage}
+											id="edit-username"
+											maxLength={30}
+											onChange={(e) => {
+												const sanitizedUsername = e.target.value
+													.replace(/[^a-zA-Z0-9_.]/g, "")
+													.toLowerCase();
+												setProfile({ ...profile, username: sanitizedUsername });
+												validateUsername(sanitizedUsername);
+											}}
+											placeholder="username"
+											value={profile.username}
+										/>
+									</div>
+									<p className="min-h-[1.25rem] text-red-500 text-sm">
+										{validationError || " "}
+									</p>
+								</div>
+								<div className="grid gap-2">
+									<Label className="dark:text-white" htmlFor="edit-bio">
+										Biografia
+									</Label>
+									<Textarea
+										className={`min-h-32 text-zinc-700 dark:bg-zinc-700 dark:text-white ${bioValidationError ? "border-red-500 dark:border-red-400" : ""}`}
+										disabled={loading || isUploadingImage}
+										id="edit-bio"
+										maxLength={150}
+										onChange={(e) => {
+											setProfile({ ...profile, bio: e.target.value });
+											validateBio(e.target.value);
+										}}
+										placeholder="Fale um pouco sobre você"
+										value={profile.bio}
+									/>
+									<div className="flex items-center justify-between">
+										<p className="min-h-[1.25rem] text-red-500 text-sm">
+											{bioValidationError || " "}
+										</p>
+										<p className="text-muted-foreground text-sm">
+											{profile.bio.length}/150
+										</p>
+									</div>
+								</div>
 							</div>
-						</div>
-					</article>
-					<div className="grid gap-2">
-						<Label className="dark:text-white" htmlFor="bio">
-							Biografia
-						</Label>
-						<Textarea
-							className={`min-h-32 text-zinc-700 dark:bg-zinc-700 dark:text-white ${
-								bioValidationError ? "border-red-500 dark:border-red-400" : ""
-							}`}
-							disabled={loading || isUploadingImage}
-							id="bio"
-							maxLength={150}
-							onChange={(e) => {
-								setProfile({ ...profile, bio: e.target.value });
-								validateBio(e.target.value);
-							}}
-							placeholder="Fale um pouco sobre você"
-							value={profile.bio}
-						/>
-						<div className="flex items-center justify-between">
-							<p className="min-h-[1.25rem] text-red-500 text-sm">
-								{bioValidationError || " "}
-							</p>
-							<p className="text-muted-foreground text-sm">
-								{profile.bio.length}/150
-							</p>
-						</div>
-					</div>
-					{hasChanges && (
-						<div className="mt-4 flex justify-end gap-2">
-							<BaseButton
-								disabled={loading || isUploadingImage}
-								onClick={handleCancelChanges}
-								variant="white"
-							>
-								Cancelar
-							</BaseButton>
-							<BaseButton
-								disabled={loading || isUploadingImage || !!validationError}
-								loading={loading || isUploadingImage}
-								onClick={handleSaveProfile}
-							>
-								Salvar
-							</BaseButton>
-						</div>
-					)}
-				</CardContent>
-			</Card>
+							<DialogFooter className="pt-2">
+								<BaseButton
+									disabled={loading || isUploadingImage}
+									onClick={() => {
+										handleCancelChanges();
+										setIsEditModalOpen(false);
+									}}
+									variant="white"
+								>
+									Cancelar
+								</BaseButton>
+								<BaseButton
+									disabled={loading || isUploadingImage || !!validationError}
+									loading={loading || isUploadingImage}
+									onClick={handleSaveProfile}
+								>
+									Salvar
+								</BaseButton>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
+				</div>
 
-			<ProfileImageCropModal
-				currentImageUrl={profilePreview}
-				isOpen={isImageCropModalOpen}
-				onClose={() => setIsImageCropModalOpen(false)}
-				onImageRemove={handleProfileImageRemove}
-				onImageSave={handleProfileImageSave}
-			/>
+				<div className="space-y-4 px-2">
+					<Card className="dark:bg-zinc-900">
+						<CardHeader>
+							<CardTitle className="dark:text-white">Estatísticas</CardTitle>
+						</CardHeader>
+						<CardContent>
+							{stats ? (
+								<div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+									<div className="rounded-lg border p-4 dark:bg-zinc-900">
+										<p className="text-muted-foreground text-xs dark:text-gray-300">
+											Visualizações
+										</p>
+										<p className="font-bold text-xl dark:text-white">
+											{stats.views.toLocaleString()}
+										</p>
+									</div>
+									<div className="rounded-lg border p-4 dark:bg-zinc-900">
+										<p className="text-muted-foreground text-xs dark:text-gray-300">
+											Cliques
+										</p>
+										<p className="font-bold text-xl dark:text-white">
+											{stats.clicks.toLocaleString()}
+										</p>
+									</div>
+									<div className="rounded-lg border p-4 dark:bg-zinc-900">
+										<p className="text-muted-foreground text-xs dark:text-gray-300">
+											Taxa de performance
+										</p>
+										<p className="font-bold text-xl dark:text-white">
+											{stats.rate}%
+										</p>
+									</div>
+								</div>
+							) : (
+								<div className="grid h-24 grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+									<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
+									<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
+									<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
+								</div>
+							)}
+						</CardContent>
+					</Card>
+
+					<Card className=" dark:bg-zinc-900">
+						<CardHeader>
+							<CardTitle className="dark:text-white">Notificações</CardTitle>
+						</CardHeader>
+						<CardContent>
+							{notifications.length > 0 ? (
+								<ul className="space-y-3">
+									{notifications.map((n) => (
+										<li
+											className="rounded-lg border p-3 dark:bg-zinc-800"
+											key={n.id}
+										>
+											<div className="flex items-center justify-between">
+												<span
+													className={`font-medium text-sm ${n.type === "error" ? "text-red-500" : n.type === "warning" ? "text-yellow-500" : "text-blue-500"}`}
+												>
+													{n.title}
+												</span>
+												<span className="text-muted-foreground text-xs">
+													{new Date(n.createdAt).toLocaleDateString()}
+												</span>
+											</div>
+											<p className="mt-1 text-sm dark:text-gray-200">
+												{n.message}
+											</p>
+										</li>
+									))}
+								</ul>
+							) : (
+								<p className="text-muted-foreground text-sm">
+									Sem notificações no momento.
+								</p>
+							)}
+						</CardContent>
+					</Card>
+				</div>
+			</div>
 		</section>
 	);
 };

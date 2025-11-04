@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function links() {
 	return (
-		<main className="h-full w-full bg-white dark:bg-zinc-800">
+		<main className="h-full w-full bg-zinc-100 dark:bg-zinc-800">
 			<ConfigsClient />
 		</main>
 	);

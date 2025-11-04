@@ -347,7 +347,7 @@ export default function WorldMapAnalytics({
 
 	if (isLoading) {
 		return (
-			<Card className="dark:border-white/40 dark:bg-zinc-900">
+			<Card className=" dark:bg-zinc-900">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
 						<Earth className="h-5 w-5" />
@@ -362,7 +362,7 @@ export default function WorldMapAnalytics({
 	}
 
 	return (
-		<Card className="dark:border-white/40 dark:bg-zinc-900">
+		<Card className=" dark:bg-zinc-900">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
 					<Earth className="h-5 w-5" />

@@ -90,19 +90,14 @@ const UnifiedLinksManager = () => {
 	});
 
 	// Hook SWR para links sociais (mantido montado; busca apenas na primeira entrada da aba)
-	const {
-    data: socialLinksData,
-    mutate: mutateSocialLinks,
-  } = useSWR<{ socialLinks: SocialLinkItem[] }>(
-    userId ? "/api/social-links" : null,
-    fetcher,
-    {
-      revalidateOnMount: false,
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-      revalidateOnReconnect: false,
-    }
-  );
+	const { data: socialLinksData, mutate: mutateSocialLinks } = useSWR<{
+		socialLinks: SocialLinkItem[];
+	}>(userId ? "/api/social-links" : null, fetcher, {
+		revalidateOnMount: false,
+		revalidateOnFocus: false,
+		revalidateIfStale: false,
+		revalidateOnReconnect: false,
+	});
 
 	// Dispara a primeira busca de socials apenas quando há redes existentes e a aba é ativada
 	useEffect(() => {
@@ -287,7 +282,6 @@ const UnifiedLinksManager = () => {
 		musicsData,
 	]);
 
-
 	const showLinksLoader =
 		activeTab === "links" &&
 		(summaryData?.linksCount ?? 0) > 0 &&
@@ -353,7 +347,7 @@ const UnifiedLinksManager = () => {
 				onValueChange={(v) => setActiveTab(v as "links" | "socials")}
 				value={activeTab}
 			>
-				<Card className="border-none px-4 shadow-none dark:bg-zinc-800">
+				<Card className="rounded-t-none border-none bg-zinc-100 px-4 shadow-none dark:bg-zinc-800">
 					<CardHeader className="flex flex-col items-start justify-between px-2 sm:px-6 lg:flex-row lg:items-center">
 						<div className="mb-4 sm:mb-0">
 							<CardTitle className="text-xl sm:text-2xl">
@@ -363,7 +357,7 @@ const UnifiedLinksManager = () => {
 								Organize seus links e redes sociais em um só lugar.
 							</CardDescription>
 						</div>
-						<TabsList className="rounded-full">
+						<TabsList className="rounded-full bg-zinc-200 dark:bg-zinc-700">
 							<TabsTrigger className="rounded-full" value="links">
 								Meus Links
 							</TabsTrigger>

@@ -593,7 +593,7 @@ export default function ConfigsClient() {
 					</CardHeader>
 					<CardContent>
 						<Link
-							className="h-9 rounded-lg border bg-background px-4 py-2 shadow-xs hover:bg-accent hover:text-accent-foreground has-[>svg]:px-3 dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
+							className="h-9 rounded-lg border bg-background px-4 py-2 text-sm shadow-xs hover:bg-accent hover:text-accent-foreground has-[>svg]:px-3 dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
 							href="https://ajuda.bionk.me"
 							passHref
 							rel="noopener noreferrer"

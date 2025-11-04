@@ -131,7 +131,7 @@ const LinksStudioClient = () => {
 	}, [fetchProfile]);
 
 	return (
-		<div className="min-h-[100dvh] w-full bg-white text-black transition-colors md:min-h-screen dark:bg-zinc-800 dark:text-white">
+		<div className="min-h-[100dvh] w-full bg-zinc-100 text-black transition-colors md:min-h-screen dark:bg-zinc-800 dark:text-white">
 			{/* Conteúdo */}
 			<div
 				className={`w-full ${mobileView === "preview" ? "hidden md:block" : "block"}`}
@@ -159,7 +159,7 @@ const LinksStudioClient = () => {
 
 			{/* Preview Mobile - substitui conteúdo quando ativo */}
 			<div
-				className={`fixed inset-0 z-40 bg-gray-100 md:hidden dark:bg-zinc-900 ${
+				className={`fixed inset-0 z-40 bg-zinc-100 md:hidden dark:bg-zinc-900 ${
 					mobileView === "preview" ? "block" : "hidden"
 				}`}
 			>
@@ -175,7 +175,7 @@ const LinksStudioClient = () => {
 			</div>
 
 			{/* Preview Desktop - simulando frame de celular (xl+) */}
-			<div className="fixed top-4 right-4 z-50 hidden h-[calc(100vh-2rem)] w-[380px] rounded-[2rem] border-4 border-gray-800 bg-gray-900 shadow-2xl xl:block">
+			<div className="fixed top-4 right-4 z-50 hidden h-[calc(100vh-2rem)] w-[380px] rounded-[2rem] border-4 border-zinc-800 bg-zinc-900 shadow-2xl xl:block">
 				<div className="flex h-full flex-col">
 					<div className="flex-1 overflow-y-auto rounded-[1.5rem] bg-white dark:bg-zinc-900">
 						{isProfileLoading ? <PreviewSkeleton /> : <UserPagePreview />}

@@ -156,7 +156,7 @@ export default function TemplateSettings({
 						className={`flex h-12 w-full items-center justify-center rounded-lg border-2 px-2 py-1 text-center font-medium text-xs capitalize transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white ${
 							selectedCategory === category
 								? "border-lime-500 bg-green-950 text-white"
-								: ""
+								: " bg-white dark:bg-zinc-900 dark:text-white"
 						}`}
 						key={category}
 						onClick={() => setSelectedCategory(category)}

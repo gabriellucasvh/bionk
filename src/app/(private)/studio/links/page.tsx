@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function LinksPage() {
 	return (
-		<div className="bg-white dark:bg-zinc-800">
+		<div className="bg-zinc-100 dark:bg-zinc-800">
 			<LinksStudioClient />
 		</div>
 	);

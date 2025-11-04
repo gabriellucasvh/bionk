@@ -285,7 +285,7 @@ const PersonalizarClient = () => {
 			<div className="md:flex">
 				{/* Painel de Edição */}
 				<div
-					className={`h-screen w-full overflow-y-auto bg-white md:h-auto md:flex-1 md:overflow-visible dark:bg-zinc-800 ${
+					className={`h-screen w-full overflow-y-auto bg-zinc-100 md:h-auto md:flex-1 md:overflow-visible dark:bg-zinc-800 ${
 						mobileView === "preview" ? "hidden xl:block" : "block"
 					}`}
 					ref={designContainerRef}

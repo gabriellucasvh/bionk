@@ -350,7 +350,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 	}
 
 	return (
-		<section className="mb-14 w-full max-w-full overflow-x-hidden p-3 pb-24 sm:p-4 md:mb-0 lg:p-6 lg:pb-8 dark:text-white">
+		<section className="mb-10 w-full max-w-full overflow-x-hidden p-6 pb-24 sm:p-6 md:mb-0 md:p-16 lg:pb-8 dark:text-white">
 			<AnalyticsHeader
 				customEnd={customEnd}
 				customStart={customStart}

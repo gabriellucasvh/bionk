@@ -16,7 +16,7 @@ export default async function Analises() {
 	const userId = session?.user?.id;
 
 	return (
-		<main className="bg-white dark:bg-zinc-800">
+		<main className="bg-zinc-100 dark:bg-zinc-800">
 			{userId ? (
 				<AnalisesClient userId={userId} />
 			) : (

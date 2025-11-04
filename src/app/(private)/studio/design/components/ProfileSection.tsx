@@ -39,12 +39,12 @@ const ProfileSection = ({
 			<h2 className="mb-4 font-bold text-lg md:text-2xl lg:block dark:text-white">
 				Header
 			</h2>
-			<Card className="border-none py-0 shadow-none dark:bg-zinc-800">
+			<Card className="border-none p-5 shadow-none dark:bg-zinc-900">
 				<CardContent className="space-y-6 px-0">
 					<article className="flex flex-col gap-4 sm:flex-row sm:items-center">
 						<div className="relative flex items-center justify-center">
 							<div
-								className={`h-26 w-26 overflow-hidden rounded-full bg-muted shadow-black/20 shadow-md ${
+								className={`h-24 w-24 overflow-hidden rounded-full bg-muted shadow-black/20 shadow-md ${
 									isUploadingImage ? "opacity-50" : ""
 								}`}
 							>

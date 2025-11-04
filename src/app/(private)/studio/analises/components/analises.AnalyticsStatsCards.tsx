@@ -14,7 +14,7 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 	({ totalProfileViews, totalClicks, performanceRate }) => {
 		return (
 			<article className="grid gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3">
-				<Card className="dark:border-white/40 dark:bg-zinc-900">
+				<Card className=" dark:bg-zinc-900">
 					<CardHeader className="pb-1 sm:pb-2">
 						<CardTitle className="font-medium text-muted-foreground text-xs sm:text-sm dark:text-white">
 							Total de Visualizações do Perfil
@@ -35,7 +35,7 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 					</CardContent>
 				</Card>
 
-				<Card className="dark:border-white/40 dark:bg-zinc-900">
+				<Card className=" dark:bg-zinc-900">
 					<CardHeader className="pb-1 sm:pb-2">
 						<CardTitle className="font-medium text-muted-foreground text-xs sm:text-sm dark:text-white">
 							Total de Cliques nos Links
@@ -56,7 +56,7 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 					</CardContent>
 				</Card>
 
-				<Card className="dark:border-white/40 dark:bg-zinc-900">
+				<Card className=" dark:bg-zinc-900">
 					<CardHeader className="pb-1 sm:pb-2">
 						<CardTitle className="font-medium text-muted-foreground text-xs sm:text-sm dark:text-white">
 							Taxa de Performance

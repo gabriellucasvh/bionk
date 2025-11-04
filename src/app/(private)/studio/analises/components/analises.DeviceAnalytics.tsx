@@ -172,7 +172,7 @@ export default function DeviceAnalytics({
 
 	if (chartData.length === 0) {
 		return (
-			<Card>
+			<Card className=" dark:bg-zinc-900">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
 						<PictureInPicture2 className="h-5 w-5" />
@@ -193,7 +193,7 @@ export default function DeviceAnalytics({
 	}
 
 	return (
-		<Card className="dark:border-white/40 dark:bg-zinc-900">
+		<Card className=" dark:bg-zinc-900">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
 					<PictureInPicture2 className="h-5 w-5" />
@@ -281,10 +281,10 @@ export default function DeviceAnalytics({
 											</div>
 										</TableCell>
 										<TableCell className="hidden text-right sm:table-cell">
-												{item.views.toLocaleString()}
+											{item.views.toLocaleString()}
 										</TableCell>
 										<TableCell className="hidden text-right sm:table-cell">
-												{(item.clicks || 0).toLocaleString()}
+											{(item.clicks || 0).toLocaleString()}
 										</TableCell>
 										<TableCell className="text-right font-semibold">
 											{item.totalInteractions.toLocaleString()}

@@ -38,15 +38,15 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 	({ chartData }) => {
 		return (
 			<article>
-				<Card className="dark:border-white/40 dark:bg-zinc-900">
+				<Card className=" dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
 							<ChartPie className="h-5 w-5" />
 							Visão Geral de Desempenho
 						</CardTitle>
-                        <CardDescription className="dark:text-gray-400">
-                            Visualize cliques e visualizações diárias no período selecionado.
-                        </CardDescription>
+						<CardDescription className="dark:text-gray-400">
+							Visualize cliques e visualizações diárias no período selecionado.
+						</CardDescription>
 					</CardHeader>
 					<CardContent className="px-3">
 						<div className="h-[300px] w-full overflow-hidden sm:h-[350px] md:h-[400px]">
