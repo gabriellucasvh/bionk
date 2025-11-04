@@ -46,7 +46,7 @@ export function ProButton({
 			{/* Botão */}
 			<span className={baseClasses}>
 				<Sparkle className="h-3.5 w-3.5 text-white dark:text-black" />
-				<span>{label}</span>
+				<span className="text-white dark:text-black">{label}</span>
 			</span>
 
 			{/* Tooltip */}
