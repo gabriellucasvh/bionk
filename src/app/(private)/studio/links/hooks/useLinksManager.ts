@@ -322,12 +322,32 @@ export const useLinksManager = (
 
 		// Preservar rascunhos (isDraft) durante revalidações para evitar perda de dados
 		const draftItems = unifiedItems.filter((item) => (item as any).isDraft);
-		const combinedItems = [...draftItems, ...allItems];
-		combinedItems.sort(
-			(a, b) =>
-				getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
-		);
-		setUnifiedItems(combinedItems);
+        const combinedItems = [...draftItems, ...allItems];
+        combinedItems.sort(
+            (a, b) =>
+                getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
+        );
+        const seen = new Set<string>();
+        const deduped = combinedItems.filter((item: UnifiedItem) => {
+            const t = item.isSection
+                ? "section"
+                : item.isText
+                ? "text"
+                : item.isVideo
+                ? "video"
+                : (item as any).isImage
+                ? "image"
+                : (item as any).isMusic
+                ? "music"
+                : "link";
+            const k = `${t}-${item.id}`;
+            if (seen.has(k)) {
+                return false;
+            }
+            seen.add(k);
+            return true;
+        });
+        setUnifiedItems(deduped);
 	}, [
 		currentLinks,
 		currentSections,
@@ -1661,44 +1681,7 @@ export const useLinksManager = (
 				mutateMusics(),
 			]);
 
-			setUnifiedItems((prev) =>
-				prev.map((item) => {
-					if (
-						(item as any).isSection &&
-						Array.isArray((item as any).children)
-					) {
-						return {
-							...item,
-							children: (item as any).children.map((link: any) =>
-								link.id === id
-									? {
-											...(link as any),
-											...newLink,
-											isDraft: false,
-											isEditing: false,
-										}
-									: link
-							),
-						} as UnifiedItem;
-					}
-					if (
-						!(
-							(item as any).isSection ||
-							(item as any).isText ||
-							(item as any).isVideo
-						) &&
-						item.id === id
-					) {
-						return {
-							...(item as any),
-							...newLink,
-							isDraft: false,
-							isEditing: false,
-						} as UnifiedItem;
-					}
-					return item;
-				})
-			);
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
 			return;
 		}
 
