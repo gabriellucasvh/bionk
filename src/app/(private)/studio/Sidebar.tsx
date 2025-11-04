@@ -389,10 +389,15 @@ const Sidebar = () => {
 					<nav className="space-y-1">{renderNavLinks(toolsLinks)}</nav>
 				</div>
 
-				{/* Perfil */}
+		{/* Perfil */}
 				<div
 					className="mt-auto mb-3 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-600 "
-					onClick={() => router.push("/studio/configs")}
+					onClick={() => {
+						if (pathname === "/studio/configs") {
+							return;
+						}
+						router.push("/studio/configs");
+					}}
 					role="none"
 				>
 					{isLoading ? (
@@ -465,11 +470,16 @@ const Sidebar = () => {
 					})}
 					{/* Perfil mobile */}
 					<li className="flex items-center justify-center">
-						<Button
-							className="flex flex-col items-center gap-1 px-1 text-[10px] text-zinc-500 sm:text-xs dark:text-zinc-400"
-							onClick={() => router.push("/studio/configs")}
-							variant="ghost"
-						>
+					<Button
+						className="flex flex-col items-center gap-1 px-1 text-[10px] text-zinc-500 sm:text-xs dark:text-zinc-400"
+						onClick={() => {
+							if (pathname === "/studio/configs") {
+								return;
+							}
+							router.push("/studio/configs");
+						}}
+						variant="ghost"
+					>
 							{isLoading ? (
 								<Skeleton className="h-6 w-6 rounded-full" />
 							) : (
