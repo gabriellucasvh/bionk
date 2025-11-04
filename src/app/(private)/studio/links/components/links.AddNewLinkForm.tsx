@@ -116,75 +116,140 @@ const ClicksPanel = ({ formData, setFormData }: PanelProps) => (
 	</div>
 );
 
-const ExpirePanel = ({ formData, setFormData }: PanelProps) => (
-	<div className="grid gap-2 rounded-md border bg-background/50 p-3">
-		<Label className="mb-2">Data de Expiração</Label>
-		<Popover>
-			<PopoverTrigger asChild>
-				<Button
-					className={cn(
-						"w-full justify-start text-left font-normal",
-						!formData.expiresAt && "text-muted-foreground"
-					)}
-					disabled={false}
-					// Desabilita interação quando plano não permite
-					variant="outline"
-				>
-					<CalendarArrowDown className="mr-2 h-4 w-4" />
-					{formData.expiresAt ? (
-						format(formData.expiresAt, "PPP")
-					) : (
-						<span>Escolha uma data</span>
-					)}
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent className="z-[60] w-auto p-0">
-				<Calendar
-					disabled={{ before: new Date() }}
-					initialFocus
-					mode="single"
-					onSelect={(date) => setFormData({ ...formData, expiresAt: date })}
-					selected={formData.expiresAt}
-				/>
-			</PopoverContent>
-		</Popover>
-	</div>
-);
+const ExpirePanel = ({ formData, setFormData }: PanelProps) => {
+    const [expireOpen, setExpireOpen] = useState(false);
+    return (
+    <div className="grid gap-2 rounded-md border bg-background/50 p-3">
+        <Label className="mb-2">Data de Expiração</Label>
+        <div className="flex gap-4">
+            <Popover open={expireOpen} onOpenChange={setExpireOpen}>
+                <PopoverTrigger asChild>
+                    <Button
+                        className={cn(
+                            "w-40 justify-between h-10",
+                            !formData.expiresAt && "text-muted-foreground"
+                        )}
+                        variant="outline"
+                    >
+                        {formData.expiresAt ? (
+                            format(formData.expiresAt, "dd/MM/yyyy")
+                        ) : (
+                            <span>Escolha uma data</span>
+                        )}
+                        <CalendarArrowDown className="ml-2 h-4 w-4" />
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="z-[60] w-auto p-0" align="start">
+                    <Calendar
+                        disabled={{ before: new Date() }}
+                        initialFocus
+                        mode="single"
+                        onSelect={(date) => {
+                            setFormData({ ...formData, expiresAt: date ?? undefined });
+                            setExpireOpen(false);
+                        }}
+                        selected={formData.expiresAt}
+                        captionLayout="dropdown"
+                        buttonVariant="outline"
+                        className="rounded-md border bg-background"
+                        classNames={{
+                            month_caption: "text-muted-foreground",
+                            weekday: "text-muted-foreground",
+                            nav: "text-muted-foreground",
+                            day: "data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground",
+                        }}
+                    />
+                </PopoverContent>
+            </Popover>
+            <Input
+                id="expire-time"
+                type="time"
+                step="60"
+                className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none w-20 h-10"
+                value={formData.expiresAt ? format(formData.expiresAt, "HH:mm") : "00:00"}
+                onChange={(e) => {
+                    const parts = e.target.value.split(":");
+                    if (parts.length >= 2 && formData.expiresAt) {
+                        const d = new Date(formData.expiresAt);
+                        d.setHours(Number(parts[0]));
+                        d.setMinutes(Number(parts[1]));
+                        d.setSeconds(0);
+                        setFormData({ ...formData, expiresAt: d });
+                    }
+                }}
+            />
+        </div>
+    </div>
+    );
+};
 
 // Painel de Lançamento
-const LaunchPanel = ({ formData, setFormData }: PanelProps) => (
-	<div className="grid gap-2 rounded-md border bg-background/50 p-3">
-		<Label className="mb-2">Data de Lançamento</Label>
-		<Popover>
-			<PopoverTrigger asChild>
-				<Button
-					className={cn(
-						"w-full justify-start text-left font-normal",
-						!formData.launchesAt && "text-muted-foreground"
-					)}
-					disabled={false}
-					variant="outline"
-				>
-					<CalendarArrowUp className="mr-2 h-4 w-4" />
-					{formData.launchesAt ? (
-						format(formData.launchesAt, "PPP")
-					) : (
-						<span>Escolha uma data</span>
-					)}
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent className="z-[60] w-auto p-0">
-				<Calendar
-					disabled={{ before: new Date() }}
-					initialFocus
-					mode="single"
-					onSelect={(date) => setFormData({ ...formData, launchesAt: date })}
-					selected={formData.launchesAt}
-				/>
-			</PopoverContent>
-		</Popover>
-	</div>
-);
+const LaunchPanel = ({ formData, setFormData }: PanelProps) => {
+    const [launchOpen, setLaunchOpen] = useState(false);
+    return (
+    <div className="grid gap-2 rounded-md border bg-background/50 p-3">
+        <Label className="mb-2">Data de Lançamento</Label>
+        <div className="flex gap-4">
+            <Popover open={launchOpen} onOpenChange={setLaunchOpen}>
+                <PopoverTrigger asChild>
+                    <Button
+                        className={cn(
+                            "w-40 justify-between h-10",
+                            !formData.launchesAt && "text-muted-foreground"
+                        )}
+                        variant="outline"
+                    >
+                        {formData.launchesAt ? (
+                            format(formData.launchesAt, "dd/MM/yyyy")
+                        ) : (
+                            <span>Escolha uma data</span>
+                        )}
+                        <CalendarArrowUp className="ml-2 h-4 w-4" />
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="z-[60] w-auto p-0" align="start">
+                    <Calendar
+                        disabled={{ before: new Date() }}
+                        initialFocus
+                        mode="single"
+                        onSelect={(date) => {
+                            setFormData({ ...formData, launchesAt: date ?? undefined });
+                            setLaunchOpen(false);
+                        }}
+                        selected={formData.launchesAt}
+                        captionLayout="dropdown"
+                        buttonVariant="outline"
+                        className="rounded-md border bg-background"
+                        classNames={{
+                            month_caption: "text-muted-foreground",
+                            weekday: "text-muted-foreground",
+                            nav: "text-muted-foreground",
+                            day: "data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground",
+                        }}
+                    />
+                </PopoverContent>
+            </Popover>
+            <Input
+                id="launch-time"
+                type="time"
+                step="60"
+                className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none w-20 h-10"
+                value={formData.launchesAt ? format(formData.launchesAt, "HH:mm") : "00:00"}
+                onChange={(e) => {
+                    const parts = e.target.value.split(":");
+                    if (parts.length >= 2 && formData.launchesAt) {
+                        const d = new Date(formData.launchesAt);
+                        d.setHours(Number(parts[0]));
+                        d.setMinutes(Number(parts[1]));
+                        d.setSeconds(0);
+                        setFormData({ ...formData, launchesAt: d });
+                    }
+                }}
+            />
+        </div>
+    </div>
+    );
+};
 
 // --- Componente Principal ---
 const AddNewLinkForm = (props: AddNewLinkFormProps) => {
@@ -278,7 +343,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					</div>
 
 					{/* Proteger com Senha */}
-					<div className="rounded-2xl border p-3">
+					<div className="rounded-2xl border p-3 bg-white dark:bg-zinc-900 ">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
 								<Lock className="mt-0.5 h-5 w-5" />
@@ -307,7 +372,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					</div>
 
 					{/* Data de Expiração */}
-					<div className="rounded-2xl border p-3">
+					<div className="rounded-2xl border p-3 bg-white dark:bg-zinc-900">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
 								<CalendarArrowDown className="mt-0.5 h-5 w-5" />
@@ -358,7 +423,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					</div>
 
 					{/* Lançamento */}
-					<div className="rounded-2xl border p-3">
+					<div className="rounded-2xl border p-3 bg-white dark:bg-zinc-900">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
 								<CalendarArrowUp className="mt-0.5 h-5 w-5" />
@@ -393,7 +458,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					</div>
 
 					{/* Limite de Cliques */}
-					<div className="rounded-2xl border p-3">
+					<div className="rounded-2xl border p-3 bg-white dark:bg-zinc-900">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
 								<Tags className="mt-0.5 h-5 w-5" />
@@ -438,7 +503,7 @@ const AddNewLinkForm = (props: AddNewLinkFormProps) => {
 					</div>
 
 					{/* Adicionar Badge */}
-					<div className="rounded-2xl border p-3">
+					<div className="rounded-2xl border p-3 bg-white dark:bg-zinc-900">
 						<div className="flex items-start justify-between gap-3">
 							<div className="flex items-start gap-3">
 								<Tags className="mt-0.5 h-5 w-5" />
