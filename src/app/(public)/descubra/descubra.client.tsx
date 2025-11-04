@@ -305,7 +305,9 @@ const DescubraClient = () => {
 								className="flex flex-col items-center gap-5 sm:flex-row"
 								key={item.title}
 							>
-								<div className="rounded-full bg-lime-400 p-2">{item.icon}</div>
+								<div className="rounded-full bg-avocado-400 p-2">
+									{item.icon}
+								</div>
 								<div className="text-center sm:text-left">
 									<h3 className="font-bold text-lg">{item.title}</h3>
 									<p className="text-emerald-400">{item.desc}</p>

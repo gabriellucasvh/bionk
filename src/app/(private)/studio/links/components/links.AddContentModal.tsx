@@ -107,8 +107,6 @@ const AddContentModal = ({
 		handleTouchEnd,
 	} = useDragGesture(onClose);
 
-
-
 	useEffect(() => {
 		if (isOpen && isMobile) {
 			setIsAnimating(true);
@@ -247,7 +245,7 @@ const AddContentModal = ({
 		return (
 			<>
 				<BaseButton
-					className="w-full bg-lime-400 text-black hover:bg-lime-500 sm:w-auto"
+					className="w-full bg-avocado-400 text-black hover:bg-avocado-500 sm:w-auto"
 					onClick={onOpen}
 				>
 					<Plus className="mr-2 h-4 w-4" />
@@ -264,27 +262,27 @@ const AddContentModal = ({
 					onMouseDown={handleMouseDown}
 					onTouchStart={handleTouchStart}
 				>
-						<h2 className="mb-6 text-center font-semibold text-xl">
-							Adicionar Conteúdo
-						</h2>
-						<div className="flex flex-col space-y-4">
-							<CategorySelector
-								onCategorySelect={handleCategorySelect}
-								selectedCategory={selectedCategory}
-							/>
-							{selectedCategory === "content" && (
-								<ContentOptions onOptionSelect={handleOptionSelectWithState} />
-							)}
-							{selectedCategory === "video" && (
-								<VideoOptions onOptionSelect={handleOptionSelectWithState} />
-							)}
-							{selectedCategory === "music" && (
-								<MusicOptions onOptionSelect={handleOptionSelectWithState} />
-							)}
-							{selectedCategory === "image" && (
-								<ImageOptions onOptionSelect={handleImageOptionSelect} />
-							)}
-						</div>
+					<h2 className="mb-6 text-center font-semibold text-xl">
+						Adicionar Conteúdo
+					</h2>
+					<div className="flex flex-col space-y-4">
+						<CategorySelector
+							onCategorySelect={handleCategorySelect}
+							selectedCategory={selectedCategory}
+						/>
+						{selectedCategory === "content" && (
+							<ContentOptions onOptionSelect={handleOptionSelectWithState} />
+						)}
+						{selectedCategory === "video" && (
+							<VideoOptions onOptionSelect={handleOptionSelectWithState} />
+						)}
+						{selectedCategory === "music" && (
+							<MusicOptions onOptionSelect={handleOptionSelectWithState} />
+						)}
+						{selectedCategory === "image" && (
+							<ImageOptions onOptionSelect={handleImageOptionSelect} />
+						)}
+					</div>
 				</MobileBottomSheet>
 			</>
 		);

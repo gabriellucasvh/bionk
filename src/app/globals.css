@@ -31,6 +31,18 @@
 	--font-fira-sans: var(--font-fira-sans);
 	--font-mulish: var(--font-mulish);
 	--color-rose: #ff527a;
+	/* base avocado: #568203; */
+	--color-avocado-50: oklch(0.9892 0.0356 115.57);
+	--color-avocado-100: oklch(0.9771 0.0745 117.45);
+	--color-avocado-200: oklch(0.9579 0.1364 120.12);
+	--color-avocado-300: oklch(0.9365 0.1978 123.59);
+	--color-avocado-400: oklch(0.9063 0.2249 126.31);
+	--color-avocado-500: oklch(0.829 0.2184 128.63);
+	--color-avocado-600: oklch(0.6986 0.186964 129.6202);
+	--color-avocado-700: oklch(0.5533 0.1466 129.46);
+	--color-avocado-800: oklch(0.483 0.1239 129);
+	--color-avocado-900: oklch(0.4297 0.1053 128.43);
+	--color-avocado-950: oklch(0.289 0.0764 129.92);
 }
 
 :root {

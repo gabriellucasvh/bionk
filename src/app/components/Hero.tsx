@@ -1,15 +1,15 @@
 "use client";
 
-import { BaseButton } from "@/components/buttons/BaseButton";
-import { AnimatedList } from "@/components/magicui/animated-list";
-import { BorderBeam } from "@/components/magicui/border-beam"; // 1. Importe o novo componente
-import { MotionDiv } from "@/components/ui/motion";
-import { cn } from "@/lib/utils";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BaseButton } from "@/components/buttons/BaseButton";
+import { AnimatedList } from "@/components/magicui/animated-list";
+import { BorderBeam } from "@/components/magicui/border-beam"; // 1. Importe o novo componente
+import { MotionDiv } from "@/components/ui/motion";
+import { cn } from "@/lib/utils";
 
 // --- Lógica da Lista Animada (sem alterações) ---
 interface Item {
@@ -141,7 +141,7 @@ const Hero = () => {
 					Adicione links na{" "}
 					<span className="relative inline-block">
 						sua bio
-						<span className="-bottom-2 sm:-bottom-4 absolute left-0 h-1 w-full rounded-full bg-lime-400" />
+						<span className="-bottom-2 sm:-bottom-4 absolute left-0 h-1 w-full rounded-full bg-avocado-400" />
 					</span>
 				</h1>
 
@@ -220,7 +220,7 @@ const Hero = () => {
 										<div className="mt-2 mb-3 flex h-3 w-24 items-center text-black/60">
 											bionk.me/{" "}
 											<Link
-												className="mt-0.5 h-3 min-w-15 animate-pulse rounded-full bg-black/30 hover:bg-lime-500"
+												className="mt-0.5 h-3 min-w-15 animate-pulse rounded-full bg-black/30 hover:bg-avocado-500"
 												href={"/registro"}
 											/>
 										</div>

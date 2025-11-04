@@ -165,7 +165,7 @@ function UpgradeSubscriptionCard() {
 
 				<CardContent className="relative z-10 mb-2">
 					<Link
-						className="group relative w-full transform overflow-hidden rounded-full bg-lime-400 px-8 py-3 font-medium text-base text-green-900 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-lime-500 hover:shadow-xl"
+						className="group relative w-full transform overflow-hidden rounded-full bg-avocado-400 px-8 py-3 font-medium text-base text-green-900 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-avocado-500 hover:shadow-xl"
 						href="/planos"
 						passHref
 					>

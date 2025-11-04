@@ -168,7 +168,7 @@ const DisplayView = ({
 					<header className="flex items-center gap-3">
 						<div
 							className={cn(
-								"flex items-center justify-center rounded-md bg-lime-500 p-1.5"
+								"flex items-center justify-center rounded-md bg-avocado-500 p-1.5"
 							)}
 						>
 							<ImageIcon className="h-4 w-4 text-white" />

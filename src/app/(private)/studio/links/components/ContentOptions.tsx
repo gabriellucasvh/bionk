@@ -16,7 +16,7 @@ const ContentOptions = ({ onOptionSelect }: ContentOptionsProps) => {
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border bg-lime-400"
+						className="relative w-20 overflow-hidden rounded-2xl border bg-avocado-400"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Plus className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-black" />

@@ -1,6 +1,4 @@
 "use client";
-import { BaseButton } from "@/components/buttons/BaseButton";
-import { BorderBeam } from "@/components/magicui/border-beam";
 import {
 	CheckCircle,
 	Compass,
@@ -12,6 +10,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { BaseButton } from "@/components/buttons/BaseButton";
+import { BorderBeam } from "@/components/magicui/border-beam";
 
 export default function Features() {
 	const router = useRouter();
@@ -83,7 +83,7 @@ export default function Features() {
 							width={450}
 						/>
 						<div className="relative z-10 p-6">
-							<div className="mb-4 inline-flex rounded-full bg-lime-100 p-3 shadow">
+							<div className="mb-4 inline-flex rounded-full bg-avocado-100 p-3 shadow">
 								<Compass className="h-8 w-8 text-lime-500" />
 							</div>
 							<h3 className="mb-3 flex items-center font-semibold text-3xl text-green-800">
@@ -105,7 +105,7 @@ export default function Features() {
 
 						{/* Conteúdo visível */}
 						<div className="relative z-10">
-							<div className="mb-4 inline-flex rounded-full bg-lime-300 p-3 shadow">
+							<div className="mb-4 inline-flex rounded-full bg-avocado-300 p-3 shadow">
 								<MousePointerClick className="h-8 w-8 text-green-700" />
 							</div>
 							<h3 className="mb-3 font-semibold text-3xl text-gray-100">

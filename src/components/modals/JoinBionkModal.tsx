@@ -105,7 +105,7 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 				</div>
 				<DialogFooter className="pt-2">
 					<Link
-						className="inline-flex h-12 w-full items-center justify-center rounded-full bg-lime-400 px-4 py-2 text-center font-medium text-black transition-colors duration-300 hover:bg-lime-500"
+						className="inline-flex h-12 w-full items-center justify-center rounded-full bg-avocado-400 px-4 py-2 text-center font-medium text-black transition-colors duration-300 hover:bg-avocado-500"
 						href={"https://www.bionk.me/registro"}
 						rel="noopener noreferrer"
 						target="_blank"

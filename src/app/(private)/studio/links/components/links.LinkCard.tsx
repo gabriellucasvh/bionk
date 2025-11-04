@@ -1,5 +1,6 @@
 "use client";
 
+import { format } from "date-fns";
 import {
 	Archive as ArchiveBox,
 	CalendarArrowDown,
@@ -17,7 +18,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { format } from "date-fns";
 import ArchivingLoader from "@/components/animations/ArchivingLoader";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { ProButton } from "@/components/buttons/ProButton";
@@ -45,8 +45,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
@@ -248,7 +258,7 @@ const EditingView = ({
 					</div>
 
 					{/* Proteger com Senha */}
-					<div className="rounded-2xl border p-3 bg-white dark:bg-zinc-900">
+					<div className="rounded-2xl border bg-white p-3 dark:bg-zinc-900">
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300">
@@ -293,7 +303,7 @@ const EditingView = ({
 					</div>
 
 					{/* Limite de Cliques */}
-					<div className="rounded-2xl border p-3 bg-white dark:bg-zinc-900">
+					<div className="rounded-2xl border bg-white p-3 dark:bg-zinc-900">
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
@@ -360,7 +370,7 @@ const EditingView = ({
 					</div>
 
 					{/* Adicionar Badge */}
-					<div className="rounded-2xl border p-3 bg-white dark:bg-zinc-900">
+					<div className="rounded-2xl border bg-white p-3 dark:bg-zinc-900">
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
@@ -407,7 +417,7 @@ const EditingView = ({
 					</div>
 
 					{/* Lançamento */}
-					<div className="rounded-2xl border p-3 bg-white dark:bg-zinc-900">
+					<div className="rounded-2xl border bg-white p-3 dark:bg-zinc-900">
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
@@ -436,82 +446,100 @@ const EditingView = ({
 								}}
 							/>
 						</div>
-        {launchEnabled && canUseAdvancedDates && (
-            <div className="mt-2">
-                <div className="grid gap-2">
-                    <Label>Data de Lançamento</Label>
-                    <div className="flex gap-4">
-                        <Popover open={launchDateOpen} onOpenChange={setLaunchDateOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    className={cn(
-                                        "w-40 justify-between h-10",
-                                        !link.launchesAt && "text-muted-foreground"
-                                    )}
-                                    variant="outline"
-                                >
-                                    {link.launchesAt ? (
-                                        format(new Date(link.launchesAt), "dd/MM/yyyy")
-                                    ) : (
-                                        <span>Escolha uma data</span>
-                                    )}
-                                    <CalendarArrowUp className="ml-2 h-4 w-4" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="z-[60] w-auto p-0" align="start">
-                                <Calendar
-                                    disabled={{ before: new Date() }}
-                                    initialFocus
-                                    mode="single"
-                                    onSelect={(date) => {
-                                        if (!date) {
-                                            onLinkAdvancedChange?.(link.id, { launchesAt: null });
-                                            setLaunchDateOpen(false);
-                                            return;
-                                        }
-                                        if (date.getTime() < Date.now()) {
-                                            setLaunchDateOpen(false);
-                                            return;
-                                        }
-                                        const v = composeLocalString(date, launchHour, launchMinute);
-                                        onLinkAdvancedChange?.(link.id, { launchesAt: v });
-                                        setLaunchDateOpen(false);
-                                    }}
-                                    selected={link.launchesAt ? new Date(link.launchesAt) : undefined}
-                                    captionLayout="dropdown"
-                                    buttonVariant="outline"
-                                />
-                            </PopoverContent>
-                        </Popover>
-                        <Input
-                            id="launch-time"
-                            type="time"
-                            step="60"
-                            className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none w-20 h-10"
-                            value={`${String(launchHour).padStart(2, "0")}:${String(launchMinute).padStart(2, "0")}`}
-                            onChange={(e) => {
-                                const parts = e.target.value.split(":");
-                                if (parts.length >= 2) {
-                                    const hh = Number(parts[0]);
-                                    const mm = Number(parts[1]);
-                                    setLaunchHour(hh);
-                                    setLaunchMinute(mm);
-                                    const base = link.launchesAt ? new Date(link.launchesAt) : undefined;
-                                    if (base) {
-                                        const v = composeLocalString(base, hh, mm);
-                                        onLinkAdvancedChange?.(link.id, { launchesAt: v });
-                                    }
-                                }
-                            }}
-                        />
-                    </div>
-                </div>
-            </div>
-        )}
+						{launchEnabled && canUseAdvancedDates && (
+							<div className="mt-2">
+								<div className="grid gap-2">
+									<Label>Data de Lançamento</Label>
+									<div className="flex gap-4">
+										<Popover
+											onOpenChange={setLaunchDateOpen}
+											open={launchDateOpen}
+										>
+											<PopoverTrigger asChild>
+												<Button
+													className={cn(
+														"h-10 w-40 justify-between",
+														!link.launchesAt && "text-muted-foreground"
+													)}
+													variant="outline"
+												>
+													{link.launchesAt ? (
+														format(new Date(link.launchesAt), "dd/MM/yyyy")
+													) : (
+														<span>Escolha uma data</span>
+													)}
+													<CalendarArrowUp className="ml-2 h-4 w-4" />
+												</Button>
+											</PopoverTrigger>
+											<PopoverContent
+												align="start"
+												className="z-[60] w-auto p-0"
+											>
+												<Calendar
+													buttonVariant="outline"
+													captionLayout="dropdown"
+													disabled={{ before: new Date() }}
+													initialFocus
+													mode="single"
+													onSelect={(date) => {
+														if (!date) {
+															onLinkAdvancedChange?.(link.id, {
+																launchesAt: null,
+															});
+															setLaunchDateOpen(false);
+															return;
+														}
+														if (date.getTime() < Date.now()) {
+															setLaunchDateOpen(false);
+															return;
+														}
+														const v = composeLocalString(
+															date,
+															launchHour,
+															launchMinute
+														);
+														onLinkAdvancedChange?.(link.id, { launchesAt: v });
+														setLaunchDateOpen(false);
+													}}
+													selected={
+														link.launchesAt
+															? new Date(link.launchesAt)
+															: undefined
+													}
+												/>
+											</PopoverContent>
+										</Popover>
+										<Input
+											className="h-10 w-20 appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+											id="launch-time"
+											onChange={(e) => {
+												const parts = e.target.value.split(":");
+												if (parts.length >= 2) {
+													const hh = Number(parts[0]);
+													const mm = Number(parts[1]);
+													setLaunchHour(hh);
+													setLaunchMinute(mm);
+													const base = link.launchesAt
+														? new Date(link.launchesAt)
+														: undefined;
+													if (base) {
+														const v = composeLocalString(base, hh, mm);
+														onLinkAdvancedChange?.(link.id, { launchesAt: v });
+													}
+												}
+											}}
+											step="60"
+											type="time"
+											value={`${String(launchHour).padStart(2, "0")}:${String(launchMinute).padStart(2, "0")}`}
+										/>
+									</div>
+								</div>
+							</div>
+						)}
 					</div>
 
 					{/* Data de Expiração */}
-					<div className="rounded-2xl border p-3 bg-white dark:bg-zinc-900">
+					<div className="rounded-2xl border bg-white p-3 dark:bg-zinc-900">
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
@@ -540,78 +568,96 @@ const EditingView = ({
 								}}
 							/>
 						</div>
-                        {expiresEnabled && canUseAdvancedDates && (
-                            <>
-							<div className="mt-2 space-y-2">
-								<div className="grid gap-2">
-									<Label>Expira em</Label>
-									<div className="flex gap-4 mb-2">
-                                        <Popover open={expireDateOpen} onOpenChange={setExpireDateOpen}>
-											<PopoverTrigger asChild>
-												<Button
-													className={cn(
-														"w-40 justify-between h-10",
-														!link.expiresAt && "text-muted-foreground"
-													)}
-													variant="outline"
+						{expiresEnabled && canUseAdvancedDates && (
+							<>
+								<div className="mt-2 space-y-2">
+									<div className="grid gap-2">
+										<Label>Expira em</Label>
+										<div className="mb-2 flex gap-4">
+											<Popover
+												onOpenChange={setExpireDateOpen}
+												open={expireDateOpen}
+											>
+												<PopoverTrigger asChild>
+													<Button
+														className={cn(
+															"h-10 w-40 justify-between",
+															!link.expiresAt && "text-muted-foreground"
+														)}
+														variant="outline"
+													>
+														{link.expiresAt ? (
+															format(new Date(link.expiresAt), "dd/MM/yyyy")
+														) : (
+															<span>Escolha uma data</span>
+														)}
+														<CalendarArrowDown className="ml-2 h-4 w-4" />
+													</Button>
+												</PopoverTrigger>
+												<PopoverContent
+													align="start"
+													className="z-[60] w-auto p-0"
 												>
-													{link.expiresAt ? (
-														format(new Date(link.expiresAt), "dd/MM/yyyy")
-													) : (
-														<span>Escolha uma data</span>
-													)}
-													<CalendarArrowDown className="ml-2 h-4 w-4" />
-												</Button>
-											</PopoverTrigger>
-                                            <PopoverContent className="z-[60] w-auto p-0" align="start">
-                                                <Calendar
-                                                    disabled={{ before: new Date() }}
-                                                    initialFocus
-                                                    mode="single"
-                                                    onSelect={(date) => {
-                                                        if (!date) {
-                                                            onLinkAdvancedChange?.(link.id, { expiresAt: null });
-                                                            setExpireDateOpen(false);
-                                                            return;
-                                                        }
-                                                        if (date.getTime() < Date.now()) {
-                                                            setExpireDateOpen(false);
-                                                            return;
-                                                        }
-                                                        const v = composeLocalString(date, expireHour, expireMinute);
-                                                        onLinkAdvancedChange?.(link.id, { expiresAt: v });
-                                                        setExpireDateOpen(false);
-                                                    }}
-                                                    selected={link.expiresAt ? new Date(link.expiresAt) : undefined}
-                                                    captionLayout="dropdown"
-                                                    buttonVariant="outline"
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        <Input
-                                            id="expire-time"
-                                            type="time"
-                                            step="60"
-                                            className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none w-20 h-10"
-                                            value={`${String(expireHour).padStart(2, "0")}:${String(expireMinute).padStart(2, "0")}`}
-                                            onChange={(e) => {
-                                                const parts = e.target.value.split(":");
-                                                if (parts.length >= 2) {
-                                                    const hh = Number(parts[0]);
-                                                    const mm = Number(parts[1]);
-                                                    setExpireHour(hh);
-                                                    setExpireMinute(mm);
-                                                    const base = link.expiresAt ? new Date(link.expiresAt) : undefined;
-                                                    if (base) {
-                                                        const v = composeLocalString(base, hh, mm);
-                                                        onLinkAdvancedChange?.(link.id, { expiresAt: v });
-                                                    }
-                                                }
-                                            }}
-                                        />
+													<Calendar
+														buttonVariant="outline"
+														captionLayout="dropdown"
+														disabled={{ before: new Date() }}
+														initialFocus
+														mode="single"
+														onSelect={(date) => {
+															if (!date) {
+																onLinkAdvancedChange?.(link.id, {
+																	expiresAt: null,
+																});
+																setExpireDateOpen(false);
+																return;
+															}
+															if (date.getTime() < Date.now()) {
+																setExpireDateOpen(false);
+																return;
+															}
+															const v = composeLocalString(
+																date,
+																expireHour,
+																expireMinute
+															);
+															onLinkAdvancedChange?.(link.id, { expiresAt: v });
+															setExpireDateOpen(false);
+														}}
+														selected={
+															link.expiresAt
+																? new Date(link.expiresAt)
+																: undefined
+														}
+													/>
+												</PopoverContent>
+											</Popover>
+											<Input
+												className="h-10 w-20 appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+												id="expire-time"
+												onChange={(e) => {
+													const parts = e.target.value.split(":");
+													if (parts.length >= 2) {
+														const hh = Number(parts[0]);
+														const mm = Number(parts[1]);
+														setExpireHour(hh);
+														setExpireMinute(mm);
+														const base = link.expiresAt
+															? new Date(link.expiresAt)
+															: undefined;
+														if (base) {
+															const v = composeLocalString(base, hh, mm);
+															onLinkAdvancedChange?.(link.id, { expiresAt: v });
+														}
+													}
+												}}
+												step="60"
+												type="time"
+												value={`${String(expireHour).padStart(2, "0")}:${String(expireMinute).padStart(2, "0")}`}
+											/>
+										</div>
 									</div>
 								</div>
-							</div>
 								<div className="flex items-center justify-between gap-3 rounded-md border bg-background/50 p-3">
 									<div className="flex items-center gap-3">
 										<div className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
@@ -629,9 +675,9 @@ const EditingView = ({
 											onLinkAdvancedChange?.(link.id, { shareAllowed: v });
 										}}
 									/>
-                                </div>
-                            </>
-                        )}
+								</div>
+							</>
+						)}
 					</div>
 				</div>
 
@@ -778,7 +824,7 @@ const LinkActionButtons = ({
 						Cancelar
 					</AlertDialogCancel>
 					<AlertDialogAction
-						className="rounded-full bg-lime-400 text-black hover:bg-lime-500"
+						className="rounded-full bg-avocado-400 text-black hover:bg-avocado-500"
 						onClick={async () => {
 							if (isExpired) {
 								return;
