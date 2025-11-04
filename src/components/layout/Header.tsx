@@ -39,7 +39,7 @@ const Header: React.FC = () => {
 	};
 
 	return (
-		<nav className="fixed top-7 right-20 left-20 z-50 hidden h-auto items-center gap-y-4 rounded-xl border bg-white px-6 py-4 lg:flex">
+		<nav className="fixed top-7 right-20 left-20 z-50 hidden h-auto items-center gap-y-4 rounded-3xl border bg-white px-6 py-4 lg:flex">
 			<div className="mr-6 min-w-[100px] shrink-0">
 				<Link href="/">
 					<Image
