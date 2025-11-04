@@ -366,16 +366,8 @@ const PerfilClient = () => {
 			</header>
 
 			<div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-				<div className="space-y-4 lg:col-span-2">
+				<div className="space-y-4 lg:col-span-2 px-2">
 					<Card className="shadow-none dark:bg-zinc-900">
-						<CardHeader>
-							<CardTitle className="dark:text-white">
-								Informações do perfil
-							</CardTitle>
-							<CardDescription className="dark:text-gray-400">
-								Atualize as informações do seu perfil e personalize sua página.
-							</CardDescription>
-						</CardHeader>
 						<CardContent className="space-y-6">
 							<article className="flex flex-col gap-4 sm:flex-row sm:items-center">
 								<div className="relative flex items-center justify-center">
@@ -517,7 +509,7 @@ const PerfilClient = () => {
 									</div>
 								</div>
 							</div>
-							<DialogFooter className="pt-2">
+							<div className="pt-2 flex justify-end gap-2">
 								<BaseButton
 									disabled={loading || isUploadingImage}
 									onClick={() => {
@@ -525,6 +517,7 @@ const PerfilClient = () => {
 										setIsEditModalOpen(false);
 									}}
 									variant="white"
+									fullWidth
 								>
 									Cancelar
 								</BaseButton>
@@ -532,10 +525,11 @@ const PerfilClient = () => {
 									disabled={loading || isUploadingImage || !!validationError}
 									loading={loading || isUploadingImage}
 									onClick={handleSaveProfile}
+									fullWidth
 								>
 									Salvar
 								</BaseButton>
-							</DialogFooter>
+							</div>
 						</DialogContent>
 					</Dialog>
 				</div>
