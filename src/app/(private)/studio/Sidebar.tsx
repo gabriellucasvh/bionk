@@ -139,25 +139,25 @@ const mainLinks: SidebarLink[] = [
 		key: "profile",
 		href: "/studio/perfil",
 		label: "Perfil",
-		icon: <User className="h-4 w-4" />,
+		icon: <User className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 	{
 		key: "links",
 		href: "/studio/links",
 		label: "Links",
-		icon: <Link2 className="h-4 w-4" />,
+		icon: <Link2 className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 	{
 		key: "personalization",
 		href: "/studio/design",
 		label: "Design",
-		icon: <Paintbrush className="h-4 w-4" />,
+		icon: <Paintbrush className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 	{
 		key: "analytics",
 		href: "/studio/analises",
 		label: "Análises",
-		icon: <BarChart3 className="h-4 w-4" />,
+		icon: <BarChart3 className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 ];
 
@@ -166,13 +166,13 @@ const toolsLinks: SidebarLink[] = [
 		key: "creators",
 		href: "/studio/criadores",
 		label: "Para Criadores",
-		icon: <SwatchBook className="h-4 w-4" />,
+		icon: <SwatchBook className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 	{
 		key: "integrations",
 		href: "/studio/integracoes",
 		label: "Integrações",
-		icon: <Blocks className="h-4 w-4" />,
+		icon: <Blocks className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 ];
 
@@ -389,15 +389,10 @@ const Sidebar = () => {
 					<nav className="space-y-1">{renderNavLinks(toolsLinks)}</nav>
 				</div>
 
-		{/* Perfil */}
+				{/* Perfil */}
 				<div
 					className="mt-auto mb-3 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-600 "
-					onClick={() => {
-						if (pathname === "/studio/configs") {
-							return;
-						}
-						router.push("/studio/configs");
-					}}
+					onClick={() => router.push("/studio/configs")}
 					role="none"
 				>
 					{isLoading ? (
@@ -454,7 +449,7 @@ const Sidebar = () => {
 						return (
 							<li className="flex items-center justify-center" key={link.key}>
 								<Button
-									className={`flex flex-col items-center gap-1 px-1 text-[10px] sm:text-xs ${
+									className={`flex flex-col items-center gap-1 px-1 text-xs font-semibold  ${
 										isActive
 											? "text-green-600 dark:text-green-400"
 											: "text-zinc-500 dark:text-zinc-400"
@@ -470,32 +465,27 @@ const Sidebar = () => {
 					})}
 					{/* Perfil mobile */}
 					<li className="flex items-center justify-center">
-					<Button
-						className="flex flex-col items-center gap-1 px-1 text-[10px] text-zinc-500 sm:text-xs dark:text-zinc-400"
-						onClick={() => {
-							if (pathname === "/studio/configs") {
-								return;
-							}
-							router.push("/studio/configs");
-						}}
-						variant="ghost"
-					>
+						<Button
+							className="flex flex-col items-center gap-1 px-1 text-xs text-zinc-500 sm:text-xs dark:text-zinc-400 font-semibold"
+							onClick={() => router.push("/studio/configs")}
+							variant="ghost"
+						>
 							{isLoading ? (
 								<Skeleton className="h-6 w-6 rounded-full" />
 							) : (
 								<Image
 									alt="Avatar"
 									className="rounded-full"
-									height={24}
+									height={20}
 									src={
 										userImageUrl || session?.user?.image
 											? `${userImageUrl || session?.user?.image}?t=${imageKey}`
 											: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 									}
-									width={24}
+									width={20}
 								/>
 							)}
-							Conta
+							<span className="-mt-1">Conta</span>
 						</Button>
 					</li>
 				</ul>
