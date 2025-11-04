@@ -484,23 +484,7 @@ button {
 		@apply border-border outline-ring/50;
 	}
 	body {
-		@apply bg-background text-foreground;
-		overflow-x: hidden;
-		width: 100vw;
-	}
-	html {
-		overflow-x: hidden;
-		width: 100vw;
-	}
-}
-
-@layer utilities {
-	.scrollbar-hide {
-		-ms-overflow-style: none;
-		scrollbar-width: none;
-	}
-	.scrollbar-hide::-webkit-scrollbar {
-		display: none;
+		@apply bg-background text-foreground overflow-x-hidden;
 	}
 }
 
