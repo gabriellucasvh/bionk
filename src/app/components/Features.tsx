@@ -19,7 +19,7 @@ export default function Features() {
 		<section className="relative overflow-hidden bg-gradient-to-br from-green-50 via-white to-white py-28">
 			<div className="container relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="mb-20 text-center">
-					<h2 className="font-extrabold text-4xl text-green-900 sm:text-5xl">
+					<h2 className="title font-bold text-4xl text-green-900 sm:text-5xl">
 						Eleve sua presença online
 					</h2>
 					<p className="mx-auto mt-6 max-w-2xl text-gray-700 text-lg">

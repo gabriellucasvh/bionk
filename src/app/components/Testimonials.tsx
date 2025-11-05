@@ -5,7 +5,7 @@ export default function Testimonials() {
 		<section className="bg-emerald-950 py-24">
 			<div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 				<div className="mb-20 text-center">
-					<h2 className="font-bold text-4xl text-white sm:text-5xl">
+					<h2 className="title font-bold text-4xl text-white sm:text-5xl">
 						O que nossos usuários dizem
 					</h2>
 					<p className="mx-auto mt-6 max-w-2xl text-gray-300 text-lg leading-relaxed">

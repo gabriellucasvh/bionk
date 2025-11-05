@@ -223,7 +223,7 @@
 	}
 	.title {
 		font-family: var(--font-clashd);
-		@apply font-bold tracking-wide;
+		@apply font-bold;
 	}
 }
 

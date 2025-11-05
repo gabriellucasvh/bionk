@@ -10,7 +10,9 @@ export default function CtaSection() {
 	const [isClicked, setIsClicked] = useState<{ [key: string]: boolean }>({});
 
 	const handleClick = (path: string) => {
-		if (isClicked[path]) return;
+		if (isClicked[path]) {
+			return;
+		}
 		setIsClicked((prev) => ({ ...prev, [path]: true }));
 		router.push(path);
 	};
@@ -19,7 +21,7 @@ export default function CtaSection() {
 		<section className="bg-white py-20 text-black">
 			<div className="container mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
 				<div className="mx-auto max-w-3xl">
-					<h2 className="mb-6 font-bold text-3xl sm:text-4xl ">
+					<h2 className="title mb-6 font-bold text-3xl sm:text-4xl ">
 						Pronto para unificar sua presença online?
 					</h2>
 					<p className="mb-8 text-black text-lg">
