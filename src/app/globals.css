@@ -78,7 +78,6 @@
 	--sidebar-accent-foreground: oklch(0.205 0 0);
 	--sidebar-border: oklch(0.922 0 0);
 	--sidebar-ring: oklch(0.708 0 0);
-	scroll-behavior: smooth;
 }
 
 .dark {
@@ -219,7 +218,7 @@
 		pointer-events: none; /* Cuidado: isso desativa clicks/hovers! */
 	}
 	body {
-		@apply bg-background text-foreground font-semibold;
+		@apply bg-background text-foreground font-semibold overflow-x-hidden;
 	}
 }
 
@@ -491,14 +490,6 @@ button {
 	animation: linkHighlight 2s ease-in-out infinite;
 }
 
-@layer base {
-	* {
-		@apply border-border outline-ring/50;
-	}
-	body {
-		@apply bg-background text-foreground overflow-x-hidden;
-	}
-}
 
 /* Oculta o botão de preview (olho) quando o bottom sheet estiver ativo */
 body.bottom-sheet-open .preview-toggle {
