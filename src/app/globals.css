@@ -8,6 +8,7 @@
 
 @theme {
 	--font-sans: var(--font-satoshi);
+	--font-clashd: var(--font-clash-display);
 	--font-geist: var(--font-geist);
 	--font-inter: var(--font-inter);
 	--font-montserrat: var(--font-montserrat);
@@ -219,6 +220,10 @@
 	}
 	body {
 		@apply bg-background text-foreground font-semibold overflow-x-hidden;
+	}
+	.title {
+		font-family: var(--font-clashd);
+		@apply font-bold tracking-wide;
 	}
 }
 
@@ -489,7 +494,6 @@ button {
 .animate-shake {
 	animation: linkHighlight 2s ease-in-out infinite;
 }
-
 
 /* Oculta o botão de preview (olho) quando o bottom sheet estiver ativo */
 body.bottom-sheet-open .preview-toggle {
