@@ -66,7 +66,7 @@ const Footer = () => {
 					<div className="mt-12 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0">
 						<div className="md:grid md:grid-cols-3 md:gap-8">
 							<div>
-								<h3 className="font-semibold text-white text-xs uppercase tracking-wider">
+								<h3 className="font-black text-white text-xs uppercase tracking-wider">
 									Recursos
 								</h3>
 								<ul className="mt-4 space-y-3">
@@ -83,7 +83,7 @@ const Footer = () => {
 								</ul>
 							</div>
 							<div className="mt-10 md:mt-0">
-								<h3 className="font-semibold text-white text-xs uppercase tracking-wider">
+								<h3 className="font-black text-white text-xs uppercase tracking-wider">
 									Legal
 								</h3>
 								<ul className="mt-4 space-y-3">
@@ -100,7 +100,7 @@ const Footer = () => {
 								</ul>
 							</div>
 							<div className="mt-10 md:mt-0">
-								<h3 className="font-semibold text-white text-xs uppercase tracking-wider">
+								<h3 className="font-black text-white text-xs uppercase tracking-wider">
 									Contato
 								</h3>
 								<ul className="mt-4 space-y-3">
