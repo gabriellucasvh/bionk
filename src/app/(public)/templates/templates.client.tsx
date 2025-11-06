@@ -64,7 +64,7 @@ const TemplatesClient = () => {
 
 			<section className="w-full px-4 py-20 sm:px-10 md:px-20 ">
 				<div className="mx-auto max-w-5xl space-y-8 text-center">
-					<h2 className="font-extrabold text-4xl sm:text-5xl md:text-6xl">
+					<h2 className="title text-4xl sm:text-5xl md:text-6xl">
 						<span className="text-violet-700">Tem uma</span>{" "}
 						<span className="text-purple-600">ideia insana?</span>
 					</h2>
