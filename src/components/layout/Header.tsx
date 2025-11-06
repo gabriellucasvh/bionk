@@ -56,7 +56,7 @@ const Header: React.FC = () => {
 				{HeaderProps.map((menu) => (
 					<li key={menu.label}>
 						<Link
-							className="whitespace-nowrap rounded-md px-4 py-2 font-semibold text-black transition-colors duration-200 hover:text-purple-600"
+							className="whitespace-nowrap px-4 py-2 font-bold text-black transition-colors duration-200 hover:text-purple-600"
 							href={menu.href}
 						>
 							{menu.label}
