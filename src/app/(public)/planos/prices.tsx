@@ -127,7 +127,7 @@ const Heading = ({
 }) => (
 	<div className="my-14 flex flex-col items-center gap-6">
 		<div className="flex flex-col items-center gap-2 text-center">
-			<h2 className="mt-4 font-extrabold text-4xl text-black lg:text-5xl">
+			<h2 className="title mt-4 text-4xl text-black lg:text-5xl">
 				Escolha o melhor plano para você.
 			</h2>
 			<p className="mt-2 max-w-xl text-gray-400 text-xl">
@@ -182,7 +182,7 @@ const PricingCard = ({
 					Mais recomendado
 				</span>
 			)}
-			<h3 className={`font-bold text-2xl text-black ${plan.nameColor}`}>
+			<h3 className={`title font-bold text-2xl text-black ${plan.nameColor}`}>
 				{plan.name}
 			</h3>
 			<p className="mt-2 text-gray-400">{plan.description}</p>
@@ -216,7 +216,7 @@ const PricingCard = ({
 const CustomPlan = () => (
 	<div className="mx-auto mt-16 flex max-w-5xl flex-col items-center justify-between gap-8 rounded-2xl border border-gray-300 bg-gray-100 p-10 shadow-lg lg:flex-row">
 		<div className="flex flex-col gap-4">
-			<h3 className="font-extrabold text-3xl text-black">{customPlan.name}</h3>
+			<h3 className="title text-3xl text-black">{customPlan.name}</h3>
 			<p className="max-w-xl text-gray-400">{customPlan.description}</p>
 			<div className="mt-4 space-y-2">
 				{customPlan.features.map((feature) => (
@@ -239,7 +239,7 @@ const CustomPlan = () => (
 // --- NOVA TABELA DE COMPARAÇÃO ---
 const ComparisonTable = () => (
 	<div className="mx-auto mt-24 max-w-7xl px-4 sm:px-6 lg:px-8">
-		<h2 className="text-center font-extrabold text-4xl text-black">
+		<h2 className="title text-center text-4xl text-black">
 			Compare os planos em detalhes
 		</h2>
 		<div className="mt-10 flow-root">
