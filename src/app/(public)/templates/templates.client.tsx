@@ -1,11 +1,11 @@
 "use client";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import HeaderMobile from "@/components/layout/HeaderMobile";
 import TemplatePreviewModal from "@/components/modals/TemplatePreviewModal";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
 import { ALL_TEMPLATES } from "./templates.constants";
 import type { TemplateType } from "./templates.types";
 
@@ -26,8 +26,8 @@ const TemplatesClient = () => {
 			<HeaderMobile />
 
 			<section className="relative flex min-h-screen flex-col items-start justify-start gap-10 px-4 pt-20 sm:px-6 md:px-10 md:pt-40 lg:px-20 xl:px-40">
-				<div className="w-full space-y-6 text-left sm:w-4/5 sm:space-y-8 md:w-3/4 lg:w-1/2">
-					<h1 className="font-bold text-3xl leading-tight sm:text-4xl md:text-5xl lg:text-6xl">
+				<div className="w-full space-y-6 text-left sm:w-4/5 sm:space-y-8 md:w-3/4 ">
+					<h1 className="title text-3xl leading-tight sm:text-4xl md:text-5xl lg:text-6xl">
 						Escolha o template perfeito para você
 					</h1>
 					<p className="text-base text-gray-800 leading-relaxed sm:text-lg md:text-xl">
@@ -44,7 +44,7 @@ const TemplatesClient = () => {
 							onClick={() => handleTemplateClick(template)}
 							role="none"
 						>
-							<div className="aspect-[9/16] overflow-hidden rounded-xl border-2 border-gray-200 transition-all duration-300 group-hover:border-lime-500">
+							<div className="aspect-[9/16] overflow-hidden rounded-xl border-2 border-gray-200 transition-all duration-300 group-hover:border-purple-500">
 								<Image
 									alt={template.name}
 									className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -54,7 +54,7 @@ const TemplatesClient = () => {
 									width={300}
 								/>
 							</div>
-							<p className="mt-2 text-center font-medium text-gray-700 text-sm transition-colors duration-300 group-hover:text-lime-600">
+							<p className="mt-2 text-center font-medium text-gray-700 text-sm transition-colors duration-300 group-hover:text-purple-600">
 								{template.name}
 							</p>
 						</div>
@@ -65,8 +65,8 @@ const TemplatesClient = () => {
 			<section className="w-full px-4 py-20 sm:px-10 md:px-20 ">
 				<div className="mx-auto max-w-5xl space-y-8 text-center">
 					<h2 className="font-extrabold text-4xl sm:text-5xl md:text-6xl">
-						<span className="text-green-700">Tem uma</span>{" "}
-						<span className="text-lime-600">ideia insana?</span>
+						<span className="text-violet-700">Tem uma</span>{" "}
+						<span className="text-purple-600">ideia insana?</span>
 					</h2>
 
 					<p className="mx-auto max-w-3xl text-gray-800 text-lg sm:text-xl md:text-2xl">
@@ -74,10 +74,10 @@ const TemplatesClient = () => {
 						funcionalidade? Uma animação? Compartilhe com a gente.
 					</p>
 
-					<p className="mt-6 font-semibold text-green-800 text-xl md:text-2xl">
+					<p className="mt-6 font-semibold text-violet-800 text-xl md:text-2xl">
 						Envie sua ideia para{" "}
 						<Link
-							className="underline decoration-lime-600 decoration-wavy transition-colors hover:text-lime-700"
+							className="underline decoration-purple-600 decoration-wavy transition-colors hover:text-purple-700"
 							href="mailto:ideias@bionk.com"
 						>
 							ideias@bionk.me
