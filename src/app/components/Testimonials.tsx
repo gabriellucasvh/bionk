@@ -1,69 +1,135 @@
-import { Star } from "lucide-react";
+"use client";
+import { AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import { MotionDiv } from "@/components/ui/motion";
 
 export default function Testimonials() {
+	const items = [
+		{
+			quote:
+				"O Bionk me ajudou a apresentar meu trabalho de forma simples e profissional. Foi além do que eu imaginava.",
+			name: "Marcos Vieira",
+			role: "Criador de Conteúdo",
+			avatar: "/images/marcos-vieira.png",
+		},
+		{
+			quote:
+				"Ficou muito mais fácil centralizar campanhas e redirecionar minha audiência. Minha bio virou meu principal canal.",
+			name: "Julia Ramos",
+			role: "Empreendedora",
+			avatar: "/images/julia-ramos.png",
+		},
+		{
+			quote:
+				"Uso diariamente para compartilhar novidades e fechar parcerias. É rápido, moderno e confiável.",
+			name: "Daniel Nogueira",
+			role: "Influenciador",
+			avatar: "/images/daniel-nogueira.png",
+		},
+	];
+
+	const [index, setIndex] = useState(0);
+
+	const prev = () => {
+		setIndex((i) => {
+			if (i === 0) {
+				return items.length - 1;
+			}
+			return i - 1;
+		});
+	};
+
+	const next = () => {
+		setIndex((i) => {
+			if (i === items.length - 1) {
+				return 0;
+			}
+			return i + 1;
+		});
+	};
+
+	const t = items[index];
+
 	return (
-		<section className="bg-emerald-950 py-24">
-			<div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-				<div className="mb-20 text-center">
-					<h2 className="title font-bold text-4xl text-white sm:text-5xl">
-						O que nossos usuários dizem
-					</h2>
-					<p className="mx-auto mt-6 max-w-2xl text-gray-300 text-lg leading-relaxed">
-						Milhares de criadores já transformaram sua presença online com o{" "}
-						<span className="font-semibold text-emerald-400">Bionk</span>
-					</p>
-				</div>
+		<section className="bg-purple-950 py-24">
+			<div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+				<div className="flex flex-col gap-12 md:flex-row md:items-center">
+					<div className="md:w-5/12">
+						<h2 className="title font-bold text-4xl text-white sm:text-5xl">
+							Da nossa <span className="font-black">comunidade.</span>
+						</h2>
+						<p className="mt-6 max-w-md text-gray-300 text-lg">
+							Veja o que nossos usuários têm a dizer sobre o Bionk.
+						</p>
+						<div className="mt-8 hidden gap-4 md:flex">
+							<button
+								aria-label="Anterior"
+								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-300 hover:bg-purple-900"
+								onClick={prev}
+								type="button"
+							>
+								<ChevronLeft className="h-6 w-6 text-white" />
+							</button>
+							<button
+								aria-label="Próximo"
+								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-300 hover:bg-purple-900"
+								onClick={next}
+								type="button"
+							>
+								<ChevronRight className="h-6 w-6 text-white" />
+							</button>
+						</div>
+					</div>
 
-				<div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
-					{[
-						{
-							content:
-								"O Bionk transformou minha presença nas redes sociais. Agora posso compartilhar todos os meus links de forma elegante!",
-							author: "Ana Silva",
-							role: "Influenciadora Digital",
-							rating: 5,
-						},
-						{
-							content:
-								"Interface super intuitiva! Em poucos minutos, configurei todos os meus links e comecei a compartilhar com minha audiência.",
-							author: "Carlos Santos",
-							role: "Produtor de Conteúdo",
-							rating: 5,
-						},
-						{
-							content:
-								"A melhor ferramenta para centralizar links que já usei. Simples, bonita e eficiente. Recomendo a todos.",
-							author: "Mariana Costa",
-							role: "Empreendedora Digital",
-							rating: 4,
-						},
-					].map((testimonial) => (
-						<article
-							className="relative flex flex-col justify-between rounded-2xl border border-white/10 bg-white/5 p-8 shadow-lg backdrop-blur-sm transition-transform hover:scale-[1.02]"
-							key={testimonial.content}
-						>
-							<p className="mb-8 text-gray-200 italic leading-relaxed">
-								“{testimonial.content}”
-							</p>
-
-							<div className="flex items-center justify-between">
-								<div>
-									<h4 className="font-semibold text-lg text-white">
-										{testimonial.author}
-									</h4>
-									<p className="text-gray-400 text-sm">{testimonial.role}</p>
+					<div className="md:w-7/12">
+						<AnimatePresence mode="wait">
+							<MotionDiv
+								animate={{ opacity: 1, y: 0 }}
+								className="rounded-3xl border-2 border-violet-500 p-10 shadow-sm"
+								exit={{ opacity: 0, y: -12 }}
+								initial={{ opacity: 0, y: 12 }}
+								key={index}
+								transition={{ duration: 0.25 }}
+							>
+								<Quote
+									className="h-8 w-8 fill-current text-purple-400"
+									strokeWidth={0.1}
+								/>
+								<p className="mt-4 text-3xl text-white leading-snug">
+									{t.quote}
+								</p>
+								<div className="mt-8 flex items-center gap-4">
+									<div className="h-12 w-12 overflow-hidden rounded-full bg-gray-200">
+										<Image alt={t.name} height={48} src={t.avatar} width={48} />
+									</div>
+									<div>
+										<div className="font-semibold text-white">{t.name}</div>
+										<div className="text-gray-300 text-sm">{t.role}</div>
+									</div>
 								</div>
-								<div className="flex">
-									{Array.from({ length: testimonial.rating }).map((_, i) => (
-										<Star
-											className="h-5 w-5 fill-yellow-400 text-yellow-400"
-											key={i}
-										/>
-									))}
-								</div>
-							</div>
-						</article>
-					))}
+							</MotionDiv>
+						</AnimatePresence>
+						<div className="mt-8 flex justify-center gap-4 md:hidden">
+							<button
+								aria-label="Anterior"
+								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-300 hover:bg-purple-900"
+								onClick={prev}
+								type="button"
+							>
+								<ChevronLeft className="h-6 w-6 text-white" />
+							</button>
+							<button
+								aria-label="Próximo"
+								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-300 hover:bg-purple-900"
+								onClick={next}
+								type="button"
+							>
+								<ChevronRight className="h-6 w-6 text-white" />
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>

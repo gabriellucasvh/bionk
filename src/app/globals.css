@@ -44,6 +44,19 @@
 	--color-avocado-800: oklch(0.483 0.1239 129);
 	--color-avocado-900: oklch(0.4297 0.1053 128.43);
 	--color-avocado-950: oklch(0.289 0.0764 129.92);
+
+	/* base bunker #121216 */
+	--color-bunker-50: #f7f7f8;
+	--color-bunker-100: #ededf1;
+	--color-bunker-200: #d7d8e0;
+	--color-bunker-300: #b5b6c4;
+	--color-bunker-400: #8c8fa4;
+	--color-bunker-500: #6e7189;
+	--color-bunker-600: #585971;
+	--color-bunker-700: #48495c;
+	--color-bunker-800: #3e3e4e;
+	--color-bunker-900: #373843;
+	--color-bunker-950: #121216;
 }
 
 :root {

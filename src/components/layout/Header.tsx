@@ -1,9 +1,9 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { BaseButton } from "../buttons/BaseButton";
 
@@ -39,14 +39,14 @@ const Header: React.FC = () => {
 	};
 
 	return (
-		<nav className="fixed top-7 right-20 left-20 z-50 hidden h-auto items-center gap-y-4 rounded-3xl border bg-white px-6 py-4 lg:flex">
+		<nav className="fixed top-7 right-4 left-4 z-50 mx-auto hidden h-auto max-w-7xl items-center gap-y-4 rounded-full border bg-white px-4 py-3 lg:flex xl:inset-x-0">
 			<div className="mr-6 min-w-[100px] shrink-0">
 				<Link href="/">
 					<Image
 						alt="logo"
 						height={90}
 						priority
-						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
+						src="/images/svg-bionk+oct.svg"
 						width={100}
 					/>
 				</Link>
@@ -56,7 +56,7 @@ const Header: React.FC = () => {
 				{HeaderProps.map((menu) => (
 					<li key={menu.label}>
 						<Link
-							className="lack whitespace-nowrap rounded-md px-4 py-2 font-semibold text-gray-600 transition-colors duration-200 hover:bg-gray-200 hover:text-b"
+							className="whitespace-nowrap rounded-md px-4 py-2 font-semibold text-black transition-colors duration-200 hover:text-purple-600"
 							href={menu.href}
 						>
 							{menu.label}
@@ -68,6 +68,7 @@ const Header: React.FC = () => {
 			<div className="flex min-w-0 flex-wrap justify-end gap-2">
 				{session ? (
 					<BaseButton
+						className="h-14"
 						loading={isLoading[KEYS.studio]}
 						onClick={() => handleClick("studio", routes.studio)}
 					>
@@ -76,6 +77,7 @@ const Header: React.FC = () => {
 				) : (
 					<>
 						<BaseButton
+							className="h-14"
 							loading={isLoading[KEYS.login]}
 							onClick={() => handleClick("login", routes.login)}
 							variant="white"
@@ -84,6 +86,7 @@ const Header: React.FC = () => {
 						</BaseButton>
 
 						<BaseButton
+							className="h-14"
 							loading={isLoading[KEYS.registro]}
 							onClick={() => handleClick("registro", routes.registro)}
 						>

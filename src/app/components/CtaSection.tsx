@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowRight, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -35,18 +34,14 @@ export default function CtaSection() {
 							onClick={() => handleClick("/registro")}
 							variant="white"
 						>
-							<span className="flex items-center">
-								Criar meu Bionk <ArrowRight className="ml-2 h-5 w-5" />
-							</span>
+							<span className="flex items-center">Criar meu Bionk</span>
 						</BaseButton>
 
 						<BaseButton
 							loading={isClicked["/planos"]}
 							onClick={() => handleClick("/planos")}
 						>
-							<span className="flex items-center">
-								Ver Planos Ultra <Users className="ml-2 h-5 w-5" />
-							</span>
+							<span className="flex items-center">Ver Planos</span>
 						</BaseButton>
 					</div>
 				</div>

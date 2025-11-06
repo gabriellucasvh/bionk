@@ -42,7 +42,7 @@ const navigation = {
 
 const Footer = () => {
 	return (
-		<footer className="w-full bg-slate-900 text-slate-300">
+		<footer className="w-full bg-bunker-950 text-bunker-300">
 			<div className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10">
 				<div className="xl:grid xl:grid-cols-3 xl:gap-8">
 					{/* Logo e descrição */}
@@ -53,11 +53,11 @@ const Footer = () => {
 								className="h-14 w-auto"
 								height={28}
 								priority
-								src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641014/bionk-logo-icon_ya5kbp.svg"
+								src="/images/bionk-oct-vet.svg"
 								width={110}
 							/>
 						</Link>
-						<p className="text-slate-400 text-sm leading-6">
+						<p className="text-bunker-400 text-sm leading-6">
 							O melhor gerenciador de links para o seu negócio.
 						</p>
 					</div>
@@ -73,7 +73,7 @@ const Footer = () => {
 									{navigation.resources.map((item) => (
 										<li key={item.name}>
 											<Link
-												className="text-slate-400 text-sm transition-colors duration-300 hover:text-green-400"
+												className="text-bunker-400 text-sm decoration-2 decoration-purple-400 transition-colors duration-300 hover:text-white hover:underline"
 												href={item.href}
 											>
 												{item.name}
@@ -90,7 +90,7 @@ const Footer = () => {
 									{navigation.legal.map((item) => (
 										<li key={item.name}>
 											<Link
-												className="text-slate-400 text-sm transition-colors duration-300 hover:text-green-400"
+												className="text-bunker-400 text-sm decoration-2 decoration-purple-400 transition-colors duration-300 hover:text-white hover:underline"
 												href={item.href}
 											>
 												{item.name}
@@ -107,7 +107,7 @@ const Footer = () => {
 									{navigation.contact.map((item) => (
 										<li key={item.name}>
 											<Link
-												className="text-slate-400 text-sm transition-colors duration-300 hover:text-green-400"
+												className="text-bunker-400 text-sm decoration-2 decoration-purple-400 transition-colors duration-300 hover:text-white hover:underline"
 												href={item.href}
 											>
 												{item.name}
@@ -122,11 +122,12 @@ const Footer = () => {
 				</div>
 
 				{/* Rodapé inferior com copyright e ícones sociais */}
-				<div className="mt-16 border-slate-800 border-t pt-8 sm:flex sm:items-center sm:justify-between">
+				<div className="mt-16 border-bunker-800 border-t pt-8 sm:flex sm:items-center sm:justify-between">
 					<div className="flex space-x-6 sm:order-2">
 						{navigation.social.map((item) => (
 							<Link
-								className="text-slate-500 transition-colors duration-300 hover:text-green-400"
+								aria-disabled={true}
+								className="text-bunker-500 "
 								href={item.href}
 								key={item.name}
 							>
@@ -141,7 +142,7 @@ const Footer = () => {
 							</Link>
 						))}
 					</div>
-					<p className="mt-6 text-slate-500 text-xs leading-5 sm:order-1 sm:mt-0">
+					<p className="mt-6 text-bunker-500 text-xs leading-5 sm:order-1 sm:mt-0">
 						&copy; {new Date().getFullYear()} Bionk. Todos os direitos
 						reservados.
 					</p>
@@ -151,9 +152,7 @@ const Footer = () => {
 				<Image
 					alt="Logo Bionk"
 					height={1000}
-					src={
-						"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755640991/bionk-logo-white_ld4dzs.svg"
-					}
+					src={"/images/svg-bionk-bioroxo-branco.svg"}
 					width={1000}
 				/>
 			</div>
