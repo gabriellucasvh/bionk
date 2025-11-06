@@ -77,7 +77,7 @@ const Header: React.FC = () => {
 				) : (
 					<>
 						<BaseButton
-							className="h-14"
+							className="h-14 font-bold"
 							loading={isLoading[KEYS.login]}
 							onClick={() => handleClick("login", routes.login)}
 							variant="white"
@@ -86,7 +86,7 @@ const Header: React.FC = () => {
 						</BaseButton>
 
 						<BaseButton
-							className="h-14"
+							className="h-14 font-bold"
 							loading={isLoading[KEYS.registro]}
 							onClick={() => handleClick("registro", routes.registro)}
 						>
