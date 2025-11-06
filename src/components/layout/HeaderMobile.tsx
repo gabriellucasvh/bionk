@@ -43,14 +43,14 @@ const HeaderMobile = () => {
 	};
 
 	return (
-		<nav className="fixed inset-x-0 z-50 m-3 flex max-w-full items-center justify-between rounded-2xl border bg-white p-4 font-sans lg:hidden">
+		<nav className="fixed inset-x-0 z-50 m-3 flex max-w-full items-center justify-between rounded-full border bg-white p-4 font-sans lg:hidden">
 			<div>
 				<Link href="/">
 					<Image
 						alt="logo"
 						height={50}
 						priority
-						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
+						src="/images/svg-bionk+oct.svg"
 						width={100}
 					/>
 				</Link>
