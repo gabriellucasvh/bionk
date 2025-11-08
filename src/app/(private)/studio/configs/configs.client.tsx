@@ -1,19 +1,5 @@
 "use client";
 
-import {
-	Archive,
-	CreditCard,
-	EyeOff,
-	HelpCircle,
-	Lock,
-	LogOut,
-	Mail,
-	SunMoon,
-	Trash2,
-	User,
-	XOctagon,
-	// RefreshCcw,
-} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
@@ -64,7 +50,6 @@ function CancelSubscriptionButton() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [message, setMessage] = useState("");
 	const [error, setError] = useState("");
-	const [showCancelDialog, setShowCancelDialog] = useState(false);
 
 	const { refreshSubscriptionPlan } = useSubscription();
 
@@ -72,7 +57,6 @@ function CancelSubscriptionButton() {
 		setIsLoading(true);
 		setError("");
 		setMessage("");
-		setShowCancelDialog(false);
 		try {
 			const res = await fetch("/api/stripe/customer-portal", {
 				method: "POST",
@@ -86,7 +70,6 @@ function CancelSubscriptionButton() {
 			// Opcionalmente atualiza estado local após retorno
 			await refreshSubscriptionPlan();
 		} catch (err: any) {
-			console.error("Erro ao cancelar assinatura:", err);
 			setError(err.message);
 		} finally {
 			setIsLoading(false);
@@ -94,40 +77,14 @@ function CancelSubscriptionButton() {
 	};
 	return (
 		<div className="mt-4">
-			<AlertDialog onOpenChange={setShowCancelDialog} open={showCancelDialog}>
-				<AlertDialogTrigger asChild>
-					<Button
-						className="w-full text-red-800 hover:text-red-600 sm:w-auto dark:border-zinc-600 dark:text-red-400 dark:hover:text-red-300"
-						disabled={isLoading}
-						size="sm"
-						variant="outline"
-					>
-						<XOctagon className="mr-2 h-4 w-4" />
-						{isLoading ? "Cancelando..." : "Cancelar Assinatura"}
-					</Button>
-				</AlertDialogTrigger>
-				<AlertDialogContent className="dark:border-zinc-700 dark:bg-zinc-800">
-					<AlertDialogHeader>
-						<AlertDialogTitle className="dark:text-white">
-							Cancelar Assinatura
-						</AlertDialogTitle>
-						<AlertDialogDescription className="dark:text-zinc-400">
-							Você tem certeza? Você será levado ao Customer Portal para
-							gerenciar ou cancelar sua assinatura.
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>Manter Assinatura</AlertDialogCancel>
-						<AlertDialogAction
-							className="bg-red-600 hover:bg-red-700"
-							disabled={isLoading}
-							onClick={handleCancelConfirm}
-						>
-							{isLoading ? "Cancelando..." : "Sim, Cancelar"}
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
+			<Button
+				className="w-full rounded-full sm:w-auto dark:border-zinc-600"
+				disabled={isLoading}
+				onClick={handleCancelConfirm}
+				variant="outline"
+			>
+				{isLoading ? "Abrindo..." : "Gerenciar Assinatura"}
+			</Button>
 			{message && (
 				<p className="mt-2 text-green-600 text-sm dark:text-green-400">
 					{message}
@@ -198,7 +155,6 @@ function SubscriptionManagement({
 			<Card className="dark:border-zinc-700 dark:bg-zinc-800">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2 dark:text-white">
-						<CreditCard className="h-5 w-5" />
 						Gerenciar Assinatura
 					</CardTitle>
 					<CardDescription className="dark:text-zinc-400">
@@ -237,7 +193,6 @@ function SubscriptionManagement({
 		<Card className="dark:border-zinc-700 dark:bg-zinc-800">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2 text-destructive dark:text-red-400">
-					<XOctagon className="h-5 w-5" />
 					Assinatura Cancelada
 				</CardTitle>
 				<CardDescription className="dark:text-zinc-400">
@@ -370,7 +325,6 @@ export default function ConfigsClient() {
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
-							<SunMoon className="h-5 w-5" />
 							Tema da Interface
 						</CardTitle>
 						<CardDescription className="dark:text-zinc-400">
@@ -449,7 +403,6 @@ export default function ConfigsClient() {
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
-							<User className="h-5 w-5" />
 							Informações da Conta
 						</CardTitle>
 						<CardDescription className="dark:text-zinc-400">
@@ -472,12 +425,10 @@ export default function ConfigsClient() {
 							</div>
 							<div className="flex justify-start">
 								<Button
-									className="w-auto"
+									className="w-auto rounded-full"
 									onClick={handleLogout}
-									size="sm"
 									variant="outline"
 								>
-									<LogOut className="mr-2 h-4 w-4" />
 									Sair da conta
 								</Button>
 							</div>
@@ -489,7 +440,6 @@ export default function ConfigsClient() {
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
-							<Archive className="h-5 w-5" />
 							Links Arquivados
 						</CardTitle>
 						<CardDescription className="dark:text-zinc-400">
@@ -498,7 +448,7 @@ export default function ConfigsClient() {
 					</CardHeader>
 					<CardContent>
 						<Button
-							className="w-full sm:w-auto"
+							className="w-full rounded-full sm:w-auto"
 							onClick={() => setIsArchivedModalOpen(true)}
 							variant="outline"
 						>
@@ -512,7 +462,6 @@ export default function ConfigsClient() {
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
-							<EyeOff className="h-5 w-5" />
 							Perfil Sensível
 							<Switch
 								checked={sensitiveProfile}
@@ -540,7 +489,6 @@ export default function ConfigsClient() {
 					<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 dark:text-white">
-								<Mail className="h-5 w-5" />
 								Alterar E-mail
 							</CardTitle>
 							<CardDescription className="dark:text-zinc-400">
@@ -549,7 +497,10 @@ export default function ConfigsClient() {
 						</CardHeader>
 						<CardContent>
 							<Link href="/profile/change-email">
-								<Button className="w-full sm:w-auto" variant="outline">
+								<Button
+									className="w-full rounded-full sm:w-auto"
+									variant="outline"
+								>
 									Alterar E-mail
 								</Button>
 							</Link>
@@ -562,7 +513,6 @@ export default function ConfigsClient() {
 					<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 						<CardHeader>
 							<CardTitle className="flex items-center gap-2 dark:text-white">
-								<Lock className="h-5 w-5" />
 								Alterar Senha
 							</CardTitle>
 							<CardDescription className="dark:text-zinc-400">
@@ -571,7 +521,10 @@ export default function ConfigsClient() {
 						</CardHeader>
 						<CardContent>
 							<Link href="/profile/change-password">
-								<Button className="w-full sm:w-auto" variant="outline">
+								<Button
+									className="w-full rounded-full sm:w-auto"
+									variant="outline"
+								>
 									Alterar Senha
 								</Button>
 							</Link>
@@ -583,7 +536,6 @@ export default function ConfigsClient() {
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 text-destructive dark:text-red-500">
-							<Trash2 className="h-5 w-5" />
 							Excluir Conta
 						</CardTitle>
 						<CardDescription className="dark:text-zinc-400">
@@ -594,7 +546,7 @@ export default function ConfigsClient() {
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
 								<Button
-									className="w-auto dark:bg-red-500"
+									className="w-auto rounded-full dark:bg-red-500"
 									variant="destructive"
 								>
 									Excluir Conta
@@ -611,11 +563,11 @@ export default function ConfigsClient() {
 									</AlertDialogDescription>
 								</AlertDialogHeader>
 								<AlertDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-									<AlertDialogCancel className="w-full text-xs sm:w-auto sm:text-sm">
+									<AlertDialogCancel className="w-full rounded-full text-xs sm:w-auto sm:text-sm">
 										Cancelar
 									</AlertDialogCancel>
 									<AlertDialogAction
-										className="w-full bg-red-500 text-white text-xs sm:w-auto sm:text-sm"
+										className="w-full rounded-full bg-red-500 text-white text-xs sm:w-auto sm:text-sm"
 										onClick={handleDeleteAccount}
 									>
 										Sim, excluir minha conta
@@ -631,7 +583,6 @@ export default function ConfigsClient() {
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2 dark:text-white">
-							<HelpCircle className="h-5 w-5" />
 							Central de Ajuda
 						</CardTitle>
 						<CardDescription className="dark:text-zinc-400">
@@ -640,7 +591,7 @@ export default function ConfigsClient() {
 					</CardHeader>
 					<CardContent>
 						<Link
-							className="h-9 rounded-lg border bg-background px-4 py-2 text-sm shadow-xs hover:bg-accent hover:text-accent-foreground has-[>svg]:px-3 dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
+							className="h-9 w-full rounded-full border bg-background px-4 py-2 text-sm shadow-xs hover:bg-accent hover:text-accent-foreground has-[>svg]:px-3 dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
 							href="https://ajuda.bionk.me"
 							passHref
 							rel="noopener noreferrer"
