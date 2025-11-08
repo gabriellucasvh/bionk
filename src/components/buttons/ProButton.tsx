@@ -1,8 +1,16 @@
 "use client";
 
-import { Sparkle } from "lucide-react";
+import { Check, Sparkle, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { BaseButton } from "@/components/buttons/BaseButton";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 type ProButtonProps = {
@@ -43,13 +51,10 @@ export function ProButton({
 
 	const content = (
 		<span className="group relative inline-block">
-			{/* Botão */}
 			<span className={baseClasses}>
 				<Sparkle className="h-3.5 w-3.5 text-white dark:text-black" />
 				<span className="text-white dark:text-black">{label}</span>
 			</span>
-
-			{/* Tooltip */}
 			{showOverlayTooltip && tooltip && (
 				<span
 					className={cn(
@@ -65,26 +70,86 @@ export function ProButton({
 		</span>
 	);
 
-	if (href && !disabled) {
-		return (
-			<Link
-				aria-disabled={disabled}
-				href={href}
-				onClick={onClick}
-			>
-				{content}
-			</Link>
-		);
-	}
-
 	return (
-		<Button
-			className="h-auto p-0"
-			disabled={disabled}
-			onClick={onClick}
-			variant="ghost"
-		>
-			{content}
-		</Button>
+		<Dialog>
+			<DialogTrigger asChild>
+				<button
+					className="h-auto p-0"
+					disabled={disabled}
+					onClick={onClick}
+					type="button"
+				>
+					{content}
+				</button>
+			</DialogTrigger>
+			<DialogContent
+				className="top-auto right-0 bottom-0 left-0 w-full max-w-none translate-x-0 translate-y-0 overflow-hidden rounded-t-3xl border-none p-0 sm:top-1/2 sm:right-auto sm:bottom-auto sm:left-1/2 sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl"
+				showCloseButton={false}
+			>
+				<DialogClose className="absolute top-4 right-4 rounded-full bg-white p-2 dark:bg-zinc-800">
+					<X className="h-4 w-4" />
+				</DialogClose>
+				<DialogTitle className="hidden font-bold text-xl">
+					Desbloqueie o Bionk PRO
+				</DialogTitle>
+				<div className="md:hidden">
+					<Image
+						alt="Bionk PRO"
+						className="h-55 w-full object-cover object-top"
+						height={112}
+						src="/images/stylish-pro.png"
+						width={640}
+					/>
+				</div>
+				<div className="grid gap-0 md:grid-cols-2">
+					<div className="hidden md:block">
+						<Image
+							alt="Bionk PRO"
+							className="h-full w-full rounded-l-3xl object-cover"
+							height={360}
+							src="/images/stylish-pro.png"
+							width={640}
+						/>
+					</div>
+					<div className="flex flex-col gap-4 p-6 text-sm">
+						<h3 className="font-bold text-3xl md:mt-10">
+							Desbloqueie o Bionk PRO
+						</h3>
+						<ul className="space-y-3">
+							<li className="flex items-center gap-2">
+								<Check className="h-5 w-5 text-green-600" />
+								<span>Templates premium exclusivos</span>
+							</li>
+							<li className="flex items-center gap-2">
+								<Check className="h-5 w-5 text-green-600" />
+								<span>Análises avançadas de cliques e tráfego</span>
+							</li>
+							<li className="flex items-center gap-2">
+								<Check className="h-5 w-5 text-green-600" />
+								<span>Links ilimitados e organização melhorada</span>
+							</li>
+							<li className="flex items-center gap-2">
+								<Check className="h-5 w-5 text-green-600" />
+								<span>Remoção de marca d’água</span>
+							</li>
+							<li className="flex items-center gap-2">
+								<Check className="h-5 w-5 text-green-600" />
+								<span>Automação e agendamento de conteúdo</span>
+							</li>
+							<li className="flex items-center gap-2">
+								<Check className="h-5 w-5 text-green-600" />
+								<span>Suporte prioritário</span>
+							</li>
+						</ul>
+						<BaseButton asChild fullWidth>
+							<Link href={href}>Atualizar plano</Link>
+						</BaseButton>
+						<span className="text-center text-muted-foreground text-xs">
+							Você pode cancelar a qualquer momento.
+						</span>
+					</div>
+				</div>
+			</DialogContent>
+		</Dialog>
 	);
 }
