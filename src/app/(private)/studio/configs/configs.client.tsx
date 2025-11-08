@@ -8,15 +8,13 @@ import {
 	Lock,
 	LogOut,
 	Mail,
-	Monitor,
-	Moon,
-	Sun,
 	SunMoon,
 	Trash2,
 	User,
 	XOctagon,
 	// RefreshCcw,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -40,6 +38,8 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { useSubscription } from "@/providers/subscriptionProvider";
@@ -152,7 +152,7 @@ function UpgradeSubscriptionCard() {
 
 				<CardHeader className="relative z-10">
 					<CardTitle className="flex items-center gap-3 font-bold text-white text-xl">
-						Desbloqueie o Poder Ultra!
+						Desbloqueie o Poder PRO!
 					</CardTitle>
 					<CardDescription className="text-base text-green-50/90 leading-relaxed">
 						Você está a um passo da{" "}
@@ -304,6 +304,22 @@ export default function ConfigsClient() {
 		signOut();
 	};
 
+	const selectedMode = isAutoMode ? "system" : theme;
+	const handleModeChange = (value: string) => {
+		if (value === "light") {
+			setTheme("light");
+			return;
+		}
+		if (value === "dark") {
+			setTheme("dark");
+			return;
+		}
+		if (value === "system") {
+			setAutoMode();
+			return;
+		}
+	};
+
 	const handleSensitiveProfileToggle = async (checked: boolean) => {
 		if (!session?.user?.id) {
 			return;
@@ -360,43 +376,66 @@ export default function ConfigsClient() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-3 sm:space-y-4">
-						<div className="grid grid-cols-3 gap-2 sm:gap-3">
-							<Button
-								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-700 ${
-									theme === "light" ? "border-green-500" : ""
-								}
-								${isAutoMode ? "border-input" : ""}
-								`}
-								onClick={() => setTheme("light")}
-								variant={"outline"}
+						<RadioGroup
+							className="flex flex-wrap gap-3 sm:gap-4"
+							onValueChange={handleModeChange}
+							value={selectedMode}
+						>
+							<Label
+								className={`group flex cursor-pointer flex-col items-start rounded-lg border p-2 transition-colors ${selectedMode === "light" ? "border-green-500" : "dark:border-zinc-700"}`}
+								htmlFor="theme-light"
 							>
-								<Sun className="h-3 w-3 sm:h-4 sm:w-4" />
-								<span className="xs:inline hidden sm:inline">Modo </span>Claro
-							</Button>
-							<Button
-								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-700 ${
-									theme === "dark" ? "dark:border-green-500" : ""
-								}
-								${isAutoMode ? "dark:border-zinc-600" : ""}
-								`}
-								onClick={() => setTheme("dark")}
-								variant={"outline"}
+								<div className="mb-2 overflow-hidden rounded-md border dark:border-zinc-700">
+									<Image
+										alt="Modo Claro"
+										className="h-28 w-[224px] object-cover"
+										height={112}
+										src="/images/light-mode.png"
+										width={224}
+									/>
+								</div>
+								<div className="flex items-center gap-2">
+									<RadioGroupItem id="theme-light" value="light" />
+									<span className="text-sm dark:text-zinc-300">Claro</span>
+								</div>
+							</Label>
+							<Label
+								className={`group flex cursor-pointer flex-col items-start rounded-lg border p-2 transition-colors ${selectedMode === "dark" ? "border-green-500" : "dark:border-zinc-700"}`}
+								htmlFor="theme-dark"
 							>
-								<Moon className="h-3 w-3 sm:h-4 sm:w-4" />
-								<span className="xs:inline hidden sm:inline">Modo </span>Escuro
-							</Button>
-							<Button
-								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-700 ${
-									isAutoMode ? "border-green-500 dark:border-green-500" : ""
-								}`}
-								onClick={() => setAutoMode()}
-								variant={"outline"}
+								<div className="mb-2 overflow-hidden rounded-md border dark:border-zinc-700">
+									<Image
+										alt="Modo Escuro"
+										className="h-28 w-[224px] object-cover"
+										height={112}
+										src="/images/dark-mode.png"
+										width={224}
+									/>
+								</div>
+								<div className="flex items-center gap-2">
+									<RadioGroupItem id="theme-dark" value="dark" />
+									<span className="text-sm dark:text-zinc-300">Escuro</span>
+								</div>
+							</Label>
+							<Label
+								className={`group flex cursor-pointer flex-col items-start rounded-lg border p-2 transition-colors ${selectedMode === "system" ? "border-green-500" : "dark:border-zinc-700"}`}
+								htmlFor="theme-system"
 							>
-								<Monitor className="h-3 w-3 sm:h-4 sm:w-4" />
-								<span className="xs:inline hidden sm:inline">Automático</span>
-								<span className="xs:hidden sm:hidden lg:hidden">Auto</span>
-							</Button>
-						</div>
+								<div className="mb-2 overflow-hidden rounded-md border dark:border-zinc-700">
+									<Image
+										alt="Automático"
+										className="h-28 w-[224px] object-cover"
+										height={112}
+										src="/images/system-mode.png"
+										width={224}
+									/>
+								</div>
+								<div className="flex items-center gap-2">
+									<RadioGroupItem id="theme-system" value="system" />
+									<span className="text-sm dark:text-zinc-300">Automático</span>
+								</div>
+							</Label>
+						</RadioGroup>
 						<p className="text-muted-foreground text-sm dark:text-zinc-400">
 							O modo automático segue a preferência do seu sistema operacional.
 						</p>
