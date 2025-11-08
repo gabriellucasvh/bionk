@@ -61,7 +61,7 @@ const SectionCard = ({
 }: SectionCardProps) => {
 	const [isAddingLink, setIsAddingLink] = useState(false);
 	return (
-		<section className="space-y-4 rounded-lg bg-gray-100 p-4 dark:bg-[#202020]">
+		<section className="space-y-4 rounded-3xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
 			{/* Header reorganizado para dispositivos móveis */}
 			<div className="space-y-3">
 				{/* Primeira linha: Grip, Título e Menu de opções */}
@@ -115,8 +115,8 @@ const SectionCard = ({
 					<div className="flex flex-shrink-0 items-center space-x-2">
 						<Switch
 							checked={section.active}
-							id={`section-switch-${section.id}`}
 							disabled={isTogglingActive}
+							id={`section-switch-${section.id}`}
 							onCheckedChange={(checked) =>
 								onSectionUpdate(section.dbId, { active: checked })
 							}
