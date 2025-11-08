@@ -151,6 +151,11 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 											!enabled && disabledItemClasses(true)
 										)}
 										onClick={() => enabled && onRangeChange("7d")}
+										onSelect={(e) => {
+											if (!enabled) {
+												e.preventDefault();
+											}
+										}}
 									>
 										<span className={cn(!enabled && "text-muted-foreground")}>
 											{RANGE_LABEL["7d"]}
@@ -181,6 +186,11 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 											!enabled && disabledItemClasses(true)
 										)}
 										onClick={() => enabled && onRangeChange("30d")}
+										onSelect={(e) => {
+											if (!enabled) {
+												e.preventDefault();
+											}
+										}}
 									>
 										<span className={cn(!enabled && "text-muted-foreground")}>
 											{RANGE_LABEL["30d"]}
@@ -211,6 +221,11 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 											!enabled && disabledItemClasses(true)
 										)}
 										onClick={() => enabled && onRangeChange("90d")}
+										onSelect={(e) => {
+											if (!enabled) {
+												e.preventDefault();
+											}
+										}}
 									>
 										<span className={cn(!enabled && "text-muted-foreground")}>
 											{RANGE_LABEL["90d"]}
@@ -239,6 +254,11 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 											!enabled && disabledItemClasses(true)
 										)}
 										onClick={() => enabled && onRangeChange("365d")}
+										onSelect={(e) => {
+											if (!enabled) {
+												e.preventDefault();
+											}
+										}}
 									>
 										<span className={cn(!enabled && "text-muted-foreground")}>
 											{RANGE_LABEL["365d"]}
@@ -271,6 +291,11 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 												return;
 											}
 											setCustomOpen(true);
+										}}
+										onSelect={(e) => {
+											if (!enabled) {
+												e.preventDefault();
+											}
 										}}
 									>
 										<span className={cn(!enabled && "text-muted-foreground")}>
