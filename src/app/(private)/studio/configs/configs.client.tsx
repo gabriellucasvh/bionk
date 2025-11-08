@@ -259,6 +259,8 @@ function SubscriptionManagement({
 export default function ConfigsClient() {
 	const { data: session } = useSession();
 	const { theme, setTheme, isAutoMode, setAutoMode } = useTheme();
+	const { subscriptionPlan, isLoading: isSubscriptionLoading } =
+		useSubscription();
 	const isCredentialsUser = session?.user?.isCredentialsUser === true;
 	const [profile, setProfile] = useState<Profile>({ email: "" });
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
@@ -462,6 +464,12 @@ export default function ConfigsClient() {
 									{profile.email}
 								</p>
 							</div>
+							<div className="space-y-1">
+								<p className="font-medium text-sm dark:text-white">Plano</p>
+								<p className="text-muted-foreground text-sm capitalize dark:text-zinc-400">
+									{isSubscriptionLoading ? "-" : subscriptionPlan || "free"}
+								</p>
+							</div>
 							<div className="flex justify-start">
 								<Button
 									className="w-auto"
@@ -470,7 +478,7 @@ export default function ConfigsClient() {
 									variant="outline"
 								>
 									<LogOut className="mr-2 h-4 w-4" />
-									Sair
+									Sair da conta
 								</Button>
 							</div>
 						</div>
