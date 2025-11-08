@@ -13,12 +13,12 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 		<div>
 			<div className="grid grid-cols-3 gap-4">
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6"
 					onClick={() => onOptionSelect("video")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border"
+						className="relative w-20 overflow-hidden rounded-2xl border transition-colors hover:brightness-110"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image
@@ -32,12 +32,12 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 "
 					onClick={() => onOptionSelect("youtube")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border bg-red-500"
+						className="relative w-20 overflow-hidden rounded-2xl border bg-red-500 transition-colors hover:brightness-110"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image
@@ -51,12 +51,12 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 "
 					onClick={() => onOptionSelect("vimeo")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border bg-blue-600"
+						className="relative w-20 overflow-hidden rounded-2xl border bg-blue-600 transition-colors hover:brightness-110"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image
@@ -70,12 +70,12 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 "
 					onClick={() => onOptionSelect("tiktok")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border bg-black"
+						className="relative w-20 overflow-hidden rounded-2xl border bg-black transition-colors hover:brightness-110"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image
@@ -89,12 +89,12 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 "
 					onClick={() => onOptionSelect("twitch")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border bg-violet-600"
+						className="relative w-20 overflow-hidden rounded-2xl border bg-violet-600 transition-colors hover:brightness-110"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image

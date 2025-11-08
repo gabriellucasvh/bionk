@@ -13,12 +13,12 @@ const ImageOptions = ({ onOptionSelect }: ImageOptionsProps) => {
 		<div>
 			<div className="grid grid-cols-3 gap-4">
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 "
 					onClick={() => onOptionSelect("image_single")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border"
+						className="relative w-20 overflow-hidden rounded-2xl border hover:brightness-110"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image
@@ -32,12 +32,12 @@ const ImageOptions = ({ onOptionSelect }: ImageOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 "
 					onClick={() => onOptionSelect("image_column")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border"
+						className="relative w-20 overflow-hidden rounded-2xl border hover:brightness-110"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image
@@ -51,12 +51,12 @@ const ImageOptions = ({ onOptionSelect }: ImageOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6 "
 					onClick={() => onOptionSelect("image_carousel")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border"
+						className="relative w-20 overflow-hidden rounded-2xl border hover:brightness-110"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image

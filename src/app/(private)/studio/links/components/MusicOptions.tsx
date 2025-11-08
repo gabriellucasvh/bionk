@@ -13,12 +13,12 @@ const MusicOptions = ({ onOptionSelect }: MusicOptionsProps) => {
 		<div>
 			<div className="grid grid-cols-3 gap-4">
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6"
 					onClick={() => onOptionSelect("spotify")}
 					type="button"
 				>
 					<div
-						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-[#1ED760]"
+						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-[#1ED760] transition-colors hover:bg-[#1ED760]/90"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image
@@ -33,12 +33,12 @@ const MusicOptions = ({ onOptionSelect }: MusicOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6"
 					onClick={() => onOptionSelect("deezer")}
 					type="button"
 				>
 					<div
-						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-white"
+						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-white transition-colors hover:bg-zinc-50"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image
@@ -53,12 +53,12 @@ const MusicOptions = ({ onOptionSelect }: MusicOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6"
 					onClick={() => onOptionSelect("apple")}
 					type="button"
 				>
 					<div
-						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-[#FA243C]"
+						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-[#FA243C] transition-colors hover:bg-[#FA243C]/90"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image
@@ -73,12 +73,12 @@ const MusicOptions = ({ onOptionSelect }: MusicOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6"
 					onClick={() => onOptionSelect("soundcloud")}
 					type="button"
 				>
 					<div
-						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-[#ff5500]"
+						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-[#ff5500] transition-colors hover:bg-[#ff5500]/90"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Image
@@ -93,12 +93,12 @@ const MusicOptions = ({ onOptionSelect }: MusicOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6"
 					onClick={() => onOptionSelect("audiomack")}
 					type="button"
 				>
 					<div
-						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-neutral-900"
+						className="relative flex w-20 items-center justify-center overflow-hidden rounded-2xl border bg-neutral-900 transition-colors hover:bg-neutral-900/90"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<svg

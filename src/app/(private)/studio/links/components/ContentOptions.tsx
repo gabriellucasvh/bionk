@@ -11,12 +11,12 @@ const ContentOptions = ({ onOptionSelect }: ContentOptionsProps) => {
 		<div>
 			<div className="grid grid-cols-3 gap-4">
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6"
 					onClick={() => onOptionSelect("link")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border bg-avocado-400"
+						className="relative w-20 overflow-hidden rounded-2xl border bg-avocado-400 transition-colors hover:bg-avocado-500"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Plus className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-black" />
@@ -25,12 +25,12 @@ const ContentOptions = ({ onOptionSelect }: ContentOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6"
 					onClick={() => onOptionSelect("section")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border bg-gray-200"
+						className="relative w-20 overflow-hidden rounded-2xl border bg-gray-200 transition-colors hover:bg-gray-300"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Layers2 className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-gray-600" />
@@ -39,12 +39,12 @@ const ContentOptions = ({ onOptionSelect }: ContentOptionsProps) => {
 				</button>
 
 				<button
-					className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+					className="flex flex-col items-center gap-2 rounded-2xl p-6"
 					onClick={() => onOptionSelect("text")}
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border bg-blue-500"
+						className="relative w-20 overflow-hidden rounded-2xl border bg-blue-500 transition-colors hover:bg-blue-600"
 						style={{ aspectRatio: "6 / 7" }}
 					>
 						<Type className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-white" />
