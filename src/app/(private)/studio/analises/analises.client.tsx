@@ -10,7 +10,7 @@ const AnalyticsHeader = dynamic(
 	() => import("./components/analises.AnalyticsHeader"),
 	{
 		loading: () => (
-			<div className="h-16 w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
+			<div className="h-16 w-full animate-pulse rounded-md" />
 		),
 	}
 );
@@ -19,9 +19,9 @@ const AnalyticsStatsCards = dynamic(
 	{
 		loading: () => (
 			<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
-				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
-				<div className="h-full w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
+				<div className="h-full w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
+				<div className="h-full w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
+				<div className="h-full w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
 			</div>
 		),
 	}
@@ -30,7 +30,7 @@ const PerformanceChart = dynamic(
 	() => import("./components/analises.PerformanceChart"),
 	{
 		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
+			<div className="h-[400px] w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
 		),
 	}
 );
@@ -38,7 +38,7 @@ const TopLinksTable = dynamic(
 	() => import("./components/analises.TopLinksTable"),
 	{
 		loading: () => (
-			<div className="h-[200px] w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
+			<div className="h-[200px] w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
 		),
 	}
 );
@@ -46,7 +46,7 @@ const DeviceAnalytics = dynamic(
 	() => import("./components/analises.DeviceAnalytics"),
 	{
 		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted dark:bg-zinc-700" />
+			<div className="h-[400px] w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
 		),
 	}
 );
@@ -136,13 +136,13 @@ const formatDate = (dateStr: string, pattern = "dd/MM/yyyy") =>
 	format(parseISO(dateStr), pattern, { locale: ptBR });
 
 interface AnalisesClientProps {
-    userId: string;
+	userId: string;
 }
 
 // Componente para renderizar seções com loading
 const LoadingSection: React.FC<{ className: string }> = ({ className }) => (
 	<div
-		className={`animate-pulse rounded-md bg-muted dark:bg-zinc-700 ${className}`}
+		className={`animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700 ${className}`}
 	/>
 );
 
@@ -242,26 +242,28 @@ const useAnalyticsData = (
 type SubscriptionPlan = "free" | "basic" | "pro" | "ultra";
 type AnalyticsPeriodOption = "7d" | "30d" | "90d" | "365d" | "custom";
 const PLAN_RANK: Record<SubscriptionPlan, number> = {
-    free: 0,
-    basic: 1,
-    pro: 2,
-    ultra: 3,
+	free: 0,
+	basic: 1,
+	pro: 2,
+	ultra: 3,
 };
 const PERIOD_REQUIRED_RANK: Record<AnalyticsPeriodOption, number> = {
-    "7d": 0,
-    "30d": 0,
-    "90d": 1,
-    "365d": 2,
-    custom: 3,
+	"7d": 0,
+	"30d": 0,
+	"90d": 1,
+	"365d": 2,
+	custom: 3,
 };
-const isPeriodAvailable = (plan: SubscriptionPlan, option: AnalyticsPeriodOption) =>
-    PLAN_RANK[plan] >= PERIOD_REQUIRED_RANK[option];
+const isPeriodAvailable = (
+	plan: SubscriptionPlan,
+	option: AnalyticsPeriodOption
+) => PLAN_RANK[plan] >= PERIOD_REQUIRED_RANK[option];
 
 const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
-    const [plan, setPlan] = useState<SubscriptionPlan>("free");
-    const [range, setRange] = useState<"7d" | "30d" | "90d" | "365d" | "tudo">(
-        "7d"
-    );
+	const [plan, setPlan] = useState<SubscriptionPlan>("free");
+	const [range, setRange] = useState<"7d" | "30d" | "90d" | "365d" | "tudo">(
+		"7d"
+	);
 	const [customStart, setCustomStart] = useState<Date | null>(null);
 	const [customEnd, setCustomEnd] = useState<Date | null>(null);
 
@@ -274,24 +276,24 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 				if (!active) {
 					return;
 				}
-                const p = (json.subscriptionPlan || "free") as SubscriptionPlan;
-                setPlan(p);
-                // Garantir que o range atual é permitido pelo plano; caso contrário, voltar para 7d
-                setRange((prev) => {
-                    const option = (prev === "tudo" ? "custom" : prev) as
-                        | "7d"
-                        | "30d"
-                        | "90d"
-                        | "365d"
-                        | "custom";
-                    return isPeriodAvailable(p, option) ? prev : "7d";
-                });
-            } catch {}
-        })();
-        return () => {
-            active = false;
-        };
-    }, []);
+				const p = (json.subscriptionPlan || "free") as SubscriptionPlan;
+				setPlan(p);
+				// Garantir que o range atual é permitido pelo plano; caso contrário, voltar para 7d
+				setRange((prev) => {
+					const option = (prev === "tudo" ? "custom" : prev) as
+						| "7d"
+						| "30d"
+						| "90d"
+						| "365d"
+						| "custom";
+					return isPeriodAvailable(p, option) ? prev : "7d";
+				});
+			} catch {}
+		})();
+		return () => {
+			active = false;
+		};
+	}, []);
 
 	const { data, error, isLoading, memoizedChartData, memoizedTopLinks } =
 		useAnalyticsData(userId, range, customStart, customEnd);
