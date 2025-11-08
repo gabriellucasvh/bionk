@@ -143,7 +143,7 @@ const TextCard = ({
 				<div className="flex items-start gap-2 sm:gap-4">
 					<div className="flex-1 space-y-4">
 						<div className="space-y-2">
-							<Label htmlFor={`title-${text.id}`}>Título</Label>
+							<Label htmlFor={`title-${text.id}`}>Título *</Label>
 							<Input
 								className="break-words"
 								id={`title-${text.id}`}
@@ -157,7 +157,7 @@ const TextCard = ({
 							</div>
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor={`description-${text.id}`}>Descrição</Label>
+							<Label htmlFor={`description-${text.id}`}>Descrição *</Label>
 							<Textarea
 								className="resize-none whitespace-pre-wrap break-words"
 								id={`description-${text.id}`}
