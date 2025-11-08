@@ -149,15 +149,20 @@ const LinksTabContent = ({
 			{handlers.isAddingSection && (
 				<AddNewSectionForm
 					formData={handlers.sectionFormData}
-					isSaveDisabled={!handlers.sectionFormData.title.trim()}
-					onCancel={() => {
-						handlers.setSectionFormData({ title: "" });
-						handlers.setIsAddingSection(false);
-					}}
-					onSave={handlers.handleAddNewSection}
 					setFormData={handlers.setSectionFormData}
+					onSave={async () => {
+						await handlers.handleCreateNewSectionFromForm();
+					}}
+					onCancel={() => {
+						handlers.setIsAddingSection(false);
+						handlers.setSectionFormData({ title: "" });
+					}}
+					isSaveDisabled={!handlers.sectionFormData.title?.trim()}
 				/>
 			)}
+
+
+
 
 			<LinkList
 				activeId={activeId}
@@ -173,6 +178,8 @@ const LinksTabContent = ({
 					handleAddNewLink: handlers.handleAddNewLink,
 				}}
 				onAddLinkToSection={handlers.handleAddLinkToSection}
+				onSaveNewSection={handlers.handleSaveEditingSection}
+				onCancelNewSection={handlers.handleCancelEditingSection}
 				onArchiveImage={handlers.handleArchiveImage}
 				onArchiveLink={handlers.handleArchiveLink}
 				onArchiveMusic={handlers.handleArchiveMusic}

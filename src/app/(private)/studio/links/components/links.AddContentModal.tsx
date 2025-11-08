@@ -157,7 +157,6 @@ const AddContentModal = ({
 
 		const validOption = option as (typeof validOptions)[number];
 
-		// Para "section", fechar o modal e abrir formulário inline na página
 		if (validOption === "section") {
 			onClose();
 			setTimeout(() => {

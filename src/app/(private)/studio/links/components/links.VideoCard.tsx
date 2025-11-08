@@ -1,13 +1,6 @@
 "use client";
 
-import {
-	Archive,
-	Edit,
-	Grip,
-	MoreVertical,
-	Trash2,
-	Video,
-} from "lucide-react";
+import { Archive, Edit, Grip, MoreVertical, Trash2, Video } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -102,7 +95,7 @@ const EditingView = ({
 	};
 
 	return (
-		<div className="flex flex-col gap-3 rounded-lg border-2 border-foreground/20 p-3 sm:p-4">
+		<div className="flex flex-col gap-3 rounded-3xl border-2 bg-white p-3 sm:p-4 dark:bg-zinc-900">
 			<div className="space-y-3">
 				<div>
 					<Label className="font-medium text-sm" htmlFor="video-title">
@@ -122,6 +115,7 @@ const EditingView = ({
 						Descrição
 					</Label>
 					<Textarea
+					className="max-h-40"
 						id="video-description"
 						maxLength={200}
 						onChange={(e) =>

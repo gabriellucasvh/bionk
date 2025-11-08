@@ -87,7 +87,7 @@ const EditingView = ({
 	};
 
 	return (
-		<div className="flex flex-col gap-3 rounded-lg border-2 border-foreground/20 p-3 sm:p-4">
+		<div className="flex flex-col gap-3 rounded-3xl border-2 bg-white p-3 sm:p-4 dark:bg-zinc-900">
 			<AddNewImageForm
 				existingSections={existingSections}
 				formData={localData as any}

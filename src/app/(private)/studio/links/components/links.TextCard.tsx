@@ -136,7 +136,7 @@ const TextCard = ({
 	if (text.isEditing) {
 		return (
 			<article
-				className={`flex flex-col gap-3 rounded-lg border-2 border-foreground/20 p-3 sm:p-4 ${
+				className={`flex flex-col gap-3 rounded-3xl border-2 bg-white p-3 sm:p-4 dark:bg-zinc-900 ${
 					isDragging ? "opacity-50" : ""
 				}`}
 			>

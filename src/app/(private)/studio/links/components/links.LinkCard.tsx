@@ -50,13 +50,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
@@ -165,25 +158,6 @@ const EditingView = ({
 		subscriptionPlan ?? "free"
 	);
 
-	const toInputValue = (iso?: string | null) => {
-		if (!iso) {
-			return "";
-		}
-		const d = new Date(iso);
-		const pad = (n: number) => `${n}`.padStart(2, "0");
-		return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-			d.getHours()
-		)}:${pad(d.getMinutes())}`;
-	};
-	// Valor mínimo (agora) para inputs datetime-local
-	const nowInputValue = () => {
-		const d = new Date();
-		const pad = (n: number) => `${n}`.padStart(2, "0");
-		return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-			d.getHours()
-		)}:${pad(d.getMinutes())}`;
-	};
-
 	const hasChanges = originalLink
 		? link.title !== originalLink.title ||
 			(link.url || "") !== (originalLink.url || "") ||
@@ -217,7 +191,7 @@ const EditingView = ({
 	};
 
 	return (
-		<div className="flex flex-col gap-3 rounded-lg border-2 border-foreground/20 p-3 sm:p-4">
+		<div className="flex flex-col gap-3 rounded-3xl border-2 bg-white p-3 sm:p-4 dark:bg-zinc-900">
 			<div className="space-y-3">
 				<div className="space-y-1.5">
 					{/* Campos principais com labels */}

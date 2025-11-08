@@ -141,7 +141,7 @@ const EditingView = ({
 	};
 
 	return (
-		<div className="flex flex-col gap-3 rounded-lg border-2 border-foreground/20 p-3 sm:p-4">
+		<div className="flex flex-col gap-3 rounded-3xl border-2 bg-white dark:bg-zinc-900 p-3 sm:p-4">
 			<div className="space-y-3">
 				<div>
 					<Label className="font-medium text-sm" htmlFor="music-title">

@@ -1,6 +1,6 @@
 "use client";
 
-import { HelpCircle, Save, Upload, X } from "lucide-react";
+import { HelpCircle, Upload } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -195,7 +195,11 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 
 			// Para layout "single", sempre substituir a imagem existente
 			if (formData.layout === "single") {
-				setFormData({ ...formData, images: [toAdd.at(-1)!] });
+				const last = toAdd.at(-1);
+				if (!last) {
+					return;
+				}
+				setFormData({ ...formData, images: [last] });
 				setUploadError("");
 				// Oculta o dropzone após escolher a imagem
 				setShowInputsSingle(false);
@@ -214,7 +218,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 				...formData,
 				images: [...(formData.images || []), ...sliced],
 			});
-		} catch (e) {
+		} catch {
 			setUploadError("Erro no upload");
 		} finally {
 			setIsUploading(false);

@@ -322,32 +322,32 @@ export const useLinksManager = (
 
 		// Preservar rascunhos (isDraft) durante revalidações para evitar perda de dados
 		const draftItems = unifiedItems.filter((item) => (item as any).isDraft);
-        const combinedItems = [...draftItems, ...allItems];
-        combinedItems.sort(
-            (a, b) =>
-                getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
-        );
-        const seen = new Set<string>();
-        const deduped = combinedItems.filter((item: UnifiedItem) => {
-            const t = item.isSection
-                ? "section"
-                : item.isText
-                ? "text"
-                : item.isVideo
-                ? "video"
-                : (item as any).isImage
-                ? "image"
-                : (item as any).isMusic
-                ? "music"
-                : "link";
-            const k = `${t}-${item.id}`;
-            if (seen.has(k)) {
-                return false;
-            }
-            seen.add(k);
-            return true;
-        });
-        setUnifiedItems(deduped);
+		const combinedItems = [...draftItems, ...allItems];
+		combinedItems.sort(
+			(a, b) =>
+				getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
+		);
+		const seen = new Set<string>();
+		const deduped = combinedItems.filter((item: UnifiedItem) => {
+			const t = item.isSection
+				? "section"
+				: item.isText
+					? "text"
+					: item.isVideo
+						? "video"
+						: (item as any).isImage
+							? "image"
+							: (item as any).isMusic
+								? "music"
+								: "link";
+			const k = `${t}-${item.id}`;
+			if (seen.has(k)) {
+				return false;
+			}
+			seen.add(k);
+			return true;
+		});
+		setUnifiedItems(deduped);
 	}, [
 		currentLinks,
 		currentSections,
@@ -402,6 +402,7 @@ export const useLinksManager = (
 
 				const sectionItems = items
 					.filter((item) => item.isSection)
+					.filter((item) => !(item as any).isDraft)
 					.map((item) => ({
 						id: item.id,
 						order: items.indexOf(item),
@@ -662,16 +663,96 @@ export const useLinksManager = (
 	};
 
 	const handleAddNewSection = async () => {
-		if (!sectionFormData.title.trim()) {
+		const id = tempIdCounterRef.current--;
+		const order = -1;
+		const draft: UnifiedItem = {
+			id,
+			title: "",
+			url: "",
+			active: true,
+			clicks: 0,
+			sensitive: false,
+			order,
+			isSection: true,
+			children: [],
+			dbId: undefined as any,
+			isEditing: true as any,
+			isDraft: true as any,
+		} as any;
+		setUnifiedItems((prev) => {
+			const cleaned = prev.map((item) =>
+				item.isEditing ? ({ ...(item as any), isEditing: false } as any) : item
+			);
+			const lowest =
+				cleaned.length > 0 ? Math.min(...cleaned.map((i) => i.order)) : 0;
+			const draftAtTop = { ...(draft as any), order: lowest - 1 } as any;
+			const next = [
+				draftAtTop,
+				...cleaned.filter((item) => !(item as any).isDraft),
+			];
+			return next.sort((a, b) => a.order - b.order);
+		});
+		setSectionFormData(initialSectionFormData);
+		setIsAddingSection(false);
+	};
+
+	const handleSaveEditingSection = async (id: number, title: string) => {
+		const target = unifiedItems.find(
+			(item) => item.isSection && item.id === id
+		);
+		const trimmed = (title || "").trim();
+		if (!trimmed) {
 			return;
 		}
+		if ((target as any)?.isDraft) {
+			const res = await fetch("/api/sections", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ title: trimmed }),
+			});
+			if (!res.ok) {
+				return;
+			}
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			await Promise.all([
+				mutateLinks(),
+				mutateSections(),
+				mutateTexts(),
+				mutateVideos(),
+				mutateImages(),
+				mutateMusics(),
+			]);
+			return;
+		}
+		await handleSectionUpdate(id, { title: trimmed });
+	};
 
-		await fetch("/api/sections", {
+	const handleCancelEditingSection = (id: number) => {
+		const target = unifiedItems.find(
+			(item) => item.isSection && item.id === id
+		);
+		if ((target as any)?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			return;
+		}
+		return;
+	};
+
+	const handleCreateNewSectionFromForm = async () => {
+		const title = (sectionFormData.title || "").trim();
+		if (!title) {
+			return;
+		}
+		const res = await fetch("/api/sections", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ title: sectionFormData.title.trim() }),
+			body: JSON.stringify({ title }),
 		});
-
+		if (!res.ok) {
+			return;
+		}
+		setIsAddingSection(false);
+		setSectionFormData(initialSectionFormData);
 		await Promise.all([
 			mutateLinks(),
 			mutateSections(),
@@ -680,8 +761,6 @@ export const useLinksManager = (
 			mutateImages(),
 			mutateMusics(),
 		]);
-		setSectionFormData(initialSectionFormData);
-		setIsAddingSection(false);
 	};
 
 	const handleAddNewText = async () => {
@@ -1333,29 +1412,60 @@ export const useLinksManager = (
 	};
 
 	const handleAddLinkToSection = async (sectionId: number) => {
-		let formattedUrl = formData.url.trim();
-		if (!urlProtocolRegex.test(formattedUrl)) {
-			formattedUrl = `https://${formattedUrl}`;
-		}
-		if (!isValidUrl(formattedUrl)) {
-			return;
-		}
+		const id = tempIdCounterRef.current--;
+		const order = -1;
+		const draft: LinkItem = {
+			id,
+			title: "",
+			url: "",
+			active: true,
+			clicks: 0,
+			sensitive: false,
+			order,
+			isEditing: true,
+			isDraft: true,
+			archived: false,
+			sectionId,
+			badge: null,
+			password: null,
+			expiresAt: null,
+			deleteOnClicks: null,
+			launchesAt: null,
+			customImageUrl: null,
+			shareAllowed: false,
+		};
 
-		await fetch("/api/links", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ ...formData, url: formattedUrl, sectionId }),
+		setUnifiedItems((prev) => {
+			const cleaned = prev.map((item) =>
+				item.isEditing ? ({ ...(item as any), isEditing: false } as any) : item
+			);
+			return cleaned.map((item) => {
+				if ((item as any).isSection && item.id === sectionId) {
+					const children = Array.isArray((item as any).children)
+						? ((item as any).children as any[])
+						: [];
+					const lowest =
+						children.length > 0
+							? Math.min(
+									...children.map((c: any) =>
+										typeof c.order === "number" ? c.order : 0
+									)
+								)
+							: 0;
+					const draftChild = { ...(draft as any), order: lowest - 1 } as any;
+					return {
+						...(item as any),
+						children: [
+							draftChild,
+							...children.filter((c: any) => !(c as any).isDraft),
+						],
+					} as any;
+				}
+				return item;
+			});
 		});
 
-		await Promise.all([
-			mutateLinks(),
-			mutateSections(),
-			mutateTexts(),
-			mutateVideos(),
-			mutateImages(),
-			mutateMusics(),
-		]);
-		setFormData(initialFormData);
+		setOriginalLink(null);
 		setIsAdding(false);
 	};
 
@@ -1671,7 +1781,6 @@ export const useLinksManager = (
 				throw new Error("Falha ao criar link");
 			}
 
-			const newLink = await res.json();
 			await Promise.all([
 				mutateLinks(),
 				mutateSections(),
@@ -1944,6 +2053,9 @@ export const useLinksManager = (
 		handleSectionUngroup,
 		handleAddNewLink,
 		handleAddNewSection,
+		handleCreateNewSectionFromForm,
+		handleSaveEditingSection,
+		handleCancelEditingSection,
 		handleAddNewText,
 		handleAddNewVideo,
 		handleAddNewImage,

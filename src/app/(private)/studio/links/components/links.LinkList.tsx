@@ -56,6 +56,8 @@ interface LinkListProps {
 	onClickLink: (id: number) => void;
 	// Novas props para criação de link na seção
 	onAddLinkToSection?: (sectionId: number) => void;
+	onSaveNewSection?: (id: number, title: string) => void;
+	onCancelNewSection?: (id: number) => void;
 	linksManager?: any;
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
 	onRemoveCustomImage?: (id: number) => void;
@@ -331,20 +333,22 @@ const LinkList = (props: LinkListProps) => {
 												order: item.order || 0,
 												links: item.children || [],
 											};
-											return (
-												<SectionCard
-													isDragging={isDragging}
-													isTogglingActive={togglingSectionId === item.id}
-													linksManager={linksManager}
-													listeners={listeners}
-													onAddLinkToSection={onAddLinkToSection}
-													onRemoveCustomImage={onRemoveCustomImage}
-													onUpdateCustomImage={onUpdateCustomImage}
-													section={sectionData}
-													setActivatorNodeRef={setActivatorNodeRef}
-													{...cardProps}
-												/>
-											);
+						return (
+							<SectionCard
+								isDragging={isDragging}
+								isTogglingActive={togglingSectionId === item.id}
+								linksManager={linksManager}
+								listeners={listeners}
+								onAddLinkToSection={onAddLinkToSection}
+								onSaveNewSection={cardProps.onSaveNewSection}
+								onCancelNewSection={cardProps.onCancelNewSection}
+								onRemoveCustomImage={onRemoveCustomImage}
+								onUpdateCustomImage={onUpdateCustomImage}
+								section={sectionData}
+								setActivatorNodeRef={setActivatorNodeRef}
+								{...cardProps}
+							/>
+						);
 										}
 
 										if (item.isText) {
