@@ -39,62 +39,64 @@ const Header: React.FC = () => {
 	};
 
 	return (
-		<nav className="fixed top-7 right-4 left-4 z-50 mx-auto hidden h-auto max-w-7xl items-center gap-y-4 rounded-4xl border bg-white px-4 py-3 lg:flex xl:inset-x-0">
-			<div className="mx-3 min-w-[100px] shrink-0">
-				<Link href="/">
-					<Image
-						alt="logo"
-						className="h-6 w-auto"
-						height={90}
-						priority
-						src="/images/bionk-name-logo.svg"
-						width={100}
-					/>
-				</Link>
-			</div>
+		<nav className="fixed inset-x-0 z-50 hidden bg-bunker-50/60 backdrop-blur-xl lg:block">
+			<div className="pointer-events-none absolute inset-0 bg-[length:6px_6px] bg-[radial-gradient(#000_0.5px,transparent_0.5px)] opacity-5" />
+			<div className="relative mx-auto flex h-auto max-w-7xl items-center gap-y-4 px-4 py-3">
+				<div className="mx-3 min-w-[100px] shrink-0">
+					<Link href="/">
+						<Image
+							alt="logo"
+							className="h-6 w-auto"
+							height={90}
+							priority
+							src="/images/bionk-name-logo.svg"
+							width={100}
+						/>
+					</Link>
+				</div>
 
-			<ul className="flex min-w-0 flex-1 flex-wrap">
-				{HeaderProps.map((menu) => (
-					<li key={menu.label}>
-						<Link
-							className="font- whitespace-nowrap px-4 py-2 text-black transition-colors duration-200 hover:text-sky-600"
-							href={menu.href}
-						>
-							{menu.label}
-						</Link>
-					</li>
-				))}
-			</ul>
+				<ul className="flex min-w-0 flex-1 flex-wrap">
+					{HeaderProps.map((menu) => (
+						<li key={menu.label}>
+							<Link
+								className="font- whitespace-nowrap px-4 py-2 text-black transition-colors duration-200 hover:text-bunker-800"
+								href={menu.href}
+							>
+								{menu.label}
+							</Link>
+						</li>
+					))}
+				</ul>
 
-			<div className="flex min-w-0 flex-wrap justify-end gap-2">
-				{session ? (
-					<BaseButton
-						className="h-14 bg-sky-300 text-black hover:bg-sky-400"
-						loading={isLoading[KEYS.studio]}
-						onClick={() => handleClick("studio", routes.studio)}
-					>
-						Acessar seu Studio
-					</BaseButton>
-				) : (
-					<>
-						<BaseButton
-							className="h-14"
-							loading={isLoading[KEYS.login]}
-							onClick={() => handleClick("login", routes.login)}
-							variant="white"
-						>
-							Entrar
-						</BaseButton>
-
+				<div className="flex min-w-0 flex-wrap justify-end gap-2">
+					{session ? (
 						<BaseButton
 							className="h-14 bg-sky-300 text-black hover:bg-sky-400"
-							loading={isLoading[KEYS.registro]}
-							onClick={() => handleClick("registro", routes.registro)}
+							loading={isLoading[KEYS.studio]}
+							onClick={() => handleClick("studio", routes.studio)}
 						>
-							Criar uma conta
+							Acessar seu Studio
 						</BaseButton>
-					</>
-				)}
+					) : (
+						<>
+							<BaseButton
+								className="h-14 bg-transparent hover:bg-transparent hover:text-bunker-800"
+								loading={isLoading[KEYS.login]}
+								onClick={() => handleClick("login", routes.login)}
+							>
+								Entrar
+							</BaseButton>
+
+							<BaseButton
+								className="h-14 bg-sky-300 text-black hover:bg-sky-400"
+								loading={isLoading[KEYS.registro]}
+								onClick={() => handleClick("registro", routes.registro)}
+							>
+								Criar uma conta
+							</BaseButton>
+						</>
+					)}
+				</div>
 			</div>
 		</nav>
 	);
