@@ -53,12 +53,12 @@ const Footer = () => {
 								className="h-14 w-auto"
 								height={28}
 								priority
-								src="/images/bionk-oct-vet.svg"
+								src="/images/bionk-icon.svg"
 								width={110}
 							/>
 						</Link>
 						<p className="text-bunker-400 text-sm leading-6">
-							O melhor gerenciador de links para o seu negócio.
+							Criado para quem compartilha o que ama.
 						</p>
 					</div>
 
@@ -73,7 +73,7 @@ const Footer = () => {
 									{navigation.resources.map((item) => (
 										<li key={item.name}>
 											<Link
-												className="text-bunker-400 text-sm decoration-2 decoration-purple-400 transition-colors duration-300 hover:text-white hover:underline"
+												className="text-bunker-400 text-sm decoration-2 decoration-sky-400 transition-colors duration-300 hover:text-white hover:underline"
 												href={item.href}
 											>
 												{item.name}
@@ -90,7 +90,7 @@ const Footer = () => {
 									{navigation.legal.map((item) => (
 										<li key={item.name}>
 											<Link
-												className="text-bunker-400 text-sm decoration-2 decoration-purple-400 transition-colors duration-300 hover:text-white hover:underline"
+												className="text-bunker-400 text-sm decoration-2 decoration-sky-400 transition-colors duration-300 hover:text-white hover:underline"
 												href={item.href}
 											>
 												{item.name}
@@ -107,7 +107,7 @@ const Footer = () => {
 									{navigation.contact.map((item) => (
 										<li key={item.name}>
 											<Link
-												className="text-bunker-400 text-sm decoration-2 decoration-purple-400 transition-colors duration-300 hover:text-white hover:underline"
+												className="text-bunker-400 text-sm decoration-2 decoration-sky-400 transition-colors duration-300 hover:text-white hover:underline"
 												href={item.href}
 											>
 												{item.name}
@@ -148,14 +148,14 @@ const Footer = () => {
 					</p>
 				</div>
 			</div>
-			<div className="mx-auto flex h-full w-full items-center justify-center p-4">
+			{/* <div className="mx-auto flex h-full w-full items-center justify-center p-4">
 				<Image
 					alt="Logo Bionk"
 					height={1000}
-					src={"/images/svg-bionk-bioroxo-branco.svg"}
+					src={"/images/big-bionk-white.svg"}
 					width={1000}
 				/>
-			</div>
+			</div> */}
 		</footer>
 	);
 };

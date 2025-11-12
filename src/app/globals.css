@@ -9,6 +9,7 @@
 @theme {
 	--font-sans: var(--font-satoshi);
 	--font-clashd: var(--font-clash-display);
+	--font-cabinet-grotesk: var(--font-cabinet-grotesk);
 	--font-geist: var(--font-geist);
 	--font-inter: var(--font-inter);
 	--font-montserrat: var(--font-montserrat);
@@ -235,7 +236,7 @@
 		@apply bg-background text-foreground font-semibold overflow-x-hidden;
 	}
 	.title {
-		font-family: var(--font-clashd);
+		font-family: var(--font-cabinet-grotesk);
 		@apply font-bold;
 	}
 }

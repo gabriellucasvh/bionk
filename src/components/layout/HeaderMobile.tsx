@@ -2,10 +2,10 @@
 
 import { AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { BaseButton } from "../buttons/BaseButton";
 import { MotionDiv } from "../ui/motion";
@@ -50,7 +50,7 @@ const HeaderMobile = () => {
 						alt="logo"
 						height={50}
 						priority
-						src="/images/svg-bionk+oct.svg"
+						src="/images/bionk-name-logo.svg"
 						width={100}
 					/>
 				</Link>

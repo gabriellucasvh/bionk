@@ -1,12 +1,10 @@
 "use client";
 
 import { ArrowRight, ExternalLink } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
-import { MotionDiv } from "@/components/ui/motion";
-
-
 
 const Hero = () => {
 	const [isLoaded, setIsLoaded] = useState(false);
@@ -31,24 +29,11 @@ const Hero = () => {
 	};
 
 	return (
-		<div className="relative min-h-screen w-full overflow-hidden bg-bunker-950 text-white">
-			{/* ... (background motion divs - sem alterações) ... */}
-			<MotionDiv
-				animate={{ scale: [1, 1.2, 1] }}
-				className="absolute inset-0 overflow-hidden"
-				transition={{
-					duration: 5,
-					repeat: Number.POSITIVE_INFINITY,
-					repeatType: "reverse",
-				}}
-			>
-				<div className="-right-24 -top-24 absolute h-96 w-96 rounded-full bg-purple-900 opacity-60 blur-3xl" />
-				<div className="-left-24 absolute top-1/2 h-96 w-96 rounded-full bg-purple-900 opacity-60 blur-3xl" />
-			</MotionDiv>
-			<div className="container relative z-10 mx-auto mt-10 flex min-h-dvh max-w-7xl flex-col items-center justify-center px-4 py-10 sm:mt-20 sm:px-6 lg:px-8">
+		<div className="relative h-[650px] w-full overflow-hidden bg-bunker-50 pt-56 sm:h-[720px] sm:pt-32 md:h-[780px] md:pt-120">
+			<div className="container relative z-10 mx-auto mt-0 flex h-full max-w-7xl flex-col items-center justify-center px-4 py-10 sm:mt-0 sm:px-6 lg:px-8">
 				{/* ... (título, texto e botões - sem alterações) ... */}
 				<div
-					className={`-translate-x-1 -translate-y-1 mt-1 mb-4 block transform px-4 py-1 text-purple-400 text-sm uppercase tracking-[4px] transition-all duration-700 ${
+					className={`-translate-x-1 -translate-y-1 mt-1 mb-4 block transform px-4 py-1 text-sky-400 text-sm uppercase tracking-[4px] transition-all duration-700 ${
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 				>
@@ -56,19 +41,16 @@ const Hero = () => {
 				</div>
 
 				<h1
-					className={`title mb-6 text-center font-semibold text-4xl text-white transition-all duration-700 sm:text-5xl md:text-6xl ${
+					className={`title mb-6 max-w-4xl text-center font-semibold text-4xl text-bunker-950 transition-all duration-700 sm:text-5xl md:text-5xl ${
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 					style={{ transitionDelay: "100ms" }}
 				>
-					Adicione links na{" "}
-					<span className="relative inline-block underline decoration-purple-400">
-						sua bio
-					</span>
+					Coloque todos os seus links em um só lugar e deixe sua bio incrível.
 				</h1>
 
 				<p
-					className={`mb-8 max-w-2xl text-center text-base text-gray-200 transition-all duration-700 sm:text-lg ${
+					className={`mb-8 max-w-2xl text-center text-base text-bunker-700 transition-all duration-700 sm:text-lg ${
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 					style={{ transitionDelay: "200ms" }}
@@ -94,7 +76,7 @@ const Hero = () => {
 						</span>
 					</BaseButton>
 					<BaseButton
-						className="group"
+						className="bg-sky-300 text-black hover:bg-sky-400"
 						disabled={isClicked["/registro"]}
 						onClick={() => handleClick("/registro")}
 					>
@@ -104,6 +86,14 @@ const Hero = () => {
 						</span>
 					</BaseButton>
 				</div>
+				<Image
+					alt="Bionk Images"
+					className="mt-10 h-150 w-auto"
+					height={2386}
+					priority
+					src="/images/test-fotos.png"
+					width={2969}
+				/>
 			</div>
 		</div>
 	);

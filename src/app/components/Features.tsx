@@ -15,7 +15,7 @@ import { BaseButton } from "@/components/buttons/BaseButton";
 export default function Features() {
 	const router = useRouter();
 	return (
-		<section className="relative overflow-hidden bg-white py-28">
+		<section className="relative overflow-hidden bg-sky-200 py-28">
 			<div className="container relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="mb-20 text-center">
 					<h2 className="title font-bold text-4xl text-black sm:text-5xl">
@@ -48,19 +48,22 @@ export default function Features() {
 								<h3 className="mb-3 font-bold text-3xl">
 									Gestão Descomplicada
 								</h3>
-								<p className="font-light text-lg opacity-90">
+								<p className="font-normal text-lg opacity-90">
 									Organize seus links em tempo real, edite com facilidade e
 									mantenha tudo otimizado.
 								</p>
 							</div>
 
-							<BaseButton onClick={() => router.push("/registro")}>
-								Criar uma conta na Bionk
+							<BaseButton
+								className="bg-green-200 text-black"
+								onClick={() => router.push("/registro")}
+							>
+								Crie sua conta
 							</BaseButton>
 						</div>
 					</div>
 
-					<div className="relative overflow-hidden rounded-3xl bg-[length:200%_200%] bg-gradient-to-r from-purple-400 via-purple-300 to-white transition-all duration-500 ease-in-out hover:bg-[position:100%_0%] md:col-span-4 ">
+					<div className="relative overflow-hidden rounded-3xl bg-yellow-950 transition-all duration-500 ease-in-out md:col-span-4 ">
 						<Image
 							alt="Ícone Bionk Web"
 							height={450}
@@ -69,13 +72,13 @@ export default function Features() {
 							width={450}
 						/>
 						<div className="relative z-10 p-6">
-							<div className="mb-4 inline-flex rounded-full bg-purple-100 p-3 shadow">
-								<Compass className="h-8 w-8 text-purple-500" />
+							<div className="mb-4 inline-flex rounded-full bg-white p-3 shadow">
+								<Compass className="h-8 w-8" />
 							</div>
-							<h3 className="mb-3 flex items-center font-semibold text-3xl text-purple-800">
+							<h3 className="mb-3 flex items-center font-semibold text-3xl text-yellow-200">
 								Sua identidade na web{" "}
 							</h3>
-							<p className="font-light text-gray-700 text-lg leading-snug lg:text-xl">
+							<p className="font-normal text-lg text-white leading-snug lg:text-xl">
 								Mostre seu nome ou marca com um link fácil de lembrar e visual
 								moderno, direto na barra do navegador.
 							</p>
@@ -84,17 +87,17 @@ export default function Features() {
 
 					<div className="relative min-h-[180px] overflow-hidden rounded-3xl p-6 md:col-span-3">
 						{/* Camada base */}
-						<div className="absolute inset-0 bg-gradient-to-bl from-purple-900 via-purple-500 to-purple-700" />
+						<div className="absolute inset-0 bg-cyan-950" />
 
 						{/* Conteúdo visível */}
 						<div className="relative z-10">
 							<div className="mb-4 inline-flex rounded-full bg-purple-300 p-3 shadow">
 								<MousePointerClick className="h-8 w-8 text-purple-700" />
 							</div>
-							<h3 className="mb-3 font-semibold text-3xl text-gray-100">
+							<h3 className="mb-3 font-semibold text-3xl text-cyan-200">
 								Fácil de Usar
 							</h3>
-							<p className="mb-12 font-light text-gray-200 text-lg leading-snug lg:text-xl">
+							<p className="mb-12 font-normal text-gray-200 text-lg leading-snug lg:text-xl">
 								Tudo pensado para você editar, compartilhar e gerenciar sem
 								complicações.
 							</p>
@@ -120,17 +123,14 @@ export default function Features() {
 					</div>
 
 					{/* Para Influencers */}
-					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-bunker-950 md:col-span-4">
+					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-blue-950 md:col-span-4">
 						<div className="relative z-20 flex h-full flex-col justify-end p-6">
 							<div className="text-balance break-words text-white">
 								<h3 className="mb-2 line-clamp-2 font-bold text-5xl leading-tight lg:text-6xl">
-									Para{" "}
-									<br />
-									<span className="font-black text-purple-500">
-										Influencers
-									</span>
+									Para <br />
+									<span className="font-black text-blue-300">Influencers</span>
 								</h3>
-								<p className="font-light text-lg leading-snug lg:text-xl">
+								<p className="font-normal text-lg leading-snug lg:text-xl">
 									Conecte todas as suas redes e promova colaborações com estilo
 									e profissionalismo.
 								</p>
@@ -139,15 +139,14 @@ export default function Features() {
 					</div>
 
 					{/* Para Empresas */}
-					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-bunker-950 md:col-span-4">
+					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-green-950 md:col-span-4">
 						<div className="relative z-20 flex h-full flex-col justify-end p-6">
 							<div className="break-keep text-white">
 								<h3 className="mb-2 line-clamp-2 font-bold text-5xl leading-tight lg:text-6xl">
-									Para{" "}
-									<br />
-									<span className="font-black text-purple-500">Empresas</span>
+									Para <br />
+									<span className="font-black text-green-300">Empresas</span>
 								</h3>
-								<p className="font-light text-lg leading-snug lg:text-xl">
+								<p className="font-normal text-lg leading-snug lg:text-xl">
 									Redirecione campanhas, promova lançamentos e mantenha seus
 									clientes engajados.
 								</p>
@@ -156,14 +155,13 @@ export default function Features() {
 					</div>
 
 					{/* Para Freelancers */}
-					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-bunker-950 md:col-span-4">
+					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-purple-950 md:col-span-4">
 						<div className="relative z-20 flex h-full flex-col justify-end break-keep p-6 text-white">
 							<h3 className="mb-2 line-clamp-2 whitespace-pre-line font-bold text-5xl leading-tight lg:text-6xl">
-								Para{" "}
-								<br />
-								<span className="font-black text-purple-500">Proveito</span>
+								Para <br />
+								<span className="font-black text-purple-300">Proveito</span>
 							</h3>
-							<p className="font-light text-lg leading-snug lg:text-xl">
+							<p className="font-normal text-lg leading-snug lg:text-xl">
 								Exiba seu portfólio, serviços e canais de contato de forma
 								profissional e acessível.
 							</p>

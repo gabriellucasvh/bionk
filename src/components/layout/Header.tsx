@@ -39,14 +39,15 @@ const Header: React.FC = () => {
 	};
 
 	return (
-		<nav className="fixed top-7 right-4 left-4 z-50 mx-auto hidden h-auto max-w-7xl items-center gap-y-4 rounded-full border bg-white px-4 py-3 lg:flex xl:inset-x-0">
-			<div className="mx-6 min-w-[100px] shrink-0">
+		<nav className="fixed top-7 right-4 left-4 z-50 mx-auto hidden h-auto max-w-7xl items-center gap-y-4 rounded-4xl border bg-white px-4 py-3 lg:flex xl:inset-x-0">
+			<div className="mx-3 min-w-[100px] shrink-0">
 				<Link href="/">
 					<Image
 						alt="logo"
+						className="h-6 w-auto"
 						height={90}
 						priority
-						src="/images/svg-bionk+oct.svg"
+						src="/images/bionk-name-logo.svg"
 						width={100}
 					/>
 				</Link>
@@ -56,7 +57,7 @@ const Header: React.FC = () => {
 				{HeaderProps.map((menu) => (
 					<li key={menu.label}>
 						<Link
-							className="whitespace-nowrap px-4 py-2 font-bold text-black transition-colors duration-200 hover:text-purple-600"
+							className="font- whitespace-nowrap px-4 py-2 text-black transition-colors duration-200 hover:text-sky-600"
 							href={menu.href}
 						>
 							{menu.label}
@@ -68,7 +69,7 @@ const Header: React.FC = () => {
 			<div className="flex min-w-0 flex-wrap justify-end gap-2">
 				{session ? (
 					<BaseButton
-						className="h-14"
+						className="h-14 bg-sky-300 text-black hover:bg-sky-400"
 						loading={isLoading[KEYS.studio]}
 						onClick={() => handleClick("studio", routes.studio)}
 					>
@@ -77,7 +78,7 @@ const Header: React.FC = () => {
 				) : (
 					<>
 						<BaseButton
-							className="h-14 font-bold"
+							className="h-14"
 							loading={isLoading[KEYS.login]}
 							onClick={() => handleClick("login", routes.login)}
 							variant="white"
@@ -86,7 +87,7 @@ const Header: React.FC = () => {
 						</BaseButton>
 
 						<BaseButton
-							className="h-14 font-bold"
+							className="h-14 bg-sky-300 text-black hover:bg-sky-400"
 							loading={isLoading[KEYS.registro]}
 							onClick={() => handleClick("registro", routes.registro)}
 						>

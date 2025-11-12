@@ -53,32 +53,32 @@ export default function Testimonials() {
 	const t = items[index];
 
 	return (
-		<section className="bg-purple-950 py-24">
+		<section className="bg-purple-200 py-24">
 			<div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="flex flex-col gap-12 md:flex-row md:items-center">
 					<div className="md:w-5/12">
-						<h2 className="title font-bold text-4xl text-white sm:text-5xl">
+						<h2 className="title font-bold text-4xl text-black sm:text-5xl">
 							Da nossa <span className="font-black">comunidade.</span>
 						</h2>
-						<p className="mt-6 max-w-md text-gray-300 text-lg">
+						<p className="mt-6 max-w-md text-gray-700 text-lg">
 							Veja o que nossos usuários têm a dizer sobre o Bionk.
 						</p>
 						<div className="mt-8 hidden gap-4 md:flex">
 							<button
 								aria-label="Anterior"
-								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-300 hover:bg-purple-900"
+								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-700 hover:bg-purple-300"
 								onClick={prev}
 								type="button"
 							>
-								<ChevronLeft className="h-6 w-6 text-white" />
+								<ChevronLeft className="h-6 w-6 text-black" />
 							</button>
 							<button
 								aria-label="Próximo"
-								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-300 hover:bg-purple-900"
+								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-700 hover:bg-purple-300"
 								onClick={next}
 								type="button"
 							>
-								<ChevronRight className="h-6 w-6 text-white" />
+								<ChevronRight className="h-6 w-6 text-black" />
 							</button>
 						</div>
 					</div>
@@ -97,7 +97,7 @@ export default function Testimonials() {
 									className="h-8 w-8 fill-current text-purple-400"
 									strokeWidth={0.1}
 								/>
-								<p className="mt-4 text-3xl text-white leading-snug">
+								<p className="mt-4 text-3xl text-black leading-snug">
 									{t.quote}
 								</p>
 								<div className="mt-8 flex items-center gap-4">
@@ -105,8 +105,8 @@ export default function Testimonials() {
 										<Image alt={t.name} height={48} src={t.avatar} width={48} />
 									</div>
 									<div>
-										<div className="font-semibold text-white">{t.name}</div>
-										<div className="text-gray-300 text-sm">{t.role}</div>
+										<div className="font-semibold text-black">{t.name}</div>
+										<div className="text-gray-700 text-sm">{t.role}</div>
 									</div>
 								</div>
 							</MotionDiv>
@@ -114,19 +114,19 @@ export default function Testimonials() {
 						<div className="mt-8 flex justify-center gap-4 md:hidden">
 							<button
 								aria-label="Anterior"
-								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-300 hover:bg-purple-900"
+								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-700 hover:bg-purple-900"
 								onClick={prev}
 								type="button"
 							>
-								<ChevronLeft className="h-6 w-6 text-white" />
+								<ChevronLeft className="h-6 w-6 text-black" />
 							</button>
 							<button
 								aria-label="Próximo"
-								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-300 hover:bg-purple-900"
+								className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gray-700 hover:bg-purple-900"
 								onClick={next}
 								type="button"
 							>
-								<ChevronRight className="h-6 w-6 text-white" />
+								<ChevronRight className="h-6 w-6 text-black" />
 							</button>
 						</div>
 					</div>

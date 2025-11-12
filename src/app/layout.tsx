@@ -42,6 +42,12 @@ const ClashDisplay = localFont({
 	variable: "--font-clash-display",
 });
 
+const cabinetGrotesk = localFont({
+	src: "/fonts/CabinetGrotesk-Variable.woff2",
+	display: "swap",
+	variable: "--font-cabinet-grotesk",
+});
+
 const geist = Geist({
 	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 	subsets: ["latin"],
@@ -174,7 +180,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html
-			className={`${geist.variable} ${ClashDisplay.variable} ${Satoshi.variable} ${inter.variable} ${montserrat.variable} ${poppins.variable} ${nunito.variable} ${playfairDisplay.variable} ${merriweather.variable} ${dancingScript.variable} ${dmSerifDisplay.variable} ${orbitron.variable} ${plusJakartaSans.variable} ${outfit.variable} ${spaceGrotesk.variable} ${libreBaskerville.variable} ${alegreya.variable} ${spectral.variable} ${urbanist.variable} ${karla.variable} ${publicSans.variable} ${atkinsonHyperlegible.variable} ${firaSans.variable} ${mulish.variable} antialiased`}
+			className={`${geist.variable} ${ClashDisplay.variable} ${cabinetGrotesk.variable} ${Satoshi.variable} ${inter.variable} ${montserrat.variable} ${poppins.variable} ${nunito.variable} ${playfairDisplay.variable} ${merriweather.variable} ${dancingScript.variable} ${dmSerifDisplay.variable} ${orbitron.variable} ${plusJakartaSans.variable} ${outfit.variable} ${spaceGrotesk.variable} ${libreBaskerville.variable} ${alegreya.variable} ${spectral.variable} ${urbanist.variable} ${karla.variable} ${publicSans.variable} ${atkinsonHyperlegible.variable} ${firaSans.variable} ${mulish.variable} antialiased`}
 			data-scroll-behavior="smooth"
 			lang="pt-BR"
 			suppressHydrationWarning={true}
