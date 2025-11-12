@@ -15,13 +15,13 @@ import { BaseButton } from "@/components/buttons/BaseButton";
 export default function Features() {
 	const router = useRouter();
 	return (
-		<section className="relative overflow-hidden bg-sky-200 py-28">
+		<section className="relative overflow-hidden bg-bunker-950 py-28">
 			<div className="container relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="mb-20 text-center">
-					<h2 className="title font-bold text-4xl text-black sm:text-5xl">
+					<h2 className="title font-bold text-4xl text-white sm:text-5xl">
 						Eleve sua presença online
 					</h2>
-					<p className="mx-auto mt-6 max-w-2xl text-gray-700 text-lg">
+					<p className="mx-auto mt-6 max-w-2xl text-bunker-300 text-lg">
 						Uma plataforma de bio inteligente para influenciadores, marcas e
 						profissionais que querem impactar.
 					</p>
@@ -123,12 +123,12 @@ export default function Features() {
 					</div>
 
 					{/* Para Influencers */}
-					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-blue-950 md:col-span-4">
+					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-sky-950 md:col-span-4">
 						<div className="relative z-20 flex h-full flex-col justify-end p-6">
 							<div className="text-balance break-words text-white">
 								<h3 className="mb-2 line-clamp-2 font-bold text-5xl leading-tight lg:text-6xl">
 									Para <br />
-									<span className="font-black text-blue-300">Influencers</span>
+									<span className="font-black text-sky-300">Influencers</span>
 								</h3>
 								<p className="font-normal text-lg leading-snug lg:text-xl">
 									Conecte todas as suas redes e promova colaborações com estilo
@@ -139,12 +139,12 @@ export default function Features() {
 					</div>
 
 					{/* Para Empresas */}
-					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-green-950 md:col-span-4">
+					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-sky-950 md:col-span-4">
 						<div className="relative z-20 flex h-full flex-col justify-end p-6">
 							<div className="break-keep text-white">
 								<h3 className="mb-2 line-clamp-2 font-bold text-5xl leading-tight lg:text-6xl">
 									Para <br />
-									<span className="font-black text-green-300">Empresas</span>
+									<span className="font-black text-sky-300">Empresas</span>
 								</h3>
 								<p className="font-normal text-lg leading-snug lg:text-xl">
 									Redirecione campanhas, promova lançamentos e mantenha seus
@@ -155,11 +155,11 @@ export default function Features() {
 					</div>
 
 					{/* Para Freelancers */}
-					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-purple-950 md:col-span-4">
+					<div className="relative flex flex-col overflow-hidden rounded-3xl bg-sky-950 md:col-span-4">
 						<div className="relative z-20 flex h-full flex-col justify-end break-keep p-6 text-white">
 							<h3 className="mb-2 line-clamp-2 whitespace-pre-line font-bold text-5xl leading-tight lg:text-6xl">
 								Para <br />
-								<span className="font-black text-purple-300">Proveito</span>
+								<span className="font-black text-sky-300">Proveito</span>
 							</h3>
 							<p className="font-normal text-lg leading-snug lg:text-xl">
 								Exiba seu portfólio, serviços e canais de contato de forma
