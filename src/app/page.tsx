@@ -1,13 +1,19 @@
+import dynamic from "next/dynamic";
 import Header from "@/components/layout/Header";
 import HeaderMobile from "@/components/layout/HeaderMobile";
 import LoadingPage from "@/components/layout/LoadingPage";
-import dynamic from "next/dynamic";
 import Hero from "./components/Hero";
 
 const Features = dynamic(() => import("@/app/components/Features"), {
 	loading: () => <LoadingPage />,
 });
-const Testimonials = dynamic(() => import("@/app/components/Testimonials"), {
+// const Testimonials = dynamic(() => import("@/app/components/Testimonials"), {
+// 	loading: () => <LoadingPage />,
+// });
+const SocialConnect = dynamic(() => import("@/app/components/SocialConnect"), {
+	loading: () => <LoadingPage />,
+});
+const EventsSection = dynamic(() => import("@/app/components/EventsSection"), {
 	loading: () => <LoadingPage />,
 });
 const CtaSection = dynamic(() => import("./components/CtaSection"), {
@@ -24,7 +30,9 @@ export default function Home() {
 			<HeaderMobile />
 			<Hero />
 			<Features />
-			<Testimonials />
+			<SocialConnect />
+			<EventsSection />
+			{/* <Testimonials /> */}
 			<CtaSection />
 			<Footer />
 		</main>

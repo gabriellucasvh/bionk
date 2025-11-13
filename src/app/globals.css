@@ -239,6 +239,9 @@
 		font-family: var(--font-cabinet-grotesk);
 		@apply font-bold;
 	}
+	::selection {
+		@apply bg-cyan-300 text-black;
+	}
 }
 
 @keyframes float {

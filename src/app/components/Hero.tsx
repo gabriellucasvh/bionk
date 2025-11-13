@@ -29,7 +29,7 @@ const Hero = () => {
 	};
 
 	return (
-		<div className="relative h-[650px] w-full overflow-hidden bg-bunker-50 pt-56 sm:h-[720px] sm:pt-32 md:h-[780px] md:pt-120">
+		<div className="relative h-[650px] w-full overflow-hidden bg-bunker-50 pt-56 sm:h-[720px] sm:pt-32 md:h-[780px] md:pt-90">
 			<div className="container relative z-10 mx-auto mt-0 flex h-full max-w-7xl flex-col items-center justify-center px-4 py-10 sm:mt-0 sm:px-6 lg:px-8">
 				{/* ... (título, texto e botões - sem alterações) ... */}
 				<div
