@@ -69,11 +69,11 @@ export default function Features() {
 						}>;
 						return (
 							<div
-								className="group hover:-translate-y-1 relative overflow-hidden rounded-3xl border border-bunker-200 bg-white p-6 transition-all duration-200 hover:shadow-lg md:col-span-4"
+								className="group relative overflow-hidden rounded-3xl bg-bunker-50 p-6 md:col-span-4"
 								key={idx}
 							>
-								<div className="mb-4 flex items-center justify-center">
-									<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-bunker-50 shadow-sm ring-1 ring-bunker-200">
+								<div className="mb-4 flex items-center justify-start">
+									<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white ">
 										<Icon className="h-8 w-8 text-sky-500" />
 									</div>
 								</div>
