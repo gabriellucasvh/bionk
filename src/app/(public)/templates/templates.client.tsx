@@ -65,8 +65,8 @@ const TemplatesClient = () => {
 			<section className="w-full px-4 py-20 sm:px-10 md:px-20 ">
 				<div className="mx-auto max-w-5xl space-y-8 text-center">
 					<h2 className="title text-4xl sm:text-5xl md:text-6xl">
-						<span className="text-violet-700">Tem uma</span>{" "}
-						<span className="text-purple-600">ideia insana?</span>
+						<span className="text-sky-400">Tem uma</span>{" "}
+						<span className="text-cyan-400">ideia insana?</span>
 					</h2>
 
 					<p className="mx-auto max-w-3xl text-gray-800 text-lg sm:text-xl md:text-2xl">
@@ -74,10 +74,10 @@ const TemplatesClient = () => {
 						funcionalidade? Uma animação? Compartilhe com a gente.
 					</p>
 
-					<p className="mt-6 font-semibold text-violet-800 text-xl md:text-2xl">
+					<p className="mt-6 font-semibold text-sky-600 text-xl md:text-2xl">
 						Envie sua ideia para{" "}
 						<Link
-							className="underline decoration-purple-600 decoration-wavy transition-colors hover:text-purple-700"
+							className="underline decoration-cyan-400 decoration-wavy transition-colors hover:text-cyan-700"
 							href="mailto:ideias@bionk.com"
 						>
 							ideias@bionk.me
