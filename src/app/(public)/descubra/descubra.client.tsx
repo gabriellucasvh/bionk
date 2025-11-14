@@ -114,7 +114,7 @@ const faqItems = [
 const DescubraClient = () => {
 	const router = useRouter();
 	return (
-		<div className="min-h-screen bg-purple-800">
+		<div className="min-h-screen bg-sky-800">
 			<Header />
 			<HeaderMobile />
 			<section className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 pt-10 text-lime-200 md:px-20 lg:flex-row lg:px-40">
@@ -257,9 +257,9 @@ const DescubraClient = () => {
 				</div>
 				<div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{featureCards.map((item) => (
-						<Card className="border-2 border-purple-700" key={item.title}>
+						<Card className="border-2 border-sky-700" key={item.title}>
 							<CardContent>
-								<CardHeader className="my-5 flex h-14 w-14 items-center justify-center rounded-full bg-purple-600 p-4">
+								<CardHeader className="my-5 flex h-14 w-14 items-center justify-center rounded-full bg-sky-600 p-4">
 									{item.icon}
 								</CardHeader>
 								<CardTitle className="mb-6 font-semibold text-xl md:text-2xl">
@@ -274,7 +274,7 @@ const DescubraClient = () => {
 				</div>
 			</section>
 
-			<section className="flex min-h-screen w-full flex-col-reverse items-center justify-between gap-10 bg-violet-950 px-6 py-16 text-purple-300 md:px-20 lg:flex-row lg:px-40">
+			<section className="flex min-h-screen w-full flex-col-reverse items-center justify-between gap-10 bg-cyan-950 px-6 py-16 text-sky-300 md:px-20 lg:flex-row lg:px-40">
 				<div>
 					<Image
 						alt="Painel de Analytics da plataforma Bionk"
@@ -302,7 +302,7 @@ const DescubraClient = () => {
 								className="flex flex-col items-center gap-5 sm:flex-row"
 								key={item.title}
 							>
-								<div className="rounded-full bg-violet-400 p-2">
+								<div className="rounded-full bg-cyan-400 p-2">
 									{item.icon}
 								</div>
 								<div className="text-center sm:text-left">
@@ -339,7 +339,7 @@ const DescubraClient = () => {
 						>
 							{faqItems.map((faq) => (
 								<AccordionItem
-									className="mb-4 w-full max-w-7xl rounded-3xl border-2 border-teal-800 bg-purple-900 px-6 py-6 transition-colors duration-300 hover:border-2 hover:border-lime-600 md:px-10"
+									className="mb-4 w-full max-w-7xl rounded-3xl border-2 border-teal-800 bg-sky-900 px-6 py-6 transition-colors duration-300 hover:border-2 hover:border-lime-600 md:px-10"
 									key={faq.value}
 									value={faq.value}
 								>
