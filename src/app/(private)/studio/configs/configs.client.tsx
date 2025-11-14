@@ -129,7 +129,7 @@ function CancelSubscriptionButton() {
 				</AlertDialogContent>
 			</AlertDialog>
 			{message && (
-				<p className="mt-2 text-green-600 text-sm dark:text-green-400">
+				<p className="mt-2 text-blue-600 text-sm dark:text-blue-400">
 					{message}
 				</p>
 			)}
@@ -143,7 +143,7 @@ function CancelSubscriptionButton() {
 function UpgradeSubscriptionCard() {
 	return (
 		<div>
-			<Card className="relative animate-gradient-x overflow-hidden border-0 bg-gradient-to-br from-cyan-500 via-green-500 to-teal-500 shadow-2xl">
+			<Card className="relative animate-gradient-x overflow-hidden border-0 bg-gradient-to-br from-blue-500 via-sky-700 to-purple-500 shadow-2xl">
 				{/* shimmer */}
 				<div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
@@ -152,9 +152,9 @@ function UpgradeSubscriptionCard() {
 
 				<CardHeader className="relative z-10">
 					<CardTitle className="flex items-center gap-3 font-bold text-white text-xl">
-						Desbloqueie o Poder Ultra!
+						Desbloqueie o Poder Pro!
 					</CardTitle>
-					<CardDescription className="text-base text-green-50/90 leading-relaxed">
+					<CardDescription className="text-base text-blue-50/90 leading-relaxed">
 						Você está a um passo da{" "}
 						<span className="font-semibold text-white">
 							experiência completa
@@ -165,7 +165,7 @@ function UpgradeSubscriptionCard() {
 
 				<CardContent className="relative z-10 mb-2">
 					<Link
-						className="group relative w-full transform overflow-hidden rounded-full bg-avocado-400 px-8 py-3 font-medium text-base text-green-900 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-avocado-500 hover:shadow-xl"
+						className="group relative w-full transform overflow-hidden rounded-full bg-sky-400 px-8 py-3 font-medium text-base text-black shadow-lg transition-all duration-300 hover:scale-105 hover:bg-sky-500 hover:shadow-xl"
 						href="/planos"
 						passHref
 					>
@@ -363,7 +363,7 @@ export default function ConfigsClient() {
 						<div className="grid grid-cols-3 gap-2 sm:gap-3">
 							<Button
 								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-700 ${
-									theme === "light" ? "border-green-500" : ""
+									theme === "light" ? "border-blue-500" : ""
 								}
 								${isAutoMode ? "border-input" : ""}
 								`}
@@ -375,7 +375,7 @@ export default function ConfigsClient() {
 							</Button>
 							<Button
 								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-700 ${
-									theme === "dark" ? "dark:border-green-500" : ""
+									theme === "dark" ? "dark:border-blue-500" : ""
 								}
 								${isAutoMode ? "dark:border-zinc-600" : ""}
 								`}
@@ -387,7 +387,7 @@ export default function ConfigsClient() {
 							</Button>
 							<Button
 								className={`flex h-10 items-center gap-1 text-xs sm:h-12 sm:gap-2 sm:text-sm dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-700 ${
-									isAutoMode ? "border-green-500 dark:border-green-500" : ""
+									isAutoMode ? "border-blue-500 dark:border-blue-500" : ""
 								}`}
 								onClick={() => setAutoMode()}
 								variant={"outline"}
