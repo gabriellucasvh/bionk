@@ -80,7 +80,7 @@ const Header: React.FC = () => {
 					) : (
 						<>
 							<BaseButton
-								className="h-14 bg-transparent hover:bg-transparent hover:text-bunker-800"
+								className="h-14 bg-transparent text-black hover:bg-transparent hover:text-bunker-800"
 								loading={isLoading[KEYS.login]}
 								onClick={() => handleClick("login", routes.login)}
 							>
