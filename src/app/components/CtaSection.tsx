@@ -50,6 +50,7 @@ export default function CtaSection() {
 							<BaseButton
 								loading={isClicked["/registro"]}
 								onClick={() => handleClick("/registro")}
+								variant="sky"
 							>
 								<span className="flex items-center">Criar meu Bionk</span>
 							</BaseButton>

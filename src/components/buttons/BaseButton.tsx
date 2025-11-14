@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	asChild?: boolean;
 	loading?: boolean;
-	variant?: "default" | "white" | "green" | "outline" | "link";
+	variant?: "default" | "white" | "green" | "outline" | "link" | "sky";
 	children: ReactNode;
 	fullWidth?: boolean;
 	size?: "default" | "sm" | "lg" | "icon";
