@@ -1,6 +1,11 @@
 // src/app/(private)/studio/VerPerfilMobile.tsx
 "use client";
 
+import { Download, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { QRCode } from "react-qrcode-logo";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import ShareSheet from "@/components/ShareSheet";
 import {
@@ -11,11 +16,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { Download, ExternalLink } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { QRCode } from "react-qrcode-logo";
 
 const VerPerfilMobile = () => {
 	const { data: session } = useSession();
@@ -27,7 +27,7 @@ const VerPerfilMobile = () => {
 	const shareText = `Confira meu perfil na Bionk: ${
 		username || session?.user?.name
 	}`;
-	const logoUrl = "/bionk-logo-quadrado-pb.svg";
+	const logoUrl = "/images/bionk-icon-black.svg";
 
 	useEffect(() => {
 		const baseUrl =

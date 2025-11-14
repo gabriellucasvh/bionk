@@ -47,7 +47,7 @@ const ProfileActionsDropdown = ({
 }) => {
 	const [isQrOpen, setIsQrOpen] = useState(false);
 	const shareText = `Confira meu perfil na Bionk: ${username || ""}`;
-	const logoUrl = "/bionk-logo-quadrado-pb.svg";
+	const logoUrl = "/images/bionk-icon-black.svg";
 
 	const handleDownloadQrCode = useCallback(() => {
 		const canvas = document.getElementById(

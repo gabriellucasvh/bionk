@@ -34,7 +34,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 		process.env.NEXT_PUBLIC_BASE_URL || "https://bionk.me"
 	}/${user.username}`;
 	const shareText = `Confira meu perfil na Bionk: ${user.username || user.name}`;
-	const logoUrl = "/bionk-logo-quadrado-pb.svg";
+	const logoUrl = "/images/bionk-icon-black.svg";
 
 	const [isMobile, setIsMobile] = React.useState(false);
 	React.useEffect(() => {

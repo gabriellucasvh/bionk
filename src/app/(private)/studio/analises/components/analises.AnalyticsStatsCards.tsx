@@ -23,7 +23,7 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 					<CardContent className="pt-1 sm:pt-2">
 						<div className="flex items-baseline justify-between">
 							<span className="flex items-center gap-1 font-bold text-lg sm:gap-2 sm:text-2xl dark:text-white">
-								<div className="rounded-full bg-green-50 p-1 text-green-500 sm:p-2 dark:bg-green-900 dark:text-green-400">
+								<div className="rounded-full bg-blue-50 p-1 text-sky-500 sm:p-2 dark:bg-sky-950 dark:text-sky-400">
 									<Eye className="h-4 w-4 sm:h-5 sm:w-5" />
 								</div>
 								{totalProfileViews.toLocaleString()}
@@ -44,7 +44,7 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 					<CardContent className="pt-1 sm:pt-2">
 						<div className="flex items-baseline justify-between">
 							<span className="flex items-center gap-1 font-bold text-lg sm:gap-2 sm:text-2xl dark:text-white">
-								<div className="rounded-full bg-green-50 p-1 text-green-500 sm:p-2 dark:bg-green-900 dark:text-green-400">
+								<div className="rounded-full bg-blue-50 p-1 text-sky-500 sm:p-2 dark:bg-sky-950 dark:text-sky-400">
 									<MousePointerClick className="h-4 w-4 sm:h-5 sm:w-5" />
 								</div>
 								{totalClicks.toLocaleString()}
@@ -65,7 +65,7 @@ const AnalyticsStatsCards: React.FC<AnalyticsStatsCardsProps> = React.memo(
 					<CardContent className="pt-1 sm:pt-2">
 						<div className="flex items-baseline justify-between">
 							<span className="flex items-center gap-1 font-bold text-lg sm:gap-2 sm:text-2xl dark:text-white">
-								<div className="rounded-full bg-green-50 p-1 text-green-500 sm:p-2 dark:bg-green-900 dark:text-green-400">
+								<div className="rounded-full bg-blue-50 p-1 text-sky-500 sm:p-2 dark:bg-sky-950 dark:text-sky-400">
 									<Percent className="h-4 w-4 sm:h-5 sm:w-5" />
 								</div>
 								{Number.parseFloat(performanceRate).toLocaleString("pt-BR", {

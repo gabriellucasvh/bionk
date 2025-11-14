@@ -279,6 +279,10 @@ button {
 	width: var(--uib-size);
 }
 
+.dark .dot-spinner {
+	--uib-color: #ffffff;
+}
+
 .dot-spinner__dot {
 	position: absolute;
 	top: 0;

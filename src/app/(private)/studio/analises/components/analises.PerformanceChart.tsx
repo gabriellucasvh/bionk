@@ -55,11 +55,11 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 								config={{
 									views: {
 										label: "Visualizações",
-										color: "oklch(55.8% 0.288 302.321)",
+										color: "oklch(0.7521 0.293 221.93)",
 									},
 									clicks: {
 										label: "Cliques",
-										color: "oklch(62.7% 0.194 149.214)",
+										color: "oklch(0.7521 0.3054 281.22)",
 									},
 								}}
 							>
