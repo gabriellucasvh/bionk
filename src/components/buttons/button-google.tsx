@@ -21,7 +21,7 @@ export function GoogleBtn() {
 
 	return (
 		<BaseButton
-			className="w-full"
+			className="w-full hover:ring-1 hover:ring-black"
 			loading={isLoading}
 			onClick={handleLogin}
 			type="button"

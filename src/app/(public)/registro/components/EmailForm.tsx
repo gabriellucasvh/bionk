@@ -70,6 +70,7 @@ export function EmailForm({ form, onSubmit, loading }: EmailFormProps) {
 				disabled={!canSubmit()}
 				loading={loading}
 				type="submit"
+				variant="dark"
 			>
 				Continuar
 			</BaseButton>
