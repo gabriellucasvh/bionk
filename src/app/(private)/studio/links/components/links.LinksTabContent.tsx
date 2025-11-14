@@ -12,6 +12,7 @@ import type {
 	TextItem,
 	VideoItem,
 } from "../types/links.types";
+import AddNewEventForm from "./events.AddNewEventForm";
 import AddContentModal from "./links.AddContentModal";
 import AddNewSectionForm from "./links.AddNewSectionForm";
 import LinkList from "./links.LinkList";
@@ -51,6 +52,7 @@ const LinksTabContent = ({
 		isAdding,
 		isAddingVideo,
 		isAddingImage,
+		isAddingEvent,
 		isAddingMusic,
 		formData,
 		videoFormData,
@@ -75,6 +77,7 @@ const LinksTabContent = ({
 		setIsAdding,
 		setIsAddingVideo,
 		setIsAddingImage,
+		setIsAddingEvent,
 		setIsAddingMusic,
 		setFormData,
 		setVideoFormData,
@@ -128,6 +131,12 @@ const LinksTabContent = ({
 				setFormData={setFormData}
 				setImageFormData={setImageFormData}
 				setIsAdding={setIsAdding}
+				setIsAddingEvent={(value: boolean) => {
+					if (value) {
+						handlers.closeAllActiveCreations();
+					}
+					setIsAddingEvent(value);
+				}}
 				setIsAddingImage={setIsAddingImage}
 				setIsAddingMusic={setIsAddingMusic}
 				setIsAddingSection={(value: boolean) => {
@@ -145,6 +154,10 @@ const LinksTabContent = ({
 				textFormData={handlers.textFormData}
 				videoFormData={videoFormData}
 			/>
+
+			{isAddingEvent && (
+				<AddNewEventForm onClose={() => setIsAddingEvent(false)} />
+			)}
 
 			{handlers.isAddingSection && (
 				<AddNewSectionForm

@@ -1,10 +1,12 @@
 "use client";
 
-import { Image as ImageIcon, Music, Plus, Video } from "lucide-react";
+import { Image as ImageIcon, Music, Plus, Ticket, Video } from "lucide-react";
 
 interface CategorySelectorProps {
-	selectedCategory: "content" | "video" | "image" | "music" | null;
-	onCategorySelect: (category: "content" | "video" | "image" | "music") => void;
+	selectedCategory: "content" | "video" | "image" | "music" | "event" | null;
+	onCategorySelect: (
+		category: "content" | "video" | "image" | "music" | "event"
+	) => void;
 }
 
 const CategorySelector = ({
@@ -67,6 +69,20 @@ const CategorySelector = ({
 			>
 				<ImageIcon className="h-5 w-5" />
 				<span className="font-medium">Imagem</span>
+			</button>
+
+			<button
+				aria-pressed={selectedCategory === "event"}
+				className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-900/30 ${
+					selectedCategory === "event"
+						? "bg-zinc-200 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300"
+						: ""
+				}`}
+				onClick={() => onCategorySelect("event")}
+				type="button"
+			>
+				<Ticket className="h-5 w-5" />
+				<span className="font-medium">Eventos</span>
 			</button>
 		</div>
 	);

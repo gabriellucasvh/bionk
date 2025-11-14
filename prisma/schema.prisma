@@ -8,6 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PriceType {
+  free
+  paid
+  donation
+}
+
 model User {
   id                            String         @id @default(uuid())
   name                          String
@@ -72,6 +78,7 @@ model User {
   Music                         Music[]
   MonthlyUserAnalytics          MonthlyUserAnalytics[]
   MonthlyLinkAnalytics          MonthlyLinkAnalytics[]
+  Event                         Event[]
 
   @@index([subscriptionStatus])
   @@index([createdAt])
@@ -374,6 +381,32 @@ model Music {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([sectionId])
+  @@index([userId])
+  @@index([userId, order])
+}
+
+model Event {
+  id               Int       @id @default(autoincrement())
+  userId           String
+  title            String
+  location         String
+  eventDate        DateTime
+  eventTime        String
+  descriptionShort String?
+  externalLink     String?
+  priceType        PriceType @default(free)
+  price            Float?
+  eventType        String
+  organizer        String?
+  coverImageUrl    String?
+  seatsAvailable   Int?
+  ageRating        String?
+  active           Boolean   @default(true)
+  order            Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([userId, order])
 }

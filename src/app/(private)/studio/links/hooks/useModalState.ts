@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 export const useModalState = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isAnimating, setIsAnimating] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState<
-        "content" | "video" | "image" | "music" | null
-     >("content");
+	const [selectedCategory, setSelectedCategory] = useState<
+		"content" | "video" | "image" | "music" | "event" | null
+	>("content");
 	const [selectedOption, setSelectedOption] = useState<
 		| "link"
 		| "section"
@@ -18,13 +18,14 @@ export const useModalState = () => {
 		| "tiktok"
 		| "twitch"
 		| "spotify"
-        | "deezer"
-        | "apple"
-        | "soundcloud"
-        | "audiomack"
-        | "image_single"
-        | "image_column"
-        | "image_carousel"
+		| "deezer"
+		| "apple"
+		| "soundcloud"
+		| "audiomack"
+		| "image_single"
+		| "image_column"
+		| "image_carousel"
+		| "event_tickets"
 		| null
 	>(null);
 	const [isMobile, setIsMobile] = useState(false);
@@ -101,10 +102,12 @@ export const useModalState = () => {
 		setSelectedOption(null);
 	};
 
-    const handleCategorySelect = (category: "content" | "video" | "image" | "music") => {
-        setSelectedCategory(category);
-        setSelectedOption(null);
-    };
+	const handleCategorySelect = (
+		category: "content" | "video" | "image" | "music" | "event"
+	) => {
+		setSelectedCategory(category);
+		setSelectedOption(null);
+	};
 
 	const handleOptionSelect = (
 		option:

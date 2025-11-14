@@ -148,6 +148,7 @@ export const useLinksManager = (
 	const [isAddingVideo, setIsAddingVideo] = useState(false);
 	const [isAddingImage, setIsAddingImage] = useState(false);
 	const [isAddingMusic, setIsAddingMusic] = useState(false);
+	const [isAddingEvent, setIsAddingEvent] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
 	const [sectionFormData, setSectionFormData] = useState<SectionFormData>(
@@ -188,6 +189,7 @@ export const useLinksManager = (
 		setIsAddingVideo(false);
 		setIsAddingImage(false);
 		setIsAddingMusic(false);
+		setIsAddingEvent(false);
 		setIsModalOpen(false);
 		setFormData(initialFormData);
 		setSectionFormData(initialSectionFormData);
@@ -322,32 +324,32 @@ export const useLinksManager = (
 
 		// Preservar rascunhos (isDraft) durante revalidações para evitar perda de dados
 		const draftItems = unifiedItems.filter((item) => (item as any).isDraft);
-        const combinedItems = [...draftItems, ...allItems];
-        combinedItems.sort(
-            (a, b) =>
-                getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
-        );
-        const seen = new Set<string>();
-        const deduped = combinedItems.filter((item: UnifiedItem) => {
-            const t = item.isSection
-                ? "section"
-                : item.isText
-                ? "text"
-                : item.isVideo
-                ? "video"
-                : (item as any).isImage
-                ? "image"
-                : (item as any).isMusic
-                ? "music"
-                : "link";
-            const k = `${t}-${item.id}`;
-            if (seen.has(k)) {
-                return false;
-            }
-            seen.add(k);
-            return true;
-        });
-        setUnifiedItems(deduped);
+		const combinedItems = [...draftItems, ...allItems];
+		combinedItems.sort(
+			(a, b) =>
+				getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
+		);
+		const seen = new Set<string>();
+		const deduped = combinedItems.filter((item: UnifiedItem) => {
+			const t = item.isSection
+				? "section"
+				: item.isText
+					? "text"
+					: item.isVideo
+						? "video"
+						: (item as any).isImage
+							? "image"
+							: (item as any).isMusic
+								? "music"
+								: "link";
+			const k = `${t}-${item.id}`;
+			if (seen.has(k)) {
+				return false;
+			}
+			seen.add(k);
+			return true;
+		});
+		setUnifiedItems(deduped);
 	}, [
 		currentLinks,
 		currentSections,
@@ -1671,7 +1673,7 @@ export const useLinksManager = (
 				throw new Error("Falha ao criar link");
 			}
 
-			const newLink = await res.json();
+			await res.json();
 			await Promise.all([
 				mutateLinks(),
 				mutateSections(),
@@ -1909,6 +1911,7 @@ export const useLinksManager = (
 		unifiedItems,
 		activeId,
 		isAdding,
+		isAddingEvent,
 		isAddingSection,
 		isAddingText,
 		isAddingVideo,
@@ -1925,6 +1928,7 @@ export const useLinksManager = (
 		archivingLinkId,
 		setActiveId,
 		setIsAdding,
+		setIsAddingEvent,
 		setIsAddingSection,
 		setIsAddingText,
 		setIsAddingVideo,

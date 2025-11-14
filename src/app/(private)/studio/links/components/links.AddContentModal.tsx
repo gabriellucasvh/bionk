@@ -22,6 +22,7 @@ import { useModalState } from "../hooks/useModalState";
 import type { SectionItem } from "../types/links.types";
 import CategorySelector from "./CategorySelector";
 import ContentOptions from "./ContentOptions";
+import EventOptions from "./EventOptions";
 
 import ImageOptions from "./ImageOptions";
 import MobileBottomSheet from "./MobileBottomSheet";
@@ -52,6 +53,7 @@ interface AddContentModalProps {
 	setIsAddingVideo: (value: boolean) => void;
 	setIsAddingImage: (value: boolean) => void;
 	setIsAddingMusic: (value: boolean) => void;
+	setIsAddingEvent: (value: boolean) => void;
 	setFormData: (data: LinkFormData) => void;
 	setSectionFormData: (data: SectionFormData) => void;
 	setTextFormData: (data: TextFormData) => void;
@@ -73,6 +75,7 @@ const AddContentModal = ({
 	videoFormData,
 	setIsAddingSection,
 	setIsAddingImage,
+	setIsAddingEvent,
 	setVideoFormData,
 	handleAddNewLink,
 	handleAddNewText,
@@ -149,6 +152,7 @@ const AddContentModal = ({
 			"apple",
 			"soundcloud",
 			"audiomack",
+			"event_tickets",
 		] as const;
 
 		if (!validOptions.includes(option as any)) {
@@ -156,6 +160,11 @@ const AddContentModal = ({
 		}
 
 		const validOption = option as (typeof validOptions)[number];
+
+		// Ao selecionar qualquer opção, garantir que formulário de evento seja fechado
+		if (validOption !== "event_tickets") {
+			setIsAddingEvent(false);
+		}
 
 		// Para "section", fechar o modal e abrir formulário inline na página
 		if (validOption === "section") {
@@ -217,14 +226,22 @@ const AddContentModal = ({
 			}, 0);
 			return;
 		}
+		if (validOption === "event_tickets") {
+			onClose();
+			setTimeout(() => {
+				setIsAddingEvent(true);
+			}, 0);
+			return;
+		}
 	};
 
 	const handleImageOptionSelect = (
 		option: "image_single" | "image_column" | "image_carousel"
 	) => {
 		// Criar rascunho e abrir edição fora do modal
-		// Garantir que o formulário de seção esteja fechado
+		// Garantir que formulários fora do contexto atual estejam fechados
 		setIsAddingSection(false);
+		setIsAddingEvent(false);
 		const layoutMap = {
 			image_single: "single",
 			image_column: "column",
@@ -282,6 +299,11 @@ const AddContentModal = ({
 						{selectedCategory === "image" && (
 							<ImageOptions onOptionSelect={handleImageOptionSelect} />
 						)}
+						{selectedCategory === "event" && (
+							<EventOptions
+								onOptionSelect={handleOptionSelectWithState as any}
+							/>
+						)}
 					</div>
 				</MobileBottomSheet>
 			</>
@@ -329,6 +351,11 @@ const AddContentModal = ({
 									)}
 									{selectedCategory === "image" && (
 										<ImageOptions onOptionSelect={handleImageOptionSelect} />
+									)}
+									{selectedCategory === "event" && (
+										<EventOptions
+											onOptionSelect={handleOptionSelectWithState as any}
+										/>
 									)}
 									{!selectedCategory && (
 										<div className="flex items-start justify-center pt-8 text-muted-foreground">
