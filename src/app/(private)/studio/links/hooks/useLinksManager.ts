@@ -1673,7 +1673,6 @@ export const useLinksManager = (
 				throw new Error("Falha ao criar link");
 			}
 
-			await res.json();
 			await Promise.all([
 				mutateLinks(),
 				mutateSections(),
