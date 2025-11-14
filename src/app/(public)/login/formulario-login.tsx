@@ -276,7 +276,6 @@ function Login() {
 									fullWidth
 									loading={loading}
 									type="submit"
-									variant="dark"
 								>
 									Entrar
 								</BaseButton>
