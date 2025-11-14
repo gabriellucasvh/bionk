@@ -45,7 +45,7 @@ const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
 						alt="Bionk Logo"
 						className="mx-auto h-auto w-24" // Ajustado
 						height={50}
-						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
+						src="/images/bionk-name-logo.svg"
 						width={100}
 					/>
 				</div>

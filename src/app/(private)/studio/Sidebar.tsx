@@ -339,7 +339,7 @@ const Sidebar = () => {
 							src={
 								theme === "dark"
 									? "/images/bionk-name-white-logo.svg"
-									: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
+									: "/images/bionk-name-logo.svg"
 							}
 							width={90}
 						/>

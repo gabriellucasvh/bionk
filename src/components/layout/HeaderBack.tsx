@@ -1,8 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 const HeaderBack = () => {
 	const [isClicked, setIsClicked] = useState(false);
@@ -22,7 +21,7 @@ const HeaderBack = () => {
 					alt="Logo Bionk"
 					className="w-16 transition-transform hover:scale-105 md:w-20"
 					height={90}
-					src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
+					src="/images/bionk-name-logo.svg"
 					width={160}
 				/>
 			</Link>

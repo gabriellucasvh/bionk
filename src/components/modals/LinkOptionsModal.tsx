@@ -31,9 +31,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 }) => {
 	// Hooks devem ser chamados no topo do componente
 	const pathname = usePathname();
-	const usernameFromPath = (pathname || "")
-		.split("/")
-		.filter(Boolean)[0] || "";
+	const usernameFromPath = (pathname || "").split("/").filter(Boolean)[0] || "";
 	const ownerUsername = username || usernameFromPath || "";
 	const reportHref = `/reportar-violacao?ref=linkoptionsmodal&u=${encodeURIComponent(ownerUsername)}`;
 
@@ -55,7 +53,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						alt="Bionk Logo"
 						className="mx-auto h-auto w-20"
 						height={40}
-						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
+						src="/images/bionk-name-logo.svg"
 						width={80}
 					/>
 				</div>

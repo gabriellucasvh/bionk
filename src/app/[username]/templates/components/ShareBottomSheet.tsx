@@ -286,7 +286,7 @@ const ShareBottomSheet: FC<ShareBottomSheetProps> = ({
 							alt="Bionk Logo"
 							className="mx-auto h-auto w-20"
 							height={40}
-							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
+							src="/images/bionk-name-logo.svg"
 							width={80}
 						/>
 					</div>

@@ -25,7 +25,8 @@ export function BaseButton({
 	const Component = asChild ? Slot : "button";
 
 	const variantClasses = {
-		default: "bg-sky-300 hover:bg-sky-400 text-black",
+		default: "bg-bunker-950 hover:bg-bunker-900 text-white",
+		sky: "bg-sky-300 hover:bg-sky-400 text-black",
 		white: "bg-white hover:bg-zinc-200 text-black border border-gray-200",
 		green: "bg-green-500 hover:bg-green-600 text-white border border-green-500",
 		dark: "bg-bunker-950 hover:bg-bunker-900 text-white",
