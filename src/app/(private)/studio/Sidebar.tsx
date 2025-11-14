@@ -338,7 +338,7 @@ const Sidebar = () => {
 							priority
 							src={
 								theme === "dark"
-									? "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755640991/bionk-logo-white_ld4dzs.svg"
+									? "/images/bionk-name-white-logo.svg"
 									: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
 							}
 							width={90}
@@ -449,7 +449,7 @@ const Sidebar = () => {
 						return (
 							<li className="flex items-center justify-center" key={link.key}>
 								<Button
-									className={`flex flex-col items-center gap-1 px-1 text-xs font-semibold  ${
+									className={`flex flex-col items-center gap-1 px-1 font-semibold text-xs ${
 										isActive
 											? "text-green-600 dark:text-green-400"
 											: "text-zinc-500 dark:text-zinc-400"
@@ -466,7 +466,7 @@ const Sidebar = () => {
 					{/* Perfil mobile */}
 					<li className="flex items-center justify-center">
 						<Button
-							className="flex flex-col items-center gap-1 px-1 text-xs text-zinc-500 sm:text-xs dark:text-zinc-400 font-semibold"
+							className="flex flex-col items-center gap-1 px-1 font-semibold text-xs text-zinc-500 sm:text-xs dark:text-zinc-400"
 							onClick={() => router.push("/studio/configs")}
 							variant="ghost"
 						>

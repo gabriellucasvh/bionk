@@ -37,7 +37,6 @@ const pricingPlans = [
 ];
 type BillingCycle = "monthly" | "annual";
 
-
 function BillingToggle({
 	billingCycle,
 	setBillingCycle,
@@ -260,7 +259,7 @@ export default function PaymentPage() {
 							alt="logo"
 							height={30}
 							priority
-							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755640991/bionk-logo-white_ld4dzs.svg"
+							src="/images/bionk-name-white-logo.svg"
 							width={90}
 						/>
 					</div>

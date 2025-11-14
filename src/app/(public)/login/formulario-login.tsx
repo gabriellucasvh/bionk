@@ -316,7 +316,7 @@ function Login() {
 					className="object-cover"
 					fill
 					priority
-					src="/abstract-wave-image.png"
+					src="/images/image-login.png"
 				/>
 				<div className="absolute inset-0 flex items-center justify-center">
 					<div className="flex flex-col items-center justify-center gap-4 p-8 text-center text-white">
@@ -325,7 +325,7 @@ function Login() {
 							className="object-contain"
 							height={200}
 							priority
-							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755640991/bionk-logo-white_ld4dzs.svg"
+							src="/images/bionk-name-white-logo.svg"
 							width={200}
 						/>
 						<p className="max-w-md text-lg opacity-90">
