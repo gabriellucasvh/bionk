@@ -251,7 +251,12 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 							onClick={() => setActionsModalOpen(true)}
 							type="button"
 						>
-							<Image alt="Bionk" height={18} src="/icons/b-icon.svg" width={18} />
+							<Image
+								alt="Bionk"
+								height={18}
+								src="/images/bionk-icon-black.svg"
+								width={18}
+							/>
 						</button>
 					</div>
 					<div className="absolute top-4 right-4 z-50 sm:top-6 sm:right-6">
@@ -261,7 +266,10 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 							onClick={() => setShareModalOpen(true)}
 							type="button"
 						>
-							<SquareArrowOutUpRight className="size-4.5 text-black" strokeWidth={1.5} />
+							<SquareArrowOutUpRight
+								className="size-4.5 text-black"
+								strokeWidth={1.5}
+							/>
 						</button>
 					</div>
 
