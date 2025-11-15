@@ -51,6 +51,20 @@ export interface UserData {
 		active?: boolean;
 		archived?: boolean;
 	}>;
+	events?: Array<{
+		id: number;
+		title: string;
+		location: string;
+		eventDate: string;
+		eventTime: string;
+		descriptionShort?: string | null;
+		externalLink: string;
+		coverImageUrl?: string | null;
+		order: number;
+		sectionId?: number | null;
+		active?: boolean;
+		archived?: boolean;
+	}>;
 }
 
 export interface Customizations {

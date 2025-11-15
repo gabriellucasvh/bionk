@@ -12,56 +12,55 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 interface AddNewEventFormProps {
 	onCreated?: (id: number) => void;
+	onSaved?: (id: number) => void;
 	onClose?: () => void;
+	event?: import("../types/links.types").EventItem;
 }
 
-const AddNewEventForm = ({ onCreated, onClose }: AddNewEventFormProps) => {
-	const [title, setTitle] = useState("");
-	const [location, setLocation] = useState("");
-	const [eventDate, setEventDate] = useState("");
-	const [dateOpen, setDateOpen] = useState(false);
-	const [eventTime, setEventTime] = useState("");
-	const [descriptionShort, setDescriptionShort] = useState("");
-	const [externalLink, setExternalLink] = useState("");
-	const [priceType, setPriceType] = useState<"free" | "paid" | "donation">(
-		"paid"
+const AddNewEventForm = ({
+	onCreated,
+	onSaved,
+	onClose,
+	event,
+}: AddNewEventFormProps) => {
+	const toLocalInputDate = (s?: string) => {
+		if (!s) {
+			return "";
+		}
+		try {
+			const d = new Date(s);
+			const pad = (n: number) => `${n}`.padStart(2, "0");
+			return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+		} catch {
+			return s;
+		}
+	};
+	const [title, setTitle] = useState(event?.title || "");
+	const [location, setLocation] = useState(event?.location || "");
+	const [eventDate, setEventDate] = useState(
+		toLocalInputDate(event?.eventDate)
 	);
-	const [priceDigits, setPriceDigits] = useState<string>("");
-	const [eventType, setEventType] = useState("");
-	const [organizer, setOrganizer] = useState("");
-	const [coverImageUrl, setCoverImageUrl] = useState("");
-	const [seatsAvailable, setSeatsAvailable] = useState<string>("");
-	const [ageRating, setAgeRating] = useState("");
+	const [dateOpen, setDateOpen] = useState(false);
+	const [eventTime, setEventTime] = useState(event?.eventTime || "");
+	const [descriptionShort, setDescriptionShort] = useState(
+		event?.descriptionShort || ""
+	);
+	const [externalLink, setExternalLink] = useState(event?.externalLink || "");
+	const [coverImageUrl, setCoverImageUrl] = useState(
+		event?.coverImageUrl || ""
+	);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string>("");
 
 	const canSubmit = () => {
-		if (
-			!(
-				title.trim() &&
-				location.trim() &&
-				eventDate &&
-				eventTime &&
-				eventType.trim()
-			)
-		) {
+		if (!(title.trim() && location.trim() && eventDate && eventTime)) {
 			return false;
 		}
-		if (
-			(priceType === "paid" || priceType === "donation") &&
-			(!priceDigits || numericPrice() === undefined)
-		) {
+		if (!externalLink.trim()) {
 			return false;
 		}
 		return true;
@@ -78,72 +77,6 @@ const AddNewEventForm = ({ onCreated, onClose }: AddNewEventFormProps) => {
 		return t;
 	};
 
-	const formatPriceDisplay = (digits: string) => {
-		const n = digits ? Number(digits) : 0;
-		const intPart = new Intl.NumberFormat("pt-BR", {
-			maximumFractionDigits: 0,
-		}).format(n);
-		return `R$ ${intPart},00`;
-	};
-
-	const handlePriceInputChange = (v: string) => {
-		const d = v.replace(/\D/g, "");
-		const base = d.endsWith("00") ? d.slice(0, -2) : d;
-		setPriceDigits(base);
-	};
-
-	const handlePriceKeyDown = (e: any) => {
-		const k = e.key;
-		if (k >= "0" && k <= "9") {
-			e.preventDefault();
-			setPriceDigits((prev) => `${prev}${k}`);
-			return;
-		}
-		if (k === "Backspace") {
-			e.preventDefault();
-			setPriceDigits((prev) => prev.slice(0, -1));
-			return;
-		}
-	};
-
-	const handlePricePaste = (e: any) => {
-		const v = e.clipboardData?.getData("text") || "";
-		const d = v.replace(/\D/g, "");
-		if (!d) {
-			e.preventDefault();
-			return;
-		}
-		e.preventDefault();
-		setPriceDigits(d);
-	};
-
-	const numericPrice = () => {
-		if (!priceDigits) {
-			return;
-		}
-		return Number(priceDigits);
-	};
-
-	const formatIntegerBR = (digits: string) => {
-		if (!digits) {
-			return "";
-		}
-		const n = Number(digits);
-		return new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 0 }).format(
-			n
-		);
-	};
-
-	const handleSeatsChange = (v: string) => {
-		const digits = v.replace(/\D/g, "").slice(0, 11);
-		if (!digits) {
-			setSeatsAvailable("");
-			return;
-		}
-		const n = Math.max(1, Number(digits));
-		setSeatsAvailable(String(n));
-	};
-
 	const handleSubmit = async () => {
 		if (!canSubmit()) {
 			setError("Preencha os campos obrigatórios");
@@ -157,27 +90,25 @@ const AddNewEventForm = ({ onCreated, onClose }: AddNewEventFormProps) => {
 			eventDate,
 			eventTime,
 			descriptionShort: descriptionShort.trim() || undefined,
-			externalLink: externalLink.trim() || undefined,
-			priceType,
-			price: priceDigits ? Number(priceDigits) : undefined,
-			eventType: eventType.trim(),
-			organizer: organizer.trim() || undefined,
+			externalLink: externalLink.trim(),
 			coverImageUrl: coverImageUrl.trim() || undefined,
-			seatsAvailable: seatsAvailable ? Number(seatsAvailable) : undefined,
-			ageRating: ageRating.trim() || undefined,
 		};
-		const res = await fetch("/api/events", {
-			method: "POST",
+		const res = await fetch(event ? `/api/events/${event.id}` : "/api/events", {
+			method: event ? "PUT" : "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(payload),
 		});
 		setLoading(false);
 		if (!res.ok) {
-			setError("Falha ao criar evento");
+			setError(event ? "Falha ao salvar evento" : "Falha ao criar evento");
 			return;
 		}
 		const json = await res.json();
-		if (onCreated && typeof json?.id === "number") {
+		if (event) {
+			if (onSaved && typeof json?.id === "number") {
+				onSaved(json.id);
+			}
+		} else if (onCreated && typeof json?.id === "number") {
 			onCreated(json.id);
 		}
 		if (onClose) {
@@ -283,68 +214,13 @@ const AddNewEventForm = ({ onCreated, onClose }: AddNewEventFormProps) => {
 						</div>
 						<div>
 							<div className="grid gap-2">
-								<Label>Link externo</Label>
+								<Label>Link externo*</Label>
 								<Input
 									className="bg-white dark:bg-bunker-950"
 									onChange={(e) => setExternalLink(e.target.value)}
 									placeholder="Ex: https://meusite.com/ingressos/0123"
+									required
 									value={externalLink}
-								/>
-							</div>
-						</div>
-						<div>
-							<div className="grid gap-2">
-								<Label>Faixa de preço</Label>
-								<Select
-									onValueChange={(v) => setPriceType(v as any)}
-									value={priceType}
-								>
-									<SelectTrigger className="bg-white dark:bg-bunker-950">
-										<SelectValue placeholder="Selecione" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="free">Gratuito</SelectItem>
-										<SelectItem value="paid">Pago</SelectItem>
-										<SelectItem value="donation">Doação</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-						</div>
-						{(priceType === "paid" || priceType === "donation") && (
-							<div>
-								<div className="grid gap-2">
-									<Label>Preço</Label>
-									<Input
-										className="bg-white dark:bg-bunker-950"
-										onChange={(e) => handlePriceInputChange(e.target.value)}
-										onKeyDown={handlePriceKeyDown}
-										onPaste={handlePricePaste}
-										placeholder="R$ 0,00"
-										value={formatPriceDisplay(priceDigits)}
-									/>
-								</div>
-							</div>
-						)}
-						<div>
-							<div className="grid gap-2">
-								<Label>Tipo de evento</Label>
-								<Input
-									className="bg-white dark:bg-bunker-950"
-									onChange={(e) => setEventType(e.target.value)}
-									placeholder="Show, Workshop, Palestra..."
-									value={eventType}
-								/>
-							</div>
-						</div>
-						<div>
-							<div className="grid gap-2">
-								<Label>Organizador</Label>
-								<Input
-									className="bg-white dark:bg-bunker-950"
-									maxLength={30}
-									onChange={(e) => setOrganizer(e.target.value)}
-									placeholder="Ex: Bionk Produções"
-									value={organizer}
 								/>
 							</div>
 						</div>
@@ -357,40 +233,6 @@ const AddNewEventForm = ({ onCreated, onClose }: AddNewEventFormProps) => {
 									placeholder="Ex: https://cdn.exemplo.com/capa.jpg"
 									value={coverImageUrl}
 								/>
-							</div>
-						</div>
-						<div>
-							<div className="grid gap-2">
-								<Label>Disponibilidade de vagas</Label>
-								<Input
-									className="bg-white dark:bg-bunker-950"
-									inputMode="numeric"
-									maxLength={11}
-									onChange={(e) => handleSeatsChange(e.target.value)}
-									placeholder="Ex: 1.000"
-									value={formatIntegerBR(seatsAvailable)}
-								/>
-							</div>
-						</div>
-						<div>
-							<div className="grid gap-2">
-								<Label>Classificação etária</Label>
-								<Select
-									onValueChange={(v) => setAgeRating(v)}
-									value={ageRating}
-								>
-									<SelectTrigger className="bg-white dark:bg-bunker-950">
-										<SelectValue placeholder="Selecione" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="Livre">Livre</SelectItem>
-										<SelectItem value="10">10</SelectItem>
-										<SelectItem value="12">12</SelectItem>
-										<SelectItem value="14">14</SelectItem>
-										<SelectItem value="16">16</SelectItem>
-										<SelectItem value="18">18</SelectItem>
-									</SelectContent>
-								</Select>
 							</div>
 						</div>
 					</div>

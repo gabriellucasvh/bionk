@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDesignStore } from "@/stores/designStore";
 import type { SocialLinkItem } from "@/types/social";
 import type {
+	EventItem,
 	ImageItem,
 	LinkItem,
 	MusicItem,
@@ -58,6 +59,7 @@ const UnifiedLinksManager = () => {
 	const hasLoadedVideos = useRef(false);
 	const hasLoadedImages = useRef(false);
 	const hasLoadedMusics = useRef(false);
+	const hasLoadedEvents = useRef(false);
 	const hasLoadedLinks = useRef(false);
 	const hasLoadedTexts = useRef(false);
 	const hasLoadedSections = useRef(false);
@@ -182,6 +184,15 @@ const UnifiedLinksManager = () => {
 		revalidateOnReconnect: false,
 	});
 
+	const { data: eventsData, mutate: mutateEvents } = useSWR<{
+		events: EventItem[];
+	}>(userId ? "/api/events" : null, fetcher, {
+		revalidateOnMount: false,
+		revalidateOnFocus: false,
+		revalidateIfStale: false,
+		revalidateOnReconnect: false,
+	});
+
 	// Carregar mídias apenas se existir motivo (contagem > 0) ou ação do usuário
 	useEffect(() => {
 		if (
@@ -215,6 +226,13 @@ const UnifiedLinksManager = () => {
 			mutateMusics();
 		}
 	}, [activeTab, summaryData?.musicsCount, mutateMusics]);
+
+	useEffect(() => {
+		if (activeTab === "links" && userId && !hasLoadedEvents.current) {
+			hasLoadedEvents.current = true;
+			mutateEvents();
+		}
+	}, [activeTab, userId, mutateEvents]);
 
 	// Carregar links/textos/seções apenas se houver itens e estiver na aba
 	useEffect(() => {
@@ -272,6 +290,7 @@ const UnifiedLinksManager = () => {
 			videos: (videosData?.videos || []) as any,
 			images: (imagesData?.images || []) as any,
 			musics: (musicsData?.musics || []) as any,
+			events: (eventsData?.events || []) as any,
 		});
 	}, [
 		linksData,
@@ -280,6 +299,7 @@ const UnifiedLinksManager = () => {
 		videosData,
 		imagesData,
 		musicsData,
+		eventsData,
 	]);
 
 	const showLinksLoader =
@@ -323,12 +343,14 @@ const UnifiedLinksManager = () => {
 		}
 		return (
 			<LinksTabContent
+				currentEvents={eventsData?.events || []}
 				currentImages={imagesData?.images || []}
 				currentLinks={linksData?.links || []}
 				currentMusics={musicsData?.musics || []}
 				currentSections={sectionsData || []}
 				currentTexts={textsData?.texts || []}
 				currentVideos={videosData?.videos || []}
+				mutateEvents={mutateEvents}
 				mutateImages={mutateImages}
 				mutateLinks={mutateLinks}
 				mutateMusics={mutateMusics}

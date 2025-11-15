@@ -393,14 +393,8 @@ model Event {
   eventDate        DateTime
   eventTime        String
   descriptionShort String?
-  externalLink     String?
-  priceType        PriceType @default(free)
-  price            Float?
-  eventType        String
-  organizer        String?
+  externalLink     String   @default("")
   coverImageUrl    String?
-  seatsAvailable   Int?
-  ageRating        String?
   active           Boolean   @default(true)
   order            Int       @default(0)
   createdAt        DateTime  @default(now())

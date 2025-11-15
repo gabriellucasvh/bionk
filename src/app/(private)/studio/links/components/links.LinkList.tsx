@@ -18,6 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import type { UnifiedItem } from "../hooks/useLinksManager";
 import type {
+	EventItem,
 	ImageItem,
 	LinkItem,
 	MusicItem,
@@ -26,6 +27,7 @@ import type {
 	VideoItem,
 } from "../types/links.types";
 import DragPreview from "./links.DragPreview";
+import EventCard from "./links.EventCard";
 import ImageCard from "./links.ImageCard";
 import LinkCard from "./links.LinkCard";
 import MusicCard from "./links.MusicCard";
@@ -130,8 +132,11 @@ interface LinkListProps {
 	) => void;
 	onCancelEditingMusic?: (id: number) => void;
 	togglingMusicId?: number | null;
+	togglingEventId?: number | null;
 	originalMusic?: MusicItem | null;
 	existingSections?: SectionItem[];
+	onDeleteEvent?: (id: number) => void;
+	onStartEditingEvent?: (id: number) => void;
 }
 
 const LinkList = (props: LinkListProps) => {
@@ -176,6 +181,7 @@ const LinkList = (props: LinkListProps) => {
 		onStartEditingMusic,
 		originalMusic,
 		togglingMusicId,
+		togglingEventId,
 		...cardProps
 	} = props;
 
@@ -261,6 +267,14 @@ const LinkList = (props: LinkListProps) => {
 			}
 		}
 
+		if (type === "event") {
+			return (
+				(items.find(
+					(i) => (i as any).isEvent && i.id === idNum
+				) as EventItem) || null
+			);
+		}
+
 		return null;
 	})();
 
@@ -289,6 +303,9 @@ const LinkList = (props: LinkListProps) => {
 						if ((item as any).isMusic) {
 							return `music-${item.id}`;
 						}
+						if ((item as any).isEvent) {
+							return `event-${item.id}`;
+						}
 						return `link-${item.id}`;
 					})}
 					strategy={verticalListSortingStrategy}
@@ -313,6 +330,9 @@ const LinkList = (props: LinkListProps) => {
 							} else if ((item as any).isMusic) {
 								key = `music-${item.id}`;
 								sortableId = `music-${item.id}`;
+							} else if ((item as any).isEvent) {
+								key = `event-${item.id}`;
+								sortableId = `event-${item.id}`;
 							} else {
 								key = `link-${item.id}`;
 								sortableId = `link-${item.id}`;
@@ -423,6 +443,23 @@ const LinkList = (props: LinkListProps) => {
 													onStartEditingMusic={onStartEditingMusic}
 													onToggleActive={cardProps.onToggleActive}
 													originalMusic={originalMusic}
+													setActivatorNodeRef={setActivatorNodeRef}
+												/>
+											);
+										}
+
+										if ((item as any).isEvent) {
+											return (
+												<EventCard
+													event={item as any}
+													isDragging={isDragging}
+													isTogglingActive={togglingEventId === item.id}
+													listeners={listeners}
+													onDeleteEvent={cardProps.onDeleteEvent as any}
+													onStartEditingEvent={
+														cardProps.onStartEditingEvent as any
+													}
+													onToggleActive={cardProps.onToggleActive}
 													setActivatorNodeRef={setActivatorNodeRef}
 												/>
 											);

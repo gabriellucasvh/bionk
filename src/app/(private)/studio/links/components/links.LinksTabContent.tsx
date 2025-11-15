@@ -5,6 +5,7 @@ import type { DragStartEvent } from "@dnd-kit/core";
 import type { Session } from "next-auth";
 import { useLinksManager } from "../hooks/useLinksManager";
 import type {
+	EventItem,
 	ImageItem,
 	LinkItem,
 	MusicItem,
@@ -24,12 +25,14 @@ interface LinksTabContentProps {
 	currentVideos: VideoItem[];
 	currentImages: ImageItem[];
 	currentMusics: MusicItem[];
+	currentEvents: EventItem[];
 	mutateLinks: () => Promise<any>;
 	mutateSections: () => Promise<any>;
 	mutateTexts: () => Promise<any>;
 	mutateVideos: () => Promise<any>;
 	mutateImages: () => Promise<any>;
 	mutateMusics: () => Promise<any>;
+	mutateEvents: () => Promise<any>;
 	session: Session | null;
 }
 
@@ -40,12 +43,14 @@ const LinksTabContent = ({
 	currentVideos,
 	currentImages,
 	currentMusics,
+	currentEvents,
 	mutateLinks,
 	mutateSections,
 	mutateTexts,
 	mutateVideos,
 	mutateImages,
 	mutateMusics,
+	mutateEvents,
 }: LinksTabContentProps) => {
 	const {
 		unifiedItems,
@@ -65,6 +70,7 @@ const LinksTabContent = ({
 		togglingVideoId,
 		togglingImageId,
 		togglingMusicId,
+		togglingEventId,
 		togglingLinkId,
 		togglingTextId,
 		togglingSectionId,
@@ -93,12 +99,14 @@ const LinksTabContent = ({
 		currentVideos,
 		currentImages,
 		currentMusics,
+		currentEvents,
 		mutateLinks,
 		mutateSections,
 		mutateTexts,
 		mutateVideos,
 		mutateImages,
-		mutateMusics
+		mutateMusics,
+		mutateEvents
 	);
 
 	const handleDragStart = (event: DragStartEvent) => {
@@ -156,7 +164,32 @@ const LinksTabContent = ({
 			/>
 
 			{isAddingEvent && (
-				<AddNewEventForm onClose={() => setIsAddingEvent(false)} />
+				<AddNewEventForm
+					event={handlers.originalEvent as any}
+					onClose={() => {
+						setIsAddingEvent(false);
+					}}
+					onCreated={async () => {
+						await mutateLinks();
+						await mutateSections();
+						await mutateTexts();
+						await mutateVideos();
+						await mutateImages();
+						await mutateMusics();
+						await mutateEvents();
+						setIsAddingEvent(false);
+					}}
+					onSaved={async () => {
+						await mutateLinks();
+						await mutateSections();
+						await mutateTexts();
+						await mutateVideos();
+						await mutateImages();
+						await mutateMusics();
+						await mutateEvents();
+						setIsAddingEvent(false);
+					}}
+				/>
 			)}
 
 			{handlers.isAddingSection && (
@@ -197,6 +230,7 @@ const LinksTabContent = ({
 				onCancelEditingText={handlers.handleCancelEditingText}
 				onCancelEditingVideo={handlers.handleCancelEditingVideo}
 				onClickLink={handlers.handleClickLink}
+				onDeleteEvent={handlers.handleDeleteEvent}
 				onDeleteImage={handlers.handleDeleteImage}
 				onDeleteLink={handlers.handleDeleteLink}
 				onDeleteMusic={handlers.handleDeleteMusic}
@@ -218,6 +252,7 @@ const LinksTabContent = ({
 				onSectionUngroup={handlers.handleSectionUngroup}
 				onSectionUpdate={handlers.handleSectionUpdate}
 				onStartEditing={handlers.handleStartEditing}
+				onStartEditingEvent={handlers.handleStartEditingEvent}
 				onStartEditingImage={handlers.handleStartEditingImage}
 				onStartEditingMusic={handlers.handleStartEditingMusic}
 				onStartEditingText={handlers.handleStartEditingText}
@@ -231,6 +266,7 @@ const LinksTabContent = ({
 				originalMusic={originalMusic}
 				originalText={originalText}
 				originalVideo={originalVideo}
+				togglingEventId={togglingEventId}
 				togglingImageId={togglingImageId}
 				togglingLinkId={togglingLinkId}
 				togglingMusicId={togglingMusicId}

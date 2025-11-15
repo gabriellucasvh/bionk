@@ -5,22 +5,31 @@ import {
 	Grip,
 	Image as ImageIcon,
 	Link as LinkIcon,
+	Music2,
+	Ticket,
 	Type,
 	Video,
-	Music2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
+	EventItem,
 	ImageItem,
 	LinkItem,
+	MusicItem,
 	SectionItem,
 	TextItem,
 	VideoItem,
-	MusicItem,
 } from "../types/links.types";
 
 interface DragPreviewProps {
-	item: LinkItem | SectionItem | TextItem | VideoItem | ImageItem | MusicItem;
+	item:
+		| LinkItem
+		| SectionItem
+		| TextItem
+		| VideoItem
+		| ImageItem
+		| MusicItem
+		| EventItem;
 	className?: string;
 }
 
@@ -64,6 +73,14 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
 				label: "Música",
 				color: "text-green-600",
 				title: item.title || "Música sem título",
+			};
+		}
+		if ("isEvent" in item && (item as any).isEvent) {
+			return {
+				icon: Ticket,
+				label: "Ingresso",
+				color: "text-purple-600",
+				title: (item as any).title || "Evento sem título",
 			};
 		}
 		return {

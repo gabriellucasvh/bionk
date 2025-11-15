@@ -2,7 +2,8 @@
 
 import { ChevronLeft, ChevronRight, Images, Lock } from "lucide-react";
 import Image from "next/image";
-import * as React from "react";
+import type { CSSProperties, MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import InteractiveLink from "@/components/InteractiveLink";
 import MusicCard from "@/components/MusicCard";
 import VideoCard from "@/components/VideoCard";
@@ -13,6 +14,9 @@ import { detectTrafficSource } from "@/utils/traffic-source";
 import PasswordProtectedLink from "./PasswordProtectedLink";
 import TextCard from "./TextCard";
 
+const REJECTED_URLS = /^(https?:\/\/|mailto:|tel:|\/\/)/i;
+const HEX_COLOR_REGEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
+const RGBA_COLOR_REGEX = /^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i;
 export default function LinksList({
 	user,
 	customPresets,
@@ -22,14 +26,14 @@ export default function LinksList({
 }: {
 	user: TemplateComponentProps["user"];
 	customPresets?: any;
-	textStyle?: React.CSSProperties;
-	buttonStyle?: React.CSSProperties;
+	textStyle?: CSSProperties;
+	buttonStyle?: CSSProperties;
 	hasScrolled?: boolean;
 }) {
 	const { animatedLinks } = useLinkAnimation();
-	const [showTooltip, setShowTooltip] = React.useState<string | null>(null);
+	const [showTooltip, setShowTooltip] = useState<string | null>(null);
 	// Estado para controlar visibilidade das setas dos carrosséis
-	const [carouselStates, setCarouselStates] = React.useState<
+	const [carouselStates, setCarouselStates] = useState<
 		Record<
 			string,
 			{ canLeft: boolean; canRight: boolean; isOverflowing: boolean }
@@ -62,14 +66,14 @@ export default function LinksList({
 		elements.forEach(updateCarouselStateFor);
 	};
 
-	React.useEffect(() => {
+	useEffect(() => {
 		recalcAllCarousels();
 		const onResize = () => recalcAllCarousels();
 		window.addEventListener("resize", onResize);
 		return () => window.removeEventListener("resize", onResize);
 	}, [user]);
 
-	const handleLockClick = (e: React.MouseEvent, linkId: string) => {
+	const handleLockClick = (e: MouseEvent, linkId: string) => {
 		e.preventDefault();
 		e.stopPropagation();
 		setShowTooltip(showTooltip === linkId ? null : linkId);
@@ -102,7 +106,7 @@ export default function LinksList({
 					<PasswordProtectedLink link={item}>
 						<div
 							className={cn(
-								"group relative w-full rounded-xl p-1 shadow-md transition-all duration-200 hover:brightness-110",
+								"group relative w-full rounded-xl p-1 shadow transition-all duration-200 hover:brightness-110",
 								isAnimated && "animate-shake"
 							)}
 							style={buttonStyle}
@@ -175,12 +179,12 @@ export default function LinksList({
 
 	const addContentToArray = (
 		contentArray: Array<{
-			type: "link" | "text" | "video" | "image" | "music";
+			type: "link" | "text" | "video" | "image" | "music" | "event";
 			item: any;
 			order: number;
 		}>,
 		items: any[] | undefined,
-		type: "link" | "text" | "video" | "image" | "music"
+		type: "link" | "text" | "video" | "image" | "music" | "event"
 	) => {
 		if (items && items.length > 0) {
 			for (const item of items) {
@@ -191,7 +195,7 @@ export default function LinksList({
 
 	const createContentArray = () => {
 		const contentArray: Array<{
-			type: "link" | "text" | "video" | "image" | "music";
+			type: "link" | "text" | "video" | "image" | "music" | "event";
 			item: any;
 			order: number;
 		}> = [];
@@ -201,6 +205,7 @@ export default function LinksList({
 		addContentToArray(contentArray, user.Video, "video");
 		addContentToArray(contentArray, (user as any).Image, "image");
 		addContentToArray(contentArray, (user as any).Music, "music");
+		addContentToArray(contentArray, (user as any).Event, "event");
 
 		return contentArray.sort((a, b) => a.order - b.order);
 	};
@@ -329,6 +334,112 @@ export default function LinksList({
 		return result;
 	};
 
+	const renderEventContent = (
+		event: any,
+		index: number,
+		sectionIdRef: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const eventSectionId = event.sectionId || null;
+
+		if (eventSectionId !== sectionIdRef.value && eventSectionId !== null) {
+			sectionIdRef.value = eventSectionId;
+			const sectionHeader = renderSectionHeader(event, eventSectionId, index);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		const dateLabel = (() => {
+			try {
+				const d = new Date(event.eventDate);
+				return d.toLocaleDateString("pt-BR");
+			} catch {
+				return event.eventDate;
+			}
+		})();
+
+		const cornerValue = customPresets?.customButtonCorners || "12";
+		const parseRgb = (c: string) => {
+			const hexMatch = c.match(HEX_COLOR_REGEX);
+			if (hexMatch) {
+				let hex = hexMatch[1];
+				if (hex.length === 3) {
+					hex = hex
+						.split("")
+						.map((ch) => ch + ch)
+						.join("");
+				}
+				const rHex = hex.slice(0, 2);
+				const gHex = hex.slice(2, 4);
+				const bHex = hex.slice(4, 6);
+				return {
+					r: Number.parseInt(rHex, 16),
+					g: Number.parseInt(gHex, 16),
+					b: Number.parseInt(bHex, 16),
+				};
+			}
+			const rgbMatch = c.match(RGBA_COLOR_REGEX);
+			if (rgbMatch) {
+				return {
+					r: Number(rgbMatch[1]),
+					g: Number(rgbMatch[2]),
+					b: Number(rgbMatch[3]),
+				};
+			}
+			return null;
+		};
+		const toForeground = (c: string, alpha = 0.7) => {
+			const rgb = parseRgb(c);
+			if (!rgb) {
+				return `rgba(0, 0, 0, ${alpha})`;
+			}
+			return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+		};
+		const mutedTextColor = toForeground(
+			String(customPresets?.customButtonTextColor || "#0f0f0f")
+		);
+
+		const href = normalizeExternalUrl(event.externalLink);
+
+		result.push(
+			<div className="w-full" key={`event-${event.id}`}>
+				{href ? (
+					<a
+						className="block border p-4 shadow"
+						href={href}
+						rel="noopener noreferrer"
+						style={{ borderRadius: `${cornerValue}px`, ...buttonStyle }}
+						target="_blank"
+					>
+						<h3 className="font-bold text-lg">{event.title}</h3>
+						<div className="text-sm" style={{ color: mutedTextColor }}>
+							{event.location}
+						</div>
+						<div className="text-sm" style={{ color: mutedTextColor }}>
+							{dateLabel} • {event.eventTime}
+						</div>
+					</a>
+				) : (
+					<div
+						className="border p-4 shadow"
+						style={{ borderRadius: `${cornerValue}px`, ...buttonStyle }}
+					>
+						<h3 className="font-bold text-lg">{event.title}</h3>
+						<div className="text-sm" style={{ color: mutedTextColor }}>
+							{event.location}
+						</div>
+						<div className="text-sm" style={{ color: mutedTextColor }}>
+							{dateLabel} • {event.eventTime}
+						</div>
+					</div>
+				)}
+			</div>
+		);
+
+		return result;
+	};
+
 	// Helpers para imagens
 	const normalizeExternalUrl = (url?: string | null): string | null => {
 		if (!url) {
@@ -339,7 +450,7 @@ export default function LinksList({
 			return null;
 		}
 		// Mantém protocolos válidos e URLs protocol-relative
-		if (/^(https?:\/\/|mailto:|tel:|\/\/)/i.test(trimmed)) {
+		if (REJECTED_URLS.test(trimmed)) {
 			return trimmed;
 		}
 		// Caso não tenha protocolo, força https
@@ -478,7 +589,7 @@ export default function LinksList({
 							<summary className="list-none">
 								<div
 									className={cn(
-										"group relative w-full rounded-xl p-1 shadow-md transition-all duration-200 hover:cursor-pointer hover:brightness-110"
+										"group relative w-full rounded-xl p-1 shadow transition-all duration-200 hover:cursor-pointer hover:brightness-110"
 									)}
 									style={buttonStyle}
 								>
@@ -559,7 +670,7 @@ export default function LinksList({
 								carouselStates[String(image.id)]?.canLeft && (
 									<button
 										aria-label="Voltar"
-										className="-translate-y-1/2 absolute top-1/2 left-2 rounded-full bg-black/50 p-2 shadow-md"
+										className="-translate-y-1/2 absolute top-1/2 left-2 rounded-full bg-black/50 p-2 shadow"
 										onClick={() => {
 											const el = document.getElementById(
 												`carousel-${image.id}`
@@ -575,7 +686,7 @@ export default function LinksList({
 								carouselStates[String(image.id)]?.canRight && (
 									<button
 										aria-label="Avançar"
-										className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-black/50 p-2 shadow-md"
+										className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-black/50 p-2 shadow"
 										onClick={() => {
 											const el = document.getElementById(
 												`carousel-${image.id}`
@@ -657,6 +768,8 @@ export default function LinksList({
 							return renderImageContent(content.item, index, currentSectionId);
 						case "music":
 							return renderMusicContent(content.item, index, currentSectionId);
+						case "event":
+							return renderEventContent(content.item, index, currentSectionId);
 						default:
 							return null;
 					}
@@ -666,7 +779,6 @@ export default function LinksList({
 
 				return (
 					<div className={needsSpacing ? "mb-8" : ""} key={`content-${index}`}>
-						{/* Se for link e for o primeiro link, remova a borda superior quando houver scroll */}
 						{content.type === "link"
 							? renderLink(content.item as UserLink, index === firstLinkIndex)
 							: renderedContent}

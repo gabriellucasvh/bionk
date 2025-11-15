@@ -1,14 +1,15 @@
 // src/types/user-profile.d.ts
 import type {
 	CustomPresets as PrismaCustomPresets,
+	Event as PrismaEvent,
+	Image as PrismaImage,
 	Link as PrismaLink,
+	Music as PrismaMusic,
 	Section as PrismaSection,
 	SocialLink as PrismaSocialLink,
 	Text as PrismaText,
-	Video as PrismaVideo,
-	Image as PrismaImage,
-	Music as PrismaMusic,
 	User as PrismaUser,
+	Video as PrismaVideo,
 } from "@prisma/client";
 
 // --- Links e Seções ---
@@ -20,7 +21,7 @@ export interface UserLink extends PrismaLink {
 		id: number;
 		title: string;
 	} | null;
-	type?: 'link' | 'section' | null;
+	type?: "link" | "section" | null;
 	expiresAt?: string | null;
 	deleteOnClicks?: number | null;
 	launchesAt?: string | null;
@@ -76,22 +77,22 @@ export interface UserVideo extends PrismaVideo {
 
 // --- Imagens ---
 export type ImageItemMeta = {
-    url: string;
-    previewUrl?: string;
-    provider?: string;
-    authorName?: string;
-    authorLink?: string;
-    sourceLink?: string;
-    linkUrl?: string;
+	url: string;
+	previewUrl?: string;
+	provider?: string;
+	authorName?: string;
+	authorLink?: string;
+	sourceLink?: string;
+	linkUrl?: string;
 };
 
 export interface UserImage extends PrismaImage {
-    // items é Json no Prisma; aqui tipamos para uso no front
-    items: ImageItemMeta[];
-    section?: {
-        id: number;
-        title: string;
-    } | null;
+	// items é Json no Prisma; aqui tipamos para uso no front
+	items: ImageItemMeta[];
+	section?: {
+		id: number;
+		title: string;
+	} | null;
 }
 
 // --- Músicas ---
@@ -102,18 +103,21 @@ export interface UserMusic extends PrismaMusic {
 	} | null;
 }
 
+// --- Ingressos ---
+export interface UserEvent extends PrismaEvent {}
+
 // --- Customização ---
 export interface CustomPresets extends PrismaCustomPresets {
-    customBackgroundColor: string;
-    customBackgroundGradient: string;
-    customBackgroundMediaType?: "image" | "video" | "" | null;
-    customBackgroundImageUrl?: string | null;
-    customBackgroundVideoUrl?: string | null;
-    customTextColor: string;
-    customFont: string;
-    customButton: string;
-    customButtonStyle: string;
-    customButtonFill: string;
+	customBackgroundColor: string;
+	customBackgroundGradient: string;
+	customBackgroundMediaType?: "image" | "video" | "" | null;
+	customBackgroundImageUrl?: string | null;
+	customBackgroundVideoUrl?: string | null;
+	customTextColor: string;
+	customFont: string;
+	customButton: string;
+	customButtonStyle: string;
+	customButtonFill: string;
 	customButtonCorners: string;
 	customButtonColor: string;
 	customButtonTextColor: string;
@@ -131,6 +135,7 @@ export type UserProfile = PrismaUser & {
 	Video: UserVideo[];
 	Image: UserImage[];
 	Music: UserMusic[];
+	Event: UserEvent[];
 	CustomPresets?: CustomPresets | null;
 
 	template?: string;

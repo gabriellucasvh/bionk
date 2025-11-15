@@ -100,11 +100,15 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 			};
 		}
 		if (hasExpiry) {
-			const expirationDate = new Date(link.expiresAt!);
-			const formattedDate = expirationDate.toLocaleDateString("pt-BR");
+			const raw = link.expiresAt;
+			const dt = raw ? new Date(raw) : null;
+			const formatted =
+				dt && !Number.isNaN(dt.getTime())
+					? dt.toLocaleDateString("pt-BR")
+					: String(raw);
 			return {
 				icon: <Clock className="size-5" />,
-				tooltip: `Expira em ${formattedDate}`,
+				tooltip: `Expira em ${formatted}`,
 				kind: "clock",
 			};
 		}
@@ -177,7 +181,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		<>
 			<div
 				className={twMerge(
-					"group relative w-full rounded-xl shadow-md",
+					"group relative w-full rounded-xl shadow",
 					isAnimated ? "animate-shake" : "",
 					className
 				)}
