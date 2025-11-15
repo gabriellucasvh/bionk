@@ -17,19 +17,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const schema = z.object({
-    login: z.string().min(3, "Informe email ou username"),
-    password: z.string().min(9, "A senha deve ter pelo menos 9 caracteres"),
+	login: z.string().min(3, "Informe email ou username"),
+	password: z.string().min(9, "A senha deve ter pelo menos 9 caracteres"),
 });
 
 type FormData = z.infer<typeof schema>;
 
 function Login() {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        watch,
-    } = useForm<FormData>({ resolver: zodResolver(schema) });
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+		watch,
+	} = useForm<FormData>({ resolver: zodResolver(schema) });
 
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState("");
@@ -153,9 +153,9 @@ function Login() {
 		return t;
 	};
 
-    const onSubmit = async (data: FormData) => {
-        setLoading(true);
-        setMessage("");
+	const onSubmit = async (data: FormData) => {
+		setLoading(true);
+		setMessage("");
 
 		try {
 			const token = await getCaptchaToken();
@@ -181,15 +181,15 @@ function Login() {
 		} finally {
 			setLoading(false);
 		}
-    };
+	};
 
-    const canSubmit = () => {
-        const loginVal = watch("login") ?? "";
-        const passVal = watch("password") ?? "";
-        return loginVal.length >= 3 && passVal.length >= 9 && !loading;
-    };
+	const canSubmit = () => {
+		const loginVal = watch("login") ?? "";
+		const passVal = watch("password") ?? "";
+		return loginVal.length >= 3 && passVal.length >= 9 && !loading;
+	};
 
-    return (
+	return (
 		<div className="flex min-h-dvh">
 			{/* Lado esquerdo - Formulário */}
 			<div className="flex flex-1 items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
@@ -269,17 +269,17 @@ function Login() {
 								</Link>
 							</div>
 
-                            <div className="space-y-4">
-                                <BaseButton
-                                    className="py-4 text-base"
-                                    fullWidth
-                                    disabled={!canSubmit()}
-                                    loading={loading}
-                                    type="submit"
-                                >
-                                    Entrar
-                                </BaseButton>
-                            </div>
+							<div className="space-y-4">
+								<BaseButton
+									className="py-4 text-base"
+									disabled={!canSubmit()}
+									fullWidth
+									loading={loading}
+									type="submit"
+								>
+									Entrar
+								</BaseButton>
+							</div>
 
 							<div className="flex items-center justify-center space-x-4">
 								<div className="h-px flex-1 bg-gray-300" />
@@ -315,7 +315,7 @@ function Login() {
 					className="object-cover"
 					fill
 					priority
-					src="/abstract-wave-image.png"
+					src="/images/image-login.png"
 				/>
 				<div className="absolute inset-0 flex items-center justify-center">
 					<div className="flex flex-col items-center justify-center gap-4 p-8 text-center text-white">
@@ -324,7 +324,7 @@ function Login() {
 							className="object-contain"
 							height={200}
 							priority
-							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755640991/bionk-logo-white_ld4dzs.svg"
+							src="/images/bionk-name-white-logo.svg"
 							width={200}
 						/>
 						<p className="max-w-md text-lg opacity-90">

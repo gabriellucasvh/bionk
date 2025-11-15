@@ -32,11 +32,7 @@ import { useSubscription } from "@/providers/subscriptionProvider";
 import { useTheme } from "@/providers/themeProvider";
 import ArchivedLinksModal from "./components/configs.ArchiveLinksModal";
 
-// (Troca de plano desativada) Dialog imports removidos
-
-// (Troca de plano desativada) Select imports removidos
-// (Troca de plano desativada) Label import removido
-
+// Tipos
 type Profile = { email: string };
 type SubscriptionDetails = {
 	isSubscribed: boolean;
@@ -45,6 +41,10 @@ type SubscriptionDetails = {
 	renewsOn?: string;
 	paymentMethod?: { brand: string; lastFour: string };
 };
+
+// -----------------------------------------------------------------------------------------------------------
+// Cancel Subscription
+// -----------------------------------------------------------------------------------------------------------
 
 function CancelSubscriptionButton() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -65,9 +65,9 @@ function CancelSubscriptionButton() {
 			if (!(res.ok && data?.url)) {
 				throw new Error(data?.error || "Falha ao abrir o Customer Portal");
 			}
-			// Redireciona o usuário para o Customer Portal da Stripe
+
 			window.location.href = data.url;
-			// Opcionalmente atualiza estado local após retorno
+
 			await refreshSubscriptionPlan();
 		} catch (err: any) {
 			setError(err.message);
@@ -75,6 +75,7 @@ function CancelSubscriptionButton() {
 			setIsLoading(false);
 		}
 	};
+
 	return (
 		<div className="mt-4">
 			<Button
@@ -85,8 +86,9 @@ function CancelSubscriptionButton() {
 			>
 				{isLoading ? "Abrindo..." : "Gerenciar Assinatura"}
 			</Button>
+
 			{message && (
-				<p className="mt-2 text-green-600 text-sm dark:text-green-400">
+				<p className="mt-2 text-blue-600 text-sm dark:text-blue-400">
 					{message}
 				</p>
 			)}
@@ -97,34 +99,34 @@ function CancelSubscriptionButton() {
 	);
 }
 
+// -----------------------------------------------------------------------------------------------------------
+// Upgrade Card
+// -----------------------------------------------------------------------------------------------------------
+
 function UpgradeSubscriptionCard() {
 	return (
 		<div>
-			<Card className="relative animate-gradient-x overflow-hidden border-0 bg-gradient-to-br from-cyan-500 via-green-500 to-teal-500 shadow-2xl">
-				{/* shimmer */}
+			<Card className="relative animate-gradient-x overflow-hidden border-0 bg-gradient-to-br from-blue-500 via-sky-700 to-purple-500 shadow-2xl">
 				<div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-				{/* gradiente preto para transparente */}
 				<div className="absolute inset-0 z-0 bg-gradient-to-t from-black/60 to-transparent" />
 
 				<CardHeader className="relative z-10">
 					<CardTitle className="flex items-center gap-3 font-bold text-white text-xl">
-						Desbloqueie o Poder PRO!
+						Desbloqueie o Poder Pro!
 					</CardTitle>
-					<CardDescription className="text-base text-green-50/90 leading-relaxed">
+					<CardDescription className="text-base text-blue-50/90 leading-relaxed">
 						Você está a um passo da{" "}
 						<span className="font-semibold text-white">
 							experiência completa
 						</span>
-						. Junte-se aos criadores de elite e transforme sua presença digital.
+						.
 					</CardDescription>
 				</CardHeader>
 
 				<CardContent className="relative z-10 mb-2">
 					<Link
-						className="group relative w-full transform overflow-hidden rounded-full bg-avocado-400 px-8 py-3 font-medium text-base text-green-900 shadow-lg transition-all duration-300 hover:scale-105 hover:bg-avocado-500 hover:shadow-xl"
+						className="group relative w-full transform overflow-hidden rounded-full bg-sky-400 px-8 py-3 font-medium text-base text-black shadow-lg transition-all duration-300 hover:scale-105 hover:bg-sky-500 hover:shadow-xl"
 						href="/planos"
-						passHref
 					>
 						Fazer Upgrade
 					</Link>
@@ -136,7 +138,10 @@ function UpgradeSubscriptionCard() {
 	);
 }
 
-// --- NOVO COMPONENTE PARA RENDERIZAÇÃO LIMPA ---
+// -----------------------------------------------------------------------------------------------------------
+// Subscription Management
+// -----------------------------------------------------------------------------------------------------------
+
 function SubscriptionManagement({
 	subscription,
 }: {
@@ -158,9 +163,10 @@ function SubscriptionManagement({
 						Gerenciar Assinatura
 					</CardTitle>
 					<CardDescription className="dark:text-zinc-400">
-						Visualize os detalhes do seu plano e forma de pagamento.
+						Visualize os detalhes do seu plano
 					</CardDescription>
 				</CardHeader>
+
 				<CardContent className="space-y-4">
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
 						<div className="space-y-1">
@@ -169,6 +175,7 @@ function SubscriptionManagement({
 								{subscription.plan}
 							</p>
 						</div>
+
 						<div className="space-y-1">
 							<p className="font-medium text-sm dark:text-white">
 								Próxima Cobrança
@@ -180,15 +187,15 @@ function SubscriptionManagement({
 							</p>
 						</div>
 					</div>
+
 					<Separator />
-					{/* Removido PlanChangeButton */}
+
 					<CancelSubscriptionButton />
 				</CardContent>
 			</Card>
 		);
 	}
 
-	// Default para status 'cancelled' ou outros
 	return (
 		<Card className="dark:border-zinc-700 dark:bg-zinc-800">
 			<CardHeader>
@@ -196,12 +203,12 @@ function SubscriptionManagement({
 					Assinatura Cancelada
 				</CardTitle>
 				<CardDescription className="dark:text-zinc-400">
-					Sua assinatura não está mais ativa. Para reativar, escolha um novo
-					plano.
+					Sua assinatura não está ativa. Para reativar, escolha um novo plano.
 				</CardDescription>
 			</CardHeader>
+
 			<CardContent>
-				<Link href="/planos" passHref>
+				<Link href="/planos">
 					<Button className="w-full sm:w-auto" variant="outline">
 						Ver Planos
 					</Button>
@@ -211,12 +218,18 @@ function SubscriptionManagement({
 	);
 }
 
+// -----------------------------------------------------------------------------------------------------------
+// Página principal
+// -----------------------------------------------------------------------------------------------------------
+
 export default function ConfigsClient() {
 	const { data: session } = useSession();
 	const { theme, setTheme, isAutoMode, setAutoMode } = useTheme();
 	const { subscriptionPlan, isLoading: isSubscriptionLoading } =
 		useSubscription();
+
 	const isCredentialsUser = session?.user?.isCredentialsUser === true;
+
 	const [profile, setProfile] = useState<Profile>({ email: "" });
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
 	const [isArchivedModalOpen, setIsArchivedModalOpen] = useState(false);
@@ -227,55 +240,43 @@ export default function ConfigsClient() {
 	const [isSensitiveLoading, setIsSensitiveLoading] = useState(false);
 
 	useEffect(() => {
-		const fetchInitialData = async () => {
+		const load = async () => {
 			if (!session?.user?.id) {
 				return;
 			}
+
 			try {
 				const [profileRes, subRes] = await Promise.all([
 					fetch("/api/profile"),
 					fetch("/api/subscription-details"),
 				]);
+
 				const profileData = await profileRes.json();
 				setProfile({ email: profileData.email || session.user.email || "" });
 				setSensitiveProfile(profileData.sensitiveProfile);
-				const subData = await subRes.json();
+
 				if (subRes.ok) {
-					setSubscription(subData);
+					setSubscription(await subRes.json());
 				}
-			} catch {
-				setProfile({ email: session.user.email || "" });
 			} finally {
 				setIsProfileLoading(false);
 			}
 		};
-		fetchInitialData();
+		load();
 	}, [session]);
 
 	const handleLogout = () => signOut();
+
 	const handleDeleteAccount = async () => {
 		if (!session?.user?.id) {
 			return;
 		}
+
 		await fetch(`/api/profile/${session.user.id}`, { method: "DELETE" });
 		signOut();
 	};
 
 	const selectedMode = isAutoMode ? "system" : theme;
-	const handleModeChange = (value: string) => {
-		if (value === "light") {
-			setTheme("light");
-			return;
-		}
-		if (value === "dark") {
-			setTheme("dark");
-			return;
-		}
-		if (value === "system") {
-			setAutoMode();
-			return;
-		}
-	};
 
 	const handleSensitiveProfileToggle = async (checked: boolean) => {
 		if (!session?.user?.id) {
@@ -284,19 +285,13 @@ export default function ConfigsClient() {
 
 		setIsSensitiveLoading(true);
 		try {
-			const response = await fetch(`/api/profile/${session.user.id}`, {
+			await fetch(`/api/profile/${session.user.id}`, {
 				method: "PATCH",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ sensitiveProfile: checked }),
 			});
 
-			if (response.ok) {
-				setSensitiveProfile(checked);
-			}
-		} catch (error) {
-			console.error("Erro ao atualizar perfil sensível:", error);
+			setSensitiveProfile(checked);
 		} finally {
 			setIsSensitiveLoading(false);
 		}
@@ -321,6 +316,7 @@ export default function ConfigsClient() {
 				<SubscriptionManagement subscription={subscription} />
 			</article>
 
+			{/* Tema */}
 			<article>
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
@@ -328,17 +324,31 @@ export default function ConfigsClient() {
 							Tema da Interface
 						</CardTitle>
 						<CardDescription className="dark:text-zinc-400">
-							Escolha entre modo claro, escuro ou automático
+							Escolha entre claro, escuro ou automático
 						</CardDescription>
 					</CardHeader>
+
 					<CardContent className="space-y-3 sm:space-y-4">
 						<RadioGroup
 							className="flex flex-wrap gap-3 sm:gap-4"
-							onValueChange={handleModeChange}
+							onValueChange={(v) => {
+								if (v === "light") {
+									setTheme("light");
+								} else if (v === "dark") {
+									setTheme("dark");
+								} else {
+									setAutoMode();
+								}
+							}}
 							value={selectedMode}
 						>
+							{/* Light */}
 							<Label
-								className={`group flex cursor-pointer flex-col items-start rounded-lg border p-2 transition-colors ${selectedMode === "light" ? "border-green-500" : "dark:border-zinc-700"}`}
+								className={`group flex cursor-pointer flex-col items-start rounded-lg border p-2 transition-colors ${
+									selectedMode === "light"
+										? "border-green-500"
+										: "dark:border-zinc-700"
+								}`}
 								htmlFor="theme-light"
 							>
 								<div className="mb-2 overflow-hidden rounded-md border dark:border-zinc-700">
@@ -355,8 +365,14 @@ export default function ConfigsClient() {
 									<span className="text-sm dark:text-zinc-300">Claro</span>
 								</div>
 							</Label>
+
+							{/* Dark */}
 							<Label
-								className={`group flex cursor-pointer flex-col items-start rounded-lg border p-2 transition-colors ${selectedMode === "dark" ? "border-green-500" : "dark:border-zinc-700"}`}
+								className={`group flex cursor-pointer flex-col items-start rounded-lg border p-2 transition-colors ${
+									selectedMode === "dark"
+										? "border-green-500"
+										: "dark:border-zinc-700"
+								}`}
 								htmlFor="theme-dark"
 							>
 								<div className="mb-2 overflow-hidden rounded-md border dark:border-zinc-700">
@@ -373,8 +389,14 @@ export default function ConfigsClient() {
 									<span className="text-sm dark:text-zinc-300">Escuro</span>
 								</div>
 							</Label>
+
+							{/* System */}
 							<Label
-								className={`group flex cursor-pointer flex-col items-start rounded-lg border p-2 transition-colors ${selectedMode === "system" ? "border-green-500" : "dark:border-zinc-700"}`}
+								className={`group flex cursor-pointer flex-col items-start rounded-lg border p-2 transition-colors ${
+									selectedMode === "system"
+										? "border-green-500"
+										: "dark:border-zinc-700"
+								}`}
 								htmlFor="theme-system"
 							>
 								<div className="mb-2 overflow-hidden rounded-md border dark:border-zinc-700">
@@ -392,63 +414,65 @@ export default function ConfigsClient() {
 								</div>
 							</Label>
 						</RadioGroup>
+
 						<p className="text-muted-foreground text-sm dark:text-zinc-400">
-							O modo automático segue a preferência do seu sistema operacional.
+							O modo automático segue o tema do sistema operacional.
 						</p>
 					</CardContent>
 				</Card>
 			</article>
 
+			{/* Conta */}
 			<article>
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2 dark:text-white">
+						<CardTitle className="dark:text-white">
 							Informações da Conta
 						</CardTitle>
 						<CardDescription className="dark:text-zinc-400">
-							Gerencie suas informações de conta e opções de login
+							Gerencie suas informações
 						</CardDescription>
 					</CardHeader>
+
 					<CardContent className="space-y-4">
-						<div className="space-y-4">
-							<div className="space-y-1">
-								<p className="font-medium text-sm dark:text-white">Email</p>
-								<p className="break-all text-muted-foreground text-sm dark:text-zinc-400">
-									{profile.email}
-								</p>
-							</div>
-							<div className="space-y-1">
-								<p className="font-medium text-sm dark:text-white">Plano</p>
-								<p className="text-muted-foreground text-sm capitalize dark:text-zinc-400">
-									{isSubscriptionLoading ? "-" : subscriptionPlan || "free"}
-								</p>
-							</div>
-							<div className="flex justify-start">
-								<Button
-									className="w-auto rounded-full"
-									onClick={handleLogout}
-									variant="outline"
-								>
-									Sair da conta
-								</Button>
-							</div>
+						<div className="space-y-1">
+							<p className="font-medium text-sm dark:text-white">Email</p>
+							<p className="break-all text-muted-foreground text-sm dark:text-zinc-400">
+								{profile.email}
+							</p>
 						</div>
+
+						<div className="space-y-1">
+							<p className="font-medium text-sm dark:text-white">Plano</p>
+							<p className="text-muted-foreground text-sm capitalize dark:text-zinc-400">
+								{isSubscriptionLoading ? "-" : subscriptionPlan || "free"}
+							</p>
+						</div>
+
+						<Button
+							className="rounded-full"
+							onClick={handleLogout}
+							variant="outline"
+						>
+							Sair da conta
+						</Button>
 					</CardContent>
 				</Card>
 			</article>
+
+			{/* Arquivados */}
 			<article>
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2 dark:text-white">
-							Links Arquivados
-						</CardTitle>
+						<CardTitle className="dark:text-white">Links Arquivados</CardTitle>
 						<CardDescription className="dark:text-zinc-400">
-							Visualize e restaure links que você arquivou
+							Visualize e restaure links arquivados
 						</CardDescription>
 					</CardHeader>
+
 					<CardContent>
 						<Button
-							className="w-full rounded-full sm:w-auto"
+							className="rounded-full"
 							onClick={() => setIsArchivedModalOpen(true)}
 							variant="outline"
 						>
@@ -458,6 +482,7 @@ export default function ConfigsClient() {
 				</Card>
 			</article>
 
+			{/* Sensível */}
 			<article>
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
@@ -470,37 +495,35 @@ export default function ConfigsClient() {
 								onCheckedChange={handleSensitiveProfileToggle}
 							/>
 						</CardTitle>
+
 						<CardDescription className="mt-2 dark:text-zinc-400">
-							Se ativado, seu perfil exibirá um aviso antes que outros usuários
-							vejam seu conteúdo.
+							Se ativado, seu perfil exibe aviso antes de mostrar conteúdo.
 						</CardDescription>
 					</CardHeader>
+
 					<CardContent>
 						<p className="text-muted-foreground text-xs dark:text-zinc-500">
-							Use esta opção apenas se você acredita que seu perfil pode não ser
-							apropriado para todos os públicos.
+							Use apenas se seu perfil pode não ser adequado para todos os
+							públicos.
 						</p>
 					</CardContent>
 				</Card>
 			</article>
 
+			{/* Alterar Email */}
 			{isCredentialsUser && (
 				<article>
 					<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 						<CardHeader>
-							<CardTitle className="flex items-center gap-2 dark:text-white">
-								Alterar E-mail
-							</CardTitle>
+							<CardTitle className="dark:text-white">Alterar E-mail</CardTitle>
 							<CardDescription className="dark:text-zinc-400">
-								Atualize o e-mail associado à sua conta
+								Atualize o e-mail associado
 							</CardDescription>
 						</CardHeader>
+
 						<CardContent>
 							<Link href="/profile/change-email">
-								<Button
-									className="w-full rounded-full sm:w-auto"
-									variant="outline"
-								>
+								<Button className="rounded-full" variant="outline">
 									Alterar E-mail
 								</Button>
 							</Link>
@@ -508,23 +531,21 @@ export default function ConfigsClient() {
 					</Card>
 				</article>
 			)}
+
+			{/* Alterar Senha */}
 			{isCredentialsUser && (
 				<article>
 					<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 						<CardHeader>
-							<CardTitle className="flex items-center gap-2 dark:text-white">
-								Alterar Senha
-							</CardTitle>
+							<CardTitle className="dark:text-white">Alterar Senha</CardTitle>
 							<CardDescription className="dark:text-zinc-400">
-								Atualize sua senha de acesso
+								Atualize sua senha
 							</CardDescription>
 						</CardHeader>
+
 						<CardContent>
 							<Link href="/profile/change-password">
-								<Button
-									className="w-full rounded-full sm:w-auto"
-									variant="outline"
-								>
+								<Button className="rounded-full" variant="outline">
 									Alterar Senha
 								</Button>
 							</Link>
@@ -532,73 +553,43 @@ export default function ConfigsClient() {
 					</Card>
 				</article>
 			)}
+
+			{/* Excluir Conta */}
 			<article>
 				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2 text-destructive dark:text-red-500">
+						<CardTitle className="text-destructive dark:text-red-500">
 							Excluir Conta
 						</CardTitle>
 						<CardDescription className="dark:text-zinc-400">
-							Exclua permanentemente sua conta e todos os seus dados
+							Exclui permanentemente seus dados
 						</CardDescription>
 					</CardHeader>
+
 					<CardContent>
 						<AlertDialog>
 							<AlertDialogTrigger asChild>
-								<Button
-									className="w-auto rounded-full dark:bg-red-500"
-									variant="destructive"
-								>
+								<Button className="rounded-full" variant="destructive">
 									Excluir Conta
 								</Button>
 							</AlertDialogTrigger>
-							<AlertDialogContent className="mx-auto w-[calc(100vw-2rem)] max-w-md sm:mx-auto sm:w-full dark:border-zinc-700 dark:bg-zinc-800">
-								<AlertDialogHeader className="space-y-2">
-									<AlertDialogTitle className="text-base sm:text-lg dark:text-white">
-										Tem certeza?
-									</AlertDialogTitle>
-									<AlertDialogDescription className="text-xs sm:text-sm dark:text-zinc-400">
-										Esta ação não pode ser desfeita. Sua conta e dados serão
-										removidos permanentemente.
+
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+									<AlertDialogDescription>
+										Esta ação é permanente.
 									</AlertDialogDescription>
 								</AlertDialogHeader>
-								<AlertDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-									<AlertDialogCancel className="w-full rounded-full text-xs sm:w-auto sm:text-sm">
-										Cancelar
-									</AlertDialogCancel>
-									<AlertDialogAction
-										className="w-full rounded-full bg-red-500 text-white text-xs sm:w-auto sm:text-sm"
-										onClick={handleDeleteAccount}
-									>
-										Sim, excluir minha conta
+
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancelar</AlertDialogCancel>
+									<AlertDialogAction onClick={handleDeleteAccount}>
+										Excluir
 									</AlertDialogAction>
 								</AlertDialogFooter>
 							</AlertDialogContent>
 						</AlertDialog>
-					</CardContent>
-				</Card>
-			</article>
-			<Separator />
-			<article>
-				<Card className="dark:border-zinc-700 dark:bg-zinc-900">
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2 dark:text-white">
-							Central de Ajuda
-						</CardTitle>
-						<CardDescription className="dark:text-zinc-400">
-							Acesse nossa documentação e perguntas frequentes
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<Link
-							className="h-9 w-full rounded-full border bg-background px-4 py-2 text-sm shadow-xs hover:bg-accent hover:text-accent-foreground has-[>svg]:px-3 dark:border-input dark:bg-input/30 dark:hover:bg-input/50"
-							href="https://ajuda.bionk.me"
-							passHref
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							Acessar Central de Ajuda
-						</Link>
 					</CardContent>
 				</Card>
 			</article>
@@ -610,5 +601,3 @@ export default function ConfigsClient() {
 		</div>
 	);
 }
-
-// Troca de plano desativada; componente PlanChangeButton removido temporariamente

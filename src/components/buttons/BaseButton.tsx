@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	asChild?: boolean;
 	loading?: boolean;
-	variant?: "default" | "white" | "green" | "outline" | "link";
+	variant?: "default" | "white" | "green" | "outline" | "link" | "sky";
 	children: ReactNode;
 	fullWidth?: boolean;
 	size?: "default" | "sm" | "lg" | "icon";
@@ -25,7 +25,8 @@ export function BaseButton({
 	const Component = asChild ? Slot : "button";
 
 	const variantClasses = {
-		default: "bg-avocado-400 hover:bg-avocado-500 text-black",
+		default: "bg-bunker-950 hover:bg-bunker-900 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-black",
+		sky: "bg-sky-300 hover:bg-sky-400 text-black",
 		white: "bg-white hover:bg-zinc-200 text-black border border-gray-200",
 		green: "bg-green-500 hover:bg-green-600 text-white border border-green-500",
 		outline:

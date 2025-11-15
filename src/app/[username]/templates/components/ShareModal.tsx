@@ -34,7 +34,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 		process.env.NEXT_PUBLIC_BASE_URL || "https://bionk.me"
 	}/${user.username}`;
 	const shareText = `Confira meu perfil na Bionk: ${user.username || user.name}`;
-	const logoUrl = "/bionk-logo-quadrado-pb.svg";
+	const logoUrl = "/images/bionk-icon-black.svg";
 
 	const [isMobile, setIsMobile] = React.useState(false);
 	React.useEffect(() => {
@@ -62,7 +62,7 @@ const ShareModal: FC<ShareModalProps> = ({ user, isOpen, onOpenChange }) => {
 						alt="Bionk Logo"
 						className="mx-auto h-auto w-20"
 						height={40}
-						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641260/bionk-logo_sehkbi.svg"
+						src="/images/bionk-name-logo.svg"
 						width={80}
 					/>
 				</div>

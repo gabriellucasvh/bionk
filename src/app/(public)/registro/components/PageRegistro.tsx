@@ -5,6 +5,7 @@ import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import Script from "next/script";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
@@ -13,7 +14,6 @@ import { z } from "zod";
 import { GoogleBtn } from "@/components/buttons/button-google";
 import LoadingPage from "@/components/layout/LoadingPage";
 import { EmailForm } from "./EmailForm";
-import Script from "next/script";
 
 const emailSchema = z.object({
 	email: z.string().email("E-mail inválido"),
@@ -49,70 +49,69 @@ export default function PageRegistro() {
 		},
 	});
 
-	useEffect(() => {
-	}, [widgetId]);
+	useEffect(() => {}, [widgetId]);
 
-    const renderTurnstile = (): string | null => {
-        const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-        const w = window as unknown as { turnstile?: any };
+	const renderTurnstile = (): string | null => {
+		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		const w = window as unknown as { turnstile?: any };
 
-        if (!siteKey) {
-            return null;
-        }
-        if (!w.turnstile) {
-            return null;
-        }
-        if (!widgetRef.current) {
-            return null;
-        }
-        if (widgetId) {
-            return widgetId;
-        }
+		if (!siteKey) {
+			return null;
+		}
+		if (!w.turnstile) {
+			return null;
+		}
+		if (!widgetRef.current) {
+			return null;
+		}
+		if (widgetId) {
+			return widgetId;
+		}
 
-        const id = w.turnstile.render(widgetRef.current, {
-            sitekey: siteKey,
-            size: "invisible",
-            callback: (token: string) => {
-                setCaptchaToken(token);
-                if (pendingTokenResolver.current) {
-                    pendingTokenResolver.current(token);
-                    pendingTokenResolver.current = null;
-                }
-            },
-        });
-        setWidgetId(id);
-        return id;
-    };
+		const id = w.turnstile.render(widgetRef.current, {
+			sitekey: siteKey,
+			size: "invisible",
+			callback: (token: string) => {
+				setCaptchaToken(token);
+				if (pendingTokenResolver.current) {
+					pendingTokenResolver.current(token);
+					pendingTokenResolver.current = null;
+				}
+			},
+		});
+		setWidgetId(id);
+		return id;
+	};
 
-    const getCaptchaToken = async (): Promise<string | null> => {
-        const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-        if (!siteKey) {
-            return captchaToken;
-        }
-        const ready = await waitForTurnstile();
-        if (!ready) {
-            return null;
-        }
-        const w = window as unknown as { turnstile?: any };
-        const id = widgetId ?? renderTurnstile();
-        if (!id) {
-            return null;
-        }
-        const existing = w.turnstile.getResponse(id);
-        if (existing) {
-            setCaptchaToken(existing);
-            return existing;
-        }
-        return await new Promise<string | null>((resolve) => {
-            pendingTokenResolver.current = (t: string) => resolve(t);
-            w.turnstile.execute(id);
-        });
-    };
+	const getCaptchaToken = async (): Promise<string | null> => {
+		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		if (!siteKey) {
+			return captchaToken;
+		}
+		const ready = await waitForTurnstile();
+		if (!ready) {
+			return null;
+		}
+		const w = window as unknown as { turnstile?: any };
+		const id = widgetId ?? renderTurnstile();
+		if (!id) {
+			return null;
+		}
+		const existing = w.turnstile.getResponse(id);
+		if (existing) {
+			setCaptchaToken(existing);
+			return existing;
+		}
+		return await new Promise<string | null>((resolve) => {
+			pendingTokenResolver.current = (t: string) => resolve(t);
+			w.turnstile.execute(id);
+		});
+	};
 
 	const handleEmailSubmit: SubmitHandler<EmailFormData> = async (data) => {
 		setLoading(true);
 		setMessage(null);
-	try {
+		try {
 			const tokenToSend = await getCaptchaToken();
 
 			const payload: any = {
@@ -146,11 +145,11 @@ export default function PageRegistro() {
 
 	return (
 		<div className="flex min-h-dvh">
-		<Script
-			src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-			async
-			defer
-		/>
+			<Script
+				async
+				defer
+				src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+			/>
 			<div className="flex flex-1 items-center justify-center bg-white px-4 sm:px-6 lg:px-8">
 				<div className="w-full max-w-lg">
 					<div className="space-y-8">
@@ -161,18 +160,18 @@ export default function PageRegistro() {
 							<p className="text-base text-muted-foreground">
 								Comece grátis e personalize seus links em segundos.
 							</p>
-					{message && (
-						<p className=" text-red-600 text-sm">{message.text}</p>
-					)}
-				</div>
+							{message && (
+								<p className=" text-red-600 text-sm">{message.text}</p>
+							)}
+						</div>
 
-					<div className="space-y-4">
-						<div ref={widgetRef} className="hidden" />
-					<EmailForm
-						form={emailForm}
-						loading={loading}
-						onSubmit={handleEmailSubmit}
-					/>
+						<div className="space-y-4">
+							<div className="hidden" ref={widgetRef} />
+							<EmailForm
+								form={emailForm}
+								loading={loading}
+								onSubmit={handleEmailSubmit}
+							/>
 
 							<div className="flex items-center justify-center space-x-4">
 								<div className="h-px flex-1 bg-gray-300" />
@@ -207,7 +206,7 @@ export default function PageRegistro() {
 					className="object-cover"
 					fill
 					priority
-					src="/abstract-wave-image.png"
+					src="/images/image-login.png"
 				/>
 				<div className="absolute inset-0 flex items-center justify-center">
 					<div className="flex flex-col items-center justify-center gap-4 p-8 text-center text-white">
@@ -216,7 +215,7 @@ export default function PageRegistro() {
 							className="object-contain"
 							height={200}
 							priority
-							src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755640991/bionk-logo-white_ld4dzs.svg"
+							src="/images/bionk-name-white-logo.svg"
 							width={200}
 						/>
 						<p className="max-w-md text-lg opacity-90">
@@ -230,18 +229,18 @@ export default function PageRegistro() {
 		</div>
 	);
 }
-	const waitForTurnstile = async (timeout = 8000): Promise<boolean> => {
-		return await new Promise((resolve) => {
-			const start = Date.now();
-			const timer = setInterval(() => {
-				const w = window as unknown as { turnstile?: any };
-				if (w.turnstile) {
-					clearInterval(timer);
-					resolve(true);
-				} else if (Date.now() - start >= timeout) {
-					clearInterval(timer);
-					resolve(false);
-				}
-			}, 50);
-		});
-	};
+const waitForTurnstile = async (timeout = 8000): Promise<boolean> => {
+	return await new Promise((resolve) => {
+		const start = Date.now();
+		const timer = setInterval(() => {
+			const w = window as unknown as { turnstile?: any };
+			if (w.turnstile) {
+				clearInterval(timer);
+				resolve(true);
+			} else if (Date.now() - start >= timeout) {
+				clearInterval(timer);
+				resolve(false);
+			}
+		}, 50);
+	});
+};

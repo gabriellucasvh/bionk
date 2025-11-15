@@ -49,21 +49,18 @@ const featureCards = [
 const analyticsFeatures = [
 	{
 		icon: (
-			<ChartNoAxesCombined
-				className="flex-shrink-0 p-4 text-green-800"
-				size={50}
-			/>
+			<ChartNoAxesCombined className="flex-shrink-0 p-4 text-white" size={50} />
 		),
 		title: "Estatísticas em tempo real",
 		desc: "Acompanhe visitantes, cliques e conversões em tempo real com painéis detalhados.",
 	},
 	{
-		icon: <Rocket className="flex-shrink-0 p-4 text-green-800" size={50} />,
+		icon: <Rocket className="flex-shrink-0 p-4 text-white" size={50} />,
 		title: "Análise de Desempenho",
 		desc: "Identifique quais links e conteúdos geram mais engajamento para otimizar sua estratégia.",
 	},
 	{
-		icon: <Globe className="flex-shrink-0 p-4 text-green-800" size={50} />,
+		icon: <Globe className="flex-shrink-0 p-4 text-white" size={50} />,
 		title: "Dados Demográficos",
 		desc: "Conheça a localização, dispositivos e comportamento do seu público para decisões mais inteligentes.",
 	},
@@ -117,13 +114,13 @@ const faqItems = [
 const DescubraClient = () => {
 	const router = useRouter();
 	return (
-		<div className="min-h-screen bg-green-800">
+		<div className="min-h-screen bg-sky-800">
 			<Header />
 			<HeaderMobile />
 			<section className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 pt-10 text-lime-200 md:px-20 lg:flex-row lg:px-40">
-				<div className="w-full space-y-4 pt-16 text-left md:pt-0 lg:w-1/2">
-					<h1 className="font-bold text-4xl md:text-6xl">
-						A melhor ferramenta de link in bio para todas as suas redes sociais
+				<div className="w-full space-y-4 pt-16 text-left lg:w-1/2 xl:pt-0">
+					<h1 className="title text-4xl md:text-6xl">
+						A melhor ferramenta de link in bio para suas redes sociais
 					</h1>
 					<p className="text-lg leading-tight md:text-2xl">
 						Reúna tudo aquilo que é essencial em um só lugar e facilite o acesso
@@ -250,7 +247,7 @@ const DescubraClient = () => {
 
 			<section className="flex min-h-screen w-full flex-col items-center justify-center space-y-8 rounded-t-3xl bg-white px-6 py-16 text-black md:px-20 lg:px-40">
 				<div className="space-y-3 text-center">
-					<h2 className="font-bold text-3xl md:text-5xl">
+					<h2 className="title text-3xl md:text-5xl">
 						Sem complicações, sem limites.
 					</h2>
 					<p className="font-medium text-muted-foreground">
@@ -260,9 +257,9 @@ const DescubraClient = () => {
 				</div>
 				<div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{featureCards.map((item) => (
-						<Card className="border-2 border-green-700" key={item.title}>
+						<Card className="border-2 border-sky-700" key={item.title}>
 							<CardContent>
-								<CardHeader className="my-5 flex h-14 w-14 items-center justify-center rounded-full bg-green-600 p-4">
+								<CardHeader className="my-5 flex h-14 w-14 items-center justify-center rounded-full bg-sky-600 p-4">
 									{item.icon}
 								</CardHeader>
 								<CardTitle className="mb-6 font-semibold text-xl md:text-2xl">
@@ -277,7 +274,7 @@ const DescubraClient = () => {
 				</div>
 			</section>
 
-			<section className="flex min-h-screen w-full flex-col-reverse items-center justify-between gap-10 bg-emerald-950 px-6 py-16 text-emerald-300 md:px-20 lg:flex-row lg:px-40">
+			<section className="flex min-h-screen w-full flex-col-reverse items-center justify-between gap-10 bg-cyan-950 px-6 py-16 text-sky-300 md:px-20 lg:flex-row lg:px-40">
 				<div>
 					<Image
 						alt="Painel de Analytics da plataforma Bionk"
@@ -291,10 +288,10 @@ const DescubraClient = () => {
 					/>
 				</div>
 				<div className="w-full text-center lg:w-1/2 lg:text-left">
-					<h2 className="mb-6 font-bold text-3xl md:text-4xl">
+					<h2 className="title mb-6 text-3xl text-white md:text-4xl">
 						Entenda seu público e otimize sua estratégia
 					</h2>
-					<p className="mb-8 font-medium text-emerald-400">
+					<p className="mb-8 font-medium text-white">
 						Acompanhe métricas detalhadas sobre acessos, cliques e comportamento
 						dos visitantes para tomar decisões mais inteligentes e aprimorar sua
 						estratégia digital.
@@ -305,12 +302,12 @@ const DescubraClient = () => {
 								className="flex flex-col items-center gap-5 sm:flex-row"
 								key={item.title}
 							>
-								<div className="rounded-full bg-avocado-400 p-2">
+								<div className="rounded-full bg-cyan-400 p-2">
 									{item.icon}
 								</div>
 								<div className="text-center sm:text-left">
 									<h3 className="font-bold text-lg">{item.title}</h3>
-									<p className="text-emerald-400">{item.desc}</p>
+									<p className="text-white">{item.desc}</p>
 								</div>
 							</div>
 						))}
@@ -323,12 +320,12 @@ const DescubraClient = () => {
 				</div>
 			</section>
 
-			<section className="flex min-h-screen w-full flex-col items-center justify-center gap-10 bg-teal-800 px-4 py-16 md:px-20 lg:px-40">
+			<section className="flex min-h-screen w-full flex-col items-center justify-center gap-10 bg-white px-4 py-16 md:px-20 lg:px-40">
 				<div className="w-full px-2 text-center md:px-0">
-					<h2 className="mb-6 font-bold text-3xl text-lime-50 md:text-4xl">
+					<h2 className="title mb-6 text-3xl text-black md:text-4xl">
 						Dúvidas? Nós temos as respostas!
 					</h2>
-					<p className="mb-8 font-medium text-lime-100">
+					<p className="mb-8 font-medium text-muted-foreground">
 						Encontre tudo o que você precisa saber sobre como usar e
 						personalizar seu Link in Bio de forma simples e rápida.
 					</p>
@@ -342,7 +339,7 @@ const DescubraClient = () => {
 						>
 							{faqItems.map((faq) => (
 								<AccordionItem
-									className="mb-4 w-full rounded-lg border-2 border-teal-800 bg-teal-900 px-6 py-6 transition-colors duration-300 hover:border-2 hover:border-lime-600 md:w-1/2 md:px-10"
+									className="mb-4 w-full max-w-7xl rounded-3xl border-2 border-teal-800 bg-sky-900 px-6 py-6 transition-colors duration-300 hover:border-2 hover:border-lime-600 md:px-10"
 									key={faq.value}
 									value={faq.value}
 								>
