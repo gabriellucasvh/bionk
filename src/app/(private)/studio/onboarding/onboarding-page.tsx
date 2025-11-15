@@ -543,7 +543,7 @@ export default function OnboardingPageComponent({
 								className="mx-auto mb-5 h-14 w-auto"
 								height={28}
 								priority
-								src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641014/bionk-logo-icon_ya5kbp.svg"
+								src="/images/bionk-icon-black.svg"
 								width={110}
 							/>
 							<h2 className="mb-2 font-bold text-2xl">Tudo pronto!</h2>

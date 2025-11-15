@@ -38,7 +38,7 @@ export default function BannedUserWarning({
 						className="mb-3 inline-block h-20 w-auto"
 						height={28}
 						priority
-						src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641014/bionk-logo-icon_ya5kbp.svg"
+						src="/images/bionk-icon-black.svg"
 						width={110}
 					/>
 					<h1 className="mb-4 font-bold text-2xl text-zinc-900">

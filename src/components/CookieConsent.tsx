@@ -159,7 +159,7 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 										className="h-10 w-auto"
 										height={24}
 										priority
-										src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641014/bionk-logo-icon_ya5kbp.svg"
+										src="/images/bionk-icon-black.svg"
 										width={24}
 									/>
 								</Link>

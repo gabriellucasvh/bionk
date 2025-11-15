@@ -466,7 +466,7 @@ export default function BionkActionsModal({
 												alt="Bionk Logo"
 												className="h-11 w-11 rounded-md"
 												height={40}
-												src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641014/bionk-logo-icon_ya5kbp.svg"
+												src="/images/bionk-icon-black.svg"
 												width={40}
 											/>
 											<div>
@@ -721,7 +721,7 @@ export default function BionkActionsModal({
 												alt="Bionk Logo"
 												className="h-11 w-11 rounded-md"
 												height={40}
-												src="https://res.cloudinary.com/dlfpjuk2r/image/upload/v1755641014/bionk-logo-icon_ya5kbp.svg"
+												src="/images/bionk-icon-black.svg"
 												width={40}
 											/>
 											<div>
