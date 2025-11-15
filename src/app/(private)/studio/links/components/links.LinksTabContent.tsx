@@ -5,6 +5,7 @@ import type { DragStartEvent } from "@dnd-kit/core";
 import type { Session } from "next-auth";
 import { useLinksManager } from "../hooks/useLinksManager";
 import type {
+	EventItem,
 	ImageItem,
 	LinkItem,
 	MusicItem,
@@ -12,6 +13,7 @@ import type {
 	TextItem,
 	VideoItem,
 } from "../types/links.types";
+import AddNewEventForm from "./events.AddNewEventForm";
 import AddContentModal from "./links.AddContentModal";
 import AddNewSectionForm from "./links.AddNewSectionForm";
 import LinkList from "./links.LinkList";
@@ -23,12 +25,14 @@ interface LinksTabContentProps {
 	currentVideos: VideoItem[];
 	currentImages: ImageItem[];
 	currentMusics: MusicItem[];
+	currentEvents: EventItem[];
 	mutateLinks: () => Promise<any>;
 	mutateSections: () => Promise<any>;
 	mutateTexts: () => Promise<any>;
 	mutateVideos: () => Promise<any>;
 	mutateImages: () => Promise<any>;
 	mutateMusics: () => Promise<any>;
+	mutateEvents: () => Promise<any>;
 	session: Session | null;
 }
 
@@ -39,18 +43,21 @@ const LinksTabContent = ({
 	currentVideos,
 	currentImages,
 	currentMusics,
+	currentEvents,
 	mutateLinks,
 	mutateSections,
 	mutateTexts,
 	mutateVideos,
 	mutateImages,
 	mutateMusics,
+	mutateEvents,
 }: LinksTabContentProps) => {
 	const {
 		unifiedItems,
 		isAdding,
 		isAddingVideo,
 		isAddingImage,
+		isAddingEvent,
 		isAddingMusic,
 		formData,
 		videoFormData,
@@ -63,6 +70,7 @@ const LinksTabContent = ({
 		togglingVideoId,
 		togglingImageId,
 		togglingMusicId,
+		togglingEventId,
 		togglingLinkId,
 		togglingTextId,
 		togglingSectionId,
@@ -75,6 +83,7 @@ const LinksTabContent = ({
 		setIsAdding,
 		setIsAddingVideo,
 		setIsAddingImage,
+		setIsAddingEvent,
 		setIsAddingMusic,
 		setFormData,
 		setVideoFormData,
@@ -90,12 +99,14 @@ const LinksTabContent = ({
 		currentVideos,
 		currentImages,
 		currentMusics,
+		currentEvents,
 		mutateLinks,
 		mutateSections,
 		mutateTexts,
 		mutateVideos,
 		mutateImages,
-		mutateMusics
+		mutateMusics,
+		mutateEvents
 	);
 
 	const handleDragStart = (event: DragStartEvent) => {
@@ -128,6 +139,12 @@ const LinksTabContent = ({
 				setFormData={setFormData}
 				setImageFormData={setImageFormData}
 				setIsAdding={setIsAdding}
+				setIsAddingEvent={(value: boolean) => {
+					if (value) {
+						handlers.closeAllActiveCreations();
+					}
+					setIsAddingEvent(value);
+				}}
 				setIsAddingImage={setIsAddingImage}
 				setIsAddingMusic={setIsAddingMusic}
 				setIsAddingSection={(value: boolean) => {
@@ -145,6 +162,35 @@ const LinksTabContent = ({
 				textFormData={handlers.textFormData}
 				videoFormData={videoFormData}
 			/>
+
+			{isAddingEvent && (
+				<AddNewEventForm
+					event={handlers.originalEvent as any}
+					onClose={() => {
+						setIsAddingEvent(false);
+					}}
+					onCreated={async () => {
+						await mutateLinks();
+						await mutateSections();
+						await mutateTexts();
+						await mutateVideos();
+						await mutateImages();
+						await mutateMusics();
+						await mutateEvents();
+						setIsAddingEvent(false);
+					}}
+					onSaved={async () => {
+						await mutateLinks();
+						await mutateSections();
+						await mutateTexts();
+						await mutateVideos();
+						await mutateImages();
+						await mutateMusics();
+						await mutateEvents();
+						setIsAddingEvent(false);
+					}}
+				/>
+			)}
 
 			{handlers.isAddingSection && (
 				<AddNewSectionForm
@@ -191,6 +237,7 @@ const LinksTabContent = ({
 				onCancelEditingText={handlers.handleCancelEditingText}
 				onCancelEditingVideo={handlers.handleCancelEditingVideo}
 				onClickLink={handlers.handleClickLink}
+				onDeleteEvent={handlers.handleDeleteEvent}
 				onDeleteImage={handlers.handleDeleteImage}
 				onDeleteLink={handlers.handleDeleteLink}
 				onDeleteMusic={handlers.handleDeleteMusic}
@@ -212,6 +259,7 @@ const LinksTabContent = ({
 				onSectionUngroup={handlers.handleSectionUngroup}
 				onSectionUpdate={handlers.handleSectionUpdate}
 				onStartEditing={handlers.handleStartEditing}
+				onStartEditingEvent={handlers.handleStartEditingEvent}
 				onStartEditingImage={handlers.handleStartEditingImage}
 				onStartEditingMusic={handlers.handleStartEditingMusic}
 				onStartEditingText={handlers.handleStartEditingText}
@@ -225,6 +273,7 @@ const LinksTabContent = ({
 				originalMusic={originalMusic}
 				originalText={originalText}
 				originalVideo={originalVideo}
+				togglingEventId={togglingEventId}
 				togglingImageId={togglingImageId}
 				togglingLinkId={togglingLinkId}
 				togglingMusicId={togglingMusicId}

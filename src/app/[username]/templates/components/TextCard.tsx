@@ -275,7 +275,7 @@ export default function TextCard({
 	);
 
 	const getCardClasses = () => {
-		const baseClasses = "border transition-all";
+		const baseClasses = "border transition-all shadow";
 		const cornerClasses = customPresets?.customButtonCorners || "rounded-xl";
 		const backgroundClasses = customPresets?.customButtonFill
 			? ""

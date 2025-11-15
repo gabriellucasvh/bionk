@@ -154,7 +154,7 @@ export default async function UserPage({ params }: PageProps) {
 			Music: {
 				where: { active: true, archived: false },
 				orderBy: { order: "asc" },
-				select: ({
+				select: {
 					id: true,
 					title: true,
 					url: true,
@@ -171,7 +171,21 @@ export default async function UserPage({ params }: PageProps) {
 							title: true,
 						},
 					},
-				}) as any,
+				} as any,
+			},
+			Event: {
+				where: { active: true },
+				orderBy: { order: "asc" },
+				select: {
+					id: true,
+					title: true,
+					location: true,
+					eventDate: true,
+					eventTime: true,
+					externalLink: true,
+					order: true,
+					userId: true,
+				},
 			},
 			Section: {
 				where: { active: true },

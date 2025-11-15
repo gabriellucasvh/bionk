@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDesignStore } from "@/stores/designStore";
 // import useSWR from "swr";
 import type {
+	EventItem,
 	ImageItem,
 	LinkItem,
 	MusicItem,
@@ -131,12 +132,14 @@ export const useLinksManager = (
 	currentVideos: VideoItem[],
 	currentImages: ImageItem[],
 	currentMusics: MusicItem[],
+	currentEvents: EventItem[],
 	mutateLinks: () => Promise<any>,
 	mutateSections: () => Promise<any>,
 	mutateTexts: () => Promise<any>,
 	mutateVideos: () => Promise<any>,
 	mutateImages: () => Promise<any>,
-	mutateMusics: () => Promise<any>
+	mutateMusics: () => Promise<any>,
+	mutateEvents: () => Promise<any>
 ) => {
 	// ... (useState, useEffect, useMemo, findContainerId, etc. continuam iguais)
 	const [unifiedItems, setUnifiedItems] = useState<UnifiedItem[]>([]);
@@ -148,7 +151,9 @@ export const useLinksManager = (
 	const [isAddingVideo, setIsAddingVideo] = useState(false);
 	const [isAddingImage, setIsAddingImage] = useState(false);
 	const [isAddingMusic, setIsAddingMusic] = useState(false);
+	const [isAddingEvent, setIsAddingEvent] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [togglingEventId, setTogglingEventId] = useState<number | null>(null);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
 	const [sectionFormData, setSectionFormData] = useState<SectionFormData>(
 		initialSectionFormData
@@ -166,6 +171,7 @@ export const useLinksManager = (
 	const [_originalVideo, setOriginalVideo] = useState<VideoItem | null>(null);
 	const [_originalImage, setOriginalImage] = useState<ImageItem | null>(null);
 	const [_originalMusic, setOriginalMusic] = useState<MusicItem | null>(null);
+	const [_originalEvent, setOriginalEvent] = useState<EventItem | null>(null);
 	const [archivingLinkId, setArchivingLinkId] = useState<number | null>(null);
 	const [togglingLinkId, setTogglingLinkId] = useState<number | null>(null);
 	const [togglingTextId, setTogglingTextId] = useState<number | null>(null);
@@ -188,6 +194,7 @@ export const useLinksManager = (
 		setIsAddingVideo(false);
 		setIsAddingImage(false);
 		setIsAddingMusic(false);
+		setIsAddingEvent(false);
 		setIsModalOpen(false);
 		setFormData(initialFormData);
 		setSectionFormData(initialSectionFormData);
@@ -200,6 +207,7 @@ export const useLinksManager = (
 		setOriginalVideo(null);
 		setOriginalImage(null);
 		setOriginalMusic(null);
+		setOriginalEvent(null);
 		setUnifiedItems((prev) => prev.filter((item) => !(item as any).isDraft));
 	}, []);
 
@@ -283,6 +291,17 @@ export const useLinksManager = (
 			} as any;
 		});
 
+		const eventItems: UnifiedItem[] = (currentEvents ?? []).map((ev) => {
+			const existingItem = unifiedItems.find(
+				(item) => (item as any).isEvent && item.id === ev.id
+			);
+			return {
+				...(ev as any),
+				isEvent: true as any,
+				isEditing: existingItem?.isEditing,
+			} as any;
+		});
+
 		// Links gerais (sem seção)
 		const generalLinks: UnifiedItem[] = currentLinks
 			.filter((link) => !link.sectionId)
@@ -296,6 +315,7 @@ export const useLinksManager = (
 			...videoItems,
 			...imageItems,
 			...musicItems,
+			...eventItems,
 		];
 
 		// Ordenar todos os itens juntos por order, com fallback estável
@@ -314,7 +334,9 @@ export const useLinksManager = (
 							? 3
 							: (item as any).isMusic
 								? 4
-								: 5;
+								: (item as any).isEvent
+									? 5
+									: 6;
 		allItems.sort(
 			(a, b) =>
 				getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
@@ -339,7 +361,9 @@ export const useLinksManager = (
 							? "image"
 							: (item as any).isMusic
 								? "music"
-								: "link";
+								: (item as any).isEvent
+									? "event"
+									: "link";
 			const k = `${t}-${item.id}`;
 			if (seen.has(k)) {
 				return false;
@@ -355,6 +379,7 @@ export const useLinksManager = (
 		currentVideos,
 		currentImages,
 		currentMusics,
+		currentEvents,
 	]);
 
 	const existingSections = useMemo(() => {
@@ -441,6 +466,14 @@ export const useLinksManager = (
 						order: items.indexOf(item),
 					}));
 
+				const eventItems = items
+					.filter((item) => (item as any).isEvent)
+					.filter((item) => !(item as any).isDraft)
+					.map((item) => ({
+						id: item.id,
+						order: items.indexOf(item),
+					}));
+
 				// Fazer chamadas para as APIs específicas
 				const promises: Promise<Response>[] = [];
 
@@ -495,6 +528,16 @@ export const useLinksManager = (
 					);
 				}
 
+				if (eventItems.length > 0) {
+					promises.push(
+						fetch("/api/events/reorder", {
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ items: eventItems }),
+						})
+					);
+				}
+
 				await Promise.all(promises);
 
 				// Atualizar o estado local imediatamente para refletir as mudanças
@@ -512,14 +555,23 @@ export const useLinksManager = (
 					await mutateTexts();
 					await mutateVideos();
 					await mutateImages();
+					await mutateMusics();
+					await mutateEvents();
 					isReorderingRef.current = false;
 				}, 200);
-			} catch (error) {
-				console.error("Erro ao persistir reordenação:", error);
+			} catch {
 				isReorderingRef.current = false;
 			}
 		},
-		[mutateLinks, mutateSections, mutateTexts, mutateVideos, mutateImages]
+		[
+			mutateLinks,
+			mutateSections,
+			mutateTexts,
+			mutateVideos,
+			mutateImages,
+			mutateMusics,
+			mutateEvents,
+		]
 	);
 
 	const handleDragEnd = (event: DragEndEvent) => {
@@ -551,6 +603,9 @@ export const useLinksManager = (
 			}
 			if ((item as any).isMusic) {
 				return `music-${item.id}`;
+			}
+			if ((item as any).isEvent) {
+				return `event-${item.id}`;
 			}
 			return `link-${item.id}`;
 		};
@@ -1469,6 +1524,34 @@ export const useLinksManager = (
 		setIsAdding(false);
 	};
 
+	const handleEventUpdate = async (id: number, payload: Partial<EventItem>) => {
+		await fetch(`/api/events/${id}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
+		await mutateEvents();
+	};
+
+	const handleDeleteEvent = async (id: number) => {
+		setUnifiedItems((prev) =>
+			prev.filter((i) => !(i as any).isEvent || i.id !== id)
+		);
+		await fetch(`/api/events/${id}`, { method: "DELETE" });
+		await mutateEvents();
+	};
+
+	const handleStartEditingEvent = (id: number) => {
+		const ev = unifiedItems.find((i) => (i as any).isEvent && i.id === id) as
+			| EventItem
+			| undefined;
+		if (!ev) {
+			return;
+		}
+		setOriginalEvent(ev);
+		setIsAddingEvent(true);
+	};
+
 	const handleLinkUpdate = async (id: number, payload: Partial<LinkItem>) => {
 		await fetch(`/api/links/${id}`, {
 			method: "PUT",
@@ -1542,6 +1625,16 @@ export const useLinksManager = (
 				await handleMusicUpdate(id, { active });
 			} finally {
 				setTogglingMusicId(null);
+			}
+			return;
+		}
+
+		if ((target as any)?.isEvent) {
+			setTogglingEventId(id);
+			try {
+				await handleEventUpdate(id, { active });
+			} finally {
+				setTogglingEventId(null);
 			}
 			return;
 		}
@@ -2018,6 +2111,7 @@ export const useLinksManager = (
 		unifiedItems,
 		activeId,
 		isAdding,
+		isAddingEvent,
 		isAddingSection,
 		isAddingText,
 		isAddingVideo,
@@ -2032,8 +2126,10 @@ export const useLinksManager = (
 		musicFormData,
 		existingSections,
 		archivingLinkId,
+		togglingEventId,
 		setActiveId,
 		setIsAdding,
+		setIsAddingEvent,
 		setIsAddingSection,
 		setIsAddingText,
 		setIsAddingVideo,
@@ -2086,6 +2182,8 @@ export const useLinksManager = (
 		handleVideoChange,
 		handleSaveEditingVideo,
 		handleCancelEditingVideo,
+		handleDeleteEvent,
+		handleStartEditingEvent,
 		handleImageUpdate,
 		handleDeleteImage,
 		handleArchiveImage,
@@ -2111,5 +2209,6 @@ export const useLinksManager = (
 		originalVideo: _originalVideo,
 		originalImage: _originalImage,
 		originalMusic: _originalMusic,
+		originalEvent: _originalEvent,
 	};
 };

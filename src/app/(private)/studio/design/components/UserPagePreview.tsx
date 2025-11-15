@@ -20,6 +20,10 @@ import { detectTrafficSource } from "@/utils/traffic-source";
 import { FONT_OPTIONS } from "../constants/design.constants";
 import { useInstantPreview } from "../hooks/useInstantPreview";
 
+const HEX_COLOR_REGEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
+const RGBA_COLOR_REGEX = /^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i;
+const URL_PREFIX_REGEX = /^(https?:\/\/|mailto:|tel:|\/\/)/i;
+
 function getFontFamily(customFont: string): string {
 	const fontOption = FONT_OPTIONS.find((option) => option.value === customFont);
 	return fontOption ? fontOption.fontFamily : "var(--font-sans)";
@@ -479,12 +483,12 @@ function ContentList({
 
 	const addContentToArray = (
 		contentArray: Array<{
-			type: "link" | "text" | "video" | "image" | "music";
+			type: "link" | "text" | "video" | "image" | "music" | "event";
 			item: any;
 			order: number;
 		}>,
 		items: any[] | undefined,
-		type: "link" | "text" | "video" | "image" | "music"
+		type: "link" | "text" | "video" | "image" | "music" | "event"
 	) => {
 		if (items && items.length > 0) {
 			for (const item of items) {
@@ -495,7 +499,7 @@ function ContentList({
 
 	const createContentArray = () => {
 		const contentArray: Array<{
-			type: "link" | "text" | "video" | "image" | "music";
+			type: "link" | "text" | "video" | "image" | "music" | "event";
 			item: any;
 			order: number;
 		}> = [];
@@ -505,6 +509,7 @@ function ContentList({
 		addContentToArray(contentArray, user.Video, "video");
 		addContentToArray(contentArray, (user as any).Image, "image");
 		addContentToArray(contentArray, user.Music, "music");
+		addContentToArray(contentArray, (user as any).Event, "event");
 
 		return contentArray.sort((a, b) => a.order - b.order);
 	};
@@ -669,6 +674,109 @@ function ContentList({
 		return result;
 	};
 
+	const renderEventContent = (
+		event: any,
+		index: number,
+		sectionIdRef: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const eventSectionId = event.sectionId || null;
+
+		if (eventSectionId !== sectionIdRef.value && eventSectionId !== null) {
+			sectionIdRef.value = eventSectionId;
+			const sectionHeader = renderSectionHeader(event, eventSectionId, index);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		const dateLabel = (() => {
+			try {
+				const d = new Date(event.eventDate);
+				return d.toLocaleDateString("pt-BR");
+			} catch {
+				return event.eventDate;
+			}
+		})();
+
+		const cornerValue = customizations?.customButtonCorners || "12";
+		const href = normalizeExternalUrl(event.externalLink);
+
+		const parseRgb = (c: string) => {
+			const hexMatch = c.match(HEX_COLOR_REGEX);
+			if (hexMatch) {
+				let hex = hexMatch[1];
+				if (hex.length === 3) {
+					hex = hex
+						.split("")
+						.map((ch) => ch + ch)
+						.join("");
+				}
+				const rHex = hex.slice(0, 2);
+				const gHex = hex.slice(2, 4);
+				const bHex = hex.slice(4, 6);
+				return {
+					r: Number.parseInt(rHex, 16),
+					g: Number.parseInt(gHex, 16),
+					b: Number.parseInt(bHex, 16),
+				};
+			}
+			const rgbMatch = c.match(RGBA_COLOR_REGEX);
+			if (rgbMatch) {
+				return {
+					r: Number(rgbMatch[1]),
+					g: Number(rgbMatch[2]),
+					b: Number(rgbMatch[3]),
+				};
+			}
+			return null;
+		};
+		const toForeground = (c: string, alpha = 0.7) => {
+			const rgb = parseRgb(c);
+			if (!rgb) {
+				return `rgba(0, 0, 0, ${alpha})`;
+			}
+			return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+		};
+		const mutedTextColor = toForeground(
+			String(customizations?.customButtonTextColor || "#0f0f0f")
+		);
+
+		result.push(
+			<div className="w-full" key={`event-${event.id}`}>
+				{href ? (
+					<a
+						className="block rounded-3xl border p-4"
+						href={href}
+						rel="noopener noreferrer"
+						style={{ borderRadius: `${cornerValue}px` }}
+						target="_blank"
+					>
+						<h3 className="font-bold text-xl">{event.title}</h3>
+						<div className="text-sm" style={{ color: mutedTextColor }}>
+							{event.location}
+						</div>
+						<div className="text-sm" style={{ color: mutedTextColor }}>
+							{dateLabel} • {event.eventTime}
+						</div>
+					</a>
+				) : (
+					<div className="rounded-3xl border p-4">
+						<h3 className="font-bold text-xl">{event.title}</h3>
+						<div className="text-sm" style={{ color: mutedTextColor }}>
+							{event.location}
+						</div>
+						<div className="text-sm" style={{ color: mutedTextColor }}>
+							{dateLabel} • {event.eventTime}
+						</div>
+					</div>
+				)}
+			</div>
+		);
+
+		return result;
+	};
+
 	// Imagens (preview simplificado)
 	const normalizeExternalUrl = (url?: string | null): string | null => {
 		if (!url) {
@@ -678,7 +786,7 @@ function ContentList({
 		if (!trimmed) {
 			return null;
 		}
-		if (/^(https?:\/\/|mailto:|tel:|\/\/)/i.test(trimmed)) {
+		if (URL_PREFIX_REGEX.test(trimmed)) {
 			return trimmed;
 		}
 		return `https://${trimmed}`;
@@ -1042,6 +1150,8 @@ function ContentList({
 							return renderImageContent(content.item, index, currentSectionId);
 						case "music":
 							return renderMusicContent(content.item, index, currentSectionId);
+						case "event":
+							return renderEventContent(content.item, index, currentSectionId);
 						default:
 							return null;
 					}
@@ -1097,6 +1207,7 @@ function convertUserDataToUserProfile(userData: any): UserProfile {
 		Music: (userData.musics || []).filter(
 			(music: any) => music?.active !== false && music?.archived !== true
 		),
+		Event: userData.events || [],
 		SocialLink: socialLinks,
 	} as UserProfile;
 }

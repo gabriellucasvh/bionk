@@ -133,4 +133,35 @@ export type MusicItem = {
 };
 
 // Tipo unificado para drag and drop
-export type UnifiedDragItem = LinkItem | TextItem | VideoItem | ImageItem | MusicItem;
+export type EventItem = {
+	id: number;
+	title: string;
+	location: string;
+	eventDate: string;
+	eventTime: string;
+	descriptionShort?: string | null;
+	externalLink: string;
+	coverImageUrl?: string | null;
+	active: boolean;
+	order: number;
+	userId?: number;
+	isEditing?: boolean;
+	isDraft?: boolean;
+	sectionId?: number | null;
+	isEvent?: boolean;
+	isSection?: boolean;
+	isText?: boolean;
+	isVideo?: boolean;
+	isImage?: boolean;
+	isMusic?: boolean;
+	children?: never;
+	dbId?: number;
+};
+
+export type UnifiedDragItem =
+	| LinkItem
+	| TextItem
+	| VideoItem
+	| ImageItem
+	| MusicItem
+	| EventItem;
