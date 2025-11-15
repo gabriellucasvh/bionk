@@ -236,7 +236,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 				<div
 					className={`relative z-10 min-h-dvh w-full sm:min-h-[calc(100vh-2rem)] sm:w-[575px] sm:overflow-hidden ${hasScrolled ? "sm:rounded-t-none" : "sm:rounded-t-3xl"} sm:shadow-2xl sm:shadow-black/20 sm:transition-all sm:duration-200 sm:ease-out ${
 						customPresets.headerStyle === "hero" ? "px-4" : "px-4"
-					} ${customPresets.headerStyle !== "hero" ? "sm:px-6 sm:pt-4" : ""}`}
+					} ${customPresets.headerStyle !== "hero" ? "sm:px-8 sm:pt-4" : ""}`}
 					ref={wrapperRef}
 					style={wrapperStyle}
 				>
