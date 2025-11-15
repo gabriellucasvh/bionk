@@ -10,6 +10,7 @@ import LinkOptionsModal from "@/components/modals/LinkOptionsModal";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { UserLink } from "@/types/user-profile";
 import { detectTrafficSource } from "@/utils/traffic-source";
+import { shouldShowImage } from "./utils/media";
 
 interface InteractiveLinkProps {
 	href: string;
@@ -23,27 +24,16 @@ interface InteractiveLinkProps {
 	};
 }
 
-// Função auxiliar para verificar se deve mostrar a imagem personalizada
-const shouldShowImage = (link: UserLink, customImageError: boolean) => {
-	return link.customImageUrl && !customImageError;
-};
 
 // Componente auxiliar para renderizar imagem personalizada
-interface ImageComponentProps {
+const ImageComponent: FC<{
 	link: UserLink;
 	borderRadius: number;
 	setCustomImageError: (error: boolean) => void;
-}
-
-const ImageComponent: FC<ImageComponentProps> = ({
-	link,
-	borderRadius,
-	setCustomImageError,
-}) => {
+}> = ({ link, borderRadius, setCustomImageError }) => {
 	const handleImageError = () => {
 		setCustomImageError(true);
 	};
-
 	const imageProps = {
 		alt: `Ícone personalizado de ${link.title}`,
 		className: "ml-1 size-13 object-cover",
@@ -53,7 +43,6 @@ const ImageComponent: FC<ImageComponentProps> = ({
 		style: { borderRadius: `${borderRadius}px` },
 		width: 32,
 	};
-
 	return <Image {...imageProps} />;
 };
 

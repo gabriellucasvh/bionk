@@ -1,4 +1,4 @@
-import VideoPlayer from "./VideoPlayer";
+import VideoPlayer from "@/components/VideoPlayer";
 
 interface VideoCardProps {
 	id: number;

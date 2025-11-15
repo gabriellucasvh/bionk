@@ -11,17 +11,17 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useReducer, useState } from "react";
-import MusicCard from "@/components/MusicCard";
+import MusicCard from "@/app/[username]/templates/components/cards/MusicCard";
+import { CardImage } from "@/app/[username]/templates/components/cards/utils/media";
+import { toForeground } from "@/app/[username]/templates/components/cards/utils/style";
+import VideoCard from "@/app/[username]/templates/components/cards/VideoCard";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
-import VideoCard from "@/components/VideoCard";
 import { cn } from "@/lib/utils";
 import type { UserLink, UserProfile } from "@/types/user-profile";
 import { detectTrafficSource } from "@/utils/traffic-source";
 import { FONT_OPTIONS } from "../constants/design.constants";
 import { useInstantPreview } from "../hooks/useInstantPreview";
 
-const HEX_COLOR_REGEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
-const RGBA_COLOR_REGEX = /^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i;
 const URL_PREFIX_REGEX = /^(https?:\/\/|mailto:|tel:|\/\/)/i;
 
 function getFontFamily(customFont: string): string {
@@ -702,42 +702,6 @@ function ContentList({
 		const cornerValue = customizations?.customButtonCorners || "12";
 		const href = normalizeExternalUrl(event.externalLink);
 
-		const parseRgb = (c: string) => {
-			const hexMatch = c.match(HEX_COLOR_REGEX);
-			if (hexMatch) {
-				let hex = hexMatch[1];
-				if (hex.length === 3) {
-					hex = hex
-						.split("")
-						.map((ch) => ch + ch)
-						.join("");
-				}
-				const rHex = hex.slice(0, 2);
-				const gHex = hex.slice(2, 4);
-				const bHex = hex.slice(4, 6);
-				return {
-					r: Number.parseInt(rHex, 16),
-					g: Number.parseInt(gHex, 16),
-					b: Number.parseInt(bHex, 16),
-				};
-			}
-			const rgbMatch = c.match(RGBA_COLOR_REGEX);
-			if (rgbMatch) {
-				return {
-					r: Number(rgbMatch[1]),
-					g: Number(rgbMatch[2]),
-					b: Number(rgbMatch[3]),
-				};
-			}
-			return null;
-		};
-		const toForeground = (c: string, alpha = 0.7) => {
-			const rgb = parseRgb(c);
-			if (!rgb) {
-				return `rgba(0, 0, 0, ${alpha})`;
-			}
-			return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
-		};
 		const mutedTextColor = toForeground(
 			String(customizations?.customButtonTextColor || "#0f0f0f")
 		);
@@ -791,25 +755,6 @@ function ContentList({
 		}
 		return `https://${trimmed}`;
 	};
-	const getAspectRatioStyle = (ratio?: string): React.CSSProperties => {
-		switch (ratio) {
-			case "square":
-				return { aspectRatio: "1 / 1" };
-			case "16:9":
-				return { aspectRatio: "16 / 9" };
-			case "3:2":
-				return { aspectRatio: "3 / 2" };
-			case "3:1":
-				return { aspectRatio: "3 / 1" };
-			default:
-				if (!ratio) {
-					return {};
-				}
-				return {
-					aspectRatio: ratio.includes(":") ? ratio.replace(":", " / ") : ratio,
-				};
-		}
-	};
 
 	// Send image click tracking to backend
 	const sendImageClickData = (imageId: number | string, itemIndex: number) => {
@@ -844,27 +789,7 @@ function ContentList({
 			return null;
 		}
 		const content = (
-			<div
-				className="relative w-full overflow-hidden"
-				style={getAspectRatioStyle(ratio)}
-			>
-				{typeof src === "string" && src.toLowerCase().endsWith(".gif") ? (
-					// biome-ignore lint/performance/noImgElement: gif rendering
-					<img
-						alt={img?.authorName || "Imagem"}
-						className="h-full w-full object-cover"
-						src={src}
-					/>
-				) : (
-					<Image
-						alt={img?.authorName || "Imagem"}
-						className="object-cover"
-						fill
-						sizes="(max-width: 640px) 100vw, 575px"
-						src={src}
-					/>
-				)}
-			</div>
+			<CardImage alt={img?.authorName || "Imagem"} ratio={ratio} src={src} />
 		);
 		const href = normalizeExternalUrl(img?.linkUrl);
 		return href ? (

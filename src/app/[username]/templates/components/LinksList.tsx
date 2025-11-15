@@ -4,19 +4,19 @@ import { ChevronLeft, ChevronRight, Images, Lock } from "lucide-react";
 import Image from "next/image";
 import type { CSSProperties, MouseEvent } from "react";
 import { useEffect, useState } from "react";
-import InteractiveLink from "@/components/InteractiveLink";
-import MusicCard from "@/components/MusicCard";
-import VideoCard from "@/components/VideoCard";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
 import { detectTrafficSource } from "@/utils/traffic-source";
-import PasswordProtectedLink from "./PasswordProtectedLink";
-import TextCard from "./TextCard";
+import InteractiveLink from "./cards/InteractiveLink";
+import MusicCard from "./cards/MusicCard";
+import PasswordProtectedLink from "./cards/PasswordProtectedLink";
+import TextCard from "./cards/TextCard";
+import { CardImage } from "./cards/utils/media";
+import { toForeground } from "./cards/utils/style";
+import VideoCard from "./cards/VideoCard";
 
 const REJECTED_URLS = /^(https?:\/\/|mailto:|tel:|\/\/)/i;
-const HEX_COLOR_REGEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
-const RGBA_COLOR_REGEX = /^rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i;
 export default function LinksList({
 	user,
 	customPresets,
@@ -360,42 +360,6 @@ export default function LinksList({
 		})();
 
 		const cornerValue = customPresets?.customButtonCorners || "12";
-		const parseRgb = (c: string) => {
-			const hexMatch = c.match(HEX_COLOR_REGEX);
-			if (hexMatch) {
-				let hex = hexMatch[1];
-				if (hex.length === 3) {
-					hex = hex
-						.split("")
-						.map((ch) => ch + ch)
-						.join("");
-				}
-				const rHex = hex.slice(0, 2);
-				const gHex = hex.slice(2, 4);
-				const bHex = hex.slice(4, 6);
-				return {
-					r: Number.parseInt(rHex, 16),
-					g: Number.parseInt(gHex, 16),
-					b: Number.parseInt(bHex, 16),
-				};
-			}
-			const rgbMatch = c.match(RGBA_COLOR_REGEX);
-			if (rgbMatch) {
-				return {
-					r: Number(rgbMatch[1]),
-					g: Number(rgbMatch[2]),
-					b: Number(rgbMatch[3]),
-				};
-			}
-			return null;
-		};
-		const toForeground = (c: string, alpha = 0.7) => {
-			const rgb = parseRgb(c);
-			if (!rgb) {
-				return `rgba(0, 0, 0, ${alpha})`;
-			}
-			return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
-		};
 		const mutedTextColor = toForeground(
 			String(customPresets?.customButtonTextColor || "#0f0f0f")
 		);
@@ -456,20 +420,6 @@ export default function LinksList({
 		// Caso não tenha protocolo, força https
 		return `https://${trimmed}`;
 	};
-	const getAspectRatioStyle = (ratio?: string): React.CSSProperties => {
-		switch (ratio) {
-			case "square":
-				return { aspectRatio: "1 / 1" };
-			case "16:9":
-				return { aspectRatio: "16 / 9" };
-			case "3:2":
-				return { aspectRatio: "3 / 2" };
-			case "3:1":
-				return { aspectRatio: "3 / 1" };
-			default:
-				return {};
-		}
-	};
 
 	const sendImageClickData = (imageId: number, itemIndex: number) => {
 		try {
@@ -500,27 +450,7 @@ export default function LinksList({
 	) => {
 		const src = img.previewUrl || img.url;
 		const content = (
-			<div
-				className="relative w-full overflow-hidden"
-				style={{ ...getAspectRatioStyle(ratio) }}
-			>
-				{typeof src === "string" && src.toLowerCase().endsWith(".gif") ? (
-					// biome-ignore lint/performance/noImgElement: gif rendering
-					<img
-						alt={img.authorName || "Imagem"}
-						className="h-full w-full object-cover"
-						src={src}
-					/>
-				) : (
-					<Image
-						alt={img.authorName || "Imagem"}
-						className="object-cover"
-						fill
-						sizes="(max-width: 640px) 100vw, 575px"
-						src={src}
-					/>
-				)}
-			</div>
+			<CardImage alt={img.authorName || "Imagem"} ratio={ratio} src={src} />
 		);
 
 		const href = normalizeExternalUrl(img.linkUrl);
