@@ -1,22 +1,20 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Images, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import Image from "next/image";
 import type { CSSProperties, MouseEvent } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
-import { detectTrafficSource } from "@/utils/traffic-source";
+import EventCard from "./cards/EventCard";
+import ImageCard from "./cards/ImageCard";
 import InteractiveLink from "./cards/InteractiveLink";
 import MusicCard from "./cards/MusicCard";
 import PasswordProtectedLink from "./cards/PasswordProtectedLink";
 import TextCard from "./cards/TextCard";
-import { CardImage } from "./cards/utils/media";
-import { toForeground } from "./cards/utils/style";
 import VideoCard from "./cards/VideoCard";
 
-const REJECTED_URLS = /^(https?:\/\/|mailto:|tel:|\/\/)/i;
 export default function LinksList({
 	user,
 	customPresets,
@@ -32,46 +30,6 @@ export default function LinksList({
 }) {
 	const { animatedLinks } = useLinkAnimation();
 	const [showTooltip, setShowTooltip] = useState<string | null>(null);
-	// Estado para controlar visibilidade das setas dos carrosséis
-	const [carouselStates, setCarouselStates] = useState<
-		Record<
-			string,
-			{ canLeft: boolean; canRight: boolean; isOverflowing: boolean }
-		>
-	>({});
-
-	const updateCarouselStateFor = (el: HTMLElement) => {
-		const id = el.id.replace("carousel-", "");
-		const maxScrollLeft = el.scrollWidth - el.clientWidth;
-		const canLeft = el.scrollLeft > 0;
-		const canRight = Math.ceil(el.scrollLeft) < maxScrollLeft;
-		const isOverflowing = el.scrollWidth > el.clientWidth;
-		setCarouselStates((prev) => {
-			const old = prev[id];
-			if (
-				old &&
-				old.canLeft === canLeft &&
-				old.canRight === canRight &&
-				old.isOverflowing === isOverflowing
-			) {
-				return prev;
-			}
-			return { ...prev, [id]: { canLeft, canRight, isOverflowing } };
-		});
-	};
-
-	const recalcAllCarousels = () => {
-		const elements =
-			document.querySelectorAll<HTMLElement>('[id^="carousel-"]');
-		elements.forEach(updateCarouselStateFor);
-	};
-
-	useEffect(() => {
-		recalcAllCarousels();
-		const onResize = () => recalcAllCarousels();
-		window.addEventListener("resize", onResize);
-		return () => window.removeEventListener("resize", onResize);
-	}, [user]);
 
 	const handleLockClick = (e: MouseEvent, linkId: string) => {
 		e.preventDefault();
@@ -350,298 +308,17 @@ export default function LinksList({
 			}
 		}
 
-		const dateLabel = (() => {
-			try {
-				const d = new Date(event.eventDate);
-				return d.toLocaleDateString("pt-BR");
-			} catch {
-				return event.eventDate;
-			}
-		})();
-
-		const cornerValue = customPresets?.customButtonCorners || "12";
-		const mutedTextColor = toForeground(
-			String(customPresets?.customButtonTextColor || "#0f0f0f")
-		);
-
-		const href = normalizeExternalUrl(event.externalLink);
-
 		result.push(
 			<div className="w-full" key={`event-${event.id}`}>
-				{href ? (
-					<a
-						className="block border p-4 shadow"
-						href={href}
-						rel="noopener noreferrer"
-						style={{ borderRadius: `${cornerValue}px`, ...buttonStyle }}
-						target="_blank"
-					>
-						<h3 className="font-bold text-lg">{event.title}</h3>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{event.location}
-						</div>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{dateLabel} • {event.eventTime}
-						</div>
-					</a>
-				) : (
-					<div
-						className="border p-4 shadow"
-						style={{ borderRadius: `${cornerValue}px`, ...buttonStyle }}
-					>
-						<h3 className="font-bold text-lg">{event.title}</h3>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{event.location}
-						</div>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{dateLabel} • {event.eventTime}
-						</div>
-					</div>
-				)}
+				<EventCard
+					buttonStyle={buttonStyle}
+					customPresets={customPresets}
+					event={event}
+				/>
 			</div>
 		);
 
 		return result;
-	};
-
-	// Helpers para imagens
-	const normalizeExternalUrl = (url?: string | null): string | null => {
-		if (!url) {
-			return null;
-		}
-		const trimmed = url.trim();
-		if (!trimmed) {
-			return null;
-		}
-		// Mantém protocolos válidos e URLs protocol-relative
-		if (REJECTED_URLS.test(trimmed)) {
-			return trimmed;
-		}
-		// Caso não tenha protocolo, força https
-		return `https://${trimmed}`;
-	};
-
-	const sendImageClickData = (imageId: number, itemIndex: number) => {
-		try {
-			const payload = JSON.stringify({
-				imageId,
-				itemIndex,
-				trafficSource: detectTrafficSource(),
-			});
-			if ("sendBeacon" in navigator) {
-				const blob = new Blob([payload], { type: "application/json" });
-				navigator.sendBeacon("/api/image-click", blob);
-			} else {
-				fetch("/api/image-click", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: payload,
-					keepalive: true,
-				}).catch(() => {});
-			}
-		} catch {}
-	};
-
-	const renderImageItem = (
-		imageId: number,
-		img: any,
-		itemIndex: number,
-		ratio?: string
-	) => {
-		const src = img.previewUrl || img.url;
-		const content = (
-			<CardImage alt={img.authorName || "Imagem"} ratio={ratio} src={src} />
-		);
-
-		const href = normalizeExternalUrl(img.linkUrl);
-		if (href) {
-			return (
-				<a
-					href={href}
-					onClick={() => sendImageClickData(imageId, itemIndex)}
-					rel="noopener noreferrer"
-					target="_blank"
-				>
-					{content}
-				</a>
-			);
-		}
-
-		return content;
-	};
-
-	const renderImageBlock = (image: any) => {
-		const widthPercent = Math.max(
-			10,
-			Math.min(100, Number(image.sizePercent) || 100)
-		);
-		const wrapperStyle: React.CSSProperties = {
-			width: `${widthPercent}%`,
-			marginLeft: "auto",
-			marginRight: "auto",
-		};
-
-		const cornerValue = customPresets?.customButtonCorners || "12";
-
-		const header = (
-			<div className="mb-2 text-center" style={textStyle}>
-				{image.title ? (
-					<h3 className="font-semibold text-lg">{image.title}</h3>
-				) : null}
-				{image.description ? (
-					<p className="text-sm opacity-80">{image.description}</p>
-				) : null}
-			</div>
-		);
-
-		switch (image.layout) {
-			case "single":
-				return (
-					<div
-						className="w-full"
-						key={`image-${image.id}`}
-						style={wrapperStyle}
-					>
-						{header}
-						<div className="overflow-hidden" style={buttonStyle}>
-							{renderImageItem(image.id, image.items?.[0], 0, image.ratio)}
-						</div>
-					</div>
-				);
-			case "column":
-				return (
-					<div
-						className="w-full"
-						key={`image-${image.id}`}
-						style={{ marginLeft: "auto", marginRight: "auto" }}
-					>
-						<details>
-							<summary className="list-none">
-								<div
-									className={cn(
-										"group relative w-full rounded-xl p-1 shadow transition-all duration-200 hover:cursor-pointer hover:brightness-110"
-									)}
-									style={buttonStyle}
-								>
-									<div className="relative z-10 flex h-full w-full items-center">
-										<div className="flex-shrink-0">
-											<div className="ml-1 size-13" />
-										</div>
-										<div className="flex flex-1 justify-center">
-											<h3 className="line-clamp-2 select-none px-2 font-medium leading-tight">
-												{image.title || "Imagens"}
-											</h3>
-										</div>
-										<div className="w-10 flex-shrink-0" />
-									</div>
-
-									{/* Ícone à direita, absoluto como nos outros cards */}
-									<div
-										aria-hidden
-										className="-translate-y-1/2 absolute top-1/2 right-3 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
-									>
-										<Images className="size-5" />
-									</div>
-								</div>
-							</summary>
-
-							<div style={wrapperStyle}>
-								{image.description ? (
-									<p
-										className="my-4 text-center text-sm opacity-80"
-										style={textStyle}
-									>
-										{image.description}
-									</p>
-								) : null}
-
-								<div className="mt-2 space-y-3">
-									{(image.items || []).map((img: any, idx: number) => (
-										<div
-											className="overflow-hidden"
-											key={`img-${image.id}-${idx}`}
-											style={{ borderRadius: `${cornerValue}px` }}
-										>
-											{renderImageItem(image.id, img, idx, image.ratio)}
-										</div>
-									))}
-								</div>
-							</div>
-						</details>
-					</div>
-				);
-			case "carousel":
-				return (
-					<div
-						className="w-full"
-						key={`image-${image.id}`}
-						style={wrapperStyle}
-					>
-						{header}
-						<div className="relative">
-							<div
-								className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-3"
-								id={`carousel-${image.id}`}
-								onScroll={(e) =>
-									updateCarouselStateFor(e.currentTarget as HTMLElement)
-								}
-							>
-								{(image.items || []).map((img: any, idx: number) => (
-									<div
-										className="w-64 flex-shrink-0 snap-center overflow-hidden"
-										key={`img-${image.id}-${idx}`}
-										style={{ borderRadius: `${cornerValue}px` }}
-									>
-										{renderImageItem(image.id, img, idx, image.ratio)}
-									</div>
-								))}
-							</div>
-							{carouselStates[String(image.id)]?.isOverflowing &&
-								carouselStates[String(image.id)]?.canLeft && (
-									<button
-										aria-label="Voltar"
-										className="-translate-y-1/2 absolute top-1/2 left-2 rounded-full bg-black/50 p-2 shadow"
-										onClick={() => {
-											const el = document.getElementById(
-												`carousel-${image.id}`
-											);
-											el?.scrollBy({ left: -240, behavior: "smooth" });
-										}}
-										type="button"
-									>
-										<ChevronLeft className="h-5 w-5 text-white" />
-									</button>
-								)}
-							{carouselStates[String(image.id)]?.isOverflowing &&
-								carouselStates[String(image.id)]?.canRight && (
-									<button
-										aria-label="Avançar"
-										className="-translate-y-1/2 absolute top-1/2 right-2 rounded-full bg-black/50 p-2 shadow"
-										onClick={() => {
-											const el = document.getElementById(
-												`carousel-${image.id}`
-											);
-											el?.scrollBy({ left: 240, behavior: "smooth" });
-										}}
-										type="button"
-									>
-										<ChevronRight className="h-5 w-5 text-white" />
-									</button>
-								)}
-						</div>
-					</div>
-				);
-			default:
-				return (
-					<div
-						className="w-full"
-						key={`image-${image.id}`}
-						style={wrapperStyle}
-					>
-						{header}
-					</div>
-				);
-		}
 	};
 
 	const renderImageContent = (
@@ -660,7 +337,15 @@ export default function LinksList({
 			}
 		}
 
-		result.push(renderImageBlock(image));
+		result.push(
+			<ImageCard
+				buttonStyle={buttonStyle}
+				customPresets={customPresets}
+				image={image}
+				key={`image-${image.id}`}
+				textStyle={textStyle}
+			/>
+		);
 		return result;
 	};
 
