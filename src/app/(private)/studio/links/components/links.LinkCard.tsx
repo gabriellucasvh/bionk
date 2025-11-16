@@ -195,7 +195,7 @@ const EditingView = ({
 			<div className="space-y-3">
 				<div className="space-y-1.5">
 					{/* Campos principais com labels */}
-					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 mb-5">
 						<div className="grid gap-2">
 							<Label htmlFor="title">Título *</Label>
 							<Input
@@ -206,9 +206,6 @@ const EditingView = ({
 								placeholder="Ex: Meu Portfólio"
 								value={link.title}
 							/>
-							<p className="mt-1 text-muted-foreground text-xs">
-								{link.title.length}/80 caracteres
-							</p>
 						</div>
 						<div className="grid gap-2">
 							<Label htmlFor="url">URL *</Label>
@@ -220,7 +217,7 @@ const EditingView = ({
 								type="url"
 								value={link.url || ""}
 							/>
-							<div className="mt-1 h-4" />
+
 						</div>
 					</div>
 
