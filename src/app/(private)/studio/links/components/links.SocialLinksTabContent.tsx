@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useDragGesture } from "../hooks/useDragGesture";
+import MobileBottomSheet from "./MobileBottomSheet";
 import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 import type { SocialLinkItem, SocialPlatform } from "@/types/social";
 import { SortableSocialLinkItem } from "./links.SortableSocialLinkItem";
@@ -38,7 +40,9 @@ const SocialLinksTabContent = ({
 	const [deletingLinkId, setDeletingLinkId] = useState<string | null>(null);
 	const [isSaving, setIsSaving] = useState(false);
 	const [originalUsername, setOriginalUsername] = useState<string>("");
-	const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
+    const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
+    const [isAnimating, setIsAnimating] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
 	const USERNAME_ONLY = new Set(["instagram", "threads", "x", "tiktok"]);
 
@@ -122,8 +126,52 @@ const SocialLinksTabContent = ({
 		"applemusic",
 	]);
 
-	const extraPlatforms = SOCIAL_PLATFORMS.filter((p) => EXTRA_KEYS.has(p.key));
-	const visiblePlatforms = SOCIAL_PLATFORMS.filter((p) => !EXTRA_KEYS.has(p.key));
+    const extraPlatforms = SOCIAL_PLATFORMS.filter((p) => EXTRA_KEYS.has(p.key));
+    const visiblePlatforms = SOCIAL_PLATFORMS.filter((p) => !EXTRA_KEYS.has(p.key));
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 640);
+        };
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
+
+    const handleCloseMoreModal = () => {
+        setIsMoreModalOpen(false);
+    };
+
+    const {
+        isDragging,
+        dragY,
+        isClosing,
+        handleMouseDown,
+        handleTouchStart,
+        handleMouseMove,
+        handleTouchMove,
+        handleMouseUp,
+        handleTouchEnd,
+    } = useDragGesture(handleCloseMoreModal);
+
+    useEffect(() => {
+        if (isMoreModalOpen && isMobile) {
+            setIsAnimating(true);
+            document.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener("mouseup", handleMouseUp);
+            document.addEventListener("touchmove", handleTouchMove);
+            document.addEventListener("touchend", handleTouchEnd);
+        } else if (!isMoreModalOpen) {
+            setIsAnimating(false);
+        }
+
+        return () => {
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
+            document.removeEventListener("touchmove", handleTouchMove);
+            document.removeEventListener("touchend", handleTouchEnd);
+        };
+    }, [isMoreModalOpen, isMobile, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
 
 	useEffect(() => {
 		const sorted = [...initialSocialLinks].sort(
@@ -363,54 +411,112 @@ const SocialLinksTabContent = ({
 				</div>
 			)}
 
-			<Dialog onOpenChange={setIsMoreModalOpen} open={isMoreModalOpen}>
-				<DialogContent className="min-w-[20vw] max-w-3xl">
-					<DialogHeader>
-						<DialogTitle>Mais Ícones</DialogTitle>
-					</DialogHeader>
-					<div className="space-y-2">
-						{extraPlatforms.map((platform) => {
-							const existingLink = socialLinks.find(
-								(link) => link.platform === platform.key
-							);
-							return (
-								<Button
-									className={`flex h-12 w-full items-center justify-start gap-3 rounded-xl p-2 transition-colors hover:bg-muted/50 ${
-										existingLink ? "border-green-400 hover:border-green-500" : ""
-									}`}
-									key={platform.key}
-									onClick={() => {
-										if (existingLink) {
-											handleEditSocialLink(existingLink);
-										} else {
-											handlePlatformSelect(platform);
-										}
-										setIsMoreModalOpen(false);
-									}}
-									title={
-										existingLink ? `Editar ${platform.name}` : `Adicionar ${platform.name}`
-									}
-									variant="outline"
-								>
-									<div
-										className="h-6 w-6"
-										style={{
-											backgroundColor: platform.color,
-											maskImage: `url(${platform.icon})`,
-											maskSize: "contain",
-											maskRepeat: "no-repeat",
-											maskPosition: "center",
-										}}
-									/>
-									<span className="truncate text-sm font-medium">
-										{platform.name}
-									</span>
-								</Button>
-							);
-						})}
-					</div>
-				</DialogContent>
-			</Dialog>
+            {!isMobile && (
+                <Dialog onOpenChange={setIsMoreModalOpen} open={isMoreModalOpen}>
+                    <DialogContent className="min-w-[20vw] max-w-3xl">
+                        <DialogHeader>
+                            <DialogTitle>Mais Ícones</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-2">
+                            {extraPlatforms.map((platform) => {
+                                const existingLink = socialLinks.find(
+                                    (link) => link.platform === platform.key
+                                );
+                                return (
+                                    <Button
+                                        className={`flex h-12 w-full items-center justify-start gap-3 rounded-xl p-2 transition-colors hover:bg-muted/50 ${
+                                            existingLink ? "border-green-400 hover:border-green-500" : ""
+                                        }`}
+                                        key={platform.key}
+                                        onClick={() => {
+                                            if (existingLink) {
+                                                handleEditSocialLink(existingLink);
+                                            } else {
+                                                handlePlatformSelect(platform);
+                                            }
+                                            setIsMoreModalOpen(false);
+                                        }}
+                                        title={
+                                            existingLink ? `Editar ${platform.name}` : `Adicionar ${platform.name}`
+                                        }
+                                        variant="outline"
+                                    >
+                                        <div
+                                            className="h-6 w-6"
+                                            style={{
+                                                backgroundColor: platform.color,
+                                                maskImage: `url(${platform.icon})`,
+                                                maskSize: "contain",
+                                                maskRepeat: "no-repeat",
+                                                maskPosition: "center",
+                                            }}
+                                        />
+                                        <span className="truncate text-sm font-medium">
+                                            {platform.name}
+                                        </span>
+                                    </Button>
+                                );
+                            })}
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
+
+            {isMobile && (
+                <MobileBottomSheet
+                    isOpen={isMoreModalOpen}
+                    isAnimating={isAnimating}
+                    isClosing={isClosing}
+                    isDragging={isDragging}
+                    dragY={dragY}
+                    onClose={handleCloseMoreModal}
+                    onMouseDown={handleMouseDown}
+                    onTouchStart={handleTouchStart}
+                >
+                    <h2 className="mb-6 text-center font-semibold text-lg">Mais Ícones</h2>
+                    <div className="space-y-2">
+                        {extraPlatforms.map((platform) => {
+                            const existingLink = socialLinks.find(
+                                (link) => link.platform === platform.key
+                            );
+                            return (
+                                <Button
+                                    className={`flex h-12 w-full items-center justify-start gap-3 rounded-xl p-2 transition-colors hover:bg-muted/50 ${
+                                        existingLink ? "border-green-400 hover:border-green-500" : ""
+                                    }`}
+                                    key={platform.key}
+                                    onClick={() => {
+                                        if (existingLink) {
+                                            handleEditSocialLink(existingLink);
+                                        } else {
+                                            handlePlatformSelect(platform);
+                                        }
+                                        handleCloseMoreModal();
+                                    }}
+                                    title={
+                                        existingLink ? `Editar ${platform.name}` : `Adicionar ${platform.name}`
+                                    }
+                                    variant="outline"
+                                >
+                                    <div
+                                        className="h-6 w-6"
+                                        style={{
+                                            backgroundColor: platform.color,
+                                            maskImage: `url(${platform.icon})`,
+                                            maskSize: "contain",
+                                            maskRepeat: "no-repeat",
+                                            maskPosition: "center",
+                                        }}
+                                    />
+                                    <span className="truncate text-sm font-medium">
+                                        {platform.name}
+                                    </span>
+                                </Button>
+                            );
+                        })}
+                    </div>
+                </MobileBottomSheet>
+            )}
 
 			{selectedPlatform && (
 				<div className="space-y-4 rounded-lg border bg-white dark:bg-zinc-900 p-4">
