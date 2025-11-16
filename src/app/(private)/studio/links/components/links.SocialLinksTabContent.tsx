@@ -7,13 +7,14 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Edit, Loader2, Trash2 } from "lucide-react";
+import { Edit, Loader2, Trash2, Plus } from "lucide-react";
 import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 import type { SocialLinkItem, SocialPlatform } from "@/types/social";
 import { SortableSocialLinkItem } from "./links.SortableSocialLinkItem";
@@ -37,6 +38,22 @@ const SocialLinksTabContent = ({
 	const [deletingLinkId, setDeletingLinkId] = useState<string | null>(null);
 	const [isSaving, setIsSaving] = useState(false);
 	const [originalUsername, setOriginalUsername] = useState<string>("");
+	const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
+
+	const EXTRA_KEYS = new Set([
+		"appstore",
+		"epidemic-sound",
+		"google-play",
+		"sympla",
+		"tidal",
+		"vsco",
+		"vimeo",
+		"audiomack",
+		"applemusic",
+	]);
+
+	const extraPlatforms = SOCIAL_PLATFORMS.filter((p) => EXTRA_KEYS.has(p.key));
+	const visiblePlatforms = SOCIAL_PLATFORMS.filter((p) => !EXTRA_KEYS.has(p.key));
 
 	useEffect(() => {
 		const sorted = [...initialSocialLinks].sort(
@@ -166,6 +183,15 @@ const SocialLinksTabContent = ({
 			return true;
 		}
 
+		if (selectedPlatform?.pattern) {
+			try {
+				const re = new RegExp(selectedPlatform.pattern);
+				if (!re.test(usernameInput.trim())) {
+					return true;
+				}
+			} catch {}
+		}
+
 		return false;
 	};
 
@@ -192,7 +218,7 @@ const SocialLinksTabContent = ({
 						Clique em um ícone para adicionar ou editar uma rede social:
 					</p>
 					<div className="grid grid-cols-4 xs:grid-cols-5 gap-2 sm:grid-cols-6 sm:gap-3 md:grid-cols-7 lg:grid-cols-8">
-						{SOCIAL_PLATFORMS.map((platform) => {
+						{visiblePlatforms.map((platform) => {
 							const existingLink = socialLinks.find(
 								(link) => link.platform === platform.key
 							);
@@ -232,9 +258,66 @@ const SocialLinksTabContent = ({
 								</Button>
 							);
 						})}
+						<Button
+							aria-label="Mais Ícones"
+							className="flex h-20 w-full flex-col items-center justify-center rounded-xl p-1 transition-colors hover:bg-muted/50 sm:p-2"
+							onClick={() => setIsMoreModalOpen(true)}
+							variant="outline"
+						>
+							<Plus className="h-7 w-7" />
+						</Button>
 					</div>
 				</div>
 			)}
+
+			<Dialog onOpenChange={setIsMoreModalOpen} open={isMoreModalOpen}>
+				<DialogContent className="min-w-[20vw] max-w-3xl">
+					<DialogHeader>
+						<DialogTitle>Mais Ícones</DialogTitle>
+					</DialogHeader>
+					<div className="space-y-2">
+						{extraPlatforms.map((platform) => {
+							const existingLink = socialLinks.find(
+								(link) => link.platform === platform.key
+							);
+							return (
+								<Button
+									className={`flex h-12 w-full items-center justify-start gap-3 rounded-xl p-2 transition-colors hover:bg-muted/50 ${
+										existingLink ? "border-green-400 hover:border-green-500" : ""
+									}`}
+									key={platform.key}
+									onClick={() => {
+										if (existingLink) {
+											handleEditSocialLink(existingLink);
+										} else {
+											handlePlatformSelect(platform);
+										}
+										setIsMoreModalOpen(false);
+									}}
+									title={
+										existingLink ? `Editar ${platform.name}` : `Adicionar ${platform.name}`
+									}
+									variant="outline"
+								>
+									<div
+										className="h-6 w-6"
+										style={{
+											backgroundColor: platform.color,
+											maskImage: `url(${platform.icon})`,
+											maskSize: "contain",
+											maskRepeat: "no-repeat",
+											maskPosition: "center",
+										}}
+									/>
+									<span className="truncate text-sm font-medium">
+										{platform.name}
+									</span>
+								</Button>
+							);
+						})}
+					</div>
+				</DialogContent>
+			</Dialog>
 
 			{selectedPlatform && (
 				<div className="space-y-4 rounded-lg border bg-muted/20 p-4">
@@ -277,6 +360,11 @@ const SocialLinksTabContent = ({
 						{selectedPlatform.key === "whatsapp" && (
 							<p className="mt-2 text-muted-foreground text-xs">
 								💡 Lembre-se de incluir o código do país antes do DDD (ex: +55)
+							</p>
+						)}
+						{selectedPlatform.pattern && usernameInput && isSaveButtonDisabled() && (
+							<p className="mt-2 text-destructive text-xs">
+								Formato inválido para {selectedPlatform.name}
 							</p>
 						)}
 					</div>

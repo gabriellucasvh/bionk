@@ -9,11 +9,12 @@ export interface SocialLinkItem {
 }
 
 export interface SocialPlatform {
-	key: string;
-	name: string;
-	icon: string;
-	iconDark?: string; 
-	baseUrl: string;
-	placeholder: string;
-	color: string;
+    key: string;
+    name: string;
+    icon: string;
+    iconDark?: string; 
+    baseUrl: string;
+    placeholder: string;
+    color: string;
+    pattern?: string;
 }
