@@ -413,7 +413,7 @@ const SocialLinksTabContent = ({
 			</Dialog>
 
 			{selectedPlatform && (
-				<div className="space-y-4 rounded-lg border bg-muted/20 p-4">
+				<div className="space-y-4 rounded-lg border bg-white dark:bg-zinc-900 p-4">
 					<div className="flex items-center gap-3">
 						<div
 							className="h-8 w-8"
@@ -502,7 +502,7 @@ const SocialLinksTabContent = ({
 									);
 									return (
 										<SortableSocialLinkItem id={link.id} key={link.id}>
-											<li className="flex items-center justify-between rounded-lg border bg-background p-2.5 transition-colors hover:bg-muted/30">
+											<li className="flex items-center justify-between rounded-lg border bg-white dark:bg-zinc-900 p-2.5">
 												<div className="flex min-w-0 flex-grow items-center gap-2 sm:gap-3">
 													{platform && (
 														<div
