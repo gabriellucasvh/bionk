@@ -75,12 +75,12 @@ const EditingView = ({
 			setUrlError(error || null);
 			return;
 		}
-		if (video.title && video.url) {
+		if (video.url) {
 			setIsLoading(true);
 			try {
 				await onSaveEditingVideo?.(
 					video.id,
-					video.title,
+					video.title || "",
 					video.description || "",
 					video.url
 				);
@@ -98,21 +98,21 @@ const EditingView = ({
 		<div className="flex flex-col gap-3 rounded-3xl border-2 bg-white p-3 sm:p-4 dark:bg-zinc-900">
 			<div className="space-y-3">
 				<div>
-					<Label className="font-medium text-sm" htmlFor="video-title">
-						Título
-					</Label>
-					<Input
-						id="video-title"
-						maxLength={100}
-						onChange={(e) => onVideoChange?.(video.id, "title", e.target.value)}
-						placeholder="Digite o título do vídeo"
-						value={video.title || ""}
-					/>
+				<Label className="font-medium text-sm" htmlFor="video-title">
+					Título (opcional)
+				</Label>
+				<Input
+					id="video-title"
+					maxLength={100}
+					onChange={(e) => onVideoChange?.(video.id, "title", e.target.value)}
+					placeholder="Digite o título do vídeo"
+					value={video.title || ""}
+				/>
 				</div>
 
 				<div>
 					<Label className="font-medium text-sm" htmlFor="video-description">
-						Descrição
+						Descrição (opcional)
 					</Label>
 					<Textarea
 					className="max-h-40"
@@ -121,7 +121,7 @@ const EditingView = ({
 						onChange={(e) =>
 							onVideoChange?.(video.id, "description", e.target.value)
 						}
-						placeholder="Digite uma descrição (opcional)"
+						placeholder="Digite uma descrição"
 						rows={3}
 						value={video.description || ""}
 					/>
@@ -152,7 +152,7 @@ const EditingView = ({
 					Cancelar
 				</BaseButton>
 				<BaseButton
-					disabled={!(video.title && video.url && hasChanges) || !!urlError}
+					disabled={!video.url || !hasChanges || !!urlError}
 					loading={isLoading}
 					onClick={handleSave}
 				>
