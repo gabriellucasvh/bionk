@@ -15,6 +15,7 @@ import MusicCard from "@/app/[username]/templates/components/cards/MusicCard";
 import { CardImage } from "@/app/[username]/templates/components/cards/utils/media";
 import { toForeground } from "@/app/[username]/templates/components/cards/utils/style";
 import VideoCard from "@/app/[username]/templates/components/cards/VideoCard";
+import EventCard from "@/app/[username]/templates/components/cards/EventCard";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
 import { cn } from "@/lib/utils";
 import type { UserLink, UserProfile } from "@/types/user-profile";
@@ -690,51 +691,9 @@ function ContentList({
 			}
 		}
 
-		const dateLabel = (() => {
-			try {
-				const d = new Date(event.eventDate);
-				return d.toLocaleDateString("pt-BR");
-			} catch {
-				return event.eventDate;
-			}
-		})();
-
-		const cornerValue = customizations?.customButtonCorners || "12";
-		const href = normalizeExternalUrl(event.externalLink);
-
-		const mutedTextColor = toForeground(
-			String(customizations?.customButtonTextColor || "#0f0f0f")
-		);
-
 		result.push(
 			<div className="w-full" key={`event-${event.id}`}>
-				{href ? (
-					<a
-						className="block rounded-3xl border p-4"
-						href={href}
-						rel="noopener noreferrer"
-						style={{ borderRadius: `${cornerValue}px` }}
-						target="_blank"
-					>
-						<h3 className="font-bold text-xl">{event.title}</h3>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{event.location}
-						</div>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{dateLabel} • {event.eventTime}
-						</div>
-					</a>
-				) : (
-					<div className="rounded-3xl border p-4">
-						<h3 className="font-bold text-xl">{event.title}</h3>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{event.location}
-						</div>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{dateLabel} • {event.eventTime}
-						</div>
-					</div>
-				)}
+				<EventCard event={event} customPresets={customizations} buttonStyle={getButtonStyle(customizations)} />
 			</div>
 		);
 
