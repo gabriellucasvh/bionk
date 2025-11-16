@@ -798,7 +798,12 @@ function ContentList({
 						style={wrapperStyle}
 					>
 						{header}
-						<div className="overflow-hidden" style={buttonStyle}>
+						<div
+							className="overflow-hidden"
+							style={{
+								borderRadius: `${customizations?.customButtonCorners || "12"}px`,
+							}}
+						>
 							{renderImageItem(image?.items?.[0], image?.ratio, image?.id, 0)}
 						</div>
 					</div>
