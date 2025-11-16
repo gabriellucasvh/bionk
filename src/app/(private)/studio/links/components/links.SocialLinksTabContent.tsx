@@ -40,6 +40,76 @@ const SocialLinksTabContent = ({
 	const [originalUsername, setOriginalUsername] = useState<string>("");
 	const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
 
+	const USERNAME_ONLY = new Set(["instagram", "threads", "x", "tiktok"]);
+
+	const getExamplePlaceholder = (platform: SocialPlatform) => {
+		if (USERNAME_ONLY.has(platform.key)) {
+			const map: Record<string, string> = {
+				instagram: "instagramuser",
+				threads: "threadsuser",
+				x: "xuser",
+				tiktok: "tiktokuser",
+			};
+			return `Ex.: ${map[platform.key]}`;
+		}
+		return `Ex.: ${platform.baseUrl}${platform.placeholder}`;
+	};
+
+	const isUrlInput = (value: string) => {
+		const v = value.trim();
+		return /^https?:\/\//i.test(v);
+	};
+
+	const getPlatformHostname = (platform: SocialPlatform) => {
+		try {
+			const u = new URL(platform.baseUrl);
+			const h = u.hostname;
+			return h.startsWith("www.") ? h.slice(4) : h;
+		} catch {
+			return "";
+		}
+	};
+
+	const isFromCorrectDomain = (platform: SocialPlatform, value: string) => {
+		try {
+			const u = new URL(value.trim());
+			const hostRaw = u.hostname.toLowerCase();
+			const host = hostRaw.startsWith("www.") ? hostRaw.slice(4) : hostRaw;
+			const expected = getPlatformHostname(platform).toLowerCase();
+			if (!expected) {
+				return false;
+			}
+			return host === expected || host.endsWith(`.${expected}`);
+		} catch {
+			return false;
+		}
+	};
+
+	const extractUsernameFromUrl = (platform: SocialPlatform, value: string) => {
+		try {
+			const u = new URL(value.trim());
+			if (platform.key === "google-play") {
+				const id = u.searchParams.get("id");
+				if (id) {
+					return id;
+				}
+			}
+			if (platform.key === "appstore") {
+				const m = u.pathname.match(/id(\d+)/);
+				if (m) {
+					return m[1];
+				}
+			}
+			const parts = u.pathname.split("/").filter(Boolean);
+			if (parts.length > 0) {
+				return parts[parts.length - 1];
+			}
+			return value.trim();
+		} catch {
+			return value.trim();
+		}
+	};
+
 	const EXTRA_KEYS = new Set([
 		"appstore",
 		"epidemic-sound",
@@ -102,11 +172,18 @@ const SocialLinksTabContent = ({
 			return;
 		}
 		setIsSaving(true);
-		const fullUrl = `${selectedPlatform.baseUrl}${usernameInput.trim()}`;
+		const isUrl = isUrlInput(usernameInput);
+		const isUsernameMode = USERNAME_ONLY.has(selectedPlatform.key);
+		const fullUrl = isUsernameMode
+			? `${selectedPlatform.baseUrl}${usernameInput.trim()}`
+			: usernameInput.trim();
+		const effectiveUsername = isUsernameMode
+			? usernameInput.trim()
+			: extractUsernameFromUrl(selectedPlatform, usernameInput);
 		const payload = {
 			userId: session.user.id,
 			platform: selectedPlatform.key,
-			username: usernameInput.trim(),
+			username: effectiveUsername,
 			url: fullUrl,
 			active: true,
 		};
@@ -116,7 +193,7 @@ const SocialLinksTabContent = ({
 						method: "PUT",
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({
-							username: usernameInput.trim(),
+							username: effectiveUsername,
 							url: fullUrl,
 						}),
 					})
@@ -138,7 +215,8 @@ const SocialLinksTabContent = ({
 		const platform = SOCIAL_PLATFORMS.find((p) => p.key === link.platform);
 		if (platform) {
 			setSelectedPlatform(platform);
-			setUsernameInput(link.username || "");
+			const isUsernameMode = USERNAME_ONLY.has(platform.key);
+			setUsernameInput(isUsernameMode ? link.username || "" : link.url || "");
 			setEditingLinkId(link.id);
 			setOriginalUsername(link.username || "");
 		}
@@ -183,7 +261,13 @@ const SocialLinksTabContent = ({
 			return true;
 		}
 
-		if (selectedPlatform?.pattern) {
+		const isUrl = isUrlInput(usernameInput);
+		const isUsernameMode = selectedPlatform ? USERNAME_ONLY.has(selectedPlatform.key) : false;
+		if (!isUsernameMode) {
+			if (!(selectedPlatform && isUrl && isFromCorrectDomain(selectedPlatform, usernameInput))) {
+				return true;
+			}
+		} else if (selectedPlatform?.pattern) {
 			try {
 				const re = new RegExp(selectedPlatform.pattern);
 				if (!re.test(usernameInput.trim())) {
@@ -205,8 +289,17 @@ const SocialLinksTabContent = ({
 				setUsernameInput(numbers);
 			}
 		} else {
-			// Remove espaços de todos os inputs de redes sociais
-			setUsernameInput(currentValue.replace(/\s/g, ""));
+			const v = currentValue;
+			const isUsernameMode = selectedPlatform ? USERNAME_ONLY.has(selectedPlatform.key) : false;
+			if (isUsernameMode) {
+				setUsernameInput(v.replace(/\s/g, ""));
+			} else {
+				if (isUrlInput(v)) {
+					setUsernameInput(v.trim());
+				} else {
+					setUsernameInput(v);
+				}
+			}
 		}
 	};
 
@@ -341,10 +434,7 @@ const SocialLinksTabContent = ({
 							className="text-muted-foreground text-xs sm:text-sm"
 							htmlFor="usernameInput"
 						>
-							{selectedPlatform.baseUrl}
-							<span className="font-medium text-primary">
-								{usernameInput || selectedPlatform.placeholder}
-							</span>
+							{getExamplePlaceholder(selectedPlatform)}
 						</Label>
 						<div className="mt-1 flex items-center gap-2">
 							<Input
@@ -352,8 +442,12 @@ const SocialLinksTabContent = ({
 								className="flex-grow text-sm sm:text-base"
 								id="usernameInput"
 								onChange={handleUsernameChange}
-								placeholder={selectedPlatform.placeholder}
-								type={selectedPlatform.key === "whatsapp" ? "tel" : "text"}
+								placeholder={getExamplePlaceholder(selectedPlatform)}
+								type={USERNAME_ONLY.has(selectedPlatform.key)
+									? selectedPlatform.key === "whatsapp"
+										? "tel"
+										: "text"
+									: "url"}
 								value={usernameInput}
 							/>
 						</div>

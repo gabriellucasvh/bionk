@@ -198,7 +198,7 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
     key: "appstore",
     name: "App Store",
     icon: "/icons/appstore.svg",
-    baseUrl: "https://apps.apple.com/app/id",
+    baseUrl: "https://apps.apple.com/app/id/",
     placeholder: "123456789",
     color: "#0D96F6",
     pattern: "^\\d{9,12}$",
