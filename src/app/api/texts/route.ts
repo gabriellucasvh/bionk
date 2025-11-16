@@ -20,19 +20,19 @@ export async function POST(request: Request) {
 			sectionId,
 		} = await request.json();
 
-		if (!(title && description)) {
-			return NextResponse.json(
-				{ error: "Título e descrição são obrigatórios" },
-				{ status: 400 }
-			);
-		}
+    if (!title) {
+        return NextResponse.json(
+            { error: "Título é obrigatório" },
+            { status: 400 }
+        );
+    }
 
-		if (description.length > 1500) {
-			return NextResponse.json(
-				{ error: "Descrição deve ter no máximo 1500 caracteres" },
-				{ status: 400 }
-			);
-		}
+    if (description && description.length > 1500) {
+        return NextResponse.json(
+            { error: "Descrição deve ter no máximo 1500 caracteres" },
+            { status: 400 }
+        );
+    }
 
         // Incrementar order de todos os itens existentes do usuário
         await prisma.$transaction([
@@ -62,19 +62,19 @@ export async function POST(request: Request) {
             }),
         ]);
 
-		const text = await prisma.text.create({
-			data: {
-				title: title.trim(),
-				description: description.trim(),
-				position,
-				hasBackground,
-				isCompact,
-				active: true,
-				order: 0,
-				userId: session.user.id,
-				sectionId: sectionId || null,
-			},
-		});
+        const text = await prisma.text.create({
+            data: {
+                title: title.trim(),
+                description: (description || "").trim(),
+                position,
+                hasBackground,
+                isCompact,
+                active: true,
+                order: 0,
+                userId: session.user.id,
+                sectionId: sectionId || null,
+            },
+        });
 
 		return NextResponse.json(text, { status: 201 });
 	} catch {

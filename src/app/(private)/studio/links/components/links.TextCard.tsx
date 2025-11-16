@@ -157,20 +157,20 @@ const TextCard = ({
 							</div>
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor={`description-${text.id}`}>Descrição *</Label>
-							<Textarea
-								className="resize-none whitespace-pre-wrap break-words"
-								id={`description-${text.id}`}
-								maxLength={1500}
-								onChange={(e) => {
-									if (e.target.value.length <= 1500) {
-										handleFieldChange("description", e.target.value);
-									}
-								}}
-								placeholder="Digite a descrição do texto"
-								rows={3}
-								value={text.description}
-							/>
+					<Label htmlFor={`description-${text.id}`}>Descrição (opcional)</Label>
+					<Textarea
+						className="resize-none whitespace-pre-wrap break-words"
+						id={`description-${text.id}`}
+						maxLength={1500}
+						onChange={(e) => {
+							if (e.target.value.length <= 1500) {
+								handleFieldChange("description", e.target.value);
+							}
+						}}
+						placeholder="Digite a descrição"
+						rows={3}
+						value={text.description}
+					/>
 							<div className="text-right text-muted-foreground text-xs">
 								{text.description.length}/1500 caracteres
 							</div>

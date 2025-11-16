@@ -2016,14 +2016,9 @@ export const useLinksManager = (
 			| TextItem
 			| undefined;
 		if (target?.isDraft) {
-			// Validação mínima no cliente para evitar 400
 			const trimmedTitle = (title || "").trim();
 			const trimmedDescription = (description || "").trim();
-			if (
-				!(trimmedTitle && trimmedDescription) ||
-				trimmedDescription.length > 1500
-			) {
-				// Mantém em edição para o usuário corrigir os dados
+			if (!trimmedTitle || trimmedDescription.length > 1500) {
 				setUnifiedItems((prev) =>
 					prev.map((item) =>
 						item.id === id && item.isText ? { ...item, isEditing: true } : item
