@@ -112,7 +112,7 @@ export async function PUT(
 			...(archived !== undefined && { archived }),
 		};
 
-		if (url && url !== video.url) {
+		if (url) {
 			const validation = validateVideoUrl(url);
 			if (!validation) {
 				return NextResponse.json(
@@ -142,7 +142,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-	request: NextRequest,
+	_request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const session = await getServerSession(authOptions);

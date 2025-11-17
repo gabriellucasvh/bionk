@@ -1081,6 +1081,15 @@ export const useLinksManager = (
 			url,
 			isEditing: false,
 		});
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if (item.isVideo && item.id === id) {
+					return { ...item, title, description, url, isEditing: false };
+				}
+				return item;
+			})
+		);
+		setOriginalVideo(null);
 	};
 
 	const handleCancelEditingVideo = (id: number) => {
