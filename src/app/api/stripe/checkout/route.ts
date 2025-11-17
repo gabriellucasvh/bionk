@@ -35,8 +35,11 @@ export async function POST(request: Request) {
 
 		const body = await request.json().catch(() => ({}));
 		const plan: string = (body.plan || "").toLowerCase();
-		const billingCycleInput: string = (body.billingCycle || "monthly").toLowerCase();
-		const billingCycle: BillingCycle = billingCycleInput === "annual" ? "annual" : "monthly";
+		const billingCycleInput: string = (
+			body.billingCycle || "monthly"
+		).toLowerCase();
+		const billingCycle: BillingCycle =
+			billingCycleInput === "annual" ? "annual" : "monthly";
 
 		const selectedPlan = plan;
 		const finalPriceId =
@@ -125,8 +128,8 @@ export async function POST(request: Request) {
 
 		// URLs de sucesso/cancelamento
 		const origin = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-		const successUrl = `${origin}/checkout/success`;
-		const cancelUrl = `${origin}/checkout/failure`;
+		const successUrl = `${origin}/checkout/success?cs_id={CHECKOUT_SESSION_ID}`;
+		const cancelUrl = `${origin}/checkout/failure?cs_id={CHECKOUT_SESSION_ID}`;
 
 		if (!customerId) {
 			return NextResponse.json(

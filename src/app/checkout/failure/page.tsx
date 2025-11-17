@@ -2,8 +2,37 @@
 
 import { XCircle } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import Stripe from "stripe";
+import { authOptions } from "@/lib/auth";
 
-export default function CheckoutFailurePage() {
+export default async function CheckoutFailurePage({
+	searchParams,
+}: {
+	searchParams: { cs_id?: string };
+}) {
+	const session = await getServerSession(authOptions);
+	if (!session?.user?.id) {
+		redirect("/registro");
+	}
+	const csId = searchParams?.cs_id;
+	if (!csId) {
+		redirect("/planos");
+	}
+	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+		apiVersion: "2025-09-30.clover",
+	});
+	let valid = false;
+	try {
+		const checkout = await stripe.checkout.sessions.retrieve(csId);
+		if (checkout && checkout.client_reference_id === session.user.id) {
+			valid = true;
+		}
+	} catch {}
+	if (!valid) {
+		redirect("/planos");
+	}
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center bg-white p-4 text-center">
 			<div className="mx-auto max-w-md space-y-6">
