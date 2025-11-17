@@ -54,9 +54,9 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import { useSubscription } from "@/providers/subscriptionProvider";
-import type { LinkItem } from "../types/links.types";
-import { isValidUrl } from "../utils/links.helpers";
-import { useCountdown } from "../utils/useCountdown";
+import type { LinkItem } from "../../types/links.types";
+import { isValidUrl } from "../../utils/links.helpers";
+import { useCountdown } from "../../utils/useCountdown";
 
 // Tipos e Interfaces
 interface LinkCardProps {
@@ -195,7 +195,7 @@ const EditingView = ({
 			<div className="space-y-3">
 				<div className="space-y-1.5">
 					{/* Campos principais com labels */}
-					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 mb-5">
+					<div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
 						<div className="grid gap-2">
 							<Label htmlFor="title">Título *</Label>
 							<Input
@@ -217,7 +217,6 @@ const EditingView = ({
 								type="url"
 								value={link.url || ""}
 							/>
-
 						</div>
 					</div>
 

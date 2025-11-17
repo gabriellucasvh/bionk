@@ -16,7 +16,7 @@ import {
 	sortableKeyboardCoordinates,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import type { UnifiedItem } from "../hooks/useLinksManager";
+import type { UnifiedItem } from "../../hooks/useLinksManager";
 import type {
 	EventItem,
 	ImageItem,
@@ -25,16 +25,16 @@ import type {
 	SectionItem,
 	TextItem,
 	VideoItem,
-} from "../types/links.types";
-import DragPreview from "./links.DragPreview";
-import EventCard from "./links.EventCard";
-import ImageCard from "./links.ImageCard";
-import LinkCard from "./links.LinkCard";
-import MusicCard from "./links.MusicCard";
-import SectionCard from "./links.SectionCard";
-import SortableItem from "./links.SortableItem";
-import TextCard from "./links.TextCard";
-import VideoCard from "./links.VideoCard";
+} from "../../types/links.types";
+import EventCard from "../cards/EventCard";
+import ImageCard from "../cards/ImageCard";
+import LinkCard from "../cards/LinkCard";
+import MusicCard from "../cards/MusicCard";
+import SectionCard from "../cards/SectionCard";
+import TextCard from "../cards/TextCard";
+import VideoCard from "../cards/VideoCard";
+import DragPreview from "../drag/DragPreview";
+import SortableItem from "../sortable/SortableItem";
 
 interface LinkListProps {
 	items: UnifiedItem[];
@@ -353,22 +353,22 @@ const LinkList = (props: LinkListProps) => {
 												order: item.order || 0,
 												links: item.children || [],
 											};
-						return (
-							<SectionCard
-								isDragging={isDragging}
-								isTogglingActive={togglingSectionId === item.id}
-								linksManager={linksManager}
-								listeners={listeners}
-								onAddLinkToSection={onAddLinkToSection}
-								onSaveNewSection={cardProps.onSaveNewSection}
-								onCancelNewSection={cardProps.onCancelNewSection}
-								onRemoveCustomImage={onRemoveCustomImage}
-								onUpdateCustomImage={onUpdateCustomImage}
-								section={sectionData}
-								setActivatorNodeRef={setActivatorNodeRef}
-								{...cardProps}
-							/>
-						);
+											return (
+												<SectionCard
+													isDragging={isDragging}
+													isTogglingActive={togglingSectionId === item.id}
+													linksManager={linksManager}
+													listeners={listeners}
+													onAddLinkToSection={onAddLinkToSection}
+													onCancelNewSection={cardProps.onCancelNewSection}
+													onRemoveCustomImage={onRemoveCustomImage}
+													onSaveNewSection={cardProps.onSaveNewSection}
+													onUpdateCustomImage={onUpdateCustomImage}
+													section={sectionData}
+													setActivatorNodeRef={setActivatorNodeRef}
+													{...cardProps}
+												/>
+											);
 										}
 
 										if (item.isText) {

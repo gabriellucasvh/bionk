@@ -22,8 +22,8 @@ import {
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import type { ImageFormData } from "../hooks/useLinksManager";
-import type { SectionItem } from "../types/links.types";
+import type { ImageFormData } from "../../hooks/useLinksManager";
+import type { SectionItem } from "../../types/links.types";
 
 interface AddNewImageFormProps {
 	formData?: ImageFormData;

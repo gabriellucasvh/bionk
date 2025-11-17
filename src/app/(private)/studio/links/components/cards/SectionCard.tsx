@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import type { SectionItem } from "../types/links.types";
-import LinkCard from "./links.LinkCard";
-import SortableItem from "./links.SortableItem";
+import type { SectionItem } from "../../types/links.types";
+import LinkCard from "../cards/LinkCard";
+import SortableItem from "../sortable/SortableItem";
 
 interface SectionCardProps {
 	section: SectionItem;

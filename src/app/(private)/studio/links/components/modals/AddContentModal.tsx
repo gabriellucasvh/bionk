@@ -2,6 +2,13 @@
 
 import { Plus } from "lucide-react";
 import { useEffect } from "react";
+import CategorySelector from "@/app/(private)/studio/links/components/shared/CategorySelector";
+import ContentOptions from "@/app/(private)/studio/links/components/shared/ContentOptions";
+import EventOptions from "@/app/(private)/studio/links/components/shared/EventOptions";
+import ImageOptions from "@/app/(private)/studio/links/components/shared/ImageOptions";
+import MobileBottomSheet from "@/app/(private)/studio/links/components/shared/MobileBottomSheet";
+import MusicOptions from "@/app/(private)/studio/links/components/shared/MusicOptions";
+import VideoOptions from "@/app/(private)/studio/links/components/shared/VideoOptions";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import {
 	Dialog,
@@ -9,7 +16,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { useDragGesture } from "../hooks/useDragGesture";
+import { useDragGesture } from "../../hooks/useDragGesture";
 import type {
 	ImageFormData,
 	LinkFormData,
@@ -17,18 +24,9 @@ import type {
 	SectionFormData,
 	TextFormData,
 	VideoFormData,
-} from "../hooks/useLinksManager";
-import { useModalState } from "../hooks/useModalState";
-import type { SectionItem } from "../types/links.types";
-import CategorySelector from "./CategorySelector";
-import ContentOptions from "./ContentOptions";
-import EventOptions from "./EventOptions";
-
-import ImageOptions from "./ImageOptions";
-import MobileBottomSheet from "./MobileBottomSheet";
-
-import MusicOptions from "./MusicOptions";
-import VideoOptions from "./VideoOptions";
+} from "../../hooks/useLinksManager";
+import { useModalState } from "../../hooks/useModalState";
+import type { SectionItem } from "../../types/links.types";
 
 interface AddContentModalProps {
 	isOpen: boolean;
@@ -258,10 +256,7 @@ const AddContentModal = ({
 	if (isMobile) {
 		return (
 			<>
-				<BaseButton
-					className="w-full"
-					onClick={onOpen}
-				>
+				<BaseButton className="w-full" onClick={onOpen}>
 					<Plus className="mr-2 h-4 w-4" />
 					Adicionar Conteúdo
 				</BaseButton>

@@ -7,19 +7,27 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Edit, Loader2, Trash2, Plus } from "lucide-react";
+import { Edit, Loader2, Plus, Trash2 } from "lucide-react";
 import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useDragGesture } from "../hooks/useDragGesture";
-import MobileBottomSheet from "./MobileBottomSheet";
 import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 import type { SocialLinkItem, SocialPlatform } from "@/types/social";
-import { SortableSocialLinkItem } from "./links.SortableSocialLinkItem";
+import { useDragGesture } from "../../hooks/useDragGesture";
+import MobileBottomSheet from "../shared/MobileBottomSheet";
+import { SortableSocialLinkItem } from "../sortable/SortableSocialLinkItem";
+
+const REGEX_URL = /^https?:\/\//i;
+const APPSTORE_REGEX = /id(\d+)/;
 
 interface SocialLinksTabContentProps {
 	initialSocialLinks: SocialLinkItem[];
@@ -40,9 +48,9 @@ const SocialLinksTabContent = ({
 	const [deletingLinkId, setDeletingLinkId] = useState<string | null>(null);
 	const [isSaving, setIsSaving] = useState(false);
 	const [originalUsername, setOriginalUsername] = useState<string>("");
-    const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
-    const [isAnimating, setIsAnimating] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
+	const [isMoreModalOpen, setIsMoreModalOpen] = useState(false);
+	const [isAnimating, setIsAnimating] = useState(false);
+	const [isMobile, setIsMobile] = useState(false);
 
 	const USERNAME_ONLY = new Set(["instagram", "threads", "x", "tiktok"]);
 
@@ -61,7 +69,7 @@ const SocialLinksTabContent = ({
 
 	const isUrlInput = (value: string) => {
 		const v = value.trim();
-		return /^https?:\/\//i.test(v);
+		return REGEX_URL.test(v);
 	};
 
 	const getPlatformHostname = (platform: SocialPlatform) => {
@@ -99,14 +107,14 @@ const SocialLinksTabContent = ({
 				}
 			}
 			if (platform.key === "appstore") {
-				const m = u.pathname.match(/id(\d+)/);
+				const m = u.pathname.match(APPSTORE_REGEX);
 				if (m) {
 					return m[1];
 				}
 			}
 			const parts = u.pathname.split("/").filter(Boolean);
 			if (parts.length > 0) {
-				return parts[parts.length - 1];
+				return parts.at(-1);
 			}
 			return value.trim();
 		} catch {
@@ -126,52 +134,61 @@ const SocialLinksTabContent = ({
 		"applemusic",
 	]);
 
-    const extraPlatforms = SOCIAL_PLATFORMS.filter((p) => EXTRA_KEYS.has(p.key));
-    const visiblePlatforms = SOCIAL_PLATFORMS.filter((p) => !EXTRA_KEYS.has(p.key));
+	const extraPlatforms = SOCIAL_PLATFORMS.filter((p) => EXTRA_KEYS.has(p.key));
+	const visiblePlatforms = SOCIAL_PLATFORMS.filter(
+		(p) => !EXTRA_KEYS.has(p.key)
+	);
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 640);
-        };
-        checkMobile();
-        window.addEventListener("resize", checkMobile);
-        return () => window.removeEventListener("resize", checkMobile);
-    }, []);
+	useEffect(() => {
+		const checkMobile = () => {
+			setIsMobile(window.innerWidth < 640);
+		};
+		checkMobile();
+		window.addEventListener("resize", checkMobile);
+		return () => window.removeEventListener("resize", checkMobile);
+	}, []);
 
-    const handleCloseMoreModal = () => {
-        setIsMoreModalOpen(false);
-    };
+	const handleCloseMoreModal = () => {
+		setIsMoreModalOpen(false);
+	};
 
-    const {
-        isDragging,
-        dragY,
-        isClosing,
-        handleMouseDown,
-        handleTouchStart,
-        handleMouseMove,
-        handleTouchMove,
-        handleMouseUp,
-        handleTouchEnd,
-    } = useDragGesture(handleCloseMoreModal);
+	const {
+		isDragging,
+		dragY,
+		isClosing,
+		handleMouseDown,
+		handleTouchStart,
+		handleMouseMove,
+		handleTouchMove,
+		handleMouseUp,
+		handleTouchEnd,
+	} = useDragGesture(handleCloseMoreModal);
 
-    useEffect(() => {
-        if (isMoreModalOpen && isMobile) {
-            setIsAnimating(true);
-            document.addEventListener("mousemove", handleMouseMove);
-            document.addEventListener("mouseup", handleMouseUp);
-            document.addEventListener("touchmove", handleTouchMove);
-            document.addEventListener("touchend", handleTouchEnd);
-        } else if (!isMoreModalOpen) {
-            setIsAnimating(false);
-        }
+	useEffect(() => {
+		if (isMoreModalOpen && isMobile) {
+			setIsAnimating(true);
+			document.addEventListener("mousemove", handleMouseMove);
+			document.addEventListener("mouseup", handleMouseUp);
+			document.addEventListener("touchmove", handleTouchMove);
+			document.addEventListener("touchend", handleTouchEnd);
+		} else if (!isMoreModalOpen) {
+			setIsAnimating(false);
+		}
 
-        return () => {
-            document.removeEventListener("mousemove", handleMouseMove);
-            document.removeEventListener("mouseup", handleMouseUp);
-            document.removeEventListener("touchmove", handleTouchMove);
-            document.removeEventListener("touchend", handleTouchEnd);
-        };
-    }, [isMoreModalOpen, isMobile, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
+		return () => {
+			document.removeEventListener("mousemove", handleMouseMove);
+			document.removeEventListener("mouseup", handleMouseUp);
+			document.removeEventListener("touchmove", handleTouchMove);
+			document.removeEventListener("touchend", handleTouchEnd);
+		};
+	}, [
+		isMoreModalOpen,
+		isMobile,
+		handleMouseMove,
+		handleMouseUp,
+		handleTouchMove,
+		handleTouchEnd,
+	]);
 
 	useEffect(() => {
 		const sorted = [...initialSocialLinks].sort(
@@ -220,7 +237,6 @@ const SocialLinksTabContent = ({
 			return;
 		}
 		setIsSaving(true);
-		const isUrl = isUrlInput(usernameInput);
 		const isUsernameMode = USERNAME_ONLY.has(selectedPlatform.key);
 		const fullUrl = isUsernameMode
 			? `${selectedPlatform.baseUrl}${usernameInput.trim()}`
@@ -310,9 +326,17 @@ const SocialLinksTabContent = ({
 		}
 
 		const isUrl = isUrlInput(usernameInput);
-		const isUsernameMode = selectedPlatform ? USERNAME_ONLY.has(selectedPlatform.key) : false;
+		const isUsernameMode = selectedPlatform
+			? USERNAME_ONLY.has(selectedPlatform.key)
+			: false;
 		if (!isUsernameMode) {
-			if (!(selectedPlatform && isUrl && isFromCorrectDomain(selectedPlatform, usernameInput))) {
+			if (
+				!(
+					selectedPlatform &&
+					isUrl &&
+					isFromCorrectDomain(selectedPlatform, usernameInput)
+				)
+			) {
 				return true;
 			}
 		} else if (selectedPlatform?.pattern) {
@@ -338,15 +362,15 @@ const SocialLinksTabContent = ({
 			}
 		} else {
 			const v = currentValue;
-			const isUsernameMode = selectedPlatform ? USERNAME_ONLY.has(selectedPlatform.key) : false;
+			const isUsernameMode = selectedPlatform
+				? USERNAME_ONLY.has(selectedPlatform.key)
+				: false;
 			if (isUsernameMode) {
 				setUsernameInput(v.replace(/\s/g, ""));
+			} else if (isUrlInput(v)) {
+				setUsernameInput(v.trim());
 			} else {
-				if (isUrlInput(v)) {
-					setUsernameInput(v.trim());
-				} else {
-					setUsernameInput(v);
-				}
+				setUsernameInput(v);
 			}
 		}
 	};
@@ -411,115 +435,125 @@ const SocialLinksTabContent = ({
 				</div>
 			)}
 
-            {!isMobile && (
-                <Dialog onOpenChange={setIsMoreModalOpen} open={isMoreModalOpen}>
-                    <DialogContent className="min-w-[20vw] max-w-3xl">
-                        <DialogHeader>
-                            <DialogTitle>Mais Ícones</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-2">
-                            {extraPlatforms.map((platform) => {
-                                const existingLink = socialLinks.find(
-                                    (link) => link.platform === platform.key
-                                );
-                                return (
-                                    <Button
-                                        className={`flex h-12 w-full items-center justify-start gap-3 rounded-xl p-2 transition-colors hover:bg-muted/50 ${
-                                            existingLink ? "border-green-400 hover:border-green-500" : ""
-                                        }`}
-                                        key={platform.key}
-                                        onClick={() => {
-                                            if (existingLink) {
-                                                handleEditSocialLink(existingLink);
-                                            } else {
-                                                handlePlatformSelect(platform);
-                                            }
-                                            setIsMoreModalOpen(false);
-                                        }}
-                                        title={
-                                            existingLink ? `Editar ${platform.name}` : `Adicionar ${platform.name}`
-                                        }
-                                        variant="outline"
-                                    >
-                                        <div
-                                            className="h-6 w-6"
-                                            style={{
-                                                backgroundColor: platform.color,
-                                                maskImage: `url(${platform.icon})`,
-                                                maskSize: "contain",
-                                                maskRepeat: "no-repeat",
-                                                maskPosition: "center",
-                                            }}
-                                        />
-                                        <span className="truncate text-sm font-medium">
-                                            {platform.name}
-                                        </span>
-                                    </Button>
-                                );
-                            })}
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            )}
+			{!isMobile && (
+				<Dialog onOpenChange={setIsMoreModalOpen} open={isMoreModalOpen}>
+					<DialogContent className="min-w-[20vw] max-w-3xl">
+						<DialogHeader>
+							<DialogTitle>Mais Ícones</DialogTitle>
+						</DialogHeader>
+						<div className="space-y-2">
+							{extraPlatforms.map((platform) => {
+								const existingLink = socialLinks.find(
+									(link) => link.platform === platform.key
+								);
+								return (
+									<Button
+										className={`flex h-12 w-full items-center justify-start gap-3 rounded-xl p-2 transition-colors hover:bg-muted/50 ${
+											existingLink
+												? "border-green-400 hover:border-green-500"
+												: ""
+										}`}
+										key={platform.key}
+										onClick={() => {
+											if (existingLink) {
+												handleEditSocialLink(existingLink);
+											} else {
+												handlePlatformSelect(platform);
+											}
+											setIsMoreModalOpen(false);
+										}}
+										title={
+											existingLink
+												? `Editar ${platform.name}`
+												: `Adicionar ${platform.name}`
+										}
+										variant="outline"
+									>
+										<div
+											className="h-6 w-6"
+											style={{
+												backgroundColor: platform.color,
+												maskImage: `url(${platform.icon})`,
+												maskSize: "contain",
+												maskRepeat: "no-repeat",
+												maskPosition: "center",
+											}}
+										/>
+										<span className="truncate font-medium text-sm">
+											{platform.name}
+										</span>
+									</Button>
+								);
+							})}
+						</div>
+					</DialogContent>
+				</Dialog>
+			)}
 
-            {isMobile && (
-                <MobileBottomSheet
-                    isOpen={isMoreModalOpen}
-                    isAnimating={isAnimating}
-                    isClosing={isClosing}
-                    isDragging={isDragging}
-                    dragY={dragY}
-                    onClose={handleCloseMoreModal}
-                    onMouseDown={handleMouseDown}
-                    onTouchStart={handleTouchStart}
-                >
-                    <h2 className="mb-6 text-center font-semibold text-lg">Mais Ícones</h2>
-                    <div className="space-y-2">
-                        {extraPlatforms.map((platform) => {
-                            const existingLink = socialLinks.find(
-                                (link) => link.platform === platform.key
-                            );
-                            return (
-                                <Button
-                                    className={`flex h-12 w-full items-center justify-start gap-3 rounded-xl p-2 transition-colors hover:bg-muted/50 ${
-                                        existingLink ? "border-green-400 hover:border-green-500" : ""
-                                    }`}
-                                    key={platform.key}
-                                    onClick={() => {
-                                        if (existingLink) {
-                                            handleEditSocialLink(existingLink);
-                                        } else {
-                                            handlePlatformSelect(platform);
-                                        }
-                                        handleCloseMoreModal();
-                                    }}
-                                    title={
-                                        existingLink ? `Editar ${platform.name}` : `Adicionar ${platform.name}`
-                                    }
-                                    variant="outline"
-                                >
-                                    <div
-                                        className="h-6 w-6"
-                                        style={{
-                                            backgroundColor: platform.color,
-                                            maskImage: `url(${platform.icon})`,
-                                            maskSize: "contain",
-                                            maskRepeat: "no-repeat",
-                                            maskPosition: "center",
-                                        }}
-                                    />
-                                    <span className="truncate text-sm font-medium">
-                                        {platform.name}
-                                    </span>
-                                </Button>
-                            );
-                        })}
-                    </div>
-                </MobileBottomSheet>
-            )}
+			{isMobile && (
+				<MobileBottomSheet
+					dragY={dragY}
+					isAnimating={isAnimating}
+					isClosing={isClosing}
+					isDragging={isDragging}
+					isOpen={isMoreModalOpen}
+					onClose={handleCloseMoreModal}
+					onMouseDown={handleMouseDown}
+					onTouchStart={handleTouchStart}
+				>
+					<h2 className="mb-6 text-center font-semibold text-lg">
+						Mais Ícones
+					</h2>
+					<div className="space-y-2">
+						{extraPlatforms.map((platform) => {
+							const existingLink = socialLinks.find(
+								(link) => link.platform === platform.key
+							);
+							return (
+								<Button
+									className={`flex h-12 w-full items-center justify-start gap-3 rounded-xl p-2 transition-colors hover:bg-muted/50 ${
+										existingLink
+											? "border-green-400 hover:border-green-500"
+											: ""
+									}`}
+									key={platform.key}
+									onClick={() => {
+										if (existingLink) {
+											handleEditSocialLink(existingLink);
+										} else {
+											handlePlatformSelect(platform);
+										}
+										handleCloseMoreModal();
+									}}
+									title={
+										existingLink
+											? `Editar ${platform.name}`
+											: `Adicionar ${platform.name}`
+									}
+									variant="outline"
+								>
+									<div
+										className="h-6 w-6"
+										style={{
+											backgroundColor: platform.color,
+											maskImage: `url(${platform.icon})`,
+											maskSize: "contain",
+											maskRepeat: "no-repeat",
+											maskPosition: "center",
+										}}
+									/>
+									<span className="truncate font-medium text-sm">
+										{platform.name}
+									</span>
+								</Button>
+							);
+						})}
+					</div>
+				</MobileBottomSheet>
+			)}
 
 			{selectedPlatform && (
-				<div className="space-y-4 rounded-lg border bg-white dark:bg-zinc-900 p-4">
+				<div className="space-y-4 rounded-lg border bg-white p-4 dark:bg-zinc-900">
 					<div className="flex items-center gap-3">
 						<div
 							className="h-8 w-8"
@@ -549,11 +583,13 @@ const SocialLinksTabContent = ({
 								id="usernameInput"
 								onChange={handleUsernameChange}
 								placeholder={getExamplePlaceholder(selectedPlatform)}
-								type={USERNAME_ONLY.has(selectedPlatform.key)
-									? selectedPlatform.key === "whatsapp"
-										? "tel"
-										: "text"
-									: "url"}
+								type={
+									USERNAME_ONLY.has(selectedPlatform.key)
+										? selectedPlatform.key === "whatsapp"
+											? "tel"
+											: "text"
+										: "url"
+								}
 								value={usernameInput}
 							/>
 						</div>
@@ -562,11 +598,13 @@ const SocialLinksTabContent = ({
 								💡 Lembre-se de incluir o código do país antes do DDD (ex: +55)
 							</p>
 						)}
-						{selectedPlatform.pattern && usernameInput && isSaveButtonDisabled() && (
-							<p className="mt-2 text-destructive text-xs">
-								Formato inválido para {selectedPlatform.name}
-							</p>
-						)}
+						{selectedPlatform.pattern &&
+							usernameInput &&
+							isSaveButtonDisabled() && (
+								<p className="mt-2 text-destructive text-xs">
+									Formato inválido para {selectedPlatform.name}
+								</p>
+							)}
 					</div>
 					<div className="flex flex-col justify-end gap-2 pt-2 sm:flex-row">
 						<BaseButton
@@ -608,7 +646,7 @@ const SocialLinksTabContent = ({
 									);
 									return (
 										<SortableSocialLinkItem id={link.id} key={link.id}>
-											<li className="flex items-center justify-between rounded-lg border bg-white dark:bg-zinc-900 p-2.5">
+											<li className="flex items-center justify-between rounded-lg border bg-white p-2.5 dark:bg-zinc-900">
 												<div className="flex min-w-0 flex-grow items-center gap-2 sm:gap-3">
 													{platform && (
 														<div

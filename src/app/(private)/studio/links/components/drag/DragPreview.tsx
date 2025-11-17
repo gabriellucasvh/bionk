@@ -12,14 +12,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
-	EventItem,
-	ImageItem,
-	LinkItem,
-	MusicItem,
-	SectionItem,
-	TextItem,
-	VideoItem,
-} from "../types/links.types";
+    EventItem,
+    ImageItem,
+    LinkItem,
+    MusicItem,
+    SectionItem,
+    TextItem,
+    VideoItem,
+} from "../../types/links.types";
 
 interface DragPreviewProps {
 	item:

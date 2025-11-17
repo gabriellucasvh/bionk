@@ -23,8 +23,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import type { ImageItem, SectionItem } from "../types/links.types";
-import AddNewImageForm from "./links.AddNewImageForm";
+import type { ImageItem, SectionItem } from "../../types/links.types";
+import AddNewImageForm from "../forms/AddNewImageForm";
 
 interface ImageCardProps {
 	image: ImageItem;

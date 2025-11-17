@@ -17,8 +17,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import type { VideoItem } from "../types/links.types";
-import { getVideoPlatform, isValidVideoUrl } from "../utils/video.helpers";
+import type { VideoItem } from "../../types/links.types";
+import { getVideoPlatform, isValidVideoUrl } from "../../utils/video.helpers";
 
 interface VideoCardProps {
 	video: VideoItem;
@@ -98,16 +98,16 @@ const EditingView = ({
 		<div className="flex flex-col gap-3 rounded-3xl border-2 bg-white p-3 sm:p-4 dark:bg-zinc-900">
 			<div className="space-y-3">
 				<div>
-				<Label className="font-medium text-sm" htmlFor="video-title">
-					Título (opcional)
-				</Label>
-				<Input
-					id="video-title"
-					maxLength={100}
-					onChange={(e) => onVideoChange?.(video.id, "title", e.target.value)}
-					placeholder="Digite o título do vídeo"
-					value={video.title || ""}
-				/>
+					<Label className="font-medium text-sm" htmlFor="video-title">
+						Título (opcional)
+					</Label>
+					<Input
+						id="video-title"
+						maxLength={100}
+						onChange={(e) => onVideoChange?.(video.id, "title", e.target.value)}
+						placeholder="Digite o título do vídeo"
+						value={video.title || ""}
+					/>
 				</div>
 
 				<div>
@@ -115,7 +115,7 @@ const EditingView = ({
 						Descrição (opcional)
 					</Label>
 					<Textarea
-					className="max-h-40"
+						className="max-h-40"
 						id="video-description"
 						maxLength={200}
 						onChange={(e) =>
@@ -152,7 +152,7 @@ const EditingView = ({
 					Cancelar
 				</BaseButton>
 				<BaseButton
-					disabled={!video.url || !hasChanges || !!urlError}
+					disabled={!(video.url && hasChanges) || !!urlError}
 					loading={isLoading}
 					onClick={handleSave}
 				>

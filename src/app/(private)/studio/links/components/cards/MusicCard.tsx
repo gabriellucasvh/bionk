@@ -25,8 +25,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 // Removido imports não utilizados após remoção do tryAutoFillTitle
-import type { MusicItem } from "../types/links.types";
-import { getMusicPlatform, isValidMusicUrl } from "../utils/music.helpers";
+import type { MusicItem } from "../../types/links.types";
+import { getMusicPlatform, isValidMusicUrl } from "../../utils/music.helpers";
 
 interface MusicCardProps {
 	music: MusicItem;
@@ -141,7 +141,7 @@ const EditingView = ({
 	};
 
 	return (
-		<div className="flex flex-col gap-3 rounded-3xl border-2 bg-white dark:bg-zinc-900 p-3 sm:p-4">
+		<div className="flex flex-col gap-3 rounded-3xl border-2 bg-white p-3 sm:p-4 dark:bg-zinc-900">
 			<div className="space-y-3">
 				<div>
 					<Label className="font-medium text-sm" htmlFor="music-title">

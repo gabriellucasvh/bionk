@@ -18,7 +18,7 @@ interface AddNewEventFormProps {
 	onCreated?: (id: number) => void;
 	onSaved?: (id: number) => void;
 	onClose?: () => void;
-	event?: import("../types/links.types").EventItem;
+	event?: import("../../types/links.types").EventItem;
 }
 
 const AddNewEventForm = ({
@@ -117,7 +117,7 @@ const AddNewEventForm = ({
 	};
 
 	return (
-		<div className="flex flex-col gap-3 rounded-3xl border-2 border-foreground/20 bg-white dark:bg-zinc-900 p-3 sm:p-4">
+		<div className="flex flex-col gap-3 rounded-3xl border-2 border-foreground/20 bg-white p-3 sm:p-4 dark:bg-zinc-900">
 			<div className="flex-1 space-y-3 overflow-y-auto">
 				<section className="space-y-4">
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -134,7 +134,6 @@ const AddNewEventForm = ({
 							<div className="grid gap-2">
 								<Label>Local*</Label>
 								<Input
-
 									maxLength={80}
 									onChange={(e) => setLocation(e.target.value)}
 									placeholder="Ex: Auditório Central, São Paulo"
@@ -148,7 +147,7 @@ const AddNewEventForm = ({
 								<Popover onOpenChange={setDateOpen} open={dateOpen}>
 									<PopoverTrigger asChild>
 										<Button
-											className={`h-10 w-40 justify-between  ${eventDate ? "" : "text-muted-foreground"}`}
+											className={`h-10 w-40 justify-between ${eventDate ? "" : "text-muted-foreground"}`}
 											onClick={() => setDateOpen(true)}
 											type="button"
 											variant="outline"
@@ -191,7 +190,7 @@ const AddNewEventForm = ({
 							<div className="grid gap-2">
 								<Label>Hora*</Label>
 								<Input
-									className="h-10 w-20 appearance-none  [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+									className="h-10 w-20 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
 									onChange={(e) => setEventTime(e.target.value)}
 									step="60"
 									type="time"
@@ -203,7 +202,6 @@ const AddNewEventForm = ({
 							<div className="grid gap-2">
 								<Label>Descrição curta</Label>
 								<Textarea
-
 									maxLength={100}
 									onChange={(e) => setDescriptionShort(e.target.value)}
 									placeholder="Breve descrição do evento"
@@ -215,7 +213,6 @@ const AddNewEventForm = ({
 							<div className="grid gap-2">
 								<Label>Link externo*</Label>
 								<Input
-
 									onChange={(e) => setExternalLink(e.target.value)}
 									placeholder="Ex: https://meusite.com/ingressos/0123"
 									required
@@ -227,7 +224,6 @@ const AddNewEventForm = ({
 							<div className="grid gap-2">
 								<Label>Imagem de capa</Label>
 								<Input
-
 									onChange={(e) => setCoverImageUrl(e.target.value)}
 									placeholder="Ex: https://cdn.exemplo.com/capa.jpg"
 									value={coverImageUrl}
@@ -239,7 +235,7 @@ const AddNewEventForm = ({
 				</section>
 			</div>
 
-			<div className="flex-shrink-0  pt-3">
+			<div className="flex-shrink-0 pt-3">
 				<div className="flex items-center justify-end gap-3">
 					<BaseButton
 						className="px-4"

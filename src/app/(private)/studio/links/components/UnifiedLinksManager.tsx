@@ -27,8 +27,8 @@ import type {
 } from "../types/links.types";
 import { fetcher } from "../utils/links.helpers";
 
-import LinksTabContent from "./links.LinksTabContent";
-import SocialLinksTabContent from "./links.SocialLinksTabContent";
+import LinksTabContent from "./tabs/LinksTabContent";
+import SocialLinksTabContent from "./tabs/SocialLinksTabContent";
 
 const LinksSkeleton = () => (
 	<div className="space-y-3">

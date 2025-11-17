@@ -1,4 +1,3 @@
-// links/components/links.SortableItem.tsx
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type React from "react";

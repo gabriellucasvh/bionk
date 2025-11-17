@@ -9,7 +9,7 @@ import { useDesignStore } from "@/stores/designStore";
 import UserPagePreview from "../design/components/UserPagePreview";
 import { useCustomizations } from "../design/hooks/useCustomizations";
 import { useProfileData } from "../design/hooks/useProfileData";
-import UnifiedLinksManager from "./components/links.UnifiedLinksManager";
+import UnifiedLinksManager from "./components/UnifiedLinksManager";
 
 const PreviewSkeleton = () => (
 	<div className="p-4">

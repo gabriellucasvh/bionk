@@ -1,4 +1,3 @@
-// src/app/(private)/studio/links/components/links.SortableSocialLinkItem.tsx
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";

@@ -3,20 +3,20 @@
 
 import type { DragStartEvent } from "@dnd-kit/core";
 import type { Session } from "next-auth";
-import { useLinksManager } from "../hooks/useLinksManager";
+import { useLinksManager } from "../../hooks/useLinksManager";
 import type {
-	EventItem,
-	ImageItem,
-	LinkItem,
-	MusicItem,
-	SectionItem,
-	TextItem,
-	VideoItem,
-} from "../types/links.types";
-import AddNewEventForm from "./events.AddNewEventForm";
-import AddContentModal from "./links.AddContentModal";
-import AddNewSectionForm from "./links.AddNewSectionForm";
-import LinkList from "./links.LinkList";
+    EventItem,
+    ImageItem,
+    LinkItem,
+    MusicItem,
+    SectionItem,
+    TextItem,
+    VideoItem,
+} from "../../types/links.types";
+import AddNewEventForm from "../forms/AddNewEventForm";
+import AddContentModal from "../modals/AddContentModal";
+import AddNewSectionForm from "../forms/AddNewSectionForm";
+import LinkList from "../lists/LinkList";
 
 interface LinksTabContentProps {
 	currentLinks: LinkItem[];
