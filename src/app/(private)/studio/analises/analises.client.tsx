@@ -4,14 +4,13 @@ import { ptBR } from "date-fns/locale";
 import dynamic from "next/dynamic";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Dynamic imports for components
 const AnalyticsHeader = dynamic(
 	() => import("./components/analises.AnalyticsHeader"),
 	{
-		loading: () => (
-			<div className="h-16 w-full animate-pulse rounded-md" />
-		),
+		loading: () => <Skeleton className="h-16 w-full" />,
 	}
 );
 const AnalyticsStatsCards = dynamic(
@@ -19,9 +18,9 @@ const AnalyticsStatsCards = dynamic(
 	{
 		loading: () => (
 			<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-				<div className="h-full w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
-				<div className="h-full w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
-				<div className="h-full w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
+				<Skeleton className="h-full w-full" />
+				<Skeleton className="h-full w-full" />
+				<Skeleton className="h-full w-full" />
 			</div>
 		),
 	}
@@ -29,49 +28,37 @@ const AnalyticsStatsCards = dynamic(
 const PerformanceChart = dynamic(
 	() => import("./components/analises.PerformanceChart"),
 	{
-		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
-		),
+		loading: () => <Skeleton className="h-[400px] w-full" />,
 	}
 );
 const TopLinksTable = dynamic(
 	() => import("./components/analises.TopLinksTable"),
 	{
-		loading: () => (
-			<div className="h-[200px] w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
-		),
+		loading: () => <Skeleton className="h-[200px] w-full" />,
 	}
 );
 const DeviceAnalytics = dynamic(
 	() => import("./components/analises.DeviceAnalytics"),
 	{
-		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700" />
-		),
+		loading: () => <Skeleton className="h-[400px] w-full" />,
 	}
 );
 const OSAnalyticsChart = dynamic(
 	() => import("./components/analises.OSAnalyticsChart"),
 	{
-		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
-		),
+		loading: () => <Skeleton className="h-[400px] w-full" />,
 	}
 );
 const WorldMapAnalytics = dynamic(
 	() => import("./components/analises.WorldMapAnalytics"),
 	{
-		loading: () => (
-			<div className="h-[500px] w-full animate-pulse rounded-md bg-muted" />
-		),
+		loading: () => <Skeleton className="h-[500px] w-full" />,
 	}
 );
 const ReferrerAnalytics = dynamic(
 	() => import("./components/analises.ReferrerAnalytics"),
 	{
-		loading: () => (
-			<div className="h-[400px] w-full animate-pulse rounded-md bg-muted" />
-		),
+		loading: () => <Skeleton className="h-[400px] w-full" />,
 	}
 );
 
@@ -139,13 +126,6 @@ interface AnalisesClientProps {
 	userId: string;
 }
 
-// Componente para renderizar seções com loading
-const LoadingSection: React.FC<{ className: string }> = ({ className }) => (
-	<div
-		className={`animate-pulse rounded-md bg-zinc-200 dark:bg-zinc-700 ${className}`}
-	/>
-);
-
 // Componente para renderizar o conteúdo das análises
 interface AnalyticsContentProps {
 	isLoading: boolean;
@@ -164,16 +144,16 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 		return (
 			<main className="space-y-4 sm:space-y-6">
 				<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-					<LoadingSection className="h-full w-full" />
-					<LoadingSection className="h-full w-full" />
-					<LoadingSection className="h-full w-full" />
+					<Skeleton className="h-full w-full" />
+					<Skeleton className="h-full w-full" />
+					<Skeleton className="h-full w-full" />
 				</div>
-				<LoadingSection className="h-[400px] w-full" />
-				<LoadingSection className="h-[200px] w-full" />
-				<LoadingSection className="h-[400px] w-full" />
-				<LoadingSection className="h-[400px] w-full" />
-				<LoadingSection className="h-[300px] w-full sm:h-[400px] lg:h-[500px]" />
-				<LoadingSection className="h-[400px] w-full" />
+				<Skeleton className="h-[400px] w-full" />
+				<Skeleton className="h-[200px] w-full" />
+				<Skeleton className="h-[400px] w-full" />
+				<Skeleton className="h-[400px] w-full" />
+				<Skeleton className="h-[300px] w-full sm:h-[400px] lg:h-[500px]" />
+				<Skeleton className="h-[400px] w-full" />
 			</main>
 		);
 	}
