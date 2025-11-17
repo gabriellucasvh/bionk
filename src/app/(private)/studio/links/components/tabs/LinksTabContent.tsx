@@ -5,18 +5,18 @@ import type { DragStartEvent } from "@dnd-kit/core";
 import type { Session } from "next-auth";
 import { useLinksManager } from "../../hooks/useLinksManager";
 import type {
-    EventItem,
-    ImageItem,
-    LinkItem,
-    MusicItem,
-    SectionItem,
-    TextItem,
-    VideoItem,
+	EventItem,
+	ImageItem,
+	LinkItem,
+	MusicItem,
+	SectionItem,
+	TextItem,
+	VideoItem,
 } from "../../types/links.types";
 import AddNewEventForm from "../forms/AddNewEventForm";
-import AddContentModal from "../modals/AddContentModal";
 import AddNewSectionForm from "../forms/AddNewSectionForm";
 import LinkList from "../lists/LinkList";
+import AddContentModal from "../modals/AddContentModal";
 
 interface LinksTabContentProps {
 	currentLinks: LinkItem[];
@@ -195,20 +195,17 @@ const LinksTabContent = ({
 			{handlers.isAddingSection && (
 				<AddNewSectionForm
 					formData={handlers.sectionFormData}
-					setFormData={handlers.setSectionFormData}
-					onSave={async () => {
-						await handlers.handleCreateNewSectionFromForm();
-					}}
+					isSaveDisabled={!handlers.sectionFormData.title?.trim()}
 					onCancel={() => {
 						handlers.setIsAddingSection(false);
 						handlers.setSectionFormData({ title: "" });
 					}}
-					isSaveDisabled={!handlers.sectionFormData.title?.trim()}
+					onSave={async () => {
+						await handlers.handleCreateNewSectionFromForm();
+					}}
+					setFormData={handlers.setSectionFormData}
 				/>
 			)}
-
-
-
 
 			<LinkList
 				activeId={activeId}
@@ -224,8 +221,6 @@ const LinksTabContent = ({
 					handleAddNewLink: handlers.handleAddNewLink,
 				}}
 				onAddLinkToSection={handlers.handleAddLinkToSection}
-				onSaveNewSection={handlers.handleSaveEditingSection}
-				onCancelNewSection={handlers.handleCancelEditingSection}
 				onArchiveImage={handlers.handleArchiveImage}
 				onArchiveLink={handlers.handleArchiveLink}
 				onArchiveMusic={handlers.handleArchiveMusic}
@@ -236,6 +231,7 @@ const LinksTabContent = ({
 				onCancelEditingMusic={handlers.handleCancelEditingMusic}
 				onCancelEditingText={handlers.handleCancelEditingText}
 				onCancelEditingVideo={handlers.handleCancelEditingVideo}
+				onCancelNewSection={handlers.handleCancelEditingSection}
 				onClickLink={handlers.handleClickLink}
 				onDeleteEvent={handlers.handleDeleteEvent}
 				onDeleteImage={handlers.handleDeleteImage}
@@ -255,6 +251,7 @@ const LinksTabContent = ({
 				onSaveEditingMusic={handlers.handleSaveEditingMusic}
 				onSaveEditingText={handlers.handleSaveEditingText}
 				onSaveEditingVideo={handlers.handleSaveEditingVideo}
+				onSaveNewSection={handlers.handleSaveEditingSection}
 				onSectionDelete={handlers.handleSectionDelete}
 				onSectionUngroup={handlers.handleSectionUngroup}
 				onSectionUpdate={handlers.handleSectionUpdate}
