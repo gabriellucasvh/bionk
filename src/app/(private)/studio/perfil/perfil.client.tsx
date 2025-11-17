@@ -10,14 +10,12 @@ import ProfileImageCropModal from "@/components/modals/ProfileImageCropModal";
 import {
 	Card,
 	CardContent,
-	CardDescription,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
 import {
 	Dialog,
 	DialogContent,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
@@ -366,13 +364,13 @@ const PerfilClient = () => {
 			</header>
 
 			<div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-				<div className="space-y-4 lg:col-span-2 px-2">
+				<div className="space-y-4 px-2 lg:col-span-2">
 					<Card className="shadow-none dark:bg-zinc-900">
 						<CardContent className="space-y-6">
-							<article className="flex flex-col gap-4 sm:flex-row sm:items-center">
+							<article className="flex flex-col gap-4 sm:items-center md:flex-row">
 								<div className="relative flex items-center justify-center">
 									<div
-										className={`h-26 w-26 overflow-hidden rounded-full bg-muted shadow-black/20 shadow-md ${isUploadingImage ? "opacity-50" : ""}`}
+										className={`h-26 w-26 overflow-hidden rounded-full bg-muted shadow-black/20 shadow-md md:h-24 md:w-24 ${isUploadingImage ? "opacity-50" : ""}`}
 									>
 										<Image
 											alt="Foto de perfil"
@@ -509,23 +507,23 @@ const PerfilClient = () => {
 									</div>
 								</div>
 							</div>
-							<div className="pt-2 flex justify-end gap-2">
+							<div className="flex justify-end gap-2 pt-2">
 								<BaseButton
 									disabled={loading || isUploadingImage}
+									fullWidth
 									onClick={() => {
 										handleCancelChanges();
 										setIsEditModalOpen(false);
 									}}
 									variant="white"
-									fullWidth
 								>
 									Cancelar
 								</BaseButton>
 								<BaseButton
 									disabled={loading || isUploadingImage || !!validationError}
+									fullWidth
 									loading={loading || isUploadingImage}
 									onClick={handleSaveProfile}
-									fullWidth
 								>
 									Salvar
 								</BaseButton>
