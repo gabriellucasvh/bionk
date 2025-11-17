@@ -15,7 +15,7 @@ export async function getCookiePreferencesFromHeaders(): Promise<CookiePreferenc
 	};
 	return {
 		essential: true,
-		analytics: getBool("cookie-analytics", true),
+		analytics: getBool("cookie-analytics", false),
 		functional: getBool("cookie-functional", false),
 		marketing: getBool("cookie-marketing", false),
 	};
@@ -32,7 +32,7 @@ export function getCookiePreferencesFromRequest(
 	};
 	return {
 		essential: true,
-		analytics: getCookie("cookie-analytics", true),
+		analytics: getCookie("cookie-analytics", false),
 		functional: getCookie("cookie-functional", false),
 		marketing: getCookie("cookie-marketing", false),
 	};

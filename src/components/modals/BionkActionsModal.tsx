@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 
-const COOKIE_CONSENT_KEY = "cookie-consent";
-const COOKIE_PREFERENCES_KEY = "cookie-preferences";
+const COOKIE_CONSENT_KEY = "bionk-cookie-consent";
+const COOKIE_PREFERENCES_KEY = "bionk-cookie-preferences";
 
 interface CookiePreferences {
 	essential: boolean;
@@ -26,10 +26,10 @@ interface CookiePreferences {
 }
 
 const defaultPreferences: CookiePreferences = {
-	essential: true,
-	analytics: false,
-	functional: true,
-	marketing: false,
+    essential: true,
+    analytics: false,
+    functional: false,
+    marketing: false,
 };
 
 interface BionkActionsModalProps {
@@ -264,7 +264,9 @@ export default function BionkActionsModal({
 			return;
 		}
 		try {
-			const saved = localStorage.getItem(COOKIE_PREFERENCES_KEY);
+			const saved =
+				localStorage.getItem(COOKIE_PREFERENCES_KEY) ||
+				localStorage.getItem("cookie-preferences");
 			if (saved) {
 				setPreferences(JSON.parse(saved));
 			}
