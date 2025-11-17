@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, RotateCcw, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -71,6 +71,14 @@ export default function ArchivedItemsPage() {
 			return;
 		}
 		setArchivedLinks([]);
+	};
+
+	const deleteLink = async (id: number) => {
+		const res = await fetch(`/api/links/${id}`, { method: "DELETE" });
+		if (!res.ok) {
+			return;
+		}
+		setArchivedLinks((prev) => prev.filter((link) => link.id !== id));
 	};
 
 	const restoreText = async (id: number) => {
@@ -172,7 +180,7 @@ export default function ArchivedItemsPage() {
 								<ul className="space-y-2">
 									{archivedLinks.map((link) => (
 										<li
-											className="flex items-center justify-between rounded-3xl border bg-white p-4 dark:border-zinc-700"
+											className="flex items-center justify-between rounded-3xl border bg-white p-4 dark:border-zinc-900 dark:bg-zinc-900"
 											key={`link-${link.id}`}
 										>
 											<div className="overflow-hidden">
@@ -181,12 +189,23 @@ export default function ArchivedItemsPage() {
 													{link.url}
 												</p>
 											</div>
-											<BaseButton
-												className="ml-4 flex-shrink-0 bg-green-500 hover:bg-green-600"
-												onClick={() => restoreLink(link.id)}
-											>
-												Restaurar
-											</BaseButton>
+											<div className="ml-4 flex flex-shrink-0 items-center gap-2">
+												<BaseButton
+													aria-label="Restaurar"
+													onClick={() => restoreLink(link.id)}
+													size="icon"
+													variant="white"
+												>
+													<RotateCcw className="h-4 w-4" />
+												</BaseButton>
+												<BaseButton
+													aria-label="Excluir"
+													onClick={() => deleteLink(link.id)}
+													size="icon"
+												>
+													<Trash2 className="h-4 w-4" />
+												</BaseButton>
+											</div>
 										</li>
 									))}
 								</ul>
