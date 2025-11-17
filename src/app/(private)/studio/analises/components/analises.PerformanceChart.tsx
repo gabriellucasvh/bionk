@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/card";
 import {
 	ChartContainer,
+	ChartLegend,
+	ChartLegendContent,
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -100,6 +102,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 											strokeWidth={2}
 											type="monotone"
 										/>
+									<ChartLegend content={<ChartLegendContent />} />
 									</LineChart>
 								</ResponsiveContainer>
 							</ChartContainer>
