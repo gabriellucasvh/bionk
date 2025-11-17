@@ -46,7 +46,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = React.memo(
 							Visualize cliques e visualizações diárias no período selecionado.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="px-3">
+					<CardContent className="-ml-10 pr-5">
 						<div className="h-[300px] w-full overflow-hidden sm:h-[350px] md:h-[400px]">
 							<ChartContainer
 								className="h-full w-full"
