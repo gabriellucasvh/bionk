@@ -382,14 +382,20 @@ export default function ReferrerAnalytics({
 
 				{/* Tabela */}
 				<div className="overflow-x-auto">
-					<Table>
+					<Table className="min-w-[340px]">
 						<TableHeader>
 							<TableRow>
-								<TableHead>Origem</TableHead>
-								<TableHead className="text-right">Visualizações</TableHead>
-								<TableHead className="text-right">Cliques</TableHead>
-								<TableHead className="text-right">Total</TableHead>
-								<TableHead className="text-right">% do Total</TableHead>
+								<TableHead className="min-w-[120px]">Origem</TableHead>
+								<TableHead className="min-w-[80px] text-right">
+									Visualizações
+								</TableHead>
+								<TableHead className="min-w-[80px] text-right">
+									Cliques
+								</TableHead>
+								<TableHead className="min-w-[80px] text-right">Total</TableHead>
+								<TableHead className="hidden min-w-[80px] text-right md:table-cell">
+									% do Total
+								</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -422,10 +428,10 @@ export default function ReferrerAnalytics({
 										<TableCell className="text-right">
 											{(item.clicks || 0).toLocaleString()}
 										</TableCell>
-										<TableCell className="text-right font-medium">
+										<TableCell className="text-right font-semibold">
 											{item.totalInteractions.toLocaleString()}
 										</TableCell>
-										<TableCell className="text-right">
+										<TableCell className="hidden text-right md:table-cell">
 											<div className="flex items-center justify-end gap-2">
 												<span className="font-medium">{percentage}%</span>
 												<div className="h-2 w-12 overflow-hidden rounded-full bg-muted">

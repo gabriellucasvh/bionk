@@ -205,14 +205,22 @@ export default function OSAnalyticsChart({
 				</div>
 
 				<div className="mt-6 overflow-x-auto">
-					<Table>
+					<Table className="min-w-[340px]">
 						<TableHeader>
 							<TableRow>
-								<TableHead>Sistema Operacional</TableHead>
-								<TableHead className="text-right">Visualizações</TableHead>
-								<TableHead className="text-right">Cliques</TableHead>
-								<TableHead className="text-right">Total</TableHead>
-								<TableHead className="text-right">% do Total</TableHead>
+								<TableHead className="min-w-[120px]">
+									Sistema Operacional
+								</TableHead>
+								<TableHead className="min-w-[80px] text-right">
+									Visualizações
+								</TableHead>
+								<TableHead className="min-w-[80px] text-right">
+									Cliques
+								</TableHead>
+								<TableHead className="min-w-[80px] text-right">Total</TableHead>
+								<TableHead className="hidden min-w-[80px] text-right md:table-cell">
+									% do Total
+								</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -221,13 +229,13 @@ export default function OSAnalyticsChart({
 								.filter((item) => item.totalInteractions > 0)
 								.sort((a, b) => b.totalInteractions - a.totalInteractions)
 								.map((item) => {
-							const percentage =
-								totalInteractions > 0
-									? (
-											(item.totalInteractions / totalInteractions) *
-											100
-										).toFixed(0)
-									: "0";
+									const percentage =
+										totalInteractions > 0
+											? (
+													(item.totalInteractions / totalInteractions) *
+													100
+												).toFixed(0)
+											: "0";
 									return (
 										<TableRow key={item.os}>
 											<TableCell className="font-medium">
@@ -253,7 +261,7 @@ export default function OSAnalyticsChart({
 											<TableCell className="text-right font-semibold">
 												{item.totalInteractions.toLocaleString()}
 											</TableCell>
-											<TableCell className="text-right">
+											<TableCell className="hidden text-right md:table-cell">
 												<div className="flex items-center justify-end gap-2">
 													<span className="font-medium">{percentage}%</span>
 													<div className="h-2 w-12 overflow-hidden rounded-full bg-muted">
