@@ -370,7 +370,7 @@ const UnifiedLinksManager = () => {
 				value={activeTab}
 			>
 				<Card className="rounded-t-none border-none bg-zinc-100 px-4 shadow-none dark:bg-zinc-800">
-					<CardHeader className="flex flex-col items-start justify-between px-2 sm:px-6 lg:flex-row lg:items-center">
+					<CardHeader className="flex flex-col items-start justify-between px-2 sm:flex-row sm:px-6 lg:items-center">
 						<div className="mb-4 sm:mb-0">
 							<CardTitle className="text-xl sm:text-2xl">
 								Gerenciador de Links

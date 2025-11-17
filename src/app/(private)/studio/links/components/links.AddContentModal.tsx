@@ -259,7 +259,7 @@ const AddContentModal = ({
 		return (
 			<>
 				<BaseButton
-					className="w-full bg-avocado-400 text-black hover:bg-avocado-500 sm:w-auto"
+					className="w-full"
 					onClick={onOpen}
 				>
 					<Plus className="mr-2 h-4 w-4" />
