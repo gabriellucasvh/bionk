@@ -38,7 +38,7 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 
 		return (
 			<article>
-				<Card className=" dark:bg-zinc-900">
+				<Card className=" gap-3 dark:bg-zinc-900">
 					<CardHeader className="pb-3 sm:pb-6">
 						<CardTitle className="flex items-center gap-1 text-base sm:gap-2 sm:text-lg">
 							Links com Melhor Desempenho
@@ -48,7 +48,7 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 							30 dias.
 						</CardDescription>
 					</CardHeader>
-					<CardContent className="pt-3 sm:pt-6">
+					<CardContent>
 						<div className="space-y-3 sm:space-y-4">
 							{displayedLinks.map((link, index) => (
 								<div
