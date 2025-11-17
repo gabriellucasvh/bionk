@@ -146,14 +146,20 @@ const LinksStudioClient = () => {
 				aria-label={
 					mobileView === "content" ? "Ver preview" : "Voltar ao conteúdo"
 				}
-				className="preview-toggle fixed right-6 bottom-30 z-50 rounded-full bg-avocado-400 p-3 text-white shadow-lg transition-colors hover:bg-avocado-500 active:scale-95 md:hidden"
+				className="preview-toggle fixed right-6 bottom-30 z-50 rounded-full bg-black p-3 text-white shadow-lg transition-colors hover:bg-black/90 active:scale-95 md:hidden dark:bg-white"
 				onClick={handleToggleView}
 				type="button"
 			>
 				{mobileView === "content" ? (
-					<Eye className="h-6 w-6 text-black" strokeWidth={1.5} />
+					<Eye
+						className="h-6 w-6 text-white dark:text-black"
+						strokeWidth={1.5}
+					/>
 				) : (
-					<EyeOff className="h-6 w-6 text-black" strokeWidth={1.5} />
+					<EyeOff
+						className="h-6 w-6 text-white dark:text-black"
+						strokeWidth={1.5}
+					/>
 				)}
 			</button>
 
