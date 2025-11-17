@@ -1,6 +1,5 @@
 // src/app/checkout/success/page.tsx
 
-import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 
@@ -17,12 +16,13 @@ export default function CheckoutSuccessPage() {
 				<p className="text-gray-600">
 					Você receberá um email com os detalhes da sua assinatura em breve.
 				</p>
-				<Button
-					asChild
-					className="mt-8 w-full bg-[#1A3A32] text-white hover:bg-[#2A4C44]"
+
+				<Link
+					className="mt-8 block w-full rounded-full bg-bunker-950 py-4 text-white hover:bg-bunker-900"
+					href="/studio"
 				>
-					<Link href="/studio">Ir para o Studio</Link>
-				</Button>
+					Ir para o Studio
+				</Link>
 			</div>
 		</div>
 	);

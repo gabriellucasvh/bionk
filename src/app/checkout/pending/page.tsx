@@ -1,6 +1,5 @@
 // src/app/checkout/pending/page.tsx
 
-import { Button } from "@/components/ui/button";
 import { Clock } from "lucide-react";
 import Link from "next/link";
 
@@ -19,15 +18,18 @@ export default function CheckoutPendingPage() {
 					e continuar navegando.
 				</p>
 				<div className="flex flex-col gap-4">
-					<Button
-						asChild
-						className="w-full bg-[#1A3A32] text-white hover:bg-[#2A4C44]"
+					<Link
+						className="mt-8 block w-full rounded-full bg-bunker-950 py-4 text-white hover:bg-bunker-900"
+						href="/studio"
 					>
-						<Link href="/studio">Voltar para o Studio</Link>
-					</Button>
-					<Button asChild className="w-full" variant="outline">
-						<Link href="/contato">Contatar Suporte</Link>
-					</Button>
+						Ir para o Studio
+					</Link>
+					<Link
+						className="block w-full rounded-full bg-bunker-400 py-4 text-white hover:bg-bunker-500"
+						href="/contato"
+					>
+						Contatar Suporte
+					</Link>
 				</div>
 			</div>
 		</div>
