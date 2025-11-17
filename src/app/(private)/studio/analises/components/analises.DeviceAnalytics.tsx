@@ -114,10 +114,6 @@ const CustomLegend = ({ payload }: any) => {
 		<div className="mt-4 flex flex-wrap justify-center gap-4">
 			{payload.map((entry: any, index: number) => (
 				<div className="flex items-center gap-2" key={index}>
-					<div
-						className="h-3 w-3 rounded-full"
-						style={{ backgroundColor: entry.color }}
-					/>
 					<div className="flex items-center gap-1">
 						{getDeviceIcon(entry.payload.device)}
 						<span className="text-sm">
@@ -269,15 +265,6 @@ export default function DeviceAnalytics({
 											<div className="flex items-center gap-2">
 												{getDeviceIcon(item.device)}
 												<span>{getDeviceLabel(item.device)}</span>
-												<div
-													className="h-3 w-3 rounded-full"
-													style={{
-														backgroundColor:
-															DEVICE_COLORS[
-																item.device as keyof typeof DEVICE_COLORS
-															] || DEVICE_COLORS.unknown,
-													}}
-												/>
 											</div>
 										</TableCell>
 										<TableCell className="hidden text-right sm:table-cell">
@@ -289,19 +276,19 @@ export default function DeviceAnalytics({
 										<TableCell className="text-right font-semibold">
 											{item.totalInteractions.toLocaleString()}
 										</TableCell>
-																				<TableCell className="hidden text-right md:table-cell">
-																					<div className="flex items-center justify-end gap-2">
-																						<span className="font-medium">{percentage}%</span>
-																						<div className="h-2 w-12 overflow-hidden rounded-full bg-muted">
-																							<div
-																								className="h-full rounded-full bg-primary transition-all duration-300"
-																								style={{
-																									width: `${Math.min(Number.parseFloat(percentage), 100)}%`,
-																								}}
-																							/>
-																						</div>
-																					</div>
-																				</TableCell>
+										<TableCell className="hidden text-right md:table-cell">
+											<div className="flex items-center justify-end gap-2">
+												<span className="font-medium">{percentage}%</span>
+												<div className="h-2 w-12 overflow-hidden rounded-full bg-muted">
+													<div
+														className="h-full rounded-full bg-primary transition-all duration-300"
+														style={{
+															width: `${Math.min(Number.parseFloat(percentage), 100)}%`,
+														}}
+													/>
+												</div>
+											</div>
+										</TableCell>
 									</TableRow>
 								);
 							})}
