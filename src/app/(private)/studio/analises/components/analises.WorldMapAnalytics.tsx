@@ -1,9 +1,11 @@
 "use client";
 
-import * as d3 from "d3";
+import { json } from "d3-fetch";
+import { geoNaturalEarth1, geoPath } from "d3-geo";
+import { pointer, select } from "d3-selection";
 import { Earth, Users } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import * as topojson from "topojson-client";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { feature } from "topojson-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	Table,
@@ -29,10 +31,11 @@ interface WorldMapAnalyticsProps {
 }
 
 interface TooltipState {
-	visible: boolean;
-	x: number;
-	y: number;
-	content: string;
+    visible: boolean;
+    x: number;
+    y: number;
+    countryName: string;
+    data?: CountryAnalytics | null;
 }
 
 export default function WorldMapAnalytics({
@@ -44,12 +47,13 @@ export default function WorldMapAnalytics({
 	// Hooks devem ser chamados primeiro
 	const svgRef = useRef<SVGSVGElement>(null);
 	const [worldData, setWorldData] = useState<any>(null);
-	const [tooltip, setTooltip] = useState<TooltipState>({
-		visible: false,
-		x: 0,
-		y: 0,
-		content: "",
-	});
+    const [tooltip, setTooltip] = useState<TooltipState>({
+        visible: false,
+        x: 0,
+        y: 0,
+        countryName: "",
+        data: null,
+    });
 
 	// Normalizar nomes de países para correspondência
 	const normalizeCountryName = (name: string): string => {
@@ -236,42 +240,31 @@ export default function WorldMapAnalytics({
 			.join(" ");
 	};
 
-	// Criar mapa de países para lookup rápido
-	const countryMap = new Map(
-		data.map((d) => {
-			const normalizedName = normalizeCountryName(d.country);
-			console.log(`Mapeando: ${d.country} -> ${normalizedName}`, d);
-			return [normalizedName, d];
-		})
-	);
+    const countryMap = useMemo(
+        () => new Map(data.map((d) => [normalizeCountryName(d.country), d])),
+        [data]
+    );
 
-	console.log("CountryMap criado:", Array.from(countryMap.entries()));
-
-	// Verificar especificamente o Brasil
-	console.log("Brasil no countryMap:", countryMap.get("Brazil"));
-	console.log("Brazil no countryMap:", countryMap.get("Brazil"));
-
-	// Calcular valores máximos para normalização das cores
-	const maxTotal = Math.max(...data.map((d) => d.totalInteractions), 1);
-	console.log("Max interactions:", maxTotal);
+    const maxTotal = useMemo(
+        () => Math.max(...data.map((d) => d.totalInteractions), 1),
+        [data]
+    );
 
 	// Função para obter intensidade da cor baseada no total de interações
-	const getColorIntensity = (countryName: string): string => {
-		const normalizedName = normalizeCountryName(countryName);
-		const countryData = countryMap.get(normalizedName);
-
-		if (!countryData || countryData.totalInteractions === 0) {
-			return "#f3f4f6"; // Cinza claro para países sem dados
-		}
-
-		const intensity = countryData.totalInteractions / maxTotal;
-		const blueIntensity = Math.max(0.2, intensity); // Mínimo de 20% de intensidade
-		return `rgba(59, 130, 246, ${blueIntensity})`; // Azul com transparência baseada na intensidade
-	};
+    const getColorIntensity = useCallback((countryName: string): string => {
+        const normalizedName = normalizeCountryName(countryName);
+        const countryData = countryMap.get(normalizedName);
+        if (!countryData || countryData.totalInteractions === 0) {
+            return "#f3f4f6";
+        }
+        const intensity = countryData.totalInteractions / maxTotal;
+        const blueIntensity = Math.max(0.2, intensity);
+        return `rgba(59, 130, 246, ${blueIntensity})`;
+    }, [countryMap, maxTotal]);
 
 	// Carregar dados do mundo
 	useEffect(() => {
-		d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
+		json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
 			.then((world: any) => {
 				setWorldData(world);
 			})
@@ -286,20 +279,19 @@ export default function WorldMapAnalytics({
 			return;
 		}
 
-		const svg = d3.select(svgRef.current);
+		const svg = select(svgRef.current);
 		svg.selectAll("*").remove();
 
-		const projection = d3
-			.geoNaturalEarth1()
+		const projection = geoNaturalEarth1()
 			.scale(width / 6.5)
 			.translate([width / 2, height / 2]);
 
-		const path = d3.geoPath().projection(projection);
+		const path = geoPath().projection(projection);
 
-		const countries = topojson.feature(
-			worldData,
-			worldData.objects.countries
-		) as any;
+        const countries = feature(
+            worldData,
+            worldData.objects.countries
+        ) as any;
 
 		svg
 			.selectAll("path")
@@ -319,31 +311,23 @@ export default function WorldMapAnalytics({
 				const normalizedName = normalizeCountryName(countryName);
 				const countryData = countryMap.get(normalizedName);
 
-				d3.select(this).attr("stroke-width", 2);
+				select(this).attr("stroke-width", 2);
 
-				const [mouseX, mouseY] = d3.pointer(event, svgRef.current);
+				const [mouseX, mouseY] = pointer(event, svgRef.current);
 
-				let content = `<strong>${countryName}</strong><br/>`;
-				if (countryData) {
-					content += `Cliques: ${countryData.clicks}<br/>`;
-					content += `Views: ${countryData.views}<br/>`;
-					content += `Total: ${countryData.totalInteractions}`;
-				} else {
-					content += "Sem dados disponíveis";
-				}
-
-				setTooltip({
-					visible: true,
-					x: mouseX,
-					y: mouseY,
-					content,
-				});
-			})
-			.on("mouseout", function () {
-				d3.select(this).attr("stroke-width", 0.5);
-				setTooltip({ visible: false, x: 0, y: 0, content: "" });
-			});
-	}, [worldData, data, width, height, countryMap, getColorIntensity]);
+                setTooltip({
+                    visible: true,
+                    x: mouseX,
+                    y: mouseY,
+                    countryName,
+                    data: countryData || null,
+                });
+            })
+            .on("mouseout", function () {
+                select(this).attr("stroke-width", 0.5);
+                setTooltip({ visible: false, x: 0, y: 0, countryName: "", data: null });
+            });
+    }, [worldData, width, height, countryMap, maxTotal]);
 
 	if (isLoading) {
 		return (
@@ -382,17 +366,27 @@ export default function WorldMapAnalytics({
 					/>
 
 					{/* Tooltip */}
-					{tooltip.visible && (
-						<div
-							className="pointer-events-none absolute z-10 rounded bg-gray-800 p-2 text-sm text-white shadow-lg"
-							dangerouslySetInnerHTML={{ __html: tooltip.content }}
-							style={{
-								left: tooltip.x,
-								top: tooltip.y,
-								transform: "translate(-50%, -100%)",
-							}}
-						/>
-					)}
+                    {tooltip.visible && (
+                        <div
+                            className="pointer-events-none absolute z-10 rounded bg-gray-800 p-2 text-sm text-white shadow-lg"
+                            style={{
+                                left: tooltip.x,
+                                top: tooltip.y,
+                                transform: "translate(-50%, -100%)",
+                            }}
+                        >
+                            <div><strong>{tooltip.countryName}</strong></div>
+                            {tooltip.data ? (
+                                <>
+                                    <div>Cliques: {tooltip.data.clicks}</div>
+                                    <div>Views: {tooltip.data.views}</div>
+                                    <div>Total: {tooltip.data.totalInteractions}</div>
+                                </>
+                            ) : (
+                                <div>Sem dados disponíveis</div>
+                            )}
+                        </div>
+                    )}
 
 					{/* Legenda */}
 					<div className="mt-4">
