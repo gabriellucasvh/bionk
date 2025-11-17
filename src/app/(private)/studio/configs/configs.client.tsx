@@ -29,7 +29,7 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { useSubscription } from "@/providers/subscriptionProvider";
 import { useTheme } from "@/providers/themeProvider";
-import ArchivedLinksModal from "./components/configs.ArchiveLinksModal";
+import { useRouter } from "next/navigation";
 
 // Tipos
 type Profile = { email: string };
@@ -222,7 +222,8 @@ function SubscriptionManagement({
 // -----------------------------------------------------------------------------------------------------------
 
 export default function ConfigsClient() {
-	const { data: session } = useSession();
+    const { data: session } = useSession();
+    const router = useRouter();
 	const { theme, setTheme, isAutoMode, setAutoMode } = useTheme();
 	const { subscriptionPlan, isLoading: isSubscriptionLoading } =
 		useSubscription();
@@ -231,10 +232,9 @@ export default function ConfigsClient() {
 
 	const [profile, setProfile] = useState<Profile>({ email: "" });
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
-	const [isArchivedModalOpen, setIsArchivedModalOpen] = useState(false);
-	const [subscription, setSubscription] = useState<SubscriptionDetails | null>(
-		null
-	);
+    const [subscription, setSubscription] = useState<SubscriptionDetails | null>(
+        null
+    );
 	const [sensitiveProfile, setSensitiveProfile] = useState(false);
 	const [isSensitiveLoading, setIsSensitiveLoading] = useState(false);
 
@@ -469,17 +469,13 @@ export default function ConfigsClient() {
 						</CardDescription>
 					</CardHeader>
 
-					<CardContent>
-						<Button
-							className="rounded-full"
-							onClick={() => setIsArchivedModalOpen(true)}
-							variant="outline"
-						>
-							Ver Links Arquivados
-						</Button>
-					</CardContent>
-				</Card>
-			</article>
+                    <CardContent>
+                        <Button className="rounded-full" onClick={() => router.push("/studio/configs/arquivados")} variant="outline">
+                            Ver Links Arquivados
+                        </Button>
+                    </CardContent>
+                </Card>
+            </article>
 
 			{/* Sensível */}
 			<article>
@@ -602,10 +598,6 @@ export default function ConfigsClient() {
 				</Card>
 			</article>
 
-			<ArchivedLinksModal
-				isOpen={isArchivedModalOpen}
-				onClose={() => setIsArchivedModalOpen(false)}
-			/>
-		</div>
-	);
+        </div>
+    );
 }
