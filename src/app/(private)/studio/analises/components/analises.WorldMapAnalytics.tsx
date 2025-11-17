@@ -441,14 +441,14 @@ export default function WorldMapAnalytics({
 						Dados por País
 					</h3>
 					<div className="overflow-x-auto">
-						<Table>
+						<Table className="min-w-[340px]">
 							<TableHeader>
 								<TableRow>
 									<TableHead className="min-w-[120px]">País</TableHead>
-									<TableHead className="hidden min-w-[80px] text-right sm:table-cell">
+									<TableHead className="min-w-[80px] text-right">
 										Visualizações
 									</TableHead>
-									<TableHead className="hidden min-w-[80px] text-right sm:table-cell">
+									<TableHead className="min-w-[80px] text-right">
 										Cliques
 									</TableHead>
 									<TableHead className="min-w-[80px] text-right">
@@ -488,10 +488,10 @@ export default function WorldMapAnalytics({
 															</div>
 														</div>
 													</TableCell>
-													<TableCell className="hidden text-right sm:table-cell">
+													<TableCell className="text-right">
 														{country.views.toLocaleString()}
 													</TableCell>
-													<TableCell className="hidden text-right sm:table-cell">
+													<TableCell className="text-right">
 														{(country.clicks || 0).toLocaleString()}
 													</TableCell>
 													<TableCell className="text-right font-medium">

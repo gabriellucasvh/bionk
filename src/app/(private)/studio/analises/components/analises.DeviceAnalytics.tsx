@@ -162,14 +162,14 @@ export default function DeviceAnalytics({
 
 				{/* Tabela */}
 				<div className="overflow-x-auto">
-					<Table>
+					<Table className="min-w-[340px]">
 						<TableHeader>
 							<TableRow>
 								<TableHead className="min-w-[120px]">Dispositivo</TableHead>
-								<TableHead className="hidden min-w-[80px] text-right sm:table-cell">
+								<TableHead className="min-w-[80px] text-right">
 									Visualizações
 								</TableHead>
-								<TableHead className="hidden min-w-[80px] text-right sm:table-cell">
+								<TableHead className="min-w-[80px] text-right">
 									Cliques
 								</TableHead>
 								<TableHead className="min-w-[80px] text-right">Total</TableHead>
@@ -196,12 +196,12 @@ export default function DeviceAnalytics({
 												<span>{getDeviceLabel(item.device)}</span>
 											</div>
 										</TableCell>
-										<TableCell className="hidden text-right sm:table-cell">
-											{item.views.toLocaleString()}
-										</TableCell>
-										<TableCell className="hidden text-right sm:table-cell">
-											{(item.clicks || 0).toLocaleString()}
-										</TableCell>
+									<TableCell className="text-right">
+										{item.views.toLocaleString()}
+									</TableCell>
+									<TableCell className="text-right">
+										{(item.clicks || 0).toLocaleString()}
+									</TableCell>
 										<TableCell className="text-right font-semibold">
 											{item.totalInteractions.toLocaleString()}
 										</TableCell>
