@@ -221,13 +221,13 @@ export default function OSAnalyticsChart({
 								.filter((item) => item.totalInteractions > 0)
 								.sort((a, b) => b.totalInteractions - a.totalInteractions)
 								.map((item) => {
-									const percentage =
-										totalInteractions > 0
-											? (
-													(item.totalInteractions / totalInteractions) *
-													100
-												).toFixed(1)
-											: "0.0";
+							const percentage =
+								totalInteractions > 0
+									? (
+											(item.totalInteractions / totalInteractions) *
+											100
+										).toFixed(0)
+									: "0";
 									return (
 										<TableRow key={item.os}>
 											<TableCell className="font-medium">

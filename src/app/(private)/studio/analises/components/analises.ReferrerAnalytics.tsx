@@ -436,13 +436,13 @@ export default function ReferrerAnalytics({
 						</TableHeader>
 						<TableBody>
 							{sortedData.map((item, index) => {
-								const percentage =
-									totalInteractions > 0
-										? (
-												(item.totalInteractions / totalInteractions) *
-												100
-											).toFixed(1)
-										: "0.0";
+						const percentage =
+							totalInteractions > 0
+								? (
+										(item.totalInteractions / totalInteractions) *
+										100
+									).toFixed(0)
+								: "0";
 
 								return (
 									<TableRow key={`${item.referrer}-${index}`}>

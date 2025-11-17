@@ -31,11 +31,11 @@ interface WorldMapAnalyticsProps {
 }
 
 interface TooltipState {
-    visible: boolean;
-    x: number;
-    y: number;
-    countryName: string;
-    data?: CountryAnalytics | null;
+	visible: boolean;
+	x: number;
+	y: number;
+	countryName: string;
+	data?: CountryAnalytics | null;
 }
 
 export default function WorldMapAnalytics({
@@ -47,13 +47,13 @@ export default function WorldMapAnalytics({
 	// Hooks devem ser chamados primeiro
 	const svgRef = useRef<SVGSVGElement>(null);
 	const [worldData, setWorldData] = useState<any>(null);
-    const [tooltip, setTooltip] = useState<TooltipState>({
-        visible: false,
-        x: 0,
-        y: 0,
-        countryName: "",
-        data: null,
-    });
+	const [tooltip, setTooltip] = useState<TooltipState>({
+		visible: false,
+		x: 0,
+		y: 0,
+		countryName: "",
+		data: null,
+	});
 
 	// Normalizar nomes de países para correspondência
 	const normalizeCountryName = (name: string): string => {
@@ -240,27 +240,30 @@ export default function WorldMapAnalytics({
 			.join(" ");
 	};
 
-    const countryMap = useMemo(
-        () => new Map(data.map((d) => [normalizeCountryName(d.country), d])),
-        [data]
-    );
+	const countryMap = useMemo(
+		() => new Map(data.map((d) => [normalizeCountryName(d.country), d])),
+		[data]
+	);
 
-    const maxTotal = useMemo(
-        () => Math.max(...data.map((d) => d.totalInteractions), 1),
-        [data]
-    );
+	const maxTotal = useMemo(
+		() => Math.max(...data.map((d) => d.totalInteractions), 1),
+		[data]
+	);
 
 	// Função para obter intensidade da cor baseada no total de interações
-    const getColorIntensity = useCallback((countryName: string): string => {
-        const normalizedName = normalizeCountryName(countryName);
-        const countryData = countryMap.get(normalizedName);
-        if (!countryData || countryData.totalInteractions === 0) {
-            return "#f3f4f6";
-        }
-        const intensity = countryData.totalInteractions / maxTotal;
-        const blueIntensity = Math.max(0.2, intensity);
-        return `rgba(59, 130, 246, ${blueIntensity})`;
-    }, [countryMap, maxTotal]);
+	const getColorIntensity = useCallback(
+		(countryName: string): string => {
+			const normalizedName = normalizeCountryName(countryName);
+			const countryData = countryMap.get(normalizedName);
+			if (!countryData || countryData.totalInteractions === 0) {
+				return "#f3f4f6";
+			}
+			const intensity = countryData.totalInteractions / maxTotal;
+			const blueIntensity = Math.max(0.2, intensity);
+			return `rgba(59, 130, 246, ${blueIntensity})`;
+		},
+		[countryMap, maxTotal]
+	);
 
 	// Carregar dados do mundo
 	useEffect(() => {
@@ -288,10 +291,7 @@ export default function WorldMapAnalytics({
 
 		const path = geoPath().projection(projection);
 
-        const countries = feature(
-            worldData,
-            worldData.objects.countries
-        ) as any;
+		const countries = feature(worldData, worldData.objects.countries) as any;
 
 		svg
 			.selectAll("path")
@@ -315,19 +315,19 @@ export default function WorldMapAnalytics({
 
 				const [mouseX, mouseY] = pointer(event, svgRef.current);
 
-                setTooltip({
-                    visible: true,
-                    x: mouseX,
-                    y: mouseY,
-                    countryName,
-                    data: countryData || null,
-                });
-            })
-            .on("mouseout", function () {
-                select(this).attr("stroke-width", 0.5);
-                setTooltip({ visible: false, x: 0, y: 0, countryName: "", data: null });
-            });
-    }, [worldData, width, height, countryMap, maxTotal]);
+				setTooltip({
+					visible: true,
+					x: mouseX,
+					y: mouseY,
+					countryName,
+					data: countryData || null,
+				});
+			})
+			.on("mouseout", function () {
+				select(this).attr("stroke-width", 0.5);
+				setTooltip({ visible: false, x: 0, y: 0, countryName: "", data: null });
+			});
+	}, [worldData, width, height, countryMap, maxTotal]);
 
 	if (isLoading) {
 		return (
@@ -366,27 +366,29 @@ export default function WorldMapAnalytics({
 					/>
 
 					{/* Tooltip */}
-                    {tooltip.visible && (
-                        <div
-                            className="pointer-events-none absolute z-10 rounded bg-gray-800 p-2 text-sm text-white shadow-lg"
-                            style={{
-                                left: tooltip.x,
-                                top: tooltip.y,
-                                transform: "translate(-50%, -100%)",
-                            }}
-                        >
-                            <div><strong>{tooltip.countryName}</strong></div>
-                            {tooltip.data ? (
-                                <>
-                                    <div>Cliques: {tooltip.data.clicks}</div>
-                                    <div>Views: {tooltip.data.views}</div>
-                                    <div>Total: {tooltip.data.totalInteractions}</div>
-                                </>
-                            ) : (
-                                <div>Sem dados disponíveis</div>
-                            )}
-                        </div>
-                    )}
+					{tooltip.visible && (
+						<div
+							className="pointer-events-none absolute z-10 rounded bg-gray-800 p-2 text-sm text-white shadow-lg"
+							style={{
+								left: tooltip.x,
+								top: tooltip.y,
+								transform: "translate(-50%, -100%)",
+							}}
+						>
+							<div>
+								<strong>{tooltip.countryName}</strong>
+							</div>
+							{tooltip.data ? (
+								<>
+									<div>Cliques: {tooltip.data.clicks}</div>
+									<div>Views: {tooltip.data.views}</div>
+									<div>Total: {tooltip.data.totalInteractions}</div>
+								</>
+							) : (
+								<div>Sem dados disponíveis</div>
+							)}
+						</div>
+					)}
 
 					{/* Legenda */}
 					<div className="mt-4">
@@ -471,8 +473,8 @@ export default function WorldMapAnalytics({
 													? (
 															(country.totalInteractions / totalInteractions) *
 															100
-														).toFixed(1)
-													: "0.0";
+														).toFixed(0)
+													: "0";
 
 											return (
 												<TableRow key={`${country.country}-${index}`}>

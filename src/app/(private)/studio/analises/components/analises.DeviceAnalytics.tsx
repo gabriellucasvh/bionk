@@ -254,14 +254,14 @@ export default function DeviceAnalytics({
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{data.map((item) => {
-								const percentage =
-									totalViews + totalClicks > 0
-										? (
-												(item.totalInteractions / (totalViews + totalClicks)) *
-												100
-											).toFixed(1)
-										: "0.0";
+						{data.map((item) => {
+							const percentage =
+								totalViews + totalClicks > 0
+									? (
+											(item.totalInteractions / (totalViews + totalClicks)) *
+											100
+										).toFixed(0)
+									: "0";
 
 								return (
 									<TableRow key={item.device}>
