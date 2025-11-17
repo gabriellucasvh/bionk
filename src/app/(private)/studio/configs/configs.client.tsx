@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import LoadingPage from "@/components/layout/LoadingPage";
 import {
 	AlertDialog,
-	AlertDialogAction,
 	AlertDialogCancel,
 	AlertDialogContent,
 	AlertDialogDescription,
@@ -578,15 +577,24 @@ export default function ConfigsClient() {
 								<AlertDialogHeader>
 									<AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
 									<AlertDialogDescription>
-										Esta ação é permanente.
+										A exclusão da conta remove permanentemente todos os dados
+										armazenados, sem possibilidade de recuperação.
 									</AlertDialogDescription>
 								</AlertDialogHeader>
 
 								<AlertDialogFooter>
-									<AlertDialogCancel>Cancelar</AlertDialogCancel>
-									<AlertDialogAction onClick={handleDeleteAccount}>
-										Excluir
-									</AlertDialogAction>
+									<AlertDialogCancel asChild>
+										<Button className="rounded-full" variant="outline">
+											Cancelar
+										</Button>
+									</AlertDialogCancel>
+									<Button
+										className="rounded-full"
+										onClick={handleDeleteAccount}
+										variant="destructive"
+									>
+										Excluir permanentemente
+									</Button>
 								</AlertDialogFooter>
 							</AlertDialogContent>
 						</AlertDialog>
