@@ -42,6 +42,7 @@ interface AnalyticsHeaderProps {
 	onRangeChange: (range: RangeKey) => void;
 	onExportToExcel: () => void;
 	onExportToPDF: () => void;
+	onExportToCSV: () => void;
 	customStart?: Date | null;
 	customEnd?: Date | null;
 	onCustomRangeChange?: (start: Date | null, end: Date | null) => void;
@@ -64,6 +65,7 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 		onRangeChange,
 		onExportToExcel,
 		onExportToPDF,
+		onExportToCSV,
 		customStart,
 		customEnd,
 		onCustomRangeChange,
@@ -428,6 +430,13 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 							>
 								<FileText className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
 								<span className="hidden sm:inline">Exportar para </span>PDF
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								className="cursor-pointer text-xs sm:text-sm"
+								onClick={onExportToCSV}
+							>
+								<FileText className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
+								<span className="hidden sm:inline">Exportar para </span>CSV
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

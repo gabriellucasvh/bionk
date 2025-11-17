@@ -281,10 +281,121 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 		}
 		const ExcelJS = (await import("exceljs")).default;
 		const workbook = new ExcelJS.Workbook();
-		const worksheet = workbook.addWorksheet("Analytics");
-		worksheet.addRow(["Data", "Cliques", "Visualizações"]);
+		const wsDaily = workbook.addWorksheet("Diário");
+		wsDaily.addRow(["Data", "Visualizações", "Cliques", "Total", "% do Total"]);
+		const totalAll = (data.chartData || []).reduce(
+			(sum, i) => sum + i.clicks + i.views,
+			0
+		);
 		for (const item of data.chartData) {
-			worksheet.addRow([formatDate(item.day), item.clicks, item.views]);
+			const total = (item.clicks || 0) + (item.views || 0);
+			const pct =
+				totalAll > 0 ? String(Math.round((total / totalAll) * 100)) : "0";
+			wsDaily.addRow([
+				formatDate(item.day),
+				item.views,
+				item.clicks,
+				total,
+				pct,
+			]);
+		}
+
+		const wsDevice = workbook.addWorksheet("Dispositivo");
+		wsDevice.addRow([
+			"Dispositivo",
+			"Visualizações",
+			"Cliques",
+			"Total",
+			"% do Total",
+		]);
+		const totalDevice = (data.deviceAnalytics || []).reduce(
+			(sum, i) => sum + i.totalInteractions,
+			0
+		);
+		for (const item of data.deviceAnalytics || []) {
+			const pct =
+				totalDevice > 0
+					? String(Math.round((item.totalInteractions / totalDevice) * 100))
+					: "0";
+			wsDevice.addRow([
+				item.device,
+				item.views,
+				item.clicks || 0,
+				item.totalInteractions,
+				pct,
+			]);
+		}
+
+		const wsOS = workbook.addWorksheet("Sistema Operacional");
+		wsOS.addRow(["OS", "Visualizações", "Cliques", "Total", "% do Total"]);
+		const totalOS = (data.osAnalytics || []).reduce(
+			(sum, i) => sum + i.totalInteractions,
+			0
+		);
+		for (const item of data.osAnalytics || []) {
+			const pct =
+				totalOS > 0
+					? String(Math.round((item.totalInteractions / totalOS) * 100))
+					: "0";
+			wsOS.addRow([
+				item.os,
+				item.views,
+				item.clicks || 0,
+				item.totalInteractions,
+				pct,
+			]);
+		}
+
+		const wsCountry = workbook.addWorksheet("País");
+		wsCountry.addRow([
+			"País",
+			"Visualizações",
+			"Cliques",
+			"Total",
+			"% do Total",
+		]);
+		const totalCountry = (data.countryAnalytics || []).reduce(
+			(sum, i) => sum + i.totalInteractions,
+			0
+		);
+		for (const item of data.countryAnalytics || []) {
+			const pct =
+				totalCountry > 0
+					? String(Math.round((item.totalInteractions / totalCountry) * 100))
+					: "0";
+			wsCountry.addRow([
+				item.country,
+				item.views,
+				item.clicks || 0,
+				item.totalInteractions,
+				pct,
+			]);
+		}
+
+		const wsReferrer = workbook.addWorksheet("Origem");
+		wsReferrer.addRow([
+			"Origem",
+			"Visualizações",
+			"Cliques",
+			"Total",
+			"% do Total",
+		]);
+		const totalRef = (data.referrerAnalytics || []).reduce(
+			(sum, i) => sum + i.totalInteractions,
+			0
+		);
+		for (const item of data.referrerAnalytics || []) {
+			const pct =
+				totalRef > 0
+					? String(Math.round((item.totalInteractions / totalRef) * 100))
+					: "0";
+			wsReferrer.addRow([
+				item.referrer,
+				item.views,
+				item.clicks || 0,
+				item.totalInteractions,
+				pct,
+			]);
 		}
 		const buffer = await workbook.xlsx.writeBuffer();
 		const blob = new Blob([buffer], {
@@ -292,7 +403,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 		});
 		const link = document.createElement("a");
 		link.href = URL.createObjectURL(blob);
-		link.download = "analytics.xlsx";
+		link.download = "bionk_metricas.xlsx";
 		link.click();
 	}, [data]);
 
@@ -303,17 +414,243 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 		const { default: jsPDF } = await import("jspdf");
 		const { default: autoTable } = await import("jspdf-autotable");
 		const doc = new jsPDF();
-		doc.text("Análises de Desempenho", 14, 10);
+		doc.text("Bionk – Relatório de Métricas", 14, 10);
 		autoTable(doc, {
 			startY: 20,
-			head: [["Data", "Cliques", "Visualizações"]],
-			body: data.chartData.map((item) => [
-				formatDate(item.day),
-				item.clicks,
-				item.views,
-			]),
+			head: [["Data", "Visualizações", "Cliques", "Total", "% do Total"]],
+			body: (() => {
+				const totalAll = (data.chartData || []).reduce(
+					(sum, i) => sum + i.clicks + i.views,
+					0
+				);
+				return data.chartData.map((item) => {
+					const total = (item.clicks || 0) + (item.views || 0);
+					const pct =
+						totalAll > 0 ? String(Math.round((total / totalAll) * 100)) : "0";
+					return [formatDate(item.day), item.views, item.clicks, total, pct];
+				});
+			})(),
 		});
-		doc.save("analytics.pdf");
+		autoTable(doc, {
+			startY: (doc as any).lastAutoTable.finalY + 10,
+			head: [
+				["Dispositivo", "Visualizações", "Cliques", "Total", "% do Total"],
+			],
+			body: (data.deviceAnalytics || []).map((item) => {
+				const total = (data.deviceAnalytics || []).reduce(
+					(s, i) => s + i.totalInteractions,
+					0
+				);
+				const pct =
+					total > 0
+						? String(Math.round((item.totalInteractions / total) * 100))
+						: "0";
+				return [
+					item.device,
+					item.views,
+					item.clicks || 0,
+					item.totalInteractions,
+					pct,
+				];
+			}),
+		});
+		autoTable(doc, {
+			startY: (doc as any).lastAutoTable.finalY + 10,
+			head: [
+				[
+					"Sistema Operacional",
+					"Visualizações",
+					"Cliques",
+					"Total",
+					"% do Total",
+				],
+			],
+			body: (data.osAnalytics || []).map((item) => {
+				const total = (data.osAnalytics || []).reduce(
+					(s, i) => s + i.totalInteractions,
+					0
+				);
+				const pct =
+					total > 0
+						? String(Math.round((item.totalInteractions / total) * 100))
+						: "0";
+				return [
+					item.os,
+					item.views,
+					item.clicks || 0,
+					item.totalInteractions,
+					pct,
+				];
+			}),
+		});
+		autoTable(doc, {
+			startY: (doc as any).lastAutoTable.finalY + 10,
+			head: [["País", "Visualizações", "Cliques", "Total", "% do Total"]],
+			body: (data.countryAnalytics || []).map((item) => {
+				const total = (data.countryAnalytics || []).reduce(
+					(s, i) => s + i.totalInteractions,
+					0
+				);
+				const pct =
+					total > 0
+						? String(Math.round((item.totalInteractions / total) * 100))
+						: "0";
+				return [
+					item.country,
+					item.views,
+					item.clicks || 0,
+					item.totalInteractions,
+					pct,
+				];
+			}),
+		});
+		autoTable(doc, {
+			startY: (doc as any).lastAutoTable.finalY + 10,
+			head: [["Origem", "Visualizações", "Cliques", "Total", "% do Total"]],
+			body: (data.referrerAnalytics || []).map((item) => {
+				const total = (data.referrerAnalytics || []).reduce(
+					(s, i) => s + i.totalInteractions,
+					0
+				);
+				const pct =
+					total > 0
+						? ((item.totalInteractions / total) * 100).toFixed(1)
+						: "0.0";
+				return [
+					item.referrer,
+					item.views,
+					item.clicks || 0,
+					item.totalInteractions,
+					pct,
+				];
+			}),
+		});
+		doc.save("bionk_metricas.pdf");
+	}, [data]);
+
+	const exportToCSV = useCallback(() => {
+		if (!data) {
+			return;
+		}
+		function esc(value: any) {
+			const s = String(value ?? "");
+			if (s.includes(",") || s.includes("\n") || s.includes('"')) {
+				return `"${s.replace(/"/g, '""')}"`;
+			}
+			return s;
+		}
+		const lines: string[] = [];
+		lines.push(
+			[
+				"Seção",
+				"Categoria",
+				"Visualizações",
+				"Cliques",
+				"Total",
+				"% do Total",
+			].join(",")
+		);
+		for (const item of data.chartData) {
+			lines.push(
+				(() => {
+					const total = (item.clicks || 0) + (item.views || 0);
+					return [
+						"Diário",
+						esc(formatDate(item.day)),
+						esc(item.views),
+						esc(item.clicks),
+						esc(total),
+						"",
+					].join(",");
+				})()
+			);
+		}
+		const totalDevice = (data.deviceAnalytics || []).reduce(
+			(sum, i) => sum + i.totalInteractions,
+			0
+		);
+		for (const item of data.deviceAnalytics || []) {
+			const pct =
+				totalDevice > 0
+					? String(Math.round((item.totalInteractions / totalDevice) * 100))
+					: "0";
+			lines.push(
+				[
+					"Dispositivo",
+					esc(item.device),
+					esc(item.views),
+					esc(item.clicks || 0),
+					esc(item.totalInteractions),
+					esc(pct),
+				].join(",")
+			);
+		}
+		const totalOS = (data.osAnalytics || []).reduce(
+			(sum, i) => sum + i.totalInteractions,
+			0
+		);
+		for (const item of data.osAnalytics || []) {
+			const pct =
+				totalOS > 0
+					? String(Math.round((item.totalInteractions / totalOS) * 100))
+					: "0";
+			lines.push(
+				[
+					"Sistema Operacional",
+					esc(item.os),
+					esc(item.views),
+					esc(item.clicks || 0),
+					esc(item.totalInteractions),
+					esc(pct),
+				].join(",")
+			);
+		}
+		const totalCountry = (data.countryAnalytics || []).reduce(
+			(sum, i) => sum + i.totalInteractions,
+			0
+		);
+		for (const item of data.countryAnalytics || []) {
+			const pct =
+				totalCountry > 0
+					? String(Math.round((item.totalInteractions / totalCountry) * 100))
+					: "0";
+			lines.push(
+				[
+					"País",
+					esc(item.country),
+					esc(item.views),
+					esc(item.clicks || 0),
+					esc(item.totalInteractions),
+					esc(pct),
+				].join(",")
+			);
+		}
+		const totalRef = (data.referrerAnalytics || []).reduce(
+			(sum, i) => sum + i.totalInteractions,
+			0
+		);
+		for (const item of data.referrerAnalytics || []) {
+			const pct =
+				totalRef > 0
+					? String(Math.round((item.totalInteractions / totalRef) * 100))
+					: "0";
+			lines.push(
+				[
+					"Origem",
+					esc(item.referrer),
+					esc(item.views),
+					esc(item.clicks || 0),
+					esc(item.totalInteractions),
+					esc(pct),
+				].join(",")
+			);
+		}
+		const csv = lines.join("\n");
+		const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+		const link = document.createElement("a");
+		link.href = URL.createObjectURL(blob);
+		link.download = "bionk_metricas.csv";
+		link.click();
 	}, [data]);
 
 	if (error) {
@@ -337,6 +674,7 @@ const AnalisesClient: React.FC<AnalisesClientProps> = ({ userId }) => {
 					setCustomStart(start);
 					setCustomEnd(end);
 				}}
+				onExportToCSV={exportToCSV}
 				onExportToExcel={exportToExcel}
 				onExportToPDF={exportToPDF}
 				onRangeChange={(r) => setRange(r)}
