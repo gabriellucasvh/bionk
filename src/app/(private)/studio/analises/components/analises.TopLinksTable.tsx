@@ -1,7 +1,6 @@
 "use client";
 
 import {
-	ChartBarDecreasing,
 	ChevronDown,
 	ChevronUp,
 	LinkIcon,
@@ -42,7 +41,6 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 				<Card className=" dark:bg-zinc-900">
 					<CardHeader className="pb-3 sm:pb-6">
 						<CardTitle className="flex items-center gap-1 text-base sm:gap-2 sm:text-lg">
-							<ChartBarDecreasing className="h-4 w-4 sm:h-5 sm:w-5" />
 							Links com Melhor Desempenho
 						</CardTitle>
 						<CardDescription className="text-xs sm:text-sm">

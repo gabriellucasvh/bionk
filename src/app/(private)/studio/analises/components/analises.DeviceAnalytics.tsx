@@ -3,7 +3,6 @@
 import {
 	HelpCircle,
 	Monitor,
-	PictureInPicture2,
 	Smartphone,
 	Tablet,
 } from "lucide-react";
@@ -80,7 +79,6 @@ export default function DeviceAnalytics({
 			<Card>
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
-						<PictureInPicture2 className="h-5 w-5" />
 						Analytics por Dispositivo
 					</CardTitle>
 				</CardHeader>
@@ -115,7 +113,6 @@ export default function DeviceAnalytics({
 		<Card className=" dark:bg-zinc-900">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					<PictureInPicture2 className="h-5 w-5" />
 					Analytics por Dispositivo
 				</CardTitle>
 				<p className="text-muted-foreground text-sm">

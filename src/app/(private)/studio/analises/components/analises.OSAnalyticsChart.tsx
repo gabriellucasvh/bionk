@@ -1,6 +1,5 @@
 "use client";
 
-import { SendToBack } from "lucide-react";
 import Image from "next/image";
 import {
 	Bar,
@@ -132,13 +131,11 @@ export default function OSAnalyticsChart({
 			<Card className=" dark:bg-zinc-900">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
-						<SendToBack className="h-5 w-5" />
 						Distribuição por Sistema Operacional
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<div className="py-12 text-center text-muted-foreground">
-						<SendToBack className="mx-auto mb-4 h-16 w-16 opacity-50" />
 						<p className="mb-2 font-medium text-lg">Nenhum dado disponível</p>
 						<p className="text-sm">
 							Os dados aparecerão conforme as interações forem registradas.
@@ -153,7 +150,6 @@ export default function OSAnalyticsChart({
 		<Card className=" dark:bg-zinc-900">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					<SendToBack className="h-5 w-5" />
 					Distribuição por Sistema Operacional
 				</CardTitle>
 				<CardDescription>

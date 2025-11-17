@@ -3,7 +3,7 @@
 import { json } from "d3-fetch";
 import { geoNaturalEarth1, geoPath } from "d3-geo";
 import { pointer, select } from "d3-selection";
-import { Earth, Users } from "lucide-react";
+import { Earth } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { feature } from "topojson-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -334,7 +334,6 @@ export default function WorldMapAnalytics({
 			<Card className=" dark:bg-zinc-900">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
-						<Earth className="h-5 w-5" />
 						Mapa Mundial de Interações
 					</CardTitle>
 				</CardHeader>
@@ -349,7 +348,6 @@ export default function WorldMapAnalytics({
 		<Card className=" dark:bg-zinc-900">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					<Earth className="h-5 w-5" />
 					Mapa Mundial de Interações
 				</CardTitle>
 			</CardHeader>
@@ -437,7 +435,6 @@ export default function WorldMapAnalytics({
 				{/* Tabela de Países */}
 				<div>
 					<h3 className="mb-4 flex items-center gap-2 font-semibold text-gray-900 text-lg dark:text-white">
-						<Users className="h-4 w-4" />
 						Dados por País
 					</h3>
 					<div className="overflow-x-auto">

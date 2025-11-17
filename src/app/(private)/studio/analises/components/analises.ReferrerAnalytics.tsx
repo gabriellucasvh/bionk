@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Globe, HelpCircle, Radar, Search } from "lucide-react";
+import { ExternalLink, Globe, HelpCircle, Search } from "lucide-react";
 import Image from "next/image";
 import {
 	Bar,
@@ -263,7 +263,6 @@ export default function ReferrerAnalytics({
 			<Card className=" dark:bg-zinc-900">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
-						<Radar className="h-5 w-5" />
 						Analytics de Origem do Tráfego
 					</CardTitle>
 				</CardHeader>
@@ -281,13 +280,11 @@ export default function ReferrerAnalytics({
 			<Card className=" dark:bg-zinc-900">
 				<CardHeader>
 					<CardTitle className="flex items-center gap-2">
-						<Radar className="h-5 w-5" />
 						Analytics de Origem do Tráfego
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<div className="py-12 text-center text-muted-foreground">
-						<Radar className="mx-auto mb-4 h-16 w-16 opacity-50" />
 						<p className="mb-2 font-medium text-lg">Nenhum dado disponível</p>
 						<p className="text-sm">
 							Os dados de origem aparecerão aqui quando houver interações
@@ -325,7 +322,6 @@ export default function ReferrerAnalytics({
 			<CardHeader>
 				<CardTitle className="flex items-center justify-between">
 					<div className="flex items-center gap-2">
-						<Radar className="h-5 w-5" />
 						Analytics de Origem do Tráfego
 					</div>
 				</CardTitle>
