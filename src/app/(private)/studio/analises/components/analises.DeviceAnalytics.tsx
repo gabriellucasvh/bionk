@@ -8,14 +8,18 @@ import {
 	Tablet,
 } from "lucide-react";
 import {
-	Cell,
-	Legend,
-	Pie,
-	PieChart,
+	Bar,
+	BarChart,
+	CartesianGrid,
 	ResponsiveContainer,
-	Tooltip,
+	XAxis,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	ChartContainer,
+	ChartTooltip,
+	ChartTooltipContent,
+} from "@/components/ui/chart";
 import {
 	Table,
 	TableBody,
@@ -36,13 +40,6 @@ interface DeviceAnalyticsProps {
 	data: DeviceAnalytics[];
 	isLoading?: boolean;
 }
-
-const DEVICE_COLORS = {
-	mobile: "#3b82f6", // blue
-	desktop: "#10b981", // green
-	tablet: "#f59e0b", // amber
-	unknown: "#6b7280", // gray
-};
 
 const getDeviceIcon = (device: string) => {
 	switch (device.toLowerCase()) {
@@ -72,59 +69,7 @@ const getDeviceLabel = (device: string) => {
 	}
 };
 
-const CustomTooltip = ({ active, payload }: any) => {
-	if (active && payload && payload.length) {
-		const data = payload[0].payload;
-		return (
-			<div className="rounded-lg border bg-background p-3 shadow-lg">
-				<div className="mb-2 flex items-center gap-2">
-					{getDeviceIcon(data.device)}
-					<span className="font-medium">{getDeviceLabel(data.device)}</span>
-				</div>
-				<div className="space-y-1 text-sm">
-					<div className="flex justify-between gap-4">
-						<span>Visualizações:</span>
-						<span className="font-medium">{data.views.toLocaleString()}</span>
-					</div>
-					<div className="flex justify-between gap-4">
-						<span>Cliques:</span>
-						<span className="font-medium">
-							{(data.clicks || 0).toLocaleString()}
-						</span>
-					</div>
-					<div className="flex justify-between gap-4 border-t pt-1">
-						<span>Total:</span>
-						<span className="font-semibold">
-							{data.totalInteractions.toLocaleString()}
-						</span>
-					</div>
-					<div className="flex justify-between gap-4">
-						<span>Porcentagem:</span>
-						<span className="font-medium">{data.percentage}%</span>
-					</div>
-				</div>
-			</div>
-		);
-	}
-	return null;
-};
-
-const CustomLegend = ({ payload }: any) => {
-	return (
-		<div className="mt-4 flex flex-wrap justify-center gap-4">
-			{payload.map((entry: any, index: number) => (
-				<div className="flex items-center gap-2" key={index}>
-					<div className="flex items-center gap-1">
-						{getDeviceIcon(entry.payload.device)}
-						<span className="text-sm">
-							{getDeviceLabel(entry.payload.device)}
-						</span>
-					</div>
-				</div>
-			))}
-		</div>
-	);
-};
+const DEFAULT_DEVICES = ["mobile", "tablet", "desktop", "unknown"] as const;
 
 export default function DeviceAnalytics({
 	data,
@@ -148,45 +93,23 @@ export default function DeviceAnalytics({
 		);
 	}
 
-	// Filtrar dados com interações > 0 e calcular porcentagens
-	const filteredData = data.filter((item) => item.totalInteractions > 0);
-	const totalInteractions = filteredData.reduce(
-		(sum, item) => sum + item.totalInteractions,
-		0
-	);
-	const totalViews = data.reduce((sum, item) => sum + item.views, 0);
-	const totalClicks = data.reduce((sum, item) => sum + item.clicks, 0);
-
-	const chartData = filteredData.map((item) => ({
-		...item,
-		name: getDeviceLabel(item.device),
-		percentage:
-			totalInteractions > 0
-				? ((item.totalInteractions / totalInteractions) * 100).toFixed(1)
-				: "0.0",
-	}));
-
-	if (chartData.length === 0) {
-		return (
-			<Card className=" dark:bg-zinc-900">
-				<CardHeader>
-					<CardTitle className="flex items-center gap-2">
-						<PictureInPicture2 className="h-5 w-5" />
-						Analytics por Dispositivo
-					</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className="py-12 text-center text-muted-foreground">
-						<PictureInPicture2 className="mx-auto mb-4 h-16 w-16 opacity-50" />
-						<p className="mb-2 font-medium text-lg">Nenhum dado disponível</p>
-						<p className="text-sm">
-							Os dados aparecerão conforme as interações forem registradas.
-						</p>
-					</div>
-				</CardContent>
-			</Card>
-		);
-	}
+	const map = new Map(data.map((d) => [d.device.toLowerCase(), d]));
+	const baseData = DEFAULT_DEVICES.map((device) => {
+		const found = map.get(device);
+		const clicks = found?.clicks || 0;
+		const views = found?.views || 0;
+		const totalInteractions = clicks + views;
+		return {
+			device,
+			clicks,
+			views,
+			totalInteractions,
+			name: getDeviceLabel(device),
+		};
+	});
+	const totalViews = baseData.reduce((sum, i) => sum + i.views, 0);
+	const totalClicks = baseData.reduce((sum, i) => sum + i.clicks, 0);
+	const chartData = baseData;
 
 	return (
 		<Card className=" dark:bg-zinc-900">
@@ -200,35 +123,41 @@ export default function DeviceAnalytics({
 				</p>
 			</CardHeader>
 			<CardContent className="space-y-6">
-				{/* Gráfico */}
 				<div className="h-64 w-full overflow-hidden sm:h-80">
-					<ResponsiveContainer height="100%" width="100%">
-						<PieChart>
-							<Pie
-								className="sm:!r-[60px] sm:!R-[120px]"
-								cx="50%"
-								cy="50%"
+					<ChartContainer
+						className="h-full w-full"
+						config={{
+							views: {
+								label: "Visualizações",
+								color: "oklch(0.7521 0.293 221.93)",
+							},
+							clicks: {
+								label: "Cliques",
+								color: "oklch(0.7521 0.3054 281.22)",
+							},
+						}}
+					>
+						<ResponsiveContainer height="100%" width="100%">
+							<BarChart
 								data={chartData}
-								dataKey="totalInteractions"
-								innerRadius={40}
-								outerRadius={80}
-								paddingAngle={2}
+								margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
 							>
-								{chartData.map((entry, index) => (
-									<Cell
-										fill={
-											DEVICE_COLORS[
-												entry.device as keyof typeof DEVICE_COLORS
-											] || DEVICE_COLORS.unknown
-										}
-										key={`cell-${index}`}
-									/>
-								))}
-							</Pie>
-							<Tooltip content={<CustomTooltip />} />
-							<Legend content={<CustomLegend />} />
-						</PieChart>
-					</ResponsiveContainer>
+								<CartesianGrid vertical={false} />
+								<XAxis
+									axisLine={false}
+									dataKey="name"
+									tickLine={false}
+									tickMargin={10}
+								/>
+								<ChartTooltip
+									content={<ChartTooltipContent indicator="dashed" />}
+									cursor={false}
+								/>
+								<Bar dataKey="views" fill="var(--color-views)" radius={4} />
+								<Bar dataKey="clicks" fill="var(--color-clicks)" radius={4} />
+							</BarChart>
+						</ResponsiveContainer>
+					</ChartContainer>
 				</div>
 
 				{/* Tabela */}
