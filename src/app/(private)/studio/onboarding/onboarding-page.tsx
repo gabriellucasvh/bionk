@@ -583,7 +583,7 @@ export default function OnboardingPageComponent({
 						</div>
 						<div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
 							<div
-								className="h-2 rounded-full bg-avocado-400 transition-all duration-300"
+								className="h-2 rounded-full bg-black transition-all duration-300"
 								style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
 							/>
 						</div>

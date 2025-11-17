@@ -41,16 +41,16 @@ export default function UserTypeSelector({
 					const active = selected === opt.key;
 					return (
 						<button
-							className={`rounded-xl border p-0 text-left transition ${
+							className={`rounded-3xl border p-0 text-left transition ${
 								active
-									? "border-lime-400 ring-2 ring-lime-400"
+									? "ring-3 ring-black"
 									: "border-gray-200 hover:border-gray-300 dark:border-gray-700"
 							}`}
 							key={opt.key}
 							onClick={() => onSelect(opt.key)}
 							type="button"
 						>
-							<div className="aspect-[4/3] w-full overflow-hidden rounded-t-xl bg-gray-100 dark:bg-gray-800">
+							<div className="aspect-[4/3] w-full overflow-hidden rounded-t-3xl bg-gray-100 dark:bg-gray-800">
 								<Image
 									alt={opt.title}
 									className="h-full w-full object-cover"

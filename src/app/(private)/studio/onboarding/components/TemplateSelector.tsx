@@ -19,7 +19,7 @@ export default function TemplateSelector({
 						<button
 							className={`group relative overflow-hidden rounded-lg border text-left transition ${
 								isActive
-									? "border-lime-500 ring-2 ring-lime-400"
+									? "ring-3 ring-black"
 									: "border-gray-200 hover:border-gray-300 dark:border-gray-700"
 							}`}
 							key={tpl.id}
