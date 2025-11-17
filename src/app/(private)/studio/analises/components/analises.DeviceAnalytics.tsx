@@ -289,9 +289,19 @@ export default function DeviceAnalytics({
 										<TableCell className="text-right font-semibold">
 											{item.totalInteractions.toLocaleString()}
 										</TableCell>
-										<TableCell className="hidden text-right text-muted-foreground md:table-cell">
-											{percentage}%
-										</TableCell>
+																				<TableCell className="hidden text-right md:table-cell">
+																					<div className="flex items-center justify-end gap-2">
+																						<span className="font-medium">{percentage}%</span>
+																						<div className="h-2 w-12 overflow-hidden rounded-full bg-muted">
+																							<div
+																								className="h-full rounded-full bg-primary transition-all duration-300"
+																								style={{
+																									width: `${Math.min(Number.parseFloat(percentage), 100)}%`,
+																								}}
+																							/>
+																						</div>
+																					</div>
+																				</TableCell>
 									</TableRow>
 								);
 							})}
