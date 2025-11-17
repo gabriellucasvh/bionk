@@ -8,16 +8,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // Dynamic imports for components
 const AnalyticsHeader = dynamic(
-	() => import("./components/analises.AnalyticsHeader"),
-	{
-		loading: () => <Skeleton className="h-16 w-full" />,
-	}
+	() => import("./components/analises.AnalyticsHeader")
 );
 const AnalyticsStatsCards = dynamic(
 	() => import("./components/analises.AnalyticsStatsCards"),
 	{
 		loading: () => (
-			<div className="grid h-32 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+			<div className="grid h-44 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
 				<Skeleton className="h-full w-full" />
 				<Skeleton className="h-full w-full" />
 				<Skeleton className="h-full w-full" />
