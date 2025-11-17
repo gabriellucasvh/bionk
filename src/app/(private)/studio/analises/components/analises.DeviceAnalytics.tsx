@@ -254,14 +254,14 @@ export default function DeviceAnalytics({
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-						{data.map((item) => {
-							const percentage =
-								totalViews + totalClicks > 0
-									? (
-											(item.totalInteractions / (totalViews + totalClicks)) *
-											100
-										).toFixed(0)
-									: "0";
+							{data.map((item) => {
+								const percentage =
+									totalViews + totalClicks > 0
+										? (
+												(item.totalInteractions / (totalViews + totalClicks)) *
+												100
+											).toFixed(0)
+										: "0";
 
 								return (
 									<TableRow key={item.device}>
@@ -297,43 +297,6 @@ export default function DeviceAnalytics({
 							})}
 						</TableBody>
 					</Table>
-				</div>
-
-				{/* Resumo estatístico */}
-				<div className="mt-6 grid grid-cols-2 gap-3 border-t pt-4 sm:grid-cols-4 sm:gap-4">
-					<div className="p-2 text-center">
-						<div className="font-bold text-amber-600 text-lg sm:text-2xl">
-							{chartData.length}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Tipos de Dispositivo
-						</div>
-					</div>
-
-					<div className="p-2 text-center">
-						<div className="font-bold text-blue-600 text-lg sm:text-2xl">
-							{totalViews.toLocaleString()}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Visualizações
-						</div>
-					</div>
-					<div className="p-2 text-center">
-						<div className="font-bold text-green-600 text-lg sm:text-2xl">
-							{totalClicks.toLocaleString()}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Cliques
-						</div>
-					</div>
-					<div className="p-2 text-center">
-						<div className="font-bold text-lg text-primary sm:text-2xl">
-							{totalInteractions.toLocaleString()}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Total de Interações
-						</div>
-					</div>
 				</div>
 			</CardContent>
 		</Card>

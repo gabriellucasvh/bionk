@@ -343,8 +343,6 @@ export default function ReferrerAnalytics({
 		(sum, item) => sum + item.totalInteractions,
 		0
 	);
-	const totalClicks = data.reduce((sum, item) => sum + item.clicks, 0);
-	const totalViews = data.reduce((sum, item) => sum + item.views, 0);
 
 	// Preparar dados para o gráfico
 	const chartData = data.map((item) => ({
@@ -436,13 +434,13 @@ export default function ReferrerAnalytics({
 						</TableHeader>
 						<TableBody>
 							{sortedData.map((item, index) => {
-						const percentage =
-							totalInteractions > 0
-								? (
-										(item.totalInteractions / totalInteractions) *
-										100
-									).toFixed(0)
-								: "0";
+								const percentage =
+									totalInteractions > 0
+										? (
+												(item.totalInteractions / totalInteractions) *
+												100
+											).toFixed(0)
+										: "0";
 
 								return (
 									<TableRow key={`${item.referrer}-${index}`}>
@@ -491,43 +489,6 @@ export default function ReferrerAnalytics({
 							})}
 						</TableBody>
 					</Table>
-				</div>
-
-				{/* Resumo estatístico */}
-				<div className="mt-6 grid grid-cols-2 gap-3 border-t pt-4 sm:grid-cols-4 sm:gap-4">
-					<div className="p-2 text-center">
-						<div className="font-bold text-amber-600 text-lg sm:text-2xl">
-							{data.length}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Fontes de Tráfego
-						</div>
-					</div>
-
-					<div className="p-2 text-center">
-						<div className="font-bold text-blue-600 text-lg sm:text-2xl">
-							{totalViews.toLocaleString()}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Visualizações
-						</div>
-					</div>
-					<div className="p-2 text-center">
-						<div className="font-bold text-green-600 text-lg sm:text-2xl">
-							{totalClicks.toLocaleString()}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Cliques
-						</div>
-					</div>
-					<div className="p-2 text-center">
-						<div className="font-bold text-lg text-primary sm:text-2xl">
-							{totalInteractions.toLocaleString()}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Total de Interações
-						</div>
-					</div>
 				</div>
 			</CardContent>
 		</Card>
