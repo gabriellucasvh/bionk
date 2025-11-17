@@ -1,17 +1,34 @@
 "use client";
 
-import { Monitor, SendToBack, Smartphone } from "lucide-react";
+import { SendToBack } from "lucide-react";
+import Image from "next/image";
 import {
 	Bar,
 	BarChart,
 	CartesianGrid,
-	Legend,
 	ResponsiveContainer,
-	Tooltip,
 	XAxis,
-	YAxis,
 } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import {
+	ChartContainer,
+	ChartTooltip,
+	ChartTooltipContent,
+} from "@/components/ui/chart";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
 
 interface OSAnalytics {
 	os: string;
@@ -25,22 +42,14 @@ interface OSAnalyticsChartProps {
 	isLoading?: boolean;
 }
 
-const getOSIcon = (os: string) => {
-	switch (os.toLowerCase()) {
-		case "ios":
-			return <Smartphone className="h-4 w-4" />;
-		case "android":
-			return <Smartphone className="h-4 w-4" />;
-		case "windows":
-			return <Monitor className="h-4 w-4" />;
-		case "macos":
-			return <Monitor className="h-4 w-4" />;
-		case "linux":
-			return <Monitor className="h-4 w-4" />;
-		default:
-			return <Monitor className="h-4 w-4" />;
-	}
-};
+const DEFAULT_OS = [
+	"ios",
+	"android",
+	"windows",
+	"macos",
+	"linux",
+	"unknown",
+] as const;
 
 const getOSLabel = (os: string) => {
 	switch (os.toLowerCase()) {
@@ -57,42 +66,6 @@ const getOSLabel = (os: string) => {
 		default:
 			return "Outros";
 	}
-};
-
-const CustomTooltip = ({ active, payload, label }: any) => {
-	if (active && payload && payload.length) {
-		return (
-			<div className="rounded-lg border bg-background p-3 shadow-lg">
-				<div className="mb-2 flex items-center gap-2">
-					{getOSIcon(label)}
-					<span className="font-medium">{getOSLabel(label)}</span>
-				</div>
-				<div className="space-y-1 text-sm">
-					<div className="flex justify-between gap-4">
-						<span className="text-blue-600">Visualizações:</span>
-						<span className="font-medium">
-							{payload[0]?.value?.toLocaleString() || 0}
-						</span>
-					</div>
-					<div className="flex justify-between gap-4">
-						<span className="text-green-600">Cliques:</span>
-						<span className="font-medium">
-							{payload[1]?.value?.toLocaleString() || 0}
-						</span>
-					</div>
-					<div className="flex justify-between gap-4 border-t pt-1">
-						<span>Total:</span>
-						<span className="font-semibold">
-							{(
-								(payload[0]?.value || 0) + (payload[1]?.value || 0)
-							).toLocaleString()}
-						</span>
-					</div>
-				</div>
-			</div>
-		);
-	}
-	return null;
 };
 
 export default function OSAnalyticsChart({
@@ -114,23 +87,47 @@ export default function OSAnalyticsChart({
 		);
 	}
 
-	// Filtrar dados com interações > 0
-	const filteredData = data.filter((item) => item.totalInteractions > 0);
-	const totalInteractions = filteredData.reduce(
+	const getOSIconSrc = (os: string) => {
+		const lower = os.toLowerCase();
+		if (lower === "ios") {
+			return "/icons/apple.svg";
+		}
+		if (lower === "android") {
+			return "/icons/android.svg";
+		}
+		if (lower === "windows") {
+			return "/icons/windows.svg";
+		}
+		if (lower === "macos") {
+			return "/icons/macos.svg";
+		}
+		if (lower === "linux") {
+			return "/icons/linux.svg";
+		}
+		return "/images/bionk-icon-black.svg";
+	};
+
+	const dataMap = new Map(data.map((item) => [item.os.toLowerCase(), item]));
+	const baseData = DEFAULT_OS.map((os) => {
+		const found = dataMap.get(os);
+		const clicks = found?.clicks || 0;
+		const views = found?.views || 0;
+		const totalInteractions = clicks + views;
+		return { os, clicks, views, totalInteractions, name: getOSLabel(os) };
+	});
+	const totalInteractions = baseData.reduce(
 		(sum, item) => sum + item.totalInteractions,
 		0
 	);
-
-	const chartData = filteredData.map((item) => ({
+	const chartData = baseData.map((item) => ({
 		...item,
-		name: getOSLabel(item.os),
 		percentage:
 			totalInteractions > 0
 				? ((item.totalInteractions / totalInteractions) * 100).toFixed(1)
 				: "0.0",
 	}));
 
-	if (chartData.length === 0) {
+	if (totalInteractions === 0) {
 		return (
 			<Card className=" dark:bg-zinc-900">
 				<CardHeader>
@@ -159,85 +156,121 @@ export default function OSAnalyticsChart({
 					<SendToBack className="h-5 w-5" />
 					Distribuição por Sistema Operacional
 				</CardTitle>
-				<p className="text-muted-foreground text-sm">
+				<CardDescription>
 					Visualizações e cliques por sistema operacional (iOS, Android,
 					Desktop)
-				</p>
+				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<div className="h-64 w-full overflow-hidden sm:h-80">
-					<ResponsiveContainer height="100%" width="100%">
-						<BarChart
-							data={chartData}
-							margin={{
-								top: 20,
-								right: 30,
-								left: 20,
-								bottom: 5,
-							}}
-						>
-							<CartesianGrid className="stroke-muted" strokeDasharray="3 3" />
-							<XAxis
-								className="text-xs"
-								dataKey="name"
-								tick={{ fontSize: 12 }}
-							/>
-							<YAxis className="text-xs" tick={{ fontSize: 12 }} />
-							<Tooltip content={<CustomTooltip />} />
-							<Legend />
-							<Bar
-								dataKey="views"
-								fill="#3b82f6"
-								name="Visualizações"
-								radius={[2, 2, 0, 0]}
-							/>
-							<Bar
-								dataKey="clicks"
-								fill="#10b981"
-								name="Cliques"
-								radius={[2, 2, 0, 0]}
-							/>
-						</BarChart>
-					</ResponsiveContainer>
+					<ChartContainer
+						className="h-full w-full"
+						config={{
+							views: {
+								label: "Visualizações",
+								color: "oklch(0.7521 0.293 221.93)",
+							},
+							clicks: {
+								label: "Cliques",
+								color: "oklch(0.7521 0.3054 281.22)",
+							},
+						}}
+					>
+						<ResponsiveContainer height="100%" width="100%">
+							<BarChart
+								data={chartData}
+								margin={{
+									top: 20,
+									right: 30,
+									left: 20,
+									bottom: 5,
+								}}
+							>
+								<CartesianGrid vertical={false} />
+								<XAxis
+									axisLine={false}
+									dataKey="name"
+									tickLine={false}
+									tickMargin={10}
+								/>
+								<ChartTooltip
+									content={<ChartTooltipContent indicator="dashed" />}
+									cursor={false}
+								/>
+								<Bar dataKey="views" fill="var(--color-views)" radius={4} />
+								<Bar dataKey="clicks" fill="var(--color-clicks)" radius={4} />
+							</BarChart>
+						</ResponsiveContainer>
+					</ChartContainer>
 				</div>
 
-				{/* Resumo estatístico */}
-				<div className="mt-6 grid grid-cols-2 gap-3 border-t pt-4 sm:grid-cols-4 sm:gap-4">
-					<div className="p-2 text-center">
-						<div className="font-bold text-amber-600 text-lg sm:text-2xl">
-							{chartData.length}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Sistemas Operacionais
-						</div>
-					</div>
-
-					<div className="p-2 text-center">
-						<div className="font-bold text-blue-600 text-lg sm:text-2xl">
-							{data.reduce((sum, item) => sum + item.views, 0).toLocaleString()}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Visualizações
-						</div>
-					</div>
-					<div className="p-2 text-center">
-						<div className="font-bold text-green-600 text-lg sm:text-2xl">
-							{data
-								.reduce((sum, item) => sum + item.clicks, 0)
-								.toLocaleString()}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Cliques
-						</div>
-					</div>
-					<div className="p-2 text-center">
-						<div className="font-bold text-lg text-primary sm:text-2xl">
-							{totalInteractions.toLocaleString()}
-						</div>
-						<div className="text-muted-foreground text-xs sm:text-sm">
-							Total de Interações
-						</div>
-					</div>
+				<div className="mt-6 overflow-x-auto">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>Sistema Operacional</TableHead>
+								<TableHead className="text-right">Visualizações</TableHead>
+								<TableHead className="text-right">Cliques</TableHead>
+								<TableHead className="text-right">Total</TableHead>
+								<TableHead className="text-right">% do Total</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{chartData
+								.slice()
+								.filter((item) => item.totalInteractions > 0)
+								.sort((a, b) => b.totalInteractions - a.totalInteractions)
+								.map((item) => {
+									const percentage =
+										totalInteractions > 0
+											? (
+													(item.totalInteractions / totalInteractions) *
+													100
+												).toFixed(1)
+											: "0.0";
+									return (
+										<TableRow key={item.os}>
+											<TableCell className="font-medium">
+												<div className="flex items-center gap-3">
+													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+														<Image
+															alt={item.name}
+															className="h-4 w-4 dark:invert"
+															height={16}
+															src={getOSIconSrc(item.os)}
+															width={16}
+														/>
+													</div>
+													<span>{item.name}</span>
+												</div>
+											</TableCell>
+											<TableCell className="text-right">
+												{item.views.toLocaleString()}
+											</TableCell>
+											<TableCell className="text-right">
+												{(item.clicks || 0).toLocaleString()}
+											</TableCell>
+											<TableCell className="text-right font-semibold">
+												{item.totalInteractions.toLocaleString()}
+											</TableCell>
+											<TableCell className="text-right">
+												<div className="flex items-center justify-end gap-2">
+													<span className="font-medium">{percentage}%</span>
+													<div className="h-2 w-12 overflow-hidden rounded-full bg-muted">
+														<div
+															className="h-full rounded-full bg-primary transition-all duration-300"
+															style={{
+																width: `${Math.min(Number.parseFloat(percentage), 100)}%`,
+															}}
+														/>
+													</div>
+												</div>
+											</TableCell>
+										</TableRow>
+									);
+								})}
+						</TableBody>
+					</Table>
 				</div>
 			</CardContent>
 		</Card>
