@@ -332,9 +332,6 @@ export default function ReferrerAnalytics({
 						<p className="text-sm">
 							Os dados de origem aparecerão aqui quando houver interações
 						</p>
-						<p className="mt-2 text-muted-foreground text-xs">
-							Debug: Data = {JSON.stringify(data)}
-						</p>
 					</div>
 				</CardContent>
 			</Card>
