@@ -15,7 +15,6 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	Table,
@@ -201,45 +200,6 @@ const getReferrerColor = (referrer: string): string => {
 		REFERRER_COLORS[referrer as keyof typeof REFERRER_COLORS] ||
 		REFERRER_COLORS.other
 	);
-};
-
-const getReferrerBadgeVariant = (referrer: string) => {
-	switch (referrer) {
-		case "Instagram":
-		case "TikTok":
-		case "Facebook":
-		case "Twitter/X":
-			return "default" as const;
-		case "Google":
-		case "Bing":
-		case "DuckDuckGo":
-		case "Yahoo":
-			return "secondary" as const;
-		case "direct":
-			return "outline" as const;
-		default:
-			return "secondary" as const;
-	}
-};
-
-const getReferrerCategory = (referrer: string): string => {
-	if (referrer === "direct") {
-		return "Direto";
-	}
-	if (referrer === "unknown") {
-		return "Outros";
-	}
-	if (referrer.includes("Google") || referrer.includes("Bing")) {
-		return "Busca";
-	}
-	if (
-		referrer.includes("Instagram") ||
-		referrer.includes("TikTok") ||
-		referrer.includes("Facebook")
-	) {
-		return "Social";
-	}
-	return "Outros";
 };
 
 const CustomTooltip = ({ active, payload }: any) => {
@@ -453,12 +413,6 @@ export default function ReferrerAnalytics({
 													<div className="font-medium">
 														{getReferrerLabel(item.referrer)}
 													</div>
-													<Badge
-														className="mt-1 text-xs"
-														variant={getReferrerBadgeVariant(item.referrer)}
-													>
-														{getReferrerCategory(item.referrer)}
-													</Badge>
 												</div>
 											</div>
 										</TableCell>
