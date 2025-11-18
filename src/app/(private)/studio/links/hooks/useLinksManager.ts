@@ -152,6 +152,7 @@ export const useLinksManager = (
 	const [isAddingImage, setIsAddingImage] = useState(false);
 	const [isAddingMusic, setIsAddingMusic] = useState(false);
 	const [isAddingEvent, setIsAddingEvent] = useState(false);
+	const [isAddingEventCountdown, setIsAddingEventCountdown] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [togglingEventId, setTogglingEventId] = useState<number | null>(null);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
@@ -195,6 +196,7 @@ export const useLinksManager = (
 		setIsAddingImage(false);
 		setIsAddingMusic(false);
 		setIsAddingEvent(false);
+		setIsAddingEventCountdown(false);
 		setIsModalOpen(false);
 		setFormData(initialFormData);
 		setSectionFormData(initialSectionFormData);
@@ -1558,6 +1560,14 @@ export const useLinksManager = (
 			return;
 		}
 		setOriginalEvent(ev);
+		if (
+			(ev as any).type === "countdown" ||
+			(!((ev as any).externalLink || (ev as any).location) &&
+				(ev as any).eventTime === "00:00")
+		) {
+			setIsAddingEventCountdown(true);
+			return;
+		}
 		setIsAddingEvent(true);
 	};
 
@@ -2116,6 +2126,7 @@ export const useLinksManager = (
 		activeId,
 		isAdding,
 		isAddingEvent,
+		isAddingEventCountdown,
 		isAddingSection,
 		isAddingText,
 		isAddingVideo,
@@ -2134,6 +2145,7 @@ export const useLinksManager = (
 		setActiveId,
 		setIsAdding,
 		setIsAddingEvent,
+		setIsAddingEventCountdown,
 		setIsAddingSection,
 		setIsAddingText,
 		setIsAddingVideo,

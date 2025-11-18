@@ -120,6 +120,9 @@ export async function GET(req: NextRequest) {
 				coverImageUrl: true,
 				active: true,
 				order: true,
+				type: true,
+				targetMonth: true,
+				targetDay: true,
 			},
 		});
 

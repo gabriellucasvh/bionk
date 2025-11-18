@@ -51,7 +51,8 @@ interface AddContentModalProps {
 	setIsAddingVideo: (value: boolean) => void;
 	setIsAddingImage: (value: boolean) => void;
 	setIsAddingMusic: (value: boolean) => void;
-	setIsAddingEvent: (value: boolean) => void;
+    setIsAddingEvent: (value: boolean) => void;
+    setIsAddingEventCountdown: (value: boolean) => void;
 	setFormData: (data: LinkFormData) => void;
 	setSectionFormData: (data: SectionFormData) => void;
 	setTextFormData: (data: TextFormData) => void;
@@ -73,7 +74,8 @@ const AddContentModal = ({
 	videoFormData,
 	setIsAddingSection,
 	setIsAddingImage,
-	setIsAddingEvent,
+    setIsAddingEvent,
+    setIsAddingEventCountdown,
 	setVideoFormData,
 	handleAddNewLink,
 	handleAddNewText,
@@ -136,7 +138,7 @@ const AddContentModal = ({
 	]);
 
 	const handleOptionSelectWithState = (option: string) => {
-		const validOptions = [
+    const validOptions = [
 			"link",
 			"section",
 			"text",
@@ -150,8 +152,9 @@ const AddContentModal = ({
 			"apple",
 			"soundcloud",
 			"audiomack",
-			"event_tickets",
-		] as const;
+        "event_tickets",
+        "event_countdown",
+        ] as const;
 
 		if (!validOptions.includes(option as any)) {
 			return;
@@ -159,9 +162,12 @@ const AddContentModal = ({
 
 		const validOption = option as (typeof validOptions)[number];
 
-		if (validOption !== "event_tickets") {
-			setIsAddingEvent(false);
-		}
+        if (validOption !== "event_tickets") {
+            setIsAddingEvent(false);
+        }
+        if (validOption !== "event_countdown") {
+            setIsAddingEventCountdown(false);
+        }
 		if (validOption === "section") {
 			onClose();
 			setTimeout(() => {
@@ -221,13 +227,20 @@ const AddContentModal = ({
 			}, 0);
 			return;
 		}
-		if (validOption === "event_tickets") {
-			onClose();
-			setTimeout(() => {
-				setIsAddingEvent(true);
-			}, 0);
-			return;
-		}
+        if (validOption === "event_tickets") {
+            onClose();
+            setTimeout(() => {
+                setIsAddingEvent(true);
+            }, 0);
+            return;
+        }
+        if (validOption === "event_countdown") {
+            onClose();
+            setTimeout(() => {
+                setIsAddingEventCountdown(true);
+            }, 0);
+            return;
+        }
 	};
 
 	const handleImageOptionSelect = (

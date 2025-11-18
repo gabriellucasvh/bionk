@@ -1,9 +1,9 @@
 "use client";
 
-import { Ticket } from "lucide-react";
+import { ClockFading, Ticket } from "lucide-react";
 
 interface EventOptionsProps {
-    onOptionSelect: (option: "event_tickets") => void;
+    onOptionSelect: (option: "event_tickets" | "event_countdown") => void;
 }
 
 const EventOptions = ({ onOptionSelect }: EventOptionsProps) => {
@@ -22,6 +22,19 @@ const EventOptions = ({ onOptionSelect }: EventOptionsProps) => {
                         <Ticket className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-black" />
                     </div>
                     <span className="font-medium text-sm">Ingressos</span>
+                </button>
+                <button
+                    className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+                    onClick={() => onOptionSelect("event_countdown")}
+                    type="button"
+                >
+                    <div
+                        className="relative w-20 overflow-hidden rounded-2xl border bg-blue-400"
+                        style={{ aspectRatio: "6 / 7" }}
+                    >
+                        <ClockFading className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-black" />
+                    </div>
+                    <span className="font-medium text-sm">Contagem Regressiva</span>
                 </button>
             </div>
         </div>

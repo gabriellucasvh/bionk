@@ -24,17 +24,20 @@ export async function PUT(
 
 	try {
 		const body = await request.json();
-		const {
-			title,
-			location,
-			eventDate,
-			eventTime,
-			descriptionShort,
-			externalLink,
-			coverImageUrl,
-			active,
-			order,
-		} = body || {};
+        const {
+            title,
+            location,
+            eventDate,
+            eventTime,
+            descriptionShort,
+            externalLink,
+            coverImageUrl,
+            active,
+            order,
+            type,
+            targetMonth,
+            targetDay,
+        } = body || {};
 
 		const event = await prisma.event.findFirst({
 			where: { id: eventId, userId: session.user.id },
@@ -47,23 +50,26 @@ export async function PUT(
 			);
 		}
 
-		const updateData: any = {
-			...(title !== undefined && { title: String(title) }),
-			...(location !== undefined && { location: String(location) }),
-			...(eventDate !== undefined && { eventDate: new Date(eventDate) }),
-			...(eventTime !== undefined && { eventTime: String(eventTime) }),
-			...(descriptionShort !== undefined && {
-				descriptionShort: descriptionShort ? String(descriptionShort) : null,
-			}),
-			...(externalLink !== undefined && {
-				externalLink: String(externalLink),
-			}),
-			...(coverImageUrl !== undefined && {
-				coverImageUrl: coverImageUrl ? String(coverImageUrl) : null,
-			}),
-			...(active !== undefined && { active }),
-			...(order !== undefined && { order }),
-		};
+        const updateData: any = {
+            ...(title !== undefined && { title: String(title) }),
+            ...(location !== undefined && { location: String(location) }),
+            ...(eventDate !== undefined && { eventDate: new Date(eventDate) }),
+            ...(eventTime !== undefined && { eventTime: String(eventTime) }),
+            ...(descriptionShort !== undefined && {
+                descriptionShort: descriptionShort ? String(descriptionShort) : null,
+            }),
+            ...(externalLink !== undefined && {
+                externalLink: String(externalLink),
+            }),
+            ...(coverImageUrl !== undefined && {
+                coverImageUrl: coverImageUrl ? String(coverImageUrl) : null,
+            }),
+            ...(active !== undefined && { active }),
+            ...(order !== undefined && { order }),
+            ...(type !== undefined && { type: String(type) }),
+            ...(targetMonth !== undefined && { targetMonth: Number(targetMonth) }),
+            ...(targetDay !== undefined && { targetDay: Number(targetDay) }),
+        };
 
 		const updated = await prisma.event.update({
 			where: { id: eventId },

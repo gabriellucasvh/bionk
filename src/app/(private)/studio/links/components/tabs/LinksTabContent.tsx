@@ -14,6 +14,7 @@ import type {
 	VideoItem,
 } from "../../types/links.types";
 import AddNewEventForm from "../forms/AddNewEventForm";
+import AddNewCountdownForm from "../forms/AddNewCountdownForm";
 import AddNewSectionForm from "../forms/AddNewSectionForm";
 import LinkList from "../lists/LinkList";
 import AddContentModal from "../modals/AddContentModal";
@@ -58,6 +59,7 @@ const LinksTabContent = ({
 		isAddingVideo,
 		isAddingImage,
 		isAddingEvent,
+		isAddingEventCountdown,
 		isAddingMusic,
 		formData,
 		videoFormData,
@@ -84,6 +86,7 @@ const LinksTabContent = ({
 		setIsAddingVideo,
 		setIsAddingImage,
 		setIsAddingEvent,
+		setIsAddingEventCountdown,
 		setIsAddingMusic,
 		setFormData,
 		setVideoFormData,
@@ -143,9 +146,15 @@ const LinksTabContent = ({
 					if (value) {
 						handlers.closeAllActiveCreations();
 					}
-					setIsAddingEvent(value);
-				}}
-				setIsAddingImage={setIsAddingImage}
+				setIsAddingEvent(value);
+			}}
+			setIsAddingImage={setIsAddingImage}
+			setIsAddingEventCountdown={(value: boolean) => {
+				if (value) {
+					handlers.closeAllActiveCreations();
+				}
+				setIsAddingEventCountdown(value);
+			}}
 				setIsAddingMusic={setIsAddingMusic}
 				setIsAddingSection={(value: boolean) => {
 					if (value) {
@@ -160,7 +169,7 @@ const LinksTabContent = ({
 				setTextFormData={handlers.setTextFormData}
 				setVideoFormData={setVideoFormData}
 				textFormData={handlers.textFormData}
-				videoFormData={videoFormData}
+			videoFormData={videoFormData}
 			/>
 
 			{isAddingEvent && (
@@ -188,6 +197,35 @@ const LinksTabContent = ({
 						await mutateMusics();
 						await mutateEvents();
 						setIsAddingEvent(false);
+					}}
+				/>
+			)}
+
+			{isAddingEventCountdown && (
+				<AddNewCountdownForm
+					event={handlers.originalEvent as any}
+					onClose={() => {
+						setIsAddingEventCountdown(false);
+					}}
+					onCreated={async () => {
+						await mutateLinks();
+						await mutateSections();
+						await mutateTexts();
+						await mutateVideos();
+						await mutateImages();
+						await mutateMusics();
+						await mutateEvents();
+						setIsAddingEventCountdown(false);
+					}}
+					onSaved={async () => {
+						await mutateLinks();
+						await mutateSections();
+						await mutateTexts();
+						await mutateVideos();
+						await mutateImages();
+						await mutateMusics();
+						await mutateEvents();
+						setIsAddingEventCountdown(false);
 					}}
 				/>
 			)}

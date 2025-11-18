@@ -1,7 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { Edit, Grip, MoreVertical, Ticket } from "lucide-react";
+import { ClockFading, Edit, Grip, MoreVertical, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -35,7 +35,15 @@ const EventCard = ({
 	isTogglingActive,
 	onStartEditingEvent,
 }: EventCardProps) => {
+	const isCountdown =
+		event.type === "countdown" ||
+		(!(event.externalLink || event.location) && event.eventTime === "00:00");
 	const dateLabel = (() => {
+		if (isCountdown && event.targetDay && event.targetMonth) {
+			const dd = String(event.targetDay).padStart(2, "0");
+			const mm = String(event.targetMonth).padStart(2, "0");
+			return `${dd}/${mm}`;
+		}
 		try {
 			const d = new Date(event.eventDate);
 			return format(d, "dd/MM/yyyy");
@@ -65,10 +73,18 @@ const EventCard = ({
 				</div>
 				<div className="flex-1 space-y-2">
 					<header className="flex items-center gap-2">
-						<div className="flex items-center justify-center rounded-md bg-purple-500 p-1.5">
-							<Ticket className="h-4 w-4 text-white" />
+						<div
+							className={`flex items-center justify-center rounded-md p-1.5 ${isCountdown ? "bg-blue-500" : "bg-purple-500"}`}
+						>
+							{isCountdown ? (
+								<ClockFading className="h-4 w-4 text-white" />
+							) : (
+								<Ticket className="h-4 w-4 text-white" />
+							)}
 						</div>
-						<span className="font-medium text-sm">Ingresso</span>
+						<span className="font-medium text-sm">
+							{isCountdown ? "Contagem" : "Ingresso"}
+						</span>
 					</header>
 
 					<div className="space-y-1">
@@ -78,10 +94,15 @@ const EventCard = ({
 								: event.title}
 						</h3>
 						<div className="text-muted-foreground text-sm">
-							{event.location} <br />
-							{dateLabel} • {event.eventTime}
+							{isCountdown ? (
+								<>{dateLabel}</>
+							) : (
+								<>
+									{event.location} <br />
+									{dateLabel} • {event.eventTime}
+								</>
+							)}
 						</div>
-
 					</div>
 				</div>
 			</div>
