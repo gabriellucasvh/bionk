@@ -295,9 +295,6 @@ export default function BionkActionsModal({
 		setCookie("cookie-analytics", prefs.analytics.toString());
 		setCookie("cookie-functional", prefs.functional.toString());
 		setCookie("cookie-marketing", prefs.marketing.toString());
-		if (typeof window !== "undefined") {
-			window.location.reload();
-		}
 	};
 
 	const savePreferences = (prefs: CookiePreferences) => {
