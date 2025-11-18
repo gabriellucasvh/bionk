@@ -50,6 +50,44 @@ export function useCookieConsent() {
 		}
 	}, []);
 
+	useEffect(() => {
+		const handler = (e: Event) => {
+			const ce = e as CustomEvent<any>;
+			const d = ce.detail;
+			if (!(d && d.preferences)) {
+				return;
+			}
+			setHasConsent(d.hasConsent === true);
+			setPreferences(d.preferences);
+			try {
+				localStorage.setItem(
+					COOKIE_CONSENT_KEY,
+					d.hasConsent ? "true" : "false"
+				);
+				localStorage.setItem(
+					COOKIE_PREFERENCES_KEY,
+					JSON.stringify(d.preferences)
+				);
+			} catch {}
+		};
+
+		if (typeof window !== "undefined") {
+			window.addEventListener(
+				"cookie-preferences-changed",
+				handler as EventListener
+			);
+		}
+
+		return () => {
+			if (typeof window !== "undefined") {
+				window.removeEventListener(
+					"cookie-preferences-changed",
+					handler as EventListener
+				);
+			}
+		};
+	}, []);
+
 	// Função para verificar se um tipo específico de cookie é permitido
 	const canUse = (type: keyof CookiePreferences): boolean => {
 		if (!hasConsent) {

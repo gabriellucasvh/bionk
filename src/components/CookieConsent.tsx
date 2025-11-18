@@ -106,6 +106,13 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 		setCookie("cookie-analytics", prefs.analytics.toString());
 		setCookie("cookie-functional", prefs.functional.toString());
 		setCookie("cookie-marketing", prefs.marketing.toString());
+
+		if (typeof window !== "undefined") {
+			const ev = new CustomEvent("cookie-preferences-changed", {
+				detail: { preferences: prefs, hasConsent: true },
+			});
+			window.dispatchEvent(ev);
+		}
 	};
 
 	const handleAcceptAll = () => {
