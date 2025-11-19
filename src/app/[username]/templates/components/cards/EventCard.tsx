@@ -1,6 +1,8 @@
 "use client";
 
+import { AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
+import { MotionSpan } from "@/components/ui/motion";
 import { parseRgb, toForeground } from "./utils/style";
 
 interface EventCardProps {
@@ -24,6 +26,23 @@ function normalizeExternalUrl(url?: string | null): string | null {
 	}
 	return `https://${trimmed}`;
 }
+
+const RollingValue = ({ v }: { v: number }) => (
+	<div className="relative overflow-hidden" style={{ height: "1.9rem" }}>
+		<AnimatePresence initial={false} mode="wait">
+			<MotionSpan
+				animate={{ y: 0, opacity: 1 }}
+				className="absolute inset-0 flex w-full items-center justify-center"
+				exit={{ y: -16, opacity: 0 }}
+				initial={{ y: 16, opacity: 0 }}
+				key={v}
+				transition={{ duration: 0.22 }}
+			>
+				{String(v).padStart(2, "0")}
+			</MotionSpan>
+		</AnimatePresence>
+	</div>
+);
 
 export default function EventCard({
 	event,
@@ -164,7 +183,7 @@ export default function EventCard({
 							className="min-w-16 rounded-lg px-3 py-2 text-center font-semibold text-2xl"
 							style={{ background: dimBg, color: textColor }}
 						>
-							{String(remaining.values[0]).padStart(2, "0")}
+							<RollingValue v={remaining.values[0]} />
 						</div>
 						<div className="text-sm" style={{ color: mutedTextColor }}>
 							{remaining.labels[0]}
@@ -175,7 +194,7 @@ export default function EventCard({
 							className="min-w-16 rounded-lg px-3 py-2 text-center font-semibold text-2xl"
 							style={{ background: dimBg, color: textColor }}
 						>
-							{String(remaining.values[1]).padStart(2, "0")}
+							<RollingValue v={remaining.values[1]} />
 						</div>
 						<div className="text-sm" style={{ color: mutedTextColor }}>
 							{remaining.labels[1]}
@@ -186,7 +205,7 @@ export default function EventCard({
 							className="min-w-16 rounded-lg px-3 py-2 text-center font-semibold text-2xl"
 							style={{ background: dimBg, color: textColor }}
 						>
-							{String(remaining.values[2]).padStart(2, "0")}
+							<RollingValue v={remaining.values[2]} />
 						</div>
 						<div className="text-sm" style={{ color: mutedTextColor }}>
 							{remaining.labels[2]}
