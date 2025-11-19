@@ -212,6 +212,39 @@ export default function EventCard({
 						</div>
 					</div>
 				</div>
+
+				{(() => {
+					const linkHref = normalizeExternalUrl(event?.countdownLinkUrl);
+					const isFinished = targetDate
+						? Date.now() >= targetDate.getTime()
+						: false;
+					const allowedDuring =
+						event?.countdownLinkVisibility === "during" && !isFinished;
+					const allowedAfter =
+						event?.countdownLinkVisibility === "after" && isFinished;
+					const showLink = Boolean(linkHref && (allowedDuring || allowedAfter));
+					if (!showLink) {
+						return null;
+					}
+					const radius = Math.max(8, Number(cornerValue || "12") - 4);
+					return (
+						<div className="-mt-1 flex justify-center pb-4">
+							<a
+								className="inline-block px-3 py-1 font-bold text-sm transition-all duration-150 hover:brightness-90"
+								href={linkHref as string}
+								rel="noopener noreferrer"
+								style={{
+									background: dimBg,
+									color: textColor,
+									borderRadius: `${radius}px`,
+								}}
+								target="_blank"
+							>
+								Abrir
+							</a>
+						</div>
+					);
+				})()}
 			</div>
 		);
 	}

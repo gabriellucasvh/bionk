@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
+const REJECT_URL = /^https:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
 export async function POST(req: NextRequest) {
 	try {
 		const session = await getServerSession(authOptions);
@@ -17,6 +18,8 @@ export async function POST(req: NextRequest) {
 			eventTime: eventTimeStr,
 			targetMonth,
 			targetDay,
+			countdownLinkUrl,
+			countdownLinkVisibility,
 		} = data || {};
 
 		if (!(title && eventDateStr && eventTimeStr)) {
@@ -51,6 +54,20 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ error: "Data inválida" }, { status: 400 });
 		}
 		const eventTime = String(eventTimeStr);
+		const isSafeUrl = (u?: string | null) => {
+			if (!u) {
+				return false;
+			}
+			return REJECT_URL.test(String(u));
+		};
+		const linkUrl = isSafeUrl(countdownLinkUrl)
+			? String(countdownLinkUrl)
+			: null;
+		const visibility =
+			typeof countdownLinkVisibility === "string" &&
+			["after", "during"].includes(countdownLinkVisibility)
+				? countdownLinkVisibility
+				: null;
 		const month =
 			typeof targetMonth === "number" ? targetMonth : eventDate.getMonth() + 1;
 		const day = typeof targetDay === "number" ? targetDay : eventDate.getDate();
@@ -101,6 +118,8 @@ export async function POST(req: NextRequest) {
 				type: "countdown",
 				targetMonth: month,
 				targetDay: day,
+				countdownLinkUrl: linkUrl,
+				countdownLinkVisibility: visibility ? (visibility as any) : null,
 			},
 			select: { id: true },
 		});

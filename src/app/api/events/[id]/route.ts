@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
+const REJECT_URL = /^https:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
 export async function PUT(
 	request: Request,
 	{ params }: { params: Promise<{ id: string }> }
@@ -24,20 +25,22 @@ export async function PUT(
 
 	try {
 		const body = await request.json();
-        const {
-            title,
-            location,
-            eventDate,
-            eventTime,
-            descriptionShort,
-            externalLink,
-            coverImageUrl,
-            active,
-            order,
-            type,
-            targetMonth,
-            targetDay,
-        } = body || {};
+		const {
+			title,
+			location,
+			eventDate,
+			eventTime,
+			descriptionShort,
+			externalLink,
+			coverImageUrl,
+			active,
+			order,
+			type,
+			targetMonth,
+			targetDay,
+			countdownLinkUrl,
+			countdownLinkVisibility,
+		} = body || {};
 
 		const event = await prisma.event.findFirst({
 			where: { id: eventId, userId: session.user.id },
@@ -50,51 +53,67 @@ export async function PUT(
 			);
 		}
 
-        const updateData: any = {
-            ...(title !== undefined && { title: String(title) }),
-            ...(location !== undefined && { location: String(location) }),
-            ...(eventDate !== undefined && { eventDate: new Date(eventDate) }),
-            ...(eventTime !== undefined && { eventTime: String(eventTime) }),
-            ...(descriptionShort !== undefined && {
-                descriptionShort: descriptionShort ? String(descriptionShort) : null,
-            }),
-            ...(externalLink !== undefined && {
-                externalLink: String(externalLink),
-            }),
-            ...(coverImageUrl !== undefined && {
-                coverImageUrl: coverImageUrl ? String(coverImageUrl) : null,
-            }),
-            ...(active !== undefined && { active }),
-            ...(order !== undefined && { order }),
-            ...(type !== undefined && { type: String(type) }),
-            ...(targetMonth !== undefined && { targetMonth: Number(targetMonth) }),
-            ...(targetDay !== undefined && { targetDay: Number(targetDay) }),
-        };
+		const updateData: any = {
+			...(title !== undefined && { title: String(title) }),
+			...(location !== undefined && { location: String(location) }),
+			...(eventDate !== undefined && { eventDate: new Date(eventDate) }),
+			...(eventTime !== undefined && { eventTime: String(eventTime) }),
+			...(descriptionShort !== undefined && {
+				descriptionShort: descriptionShort ? String(descriptionShort) : null,
+			}),
+			...(externalLink !== undefined && {
+				externalLink: String(externalLink),
+			}),
+			...(coverImageUrl !== undefined && {
+				coverImageUrl: coverImageUrl ? String(coverImageUrl) : null,
+			}),
+			...(active !== undefined && { active }),
+			...(order !== undefined && { order }),
+			...(type !== undefined && { type: String(type) }),
+			...(targetMonth !== undefined && { targetMonth: Number(targetMonth) }),
+			...(targetDay !== undefined && { targetDay: Number(targetDay) }),
+			...(countdownLinkUrl !== undefined && {
+				countdownLinkUrl: REJECT_URL.test(
+					String(countdownLinkUrl)
+				)
+					? String(countdownLinkUrl)
+					: null,
+			}),
+			...(countdownLinkVisibility !== undefined && {
+				countdownLinkVisibility: ["after", "during"].includes(
+					String(countdownLinkVisibility)
+				)
+					? String(countdownLinkVisibility)
+					: null,
+			}),
+		};
 
-        if (String(type || event.type) === "countdown" && eventDate !== undefined) {
-            const parseLocalDate = (s: string) => {
-                const parts = String(s).split("-").map((p) => Number(p));
-                return new Date(parts[0], parts[1] - 1, parts[2]);
-            };
-            const tomorrowLocalStart = () => {
-                const t = new Date();
-                t.setDate(t.getDate() + 1);
-                t.setHours(0, 0, 0, 0);
-                return t;
-            };
-            const oneYearFromTodayStart = () => {
-                const t = new Date();
-                t.setDate(t.getDate() + 365);
-                t.setHours(0, 0, 0, 0);
-                return t;
-            };
-            const d = parseLocalDate(String(eventDate));
-            const lower = tomorrowLocalStart().getTime();
-            const upper = oneYearFromTodayStart().getTime();
-            if (!(d.getTime() >= lower && d.getTime() <= upper)) {
-                return NextResponse.json({ error: "Data inválida" }, { status: 400 });
-            }
-        }
+		if (String(type || event.type) === "countdown" && eventDate !== undefined) {
+			const parseLocalDate = (s: string) => {
+				const parts = String(s)
+					.split("-")
+					.map((p) => Number(p));
+				return new Date(parts[0], parts[1] - 1, parts[2]);
+			};
+			const tomorrowLocalStart = () => {
+				const t = new Date();
+				t.setDate(t.getDate() + 1);
+				t.setHours(0, 0, 0, 0);
+				return t;
+			};
+			const oneYearFromTodayStart = () => {
+				const t = new Date();
+				t.setDate(t.getDate() + 365);
+				t.setHours(0, 0, 0, 0);
+				return t;
+			};
+			const d = parseLocalDate(String(eventDate));
+			const lower = tomorrowLocalStart().getTime();
+			const upper = oneYearFromTodayStart().getTime();
+			if (!(d.getTime() >= lower && d.getTime() <= upper)) {
+				return NextResponse.json({ error: "Data inválida" }, { status: 400 });
+			}
+		}
 
 		const updated = await prisma.event.update({
 			where: { id: eventId },

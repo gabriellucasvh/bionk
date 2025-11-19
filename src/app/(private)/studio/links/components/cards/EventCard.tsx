@@ -67,6 +67,8 @@ const EventCard = ({
 			title: string;
 			eventDate: string;
 			eventTime: string;
+			countdownLinkUrl?: string | null;
+			countdownLinkVisibility?: "after" | "during" | null;
 		}) => {
 			const d = new Date(payload.eventDate);
 			const month = d.getMonth() + 1;
@@ -78,6 +80,8 @@ const EventCard = ({
 				eventTime: payload.eventTime,
 				targetMonth: month as any,
 				targetDay: day as any,
+				countdownLinkUrl: payload.countdownLinkUrl ?? null,
+				countdownLinkVisibility: payload.countdownLinkVisibility ?? null,
 			});
 		};
 		return (

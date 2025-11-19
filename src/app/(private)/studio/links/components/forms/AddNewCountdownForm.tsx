@@ -11,7 +11,9 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
+const REJECT_URL = /^https:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
 interface AddNewCountdownFormProps {
 	onCreated?: (id: number) => void;
 	onSaved?: (id: number) => void;
@@ -21,6 +23,8 @@ interface AddNewCountdownFormProps {
 		title: string;
 		eventDate: string;
 		eventTime: string;
+		countdownLinkUrl?: string | null;
+		countdownLinkVisibility?: "after" | "during" | null;
 	}) => void | Promise<void>;
 }
 
@@ -76,6 +80,20 @@ const AddNewCountdownForm = ({
 	);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [redirectUrl, setRedirectUrl] = useState<string>(
+		event?.countdownLinkUrl || ""
+	);
+	const [visibility, setVisibility] = useState<"after" | "during" | null>(
+		event?.countdownLinkVisibility || "after"
+	);
+	const [urlError, setUrlError] = useState<string | null>(null);
+
+	const isSafeUrl = (u?: string | null) => {
+		if (!u) {
+			return false;
+		}
+		return REJECT_URL.test(String(u));
+	};
 
 	const canSubmit = () => {
 		if (!(title.trim() && eventDate && eventTime)) {
@@ -91,6 +109,9 @@ const AddNewCountdownForm = ({
 				return false;
 			}
 		} catch {
+			return false;
+		}
+		if (redirectUrl && !isSafeUrl(redirectUrl)) {
 			return false;
 		}
 		return true;
@@ -110,7 +131,13 @@ const AddNewCountdownForm = ({
 		try {
 			if (event?.id) {
 				if (onSaveManaged) {
-					await onSaveManaged({ title, eventDate, eventTime });
+					await onSaveManaged({
+						title,
+						eventDate,
+						eventTime,
+						countdownLinkUrl: redirectUrl || null,
+						countdownLinkVisibility: redirectUrl ? visibility : null,
+					});
 					onSaved?.(event.id);
 				} else {
 					const res = await fetch(`/api/events/${event.id}`, {
@@ -121,6 +148,8 @@ const AddNewCountdownForm = ({
 							type: "countdown",
 							eventDate,
 							eventTime,
+							countdownLinkUrl: redirectUrl || null,
+							countdownLinkVisibility: redirectUrl ? visibility : null,
 						}),
 					});
 					if (!res.ok) {
@@ -135,7 +164,13 @@ const AddNewCountdownForm = ({
 				const res = await fetch("/api/events/countdown", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ title, eventDate, eventTime }),
+					body: JSON.stringify({
+						title,
+						eventDate,
+						eventTime,
+						countdownLinkUrl: redirectUrl || null,
+						countdownLinkVisibility: redirectUrl ? visibility : null,
+					}),
 				});
 				if (!res.ok) {
 					setError("Falha ao criar contagem");
@@ -154,8 +189,8 @@ const AddNewCountdownForm = ({
 		<div className="flex flex-col gap-3 rounded-3xl border-2 border-foreground/20 bg-white p-3 sm:p-4 dark:bg-zinc-900">
 			<div className="flex-1 space-y-3 overflow-y-auto">
 				<section className="space-y-4">
-					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-						<div className="grid gap-2">
+					<div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+						<div className="grid flex-1 gap-2">
 							<Label>Título*</Label>
 							<Input
 								maxLength={80}
@@ -164,14 +199,14 @@ const AddNewCountdownForm = ({
 								value={title}
 							/>
 						</div>
-						<div className="grid gap-2">
+						<div className="grid w-full gap-2 sm:w-[360px]">
 							<div className="grid grid-cols-2 gap-2">
 								<div className="grid gap-2">
 									<Label>Data*</Label>
 									<Popover onOpenChange={setDateOpen} open={dateOpen}>
 										<PopoverTrigger asChild>
 											<Button
-												className={`h-10 w-40 justify-between ${eventDate ? "" : "text-muted-foreground"}`}
+												className={`h-10 w-full justify-between ${eventDate ? "" : "text-muted-foreground"}`}
 												onClick={() => setDateOpen(true)}
 												type="button"
 												variant="outline"
@@ -223,7 +258,7 @@ const AddNewCountdownForm = ({
 								<div className="grid gap-2">
 									<Label>Hora*</Label>
 									<Input
-										className="h-10 w-24 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+										className="h-10 w-full appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
 										onChange={(e) => setEventTime(e.target.value)}
 										step="60"
 										type="time"
@@ -232,6 +267,51 @@ const AddNewCountdownForm = ({
 								</div>
 							</div>
 						</div>
+					</div>
+					<div className="grid gap-2">
+						<Label>Link (opcional)</Label>
+						<Input
+							onChange={(e) => {
+								const v = e.target.value;
+								setRedirectUrl(v);
+								if (!v) {
+									setUrlError(null);
+									return;
+								}
+								setUrlError(isSafeUrl(v) ? null : "URL inválida ou não segura");
+							}}
+							placeholder="https://exemplo.com"
+							value={redirectUrl}
+						/>
+						{urlError && <div className="text-red-600 text-sm">{urlError}</div>}
+					</div>
+					<div className="grid gap-2">
+						<Label>Visibilidade do link</Label>
+						<RadioGroup
+							onValueChange={(v) => setVisibility(v as any)}
+							value={visibility || undefined}
+						>
+							<div className="flex items-center gap-2">
+								<RadioGroupItem
+									disabled={!(redirectUrl && isSafeUrl(redirectUrl))}
+									id="vis-after"
+									value="after"
+								/>
+								<Label htmlFor="vis-after">
+									Permitir link após o tempo acabar
+								</Label>
+							</div>
+							<div className="flex items-center gap-2">
+								<RadioGroupItem
+									disabled={!(redirectUrl && isSafeUrl(redirectUrl))}
+									id="vis-during"
+									value="during"
+								/>
+								<Label htmlFor="vis-during">
+									Permitir link durante a contagem
+								</Label>
+							</div>
+						</RadioGroup>
 					</div>
 					{error && <div className="text-red-600 text-sm">{error}</div>}
 				</section>
