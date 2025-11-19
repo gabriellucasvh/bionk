@@ -101,8 +101,6 @@ const AddNewCountdownForm = ({
 		return new Date(parts[0], parts[1] - 1, parts[2]);
 	};
 
-    
-
 	const handleSubmit = async () => {
 		if (!canSubmit()) {
 			return;
@@ -167,66 +165,72 @@ const AddNewCountdownForm = ({
 							/>
 						</div>
 						<div className="grid gap-2">
-							<Label>Data*</Label>
-							<Popover onOpenChange={setDateOpen} open={dateOpen}>
-								<PopoverTrigger asChild>
-									<Button
-										className={`h-10 w-40 justify-between ${eventDate ? "" : "text-muted-foreground"}`}
-										onClick={() => setDateOpen(true)}
-										type="button"
-										variant="outline"
-									>
-										{eventDate ? (
-											new Intl.DateTimeFormat("pt-BR").format(
-												parseLocalDate(eventDate)
-											)
-										) : (
-											<span>Selecionar data</span>
-										)}
-									</Button>
-								</PopoverTrigger>
-								<PopoverContent align="start" className="w-auto p-0">
-									<Calendar
-										disabled={{
-											before: tomorrowLocalStart(),
-											after: oneYearFromTodayStart(),
-										}}
-										mode="single"
-										onSelect={(d) => {
-											if (!d) {
-												return;
-											}
-											const lower = tomorrowLocalStart().getTime();
-											const upper = oneYearFromTodayStart().getTime();
-											const ts = new Date(
-												d.getFullYear(),
-												d.getMonth(),
-												d.getDate()
-											).getTime();
-											if (!(ts >= lower && ts <= upper)) {
-												setDateOpen(false);
-												return;
-											}
-											const val = toLocalInputFromDate(
-												new Date(d.getFullYear(), d.getMonth(), d.getDate())
-											);
-											setEventDate(val);
-											setDateOpen(false);
-										}}
-										selected={eventDate ? parseLocalDate(eventDate) : undefined}
+							<div className="grid grid-cols-2 gap-2">
+								<div className="grid gap-2">
+									<Label>Data*</Label>
+									<Popover onOpenChange={setDateOpen} open={dateOpen}>
+										<PopoverTrigger asChild>
+											<Button
+												className={`h-10 w-40 justify-between ${eventDate ? "" : "text-muted-foreground"}`}
+												onClick={() => setDateOpen(true)}
+												type="button"
+												variant="outline"
+											>
+												{eventDate ? (
+													new Intl.DateTimeFormat("pt-BR").format(
+														parseLocalDate(eventDate)
+													)
+												) : (
+													<span>Selecionar data</span>
+												)}
+											</Button>
+										</PopoverTrigger>
+										<PopoverContent align="start" className="w-auto p-0">
+											<Calendar
+												disabled={{
+													before: tomorrowLocalStart(),
+													after: oneYearFromTodayStart(),
+												}}
+												mode="single"
+												onSelect={(d) => {
+													if (!d) {
+														return;
+													}
+													const lower = tomorrowLocalStart().getTime();
+													const upper = oneYearFromTodayStart().getTime();
+													const ts = new Date(
+														d.getFullYear(),
+														d.getMonth(),
+														d.getDate()
+													).getTime();
+													if (!(ts >= lower && ts <= upper)) {
+														setDateOpen(false);
+														return;
+													}
+													const val = toLocalInputFromDate(
+														new Date(d.getFullYear(), d.getMonth(), d.getDate())
+													);
+													setEventDate(val);
+													setDateOpen(false);
+												}}
+												selected={
+													eventDate ? parseLocalDate(eventDate) : undefined
+												}
+											/>
+										</PopoverContent>
+									</Popover>
+								</div>
+								<div className="grid gap-2">
+									<Label>Hora*</Label>
+									<Input
+										className="h-10 w-24 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+										onChange={(e) => setEventTime(e.target.value)}
+										step="60"
+										type="time"
+										value={eventTime}
 									/>
-								</PopoverContent>
-							</Popover>
-						</div>
-						<div className="grid gap-2">
-							<Label>Hora*</Label>
-							<Input
-								className="h-10 w-20 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-								onChange={(e) => setEventTime(e.target.value)}
-								step="60"
-								type="time"
-								value={eventTime}
-							/>
+								</div>
+							</div>
 						</div>
 					</div>
 					{error && <div className="text-red-600 text-sm">{error}</div>}
