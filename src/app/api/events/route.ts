@@ -123,6 +123,8 @@ export async function GET(req: NextRequest) {
 				type: true,
 				targetMonth: true,
 				targetDay: true,
+				countdownLinkUrl: true,
+				countdownLinkVisibility: true,
 			},
 		});
 
