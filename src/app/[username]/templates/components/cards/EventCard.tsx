@@ -4,6 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { MotionSpan } from "@/components/ui/motion";
 import { parseRgb, toForeground } from "./utils/style";
+import Link from "next/link";
 
 interface EventCardProps {
 	event: any;
@@ -229,7 +230,7 @@ export default function EventCard({
 					const radius = Math.max(8, Number(cornerValue || "12") - 4);
 					return (
 						<div className="-mt-1 flex justify-center pb-4">
-							<a
+							<Link
 								className="inline-block px-3 py-1 font-bold text-sm transition-all duration-150 hover:brightness-90"
 								href={linkHref as string}
 								rel="noopener noreferrer"
@@ -241,7 +242,7 @@ export default function EventCard({
 								target="_blank"
 							>
 								Abrir
-							</a>
+							</Link>
 						</div>
 					);
 				})()}
