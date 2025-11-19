@@ -158,19 +158,25 @@ export async function GET(request: Request) {
 		startDate = new Date(endDate);
 	}
 
-	// Buscar todos os links do usuário
-	const links = await prisma.link.findMany({
-		where: { userId },
-		select: { id: true, title: true, url: true },
-	});
+    // Buscar todos os links do usuário (inclui countdown)
+    const links = await prisma.link.findMany({
+        where: { userId },
+        select: { id: true, title: true, url: true },
+    });
+    const linkIdsAll = links.map((link) => link.id);
 
-	const linkIds = links.map((link) => link.id);
+    // Lista para ranking (exclui countdown)
+    const linksTop = await prisma.link.findMany({
+        where: { userId, NOT: { type: "countdown_link" } },
+        select: { id: true, title: true, url: true },
+    });
+    const topLinkIds = linksTop.map((link) => link.id);
 
 	// Buscar total de cliques e visualizações paralelamente
 	const [totalClicks, totalProfileViews] = await Promise.all([
 		prisma.linkClick.count({
 			where: {
-				linkId: { in: linkIds },
+				linkId: { in: linkIdsAll },
 				createdAt: { gte: startDate, lte: endDate },
 			},
 		}),
@@ -282,12 +288,12 @@ export async function GET(request: Request) {
 		let totalClicksAll = rollupTotals._sum.clicks || 0;
 		let totalProfileViewsAll = rollupTotals._sum.views || 0;
 		if (!rollupsOnly) {
-			const currentMonthClicks = await prisma.linkClick.count({
-				where: {
-					linkId: { in: linkIds },
-					createdAt: { gte: currentMonthStart, lte: endDate },
-				},
-			});
+            const currentMonthClicks = await prisma.linkClick.count({
+                where: {
+                    linkId: { in: linkIdsAll },
+                    createdAt: { gte: currentMonthStart, lte: endDate },
+                },
+            });
 			const currentMonthViews = await prisma.profileView.count({
 				where: { userId, createdAt: { gte: currentMonthStart, lte: endDate } },
 			});
@@ -310,14 +316,14 @@ export async function GET(request: Request) {
 			combinedClicks.set(r.linkId as number, r._sum.clicks || 0);
 		}
 		if (!rollupsOnly) {
-			const currentMonthClicksPerLink = await prisma.linkClick.groupBy({
-				by: ["linkId"],
-				_count: true,
-				where: {
-					linkId: { in: linkIds },
-					createdAt: { gte: currentMonthStart, lte: endDate },
-				},
-			});
+            const currentMonthClicksPerLink = await prisma.linkClick.groupBy({
+                by: ["linkId"],
+                _count: true,
+                where: {
+                    linkId: { in: topLinkIds },
+                    createdAt: { gte: currentMonthStart, lte: endDate },
+                },
+            });
 			for (const r of currentMonthClicksPerLink) {
 				combinedClicks.set(
 					r.linkId as number,
@@ -326,14 +332,14 @@ export async function GET(request: Request) {
 			}
 		}
 
-		const topLinksAll = links
-			.map((link) => ({
-				id: link.id,
-				title: link.title,
-				url: link.url,
-				clicks: combinedClicks.get(link.id) || 0,
-			}))
-			.sort((a, b) => b.clicks - a.clicks);
+        const topLinksAll = linksTop
+            .map((link) => ({
+                id: link.id,
+                title: link.title,
+                url: link.url,
+                clicks: combinedClicks.get(link.id) || 0,
+            }))
+            .sort((a, b) => b.clicks - a.clicks);
 
 		const topLinks = topLinksAll.slice((page - 1) * limit, page * limit);
 		const topLinksAllCount = topLinksAll.length;
@@ -568,14 +574,14 @@ export async function GET(request: Request) {
 	}
 
 	// Agrupamento por dia do período selecionado
-	const clicksByDay = await prisma.linkClick.groupBy({
-		by: ["createdAt"],
-		_count: true,
-		where: {
-			linkId: { in: linkIds },
-			createdAt: { gte: startDate, lte: endDate },
-		},
-	});
+    const clicksByDay = await prisma.linkClick.groupBy({
+        by: ["createdAt"],
+        _count: true,
+        where: {
+            linkId: { in: linkIdsAll },
+            createdAt: { gte: startDate, lte: endDate },
+        },
+    });
 
 	const viewsByDay = await prisma.profileView.groupBy({
 		by: ["createdAt"],
@@ -624,25 +630,25 @@ export async function GET(request: Request) {
 	}));
 
 	// Agrupar cliques por link
-	const clicksPerLink = await prisma.linkClick.groupBy({
-		by: ["linkId"],
-		_count: true,
-		where: {
-			linkId: { in: linkIds },
-			createdAt: { gte: startDate, lte: endDate },
-		},
-	});
+    const clicksPerLink = await prisma.linkClick.groupBy({
+        by: ["linkId"],
+        _count: true,
+        where: {
+            linkId: { in: topLinkIds },
+            createdAt: { gte: startDate, lte: endDate },
+        },
+    });
 
 	// Agrupar dados por dispositivo
 	const [clicksByDevice, viewsByDevice] = await Promise.all([
-		prisma.linkClick.groupBy({
-			by: ["device"],
-			_count: true,
-			where: {
-				linkId: { in: linkIds },
-				createdAt: { gte: startDate, lte: endDate },
-			},
-		}),
+        prisma.linkClick.groupBy({
+            by: ["device"],
+            _count: true,
+            where: {
+                linkId: { in: linkIdsAll },
+                createdAt: { gte: startDate, lte: endDate },
+            },
+        }),
 		prisma.profileView.groupBy({
 			by: ["device"],
 			_count: true,
@@ -698,13 +704,13 @@ export async function GET(request: Request) {
 		clicksByReferrer,
 		viewsByReferrer,
 	] = await Promise.all([
-		prisma.linkClick.findMany({
-			where: {
-				linkId: { in: linkIds },
-				createdAt: { gte: startDate, lte: endDate },
-			},
-			select: { userAgent: true },
-		}),
+        prisma.linkClick.findMany({
+            where: {
+                linkId: { in: linkIdsAll },
+                createdAt: { gte: startDate, lte: endDate },
+            },
+            select: { userAgent: true },
+        }),
 		prisma.profileView.findMany({
 			where: {
 				userId,
@@ -712,13 +718,13 @@ export async function GET(request: Request) {
 			},
 			select: { userAgent: true },
 		}),
-		prisma.linkClick.findMany({
-			where: {
-				linkId: { in: linkIds },
-				createdAt: { gte: startDate, lte: endDate },
-			},
-			select: { country: true },
-		}),
+        prisma.linkClick.findMany({
+            where: {
+                linkId: { in: linkIdsAll },
+                createdAt: { gte: startDate, lte: endDate },
+            },
+            select: { country: true },
+        }),
 		prisma.profileView.findMany({
 			where: {
 				userId,
@@ -726,13 +732,13 @@ export async function GET(request: Request) {
 			},
 			select: { country: true },
 		}),
-		prisma.linkClick.findMany({
-			where: {
-				linkId: { in: linkIds },
-				createdAt: { gte: startDate, lte: endDate },
-			},
-			select: { referrer: true },
-		}),
+        prisma.linkClick.findMany({
+            where: {
+                linkId: { in: linkIdsAll },
+                createdAt: { gte: startDate, lte: endDate },
+            },
+            select: { referrer: true },
+        }),
 		prisma.profileView.findMany({
 			where: {
 				userId,
@@ -856,17 +862,17 @@ export async function GET(request: Request) {
 	const page = Math.max(1, Number(pageParam) || 1);
 	const limit = Math.min(100, Math.max(1, Number(limitParam) || 20));
 
-	const topLinksAll = links
-		.map((link) => {
-			const match = clicksPerLink.find((c) => c.linkId === link.id);
-			return {
-				id: link.id,
-				title: link.title,
-				url: link.url,
-				clicks: match?._count ?? 0,
-			};
-		})
-		.sort((a, b) => b.clicks - a.clicks);
+    const topLinksAll = linksTop
+        .map((link) => {
+            const match = clicksPerLink.find((c) => c.linkId === link.id);
+            return {
+                id: link.id,
+                title: link.title,
+                url: link.url,
+                clicks: match?._count ?? 0,
+            };
+        })
+        .sort((a, b) => b.clicks - a.clicks);
 
 	const topLinks = topLinksAll.slice((page - 1) * limit, page * limit);
 	const responseBody = {

@@ -8,13 +8,43 @@ export async function POST(req: NextRequest) {
 	try {
 		// Lida tanto com JSON quanto com texto plano do sendBeacon
 		const body = await req.text();
-		const { linkId, trafficSource } = JSON.parse(body);
+		const parsed = JSON.parse(body);
+		let { linkId, trafficSource, url, userId, title } = parsed as {
+			linkId?: number | string;
+			trafficSource?: string;
+			url?: string;
+			userId?: string;
+			title?: string;
+		};
 
 		if (!linkId || Number.isNaN(Number(linkId))) {
-			return NextResponse.json(
-				{ error: "ID do link é obrigatório e deve ser um número" },
-				{ status: 400 }
-			);
+			if (!(url && userId)) {
+				return NextResponse.json(
+					{ error: "ID do link inválido; informe url e userId ou um linkId válido" },
+					{ status: 400 }
+				);
+			}
+
+            const existing = await prisma.link.findFirst({
+                where: { userId, url, type: "countdown_link" },
+                select: { id: true },
+            });
+			if (existing) {
+				linkId = existing.id;
+			} else {
+            const created = await prisma.link.create({
+                data: {
+                    userId,
+                    title: title ? `Countdown: ${title}` : "Countdown",
+                    url,
+                    active: false,
+                    archived: true,
+                    type: "countdown_link",
+                },
+                select: { id: true },
+            });
+				linkId = created.id;
+			}
 		}
 
 		// Verificar preferências de cookies

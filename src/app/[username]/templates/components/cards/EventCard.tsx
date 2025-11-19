@@ -4,6 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { MotionSpan } from "@/components/ui/motion";
+import { detectTrafficSource } from "@/utils/traffic-source";
 import { parseRgb, toForeground } from "./utils/style";
 
 interface EventCardProps {
@@ -252,6 +253,32 @@ export default function EventCard({
 							<Link
 								className="inline-block px-3 py-1 font-bold text-sm transition-all duration-150 hover:brightness-90"
 								href={linkHref as string}
+								onClick={() => {
+									try {
+										const url = String(linkHref || "");
+										const trafficSource = detectTrafficSource();
+										const payload = JSON.stringify({
+											userId: String(event?.userId || ""),
+											url,
+											trafficSource,
+											title: String(event?.title || "Countdown"),
+										});
+										const endpoint = "/api/link-click";
+										if (navigator.sendBeacon) {
+											const blob = new Blob([payload], {
+												type: "application/json",
+											});
+											navigator.sendBeacon(endpoint, blob);
+										} else {
+											fetch(endpoint, {
+												method: "POST",
+												headers: { "Content-Type": "application/json" },
+												body: payload,
+												keepalive: true,
+											});
+										}
+									} catch {}
+								}}
 								rel="noopener noreferrer"
 								style={{
 									background: dimBg,
