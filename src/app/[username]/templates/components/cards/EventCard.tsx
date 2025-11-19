@@ -57,7 +57,7 @@ export default function EventCard({
 		if (!rgb) {
 			return "rgba(0,0,0,0.12)";
 		}
-		const f = 0.7;
+		const f = 0.9;
 		return `rgba(${Math.round(rgb.r * f)}, ${Math.round(rgb.g * f)}, ${Math.round(rgb.b * f)}, 0.85)`;
 	}, [buttonColor]);
 	const dimHeader = useMemo(() => {
@@ -65,7 +65,7 @@ export default function EventCard({
 		if (!rgb) {
 			return "rgba(0,0,0,0.16)";
 		}
-		const f = 0.65;
+		const f = 0.8;
 		return `rgba(${Math.round(rgb.r * f)}, ${Math.round(rgb.g * f)}, ${Math.round(rgb.b * f)}, 0.9)`;
 	}, [buttonColor]);
 
