@@ -1,10 +1,10 @@
 "use client";
 
 import { AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { MotionSpan } from "@/components/ui/motion";
 import { parseRgb, toForeground } from "./utils/style";
-import Link from "next/link";
 
 interface EventCardProps {
 	event: any;
@@ -178,41 +178,60 @@ export default function EventCard({
 				>
 					<div className="font-semibold">{event?.title}</div>
 				</div>
-				<div className="mt-3 flex items-center justify-center gap-3 px-4 pb-4">
-					<div className="flex flex-col items-center gap-2">
-						<div
-							className="min-w-16 rounded-lg px-3 py-2 text-center font-semibold text-2xl"
-							style={{ background: dimBg, color: textColor }}
-						>
-							<RollingValue v={remaining.values[0]} />
+				{(() => {
+					const isFinished = targetDate
+						? Date.now() >= targetDate.getTime()
+						: false;
+					if (isFinished) {
+						return (
+							<div className="mt-3 flex justify-center px-4 pb-4">
+								<div
+									className="rounded-lg px-3 py-2 text-center font-semibold"
+									style={{ color: textColor }}
+								>
+									Finalizado!
+								</div>
+							</div>
+						);
+					}
+					return (
+						<div className="mt-3 flex items-center justify-center gap-3 px-4 pb-4">
+							<div className="flex flex-col items-center gap-2">
+								<div
+									className="min-w-16 rounded-lg px-3 py-2 text-center font-semibold text-2xl"
+									style={{ background: dimBg, color: textColor }}
+								>
+									<RollingValue v={remaining.values[0]} />
+								</div>
+								<div className="text-sm" style={{ color: mutedTextColor }}>
+									{remaining.labels[0]}
+								</div>
+							</div>
+							<div className="flex flex-col items-center gap-2">
+								<div
+									className="min-w-16 rounded-lg px-3 py-2 text-center font-semibold text-2xl"
+									style={{ background: dimBg, color: textColor }}
+								>
+									<RollingValue v={remaining.values[1]} />
+								</div>
+								<div className="text-sm" style={{ color: mutedTextColor }}>
+									{remaining.labels[1]}
+								</div>
+							</div>
+							<div className="flex flex-col items-center gap-2">
+								<div
+									className="min-w-16 rounded-lg px-3 py-2 text-center font-semibold text-2xl"
+									style={{ background: dimBg, color: textColor }}
+								>
+									<RollingValue v={remaining.values[2]} />
+								</div>
+								<div className="text-sm" style={{ color: mutedTextColor }}>
+									{remaining.labels[2]}
+								</div>
+							</div>
 						</div>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{remaining.labels[0]}
-						</div>
-					</div>
-					<div className="flex flex-col items-center gap-2">
-						<div
-							className="min-w-16 rounded-lg px-3 py-2 text-center font-semibold text-2xl"
-							style={{ background: dimBg, color: textColor }}
-						>
-							<RollingValue v={remaining.values[1]} />
-						</div>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{remaining.labels[1]}
-						</div>
-					</div>
-					<div className="flex flex-col items-center gap-2">
-						<div
-							className="min-w-16 rounded-lg px-3 py-2 text-center font-semibold text-2xl"
-							style={{ background: dimBg, color: textColor }}
-						>
-							<RollingValue v={remaining.values[2]} />
-						</div>
-						<div className="text-sm" style={{ color: mutedTextColor }}>
-							{remaining.labels[2]}
-						</div>
-					</div>
-				</div>
+					);
+				})()}
 
 				{(() => {
 					const linkHref = normalizeExternalUrl(event?.countdownLinkUrl);
