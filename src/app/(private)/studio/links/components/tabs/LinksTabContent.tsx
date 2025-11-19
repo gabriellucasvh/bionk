@@ -13,8 +13,8 @@ import type {
 	TextItem,
 	VideoItem,
 } from "../../types/links.types";
-import AddNewEventForm from "../forms/AddNewEventForm";
 import AddNewCountdownForm from "../forms/AddNewCountdownForm";
+import AddNewEventForm from "../forms/AddNewEventForm";
 import AddNewSectionForm from "../forms/AddNewSectionForm";
 import LinkList from "../lists/LinkList";
 import AddContentModal from "../modals/AddContentModal";
@@ -146,15 +146,15 @@ const LinksTabContent = ({
 					if (value) {
 						handlers.closeAllActiveCreations();
 					}
-				setIsAddingEvent(value);
-			}}
-			setIsAddingImage={setIsAddingImage}
-			setIsAddingEventCountdown={(value: boolean) => {
-				if (value) {
-					handlers.closeAllActiveCreations();
-				}
-				setIsAddingEventCountdown(value);
-			}}
+					setIsAddingEvent(value);
+				}}
+				setIsAddingEventCountdown={(value: boolean) => {
+					if (value) {
+						handlers.closeAllActiveCreations();
+					}
+					setIsAddingEventCountdown(value);
+				}}
+				setIsAddingImage={setIsAddingImage}
 				setIsAddingMusic={setIsAddingMusic}
 				setIsAddingSection={(value: boolean) => {
 					if (value) {
@@ -169,7 +169,7 @@ const LinksTabContent = ({
 				setTextFormData={handlers.setTextFormData}
 				setVideoFormData={setVideoFormData}
 				textFormData={handlers.textFormData}
-			videoFormData={videoFormData}
+				videoFormData={videoFormData}
 			/>
 
 			{isAddingEvent && (
@@ -249,6 +249,8 @@ const LinksTabContent = ({
 				activeId={activeId}
 				archivingLinkId={archivingLinkId}
 				existingSections={existingSections}
+				handleCancelEditingEvent={handlers.handleCancelEditingEvent}
+				handleSaveEditingEvent={handlers.handleSaveEditingEvent}
 				items={unifiedItems}
 				linksManager={{
 					isAdding,
@@ -303,6 +305,7 @@ const LinksTabContent = ({
 				onToggleActive={handlers.toggleActive}
 				onUpdateCustomImage={handlers.handleUpdateCustomImage}
 				onVideoChange={handlers.handleVideoChange}
+				originalEvent={handlers.originalEvent as any}
 				originalImage={originalImage}
 				originalLink={originalLink}
 				originalMusic={originalMusic}

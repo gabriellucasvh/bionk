@@ -139,6 +139,9 @@ interface LinkListProps {
 	existingSections?: SectionItem[];
 	onDeleteEvent?: (id: number) => void;
 	onStartEditingEvent?: (id: number) => void;
+	handleSaveEditingEvent?: (id: number, payload: Partial<EventItem>) => void;
+	handleCancelEditingEvent?: (id: number) => void;
+	originalEvent?: EventItem | null;
 }
 
 const LinkList = (props: LinkListProps) => {
@@ -173,6 +176,9 @@ const LinkList = (props: LinkListProps) => {
 		originalText,
 		originalVideo,
 		originalImage,
+		originalEvent,
+		handleSaveEditingEvent,
+		handleCancelEditingEvent,
 		existingSections,
 		// Handlers e estados de Música (antes ausentes)
 		onArchiveMusic,
@@ -459,11 +465,14 @@ const LinkList = (props: LinkListProps) => {
 													isDragging={isDragging}
 													isTogglingActive={togglingEventId === item.id}
 													listeners={listeners}
+													onCancelEditingEvent={handleCancelEditingEvent as any}
 													onDeleteEvent={cardProps.onDeleteEvent as any}
+													onSaveEditingEvent={handleSaveEditingEvent as any}
 													onStartEditingEvent={
 														cardProps.onStartEditingEvent as any
 													}
 													onToggleActive={cardProps.onToggleActive}
+													originalEvent={originalEvent}
 													setActivatorNodeRef={setActivatorNodeRef}
 												/>
 											);

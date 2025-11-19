@@ -71,6 +71,31 @@ export async function PUT(
             ...(targetDay !== undefined && { targetDay: Number(targetDay) }),
         };
 
+        if (String(type || event.type) === "countdown" && eventDate !== undefined) {
+            const parseLocalDate = (s: string) => {
+                const parts = String(s).split("-").map((p) => Number(p));
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            };
+            const tomorrowLocalStart = () => {
+                const t = new Date();
+                t.setDate(t.getDate() + 1);
+                t.setHours(0, 0, 0, 0);
+                return t;
+            };
+            const oneYearFromTodayStart = () => {
+                const t = new Date();
+                t.setDate(t.getDate() + 365);
+                t.setHours(0, 0, 0, 0);
+                return t;
+            };
+            const d = parseLocalDate(String(eventDate));
+            const lower = tomorrowLocalStart().getTime();
+            const upper = oneYearFromTodayStart().getTime();
+            if (!(d.getTime() >= lower && d.getTime() <= upper)) {
+                return NextResponse.json({ error: "Data inválida" }, { status: 400 });
+            }
+        }
+
 		const updated = await prisma.event.update({
 			where: { id: eventId },
 			data: updateData,

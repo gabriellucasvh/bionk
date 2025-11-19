@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import type { EventItem } from "../../types/links.types";
+import AddNewCountdownForm from "../forms/AddNewCountdownForm";
 
 interface EventCardProps {
 	event: EventItem;
@@ -23,6 +24,9 @@ interface EventCardProps {
 	onDeleteEvent?: (id: number) => void;
 	isTogglingActive?: boolean;
 	onStartEditingEvent?: (id: number) => void;
+	onSaveEditingEvent?: (id: number, payload: Partial<EventItem>) => void;
+	onCancelEditingEvent?: (id: number) => void;
+	originalEvent?: EventItem | null;
 }
 
 const EventCard = ({
@@ -34,6 +38,8 @@ const EventCard = ({
 	onDeleteEvent,
 	isTogglingActive,
 	onStartEditingEvent,
+	onSaveEditingEvent,
+	onCancelEditingEvent,
 }: EventCardProps) => {
 	const isCountdown =
 		event.type === "countdown" ||
@@ -55,6 +61,41 @@ const EventCard = ({
 	const handleDelete = () => {
 		onDeleteEvent?.(event.id);
 	};
+
+	if (event.isEditing && isCountdown) {
+		const handleSaveManaged = async (payload: {
+			title: string;
+			eventDate: string;
+			eventTime: string;
+		}) => {
+			const d = new Date(payload.eventDate);
+			const month = d.getMonth() + 1;
+			const day = d.getDate();
+			onSaveEditingEvent?.(event.id, {
+				title: payload.title,
+				type: "countdown",
+				eventDate: payload.eventDate as any,
+				eventTime: payload.eventTime,
+				targetMonth: month as any,
+				targetDay: day as any,
+			});
+		};
+		return (
+			<article
+				className={cn(
+					"relative flex flex-col gap-3 rounded-3xl border bg-white p-3 transition-all sm:p-4 dark:bg-zinc-900",
+					isDragging && "opacity-50"
+				)}
+			>
+				<AddNewCountdownForm
+					event={event as any}
+					onClose={() => onCancelEditingEvent?.(event.id)}
+					onSaved={() => {}}
+					onSaveManaged={handleSaveManaged}
+				/>
+			</article>
+		);
+	}
 
 	return (
 		<article

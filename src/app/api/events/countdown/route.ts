@@ -10,33 +10,50 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 		}
 
-        const data = await req.json();
-        const { title, eventDate: eventDateStr, eventTime: eventTimeStr, targetMonth, targetDay } = data || {};
+		const data = await req.json();
+		const {
+			title,
+			eventDate: eventDateStr,
+			eventTime: eventTimeStr,
+			targetMonth,
+			targetDay,
+		} = data || {};
 
-        if (!(title && (eventDateStr && eventTimeStr))) {
-            return NextResponse.json(
-                { error: "Campos obrigatórios ausentes" },
-                { status: 400 }
-            );
-        }
+		if (!(title && eventDateStr && eventTimeStr)) {
+			return NextResponse.json(
+				{ error: "Campos obrigatórios ausentes" },
+				{ status: 400 }
+			);
+		}
 
-        const parseLocalDate = (s: string) => {
-            const parts = s.split("-").map((p) => Number(p));
-            return new Date(parts[0], parts[1] - 1, parts[2]);
-        };
-        const todayLocalStart = () => {
-            const t = new Date();
-            t.setHours(0, 0, 0, 0);
-            return t;
-        };
+		const parseLocalDate = (s: string) => {
+			const parts = s.split("-").map((p) => Number(p));
+			return new Date(parts[0], parts[1] - 1, parts[2]);
+		};
 
-        const eventDate = parseLocalDate(String(eventDateStr));
-        if (eventDate.getTime() < todayLocalStart().getTime()) {
-            return NextResponse.json({ error: "Data inválida" }, { status: 400 });
-        }
-        const eventTime = String(eventTimeStr);
-        const month = typeof targetMonth === "number" ? targetMonth : eventDate.getMonth() + 1;
-        const day = typeof targetDay === "number" ? targetDay : eventDate.getDate();
+		const tomorrowLocalStart = () => {
+			const t = new Date();
+			t.setDate(t.getDate() + 1);
+			t.setHours(0, 0, 0, 0);
+			return t;
+		};
+		const oneYearFromTodayStart = () => {
+			const t = new Date();
+			t.setDate(t.getDate() + 365);
+			t.setHours(0, 0, 0, 0);
+			return t;
+		};
+
+		const eventDate = parseLocalDate(String(eventDateStr));
+		const lower = tomorrowLocalStart().getTime();
+		const upper = oneYearFromTodayStart().getTime();
+		if (!(eventDate.getTime() >= lower && eventDate.getTime() <= upper)) {
+			return NextResponse.json({ error: "Data inválida" }, { status: 400 });
+		}
+		const eventTime = String(eventTimeStr);
+		const month =
+			typeof targetMonth === "number" ? targetMonth : eventDate.getMonth() + 1;
+		const day = typeof targetDay === "number" ? targetDay : eventDate.getDate();
 
 		await prisma.$transaction([
 			prisma.link.updateMany({
@@ -75,15 +92,15 @@ export async function POST(req: NextRequest) {
 				title: String(title),
 				location: "",
 				eventDate,
-                eventTime,
-                descriptionShort: null,
-                externalLink: "",
-                coverImageUrl: null,
-                order: 0,
-                active: true,
-                type: "countdown",
-                targetMonth: month,
-                targetDay: day,
+				eventTime,
+				descriptionShort: null,
+				externalLink: "",
+				coverImageUrl: null,
+				order: 0,
+				active: true,
+				type: "countdown",
+				targetMonth: month,
+				targetDay: day,
 			},
 			select: { id: true },
 		});

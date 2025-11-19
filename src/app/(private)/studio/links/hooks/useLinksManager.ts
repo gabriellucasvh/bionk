@@ -1560,15 +1560,68 @@ export const useLinksManager = (
 			return;
 		}
 		setOriginalEvent(ev);
-		if (
+		const isCountdown =
 			(ev as any).type === "countdown" ||
 			(!((ev as any).externalLink || (ev as any).location) &&
-				(ev as any).eventTime === "00:00")
-		) {
-			setIsAddingEventCountdown(true);
+				(ev as any).eventTime === "00:00");
+		if (isCountdown) {
+			setUnifiedItems((prevItems) =>
+				prevItems.map((item) => {
+					if (item.isEditing && item.id !== id) {
+						return { ...(item as any), isEditing: false } as any;
+					}
+					if ((item as any).isEvent && item.id === id) {
+						return { ...(item as any), isEditing: true } as any;
+					}
+					return item;
+				})
+			);
 			return;
 		}
 		setIsAddingEvent(true);
+	};
+
+	const handleSaveEditingEvent = async (
+		id: number,
+		next: Partial<EventItem>
+	) => {
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if ((item as any).isEvent && item.id === id) {
+					return { ...(item as any), ...next, isEditing: false } as any;
+				}
+				return item;
+			})
+		);
+		await handleEventUpdate(id, next);
+		setOriginalEvent(null);
+	};
+
+	const handleCancelEditingEvent = (id: number) => {
+		const target = unifiedItems.find(
+			(item) => (item as any).isEvent && item.id === id
+		) as EventItem | undefined;
+		if ((target as any)?.isDraft) {
+			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
+			setOriginalEvent(null);
+			return;
+		}
+		const evToRestore = currentEvents.find((e) => e.id === id);
+		if (evToRestore) {
+			setUnifiedItems((prevItems) =>
+				prevItems.map((item) => {
+					if ((item as any).isEvent && item.id === id) {
+						return {
+							...(evToRestore as any),
+							isEvent: true,
+							isEditing: false,
+						} as any;
+					}
+					return item;
+				})
+			);
+		}
+		setOriginalEvent(null);
 	};
 
 	const handleLinkUpdate = async (id: number, payload: Partial<LinkItem>) => {
@@ -2200,6 +2253,8 @@ export const useLinksManager = (
 		handleCancelEditingVideo,
 		handleDeleteEvent,
 		handleStartEditingEvent,
+		handleSaveEditingEvent,
+		handleCancelEditingEvent,
 		handleImageUpdate,
 		handleDeleteImage,
 		handleArchiveImage,
