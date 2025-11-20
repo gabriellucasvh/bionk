@@ -183,7 +183,7 @@ const Sidebar = () => {
 	const { subscriptionPlan } = useSubscription();
 	const { theme } = useTheme();
 	const [profileUrl, setProfileUrl] = useState("#");
-	const [imageKey, setImageKey] = useState(Date.now());
+	const [imageKey, setImageKey] = useState(0);
 	const [userName, setUserName] = useState<string>("");
 	const [userImageUrl, setUserImageUrl] = useState<string>("");
 
@@ -223,6 +223,10 @@ const Sidebar = () => {
 			setImageKey(Date.now());
 		}
 	}, [session?.user?.image]);
+
+	useEffect(() => {
+		setImageKey(Date.now());
+	}, []);
 
 	// Busca dados atuais do usuário quando a sessão carrega
 	useEffect(() => {
@@ -405,7 +409,9 @@ const Sidebar = () => {
 								height={42}
 								src={
 									userImageUrl || session?.user?.image
-										? `${userImageUrl || session?.user?.image}?t=${imageKey}`
+										? imageKey > 0
+											? `${userImageUrl || session?.user?.image}?t=${imageKey}`
+											: `${userImageUrl || session?.user?.image}`
 										: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 								}
 								width={42}
@@ -479,7 +485,9 @@ const Sidebar = () => {
 									height={20}
 									src={
 										userImageUrl || session?.user?.image
-											? `${userImageUrl || session?.user?.image}?t=${imageKey}`
+											? imageKey > 0
+												? `${userImageUrl || session?.user?.image}?t=${imageKey}`
+												: `${userImageUrl || session?.user?.image}`
 											: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 									}
 									width={20}
