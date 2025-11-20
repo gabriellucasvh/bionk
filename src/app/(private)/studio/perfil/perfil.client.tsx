@@ -334,7 +334,6 @@ const PerfilClient = () => {
 		setSelectedProfileFile(null);
 		setProfileImageChanged(false);
 		setValidationError("");
-		setIsEditingUsername(false);
 	};
 
 	const handleProfileImageSave = (imageFile: File) => {
@@ -409,7 +408,12 @@ const PerfilClient = () => {
 								</div>
 							</article>
 							<div className="flex justify-center md:justify-end">
-								<BaseButton onClick={() => setIsEditModalOpen(true)}>
+								<BaseButton
+									onClick={() => {
+										setIsEditingUsername(false);
+										setIsEditModalOpen(true);
+									}}
+								>
 									Editar Perfil
 								</BaseButton>
 							</div>
@@ -427,7 +431,9 @@ const PerfilClient = () => {
 					<Dialog
 						onOpenChange={(open) => {
 							setIsEditModalOpen(open);
-							if (!open) {
+							if (open) {
+								setIsEditingUsername(false);
+							} else {
 								handleCancelChanges();
 							}
 						}}
