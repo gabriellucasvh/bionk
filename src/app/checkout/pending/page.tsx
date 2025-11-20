@@ -8,15 +8,16 @@ import Stripe from "stripe";
 import { authOptions } from "@/lib/auth";
 
 export default async function CheckoutPendingPage({
-	searchParams,
+    searchParams,
 }: {
-	searchParams: { cs_id?: string };
+    searchParams: Promise<{ cs_id?: string }>;
 }) {
 	const session = await getServerSession(authOptions);
 	if (!session?.user?.id) {
 		redirect("/registro");
 	}
-	const csId = searchParams?.cs_id;
+    const sp = await searchParams;
+    const csId = sp?.cs_id;
 	if (!csId) {
 		redirect("/planos");
 	}
