@@ -123,12 +123,12 @@ const AddNewEventForm = ({
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 						<div className="grid gap-2">
 							<Label>Título*</Label>
-							<Input
-								maxLength={80}
-								onChange={(e) => setTitle(e.target.value)}
-								placeholder="Ex: Nome do evento"
-								value={title}
-							/>
+						<Input
+							maxLength={40}
+							onChange={(e) => setTitle(e.target.value)}
+							placeholder="Ex: Nome do evento"
+							value={title}
+						/>
 						</div>
 						<div>
 							<div className="grid gap-2">

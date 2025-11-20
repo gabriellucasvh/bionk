@@ -54,7 +54,7 @@ export async function PUT(
 		}
 
 		const updateData: any = {
-			...(title !== undefined && { title: String(title) }),
+			...(title !== undefined && { title: String(title).trim().slice(0, 40) }),
 			...(location !== undefined && { location: String(location) }),
 			...(eventTime !== undefined && { eventTime: String(eventTime) }),
 			...(descriptionShort !== undefined && {

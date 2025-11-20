@@ -193,9 +193,9 @@ const AddNewCountdownForm = ({
 						<div className="grid flex-1 gap-2">
 							<Label>Título*</Label>
 							<Input
-								maxLength={80}
+								maxLength={40}
 								onChange={(e) => setTitle(e.target.value)}
-								placeholder="Ex: Aniversário"
+								placeholder="Ex: Aniversário, Lançamento"
 								value={title}
 							/>
 						</div>

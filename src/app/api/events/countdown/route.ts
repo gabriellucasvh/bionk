@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 		const created = await prisma.event.create({
 			data: {
 				userId: session.user.id,
-				title: String(title),
+				title: String(title).trim().slice(0, 40),
 				location: "",
 				eventDate,
 				eventTime,
