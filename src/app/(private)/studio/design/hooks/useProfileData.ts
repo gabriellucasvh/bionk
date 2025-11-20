@@ -28,6 +28,7 @@ interface UserData {
 	SocialLink: SocialLinkItem[];
 	Image: UserImage[];
 	Music: UserMusic[];
+	Event: any[];
 }
 
 interface ProfileState {
@@ -64,6 +65,7 @@ export const useProfileData = (
 		SocialLink: [],
 		Image: [],
 		Music: [],
+		Event: [],
 	});
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
 
@@ -87,6 +89,7 @@ export const useProfileData = (
 			let userVideos: UserVideo[] = [];
 			let userImages: UserImage[] = [];
 			let userMusics: UserMusic[] = [];
+			let userEvents: any[] = [];
 
 			// When not in profile-only mode, fetch additional user content
 			if (!options?.profileOnly) {
@@ -113,6 +116,10 @@ export const useProfileData = (
 				const musicsRes = await fetch("/api/musics");
 				const musicsData = await musicsRes.json();
 				userMusics = musicsData?.musics || [];
+
+				const eventsRes = await fetch("/api/events");
+				const eventsData = await eventsRes.json();
+				userEvents = eventsData?.events || [];
 			}
 
 			const profileData = { name, username, bio: bio || "" };
@@ -132,6 +139,7 @@ export const useProfileData = (
 				SocialLink: socialLinks,
 				Image: userImages,
 				Music: userMusics,
+				Event: userEvents,
 			});
 
 			return currentImage;
@@ -153,6 +161,7 @@ export const useProfileData = (
 				SocialLink: [],
 				Image: [],
 				Music: [],
+				Event: [],
 			});
 
 			return fallbackUrl;

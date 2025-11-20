@@ -218,6 +218,7 @@ const PersonalizarClient = () => {
 					type: video.type || "direct",
 				})) || [],
 			musics: userDataInput.Music || [],
+			events: userDataInput.Event || [],
 		};
 	};
 

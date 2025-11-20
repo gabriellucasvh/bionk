@@ -185,27 +185,39 @@ export default function EventCard({
 		return (
 			<div
 				className="overflow-hidden border shadow"
-				style={{ borderRadius: `${cornerValue}px`, ...(buttonStyle || {}) }}
+				style={{
+					...(buttonStyle || {}),
+					borderRadius: `${cornerValue}px`,
+					padding: 0,
+				}}
 			>
 				<div
 					className="text-center"
-					style={{ background: dimHeader, color: textColor, padding: "12px 0" }}
+					style={{
+						background: dimHeader,
+						color: textColor,
+						padding: "12px 0",
+						borderTopLeftRadius: `${cornerValue}px`,
+						borderTopRightRadius: `${cornerValue}px`,
+					}}
 				>
-					<div className="font-semibold">{event?.title}</div>
+					<div className="break-words px-6 font-semibold sm:break-normal">
+						{event?.title}
+					</div>
 				</div>
 				{(() => {
-			if (isFinished) {
-				return (
-					<div className="mt-3 flex justify-center px-4 pb-4">
-						<div
-							className="rounded-lg px-3 py-2 text-center font-semibold"
-							style={{ color: textColor }}
-						>
-							Finalizado!
-						</div>
-					</div>
-				);
-			}
+					if (isFinished) {
+						return (
+							<div className="mt-3 flex justify-center px-4 pb-4">
+								<div
+									className="rounded-lg px-3 py-2 text-center font-semibold"
+									style={{ color: textColor }}
+								>
+									Finalizado!
+								</div>
+							</div>
+						);
+					}
 					return (
 						<div className="mt-3 flex items-center justify-center gap-3 px-4 pb-4">
 							<div className="flex flex-col items-center gap-2">
@@ -247,14 +259,14 @@ export default function EventCard({
 
 				{(() => {
 					const linkHref = normalizeExternalUrl(event?.countdownLinkUrl);
-			const allowedDuring =
-				event?.countdownLinkVisibility === "during" && !isFinished;
-			const allowedAfter =
-				event?.countdownLinkVisibility === "after" && isFinished;
-			const showLink = Boolean(linkHref && (allowedDuring || allowedAfter));
-			if (!showLink) {
-				return null;
-			}
+					const allowedDuring =
+						event?.countdownLinkVisibility === "during" && !isFinished;
+					const allowedAfter =
+						event?.countdownLinkVisibility === "after" && isFinished;
+					const showLink = Boolean(linkHref && (allowedDuring || allowedAfter));
+					if (!showLink) {
+						return null;
+					}
 					const radius = Math.max(8, Number(cornerValue || "12") - 4);
 					return (
 						<div className="-mt-1 flex justify-center pb-4">
