@@ -3,7 +3,7 @@
 import { Edit, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingPage from "@/components/layout/LoadingPage";
 import ProfileImageCropModal from "@/components/modals/ProfileImageCropModal";
@@ -53,6 +53,11 @@ const PerfilClient = () => {
 	const [bioValidationError, setBioValidationError] = useState<string>("");
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isEditingUsername, setIsEditingUsername] = useState(false);
+	const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+	const lastUsernameRequestedRef = useRef<string>("");
+	const currentUsernameRef = useRef<string>("");
+	const usernameDebounceRef = useRef<number | null>(null);
+	const usernameCheckAbortRef = useRef<AbortController | null>(null);
 
 	const [stats, setStats] = useState<{
 		views: number;
@@ -188,6 +193,10 @@ const PerfilClient = () => {
 			setValidationError("O campo de nome de usuário não pode ficar vazio.");
 			return false;
 		}
+		if (username.length < 3) {
+			setValidationError("Nome de usuário deve ter pelo menos 3 caracteres.");
+			return false;
+		}
 		if (username.length > 30) {
 			setValidationError("Nome de usuário deve ter no máximo 30 caracteres.");
 			return false;
@@ -198,6 +207,49 @@ const PerfilClient = () => {
 		}
 		setValidationError("");
 		return true;
+	};
+
+	const checkUsernameAvailability = async (username: string) => {
+		if (!username.trim()) {
+			return;
+		}
+		if (username === originalProfile.username) {
+			setIsCheckingUsername(false);
+			setValidationError("");
+			return;
+		}
+		lastUsernameRequestedRef.current = username;
+		setIsCheckingUsername(true);
+		try {
+			if (usernameCheckAbortRef.current) {
+				usernameCheckAbortRef.current.abort();
+			}
+			const controller = new AbortController();
+			usernameCheckAbortRef.current = controller;
+			const res = await fetch(
+				`/api/auth/check-username?username=${encodeURIComponent(username)}`,
+				{ signal: controller.signal }
+			);
+			const json = await res.json();
+			if (username !== lastUsernameRequestedRef.current) {
+				return;
+			}
+			if (username !== currentUsernameRef.current) {
+				return;
+			}
+			if (json && json.available) {
+				setValidationError("");
+			} else {
+				setValidationError("Nome de usuário já está em uso");
+			}
+		} catch (err: any) {
+			if (err?.name === "AbortError") {
+				return;
+			}
+			setValidationError("Erro ao verificar disponibilidade");
+		} finally {
+			setIsCheckingUsername(false);
+		}
 	};
 
 	const uploadImage = async (file: File): Promise<string | null> => {
@@ -465,28 +517,50 @@ const PerfilClient = () => {
 												<span className="text-muted-foreground dark:text-gray-400">
 													bionk.me/
 												</span>
-												<Input
-													className={
-														validationError
-															? "border-red-500 dark:border-red-400"
-															: "text-zinc-700 dark:bg-zinc-700 dark:text-white"
-													}
-													disabled={loading || isUploadingImage}
-													id="edit-username"
-													maxLength={30}
-													onChange={(e) => {
-														const sanitizedUsername = e.target.value
-															.replace(/[^a-zA-Z0-9_.]/g, "")
-															.toLowerCase();
-														setProfile({
-															...profile,
-															username: sanitizedUsername,
-														});
-														validateUsername(sanitizedUsername);
-													}}
-													placeholder="username"
-													value={profile.username}
-												/>
+												<div className="relative flex-1">
+													<Input
+														className={`${validationError ? "border-red-500 dark:border-red-400" : "text-zinc-700 dark:bg-zinc-700 dark:text-white"} w-full pr-10`}
+														disabled={loading || isUploadingImage}
+														id="edit-username"
+														maxLength={30}
+														onChange={(e) => {
+															const sanitizedUsername = e.target.value
+																.replace(/[^a-zA-Z0-9_.]/g, "")
+																.toLowerCase();
+															setProfile({
+																...profile,
+																username: sanitizedUsername,
+															});
+															currentUsernameRef.current = sanitizedUsername;
+															if (usernameDebounceRef.current) {
+																window.clearTimeout(
+																	usernameDebounceRef.current
+																);
+																usernameDebounceRef.current = null;
+															}
+															setIsCheckingUsername(true);
+															usernameDebounceRef.current = window.setTimeout(
+																() => {
+																	const ok =
+																		validateUsername(sanitizedUsername);
+																	if (ok) {
+																		checkUsernameAvailability(
+																			sanitizedUsername
+																		);
+																	} else {
+																		setIsCheckingUsername(false);
+																	}
+																},
+																2000
+															);
+														}}
+														placeholder="username"
+														value={profile.username}
+													/>
+													{isCheckingUsername && (
+														<Loader2 className="-translate-y-1/2 absolute top-1/2 right-3 h-4 w-4 animate-spin text-muted-foreground" />
+													)}
+												</div>
 											</div>
 											<p className="min-h-[1.25rem] text-red-500 text-sm">
 												{validationError || " "}
@@ -516,8 +590,10 @@ const PerfilClient = () => {
 											disabled={
 												loading ||
 												isUploadingImage ||
+												isCheckingUsername ||
 												!!validationError ||
 												!profile.username ||
+												profile.username.length < 3 ||
 												profile.username === originalProfile.username
 											}
 											fullWidth
@@ -559,7 +635,11 @@ const PerfilClient = () => {
 												</div>
 												<BaseButton
 													className="h-8 px-3 text-xs"
-													onClick={() => setIsEditingUsername(true)}
+													onClick={() => {
+														setValidationError("");
+														setIsCheckingUsername(false);
+														setIsEditingUsername(true);
+													}}
 													size="sm"
 												>
 													Alterar
