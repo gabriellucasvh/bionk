@@ -1,14 +1,15 @@
 "use client";
 
 import {
-	FolderOpen,
-	Grip,
-	Image as ImageIcon,
-	Link as LinkIcon,
-	Music2,
-	Ticket,
-	Type,
-	Video,
+    FolderOpen,
+    Grip,
+    Image as ImageIcon,
+    Link as LinkIcon,
+    Music2,
+    Ticket,
+    Type,
+    Video,
+    ClockFading,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type {
@@ -75,14 +76,27 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
 				title: item.title || "Música sem título",
 			};
 		}
-		if ("isEvent" in item && (item as any).isEvent) {
-			return {
-				icon: Ticket,
-				label: "Ingresso",
-				color: "text-purple-600",
-				title: (item as any).title || "Evento sem título",
-			};
-		}
+    if ("isEvent" in item && (item as any).isEvent) {
+            const ev = item as any;
+            const isCountdown =
+                ev.type === "countdown" ||
+                Boolean(ev.targetDay && ev.targetMonth) ||
+                (!(ev.externalLink || ev.location) && ev.eventTime === "00:00");
+            if (isCountdown) {
+                return {
+                    icon: ClockFading,
+                    label: "Contagem",
+                    color: "text-blue-600",
+                    title: ev.title || "Contagem",
+                };
+            }
+            return {
+                icon: Ticket,
+                label: "Ingresso",
+                color: "text-purple-600",
+                title: ev.title || "Evento",
+            };
+    }
 		return {
 			icon: LinkIcon,
 			label: "Link",

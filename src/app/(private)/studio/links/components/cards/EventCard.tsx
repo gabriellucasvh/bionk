@@ -43,15 +43,17 @@ const EventCard = ({
 }: EventCardProps) => {
 	const isCountdown =
 		event.type === "countdown" ||
+		Boolean(event.targetDay && event.targetMonth) ||
 		(!(event.externalLink || event.location) && event.eventTime === "00:00");
 	const dateLabel = (() => {
-		if (isCountdown && event.targetDay && event.targetMonth) {
-			const dd = String(event.targetDay).padStart(2, "0");
-			const mm = String(event.targetMonth).padStart(2, "0");
-			return `${dd}/${mm}`;
-		}
 		try {
 			const d = new Date(event.eventDate);
+			if (isCountdown && event.targetDay && event.targetMonth) {
+				const day = String(event.targetDay).padStart(2, "0");
+				const month = String(event.targetMonth).padStart(2, "0");
+				const year = d.getFullYear();
+				return `${day}/${month}/${year}`;
+			}
 			return format(d, "dd/MM/yyyy");
 		} catch {
 			return event.eventDate;
