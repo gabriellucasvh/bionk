@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import {
 	Alegreya,
 	Atkinson_Hyperlegible,
@@ -173,27 +175,28 @@ export const metadata: Metadata = {
 	},
 };
 
-export default function RootLayout({
-	children,
+export default async function RootLayout({
+    children,
 }: Readonly<{
-	children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-	return (
-		<html
-			className={`${geist.variable} ${ClashDisplay.variable} ${cabinetGrotesk.variable} ${Satoshi.variable} ${inter.variable} ${montserrat.variable} ${poppins.variable} ${nunito.variable} ${playfairDisplay.variable} ${merriweather.variable} ${dancingScript.variable} ${dmSerifDisplay.variable} ${orbitron.variable} ${plusJakartaSans.variable} ${outfit.variable} ${spaceGrotesk.variable} ${libreBaskerville.variable} ${alegreya.variable} ${spectral.variable} ${urbanist.variable} ${karla.variable} ${publicSans.variable} ${atkinsonHyperlegible.variable} ${firaSans.variable} ${mulish.variable} antialiased`}
-			data-scroll-behavior="smooth"
-			lang="pt-BR"
-			suppressHydrationWarning={true}
-		>
-			<body>
-				<NextAuthSessionProvider>
-					<SubscriptionProvider>
-						<LinkAnimationProvider>
-							<ThemeProvider>{children}</ThemeProvider>
-						</LinkAnimationProvider>
-					</SubscriptionProvider>
-				</NextAuthSessionProvider>
-			</body>
-		</html>
-	);
+    const session = await getServerSession(authOptions);
+    return (
+        <html
+            className={`${geist.variable} ${ClashDisplay.variable} ${cabinetGrotesk.variable} ${Satoshi.variable} ${inter.variable} ${montserrat.variable} ${poppins.variable} ${nunito.variable} ${playfairDisplay.variable} ${merriweather.variable} ${dancingScript.variable} ${dmSerifDisplay.variable} ${orbitron.variable} ${plusJakartaSans.variable} ${outfit.variable} ${spaceGrotesk.variable} ${libreBaskerville.variable} ${alegreya.variable} ${spectral.variable} ${urbanist.variable} ${karla.variable} ${publicSans.variable} ${atkinsonHyperlegible.variable} ${firaSans.variable} ${mulish.variable} antialiased`}
+            data-scroll-behavior="smooth"
+            lang="pt-BR"
+            suppressHydrationWarning={true}
+        >
+            <body>
+                <NextAuthSessionProvider session={session}>
+                    <SubscriptionProvider>
+                        <LinkAnimationProvider>
+                            <ThemeProvider>{children}</ThemeProvider>
+                        </LinkAnimationProvider>
+                    </SubscriptionProvider>
+                </NextAuthSessionProvider>
+            </body>
+        </html>
+    );
 }
