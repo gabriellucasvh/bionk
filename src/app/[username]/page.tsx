@@ -186,6 +186,8 @@ export default async function UserPage({ params }: PageProps) {
           type: true,
           order: true,
           userId: true,
+          targetMonth: true,
+          targetDay: true,
           countdownLinkUrl: true,
           countdownLinkVisibility: true,
         },

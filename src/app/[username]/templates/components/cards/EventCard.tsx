@@ -106,6 +106,7 @@ export default function EventCard({
 		values: [number, number, number];
 		labels: [string, string, string];
 	}>({ values: [0, 0, 0], labels: ["Dias", "Horas", "Minutos"] });
+	const [isFinished, setIsFinished] = useState(false);
 
 	useEffect(() => {
 		if (!(isCountdown && targetDate)) {
@@ -115,6 +116,7 @@ export default function EventCard({
 			const now = Date.now();
 			const end = targetDate.getTime();
 			const diff = Math.max(0, end - now);
+			setIsFinished(now >= end);
 			const msDay = 24 * 60 * 60 * 1000;
 			const msHour = 60 * 60 * 1000;
 			const msMin = 60 * 1000;
@@ -159,11 +161,23 @@ export default function EventCard({
 	}, [isCountdown, targetDate]);
 
 	const dateLabel = (() => {
+		if (
+			(isCountdown || event?.type === "countdown") &&
+			Number.isFinite(Number(event?.targetDay)) &&
+			Number.isFinite(Number(event?.targetMonth))
+		) {
+			const dd = String(Number(event?.targetDay)).padStart(2, "0");
+			const mm = String(Number(event?.targetMonth)).padStart(2, "0");
+			return `${dd}/${mm}`;
+		}
 		try {
 			const d = new Date(event?.eventDate);
-			return d.toLocaleDateString("pt-BR");
+			const day = String(d.getDate()).padStart(2, "0");
+			const month = String(d.getMonth() + 1).padStart(2, "0");
+			const year = d.getFullYear();
+			return `${day}/${month}/${year}`;
 		} catch {
-			return event?.eventDate;
+			return String(event?.eventDate || "");
 		}
 	})();
 
@@ -180,21 +194,18 @@ export default function EventCard({
 					<div className="font-semibold">{event?.title}</div>
 				</div>
 				{(() => {
-					const isFinished = targetDate
-						? Date.now() >= targetDate.getTime()
-						: false;
-					if (isFinished) {
-						return (
-							<div className="mt-3 flex justify-center px-4 pb-4">
-								<div
-									className="rounded-lg px-3 py-2 text-center font-semibold"
-									style={{ color: textColor }}
-								>
-									Finalizado!
-								</div>
-							</div>
-						);
-					}
+			if (isFinished) {
+				return (
+					<div className="mt-3 flex justify-center px-4 pb-4">
+						<div
+							className="rounded-lg px-3 py-2 text-center font-semibold"
+							style={{ color: textColor }}
+						>
+							Finalizado!
+						</div>
+					</div>
+				);
+			}
 					return (
 						<div className="mt-3 flex items-center justify-center gap-3 px-4 pb-4">
 							<div className="flex flex-col items-center gap-2">
@@ -236,17 +247,14 @@ export default function EventCard({
 
 				{(() => {
 					const linkHref = normalizeExternalUrl(event?.countdownLinkUrl);
-					const isFinished = targetDate
-						? Date.now() >= targetDate.getTime()
-						: false;
-					const allowedDuring =
-						event?.countdownLinkVisibility === "during" && !isFinished;
-					const allowedAfter =
-						event?.countdownLinkVisibility === "after" && isFinished;
-					const showLink = Boolean(linkHref && (allowedDuring || allowedAfter));
-					if (!showLink) {
-						return null;
-					}
+			const allowedDuring =
+				event?.countdownLinkVisibility === "during" && !isFinished;
+			const allowedAfter =
+				event?.countdownLinkVisibility === "after" && isFinished;
+			const showLink = Boolean(linkHref && (allowedDuring || allowedAfter));
+			if (!showLink) {
+				return null;
+			}
 					const radius = Math.max(8, Number(cornerValue || "12") - 4);
 					return (
 						<div className="-mt-1 flex justify-center pb-4">

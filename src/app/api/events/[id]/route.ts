@@ -56,7 +56,6 @@ export async function PUT(
 		const updateData: any = {
 			...(title !== undefined && { title: String(title) }),
 			...(location !== undefined && { location: String(location) }),
-			...(eventDate !== undefined && { eventDate: new Date(eventDate) }),
 			...(eventTime !== undefined && { eventTime: String(eventTime) }),
 			...(descriptionShort !== undefined && {
 				descriptionShort: descriptionShort ? String(descriptionShort) : null,
@@ -113,6 +112,11 @@ export async function PUT(
 			if (!(d.getTime() >= lower && d.getTime() <= upper)) {
 				return NextResponse.json({ error: "Data inválida" }, { status: 400 });
 			}
+			updateData.eventDate = d;
+		}
+
+		if (String(type || event.type) !== "countdown" && eventDate !== undefined) {
+			updateData.eventDate = new Date(eventDate);
 		}
 
 		const updated = await prisma.event.update({
