@@ -7,12 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingPage from "@/components/layout/LoadingPage";
 import ProfileImageCropModal from "@/components/modals/ProfileImageCropModal";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	Dialog,
 	DialogContent,
@@ -57,6 +52,7 @@ const PerfilClient = () => {
 	const [validationError, setValidationError] = useState<string>("");
 	const [bioValidationError, setBioValidationError] = useState<string>("");
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [isEditingUsername, setIsEditingUsername] = useState(false);
 
 	const [stats, setStats] = useState<{
 		views: number;
@@ -338,6 +334,7 @@ const PerfilClient = () => {
 		setSelectedProfileFile(null);
 		setProfileImageChanged(false);
 		setValidationError("");
+		setIsEditingUsername(false);
 	};
 
 	const handleProfileImageSave = (imageFile: File) => {
@@ -427,107 +424,185 @@ const PerfilClient = () => {
 						onImageSave={handleProfileImageSave}
 					/>
 
-					<Dialog onOpenChange={setIsEditModalOpen} open={isEditModalOpen}>
-						<DialogContent className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 shadow-xl sm:max-w-lg">
+					<Dialog
+						onOpenChange={(open) => {
+							setIsEditModalOpen(open);
+							if (!open) {
+								handleCancelChanges();
+							}
+						}}
+						open={isEditModalOpen}
+					>
+						<DialogContent
+							className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 shadow-xl sm:max-w-lg"
+							onOpenAutoFocus={(e) => e.preventDefault()}
+						>
 							<DialogHeader>
-								<DialogTitle className="text-center">Editar Perfil</DialogTitle>
+								<DialogTitle className="text-center">
+									{isEditingUsername
+										? "Alterar nome de usuário"
+										: "Editar Perfil"}
+								</DialogTitle>
 							</DialogHeader>
-							<div className="space-y-4">
-								<div className="grid gap-1">
-									<Label className="dark:text-white" htmlFor="edit-name">
-										Nome
-									</Label>
-									<Input
-										className="text-zinc-700 dark:bg-zinc-700 dark:text-white"
-										disabled={loading || isUploadingImage}
-										id="edit-name"
-										maxLength={44}
-										onChange={(e) => {
-											setProfile({ ...profile, name: e.target.value });
-										}}
-										placeholder="Seu nome de exibição"
-										value={profile.name}
-									/>
-								</div>
-								<div className="grid gap-1">
-									<Label className="dark:text-white" htmlFor="edit-username">
-										Nome de usuário
-									</Label>
-									<div className="flex items-center gap-2">
-										<span className="text-muted-foreground dark:text-gray-400">
-											bionk.me/
-										</span>
-										<Input
-											className={
-												validationError
-													? "border-red-500 dark:border-red-400"
-													: "text-zinc-700 dark:bg-zinc-700 dark:text-white"
+
+							{isEditingUsername ? (
+								<div className="space-y-6">
+									<div className="space-y-4">
+										<div className="grid gap-1">
+											<Label
+												className="dark:text-white"
+												htmlFor="edit-username"
+											>
+												Novo nome de usuário
+											</Label>
+											<div className="flex items-center gap-2">
+												<span className="text-muted-foreground dark:text-gray-400">
+													bionk.me/
+												</span>
+												<Input
+													className={
+														validationError
+															? "border-red-500 dark:border-red-400"
+															: "text-zinc-700 dark:bg-zinc-700 dark:text-white"
+													}
+													disabled={loading || isUploadingImage}
+													id="edit-username"
+													maxLength={30}
+													onChange={(e) => {
+														const sanitizedUsername = e.target.value
+															.replace(/[^a-zA-Z0-9_.]/g, "")
+															.toLowerCase();
+														setProfile({
+															...profile,
+															username: sanitizedUsername,
+														});
+														validateUsername(sanitizedUsername);
+													}}
+													placeholder="username"
+													value={profile.username}
+												/>
+											</div>
+											<p className="min-h-[1.25rem] text-red-500 text-sm">
+												{validationError || " "}
+											</p>
+										</div>
+
+										<div>
+											<h4 className="mb-2 font-semibold text-black text-sm dark:text-white">
+												Atenção ao alterar seu usuário:
+											</h4>
+											<ul className="list-inside list-disc space-y-1 text-muted-foreground text-sm dark:text-white">
+												<li>
+													O nome de usuário só pode ser trocado a cada 3 dias.
+												</li>
+												<li>O seu link de perfil (URL) mudará.</li>
+												<li>
+													Você precisará atualizar o link em todas as suas redes
+													sociais.
+												</li>
+												<li>O seu QR Code será alterado.</li>
+											</ul>
+										</div>
+									</div>
+
+									<div className="flex justify-end gap-2">
+										<BaseButton
+											disabled={
+												loading ||
+												isUploadingImage ||
+												!!validationError ||
+												!profile.username ||
+												profile.username === originalProfile.username
 											}
-											disabled={loading || isUploadingImage}
-											id="edit-username"
-											maxLength={30}
-											onChange={(e) => {
-												const sanitizedUsername = e.target.value
-													.replace(/[^a-zA-Z0-9_.]/g, "")
-													.toLowerCase();
-												setProfile({ ...profile, username: sanitizedUsername });
-												validateUsername(sanitizedUsername);
-											}}
-											placeholder="username"
-											value={profile.username}
-										/>
-									</div>
-									<p className="min-h-[1.25rem] text-red-500 text-sm">
-										{validationError || " "}
-									</p>
-								</div>
-								<div className="grid gap-2">
-									<Label className="dark:text-white" htmlFor="edit-bio">
-										Biografia
-									</Label>
-									<Textarea
-										className={`min-h-32 text-zinc-700 dark:bg-zinc-700 dark:text-white ${bioValidationError ? "border-red-500 dark:border-red-400" : ""}`}
-										disabled={loading || isUploadingImage}
-										id="edit-bio"
-										maxLength={150}
-										onChange={(e) => {
-											setProfile({ ...profile, bio: e.target.value });
-											validateBio(e.target.value);
-										}}
-										placeholder="Fale um pouco sobre você"
-										value={profile.bio}
-									/>
-									<div className="flex items-center justify-between">
-										<p className="min-h-[1.25rem] text-red-500 text-sm">
-											{bioValidationError || " "}
-										</p>
-										<p className="text-muted-foreground text-sm">
-											{profile.bio.length}/150
-										</p>
+											fullWidth
+											onClick={() => setIsEditingUsername(false)}
+										>
+											Confirmar
+										</BaseButton>
 									</div>
 								</div>
-							</div>
-							<div className="flex justify-end gap-2 pt-2">
-								<BaseButton
-									disabled={loading || isUploadingImage}
-									fullWidth
-									onClick={() => {
-										handleCancelChanges();
-										setIsEditModalOpen(false);
-									}}
-									variant="white"
-								>
-									Cancelar
-								</BaseButton>
-								<BaseButton
-									disabled={loading || isUploadingImage || !!validationError}
-									fullWidth
-									loading={loading || isUploadingImage}
-									onClick={handleSaveProfile}
-								>
-									Salvar
-								</BaseButton>
-							</div>
+							) : (
+								<>
+									<div className="space-y-4">
+										<div className="grid gap-1">
+											<Label className="dark:text-white" htmlFor="edit-name">
+												Nome
+											</Label>
+											<Input
+												className="text-zinc-700 dark:bg-zinc-700 dark:text-white"
+												disabled={loading || isUploadingImage}
+												id="edit-name"
+												maxLength={44}
+												onChange={(e) => {
+													setProfile({ ...profile, name: e.target.value });
+												}}
+												placeholder="Seu nome de exibição"
+												value={profile.name}
+											/>
+										</div>
+										<div className="grid gap-1">
+											<Label className="dark:text-white">Nome de usuário</Label>
+											<div className="flex items-center justify-between ">
+												<div className="flex items-center gap-1 overflow-hidden">
+													<span className="text-muted-foreground dark:text-gray-400">
+														bionk.me/
+													</span>
+													<span className="truncate font-medium dark:text-white">
+														{profile.username}
+													</span>
+												</div>
+												<BaseButton
+													className="h-8 px-3 text-xs"
+													onClick={() => setIsEditingUsername(true)}
+													size="sm"
+												>
+													Alterar
+												</BaseButton>
+											</div>
+										</div>
+										<div className="grid gap-2">
+											<Label className="dark:text-white" htmlFor="edit-bio">
+												Biografia
+											</Label>
+											<Textarea
+												className={`min-h-32 text-zinc-700 dark:bg-zinc-700 dark:text-white ${bioValidationError ? "border-red-500 dark:border-red-400" : ""}`}
+												disabled={loading || isUploadingImage}
+												id="edit-bio"
+												maxLength={150}
+												onChange={(e) => {
+													setProfile({ ...profile, bio: e.target.value });
+													validateBio(e.target.value);
+												}}
+												placeholder="Fale um pouco sobre você"
+												value={profile.bio}
+											/>
+											<div className="flex items-center justify-between">
+												<p className="min-h-[1.25rem] text-red-500 text-sm">
+													{bioValidationError || " "}
+												</p>
+												<p className="text-muted-foreground text-sm">
+													{profile.bio.length}/150
+												</p>
+											</div>
+										</div>
+									</div>
+									<div className="flex justify-end gap-2 pt-2">
+										<BaseButton
+											disabled={
+												loading ||
+												isUploadingImage ||
+												!!validationError ||
+												!hasChanges
+											}
+											fullWidth
+											loading={loading || isUploadingImage}
+											onClick={handleSaveProfile}
+										>
+											Salvar
+										</BaseButton>
+									</div>
+								</>
+							)}
 						</DialogContent>
 					</Dialog>
 				</div>
