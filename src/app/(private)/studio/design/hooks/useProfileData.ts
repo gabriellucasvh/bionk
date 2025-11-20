@@ -119,7 +119,7 @@ export const useProfileData = (
 
 				const eventsRes = await fetch("/api/events");
 				const eventsData = await eventsRes.json();
-				userEvents = eventsData?.events || [];
+				userEvents = (eventsData?.events || []).filter((ev: any) => ev.active !== false);
 			}
 
 			const profileData = { name, username, bio: bio || "" };

@@ -290,7 +290,7 @@ const UnifiedLinksManager = () => {
 			videos: (videosData?.videos || []) as any,
 			images: (imagesData?.images || []) as any,
 			musics: (musicsData?.musics || []) as any,
-			events: (eventsData?.events || []) as any,
+			events: ((eventsData?.events || []).filter((e) => e.active !== false)) as any,
 		});
 	}, [
 		linksData,
