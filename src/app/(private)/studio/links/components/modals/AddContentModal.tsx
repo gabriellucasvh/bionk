@@ -447,28 +447,136 @@ const AddContentModal = ({
 				Adicionar Conteúdo
 			</BaseButton>
 
-			<Dialog onOpenChange={onClose} open={isOpen}>
-				<DialogContent className="h-[80vh] max-h-[600px] min-w-2xl max-w-2xl p-1 dark:bg-zinc-900">
+            <Dialog onOpenChange={onClose} open={isOpen}>
+                <DialogContent className="h-[80vh] max-h-[600px] min-w-2xl max-w-2xl p-1 dark:bg-zinc-900 overflow-hidden">
 					<div className="flex h-full flex-col">
 						<DialogHeader className="border-b px-6 py-4">
 							<DialogTitle>Adicionar Conteúdo</DialogTitle>
 						</DialogHeader>
 
-					<div className="flex-1 overflow-y-auto overflow-x-hidden">
-							<div className="flex h-full">
-								<div className="w-48 border-r p-2">
+                    <div className="flex-1 overflow-y-hidden overflow-x-hidden min-h-0">
+                            <div className="flex h-full min-h-0">
+                                <div className="w-48 border-r p-2">
 									<CategorySelector
 										onCategorySelect={handleCategorySelect}
 										selectedCategory={selectedCategory}
 									/>
 								</div>
 
-								<div className="flex-1 p-4 overflow-x-hidden">
-									{selectedCategory === "content" && (
-										<ContentOptions
-											onOptionSelect={handleOptionSelectWithState}
-										/>
-									)}
+                                <div className="flex-1 p-4 overflow-x-hidden overflow-y-auto min-h-0">
+                                    {selectedCategory === "content" && (
+                                        <>
+                                            <ContentOptions
+                                                onOptionSelect={handleOptionSelectWithState}
+                                            />
+                                            <div className="mt-6 space-y-2">
+                                                <div className="px-2 text-sm font-medium text-muted-foreground">Sugestões</div>
+                                                <div className="relative">
+                                                <div className="max-h-[340px] overflow-y-auto pr-2">
+                                                <div className="flex w-full max-w-full flex-col gap-2 divide-y divide-zinc-200 dark:divide-zinc-800">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleOptionSelectWithState("spotify")}
+                                                        className="relative flex w-full max-w-full items-center justify-between gap-4 py-2 overflow-hidden"
+                                                    >
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-[#1ED760]">
+                                                                <Image alt="Spotify" src="/icons/spotify.svg" fill className="object-contain p-2" />
+                                                            </div>
+                                                            <div className="flex min-w-0 flex-1 flex-col max-w-md">
+                                                                <span className="font-medium text-left">Spotify</span>
+                                                                <span className="text-sm text-gray-500 dark:text-gray-300 truncate break-words max-w-md font-normal text-left">Adicione uma faixa ou álbum do Spotify.</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 flex h-18 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-transparent via-background to-background  dark:from-transparent dark:via-zinc-900 dark:to-zinc-900">
+                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-black dark:text-white"><path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                        </div>
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleOptionSelectWithState("youtube")}
+                                                        className="relative flex w-full max-w-full items-center justify-between gap-4 py-2 overflow-hidden"
+                                                    >
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-red-500">
+                                                                <Image alt="YouTube" src="/icons/youtube.svg" fill className="object-contain p-2 invert" />
+                                                            </div>
+                                                            <div className="flex min-w-0 flex-1 flex-col max-w-md">
+                                                                <span className="font-medium text-left">YouTube</span>
+                                                                <span className="text-sm text-gray-500 dark:text-gray-300 truncate break-words max-w-md font-normal text-left">Mostre vídeos do YouTube direto no seu Link.</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 flex h-18 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-transparent via-background to-background  dark:from-transparent dark:via-zinc-900 dark:to-zinc-900">
+                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-black dark:text-white"><path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                        </div>
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleImageOptionSelect("image_single")}
+                                                        className="relative flex w-full max-w-full items-center justify-between gap-4 py-2 overflow-hidden"
+                                                    >
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-teal-400">
+                                                                <ImageIcon className="h-6 w-6 text-black" />
+                                                            </div>
+                                                            <div className="flex min-w-0 flex-1 flex-col max-w-md">
+                                                                <span className="font-medium text-left">Imagem única</span>
+                                                                <span className="text-sm text-gray-500 dark:text-gray-300 truncate break-words max-w-md font-normal text-left">Uma única imagem destacada.</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 flex h-18 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-transparent via-background to-background  dark:from-transparent dark:via-zinc-900 dark:to-zinc-900">
+                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-black dark:text-white"><path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                        </div>
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleOptionSelectWithState("tiktok")}
+                                                        className="relative flex w-full max-w-full items-center justify-between gap-4 py-2 overflow-hidden"
+                                                    >
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-black">
+                                                                <Image alt="TikTok" src="/icons/tiktok.svg" fill className="object-contain p-2 invert" />
+                                                            </div>
+                                                            <div className="flex min-w-0 flex-1 flex-col max-w-md">
+                                                                <span className="font-medium text-left">TikTok</span>
+                                                                <span className="text-sm text-gray-500 dark:text-gray-300 truncate break-words max-w-md font-normal text-left">Destaque um TikTok ou incorpore vídeos do TikTok.</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 flex h-18 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-transparent via-background to-background  dark:from-transparent dark:via-zinc-900 dark:to-zinc-900">
+                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-black dark:text-white"><path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                        </div>
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleOptionSelectWithState("apple")}
+                                                        className="relative flex w-full max-w-full items-center justify-between gap-4 py-2 overflow-hidden"
+                                                    >
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-[#FA243C]">
+                                                                <Image alt="Apple Music" src="/icons/applemusic.svg" fill className="object-contain p-2 invert" />
+                                                            </div>
+                                                            <div className="flex min-w-0 flex-1 flex-col max-w-md">
+                                                                <span className="font-medium text-left">Apple Music</span>
+                                                                <span className="text-sm text-gray-500 dark:text-gray-300 truncate break-words max-w-md font-normal text-left">Exiba conteúdo do Apple Music.</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 flex h-18 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-transparent via-background to-background  dark:from-transparent dark:via-zinc-900 dark:to-zinc-900">
+                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-black dark:text-white"><path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                                <div className="pt-1 text-center text-xs">
+                                                    Tem alguma sugestão? <Link href="/contato" className="underline">Sugira para nós</Link>
+                                                </div>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
 									{selectedCategory === "video" && (
 										<VideoOptions
 											onOptionSelect={handleOptionSelectWithState}
