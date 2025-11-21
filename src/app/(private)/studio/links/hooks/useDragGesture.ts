@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useDragGesture = (onClose: () => void) => {
 	const [isDragging, setIsDragging] = useState(false);
@@ -10,6 +10,14 @@ export const useDragGesture = (onClose: () => void) => {
 	const lastMoveTime = useRef<number>(0);
 	const lastMoveY = useRef<number>(0);
 	const velocityHistory = useRef<number[]>([]);
+	const isDraggingRef = useRef(false);
+	const startYRef = useRef(0);
+	const dragYRef = useRef(0);
+	const onCloseRef = useRef(onClose);
+
+	useEffect(() => {
+		onCloseRef.current = onClose;
+	}, [onClose]);
 
 	const calculateVelocity = useCallback(
 		(currentY: number, currentTime: number) => {
@@ -51,6 +59,9 @@ export const useDragGesture = (onClose: () => void) => {
 			setIsDragging(true);
 			setStartY(e.clientY);
 			setDragY(0);
+			isDraggingRef.current = true;
+			startYRef.current = e.clientY;
+			dragYRef.current = 0;
 			resetVelocityTracking();
 			lastMoveTime.current = Date.now();
 			lastMoveY.current = e.clientY;
@@ -63,6 +74,9 @@ export const useDragGesture = (onClose: () => void) => {
 			setIsDragging(true);
 			setStartY(e.touches[0].clientY);
 			setDragY(0);
+			isDraggingRef.current = true;
+			startYRef.current = e.touches[0].clientY;
+			dragYRef.current = 0;
 			resetVelocityTracking();
 			lastMoveTime.current = Date.now();
 			lastMoveY.current = e.touches[0].clientY;
@@ -72,32 +86,34 @@ export const useDragGesture = (onClose: () => void) => {
 
 	const handleMouseMove = useCallback(
 		(e: MouseEvent) => {
-			if (!isDragging) {
+			if (!isDraggingRef.current) {
 				return;
 			}
 
 			const currentY = e.clientY;
-			const deltaY = Math.max(0, currentY - startY);
+			const deltaY = Math.max(0, currentY - startYRef.current);
+			dragYRef.current = deltaY;
 			setDragY(deltaY);
 
 			calculateVelocity(currentY, Date.now());
 		},
-		[isDragging, startY, calculateVelocity]
+		[calculateVelocity]
 	);
 
 	const handleTouchMove = useCallback(
 		(e: TouchEvent) => {
-			if (!isDragging) {
+			if (!isDraggingRef.current) {
 				return;
 			}
 
 			const currentY = e.touches[0].clientY;
-			const deltaY = Math.max(0, currentY - startY);
+			const deltaY = Math.max(0, currentY - startYRef.current);
+			dragYRef.current = deltaY;
 			setDragY(deltaY);
 
 			calculateVelocity(currentY, Date.now());
 		},
-		[isDragging, startY, calculateVelocity]
+		[calculateVelocity]
 	);
 
 	const resetClosingState = useCallback(() => {
@@ -110,18 +126,21 @@ export const useDragGesture = (onClose: () => void) => {
 		setDragY(window.innerHeight);
 		
 		setTimeout(() => {
-			onClose();
+			const fn = onCloseRef.current;
+			if (fn) {
+				fn();
+			}
 			resetClosingState();
 		}, 400);
-	}, [onClose, resetClosingState]);
+	}, [resetClosingState]);
 
 	const handleMouseUp = useCallback(() => {
-		if (!isDragging) {
+		if (!isDraggingRef.current) {
 			return;
 		}
 
 		const avgVelocity = getAverageVelocity();
-		const isFlickGesture = avgVelocity > 0.8 && dragY > 50;
+		const isFlickGesture = avgVelocity > 0.8 && dragYRef.current > 50;
 
 		if (isFlickGesture) {
 			startClosingAnimation();
@@ -130,16 +149,17 @@ export const useDragGesture = (onClose: () => void) => {
 		}
 
 		setIsDragging(false);
+		isDraggingRef.current = false;
 		resetVelocityTracking();
-	}, [isDragging, dragY, startClosingAnimation, getAverageVelocity, resetVelocityTracking]);
+	}, [startClosingAnimation, getAverageVelocity, resetVelocityTracking]);
 
 	const handleTouchEnd = useCallback(() => {
-		if (!isDragging) {
+		if (!isDraggingRef.current) {
 			return;
 		}
 
 		const avgVelocity = getAverageVelocity();
-		const isFlickGesture = avgVelocity > 0.8 && dragY > 50;
+		const isFlickGesture = avgVelocity > 0.8 && dragYRef.current > 50;
 
 		if (isFlickGesture) {
 			startClosingAnimation();
@@ -148,8 +168,9 @@ export const useDragGesture = (onClose: () => void) => {
 		}
 
 		setIsDragging(false);
+		isDraggingRef.current = false;
 		resetVelocityTracking();
-	}, [isDragging, dragY, startClosingAnimation, getAverageVelocity, resetVelocityTracking]);
+	}, [startClosingAnimation, getAverageVelocity, resetVelocityTracking]);
 
 	return {
 		isDragging,
