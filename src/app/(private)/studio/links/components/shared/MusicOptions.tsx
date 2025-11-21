@@ -99,7 +99,7 @@ const MusicOptions = ({ onOptionSelect }: MusicOptionsProps) => {
     ];
 
     return (
-        <div className="flex w-full max-w-full flex-col gap-0 divide-y divide-zinc-200 dark:divide-zinc-800">
+        <div className="flex w-full max-w-full flex-col gap-2 divide-y divide-zinc-200 dark:divide-zinc-800">
             {options.map((opt) => (
                 <OptionItem key={opt.value} opt={opt} onSelect={(v) => onOptionSelect(v)} />
             ))}
