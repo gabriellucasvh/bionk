@@ -112,6 +112,7 @@ const AddContentModal = ({
 
 	useEffect(() => {
 		if (isOpen && isMobile) {
+			handleCategorySelect("content");
 			setIsAnimating(true);
 			document.addEventListener("mousemove", handleMouseMove);
 			document.addEventListener("mouseup", handleMouseUp);
@@ -287,30 +288,28 @@ const AddContentModal = ({
 					<h2 className="mb-6 text-center font-semibold text-xl">
 						Adicionar Conteúdo
 					</h2>
-					<div className="flex flex-col space-y-4">
-						<CategorySelector
-							onCategorySelect={handleCategorySelect}
-							selectedCategory={selectedCategory}
-						/>
-						{selectedCategory === "content" && (
+						<div className="flex flex-col space-y-4">
 							<ContentOptions onOptionSelect={handleOptionSelectWithState} />
-						)}
-						{selectedCategory === "video" && (
-							<VideoOptions onOptionSelect={handleOptionSelectWithState} />
-						)}
-						{selectedCategory === "music" && (
-							<MusicOptions onOptionSelect={handleOptionSelectWithState} />
-						)}
-						{selectedCategory === "image" && (
-							<ImageOptions onOptionSelect={handleImageOptionSelect} />
-						)}
-						{selectedCategory === "event" && (
-							<EventOptions
-								onOptionSelect={handleOptionSelectWithState as any}
+							<CategorySelector
+								onCategorySelect={handleCategorySelect}
+								selectedCategory={selectedCategory}
 							/>
-						)}
-					</div>
-				</MobileBottomSheet>
+							{selectedCategory === "video" && (
+								<VideoOptions onOptionSelect={handleOptionSelectWithState} />
+							)}
+							{selectedCategory === "music" && (
+								<MusicOptions onOptionSelect={handleOptionSelectWithState} />
+							)}
+							{selectedCategory === "image" && (
+								<ImageOptions onOptionSelect={handleImageOptionSelect} />
+							)}
+							{selectedCategory === "event" && (
+								<EventOptions
+									onOptionSelect={handleOptionSelectWithState as any}
+								/>
+							)}
+						</div>
+					</MobileBottomSheet>
 			</>
 		);
 	}
