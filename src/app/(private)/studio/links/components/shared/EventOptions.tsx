@@ -19,7 +19,7 @@ const OptionItem = ({ opt, onSelect }: { opt: Option; onSelect: (v: Option["valu
         <button
             type="button"
             onClick={() => onSelect(opt.value)}
-            className="relative flex w-full max-w-full items-center justify-between gap-4 py-2 transition-colors hover:bg-gray-50 overflow-hidden"
+            className="relative flex w-full max-w-full items-center justify-between gap-4 py-2 transition-colors  overflow-hidden"
         >
             <div className="flex items-center gap-4">
                 <div className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${opt.bg}`}>
@@ -31,19 +31,19 @@ const OptionItem = ({ opt, onSelect }: { opt: Option; onSelect: (v: Option["valu
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col  max-w-md">
                     <span className="font-medium text-left">{opt.title}</span>
-                    <span className="text-sm text-gray-500 truncate break-words max-w-md font-normal text-left">
+                    <span className="text-sm text-gray-500 dark:text-gray-300 truncate break-words max-w-md font-normal text-left">
                         {opt.description}
                     </span>
                 </div>
             </div>
-            <div className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 flex h-18 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-transparent via-background to-background`}>
+            <div className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 flex h-18 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-transparent via-background to-background  dark:from-transparent dark:via-zinc-900 dark:to-zinc-900`}>
                 <svg
                     width="20"
                     height="20"
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="text-black"
+                    className="text-black dark:text-white"
                 >
                     <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>

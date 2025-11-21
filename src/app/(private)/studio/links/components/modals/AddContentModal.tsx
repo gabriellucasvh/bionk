@@ -289,7 +289,7 @@ const AddContentModal = ({
                         <div className="flex flex-col space-y-4">
                             <div className="relative flex items-center justify-center mt-2">
                                 <button
-                                    className="absolute left-0 flex items-center gap-2 rounded-3xl px-3 py-2 hover:bg-zinc-200"
+                                    className="absolute left-0 flex items-center gap-2 rounded-3xl px-3 py-2 hover:bg-zinc-200 dark:hover:bg-zinc-700"
                                     onClick={() => handleCategorySelect("content")}
                                     type="button"
                                 >
