@@ -243,20 +243,7 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
 		set({ isSaving: true });
 
 		try {
-			// Salvar dados do usuário
-			const userResponse = await fetch(`/api/profile/${userData.id}`, {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					name: userData.name,
-					bio: userData.bio,
-					username: userData.username,
-				}),
-			});
-
-			if (!userResponse.ok) {
-				throw new Error("Erro ao salvar dados do usuário");
-			}
+			// Salvar apenas customizações de design
 
 			// Salvar customizações
 			const customResponse = await fetch("/api/update-customizations", {
@@ -278,9 +265,7 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
 				throw new Error(serverError?.error || "Erro ao salvar customizações");
 			}
 
-			// Atualizar estado original
 			set({
-				originalUserData: structuredClone(userData),
 				originalCustomizations: structuredClone(customizations),
 				hasUnsavedChanges: false,
 				isSaving: false,
@@ -315,12 +300,8 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
 			return;
 		}
 
-		// Verificar mudanças nos dados do usuário
-		const userDataChanged =
-			userData.name !== originalUserData.name ||
-			userData.username !== originalUserData.username ||
-			userData.bio !== originalUserData.bio ||
-			userData.image !== originalUserData.image;
+		// Considerar apenas alterações de imagem para dados do usuário
+		const userDataChanged = userData.image !== originalUserData.image;
 
 		// Verificar mudanças nas customizações
 		const customizationsChanged =

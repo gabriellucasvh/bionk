@@ -11,12 +11,9 @@ import CategoriasTemplates from "./components/design.CategoriasTemplates";
 import { DesignPanel } from "./components/design.Panel";
 import ProfileSection from "./components/ProfileSection";
 import UserPagePreview from "./components/UserPagePreview";
-import { useButtonAnimations } from "./hooks/useButtonAnimations";
 import { useCustomizations } from "./hooks/useCustomizations";
 import { useProfileData } from "./hooks/useProfileData";
 import { useProfileImage } from "./hooks/useProfileImage";
-import { useProfileValidation } from "./hooks/useProfileValidation";
-import { useSaveProfile } from "./hooks/useSaveProfile";
 
 const DesignPreviewSkeleton = () => (
 	<div className="p-4">
@@ -86,12 +83,8 @@ const PersonalizarClient = () => {
 
 	const {
 		profile,
-		setProfile,
-		originalProfile,
-		setOriginalProfile,
 		userData,
 		isProfileLoading,
-		updateProfileText,
 		fetchProfile,
 	} = useProfileData(
 		session?.user?.id || undefined,
@@ -100,8 +93,6 @@ const PersonalizarClient = () => {
 
 	const {
 		profilePreview,
-		selectedProfileFile,
-		profileImageChanged,
 		isUploadingImage,
 		isImageCropModalOpen,
 		setIsImageCropModalOpen,
@@ -114,43 +105,8 @@ const PersonalizarClient = () => {
 			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 	);
 
-	const {
-		validationError,
-		bioValidationError,
-		isCheckingUsername,
-		validateBio,
-		validateUsername,
-		clearValidationErrors,
-	} = useProfileValidation();
-
-	const { showButtons, animateButtonsOut } = useButtonAnimations(
-		profile,
-		originalProfile,
-		profileImageChanged
-	);
 
 	const { userCustomizations, handleTemplateChange } = useCustomizations();
-
-	const {
-		loading,
-		handleSaveProfile,
-		handleCancelChanges,
-		debouncedValidateUsername,
-	} = useSaveProfile({
-		profile,
-		originalProfile,
-		profileImageChanged,
-		selectedProfileFile,
-		validateBio,
-		validateUsername,
-		uploadImage,
-		updateProfileText,
-		setOriginalProfile,
-		updateOriginalImageUrl,
-		resetImageState,
-		clearValidationErrors,
-		animateButtonsOut,
-	});
 
 	// Atualiza a imagem de perfil do ProfileSection quando outro fluxo disparar o evento
 	useEffect(() => {
@@ -253,15 +209,6 @@ const PersonalizarClient = () => {
 		};
 	}, [fetchProfile]);
 
-	const handleProfileChange = (field: string, value: string) => {
-		setProfile({ ...profile, [field]: value });
-	};
-
-	const handleProfileCancel = () => {
-		setProfile({ ...originalProfile });
-		handleCancelChanges();
-	};
-
 	return (
 		<div className="min-h-screen w-full bg-white text-black transition-colors dark:bg-zinc-800 dark:text-white">
 			{/* Botão flutuante mobile substitui navbar */}
@@ -311,21 +258,9 @@ const PersonalizarClient = () => {
 						) : (
 							<>
 								<ProfileSection
-									bioValidationError={bioValidationError}
-									isCheckingUsername={isCheckingUsername}
 									isUploadingImage={isUploadingImage}
-									loading={loading}
-									onBioChange={validateBio}
-									onCancelChanges={handleProfileCancel}
 									onImageEditClick={() => setIsImageCropModalOpen(true)}
-									onProfileChange={handleProfileChange}
-									onSaveProfile={handleSaveProfile}
-									onUsernameChange={debouncedValidateUsername}
-									originalProfile={originalProfile}
-									profile={profile}
 									profilePreview={profilePreview}
-									showButtons={showButtons}
-									validationError={validationError}
 								/>
 
 								<section className="border-t pt-6 dark:border-gray-700">

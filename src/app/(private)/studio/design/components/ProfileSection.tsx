@@ -4,29 +4,9 @@ import { BaseButton } from "@/components/buttons/BaseButton";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface ProfileSectionProps {
-	profile: {
-		name: string;
-		username: string;
-		bio: string;
-	};
-	originalProfile: {
-		name: string;
-		username: string;
-		bio: string;
-	};
 	profilePreview: string;
 	isUploadingImage: boolean;
-	loading: boolean;
-	validationError: string | null;
-	bioValidationError: string | null;
-	isCheckingUsername: boolean;
-	showButtons: boolean;
-	onProfileChange: (field: string, value: string) => void;
-	onUsernameChange: (username: string) => void;
-	onBioChange: (bio: string) => void;
 	onImageEditClick: () => void;
-	onSaveProfile: () => void;
-	onCancelChanges: () => void;
 }
 
 const ProfileSection = ({
