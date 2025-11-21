@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus, ChevronLeft } from "lucide-react";
 import { useEffect } from "react";
 import CategorySelector from "@/app/(private)/studio/links/components/shared/CategorySelector";
 import ContentOptions from "@/app/(private)/studio/links/components/shared/ContentOptions";
@@ -275,41 +275,63 @@ const AddContentModal = ({
 					Adicionar Conteúdo
 				</BaseButton>
 
-				<MobileBottomSheet
-					dragY={dragY}
-					isAnimating={isAnimating}
-					isClosing={isClosing}
-					isDragging={isDragging}
-					isOpen={isOpen}
-					onClose={onClose}
-					onMouseDown={handleMouseDown}
-					onTouchStart={handleTouchStart}
-				>
-					<h2 className="mb-6 text-center font-semibold text-xl">
-						Adicionar Conteúdo
-					</h2>
-						<div className="flex flex-col space-y-4">
-							<ContentOptions onOptionSelect={handleOptionSelectWithState} />
-							<CategorySelector
-								onCategorySelect={handleCategorySelect}
-								selectedCategory={selectedCategory}
-							/>
-							{selectedCategory === "video" && (
-								<VideoOptions onOptionSelect={handleOptionSelectWithState} />
-							)}
-							{selectedCategory === "music" && (
-								<MusicOptions onOptionSelect={handleOptionSelectWithState} />
-							)}
-							{selectedCategory === "image" && (
-								<ImageOptions onOptionSelect={handleImageOptionSelect} />
-							)}
-							{selectedCategory === "event" && (
-								<EventOptions
-									onOptionSelect={handleOptionSelectWithState as any}
-								/>
-							)}
-						</div>
-					</MobileBottomSheet>
+                <MobileBottomSheet
+                    dragY={dragY}
+                    isAnimating={isAnimating}
+                    isClosing={isClosing}
+                    isDragging={isDragging}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onMouseDown={handleMouseDown}
+                    onTouchStart={handleTouchStart}
+                >
+                    {selectedCategory && selectedCategory !== "content" ? (
+                        <div className="flex flex-col space-y-4">
+                            <div className="relative flex items-center justify-center mt-2">
+                                <button
+                                    className="absolute left-0 flex items-center gap-2 rounded-3xl px-3 py-2 hover:bg-zinc-200"
+                                    onClick={() => handleCategorySelect("content")}
+                                    type="button"
+                                >
+                                    <ChevronLeft className="h-5 w-5" />
+                                    <span className="font-medium">Voltar</span>
+                                </button>
+                                <span className="font-semibold text-lg">
+                                    {selectedCategory === "video"
+                                        ? "Vídeo"
+                                        : selectedCategory === "music"
+                                        ? "Música"
+                                        : selectedCategory === "image"
+                                        ? "Imagem"
+                                        : "Eventos"}
+                                </span>
+                            </div>
+                            {selectedCategory === "video" && (
+                                <VideoOptions onOptionSelect={handleOptionSelectWithState} />
+                            )}
+                            {selectedCategory === "music" && (
+                                <MusicOptions onOptionSelect={handleOptionSelectWithState} />
+                            )}
+                            {selectedCategory === "image" && (
+                                <ImageOptions onOptionSelect={handleImageOptionSelect} />
+                            )}
+                            {selectedCategory === "event" && (
+                                <EventOptions
+                                    onOptionSelect={handleOptionSelectWithState as any}
+                                />
+                            )}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col space-y-4">
+                            <h2 className="text-center font-semibold text-xl">Adicionar Conteúdo</h2>
+                            <ContentOptions onOptionSelect={handleOptionSelectWithState} />
+                            <CategorySelector
+                                onCategorySelect={handleCategorySelect}
+                                selectedCategory={selectedCategory}
+                            />
+                        </div>
+                    )}
+                </MobileBottomSheet>
 			</>
 		);
 	}
