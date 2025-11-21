@@ -53,7 +53,7 @@ const OptionItem = ({ opt, onSelect }: { opt: Option; onSelect: (v: Option["valu
 };
 
 const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
-    const options = [
+    const options: Option[] = [
         {
             value: "video",
             title: "Vídeo",
