@@ -69,7 +69,7 @@ export async function PATCH(
 		const { sensitiveProfile } = body;
 
 		// Valida se sensitiveProfile é um boolean
-		if (typeof sensitiveProfile !== 'boolean') {
+		if (typeof sensitiveProfile !== "boolean") {
 			return NextResponse.json(
 				{ error: "sensitiveProfile deve ser um valor booleano" },
 				{ status: 400 }
@@ -208,6 +208,41 @@ export async function PUT(
 		const body = await request.json();
 		const { name, username, bio, bannerUrl, image } = body;
 
+		const existing = await prisma.user.findUnique({
+			where: { id },
+			select: { username: true, lastUsernameChange: true },
+		});
+
+		if (!existing) {
+			return NextResponse.json(
+				{ error: "Usuário não encontrado" },
+				{ status: 404 }
+			);
+		}
+
+		const isUsernameChange =
+			typeof username === "string" &&
+			username.trim() &&
+			username !== existing.username;
+
+		if (isUsernameChange) {
+			const last = existing.lastUsernameChange
+				? new Date(existing.lastUsernameChange)
+				: null;
+			const now = new Date();
+			const cooldownMs = 3 * 24 * 60 * 60 * 1000;
+			if (last && now.getTime() < last.getTime() + cooldownMs) {
+				const retryAt = new Date(last.getTime() + cooldownMs).toISOString();
+				return NextResponse.json(
+					{
+						error: "Você só pode trocar o nome de usuário a cada 3 dias.",
+						retryAt,
+					},
+					{ status: 400 }
+				);
+			}
+		}
+
 		const updatedUser = await prisma.user.update({
 			where: { id },
 			data: {
@@ -216,6 +251,7 @@ export async function PUT(
 				bio,
 				bannerUrl,
 				image,
+				lastUsernameChange: isUsernameChange ? new Date() : undefined,
 			},
 		});
 

@@ -32,6 +32,7 @@ yarn-error.log*
 logs.txt
 tasks.md
 assigntrafficsources.js
+.cursorrules
 
 # env files (can opt-in for committing if needed)
 .env*

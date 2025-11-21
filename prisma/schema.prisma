@@ -65,6 +65,7 @@ model User {
   verificationTokenExpiry       DateTime?
   usernameReservedAt            DateTime?
   usernameReservationExpiry     DateTime?
+  lastUsernameChange            DateTime?
   stripeCustomerId              String?
   stripeSubscriptionId          String?
   stripePriceId                 String?

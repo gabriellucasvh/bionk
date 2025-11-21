@@ -22,6 +22,7 @@ export async function GET() {
         image: true,
         email: true,
         sensitiveProfile: true,
+        lastUsernameChange: true,
       },
     });
 
