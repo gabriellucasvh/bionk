@@ -11,12 +11,12 @@ const EventOptions = ({ onOptionSelect }: EventOptionsProps) => {
         <div>
             <div className="grid grid-cols-3 gap-4">
                 <button
-                    className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+                    className="flex flex-col items-center gap-2 rounded-2xl p-6"
                     onClick={() => onOptionSelect("event_tickets")}
                     type="button"
                 >
                     <div
-                        className="relative w-20 overflow-hidden rounded-2xl border bg-purple-400"
+                        className="relative w-20 overflow-hidden rounded-2xl border bg-purple-400 hover:bg-purple-500"
                         style={{ aspectRatio: "6 / 7" }}
                     >
                         <Ticket className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-black" />
@@ -24,12 +24,12 @@ const EventOptions = ({ onOptionSelect }: EventOptionsProps) => {
                     <span className="font-medium text-sm">Ingressos</span>
                 </button>
                 <button
-                    className="flex flex-col items-center gap-2 rounded-2xl p-6 transition-colors hover:bg-muted"
+                    className="flex flex-col items-center gap-2 rounded-2xl p-6"
                     onClick={() => onOptionSelect("event_countdown")}
                     type="button"
                 >
                     <div
-                        className="relative w-20 overflow-hidden rounded-2xl border bg-blue-400"
+                        className="relative w-20 overflow-hidden rounded-2xl border bg-blue-400 hover:bg-blue-500"
                         style={{ aspectRatio: "6 / 7" }}
                     >
                         <ClockFading className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-black" />
