@@ -30,10 +30,10 @@ const ContentOptions = ({ onOptionSelect }: ContentOptionsProps) => {
                     type="button"
                 >
                     <div
-                        className="relative w-20 overflow-hidden rounded-2xl border bg-gray-200 transition-all hover:ring-2 hover:ring-black ring-offset-2 duration-300"
+                        className="relative w-20 overflow-hidden rounded-2xl border bg-green-950 transition-all hover:ring-2 hover:ring-black ring-offset-2 duration-300"
                         style={{ aspectRatio: "7 / 7" }}
                     >
-                        <Layers2 className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-gray-600" />
+                        <Layers2 className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-avocado-100" />
                     </div>
                     <span className="font-medium text-sm">Seção</span>
                 </button>
@@ -44,10 +44,10 @@ const ContentOptions = ({ onOptionSelect }: ContentOptionsProps) => {
                     type="button"
                 >
                     <div
-                        className="relative w-20 overflow-hidden rounded-2xl border bg-blue-500 transition-all hover:ring-2 hover:ring-black ring-offset-2 duration-300"
+                        className="relative w-20 overflow-hidden rounded-2xl border bg-blue-800 transition-all hover:ring-2 hover:ring-black ring-offset-2 duration-300"
                         style={{ aspectRatio: "7 / 7" }}
                     >
-                        <Type className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-white" />
+                        <Type className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-sky-100" />
                     </div>
                     <span className="font-medium text-sm">Texto</span>
                 </button>
