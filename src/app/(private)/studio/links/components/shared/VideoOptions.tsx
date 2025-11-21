@@ -8,105 +8,98 @@ interface VideoOptionsProps {
     ) => void;
 }
 
-const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
+type Option = {
+    value: "video" | "youtube" | "vimeo" | "tiktok" | "twitch";
+    title: string;
+    description: string;
+    imageSrc: string;
+    bg: string;
+};
+
+const OptionItem = ({ opt, onSelect }: { opt: Option; onSelect: (v: Option["value"]) => void }) => {
     return (
-        <div>
-            <div className="grid grid-cols-3 gap-4">
-                <button
-                    className="flex flex-col items-center gap-2 rounded-2xl p-6"
-                    onClick={() => onOptionSelect("video")}
-                    type="button"
+        <button
+            type="button"
+            onClick={() => onSelect(opt.value)}
+            className="relative flex w-full max-w-full items-center justify-between gap-4 py-2 transition-colors hover:bg-gray-50 overflow-hidden"
+        >
+            <div className="flex items-center gap-4">
+                <div
+                    className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${opt.bg}`}
                 >
-                    <div
-                        className="relative w-20 overflow-hidden rounded-2xl border transition-colors hover:brightness-110"
-                        style={{ aspectRatio: "6 / 7" }}
-                    >
-                        <Image
-                            alt="Vídeo"
-                            className="object-cover"
-                            fill
-                            src="/images/video-content.png"
-                        />
-                    </div>
-                    <span className="font-medium text-sm">Vídeo</span>
-                </button>
-
-                <button
-                    className="flex flex-col items-center gap-2 rounded-2xl p-6 "
-                    onClick={() => onOptionSelect("youtube")}
-                    type="button"
-                >
-                    <div
-                        className="relative w-20 overflow-hidden rounded-2xl border bg-red-500 transition-colors hover:brightness-110"
-                        style={{ aspectRatio: "6 / 7" }}
-                    >
-                        <Image
-                            alt="YouTube"
-                            className="object-cover"
-                            fill
-                            src="/images/youtube-content.png"
-                        />
-                    </div>
-                    <span className="font-medium text-sm">YouTube</span>
-                </button>
-
-                <button
-                    className="flex flex-col items-center gap-2 rounded-2xl p-6 "
-                    onClick={() => onOptionSelect("vimeo")}
-                    type="button"
-                >
-                    <div
-                        className="relative w-20 overflow-hidden rounded-2xl border bg-blue-600 transition-colors hover:brightness-110"
-                        style={{ aspectRatio: "6 / 7" }}
-                    >
-                        <Image
-                            alt="Vimeo"
-                            className="object-cover"
-                            fill
-                            src="/images/vimeo-content.png"
-                        />
-                    </div>
-                    <span className="font-medium text-sm">Vimeo</span>
-                </button>
-
-                <button
-                    className="flex flex-col items-center gap-2 rounded-2xl p-6 "
-                    onClick={() => onOptionSelect("tiktok")}
-                    type="button"
-                >
-                    <div
-                        className="relative w-20 overflow-hidden rounded-2xl border bg-black transition-colors hover:brightness-110"
-                        style={{ aspectRatio: "6 / 7" }}
-                    >
-                        <Image
-                            alt="TikTok"
-                            className="object-cover"
-                            fill
-                            src="/images/tiktok-content.png"
-                        />
-                    </div>
-                    <span className="font-medium text-sm">TikTok</span>
-                </button>
-
-                <button
-                    className="flex flex-col items-center gap-2 rounded-2xl p-6 "
-                    onClick={() => onOptionSelect("twitch")}
-                    type="button"
-                >
-                    <div
-                        className="relative w-20 overflow-hidden rounded-2xl border bg-violet-600 transition-colors hover:brightness-110"
-                        style={{ aspectRatio: "6 / 7" }}
-                    >
-                        <Image
-                            alt="Twitch"
-                            className="object-cover"
-                            fill
-                            src="/images/twitch-content.png"
-                        />
-                    </div>
-                    <span className="font-medium text-sm">Twitch</span>
-                </button>
+                    <Image alt={opt.title} src={opt.imageSrc} fill className="object-contain p-2 invert" />
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col  max-w-md">
+                    <span className="font-medium text-left">{opt.title}</span>
+                    <span className="text-sm text-gray-500 truncate break-words max-w-md font-normal text-left">
+                        {opt.description}
+                    </span>
+                </div>
             </div>
+            <div className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 flex h-18 w-10 items-center justify-center rounded-2xl bg-gradient-to-r from-transparent via-background to-background`}>
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-black"
+                >
+                    <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            </div>
+        </button>
+    );
+};
+
+const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
+    const options = [
+        {
+            value: "video",
+            title: "Vídeo",
+            description:
+                "Vídeos direto na sua página, sem sair.",
+            imageSrc: "/icons/video.svg",
+            bg: "bg-yellow-300",
+        },
+        {
+            value: "youtube",
+            title: "YouTube",
+            description:
+                "Mostre vídeos do YouTube direto no seu Link.",
+            imageSrc: "/icons/youtube.svg",
+            bg: "bg-red-500",
+        },
+        {
+            value: "tiktok",
+            title: "TikTok",
+            description:
+                "Destaque um TikTok ou incorpore vídeos do TikTok.",
+            imageSrc: "/icons/tiktok.svg",
+            bg: "bg-black",
+        },
+        {
+            value: "vimeo",
+            title: "Vimeo",
+            description:
+                "Compartilhe vídeos do Vimeo e assista sem sair.",
+            imageSrc: "/icons/vimeo.svg",
+            bg: "bg-blue-600",
+        },
+        {
+            value: "twitch",
+            title: "Twitch",
+            description: "Integre transmissões ou clipes da Twitch.",
+            imageSrc: "/icons/twitch.svg",
+            bg: "bg-violet-600",
+        },
+    ];
+
+    return (
+        <div className="flex w-full max-w-full flex-col gap-2">
+            {options.map((opt) => (
+                <OptionItem key={opt.value} opt={opt} onSelect={(v) => onOptionSelect(v)} />
+            ))}
         </div>
     );
 };
