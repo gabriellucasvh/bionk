@@ -17,9 +17,9 @@ const CategorySelector = ({
         <div className="space-y-2">
             <button
                 aria-pressed={selectedCategory === "content"}
-                className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-900/30 ${
+                className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-700 ${
                     selectedCategory === "content"
-                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300"
+                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-white"
                         : ""
                 }`}
                 onClick={() => onCategorySelect("content")}
@@ -31,9 +31,9 @@ const CategorySelector = ({
 
             <button
                 aria-pressed={selectedCategory === "video"}
-                className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-900/30 ${
+                className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-700 ${
                     selectedCategory === "video"
-                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300"
+                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-white"
                         : ""
                 }`}
                 onClick={() => onCategorySelect("video")}
@@ -45,9 +45,9 @@ const CategorySelector = ({
 
             <button
                 aria-pressed={selectedCategory === "music"}
-                className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-900/30 ${
+                className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-700 ${
                     selectedCategory === "music"
-                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300"
+                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-white"
                         : ""
                 }`}
                 onClick={() => onCategorySelect("music")}
@@ -59,9 +59,9 @@ const CategorySelector = ({
 
             <button
                 aria-pressed={selectedCategory === "image"}
-                className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-900/30 ${
+                className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-700 ${
                     selectedCategory === "image"
-                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300"
+                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-white"
                         : ""
                 }`}
                 onClick={() => onCategorySelect("image")}
@@ -73,9 +73,9 @@ const CategorySelector = ({
 
             <button
                 aria-pressed={selectedCategory === "event"}
-                className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-900/30 ${
+                className={`flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-700 ${
                     selectedCategory === "event"
-                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300"
+                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-white"
                         : ""
                 }`}
                 onClick={() => onCategorySelect("event")}

@@ -323,7 +323,7 @@ const AddContentModal = ({
 			</BaseButton>
 
 			<Dialog onOpenChange={onClose} open={isOpen}>
-				<DialogContent className="h-[80vh] max-h-[600px] min-w-[40vw] max-w-4xl p-0">
+				<DialogContent className="h-[80vh] max-h-[600px] min-w-2xl max-w-2xl p-1">
 					<div className="flex h-full flex-col">
 						<DialogHeader className="border-b px-6 py-4">
 							<DialogTitle>Adicionar Conteúdo</DialogTitle>
