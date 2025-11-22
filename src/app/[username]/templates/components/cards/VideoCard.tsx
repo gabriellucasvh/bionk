@@ -1,7 +1,7 @@
 import type React from "react";
 import VideoPlayer from "@/components/VideoPlayer";
 import type { CustomPresets } from "./utils/style";
-import { toForeground } from "./utils/style";
+import { toForeground, buildCompactButtonStyle } from "./utils/style";
 
 interface VideoCardProps {
 	id: number;
@@ -74,11 +74,22 @@ export default function VideoCard({
 					/>
 				</div>
 			</div>
-			{hasInfoArea && (
-				<div
-					className="px-4 py-3 text-center"
-					style={{ backgroundColor: buttonColor, ...bottomRadiusStyle }}
-				>
+            {hasInfoArea && (
+                <div
+                    className="px-4 py-3 text-center"
+                    style={{
+                        ...(() => {
+                            const s = customPresets
+                                ? buildCompactButtonStyle(customPresets)
+                                : { backgroundColor: buttonColor };
+                            return {
+                                ...s,
+                                borderRadius: 0,
+                                ...bottomRadiusStyle,
+                            } as React.CSSProperties;
+                        })(),
+                    }}
+                >
 					{displayTitle && (
 						<h3
 							className={`font-bold text-lg ${classNames?.name || ""}`}
