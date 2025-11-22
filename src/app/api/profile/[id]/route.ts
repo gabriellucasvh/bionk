@@ -4,10 +4,12 @@ import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import Stripe from "stripe";
+import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import { authOptions } from "@/lib/auth";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
 
+const regex = /^[a-z0-9._]{3,30}$/;
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 	apiVersion: "2025-09-30.clover",
 });
@@ -223,9 +225,31 @@ export async function PUT(
 		const isUsernameChange =
 			typeof username === "string" &&
 			username.trim() &&
-			username !== existing.username;
+			username.toLowerCase() !== (existing.username || "");
 
 		if (isUsernameChange) {
+			const normalized = username.toLowerCase().trim();
+			if (!regex.test(normalized)) {
+				return NextResponse.json(
+					{ error: "Username inválido" },
+					{ status: 400 }
+				);
+			}
+			if (BLACKLISTED_USERNAMES.includes(normalized)) {
+				return NextResponse.json(
+					{ error: "Username não disponível" },
+					{ status: 400 }
+				);
+			}
+			const exists = await prisma.user.findUnique({
+				where: { username: normalized },
+			});
+			if (exists && exists.id !== id) {
+				return NextResponse.json(
+					{ error: "Username já está em uso" },
+					{ status: 400 }
+				);
+			}
 			const last = existing.lastUsernameChange
 				? new Date(existing.lastUsernameChange)
 				: null;
@@ -247,7 +271,9 @@ export async function PUT(
 			where: { id },
 			data: {
 				name,
-				username,
+				username: isUsernameChange
+					? username.toLowerCase().trim()
+					: existing.username,
 				bio,
 				bannerUrl,
 				image,

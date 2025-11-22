@@ -6,7 +6,7 @@ import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { getDefaultCustomPresets } from "@/utils/templatePresets";
 
-const USERNAME_REGEX = /^[a-zA-Z0-9._]{3,30}$/;
+const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
 const BASE64_IMAGE_REGEX = /^data:image\/\w+;base64,/;
 
 // Função auxiliar para validar dados do onboarding
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
 
 		// Verificar se username já existe
 		const existingUser = await prisma.user.findUnique({
-			where: { username },
+			where: { username: username.toLowerCase() },
 		});
 
 		if (existingUser && existingUser.id !== session.user.id) {
@@ -124,7 +124,9 @@ export async function POST(request: Request) {
 
 		// Atualizar usuário no banco e criar presets padrão (idempotente)
 		const selectedType =
-			userType === "creator" || userType === "enterprise" || userType === "personal"
+			userType === "creator" ||
+			userType === "enterprise" ||
+			userType === "personal"
 				? userType
 				: "personal";
 		const selectedPlan = plan === "pro" ? "pro" : "free";
@@ -133,7 +135,7 @@ export async function POST(request: Request) {
 			where: { id: session.user.id },
 			data: {
 				name: name.trim(),
-				username,
+				username: username.toLowerCase().trim(),
 				bio: bio?.trim() || null,
 				image: imageUrl,
 				onboardingCompleted: true,
@@ -141,6 +143,7 @@ export async function POST(request: Request) {
 				userType: selectedType,
 				pendingSubscriptionPlan: selectedPlan === "pro" ? "pro" : null,
 				subscriptionPlan: selectedPlan === "free" ? "free" : "free",
+				lastUsernameChange: null,
 				CustomPresets: {
 					upsert: {
 						create: getDefaultCustomPresets(),
