@@ -1,30 +1,39 @@
 /* eslint-disable react/no-unescaped-entities */
 
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import HeaderMobile from "@/components/layout/HeaderMobile";
 import { Separator } from "@/components/ui/separator";
+import { getDictionary, normalizeLocale } from "@/lib/i18n";
+export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-	title: "Bionk | Política de Privacidade",
-	description:
-		"Saiba como a Bionk protege seus dados. Nossa Política de Privacidade explica de forma clara como coletamos, usamos e protegemos suas informações.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
+	const dict = await getDictionary(locale, "privacidade");
+	return { title: dict.metadataTitle, description: dict.metadataDescription };
+}
 
-export default function PoliticaDePrivacidade() {
+export default async function PoliticaDePrivacidade() {
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
+	const dict = await getDictionary(locale, "privacidade");
 	return (
 		<div className="flex min-h-screen flex-col items-center bg-background">
 			<header>
-				<Header />
-				<HeaderMobile />
+				<Header locale={locale} />
+				<HeaderMobile locale={locale} />
 			</header>
 			<main className="flex-1 px-10 pt-28 md:px-0">
 				<div className="container py-6 md:py-8 lg:py-10">
 					<div className="mx-auto max-w-3xl space-y-6">
 						<div>
 							<h1 className="font-bold text-3xl tracking-tight">
-								Política de Privacidade
+								{dict.pageTitle}
 							</h1>
 							<p className="text-muted-foreground">
 								Última atualização: 17/09/2025
@@ -620,8 +629,7 @@ export default function PoliticaDePrivacidade() {
 					</div>
 				</div>
 			</main>
-
-			<Footer />
+			<Footer locale={locale} />
 		</div>
 	);
 }

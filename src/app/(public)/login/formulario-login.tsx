@@ -23,7 +23,25 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-function Login() {
+type LoginDict = {
+	title: string;
+	subtitle: string;
+	emailOrUsernameLabel: string;
+	emailOrUsernamePlaceholder: string;
+	passwordLabel: string;
+	passwordPlaceholder: string;
+	forgotPassword: string;
+	submit: string;
+	or: string;
+	noAccount: string;
+	createFree: string;
+	invalidCredentials: string;
+	genericError: string;
+	oauthLinked: string;
+	rightPanelText: string;
+};
+
+function Login({ dict }: { dict: LoginDict; locale: "pt-br" | "en" | "es" }) {
 	const {
 		register,
 		handleSubmit,
@@ -70,12 +88,9 @@ function Login() {
 	useEffect(() => {
 		const error = searchParams.get("error");
 		if (error === "OAuthAccountNotLinked") {
-			setMessage(
-				"Este e-mail já está cadastrado. Faça login com o método original ou use outro e-mail para o Google."
-			);
+			setMessage(dict.oauthLinked);
 		} else if (error) {
-			// Handle other potential errors from URL if necessary
-			setMessage("Ocorreu um erro. Tente novamente.");
+			setMessage(dict.genericError);
 		}
 
 		if (status === "authenticated") {
@@ -172,12 +187,12 @@ function Login() {
 			});
 
 			if (result?.error) {
-				setMessage("Credenciais inválidas. Tente novamente.");
+				setMessage(dict.invalidCredentials);
 			} else {
 				router.replace("/studio/perfil");
 			}
 		} catch {
-			setMessage("Ocorreu um erro durante o login");
+			setMessage(dict.genericError);
 		} finally {
 			setLoading(false);
 		}
@@ -197,12 +212,8 @@ function Login() {
 					<form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
 						<div className="hidden" ref={widgetRef} />
 						<div className="space-y-4 text-center">
-							<h1 className="font-bold text-3xl text-black">
-								Bem-vindo de volta!
-							</h1>
-							<p className="text-base text-muted-foreground">
-								Acesse sua conta na Bionk.
-							</p>
+							<h1 className="font-bold text-3xl text-black">{dict.title}</h1>
+							<p className="text-base text-muted-foreground">{dict.subtitle}</p>
 							{message && (
 								<p className="rounded-md bg-red-50 p-3 text-red-600 text-sm">
 									{message}
@@ -213,11 +224,11 @@ function Login() {
 						<div className="space-y-5">
 							<div>
 								<Label className="mb-2 block text-base text-black">
-									Email ou username
+									{dict.emailOrUsernameLabel}
 								</Label>
 								<Input
 									className="w-full rounded-md px-4 py-4 text-base focus-visible:border-lime-500"
-									placeholder="Digite seu e-mail ou username"
+									placeholder={dict.emailOrUsernamePlaceholder}
 									type="text"
 									{...register("login")}
 								/>
@@ -233,12 +244,12 @@ function Login() {
 
 							<div>
 								<Label className="mb-2 block text-base text-black">
-									Sua senha
+									{dict.passwordLabel}
 								</Label>
 								<div className="relative">
 									<Input
 										className="w-full rounded-md px-4 py-4 text-base focus-visible:border-lime-500"
-										placeholder="Digite sua senha"
+										placeholder={dict.passwordPlaceholder}
 										type={showPassword ? "text" : "password"}
 										{...register("password")}
 									/>
@@ -263,9 +274,9 @@ function Login() {
 							<div className="text-left">
 								<Link
 									className="h-auto p-0 text-blue-500 text-sm hover:underline"
-									href="/esqueci-senha"
+									href={"/esqueci-senha"}
 								>
-									Esqueceu a senha?
+									{dict.forgotPassword}
 								</Link>
 							</div>
 
@@ -277,13 +288,13 @@ function Login() {
 									loading={loading}
 									type="submit"
 								>
-									Entrar
+									{dict.submit}
 								</BaseButton>
 							</div>
 
 							<div className="flex items-center justify-center space-x-4">
 								<div className="h-px flex-1 bg-gray-300" />
-								<span className="text-gray-500 text-sm">ou</span>
+								<span className="text-gray-500 text-sm">{dict.or}</span>
 								<div className="h-px flex-1 bg-gray-300" />
 							</div>
 
@@ -293,12 +304,12 @@ function Login() {
 
 							<div className="text-center">
 								<span className="text-gray-600">
-									Não possui uma conta?{" "}
+									{dict.noAccount}{" "}
 									<Link
 										className="font-medium text-blue-500 hover:underline"
 										href={"/registro"}
 									>
-										Crie gratuitamente!
+										{dict.createFree}
 									</Link>
 								</span>
 							</div>
@@ -327,11 +338,7 @@ function Login() {
 							src="/images/bionk-name-white-logo.svg"
 							width={200}
 						/>
-						<p className="max-w-md text-lg opacity-90">
-							Sua plataforma completa para gerenciar e personalizar seus links,
-							criar páginas exclusivas, destacar o essencial e aumentar sua
-							presença digital de forma profissional.
-						</p>
+						<p className="max-w-md text-lg opacity-90">{dict.rightPanelText}</p>
 					</div>
 				</div>
 			</div>

@@ -1,30 +1,47 @@
 /* eslint-disable react/no-unescaped-entities */
 
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import HeaderMobile from "@/components/layout/HeaderMobile";
 import { Separator } from "@/components/ui/separator";
+import { getDictionary, normalizeLocale } from "@/lib/i18n";
+export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-	title: "Bionk | Diretrizes da Comunidade",
-	description:
-		"Diretrizes completas da Comunidade Bionk: comportamento, conteúdo proibido, autenticidade, segurança, privacidade, propriedade intelectual, integridade da plataforma, consequências, apelações e denúncias.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
+	const dict = await getDictionary(locale, "comunidade").catch(() => ({
+		metadataTitle: "Bionk | Diretrizes da Comunidade",
+		metadataDescription: "Diretrizes da Comunidade",
+	}));
+	return {
+		title: dict.metadataTitle,
+		description: dict.metadataDescription,
+	} as Metadata;
+}
 
-export default function DiretrizesDaComunidade() {
+export default async function DiretrizesDaComunidade() {
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
+	const dict = await getDictionary(locale, "comunidade").catch(() => ({
+		pageTitle: "Diretrizes da Comunidade",
+	}));
 	return (
 		<div className="flex min-h-screen flex-col items-center bg-background">
 			<header>
-				<Header />
-				<HeaderMobile />
+				<Header locale={locale} />
+				<HeaderMobile locale={locale} />
 			</header>
 			<main className="flex-1 px-10 pt-28 md:px-0">
 				<div className="container py-6 md:py-8 lg:py-10">
 					<div className="mx-auto max-w-3xl space-y-6">
 						<div>
 							<h1 className="font-bold text-3xl tracking-tight">
-								Diretrizes da Comunidade
+								{dict.pageTitle}
 							</h1>
 							<p className="text-muted-foreground">
 								Última atualização: 19/10/2025
@@ -652,7 +669,7 @@ export default function DiretrizesDaComunidade() {
 					</div>
 				</div>
 			</main>
-			<Footer />
+			<Footer locale={locale} />
 		</div>
 	);
 }

@@ -1,51 +1,60 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import HeaderMobile from "@/components/layout/HeaderMobile";
+import { getDictionary, normalizeLocale } from "@/lib/i18n";
 import ContactForm from "./ContactForm";
+export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-	title: "Contato - Bionk",
-	description:
-		"Entre em contato conosco. Nossa equipe está pronta para ajudar com suporte técnico, dúvidas sobre planos, parcerias e muito mais.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
+	const dict = await getDictionary(locale, "contato");
+	return { title: dict.metadataTitle, description: dict.metadataDescription };
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
+	const dict = await getDictionary(locale, "contato");
 	return (
 		<div className="min-h-dvh bg-white">
-			<Header />
-			<HeaderMobile />
+			<Header locale={locale} />
+			<HeaderMobile locale={locale} />
 			<div className="container mx-auto px-4 py-12 pt-32">
 				{/* Título Principal */}
 				<div className="text-start md:text-center">
-					<h1 className="mb-4 font-bold text-4xl text-black">Fale Conosco</h1>
+					<h1 className="mb-4 font-bold text-4xl text-black">
+						{dict.pageTitle}
+					</h1>
 					<p className="mx-auto max-w-3xl pb-7 font-medium text-gray-700 md:text-lg">
-						Tem alguma dúvida, sugestão ou precisa de ajuda? Nossa equipe está
-						aqui para ajudar você.
+						{dict.pageIntro1}
 						<br />
 						<span>
-							Você também pode consultar na{" "}
+							{dict.pageIntro2.split("Central de Ajuda")[0]}
 							<Link
 								className="text-green-600 underline"
 								href="https://ajuda.bionk.me"
 								rel="noopener noreferrer"
 								target="_blank"
 							>
-								Central de Ajuda
+								{dict.helpCenter}
 							</Link>{" "}
-							para obter respostas rápidas e eficientes. Se precisar de suporte
-							técnico, entre em contato conosco através do formulário abaixo.
+							{dict.pageIntro2.split("Central de Ajuda")[1]}
 						</span>
 					</p>
 				</div>
 
 				{/* Formulário de Contato */}
 				<div className="mx-auto max-w-2xl md:p-12">
-					<ContactForm />
+					<ContactForm dict={dict} locale={locale} />
 				</div>
 			</div>
-			<Footer />
+			<Footer locale={locale} />
 		</div>
 	);
 }

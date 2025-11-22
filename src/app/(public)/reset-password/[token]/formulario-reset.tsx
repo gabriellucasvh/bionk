@@ -11,6 +11,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { normalizeLocale } from "@/lib/i18n";
 
 // Define the form schema
 const schema = z
@@ -28,9 +29,13 @@ type FormData = z.infer<typeof schema>;
 
 interface ResetPasswordFormProps {
 	token: string;
+	locale: "pt-br" | "en" | "es";
 }
 
-export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+export default function ResetPasswordForm({
+	token,
+	locale,
+}: ResetPasswordFormProps) {
 	const {
 		register,
 		handleSubmit,
@@ -43,6 +48,10 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const router = useRouter();
+
+	const dict = require(
+		`@/dictionaries/public/${normalizeLocale(locale)}/reset-token.ts`
+	).default;
 
 	const onSubmit = async (data: FormData) => {
 		setLoading(true);
@@ -67,7 +76,6 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 			} else {
 				setMessage("Ocorreu um erro inesperado.");
 			}
-			console.error("Reset password error:", error);
 		} finally {
 			setLoading(false);
 		}
@@ -77,19 +85,19 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 		<article className="w-full max-w-md rounded-lg border-lime-500 bg-white p-8 md:border">
 			<div className="mb-6 space-y-2 text-center">
 				<h2 className="text-center font-bold text-2xl text-black">
-					Redefinir Senha
+					{dict.title}
 				</h2>
-				<p className="text-muted-foreground">Digite sua nova senha abaixo.</p>
+				<p className="text-muted-foreground">{dict.subtitle}</p>
 			</div>
 			<form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
 				<div>
 					<Label className="block font-semibold text-base text-black">
-						Nova Senha
+						{dict.newPassword}
 					</Label>
 					<div className="relative">
 						<Input
 							className="w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
-							placeholder="Digite sua nova senha"
+							placeholder={dict.newPasswordPlaceholder}
 							type={showPassword ? "text" : "password"}
 							{...register("password")}
 							disabled={loading || isSuccess}
@@ -112,12 +120,12 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
 				<div>
 					<Label className="block font-semibold text-base text-black">
-						Confirmar Nova Senha
+						{dict.confirmNew}
 					</Label>
 					<div className="relative">
 						<Input
 							className="w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
-							placeholder="Confirme sua nova senha"
+							placeholder={dict.confirmNewPlaceholder}
 							type={showConfirmPassword ? "text" : "password"}
 							{...register("confirmPassword")}
 							disabled={loading || isSuccess}
@@ -143,7 +151,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 					disabled={loading || isSuccess}
 					type="submit"
 				>
-					{loading ? "Redefinindo..." : "Redefinir Senha"}
+					{loading ? dict.redefining : dict.submit}
 				</Button>
 
 				{message && (
@@ -152,9 +160,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 					>
 						{message}
 						{isSuccess && (
-							<p className="mt-1 text-xs">
-								Você será redirecionado para o login...
-							</p>
+							<p className="mt-1 text-xs">{dict.successRedirect}</p>
 						)}
 					</div>
 				)}

@@ -1,16 +1,26 @@
-import type { Metadata } from 'next';
-import React from 'react'
-import TemplatesClient from './templates.client'
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { getDictionary, normalizeLocale } from "@/lib/i18n";
+import TemplatesClient from "./templates.client";
+export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-    title: "Bionk | Templates",
-    description: "Escolha entre diversos templates para sua página de links. Design profissional em 1 clique - encontre o estilo perfeito para seu perfil!",
-};
-
-const Templates = () => {
-    return (
-        <div><TemplatesClient /></div>
-    )
+export async function generateMetadata(): Promise<Metadata> {
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
+	const dict = await getDictionary(locale, "templates");
+	return { title: dict.metadataTitle, description: dict.metadataDescription };
 }
 
-export default Templates
+const Templates = async () => {
+    const cookieStore = await cookies();
+    const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+    const locale = normalizeLocale(cookieLocale);
+    return (
+        <div>
+            <TemplatesClient locale={locale} />
+        </div>
+    );
+};
+
+export default Templates;

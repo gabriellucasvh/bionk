@@ -5,20 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
+import { useHeaderLabels } from "@/hooks/useHeaderLabels";
 import { BaseButton } from "../buttons/BaseButton";
 
-const HeaderProps = [
-	{ label: "Menu", href: "/" },
-	{ label: "Templates", href: "/templates" },
-	{ label: "Planos", href: "/planos" },
-	{ label: "Descubra", href: "/descubra" },
-	{ label: "Ajuda", href: "https://ajuda.bionk.me" },
-];
-
-const Header: React.FC = () => {
+const Header: React.FC<{ locale?: "pt-br" | "en" | "es" }> = ({
+	locale = "pt-br",
+}) => {
 	const { data: session } = useSession();
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});
+	const { labels, items } = useHeaderLabels(locale as any);
 
 	const handleClick = (key: string, path: string) => {
 		if (isLoading[key]) {
@@ -56,7 +52,7 @@ const Header: React.FC = () => {
 				</div>
 
 				<ul className="flex min-w-0 flex-1 flex-wrap">
-					{HeaderProps.map((menu) => (
+					{items.map((menu) => (
 						<li key={menu.label}>
 							<Link
 								className="font- whitespace-nowrap px-4 py-2 text-black transition-colors duration-200 hover:text-bunker-800"
@@ -75,7 +71,7 @@ const Header: React.FC = () => {
 							loading={isLoading[KEYS.studio]}
 							onClick={() => handleClick("studio", routes.studio)}
 						>
-							Acessar seu Studio
+							{labels.studio}
 						</BaseButton>
 					) : (
 						<>
@@ -84,7 +80,7 @@ const Header: React.FC = () => {
 								loading={isLoading[KEYS.login]}
 								onClick={() => handleClick("login", routes.login)}
 							>
-								Entrar
+								{labels.signIn}
 							</BaseButton>
 
 							<BaseButton
@@ -92,7 +88,7 @@ const Header: React.FC = () => {
 								loading={isLoading[KEYS.registro]}
 								onClick={() => handleClick("registro", routes.registro)}
 							>
-								Criar uma conta
+								{labels.signUp}
 							</BaseButton>
 						</>
 					)}

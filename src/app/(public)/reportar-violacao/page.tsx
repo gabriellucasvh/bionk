@@ -1,46 +1,39 @@
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import HeaderMobile from "@/components/layout/HeaderMobile";
 import { Separator } from "@/components/ui/separator";
+import { getDictionary, normalizeLocale } from "@/lib/i18n";
+export const dynamic = "force-dynamic";
 
-export const metadata = {
-	title: "Bionk | Reportar Violação",
-	description:
-		"Denuncie conteúdo que viole nossos Termos de Uso ou Diretrizes da Comunidade. Preencha o formulário para que possamos avaliar e agir.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
+	const dict = await getDictionary(locale, "reportar-violacao");
+	return { title: dict.metadataTitle, description: dict.metadataDescription };
+}
 
-export default function ReportarViolacaoPage() {
+export default async function ReportarViolacaoPage() {
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
+	const dict = await getDictionary(locale, "reportar-violacao");
 	return (
 		<div className="min-h-screen bg-background text-foreground">
-			<Header />
-			<HeaderMobile />
+			<Header locale={locale} />
+			<HeaderMobile locale={locale} />
 
 			<main className="mx-auto max-w-4xl px-6 pt-32 pb-24">
 				<section className="scroll-mt-[140px]" id="inicio">
-					<h1 className="font-extrabold text-4xl">Reportar Violação</h1>
+					<h1 className="font-extrabold text-4xl">{dict.pageTitle}</h1>
 					<Separator className="my-6" />
 
-					<p className="mt-4">
-						Se você encontrou conteúdo no Bionk que possa violar nossos
-						<a className="ml-1 underline" href="/termos">
-							{" "}
-							Termos de Uso
-						</a>{" "}
-						ou
-						<a className="ml-1 underline" href="/comunidade">
-							{" "}
-							Diretrizes da Comunidade
-						</a>
-						, preencha o formulário abaixo. Levamos todas as denúncias com
-						seriedade, analisamos cada caso e tomamos as medidas adequadas
-						conforme necessário.
-					</p>
+					<p className="mt-4">{dict.introParagraph}</p>
 
-					<h2 className="mt-8 font-semibold text-xl">Importante</h2>
-					<p className="mt-2">
-						Este formulário é exclusivo para relatar conteúdo, comportamento ou
-						links que infrinjam nossas políticas.
-					</p>
+					<h2 className="mt-8 font-semibold text-xl">{dict.importantTitle}</h2>
+					<p className="mt-2">{dict.importantParagraph}</p>
 					<p className="mt-2">
 						Para problemas de acesso à conta, questões técnicas, suporte geral
 						ou solicitações administrativas, entre em contato diretamente com
@@ -65,12 +58,8 @@ export default function ReportarViolacaoPage() {
 				</section>
 
 				<section className="scroll-mt-[140px]" id="formulario">
-					<h2 className="mt-10 font-semibold text-xl">
-						Formulário de denúncia
-					</h2>
-					<p className="mt-2 text-muted-foreground">
-						Descreva o caso com o máximo de detalhes possível para agilizar a análise.
-					</p>
+					<h2 className="mt-10 font-semibold text-xl">{dict.formTitle}</h2>
+					<p className="mt-2 text-muted-foreground">{dict.helpText}</p>
 					<div className="mt-4">
 						<iframe
 							allowFullScreen
@@ -86,7 +75,7 @@ export default function ReportarViolacaoPage() {
 				</section>
 			</main>
 
-			<Footer />
+			<Footer locale={locale} />
 		</div>
 	);
 }

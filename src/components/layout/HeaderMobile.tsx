@@ -6,22 +6,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
+import { useHeaderLabels } from "@/hooks/useHeaderLabels";
 import { BaseButton } from "../buttons/BaseButton";
 import { MotionDiv } from "../ui/motion";
 
-const HeaderProps = [
-	{ label: "Menu", href: "/" },
-	{ label: "Templates", href: "/templates" },
-	{ label: "Planos", href: "/planos" },
-	{ label: "Descubra", href: "/descubra" },
-	{ label: "Ajuda", href: "https://ajuda.bionk.me" },
-];
-
-const HeaderMobile = () => {
+const HeaderMobile = ({
+	locale = "pt-br",
+}: {
+	locale?: "pt-br" | "en" | "es";
+}) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const { data: session } = useSession();
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});
+	const { labels, items } = useHeaderLabels(locale as any);
 
 	const handleClick = (key: string, path: string) => {
 		if (isLoading[key]) {
@@ -70,7 +68,7 @@ const HeaderMobile = () => {
 				</div>
 				<button
 					aria-expanded={isOpen ? "true" : "false"}
-					aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
+					aria-label={isOpen ? labels.ariaOpen : labels.ariaClosed}
 					className="relative h-7 w-8 select-none rounded-md focus:outline-none"
 					onClick={() => setIsOpen(!isOpen)}
 					type="button"
@@ -96,7 +94,7 @@ const HeaderMobile = () => {
 							transition={{ duration: 0.22 }}
 						>
 							<div className="relative flex flex-col space-y-2">
-								{HeaderProps.map((menu) => (
+								{items.map((menu) => (
 									<MotionDiv
 										animate={{ opacity: 1, x: 0 }}
 										initial={{ opacity: 0, x: -10 }}
@@ -124,7 +122,7 @@ const HeaderMobile = () => {
 													loading={isLoading[KEYS.studio]}
 													onClick={() => handleClick("studio", routes.studio)}
 												>
-													Acessar o Studio
+													{labels.studio}
 												</BaseButton>
 											</div>
 										) : (
@@ -134,7 +132,7 @@ const HeaderMobile = () => {
 													onClick={() => handleClick("login", routes.login)}
 													variant="white"
 												>
-													Entrar
+													{labels.signIn}
 												</BaseButton>
 												<BaseButton
 													loading={isLoading[KEYS.registro]}
@@ -142,7 +140,7 @@ const HeaderMobile = () => {
 														handleClick("registro", routes.registro)
 													}
 												>
-													Cadastre-se gratuitamente
+													{labels.signUp}
 												</BaseButton>
 											</div>
 										)}

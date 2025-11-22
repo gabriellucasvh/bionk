@@ -1,46 +1,126 @@
+"use client";
+
 // Removido import dos ícones do Lucide - usando ícones SVG locais
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useMemo } from "react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
-const navigation = {
-	resources: [
-		{ name: "Ajuda", href: "https://ajuda.bionk.me" },
-		{ name: "Descubra", href: "/descubra" },
-		{ name: "Templates", href: "/templates" },
-		{ name: "Preços e Planos", href: "/planos" },
-	],
-	contact: [
-		{ name: "Contato", href: "/contato" },
-		{ name: "contato@bionk.me", href: "mailto:contato@bionk.me" },
-	],
-	legal: [
-		{ name: "Termos e Condições", href: "/termos" },
-		{ name: "Política de Privacidade", href: "/privacidade" },
-		{ name: "Uso de Cookies", href: "/cookies" },
-		{ name: "Diretrizes da Comunidade", href: "/comunidade" },
-		{ name: "Reportar Violação", href: "/reportar-violacao" },
-	],
-	social: [
-		{
-			name: "Twitter",
-			href: "#",
-			icon: "/icons/x.svg",
-		},
-		{
-			name: "Instagram",
-			href: "#",
-			icon: "/icons/instagram.svg",
-		},
-		{
-			name: "Facebook",
-			href: "#",
-			icon: "/icons/facebook.svg",
-		},
-	],
+type Locale = "pt-br" | "en" | "es";
+
+const useFooterDict = (locale: Locale) => {
+	const dict = useMemo(() => {
+		if (locale === "en") {
+			return {
+				tagline: "Made for those who share what they love.",
+				sections: {
+					resources: "Resources",
+					legal: "Legal",
+					contact: "Contact",
+				},
+				nav: {
+					help: "Help",
+					discover: "Discover",
+					templates: "Templates",
+					plans: "Pricing & Plans",
+					terms: "Terms & Conditions",
+					privacy: "Privacy Policy",
+					cookies: "Cookies",
+					community: "Community Guidelines",
+					report: "Report Violation",
+					email: "contato@bionk.me",
+					contact: "Contact",
+				},
+				copyright: `© ${new Date().getFullYear()} Bionk. All rights reserved.`,
+			};
+		}
+		if (locale === "es") {
+			return {
+				tagline: "Creado para quienes comparten lo que aman.",
+				sections: {
+					resources: "Recursos",
+					legal: "Legal",
+					contact: "Contacto",
+				},
+				nav: {
+					help: "Ayuda",
+					discover: "Descubre",
+					templates: "Plantillas",
+					plans: "Precios y Planes",
+					terms: "Términos y Condiciones",
+					privacy: "Política de Privacidad",
+					cookies: "Cookies",
+					community: "Guías de la Comunidad",
+					report: "Reportar Infracción",
+					email: "contato@bionk.me",
+					contact: "Contacto",
+				},
+				copyright: `© ${new Date().getFullYear()} Bionk. Todos los derechos reservados.`,
+			};
+		}
+		return {
+			tagline: "Criado para quem compartilha o que ama.",
+			sections: { resources: "Recursos", legal: "Legal", contact: "Contato" },
+			nav: {
+				help: "Ajuda",
+				discover: "Descubra",
+				templates: "Templates",
+				plans: "Preços e Planos",
+				terms: "Termos e Condições",
+				privacy: "Política de Privacidade",
+				cookies: "Uso de Cookies",
+				community: "Diretrizes da Comunidade",
+				report: "Reportar Violação",
+				email: "contato@bionk.me",
+				contact: "Contato",
+			},
+			copyright: `© ${new Date().getFullYear()} Bionk. Todos os direitos reservados.`,
+		};
+	}, [locale]);
+	const navigation = useMemo(
+		() => ({
+			resources: [
+				{ name: dict.nav.help, href: "https://ajuda.bionk.me" },
+				{ name: dict.nav.discover, href: "/descubra" },
+				{ name: dict.nav.templates, href: "/templates" },
+				{ name: dict.nav.plans, href: "/planos" },
+			],
+			contact: [
+				{ name: dict.nav.contact, href: "/contato" },
+				{ name: dict.nav.email, href: "mailto:contato@bionk.me" },
+			],
+			legal: [
+				{ name: dict.nav.terms, href: "/termos" },
+				{ name: dict.nav.privacy, href: "/privacidade" },
+				{ name: dict.nav.cookies, href: "/cookies" },
+				{ name: dict.nav.community, href: "/comunidade" },
+				{ name: dict.nav.report, href: "/reportar-violacao" },
+			],
+			social: [
+				{
+					name: "Twitter",
+					href: "#",
+					icon: "/icons/x.svg",
+				},
+				{
+					name: "Instagram",
+					href: "#",
+					icon: "/icons/instagram.svg",
+				},
+				{
+					name: "Facebook",
+					href: "#",
+					icon: "/icons/facebook.svg",
+				},
+			],
+		}),
+		[dict]
+	);
+	return { dict, navigation };
 };
 
-const Footer = () => {
+const Footer = ({ locale = "pt-br" }: { locale?: Locale }) => {
+	const { dict, navigation } = useFooterDict(locale);
 	return (
 		<footer className="w-full bg-bunker-950 text-bunker-300">
 			<div className="mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10">
@@ -57,9 +137,7 @@ const Footer = () => {
 								width={110}
 							/>
 						</Link>
-						<p className="text-bunker-400 text-sm leading-6">
-							Criado para quem compartilha o que ama.
-						</p>
+						<p className="text-bunker-400 text-sm leading-6">{dict.tagline}</p>
 					</div>
 
 					{/* Links de navegação */}
@@ -67,7 +145,7 @@ const Footer = () => {
 						<div className="md:grid md:grid-cols-3 md:gap-8">
 							<div>
 								<h3 className="font-black text-white text-xs uppercase tracking-wider">
-									Recursos
+									{dict.sections.resources}
 								</h3>
 								<ul className="mt-4 space-y-3">
 									{navigation.resources.map((item) => (
@@ -84,7 +162,7 @@ const Footer = () => {
 							</div>
 							<div className="mt-10 md:mt-0">
 								<h3 className="font-black text-white text-xs uppercase tracking-wider">
-									Legal
+									{dict.sections.legal}
 								</h3>
 								<ul className="mt-4 space-y-3">
 									{navigation.legal.map((item) => (
@@ -101,7 +179,7 @@ const Footer = () => {
 							</div>
 							<div className="mt-10 md:mt-0">
 								<h3 className="font-black text-white text-xs uppercase tracking-wider">
-									Contato
+									{dict.sections.contact}
 								</h3>
 								<ul className="mt-4 space-y-3">
 									{navigation.contact.map((item) => (
@@ -142,10 +220,12 @@ const Footer = () => {
 							</Link>
 						))}
 					</div>
-					<p className="mt-6 text-bunker-500 text-xs leading-5 sm:order-1 sm:mt-0">
-						&copy; {new Date().getFullYear()} Bionk. Todos os direitos
-						reservados.
-					</p>
+					<div className="flex items-center gap-4 sm:order-1 sm:mt-0">
+						<LanguageSwitcher locale={locale} />
+						<p className="text-bunker-500 text-xs leading-5">
+							{dict.copyright}
+						</p>
+					</div>
 				</div>
 			</div>
 			{/* <div className="mx-auto flex h-full w-full items-center justify-center p-4">

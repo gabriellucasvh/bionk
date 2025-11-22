@@ -21,7 +21,23 @@ const emailSchema = z.object({
 
 type EmailFormData = z.infer<typeof emailSchema>;
 
-export default function PageRegistro() {
+type RegistroDict = {
+	title: string;
+	subtitle: string;
+	or: string;
+	haveAccount: string;
+	login: string;
+	rightPanelText: string;
+	emailInvalid: string;
+	requestCodeError: string;
+};
+
+export default function PageRegistro({
+	dict,
+}: {
+	dict: RegistroDict;
+	locale: "pt-br" | "en" | "es";
+}) {
 	const [loading, setLoading] = useState(false);
 	const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 	const widgetRef = useRef<HTMLDivElement | null>(null);
@@ -129,10 +145,10 @@ export default function PageRegistro() {
 			if (error instanceof AxiosError) {
 				setMessage({
 					type: "error",
-					text: error.response?.data?.error || "Erro ao solicitar código.",
+					text: error.response?.data?.error || dict.requestCodeError,
 				});
 			} else {
-				setMessage({ type: "error", text: "Erro ao solicitar código." });
+				setMessage({ type: "error", text: dict.requestCodeError });
 			}
 		} finally {
 			setLoading(false);
@@ -154,12 +170,8 @@ export default function PageRegistro() {
 				<div className="w-full max-w-lg">
 					<div className="space-y-8">
 						<div className="space-y-4 text-center">
-							<h1 className="font-bold text-3xl text-black">
-								Crie sua conta Bionk
-							</h1>
-							<p className="text-base text-muted-foreground">
-								Comece grátis e personalize seus links em segundos.
-							</p>
+							<h1 className="font-bold text-3xl text-black">{dict.title}</h1>
+							<p className="text-base text-muted-foreground">{dict.subtitle}</p>
 							{message && (
 								<p className=" text-red-600 text-sm">{message.text}</p>
 							)}
@@ -175,7 +187,7 @@ export default function PageRegistro() {
 
 							<div className="flex items-center justify-center space-x-4">
 								<div className="h-px flex-1 bg-gray-300" />
-								<span className="text-gray-500 text-sm">ou</span>
+								<span className="text-gray-500 text-sm">{dict.or}</span>
 								<div className="h-px flex-1 bg-gray-300" />
 							</div>
 
@@ -185,12 +197,12 @@ export default function PageRegistro() {
 
 							<div className="text-center">
 								<span className="text-gray-600">
-									Já possui uma conta?{" "}
+									{dict.haveAccount}{" "}
 									<Link
 										className="font-medium text-blue-500 hover:underline"
-										href="/login"
+										href={"/login"}
 									>
-										Faça login
+										{dict.login}
 									</Link>
 								</span>
 							</div>
@@ -218,11 +230,7 @@ export default function PageRegistro() {
 							src="/images/bionk-name-white-logo.svg"
 							width={200}
 						/>
-						<p className="max-w-md text-lg opacity-90">
-							Sua plataforma completa para gerenciar e personalizar seus links,
-							criar páginas exclusivas, destacar o essencial e aumentar sua
-							presença digital de forma profissional.
-						</p>
+						<p className="max-w-md text-lg opacity-90">{dict.rightPanelText}</p>
 					</div>
 				</div>
 			</div>

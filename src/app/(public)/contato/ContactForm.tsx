@@ -73,32 +73,65 @@ type ContactFormData = z.infer<typeof contactSchema>;
 // Componente de estado de sucesso
 interface SuccessStateProps {
 	fullName: string;
+	dict: ContatoDict;
 }
 
-function SuccessState({ fullName }: SuccessStateProps) {
+function SuccessState({ fullName, dict }: SuccessStateProps) {
 	return (
 		<div className="py-8 text-center">
 			<div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
 				<CheckCircle className="h-8 w-8 text-green-600" />
 			</div>
 			<h3 className="mb-4 font-semibold text-2xl text-gray-900">
-				Mensagem Enviada!
+				{dict.successTitle}
 			</h3>
 			<p className="mb-6 text-gray-600">
-				Obrigado, <strong>{fullName}</strong>! Recebemos sua mensagem e nossa
-				equipe responderá em até 2 dias úteis.
+				{dict.successThanks.replace("{name}", fullName)}
 			</p>
 			<div>
 				<p className="text-green-800 text-sm">
-					<strong>Dica:</strong> Verifique sua caixa de entrada e spam para
-					nossa resposta.
+					<strong>{dict.tip}</strong> {dict.tipText}
 				</p>
 			</div>
 		</div>
 	);
 }
 
-export default function ContactForm() {
+type ContatoDict = {
+	fullName: string;
+	fullNamePlaceholder: string;
+	email: string;
+	emailPlaceholder: string;
+	subject: string;
+	subjectPlaceholder: string;
+	subjectOptions: {
+		suporte: string;
+		planos: string;
+		parcerias: string;
+		feedback: string;
+		reportar: string;
+		outros: string;
+	};
+	message: string;
+	messagePlaceholder: string;
+	detailsHint: string;
+	disclaimerPrefix: string;
+	terms: string;
+	privacy: string;
+	send: string;
+	sending: string;
+	successTitle: string;
+	successThanks: string;
+	tip: string;
+	tipText: string;
+};
+
+export default function ContactForm({
+	dict,
+}: {
+	dict: ContatoDict;
+	locale: "pt-br" | "en" | "es";
+}) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -148,24 +181,23 @@ export default function ContactForm() {
 	const subjectOptions = [
 		{
 			value: "suporte-tecnico",
-			label: "Suporte Técnico (problemas de acesso, bugs)",
+			label: dict.subjectOptions.suporte,
 		},
 		{
 			value: "planos-assinaturas",
-			label:
-				"Planos e Assinaturas (dúvidas sobre upgrade, pagamento, cancelamento)",
+			label: dict.subjectOptions.planos,
 		},
-		{ value: "parcerias-colaboracoes", label: "Parcerias e Colaborações" },
-		{ value: "feedback-sugestoes", label: "Feedback e Sugestões" },
+		{ value: "parcerias-colaboracoes", label: dict.subjectOptions.parcerias },
+		{ value: "feedback-sugestoes", label: dict.subjectOptions.feedback },
 		{
 			value: "reportar-problema",
-			label: "Reportar Problema (abuso, links indevidos)",
+			label: dict.subjectOptions.reportar,
 		},
-		{ value: "outros", label: "Outros" },
+		{ value: "outros", label: dict.subjectOptions.outros },
 	];
 
 	if (isSuccess) {
-		return <SuccessState fullName={submittedName} />;
+		return <SuccessState dict={dict} fullName={submittedName} />;
 	}
 
 	return (
@@ -189,13 +221,13 @@ export default function ContactForm() {
 				{/* Nome Completo */}
 				<div className="space-y-2">
 					<Label className="text-green-800" htmlFor="fullName">
-						Nome Completo *
+						{dict.fullName}
 					</Label>
 					<Input
 						id="fullName"
 						{...register("fullName")}
 						className={errors.fullName ? "border-red-500" : ""}
-						placeholder="Seu nome completo"
+						placeholder={dict.fullNamePlaceholder}
 					/>
 					{errors.fullName && (
 						<p className="text-red-600 text-sm">{errors.fullName.message}</p>
@@ -205,14 +237,14 @@ export default function ContactForm() {
 				{/* Email */}
 				<div className="space-y-2">
 					<Label className="text-green-800" htmlFor="email">
-						Email *
+						{dict.email}
 					</Label>
 					<Input
 						id="email"
 						type="email"
 						{...register("email")}
 						className={errors.email ? "border-red-500" : ""}
-						placeholder="seu@email.com"
+						placeholder={dict.emailPlaceholder}
 					/>
 					{errors.email && (
 						<p className="text-red-600 text-sm">{errors.email.message}</p>
@@ -223,11 +255,11 @@ export default function ContactForm() {
 			{/* Assunto */}
 			<div className="space-y-2">
 				<Label className="text-green-800" htmlFor="subject">
-					Assunto *
+					{dict.subject}
 				</Label>
 				<Select onValueChange={(value) => setValue("subject", value as any)}>
 					<SelectTrigger className={errors.subject ? "border-red-500" : ""}>
-						<SelectValue placeholder="Selecione o assunto da sua mensagem" />
+						<SelectValue placeholder={dict.subjectPlaceholder} />
 					</SelectTrigger>
 					<SelectContent>
 						{subjectOptions.map((option) => (
@@ -245,42 +277,40 @@ export default function ContactForm() {
 			{/* Mensagem */}
 			<div className="space-y-2">
 				<Label className="text-green-800" htmlFor="message">
-					Mensagem *
+					{dict.message}
 				</Label>
 				<Textarea
 					id="message"
 					{...register("message")}
 					className={errors.message ? "border-red-500" : ""}
-					placeholder="Descreva sua dúvida, problema ou sugestão em detalhes..."
+					placeholder={dict.messagePlaceholder}
 					rows={6}
 				/>
 				{errors.message && (
 					<p className="text-red-600 text-sm">{errors.message.message}</p>
 				)}
-				<p className="text-gray-500 text-sm">
-					Quanto mais detalhes você fornecer, melhor poderemos ajudá-lo.
-				</p>
+				<p className="text-gray-500 text-sm">{dict.detailsHint}</p>
 			</div>
 
 			{/* Disclaimer */}
 			<p className="text-start text-gray-500 text-sm">
-				Ao enviar esta mensagem, você concorda com nossos{" "}
+				{dict.disclaimerPrefix}
 				<Link
 					className="text-blue-600 hover:underline"
-					href="/termos"
+					href={"/termos"}
 					rel="noopener noreferrer"
 					target="_blank"
 				>
-					Termos de Uso
+					{dict.terms}
 				</Link>{" "}
 				e{" "}
 				<Link
 					className="text-blue-600 hover:underline"
-					href="/privacidade"
+					href={"/privacidade"}
 					rel="noopener noreferrer"
 					target="_blank"
 				>
-					Política de Privacidade
+					{dict.privacy}
 				</Link>
 				.
 			</p>
@@ -290,7 +320,7 @@ export default function ContactForm() {
 				disabled={isLoading}
 				type="submit"
 			>
-				{isLoading ? <span>Enviando...</span> : <span>Enviar</span>}
+				{isLoading ? <span>{dict.sending}</span> : <span>{dict.send}</span>}
 			</Button>
 		</form>
 	);

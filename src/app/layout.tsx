@@ -1,6 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import {
 	Alegreya,
 	Atkinson_Hyperlegible,
@@ -26,11 +24,15 @@ import {
 	Urbanist,
 } from "next/font/google";
 import localFont from "next/font/local";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { LinkAnimationProvider } from "@/providers/linkAnimationProvider";
 import NextAuthSessionProvider from "@/providers/sessionProvider";
 import { SubscriptionProvider } from "@/providers/subscriptionProvider";
 import { ThemeProvider } from "@/providers/themeProvider";
 import "./globals.css";
+import { cookies } from "next/headers";
+export const dynamic = "force-dynamic";
 
 const Satoshi = localFont({
 	src: "/fonts/Satoshi-Variable.woff2",
@@ -176,27 +178,30 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-    children,
+	children,
 }: Readonly<{
-    children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-    const session = await getServerSession(authOptions);
-    return (
-        <html
-            className={`${geist.variable} ${ClashDisplay.variable} ${cabinetGrotesk.variable} ${Satoshi.variable} ${inter.variable} ${montserrat.variable} ${poppins.variable} ${nunito.variable} ${playfairDisplay.variable} ${merriweather.variable} ${dancingScript.variable} ${dmSerifDisplay.variable} ${orbitron.variable} ${plusJakartaSans.variable} ${outfit.variable} ${spaceGrotesk.variable} ${libreBaskerville.variable} ${alegreya.variable} ${spectral.variable} ${urbanist.variable} ${karla.variable} ${publicSans.variable} ${atkinsonHyperlegible.variable} ${firaSans.variable} ${mulish.variable} antialiased`}
-            data-scroll-behavior="smooth"
-            lang="pt-BR"
-            suppressHydrationWarning={true}
-        >
-            <body>
-                <NextAuthSessionProvider session={session}>
-                    <SubscriptionProvider>
-                        <LinkAnimationProvider>
-                            <ThemeProvider>{children}</ThemeProvider>
-                        </LinkAnimationProvider>
-                    </SubscriptionProvider>
-                </NextAuthSessionProvider>
-            </body>
-        </html>
-    );
+	const session = await getServerSession(authOptions);
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const htmlLang = cookieLocale === "pt-br" ? "pt-BR" : cookieLocale;
+	return (
+		<html
+			className={`${geist.variable} ${ClashDisplay.variable} ${cabinetGrotesk.variable} ${Satoshi.variable} ${inter.variable} ${montserrat.variable} ${poppins.variable} ${nunito.variable} ${playfairDisplay.variable} ${merriweather.variable} ${dancingScript.variable} ${dmSerifDisplay.variable} ${orbitron.variable} ${plusJakartaSans.variable} ${outfit.variable} ${spaceGrotesk.variable} ${libreBaskerville.variable} ${alegreya.variable} ${spectral.variable} ${urbanist.variable} ${karla.variable} ${publicSans.variable} ${atkinsonHyperlegible.variable} ${firaSans.variable} ${mulish.variable} antialiased`}
+			data-scroll-behavior="smooth"
+			lang={htmlLang}
+			suppressHydrationWarning={true}
+		>
+			<body>
+				<NextAuthSessionProvider session={session}>
+					<SubscriptionProvider>
+						<LinkAnimationProvider>
+							<ThemeProvider>{children}</ThemeProvider>
+						</LinkAnimationProvider>
+					</SubscriptionProvider>
+				</NextAuthSessionProvider>
+			</body>
+		</html>
+	);
 }

@@ -3,13 +3,19 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import OTPInputCustom from "@/components/ui/otp-input-custom";
+import { normalizeLocale } from "@/lib/i18n";
 
 export default function VerificarOtpClient({
 	initialLogin,
+	locale,
 }: {
 	initialLogin: string;
+	locale: "pt-br" | "en" | "es";
 }) {
 	const router = useRouter();
+	const dict = require(
+		`@/dictionaries/public/${normalizeLocale(locale)}/verificar-otp.ts`
+	).default;
 	const login = initialLogin;
 	const [otp, setOtp] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -118,10 +124,8 @@ export default function VerificarOtpClient({
 
 	return (
 		<div className="mx-auto flex h-dvh w-full max-w-lg flex-col items-center justify-center px-4 text-center">
-			<h1 className="font-semibold text-2xl">Verifique seu código de acesso</h1>
-			<p className="mt-2 text-muted-foreground text-sm">
-				Digite o código enviado ao seu e-mail.
-			</p>
+			<h1 className="font-semibold text-2xl">{dict.title}</h1>
+			<p className="mt-2 text-muted-foreground text-sm">{dict.subtitle}</p>
 			<div className="mt-6 w-full space-y-2">
 				<div className="flex justify-center">
 					<OTPInputCustom
@@ -147,8 +151,8 @@ export default function VerificarOtpClient({
 						type="button"
 					>
 						{otpCooldownTimer > 0
-							? `Reenviar código em ${otpCooldownTimer}s`
-							: "Reenviar código"}
+							? `${dict.resendIn} ${otpCooldownTimer}s`
+							: dict.resend}
 					</button>
 				</div>
 				<BaseButton
@@ -156,7 +160,7 @@ export default function VerificarOtpClient({
 					fullWidth
 					onClick={handleVerify}
 				>
-					{loading ? "Verificando..." : "Verificar"}
+					{loading ? dict.verifying : dict.verify}
 				</BaseButton>
 			</div>
 		</div>

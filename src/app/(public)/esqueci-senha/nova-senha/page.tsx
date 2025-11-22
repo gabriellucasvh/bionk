@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { normalizeLocale } from "@/lib/i18n";
 import NovaSenhaClient from "./NovaSenhaClient";
 
 export default async function NovaSenhaPage() {
@@ -9,5 +10,7 @@ export default async function NovaSenhaPage() {
 	if (!(verified && verified.value === "1" && th && th.value)) {
 		redirect("/esqueci-senha/verificar");
 	}
-	return <NovaSenhaClient />;
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
+	return <NovaSenhaClient locale={locale} />;
 }
