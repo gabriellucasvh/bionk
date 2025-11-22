@@ -1,7 +1,9 @@
 import dynamic from "next/dynamic";
+import { cookies } from "next/headers";
 import Header from "@/components/layout/Header";
 import HeaderMobile from "@/components/layout/HeaderMobile";
 import LoadingPage from "@/components/layout/LoadingPage";
+import { normalizeLocale } from "@/lib/i18n";
 import Hero from "./components/Hero";
 
 const Features = dynamic(() => import("@/app/components/Features"), {
@@ -23,18 +25,21 @@ const Footer = dynamic(() => import("@/components/layout/Footer"), {
 	loading: () => <LoadingPage />,
 });
 
-export default function Home() {
+export default async function Home() {
+	const cookieStore = await cookies();
+	const cookieLocale = cookieStore.get("locale")?.value || "pt-br";
+	const locale = normalizeLocale(cookieLocale);
 	return (
 		<main>
-			<Header />
-			<HeaderMobile />
-			<Hero />
-			<Features />
-			<SocialConnect />
-			<EventsSection />
-			{/* <Testimonials /> */}
-			<CtaSection />
-			<Footer />
+			<Header locale={locale} />
+			<HeaderMobile locale={locale} />
+			<Hero locale={locale} />
+			<Features locale={locale} />
+			<SocialConnect locale={locale} />
+			<EventsSection locale={locale} />
+			{/* <Testimonials locale={locale} /> */}
+			<CtaSection locale={locale} />
+			<Footer locale={locale} />
 		</main>
 	);
 }

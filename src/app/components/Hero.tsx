@@ -3,10 +3,41 @@
 import { ArrowRight, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 
-const Hero = () => {
+const Hero = ({ locale = "pt-br" }: { locale?: "pt-br" | "en" | "es" }) => {
+	const dict = useMemo(() => {
+		if (locale === "en") {
+			return {
+				badge: "ALL IN ONE PLACE",
+				title: "Put all your links in one place and make your bio shine.",
+				description:
+					"Stand out online with Bionk. Gather social links, portfolio, events, contacts and more on a single page.",
+				learnMore: "Learn more",
+				getStarted: "Get started free",
+			};
+		}
+		if (locale === "es") {
+			return {
+				badge: "TODO EN UN SOLO LUGAR",
+				title: "Pon todos tus enlaces en un solo lugar y haz tu bio increíble.",
+				description:
+					"Destaca tu presencia digital con Bionk. Reúne enlaces de redes, portafolio, agenda de eventos, contactos y más en una única página.",
+				learnMore: "Saber más",
+				getStarted: "Empieza gratis",
+			};
+		}
+		return {
+			badge: "TUDO EM UM SÓ LUGAR",
+			title:
+				"Coloque todos os seus links em um só lugar e deixe sua bio incrível.",
+			description:
+				"Destaque sua presença digital com o Bionk. Reúna links de redes sociais, portfólio, agenda de eventos, contatos e muito mais em uma única página.",
+			learnMore: "Saiba mais",
+			getStarted: "Comece Grátis",
+		};
+	}, [locale]);
 	const [isLoaded, setIsLoaded] = useState(false);
 	const [isClicked, setIsClicked] = useState<{ [key: string]: boolean }>({});
 	const router = useRouter();
@@ -37,7 +68,7 @@ const Hero = () => {
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 				>
-					TUDO EM UM SÓ LUGAR
+					{dict.badge}
 				</div>
 
 				<h1
@@ -46,7 +77,7 @@ const Hero = () => {
 					}`}
 					style={{ transitionDelay: "100ms" }}
 				>
-					Coloque todos os seus links em um só lugar e deixe sua bio incrível.
+					{dict.title}
 				</h1>
 
 				<p
@@ -55,9 +86,7 @@ const Hero = () => {
 					}`}
 					style={{ transitionDelay: "200ms" }}
 				>
-					Destaque sua presença digital com o Bionk. Reúna links de redes
-					sociais, portfólio, agenda de eventos, contatos e muito mais em uma
-					única página.
+					{dict.description}
 				</p>
 
 				<div
@@ -72,7 +101,7 @@ const Hero = () => {
 						variant="white"
 					>
 						<span className="flex items-center">
-							Saiba mais <ExternalLink className="ml-2 h-4 w-4" />
+							{dict.learnMore} <ExternalLink className="ml-2 h-4 w-4" />
 						</span>
 					</BaseButton>
 					<BaseButton
@@ -81,7 +110,7 @@ const Hero = () => {
 						onClick={() => handleClick("/registro")}
 					>
 						<span className="relative z-10 flex items-center">
-							Comece Grátis{" "}
+							{dict.getStarted}{" "}
 							<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
 						</span>
 					</BaseButton>
