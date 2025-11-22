@@ -4,12 +4,12 @@ import Image from "next/image";
 
 interface VideoOptionsProps {
 	onOptionSelect: (
-		option: "video" | "youtube" | "vimeo" | "tiktok" | "twitch"
+		option: "video" | "youtube" | "vimeo" | "tiktok" | "twitch clip"
 	) => void;
 }
 
 type Option = {
-	value: "video" | "youtube" | "vimeo" | "tiktok" | "twitch";
+	value: "video" | "youtube" | "vimeo" | "tiktok" | "twitch clip";
 	title: string;
 	description: string;
 	imageSrc: string;
@@ -106,9 +106,9 @@ const VideoOptions = ({ onOptionSelect }: VideoOptionsProps) => {
 			bg: "bg-blue-600",
 		},
 		{
-			value: "twitch",
-			title: "Twitch",
-			description: "Integre transmissões ou clipes da Twitch.",
+			value: "twitch clip",
+			title: "Twitch Clip",
+			description: "Integre clipes da Twitch.",
 			imageSrc: "/icons/twitch.svg",
 			bg: "bg-violet-600",
 		},
