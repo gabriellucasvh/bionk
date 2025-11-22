@@ -1,6 +1,7 @@
 "use client";
 
 import Cookies from "js-cookie";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const locales = ["pt-br", "en", "es"] as const;
@@ -31,7 +32,27 @@ export default function LanguageSwitcher({
 					onClick={() => setLocale(l)}
 					type="button"
 				>
-					{l === "pt-br" ? "PT" : l.toUpperCase()}
+					<span className="inline-flex items-center gap-1">
+						<Image
+							alt={
+								l === "pt-br"
+									? "Bandeira PT-BR"
+									: l === "en"
+										? "Bandeira EN"
+										: "Bandeira ES"
+							}
+							height={14}
+							src={
+								l === "pt-br"
+									? "/flags/br.svg"
+									: l === "en"
+										? "/flags/us.svg"
+										: "/flags/es.svg"
+							}
+							width={20}
+						/>
+						<span>{l === "pt-br" ? "PT" : l.toUpperCase()}</span>
+					</span>
 				</button>
 			))}
 		</div>
