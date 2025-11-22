@@ -1,7 +1,6 @@
 generator client {
-  provider        = "prisma-client"
-  previewFeatures = ["driverAdapters"]
-  output          = "../node_modules/.prisma/client"
+  provider = "prisma-client"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -20,48 +19,48 @@ enum EventLinkVisibility {
 }
 
 model User {
-  id                            String         @id @default(uuid())
+  id                            String                 @id @default(uuid())
   name                          String
-  username                      String         @unique
-  email                         String         @unique
+  username                      String                 @unique
+  email                         String                 @unique
   bio                           String?
   provider                      String?
   emailVerified                 DateTime?
-  image                         String?        @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png")
+  image                         String?                @default("https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png")
   bannerUrl                     String?
   googleId                      String?
   hashedPassword                String?
-  createdAt                     DateTime       @default(now())
-  onboardingCompleted           Boolean        @default(false)
-  template                      String         @default("default")
-  templateCategory              String         @default("classicos")
-  sensitiveProfile              Boolean        @default(false)
-  isBanned                      Boolean        @default(false)
-  banReason                     String?        @default("violation")
+  createdAt                     DateTime               @default(now())
+  onboardingCompleted           Boolean                @default(false)
+  template                      String                 @default("default")
+  templateCategory              String                 @default("classicos")
+  sensitiveProfile              Boolean                @default(false)
+  isBanned                      Boolean                @default(false)
+  banReason                     String?                @default("violation")
   pendingSubscriptionPlan       String?
-  status                        String         @default("pending")
-  userType                      String         @default("personal")
+  status                        String                 @default("pending")
+  userType                      String                 @default("personal")
   subscriptionPlan              String?
   subscriptionStatus            String?
   billingCycle                  String?
   subscriptionEndDate           DateTime?
   subscriptionStartDate         DateTime?
   passwordResetExpires          DateTime?
-  passwordResetToken            String?        @unique
-  emailVerificationToken        String?        @unique
+  passwordResetToken            String?                @unique
+  emailVerificationToken        String?                @unique
   emailVerificationTokenExpires DateTime?
-  newEmailPending               String?        @unique
+  newEmailPending               String?                @unique
   registrationOtp               String?
-  registrationOtpAttempts       Int            @default(0)
+  registrationOtpAttempts       Int                    @default(0)
   registrationOtpBlockedUntil   DateTime?
   registrationOtpExpiry         DateTime?
   registrationCsrfState         String?
   registrationCsrfExpiry        DateTime?
-  passwordSetupToken            String?        @unique
+  passwordSetupToken            String?                @unique
   passwordSetupTokenExpiry      DateTime?
-  otpToken                      String?        @unique
+  otpToken                      String?                @unique
   otpTokenExpiry                DateTime?
-  verificationToken             String?        @unique
+  verificationToken             String?                @unique
   verificationTokenExpiry       DateTime?
   usernameReservedAt            DateTime?
   usernameReservationExpiry     DateTime?
@@ -128,31 +127,31 @@ model VerificationToken {
 }
 
 model Link {
-  id              Int         @id @default(autoincrement())
-  title           String      @db.VarChar(80)
-  url             String?
-  active          Boolean     @default(true)
-  clicks          Int         @default(0)
-  order           Int         @default(0)
-  userId          String
-  archived        Boolean     @default(false)
-  badge           String?
-  deleteOnClicks  Int?
-  expiresAt       DateTime?
-  launchesAt      DateTime?
-  password        String?
-  isProduct       Boolean?    @default(false)
-  price           Float?
-  productImageUrl String?
-  sectionId       Int?
-  customImageUrl  String?
-  type            String      @default("link")
-  animated        Boolean     @default(false)
-  shareAllowed    Boolean     @default(false)
-  section         Section?    @relation(fields: [sectionId], references: [id])
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  LinkClick       LinkClick[]
-  LinkView        LinkView[]
+  id                   Int                    @id @default(autoincrement())
+  title                String                 @db.VarChar(80)
+  url                  String?
+  active               Boolean                @default(true)
+  clicks               Int                    @default(0)
+  order                Int                    @default(0)
+  userId               String
+  archived             Boolean                @default(false)
+  badge                String?
+  deleteOnClicks       Int?
+  expiresAt            DateTime?
+  launchesAt           DateTime?
+  password             String?
+  isProduct            Boolean?               @default(false)
+  price                Float?
+  productImageUrl      String?
+  sectionId            Int?
+  customImageUrl       String?
+  type                 String                 @default("link")
+  animated             Boolean                @default(false)
+  shareAllowed         Boolean                @default(false)
+  section              Section?               @relation(fields: [sectionId], references: [id])
+  user                 User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  LinkClick            LinkClick[]
+  LinkView             LinkView[]
   MonthlyLinkAnalytics MonthlyLinkAnalytics[]
 
   @@index([sectionId])
@@ -246,15 +245,15 @@ model MonthlyLinkAnalytics {
 
 // Ledger de execuções diárias do cron para garantir idempotência
 model DailyRollup {
-  id        Int      @id @default(autoincrement())
-  dayStart  DateTime // início do dia (UTC) consolidado
-  status    String   @default("pending") // valores: pending | completed | failed
-  source    String?
-  attempts  Int      @default(0)
+  id          Int       @id @default(autoincrement())
+  dayStart    DateTime // início do dia (UTC) consolidado
+  status      String    @default("pending") // valores: pending | completed | failed
+  source      String?
+  attempts    Int       @default(0)
   nextRetryAt DateTime?
-  lastError String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  lastError   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@unique([dayStart])
   @@index([status])
@@ -392,25 +391,25 @@ model Music {
 }
 
 model Event {
-  id               Int       @id @default(autoincrement())
-  userId           String
-  title            String
-  location         String
-  eventDate        DateTime
-  eventTime        String
-  descriptionShort String?
-  externalLink     String   @default("")
-  countdownLinkUrl String?
+  id                      Int                  @id @default(autoincrement())
+  userId                  String
+  title                   String
+  location                String
+  eventDate               DateTime
+  eventTime               String
+  descriptionShort        String?
+  externalLink            String               @default("")
+  countdownLinkUrl        String?
   countdownLinkVisibility EventLinkVisibility?
-  coverImageUrl    String?
-  active           Boolean   @default(true)
-  order            Int       @default(0)
-  type             String    @default("tickets")
-  targetMonth      Int?
-  targetDay        Int?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coverImageUrl           String?
+  active                  Boolean              @default(true)
+  order                   Int                  @default(0)
+  type                    String               @default("tickets")
+  targetMonth             Int?
+  targetDay               Int?
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+  user                    User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, order])
