@@ -1,21 +1,8 @@
 "use client";
 
-import {
-	CalendarRange,
-	ChevronDown,
-	FileSpreadsheet,
-	FileText,
-	LayoutDashboard as LayoutStudio,
-} from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
 	Popover,
 	PopoverContent,
@@ -29,9 +16,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import "react-day-picker/dist/style.css";
-import { BaseButton } from "@/components/buttons/BaseButton";
-import { ProButton } from "@/components/buttons/ProButton";
-import { cn } from "@/lib/utils";
+import ExportOptions from "./analises.ExportOptions";
+import PeriodSelector from "./analises.PeriodSelector";
 
 type Plan = "free" | "basic" | "pro" | "ultra";
 type RangeKey = "7d" | "30d" | "90d" | "365d" | "tudo";
@@ -47,16 +33,6 @@ interface AnalyticsHeaderProps {
 	customEnd?: Date | null;
 	onCustomRangeChange?: (start: Date | null, end: Date | null) => void;
 }
-
-const RANGE_LABEL: Record<RangeKey, string> = {
-	"7d": "Últimos 7 dias",
-	"30d": "Últimos 30 dias",
-	"90d": "Últimos 90 dias",
-	"365d": "Últimos 365 dias",
-	// Usamos "tudo" como chave interna para customização de período
-	// mas exibimos como "Personalizar período"
-	tudo: "Personalizar período",
-};
 
 const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 	({
@@ -81,42 +57,6 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 			return arr;
 		}, [currentYear]);
 
-		// Mantemos todas as opções sempre visíveis; disponibilidade controlada pelo plano
-
-		type PeriodOption = "7d" | "30d" | "90d" | "365d" | "custom";
-		const PLAN_RANK: Record<Plan, number> = {
-			free: 0,
-			basic: 1,
-			pro: 2,
-			ultra: 3,
-		};
-		const PERIOD_REQUIRED_RANK: Record<PeriodOption, number> = {
-			"7d": 0,
-			"30d": 0,
-			"90d": 1,
-			"365d": 2,
-			custom: 3,
-		};
-		const PLAN_BY_RANK: Record<number, Plan> = {
-			0: "free",
-			1: "basic",
-			2: "pro",
-			3: "ultra",
-		};
-		const isPeriodAvailable = (p: Plan, option: PeriodOption) =>
-			PLAN_RANK[p] >= PERIOD_REQUIRED_RANK[option];
-		const disabledItemClasses = (disabled: boolean) =>
-			cn(disabled && "cursor-not-allowed select-none");
-
-		const labelFromPlan = (p: Plan) =>
-			p === "free"
-				? "Free"
-				: p === "basic"
-					? "Basic"
-					: p === "pro"
-						? "Pro"
-						: "Ultra";
-
 		const onSelectMonthYear = (year: number, monthIndex: number) => {
 			if (!onCustomRangeChange) {
 				return;
@@ -131,192 +71,21 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 			<header className="mb-3 flex flex-col items-start justify-between gap-3 sm:mb-4 sm:flex-row sm:items-center sm:gap-4">
 				<h2 className="font-bold text-xl sm:text-2xl">Análises</h2>
 				<div className="flex w-full flex-row justify-between gap-2 sm:w-auto">
-					{/* Seletor de intervalo */}
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<BaseButton className="select-none rounded-xl bg-black text-white text-xs hover:bg-black/80 sm:text-sm dark:bg-white dark:text-black">
-								<CalendarRange className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
-								{RANGE_LABEL[range]}
-								<ChevronDown className="mr-1 ml-2 h-4 w-4" />
-							</BaseButton>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="w-48 sm:w-56">
-							{/* 7d */}
-							{(() => {
-								const enabled = isPeriodAvailable(plan, "7d");
-								return (
-									<DropdownMenuItem
-										aria-disabled={!enabled}
-										className={cn(
-											"text-xs sm:text-sm",
-											"flex items-center justify-between gap-2",
-											!enabled && disabledItemClasses(true)
-										)}
-										onClick={() => enabled && onRangeChange("7d")}
-										onSelect={(e) => {
-											if (!enabled) {
-												e.preventDefault();
-											}
-										}}
-									>
-										<span className={cn(!enabled && "text-muted-foreground")}>
-											{RANGE_LABEL["7d"]}
-										</span>
-										{!enabled && (
-											<ProButton
-												href="/planos"
-												label={labelFromPlan(
-													PLAN_BY_RANK[PERIOD_REQUIRED_RANK["7d"]]
-												)}
-												showOverlayTooltip={false}
-												size="xs"
-												tooltip={`Disponível no plano ${labelFromPlan(PLAN_BY_RANK[PERIOD_REQUIRED_RANK["7d"]])}`}
-											/>
-										)}
-									</DropdownMenuItem>
-								);
-							})()}
-							{/* 30d */}
-							{(() => {
-								const enabled = isPeriodAvailable(plan, "30d");
-								return (
-									<DropdownMenuItem
-										aria-disabled={!enabled}
-										className={cn(
-											"text-xs sm:text-sm",
-											"flex items-center justify-between gap-2",
-											!enabled && disabledItemClasses(true)
-										)}
-										onClick={() => enabled && onRangeChange("30d")}
-										onSelect={(e) => {
-											if (!enabled) {
-												e.preventDefault();
-											}
-										}}
-									>
-										<span className={cn(!enabled && "text-muted-foreground")}>
-											{RANGE_LABEL["30d"]}
-										</span>
-										{!enabled && (
-											<ProButton
-												href="/planos"
-												label={labelFromPlan(
-													PLAN_BY_RANK[PERIOD_REQUIRED_RANK["30d"]]
-												)}
-												showOverlayTooltip={false}
-												size="xs"
-												tooltip={`Disponível no plano ${labelFromPlan(PLAN_BY_RANK[PERIOD_REQUIRED_RANK["30d"]])}`}
-											/>
-										)}
-									</DropdownMenuItem>
-								);
-							})()}
-							{/* 90d */}
-							{(() => {
-								const enabled = isPeriodAvailable(plan, "90d");
-								return (
-									<DropdownMenuItem
-										aria-disabled={!enabled}
-										className={cn(
-											"text-xs sm:text-sm",
-											"flex items-center justify-between gap-2",
-											!enabled && disabledItemClasses(true)
-										)}
-										onClick={() => enabled && onRangeChange("90d")}
-										onSelect={(e) => {
-											if (!enabled) {
-												e.preventDefault();
-											}
-										}}
-									>
-										<span className={cn(!enabled && "text-muted-foreground")}>
-											{RANGE_LABEL["90d"]}
-										</span>
-										{!enabled && (
-											<ProButton
-												href="/planos"
-												label="Pro"
-												showOverlayTooltip={false}
-												size="xs"
-												tooltip={`Disponível no plano ${labelFromPlan(PLAN_BY_RANK[PERIOD_REQUIRED_RANK["90d"]])}`}
-											/>
-										)}
-									</DropdownMenuItem>
-								);
-							})()}
-							{/* 365d */}
-							{(() => {
-								const enabled = isPeriodAvailable(plan, "365d");
-								return (
-									<DropdownMenuItem
-										aria-disabled={!enabled}
-										className={cn(
-											"text-xs sm:text-sm",
-											"flex items-center justify-between gap-2",
-											!enabled && disabledItemClasses(true)
-										)}
-										onClick={() => enabled && onRangeChange("365d")}
-										onSelect={(e) => {
-											if (!enabled) {
-												e.preventDefault();
-											}
-										}}
-									>
-										<span className={cn(!enabled && "text-muted-foreground")}>
-											{RANGE_LABEL["365d"]}
-										</span>
-										{!enabled && (
-											<ProButton
-												href="/planos"
-												label="Pro"
-												showOverlayTooltip={false}
-												size="xs"
-												tooltip={`Disponível no plano ${labelFromPlan(PLAN_BY_RANK[PERIOD_REQUIRED_RANK["365d"]])}`}
-											/>
-										)}
-									</DropdownMenuItem>
-								);
-							})()}
-							{/* Personalizar período (custom) */}
-							{(() => {
-								const enabled = isPeriodAvailable(plan, "custom");
-								return (
-									<DropdownMenuItem
-										aria-disabled={!enabled}
-										className={cn(
-											"text-xs sm:text-sm",
-											"flex items-center justify-between gap-2",
-											!enabled && disabledItemClasses(true)
-										)}
-										onClick={() => {
-											if (!enabled) {
-												return;
-											}
-											setCustomOpen(true);
-										}}
-										onSelect={(e) => {
-											if (!enabled) {
-												e.preventDefault();
-											}
-										}}
-									>
-										<span className={cn(!enabled && "text-muted-foreground")}>
-											Personalizar período…
-										</span>
-										{!enabled && (
-											<ProButton
-												href="/planos"
-												label="Pro"
-												showOverlayTooltip={false}
-												size="xs"
-												tooltip={`Disponível no plano ${labelFromPlan(PLAN_BY_RANK[PERIOD_REQUIRED_RANK.custom])}`}
-											/>
-										)}
-									</DropdownMenuItem>
-								);
-							})()}
-						</DropdownMenuContent>
-					</DropdownMenu>
+					<PeriodSelector
+						customEnd={customEnd}
+						customStart={customStart}
+						onCustomRangeChange={(start, end) => {
+							if (!onCustomRangeChange) {
+								return;
+							}
+							onRangeChange("tudo");
+							onCustomRangeChange(start, end);
+						}}
+						onOpenCustom={() => setCustomOpen(true)}
+						onRangeChange={onRangeChange}
+						plan={plan}
+						range={range}
+					/>
 
 					{/* Popover de customização (apenas abre quando permitido) */}
 					<Popover onOpenChange={setCustomOpen} open={customOpen}>
@@ -408,38 +177,11 @@ const AnalyticsHeader: React.FC<AnalyticsHeaderProps> = React.memo(
 						</PopoverContent>
 					</Popover>
 
-					{/* Exportações */}
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<BaseButton className="select-none rounded-xl bg-black text-white text-xs hover:bg-black/80 sm:text-sm dark:bg-white dark:text-black">
-								<LayoutStudio className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
-								Exportar
-							</BaseButton>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="w-36 sm:w-50">
-							<DropdownMenuItem
-								className="cursor-pointer text-xs sm:text-sm"
-								onClick={onExportToExcel}
-							>
-								<FileSpreadsheet className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
-								<span className="hidden sm:inline">Exportar para </span>Excel
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								className="cursor-pointer text-xs sm:text-sm"
-								onClick={onExportToPDF}
-							>
-								<FileText className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
-								<span className="hidden sm:inline">Exportar para </span>PDF
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								className="cursor-pointer text-xs sm:text-sm"
-								onClick={onExportToCSV}
-							>
-								<FileText className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
-								<span className="hidden sm:inline">Exportar para </span>CSV
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+					<ExportOptions
+						onExportToCSV={onExportToCSV}
+						onExportToExcel={onExportToExcel}
+						onExportToPDF={onExportToPDF}
+					/>
 				</div>
 			</header>
 		);
