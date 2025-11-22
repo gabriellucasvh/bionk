@@ -457,7 +457,7 @@ const Sidebar = () => {
 								<Button
 									className={`flex flex-col items-center gap-1 px-1 font-semibold text-xs ${
 										isActive
-											? "text-green-600 dark:text-green-400"
+											? "text-black dark:text-white"
 											: "text-zinc-500 dark:text-zinc-400"
 									}`}
 									onClick={() => !isActive && handleNavClick(link.href)}
