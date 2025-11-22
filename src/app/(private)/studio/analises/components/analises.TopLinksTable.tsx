@@ -17,6 +17,8 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 
+const TRAILING_SLASHES_REGEX = /\/+$/;
+
 interface TopLinkData {
 	id: string;
 	title: string;
@@ -72,14 +74,44 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 											</span>{" "}
 											{link.title}
 										</span>
-										<Link
-											className="flex w-full max-w-full items-center gap-1 overflow-hidden text-blue-500 text-xs sm:max-w-md sm:text-sm"
-											href={link.url}
-											target="_blank"
-										>
-											<LinkIcon className="h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
-											<span className="truncate">{link.url}</span>
-										</Link>
+										{(() => {
+											const transformTwitchUrl = (u: string) => {
+												try {
+													const parsed = new URL(u);
+													if (
+														parsed.hostname.toLowerCase() ===
+															"clips.twitch.tv" &&
+														parsed.pathname.replace(
+															TRAILING_SLASHES_REGEX,
+															""
+														) === "/embed"
+													) {
+														const slug = parsed.searchParams.get("clip");
+														if (slug && slug.trim().length > 0) {
+															const display = `https://clips.twitch.tv/${slug}`;
+															return { href: display, text: display };
+														}
+													}
+												} catch {}
+												return { href: u, text: u };
+											};
+											const isTwitchEmbed = link.url.includes(
+												"clips.twitch.tv/embed"
+											);
+											const display = isTwitchEmbed
+												? transformTwitchUrl(link.url)
+												: { href: link.url, text: link.url };
+											return (
+												<Link
+													className="flex w-full max-w-full items-center gap-1 overflow-hidden text-blue-500 text-xs sm:max-w-md sm:text-sm"
+													href={display.href}
+													target="_blank"
+												>
+													<LinkIcon className="h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
+													<span className="truncate">{display.text}</span>
+												</Link>
+											);
+										})()}
 									</div>
 									<div className="flex items-center rounded-full bg-primary/5 px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm">
 										<MousePointerClick

@@ -9,6 +9,7 @@ interface VideoPlayerProps {
 	title?: string;
 	className?: string;
 	customButtonCorners?: string;
+	onPlayClick?: () => void;
 }
 
 export default function VideoPlayer({
@@ -17,6 +18,7 @@ export default function VideoPlayer({
 	title,
 	className = "",
 	customButtonCorners,
+	onPlayClick,
 }: VideoPlayerProps) {
 	const getBorderRadius = () => {
 		if (customButtonCorners && customButtonCorners !== "") {
@@ -131,6 +133,9 @@ export default function VideoPlayer({
 	}, [type, url]);
 
 	const handlePlay = () => {
+		if (onPlayClick) {
+			onPlayClick();
+		}
 		if (type === "direct") {
 			if (videoRef.current) {
 				videoRef.current.play();

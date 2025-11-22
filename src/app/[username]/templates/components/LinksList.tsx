@@ -7,6 +7,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { TemplateComponentProps, UserLink } from "@/types/user-profile";
+import { detectTrafficSource } from "@/utils/traffic-source";
 import EventCard from "./cards/EventCard";
 import ImageCard from "./cards/ImageCard";
 import InteractiveLink from "./cards/InteractiveLink";
@@ -14,6 +15,15 @@ import MusicCard from "./cards/MusicCard";
 import PasswordProtectedLink from "./cards/PasswordProtectedLink";
 import TextCard from "./cards/TextCard";
 import VideoCard from "./cards/VideoCard";
+
+const YOUTUBE_ID_REGEX =
+	/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/;
+const VIMEO_ID_REGEX = /vimeo\.com\/(\d+)/;
+const VIMEO_PLAYER_ID_REGEX = /player\.vimeo\.com\/video\/(\d+)/;
+const TIKTOK_ID_REGEX = /tiktok\.com\/@[^/]+\/video\/(\d+)/;
+const TWITCH_CLIP_REGEX =
+	/(?:clips\.twitch\.tv\/([A-Za-z0-9-]+)|twitch\.tv\/[^/]+\/clip\/([A-Za-z0-9-]+))/i;
+const TRAILING_SLASHES_REGEX = /\/+$/;
 
 export default function LinksList({
 	user,
@@ -250,11 +260,115 @@ export default function LinksList({
 			}
 		}
 
+		const sendVideoClickData = () => {
+			const endpoint = "/api/link-click";
+			const trafficSource = detectTrafficSource();
+			const platformName = (() => {
+				if (video.type === "youtube") {
+					return "YouTube";
+				}
+				if (video.type === "vimeo") {
+					return "Vimeo";
+				}
+				if (video.type === "tiktok") {
+					return "TikTok";
+				}
+				if (video.type === "twitch") {
+					return "Twitch";
+				}
+				return "Vídeo";
+			})();
+			const ensureHttps = (u: string) => {
+				if (!u) {
+					return "";
+				}
+				if (u.startsWith("http://")) {
+					return `https://${u.slice(7)}`;
+				}
+				if (!u.startsWith("http")) {
+					return `https://${u}`;
+				}
+				return u;
+			};
+			const normalizeUrlForClick = (u: string, t: string) => {
+				const trimmed = ensureHttps(u.trim());
+				if (t === "youtube") {
+					const m = trimmed.match(YOUTUBE_ID_REGEX);
+					if (m) {
+						return `https://www.youtube.com/embed/${m[1]}`;
+					}
+					return trimmed;
+				}
+				if (t === "vimeo") {
+					const m1 = trimmed.match(VIMEO_ID_REGEX);
+					if (m1) {
+						return `https://player.vimeo.com/video/${m1[1]}`;
+					}
+					const m2 = trimmed.match(VIMEO_PLAYER_ID_REGEX);
+					if (m2) {
+						return `https://player.vimeo.com/video/${m2[1]}`;
+					}
+					return trimmed;
+				}
+				if (t === "tiktok") {
+					const m = trimmed.match(TIKTOK_ID_REGEX);
+					if (m) {
+						return `https://www.tiktok.com/embed/v2/${m[1]}`;
+					}
+					return trimmed;
+				}
+				if (t === "twitch") {
+					try {
+						const parsedUrl = new URL(trimmed);
+						if (
+							parsedUrl.hostname.toLowerCase() === "clips.twitch.tv" &&
+							parsedUrl.pathname.replace(TRAILING_SLASHES_REGEX, "") ===
+								"/embed"
+						) {
+							const slugParam = parsedUrl.searchParams.get("clip");
+							if (slugParam && slugParam.trim().length > 0) {
+								return `https://clips.twitch.tv/embed?clip=${slugParam}`;
+							}
+						}
+					} catch {}
+					const m = trimmed.match(TWITCH_CLIP_REGEX);
+					const slug = m ? m[1] || m[2] : null;
+					if (slug) {
+						return `https://clips.twitch.tv/embed?clip=${slug}`;
+					}
+					return trimmed;
+				}
+				return trimmed;
+			};
+			const normalizedUrl = normalizeUrlForClick(
+				video.url || "",
+				video.type || "video"
+			);
+			const payload = JSON.stringify({
+				trafficSource,
+				url: normalizedUrl,
+				userId: user.id,
+				title: video.title || platformName,
+				type: "video_link",
+			});
+			if (navigator.sendBeacon) {
+				navigator.sendBeacon(endpoint, payload);
+			} else {
+				fetch(endpoint, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: payload,
+					keepalive: true,
+				});
+			}
+		};
+
 		result.push(
 			<VideoCard
 				customPresets={customPresets}
 				key={`video-${video.id}`}
 				{...video}
+				onPlayClick={sendVideoClickData}
 			/>
 		);
 		return result;

@@ -4,27 +4,29 @@ import type { CustomPresets } from "./utils/style";
 import { buildCompactButtonStyle, toForeground } from "./utils/style";
 
 interface VideoCardProps {
-	id: number;
-	title?: string;
-	description?: string;
-	type: string;
-	url: string;
-	className?: string;
-	classNames?: {
-		name?: string;
-		bio?: string;
-	};
-	customPresets?: CustomPresets;
+    id: number;
+    title?: string;
+    description?: string;
+    type: string;
+    url: string;
+    className?: string;
+    classNames?: {
+        name?: string;
+        bio?: string;
+    };
+    customPresets?: CustomPresets;
+    onPlayClick?: () => void;
 }
 
 export default function VideoCard({
-	title,
-	description,
-	type,
-	url,
-	className = "",
-	classNames,
-	customPresets,
+    title,
+    description,
+    type,
+    url,
+    className = "",
+    classNames,
+    customPresets,
+    onPlayClick,
 }: VideoCardProps) {
 	const isTikTok = type === "tiktok";
 	const videoContainerClass = isTikTok ? "flex justify-center" : "";
@@ -64,17 +66,18 @@ export default function VideoCard({
 				className={`${videoContainerClass} overflow-hidden bg-black`}
 				style={hasInfoArea ? topRadiusStyle : fullRadiusStyle}
 			>
-				<VideoPlayer
-					className={
-						hasInfoArea ? `rounded-none ${videoPlayerClass}` : videoPlayerClass
-					}
-					customButtonCorners={
-						hasInfoArea ? undefined : customPresets?.customButtonCorners
-					}
-					title={title}
-					type={type}
-					url={url}
-				/>
+                <VideoPlayer
+                    className={
+                        hasInfoArea ? `rounded-none ${videoPlayerClass}` : videoPlayerClass
+                    }
+                    customButtonCorners={
+                        hasInfoArea ? undefined : customPresets?.customButtonCorners
+                    }
+                    title={title}
+                    type={type}
+                    url={url}
+                    onPlayClick={onPlayClick}
+                />
 			</div>
 			{hasInfoArea && (
 				<div

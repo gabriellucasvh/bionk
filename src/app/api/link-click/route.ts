@@ -9,40 +9,51 @@ export async function POST(req: NextRequest) {
 		// Lida tanto com JSON quanto com texto plano do sendBeacon
 		const body = await req.text();
 		const parsed = JSON.parse(body);
-		let { linkId, trafficSource, url, userId, title } = parsed as {
+		let { linkId, trafficSource, url, userId, title, type } = parsed as {
 			linkId?: number | string;
 			trafficSource?: string;
 			url?: string;
 			userId?: string;
 			title?: string;
+			type?: string;
 		};
 
 		if (!linkId || Number.isNaN(Number(linkId))) {
 			if (!(url && userId)) {
 				return NextResponse.json(
-					{ error: "ID do link inválido; informe url e userId ou um linkId válido" },
+					{
+						error:
+							"ID do link inválido; informe url e userId ou um linkId válido",
+					},
 					{ status: 400 }
 				);
 			}
 
-            const existing = await prisma.link.findFirst({
-                where: { userId, url, type: "countdown_link" },
-                select: { id: true },
-            });
+			const linkType =
+				typeof type === "string" && type ? type : "countdown_link";
+			const existing = await prisma.link.findFirst({
+				where: { userId, url, type: linkType },
+				select: { id: true },
+			});
 			if (existing) {
 				linkId = existing.id;
 			} else {
-            const created = await prisma.link.create({
-                data: {
-                    userId,
-                    title: title ? `Countdown: ${title}` : "Countdown",
-                    url,
-                    active: false,
-                    archived: true,
-                    type: "countdown_link",
-                },
-                select: { id: true },
-            });
+				const created = await prisma.link.create({
+					data: {
+						userId,
+						title:
+							linkType === "countdown_link"
+								? title
+									? `Countdown: ${title}`
+									: "Countdown"
+								: title || "Vídeo",
+						url,
+						active: false,
+						archived: true,
+						type: linkType,
+					},
+					select: { id: true },
+				});
 				linkId = created.id;
 			}
 		}
@@ -50,26 +61,34 @@ export async function POST(req: NextRequest) {
 		// Verificar preferências de cookies
 		const cookiePreferences = await getCookiePreferencesFromHeaders();
 
-		// Se analytics não estão permitidos, não processar o tracking detalhado
+		// Se analytics não estão permitidos, registramos o clique com dados mínimos
 		if (!cookiePreferences.analytics) {
-			// Ainda incrementar o contador de cliques (funcionalidade essencial)
-			// mas sem coletar dados de tracking
-			const linkWithIncrementedClicks = await prisma.link.update({
-				where: { id: Number(linkId) },
-				data: { clicks: { increment: 1 } },
-				select: {
-					id: true,
-					clicks: true,
-					deleteOnClicks: true,
-					active: true,
-					title: true,
-				},
-			});
+			const [, updatedLinkAnon] = await prisma.$transaction([
+				prisma.linkClick.create({
+					data: {
+						linkId: Number(linkId),
+						device: "unknown",
+						userAgent: null,
+						country: null,
+						referrer: null,
+					},
+				}),
+				prisma.link.update({
+					where: { id: Number(linkId) },
+					data: { clicks: { increment: 1 } },
+					select: {
+						id: true,
+						clicks: true,
+						deleteOnClicks: true,
+						active: true,
+						title: true,
+					},
+				}),
+			]);
 
 			if (
-				linkWithIncrementedClicks.deleteOnClicks &&
-				linkWithIncrementedClicks.clicks >=
-					linkWithIncrementedClicks.deleteOnClicks
+				updatedLinkAnon.deleteOnClicks &&
+				updatedLinkAnon.clicks >= updatedLinkAnon.deleteOnClicks
 			) {
 				await prisma.link.update({
 					where: { id: Number(linkId) },
@@ -77,10 +96,7 @@ export async function POST(req: NextRequest) {
 				});
 			}
 
-			return NextResponse.json({
-				message: "Click recorded without tracking",
-				clicks: linkWithIncrementedClicks.clicks,
-			});
+			return NextResponse.json(updatedLinkAnon);
 		}
 
 		// Detectar tipo de dispositivo de forma anônima (LGPD compliant)
@@ -96,7 +112,7 @@ export async function POST(req: NextRequest) {
 		// Usar trafficSource do cliente ou fallback para direct
 		const normalizedReferrer = trafficSource || "direct";
 
-		const [, updatedLink] = await prisma.$transaction([
+		const [, updatedLinkDetailed] = await prisma.$transaction([
 			prisma.linkClick.create({
 				data: {
 					linkId: Number(linkId),
@@ -120,8 +136,8 @@ export async function POST(req: NextRequest) {
 		]);
 
 		if (
-			updatedLink.deleteOnClicks &&
-			updatedLink.clicks >= updatedLink.deleteOnClicks
+			updatedLinkDetailed.deleteOnClicks &&
+			updatedLinkDetailed.clicks >= updatedLinkDetailed.deleteOnClicks
 		) {
 			await prisma.link.update({
 				where: { id: Number(linkId) },
@@ -129,7 +145,7 @@ export async function POST(req: NextRequest) {
 			});
 		}
 
-		return NextResponse.json(updatedLink);
+		return NextResponse.json(updatedLinkDetailed);
 	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
