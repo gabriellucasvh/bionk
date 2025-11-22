@@ -1,7 +1,7 @@
 import type React from "react";
 import VideoPlayer from "@/components/VideoPlayer";
 import type { CustomPresets } from "./utils/style";
-import { toForeground, buildCompactButtonStyle } from "./utils/style";
+import { buildCompactButtonStyle, toForeground } from "./utils/style";
 
 interface VideoCardProps {
 	id: number;
@@ -51,45 +51,63 @@ export default function VideoCard({
 		borderBottomLeftRadius: `${cornerValue}px`,
 		borderBottomRightRadius: `${cornerValue}px`,
 	} as React.CSSProperties;
+	const fullRadiusStyle = {
+		borderTopLeftRadius: `${cornerValue}px`,
+		borderTopRightRadius: `${cornerValue}px`,
+		borderBottomLeftRadius: `${cornerValue}px`,
+		borderBottomRightRadius: `${cornerValue}px`,
+	} as React.CSSProperties;
 
 	return (
 		<div className={`w-full pb-4 ${className}`}>
-			<div className={videoContainerClass}>
-				<div
-					className="overflow-hidden"
-					style={hasInfoArea ? topRadiusStyle : undefined}
-				>
-					<VideoPlayer
-						className={
-							hasInfoArea
-								? `rounded-none ${videoPlayerClass}`
-								: videoPlayerClass
-						}
-						customButtonCorners={
-							hasInfoArea ? undefined : customPresets?.customButtonCorners
-						}
-						title={title}
-						type={type}
-						url={url}
-					/>
-				</div>
+			<div
+				className={`${videoContainerClass} overflow-hidden bg-black`}
+				style={hasInfoArea ? topRadiusStyle : fullRadiusStyle}
+			>
+				<VideoPlayer
+					className={
+						hasInfoArea ? `rounded-none ${videoPlayerClass}` : videoPlayerClass
+					}
+					customButtonCorners={
+						hasInfoArea ? undefined : customPresets?.customButtonCorners
+					}
+					title={title}
+					type={type}
+					url={url}
+				/>
 			</div>
-            {hasInfoArea && (
-                <div
-                    className="px-4 py-3 text-center"
-                    style={{
-                        ...(() => {
-                            const s = customPresets
-                                ? buildCompactButtonStyle(customPresets)
-                                : { backgroundColor: buttonColor };
-                            return {
-                                ...s,
-                                borderRadius: 0,
-                                ...bottomRadiusStyle,
-                            } as React.CSSProperties;
-                        })(),
-                    }}
-                >
+			{hasInfoArea && (
+				<div
+					className="px-4 py-3 text-center"
+					style={{
+						...(() => {
+							const baseStyle = customPresets
+								? buildCompactButtonStyle(customPresets)
+								: { backgroundColor: buttonColor };
+							const { border: baseBorder, ...restBase } = baseStyle as any;
+							const style: React.CSSProperties = {
+								...restBase,
+								borderRadius: 0,
+								...bottomRadiusStyle,
+								borderTop: "none",
+							};
+							if (baseBorder) {
+								(style as any).borderLeft = baseBorder;
+								(style as any).borderRight = baseBorder;
+								(style as any).borderBottom = baseBorder;
+							}
+							const btnStyle = customPresets?.customButtonStyle || "";
+							if (btnStyle === "neon") {
+								style.boxShadow = `0 4px 8px ${buttonColor}40`;
+							} else if (btnStyle === "shadow") {
+								style.boxShadow = "0 4px 6px rgba(0,0,0,0.12)";
+							} else if (btnStyle === "raised" || btnStyle === "inset") {
+								style.boxShadow = "none";
+							}
+							return style;
+						})(),
+					}}
+				>
 					{displayTitle && (
 						<h3
 							className={`font-bold text-lg ${classNames?.name || ""}`}
