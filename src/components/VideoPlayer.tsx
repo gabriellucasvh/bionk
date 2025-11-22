@@ -1,3 +1,8 @@
+"use client";
+
+import { Play } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
 interface VideoPlayerProps {
 	type: string;
 	url: string;
@@ -24,52 +29,207 @@ export default function VideoPlayer({
 	const aspectRatio = type === "tiktok" ? "aspect-[9/16]" : "aspect-video";
 	const baseClasses = `w-full ${aspectRatio} ${borderRadius ? "" : ""} ${className}`;
 	const inlineStyle = borderRadius ? { borderRadius } : undefined;
+	const [currentSrc, setCurrentSrc] = useState(url);
+	const [isPlaying, setIsPlaying] = useState(false);
+	const videoRef = useRef<HTMLVideoElement | null>(null);
+	const [vimeoThumb, setVimeoThumb] = useState<string>("");
+
+	const getYouTubeId = (u: string) => {
+		try {
+			const y = new URL(u);
+			const host = y.hostname.replace("www.", "");
+			if (host === "youtu.be") {
+				const p = y.pathname.split("/").filter(Boolean);
+				return p[0] || "";
+			}
+			if (host === "youtube.com") {
+				if (y.pathname.startsWith("/embed/")) {
+					const p = y.pathname.split("/").filter(Boolean);
+					return p[1] || "";
+				}
+				const v = y.searchParams.get("v");
+				if (v) {
+					return v;
+				}
+			}
+		} catch {}
+		return "";
+	};
+
+	const buildAutoplaySrc = (u: string) => {
+		const hasQuery = u.includes("?");
+		if (type === "youtube") {
+			const id = getYouTubeId(u);
+			if (id) {
+				return `https://www.youtube.com/embed/${id}?autoplay=1&modestbranding=1&rel=0&playsinline=1`;
+			}
+			return `${u}${hasQuery ? "&" : "?"}autoplay=1`;
+		}
+		if (type === "vimeo") {
+			return `${u}${hasQuery ? "&" : "?"}autoplay=1`;
+		}
+		if (type === "tiktok") {
+			return u;
+		}
+		if (type === "twitch") {
+			return `${u}${hasQuery ? "&" : "?"}autoplay=true`;
+		}
+		return u;
+	};
+
+	useEffect(() => {
+		if (type === "vimeo") {
+			const endpoint = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
+			fetch(endpoint)
+				.then((r) => (r.ok ? r.json() : null))
+				.then((d) => {
+					const t = d && d.thumbnail_url ? String(d.thumbnail_url) : "";
+					if (t) {
+						setVimeoThumb(t);
+					}
+				})
+				.catch(() => {});
+		}
+	}, [type, url]);
+
+	const handlePlay = () => {
+		if (type === "direct") {
+			if (videoRef.current) {
+				videoRef.current.play();
+			}
+			setIsPlaying(true);
+			return;
+		}
+		const next = buildAutoplaySrc(url);
+		setCurrentSrc(next);
+		setIsPlaying(true);
+	};
 
 	if (type === "direct") {
 		return (
-			<video
-				className={baseClasses}
-				controls
-				preload="metadata"
-				src={url}
-				style={inlineStyle}
-				title={title}
-			>
-				<track
-					default
-					kind="captions"
-					label="Português"
-					src="/captions/sample.vtt"
-					srcLang="pt"
-				/>
-				Seu navegador não suporta o elemento de vídeo.
-			</video>
+			<div className="relative">
+				<video
+					className={baseClasses}
+					controls
+					playsInline
+					preload="metadata"
+					ref={videoRef}
+					src={currentSrc}
+					style={inlineStyle}
+					title={title}
+				>
+					<track
+						default
+						kind="captions"
+						label="Português"
+						src="/captions/sample.vtt"
+						srcLang="pt"
+					/>
+				</video>
+				{!isPlaying && (
+					<>
+						<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+						<button
+							aria-label="Reproduzir"
+							className="absolute inset-0 z-20 flex items-center justify-center"
+							onClick={handlePlay}
+							type="button"
+						>
+							<span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-white/60 shadow-lg backdrop-blur-md transition-all hover:bg-white/90 active:scale-[0.98]">
+								<Play className="h-7 w-7 fill-current text-black/90" />
+							</span>
+						</button>
+					</>
+				)}
+			</div>
 		);
 	}
 
 	if (type === "youtube") {
+		const ytId = getYouTubeId(url);
+		const thumb = ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : "";
 		return (
-			<iframe
-				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-				allowFullScreen
-				className={baseClasses}
-				src={url}
-				style={inlineStyle}
-				title={title || "Vídeo do YouTube"}
-			/>
+			<div className="relative">
+				{isPlaying ? (
+					<iframe
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+						allowFullScreen
+						className={baseClasses}
+						src={currentSrc}
+						style={inlineStyle}
+						title={title || "Vídeo do YouTube"}
+					/>
+				) : (
+					<div
+						className={baseClasses}
+						style={{
+							...inlineStyle,
+							backgroundImage: thumb ? `url(${thumb})` : undefined,
+							backgroundSize: "cover",
+							backgroundPosition: "center",
+							backgroundColor: "black",
+						}}
+					/>
+				)}
+				{!isPlaying && (
+					<>
+						<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+						<button
+							aria-label="Reproduzir"
+							className="absolute inset-0 z-20 flex items-center justify-center"
+							onClick={handlePlay}
+							type="button"
+						>
+							<span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-white/60 shadow-lg backdrop-blur-md transition-all hover:bg-white/90 active:scale-[0.98]">
+								<Play className="h-7 w-7 fill-current text-black/90" />
+							</span>
+						</button>
+					</>
+				)}
+			</div>
 		);
 	}
 
 	if (type === "vimeo") {
 		return (
-			<iframe
-				allow="autoplay; fullscreen; picture-in-picture"
-				allowFullScreen
-				className={baseClasses}
-				src={url}
-				style={inlineStyle}
-				title={title || "Vídeo do Vimeo"}
-			/>
+			<div className="relative">
+				{isPlaying ? (
+					<iframe
+						allow="autoplay; fullscreen; picture-in-picture"
+						allowFullScreen
+						className={baseClasses}
+						src={currentSrc}
+						style={inlineStyle}
+						title={title || "Vídeo do Vimeo"}
+					/>
+				) : (
+					<div
+						className={baseClasses}
+						style={{
+							...inlineStyle,
+							backgroundImage: vimeoThumb ? `url(${vimeoThumb})` : undefined,
+							backgroundSize: "cover",
+							backgroundPosition: "center",
+							backgroundColor: "black",
+						}}
+					/>
+				)}
+				{!isPlaying && (
+					<>
+						<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+						<button
+							aria-label="Reproduzir"
+							className="absolute inset-0 z-20 flex items-center justify-center"
+							onClick={handlePlay}
+							type="button"
+						>
+							<span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-white/60 shadow-lg backdrop-blur-md transition-all hover:bg-white/90 active:scale-[0.98]">
+								<Play className="h-7 w-7 fill-current text-black/90" />
+							</span>
+						</button>
+					</>
+				)}
+			</div>
 		);
 	}
 
@@ -88,14 +248,41 @@ export default function VideoPlayer({
 
 	if (type === "twitch") {
 		return (
-			<iframe
-				allow="autoplay; fullscreen"
-				allowFullScreen
-				className={baseClasses}
-				src={url}
-				style={inlineStyle}
-				title={title || "Vídeo do Twitch"}
-			/>
+			<div className="relative">
+				{isPlaying ? (
+					<iframe
+						allow="autoplay; fullscreen"
+						allowFullScreen
+						className={baseClasses}
+						src={currentSrc}
+						style={inlineStyle}
+						title={title || "Vídeo do Twitch"}
+					/>
+				) : (
+					<div
+						className={baseClasses}
+						style={{
+							...inlineStyle,
+							backgroundColor: "black",
+						}}
+					/>
+				)}
+				{!isPlaying && (
+					<>
+						<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+						<button
+							aria-label="Reproduzir"
+							className="absolute inset-0 z-20 flex items-center justify-center"
+							onClick={handlePlay}
+							type="button"
+						>
+							<span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-white/60 shadow-lg backdrop-blur-md transition-all hover:bg-white/90 active:scale-[0.98]">
+								<Play className="h-7 w-7 fill-current text-black/90" />
+							</span>
+						</button>
+					</>
+				)}
+			</div>
 		);
 	}
 
