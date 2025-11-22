@@ -237,8 +237,8 @@ const DisplayView = ({
 						<div className="space-y-1">
 							{video.title && (
 								<h3 className="font-medium">
-									{video.title.length > 64
-										? `${video.title.slice(0, 64)}...`
+									{video.title.length > 100
+										? `${video.title.slice(0, 100)}...`
 										: video.title}
 								</h3>
 							)}
