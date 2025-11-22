@@ -3,12 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
-// Regex no escopo global
 const DIRECT_REGEX = /\.(mp4|webm|ogg)$/i;
 const YOUTUBE_REGEX = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/;
 const VIMEO_REGEX = /vimeo\.com\/(\d+)/;
 const TIKTOK_REGEX = /tiktok\.com\/@[^/]+\/video\/(\d+)/;
-const TWITCH_REGEX = /twitch\.tv\/videos\/(\d+)/;
+const TWITCH_CLIP_REGEX =
+	/(?:clips\.twitch\.tv\/([A-Za-z0-9-]+)|twitch\.tv\/[^/]+\/clip\/([A-Za-z0-9-]+))/i;
 
 function validateVideoUrl(
 	url: string
@@ -43,12 +43,15 @@ function validateVideoUrl(
 		};
 	}
 
-	const twitchMatch = trimmedUrl.match(TWITCH_REGEX);
-	if (twitchMatch) {
-		return {
-			type: "twitch",
-			normalizedUrl: `https://player.twitch.tv/?video=${twitchMatch[1]}&parent=localhost`,
-		};
+	const twitchClipMatch = trimmedUrl.match(TWITCH_CLIP_REGEX);
+	if (twitchClipMatch) {
+		const slug = twitchClipMatch[1] || twitchClipMatch[2];
+		if (slug) {
+			return {
+				type: "twitch",
+				normalizedUrl: `https://clips.twitch.tv/embed?clip=${slug}`,
+			};
+		}
 	}
 
 	return null;
@@ -118,7 +121,7 @@ export async function PUT(
 				return NextResponse.json(
 					{
 						error:
-							"URL de vídeo inválida. Aceitos: YouTube, Vimeo, TikTok, Twitch ou arquivos .mp4, .webm, .ogg",
+							"URL de vídeo inválida. Aceitos: YouTube, Vimeo, TikTok, Twitch (apenas clipes) ou arquivos .mp4, .webm, .ogg",
 					},
 					{ status: 400 }
 				);

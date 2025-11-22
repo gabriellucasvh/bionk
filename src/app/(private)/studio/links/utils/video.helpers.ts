@@ -55,14 +55,14 @@ export const getVideoPlatform = (url: string): VideoPlatform => {
 };
 
 export const VIDEO_URL_ERROR_MESSAGE =
-	"URL de vídeo inválida. Aceitos: YouTube, Vimeo, TikTok, Twitch ou arquivos .mp4, .webm, .ogg";
+	"URL de vídeo inválida. Aceitos: YouTube, Vimeo, TikTok, Twitch (apenas clipes) ou arquivos .mp4, .webm, .ogg";
 
-// Top-level regexes for performance (avoid recreating on each call)
 const DIRECT_VIDEO_EXT_REGEX = /\.(mp4|webm|ogg)$/i;
 const YOUTUBE_REGEX = /(?:youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]+/;
 const VIMEO_REGEX = /vimeo\.com\/\d+/;
 const TIKTOK_REGEX = /tiktok\.com\/@[^/]+\/video\/\d+/;
-const TWITCH_REGEX = /twitch\.tv\/videos\/\d+/;
+const TWITCH_CLIP_REGEX =
+	/(?:clips\.twitch\.tv\/[A-Za-z0-9-]+|twitch\.tv\/[^/]+\/clip\/[A-Za-z0-9-]+)/i;
 
 export function isValidVideoUrl(url: string): {
 	valid: boolean;
@@ -76,8 +76,8 @@ export function isValidVideoUrl(url: string): {
 	const youtube = YOUTUBE_REGEX.test(trimmed);
 	const vimeo = VIMEO_REGEX.test(trimmed);
 	const tiktok = TIKTOK_REGEX.test(trimmed);
-	const twitch = TWITCH_REGEX.test(trimmed);
-	const ok = direct || youtube || vimeo || tiktok || twitch;
+	const twitchClip = TWITCH_CLIP_REGEX.test(trimmed);
+	const ok = direct || youtube || vimeo || tiktok || twitchClip;
 	return ok
 		? { valid: true }
 		: { valid: false, error: VIDEO_URL_ERROR_MESSAGE };

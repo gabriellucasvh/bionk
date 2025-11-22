@@ -33,6 +33,35 @@ export default function VideoPlayer({
 	const [isPlaying, setIsPlaying] = useState(false);
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const [vimeoThumb, setVimeoThumb] = useState<string>("");
+	const getParentHost = () => {
+		try {
+			return window.location.hostname || "localhost";
+		} catch {
+			return "localhost";
+		}
+	};
+	const getTwitchClipSlug = (u: string) => {
+		try {
+			const base = u.startsWith("http") ? u : `https://${u}`;
+			const urlObj = new URL(base);
+			const host = urlObj.hostname.replace("www.", "");
+			if (host === "clips.twitch.tv") {
+				const clipParam = urlObj.searchParams.get("clip");
+				if (clipParam) {
+					return clipParam;
+				}
+				const p = urlObj.pathname.split("/").filter(Boolean);
+				return p[0] || "";
+			}
+			if (host === "twitch.tv") {
+				const p = urlObj.pathname.split("/").filter(Boolean);
+				if (p.length >= 3 && p[1] === "clip" && p[2]) {
+					return p[2];
+				}
+			}
+		} catch {}
+		return "";
+	};
 
 	const getYouTubeId = (u: string) => {
 		try {
@@ -72,7 +101,16 @@ export default function VideoPlayer({
 			return u;
 		}
 		if (type === "twitch") {
-			return `${u}${hasQuery ? "&" : "?"}autoplay=true`;
+			const slug = getTwitchClipSlug(u);
+			if (slug) {
+				const parent = getParentHost();
+				const parentsParam =
+					parent === "localhost"
+						? "parent=localhost"
+						: `parent=${encodeURIComponent(parent)}&parent=localhost`;
+				return `https://clips.twitch.tv/embed?clip=${encodeURIComponent(slug)}&${parentsParam}&autoplay=true&muted=true`;
+			}
+			return u;
 		}
 		return u;
 	};
@@ -247,13 +285,25 @@ export default function VideoPlayer({
 	}
 
 	if (type === "twitch") {
+		const slug = getTwitchClipSlug(url);
+		if (!slug) {
+			return (
+				<div
+					className={`${baseClasses} flex items-center justify-center bg-black`}
+					style={inlineStyle}
+				>
+					<p className="text-white/80">Vídeo do Twitch não suportado</p>
+				</div>
+			);
+		}
 		return (
 			<div className="relative">
 				{isPlaying ? (
 					<iframe
-						allow="autoplay; fullscreen"
+						allow="autoplay; fullscreen; picture-in-picture"
 						allowFullScreen
 						className={baseClasses}
+						referrerPolicy="no-referrer-when-downgrade"
 						src={currentSrc}
 						style={inlineStyle}
 						title={title || "Vídeo do Twitch"}
