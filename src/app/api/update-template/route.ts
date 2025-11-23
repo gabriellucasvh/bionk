@@ -58,7 +58,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 
 		const templatePreset = getTemplatePreset(template);
 
-		await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: any) => {
 			await tx.user.update({
 				where: { email: userEmail },
 				data: {

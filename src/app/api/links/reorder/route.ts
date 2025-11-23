@@ -49,17 +49,18 @@ export async function PUT(req: Request): Promise<NextResponse> {
 		const referencedSectionIds = linkItems
 			.map(item => item.sectionId)
 			.filter(id => id !== null && id !== undefined);
-		
+
 		if (referencedSectionIds.length > 0) {
-			const existingSections = await prisma.section.findMany({
-				where: {
-					id: { in: referencedSectionIds },
-					userId,
-				},
-			});
-			const existingSectionIds = new Set(existingSections.map(s => s.id));
+            const existingSections: Array<{ id: number }> = await prisma.section.findMany({
+                where: {
+                    id: { in: referencedSectionIds },
+                    userId,
+                },
+                select: { id: true },
+            });
+            const existingSectionIds = new Set(existingSections.map((s: { id: number }) => s.id));
 			const invalidSectionIds = referencedSectionIds.filter(id => !existingSectionIds.has(id));
-			
+
 			if (invalidSectionIds.length > 0) {
 				return NextResponse.json(
 					{ error: `Seções não encontradas: ${invalidSectionIds.join(', ')}` },
@@ -87,15 +88,15 @@ export async function PUT(req: Request): Promise<NextResponse> {
 		}
 
 		// Buscar todas as seções existentes como links primeiro
-		const existingLinks = await prisma.link.findMany({
-			where: {
-				id: { in: sectionItems.map(item => item.id) },
-				userId,
-				type: "section",
-			},
-			select: { id: true },
-		});
-		const existingLinkIds = new Set(existingLinks.map(link => link.id));
+        const existingLinks: Array<{ id: number }> = await prisma.link.findMany({
+            where: {
+                id: { in: sectionItems.map(item => item.id) },
+                userId,
+                type: "section",
+            },
+            select: { id: true },
+        });
+        const existingLinkIds = new Set(existingLinks.map((link: { id: number }) => link.id));
 
 		// Atualizar seções (tratadas como links especiais)
 		for (const item of sectionItems) {

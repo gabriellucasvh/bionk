@@ -1,20 +1,12 @@
 // src/app/(private)/studio/UserComponents.tsx
 
-import type { Prisma } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import type { FC } from "react";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
-type UserWithLinks = Prisma.UserGetPayload<{
-	include: {
-		Link: {
-			where: { active: true };
-			orderBy: { order: "asc" };
-		};
-	};
-}>;
+type UserWithLinks = any;
 
 export default async function UserComponent() {
 	const session = await getServerSession(authOptions);

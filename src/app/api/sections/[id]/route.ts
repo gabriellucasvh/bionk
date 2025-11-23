@@ -30,7 +30,7 @@ export async function PUT(
 		const { title, links, active } = body;
 
 		// Inicia uma transação para garantir a consistência dos dados
-		const result = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx: any) => {
 			// Se o status 'active' está sendo atualizado, atualiza também todos os links associados
 			if (typeof active === "boolean") {
 				await tx.link.updateMany({

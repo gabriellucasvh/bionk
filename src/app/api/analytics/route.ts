@@ -3,6 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
+type LinkBasic = { id: number; title: string | null; url: string | null };
+type MonthlyRollupBasic = { monthStart: Date; clicks: number | null; views: number | null };
+type ClicksPerLinkItem = { linkId: number; _count: number };
+
 // Normaliza uma data para string "YYYY-MM-DD" em UTC
 function formatDayISO(date: Date): string {
 	return new Date(date).toISOString().split("T")[0];
@@ -159,18 +163,18 @@ export async function GET(request: Request) {
 	}
 
     // Buscar todos os links do usuário (inclui countdown)
-    const links = await prisma.link.findMany({
+    const links: LinkBasic[] = await prisma.link.findMany({
         where: { userId },
         select: { id: true, title: true, url: true },
     });
-    const linkIdsAll = links.map((link) => link.id);
+    const linkIdsAll = links.map((link: LinkBasic) => link.id);
 
     // Lista para ranking (exclui countdown)
-    const linksTop = await prisma.link.findMany({
+    const linksTop: LinkBasic[] = await prisma.link.findMany({
         where: { userId, NOT: { type: "countdown_link" } },
         select: { id: true, title: true, url: true },
     });
-    const topLinkIds = linksTop.map((link) => link.id);
+    const topLinkIds = linksTop.map((link: LinkBasic) => link.id);
 
 	// Buscar total de cliques e visualizações paralelamente
 	const [totalClicks, totalProfileViews] = await Promise.all([
@@ -259,21 +263,21 @@ export async function GET(request: Request) {
 			| null = null;
 		if (rollupsOnly) {
 			// Buscar rollups mensais para série temporal
-			const monthlyRollups = await prisma.monthlyUserAnalytics.findMany({
-				where: { userId, monthStart: { lt: currentMonthStart } },
-				select: { monthStart: true, clicks: true, views: true },
-				orderBy: { monthStart: "asc" },
-			});
+            const monthlyRollups: MonthlyRollupBasic[] = await prisma.monthlyUserAnalytics.findMany({
+                where: { userId, monthStart: { lt: currentMonthStart } },
+                select: { monthStart: true, clicks: true, views: true },
+                orderBy: { monthStart: "asc" },
+            });
 
 			function formatMonth(date: Date) {
 				return new Date(date).toISOString().substring(0, 7); // YYYY-MM
 			}
 
-			monthlyChartData = monthlyRollups.map((rollup) => ({
-				month: formatMonth(rollup.monthStart),
-				clicks: rollup.clicks || 0,
-				views: rollup.views || 0,
-			}));
+            monthlyChartData = monthlyRollups.map((rollup: MonthlyRollupBasic) => ({
+                month: formatMonth(rollup.monthStart),
+                clicks: rollup.clicks || 0,
+                views: rollup.views || 0,
+            }));
 		}
 
 		// Somar rollups diretamente para "tudo" com tratamento de mês parcial
@@ -333,7 +337,7 @@ export async function GET(request: Request) {
 		}
 
         const topLinksAll = linksTop
-            .map((link) => ({
+            .map((link: LinkBasic) => ({
                 id: link.id,
                 title: link.title,
                 url: link.url,
@@ -863,8 +867,8 @@ export async function GET(request: Request) {
 	const limit = Math.min(100, Math.max(1, Number(limitParam) || 20));
 
     const topLinksAll = linksTop
-        .map((link) => {
-            const match = clicksPerLink.find((c) => c.linkId === link.id);
+        .map((link: LinkBasic) => {
+            const match = clicksPerLink.find((c: ClicksPerLinkItem) => c.linkId === link.id);
             return {
                 id: link.id,
                 title: link.title,

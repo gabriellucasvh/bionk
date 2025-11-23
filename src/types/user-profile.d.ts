@@ -13,21 +13,22 @@ import type {
 } from "@prisma/client";
 
 // --- Links e Seções ---
-export interface UserLink extends PrismaLink {
-	badge?: string | null;
-	password?: string | null;
-	sectionId?: number | null;
-	section?: {
-		id: number;
-		title: string;
-	} | null;
-	type?: "link" | "section" | null;
-	expiresAt?: string | null;
-	deleteOnClicks?: number | null;
-	launchesAt?: string | null;
-	customImageUrl?: string | null;
-	shareAllowed?: boolean | null;
-}
+export type UserLink = PrismaLink & {
+    url?: string | null;
+    badge?: string | null;
+    password?: string | null;
+    sectionId?: number | null;
+    section?: {
+        id: number;
+        title: string;
+    } | null;
+    type?: "link" | "section" | null;
+    expiresAt?: string | null;
+    deleteOnClicks?: number | null;
+    launchesAt?: string | null;
+    customImageUrl?: string | null;
+    shareAllowed?: boolean | null;
+};
 
 export type UserSection = PrismaSection & {
 	links: UserLink[];
@@ -46,9 +47,9 @@ export type SocialPlatform =
 	| "discord"
 	| "website";
 
-export interface SocialLink extends PrismaSocialLink {
-	platform: SocialPlatform;
-}
+export type SocialLink = PrismaSocialLink & {
+    platform: SocialPlatform;
+};
 
 // --- Textos ---
 export interface UserText extends PrismaText {

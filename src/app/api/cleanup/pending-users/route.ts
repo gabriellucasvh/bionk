@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+type PendingUser = { id: string; email: string | null; createdAt: Date };
+
 // Esta rota deve ser chamada por um cron job para limpar usuários pending antigos
 export async function POST(request: Request) {
 	try {
@@ -27,19 +29,19 @@ export async function POST(request: Request) {
 		sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
 		// Buscar usuários com status pending criados há mais de 7 dias
-		const pendingUsers = await prisma.user.findMany({
-			where: {
-				status: "pending",
-				createdAt: {
-					lt: sevenDaysAgo,
-				},
-			},
-			select: {
-				id: true,
-				email: true,
-				createdAt: true,
-			},
-		});
+        const pendingUsers: PendingUser[] = await prisma.user.findMany({
+            where: {
+                status: "pending",
+                createdAt: {
+                    lt: sevenDaysAgo,
+                },
+            },
+            select: {
+                id: true,
+                email: true,
+                createdAt: true,
+            },
+        });
 
 		if (pendingUsers.length === 0) {
 			return NextResponse.json({
@@ -49,29 +51,29 @@ export async function POST(request: Request) {
 		}
 
 		// Remover usuários pending antigos
-		const deleteResult = await prisma.user.deleteMany({
-			where: {
-				id: {
-					in: pendingUsers.map(user => user.id),
-				},
-			},
-		});
+        const deleteResult = await prisma.user.deleteMany({
+            where: {
+                id: {
+                    in: pendingUsers.map((user: PendingUser) => user.id),
+                },
+            },
+        });
 
 		console.log(`Limpeza automática: ${deleteResult.count} usuários pending removidos`, {
-			userIds: pendingUsers.map(u => u.id),
-			emails: pendingUsers.map(u => u.email),
-			createdDates: pendingUsers.map(u => u.createdAt),
-		});
+            userIds: pendingUsers.map((u: PendingUser) => u.id),
+            emails: pendingUsers.map((u: PendingUser) => u.email),
+            createdDates: pendingUsers.map((u: PendingUser) => u.createdAt),
+        });
 
 		return NextResponse.json({
 			message: `Limpeza concluída: ${deleteResult.count} usuários removidos`,
 			cleanedCount: deleteResult.count,
-			cleanedUsers: pendingUsers.map(u => ({
-				id: u.id,
-				email: u.email,
-				createdAt: u.createdAt,
-			})),
-		});
+            cleanedUsers: pendingUsers.map((u: PendingUser) => ({
+                id: u.id,
+                email: u.email,
+                createdAt: u.createdAt,
+            })),
+        });
 	} catch (error) {
 		console.error("Erro na limpeza de usuários pending:", error);
 		return NextResponse.json(

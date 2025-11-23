@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
+type SectionItem = { id: number } & { [key: string]: any };
+
 export async function GET(): Promise<NextResponse> {
 	const session = await getServerSession(authOptions);
 	if (!session?.user?.id) {
@@ -19,18 +21,18 @@ export async function GET(): Promise<NextResponse> {
 		);
 	}
 
-	const sections = await prisma.section.findMany({
-		where: { userId: session.user.id },
-		orderBy: { order: "asc" },
-		include: { links: true },
-	});
+    const sections: SectionItem[] = await prisma.section.findMany({
+        where: { userId: session.user.id },
+        orderBy: { order: "asc" },
+        include: { links: true },
+    });
 
 	// Transformar para incluir dbId
-	const transformedSections = sections.map(section => ({
-		...section,
-		id: `section-${section.id}`,
-		dbId: section.id,
-	}));
+    const transformedSections = sections.map((section: SectionItem) => ({
+        ...section,
+        id: `section-${section.id}`,
+        dbId: section.id,
+    }));
 
 	return NextResponse.json(transformedSections);
 }

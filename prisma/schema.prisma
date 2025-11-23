@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
 }
 
@@ -321,22 +321,22 @@ model Section {
 }
 
 model Video {
-  id          Int      @id @default(autoincrement())
-  title       String?
-  description String?
-  type        String
-  url         String
+  id           Int      @id @default(autoincrement())
+  title        String?
+  description  String?
+  type         String
+  url          String
   thumbnailUrl String?
-  order       Int      @default(0)
-  userId      String
-  active      Boolean  @default(true)
-  sectionId   Int?
-  isCompact   Boolean  @default(false)
-  archived    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  section     Section? @relation(fields: [sectionId], references: [id])
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order        Int      @default(0)
+  userId       String
+  active       Boolean  @default(true)
+  sectionId    Int?
+  isCompact    Boolean  @default(false)
+  archived     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  section      Section? @relation(fields: [sectionId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([sectionId])
   @@index([userId])

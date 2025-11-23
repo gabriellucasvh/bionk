@@ -6,6 +6,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
+type LinkItem = {
+    id: number;
+    sectionId: number | null;
+    section: { id: number; title: string; active: boolean; order: number } | null;
+} & { [key: string]: any };
+
 export async function GET(request: Request): Promise<NextResponse> {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
@@ -31,32 +37,32 @@ export async function GET(request: Request): Promise<NextResponse> {
             data: { active: false },
         });
 
-        const links = await prisma.link.findMany({
+        const links: LinkItem[] = await prisma.link.findMany({
             where: { userId: session.user.id, archived: status === "archived" },
             orderBy: { order: "asc" },
             include: {
                 section: {
                     select: {
                         id: true,
-						title: true,
-						active: true,
-						order: true,
-					},
-				},
-			},
-		});
+                        title: true,
+                        active: true,
+                        order: true,
+                    },
+                },
+            },
+        });
 
 		// Transform the data to include section information directly in the link
-		const transformedLinks = links.map((link) => ({
-			...link,
-			sectionId: link.section?.id || link.sectionId,
-			section: link.section
-				? {
-						id: link.section.id,
-						title: link.section.title,
-					}
-				: null,
-		}));
+        const transformedLinks = links.map((link: LinkItem) => ({
+            ...link,
+            sectionId: link.section?.id || link.sectionId,
+            section: link.section
+                ? {
+                        id: link.section.id,
+                        title: link.section.title,
+                    }
+                : null,
+        }));
 
 		return NextResponse.json({ links: transformedLinks });
 	} catch {

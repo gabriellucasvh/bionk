@@ -198,20 +198,20 @@ export async function GET(request: Request) {
 
 	try {
 		// Agregar cliques por userId/linkId para o dia alvo
-		const clicksByLink = await prisma.$queryRaw<
-			Array<{ userId: string; linkId: number; clicks: number }>
-		>`
-    SELECT l."userId" as "userId", lc."linkId" as "linkId", COUNT(lc.id)::int as clicks
-    FROM "public"."LinkClick" lc
-    JOIN "public"."Link" l ON l.id = lc."linkId"
-    WHERE lc."createdAt" BETWEEN ${startOfTarget} AND ${endOfTarget}
-    GROUP BY l."userId", lc."linkId";
-  `;
+        const clicksByLink: Array<{ userId: string; linkId: number; clicks: number }> = await prisma.$queryRaw<
+            Array<{ userId: string; linkId: number; clicks: number }>
+        >`
+            SELECT l."userId" as "userId", lc."linkId" as "linkId", COUNT(lc.id)::int as clicks
+            FROM "public"."LinkClick" lc
+            JOIN "public"."Link" l ON l.id = lc."linkId"
+            WHERE lc."createdAt" BETWEEN ${startOfTarget} AND ${endOfTarget}
+            GROUP BY l."userId", lc."linkId";
+        `;
 
 		// Agregar views por userId para o dia alvo
-		const viewsByUser = await prisma.$queryRaw<
-			Array<{ userId: string; views: number }>
-		>`
+        const viewsByUser: Array<{ userId: string; views: number }> = await prisma.$queryRaw<
+            Array<{ userId: string; views: number }>
+        >`
     SELECT pv."userId" as "userId", COUNT(pv.id)::int as views
     FROM "public"."ProfileView" pv
     WHERE pv."createdAt" BETWEEN ${startOfTarget} AND ${endOfTarget}
@@ -219,9 +219,9 @@ export async function GET(request: Request) {
   `;
 
 		// Agregar cliques por userId para o dia alvo
-		const clicksByUser = await prisma.$queryRaw<
-			Array<{ userId: string; clicks: number }>
-		>`
+        const clicksByUser: Array<{ userId: string; clicks: number }> = await prisma.$queryRaw<
+            Array<{ userId: string; clicks: number }>
+        >`
     SELECT l."userId" as "userId", COUNT(lc.id)::int as clicks
     FROM "public"."LinkClick" lc
     JOIN "public"."Link" l ON l.id = lc."linkId"
@@ -254,8 +254,8 @@ export async function GET(request: Request) {
 
 		// Upserts em paralelo para views por usuário
 		let updatedUserRollups = 0;
-		const userViewUpserts = viewsByUser.map((row) =>
-			prisma.monthlyUserAnalytics.upsert({
+        const userViewUpserts = viewsByUser.map((row: { userId: string; views: number }) =>
+            prisma.monthlyUserAnalytics.upsert({
 				where: {
 					userId_monthStart: {
 						userId: row.userId,
@@ -272,8 +272,8 @@ export async function GET(request: Request) {
 			})
 		);
 		// Upserts em paralelo para cliques por usuário
-		const userClickUpserts = clicksByUser.map((row) =>
-			prisma.monthlyUserAnalytics.upsert({
+        const userClickUpserts = clicksByUser.map((row: { userId: string; clicks: number }) =>
+            prisma.monthlyUserAnalytics.upsert({
 				where: {
 					userId_monthStart: {
 						userId: row.userId,

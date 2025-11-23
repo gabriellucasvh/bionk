@@ -30,7 +30,7 @@ export async function generateUniqueUsername(name: string): Promise<string> {
 		select: { username: true },
 	});
 
-	const existingUsernames = new Set(existingUsers.map((u) => u.username));
+    const existingUsernames = new Set(existingUsers.map((u: { username: string }) => u.username));
 
 	if (!existingUsernames.has(username)) {
 		return username;
