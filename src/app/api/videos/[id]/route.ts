@@ -128,6 +128,27 @@ export async function PUT(
 			}
 			updateData.type = validation.type;
 			updateData.url = validation.normalizedUrl;
+
+			let nextThumb: string | null = null;
+			try {
+				if (validation.type === "youtube") {
+					const m = url.match(YOUTUBE_REGEX);
+					if (m && m[1]) {
+						nextThumb = `https://i.ytimg.com/vi/${m[1]}/hqdefault.jpg`;
+					}
+				} else if (validation.type === "vimeo") {
+					const endpoint = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
+					const r = await fetch(endpoint);
+					if (r && r.ok) {
+						const d = await r.json();
+						const t = d && d.thumbnail_url ? String(d.thumbnail_url) : "";
+						if (t) {
+							nextThumb = t;
+						}
+					}
+				}
+			} catch {}
+			updateData.thumbnailUrl = nextThumb;
 		}
 
 		const updatedVideo = await prisma.video.update({

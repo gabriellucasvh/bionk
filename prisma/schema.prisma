@@ -326,6 +326,7 @@ model Video {
   description String?
   type        String
   url         String
+  thumbnailUrl String?
   order       Int      @default(0)
   userId      String
   active      Boolean  @default(true)

@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 	}
 
 	try {
-		const { title, description, url, sectionId } = await request.json();
+    const { title, description, url, sectionId } = await request.json();
 
 		if (!url) {
 			return NextResponse.json({ error: "URL é obrigatória" }, { status: 400 });
@@ -85,16 +85,36 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const validation = validateVideoUrl(url);
-		if (!validation) {
-			return NextResponse.json(
-				{
-					error:
-						"URL de vídeo inválida. Aceitos: YouTube, Vimeo, TikTok, Twitch (apenas clipes) ou arquivos .mp4, .webm, .ogg",
-				},
-				{ status: 400 }
-			);
-		}
+    const validation = validateVideoUrl(url);
+    if (!validation) {
+        return NextResponse.json(
+            {
+                error:
+                    "URL de vídeo inválida. Aceitos: YouTube, Vimeo, TikTok, Twitch (apenas clipes) ou arquivos .mp4, .webm, .ogg",
+            },
+            { status: 400 }
+        );
+    }
+
+    let thumbnailUrl: string | null = null;
+    try {
+        if (validation.type === "youtube") {
+            const m = url.match(YOUTUBE_REGEX);
+            if (m && m[1]) {
+                thumbnailUrl = `https://i.ytimg.com/vi/${m[1]}/hqdefault.jpg`;
+            }
+        } else if (validation.type === "vimeo") {
+            const endpoint = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
+            const r = await fetch(endpoint);
+            if (r && r.ok) {
+                const d = await r.json();
+                const t = d && d.thumbnail_url ? String(d.thumbnail_url) : "";
+                if (t) {
+                    thumbnailUrl = t;
+                }
+            }
+        }
+    } catch {}
 
 		await prisma.$transaction([
 			prisma.link.updateMany({
@@ -123,18 +143,21 @@ export async function POST(request: Request) {
 			}),
 		]);
 
-		const video = await prisma.video.create({
-			data: {
-				title: title?.trim() || null,
-				description: description?.trim() || null,
-				type: validation.type,
-				url: validation.normalizedUrl,
-				active: true,
-				order: 0,
-				userId: session.user.id,
-				sectionId: sectionId || null,
-			},
-		});
+    const data = {
+        title: title?.trim() || null,
+        description: description?.trim() || null,
+        type: validation.type,
+        url: validation.normalizedUrl,
+        thumbnailUrl: thumbnailUrl ?? null,
+        active: true,
+        order: 0,
+        userId: session.user.id,
+        sectionId: sectionId || null,
+    };
+
+    const video = await prisma.video.create({
+        data: data as any,
+    });
 
 		return NextResponse.json(video, { status: 201 });
 	} catch {

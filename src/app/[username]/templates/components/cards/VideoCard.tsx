@@ -9,6 +9,7 @@ interface VideoCardProps {
     description?: string;
     type: string;
     url: string;
+    thumbnailUrl?: string | null;
     className?: string;
     classNames?: {
         name?: string;
@@ -23,6 +24,7 @@ export default function VideoCard({
     description,
     type,
     url,
+    thumbnailUrl,
     className = "",
     classNames,
     customPresets,
@@ -76,6 +78,7 @@ export default function VideoCard({
                     title={title}
                     type={type}
                     url={url}
+                    thumbnailUrl={thumbnailUrl || undefined}
                     onPlayClick={onPlayClick}
                 />
 			</div>

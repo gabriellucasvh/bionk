@@ -107,27 +107,28 @@ export default async function UserPage({ params }: PageProps) {
 					},
 				},
 			},
-			Video: {
-				where: { active: true, archived: false },
-				orderBy: { order: "asc" },
-				select: {
-					id: true,
-					title: true,
-					description: true,
-					type: true,
-					url: true,
-					order: true,
-					active: true,
-					userId: true,
-					sectionId: true,
-					section: {
-						select: {
-							id: true,
-							title: true,
-						},
-					},
-				},
-			},
+            Video: {
+                where: { active: true, archived: false },
+                orderBy: { order: "asc" },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    type: true,
+                    url: true,
+                    thumbnailUrl: true,
+                    order: true,
+                    active: true,
+                    userId: true,
+                    sectionId: true,
+                    section: {
+                        select: {
+                            id: true,
+                            title: true,
+                        },
+                    },
+                } as any,
+            },
 			Image: {
 				where: { active: true, archived: false },
 				orderBy: { order: "asc" },

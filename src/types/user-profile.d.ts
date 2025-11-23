@@ -65,14 +65,15 @@ export interface UserText extends PrismaText {
 
 // --- Vídeos ---
 export interface UserVideo extends PrismaVideo {
-	id: number;
-	title?: string;
-	description?: string;
-	type: string;
-	url: string;
-	order: number;
-	active: boolean;
-	userId: string;
+    id: number;
+    title?: string;
+    description?: string;
+    type: string;
+    url: string;
+    thumbnailUrl?: string | null;
+    order: number;
+    active: boolean;
+    userId: string;
 }
 
 // --- Imagens ---

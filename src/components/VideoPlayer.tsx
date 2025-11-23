@@ -4,21 +4,23 @@ import { Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface VideoPlayerProps {
-	type: string;
-	url: string;
-	title?: string;
-	className?: string;
-	customButtonCorners?: string;
-	onPlayClick?: () => void;
+    type: string;
+    url: string;
+    title?: string;
+    className?: string;
+    customButtonCorners?: string;
+    onPlayClick?: () => void;
+    thumbnailUrl?: string;
 }
 
 export default function VideoPlayer({
-	type,
-	url,
-	title,
-	className = "",
-	customButtonCorners,
-	onPlayClick,
+    type,
+    url,
+    title,
+    className = "",
+    customButtonCorners,
+    onPlayClick,
+    thumbnailUrl,
 }: VideoPlayerProps) {
 	const getBorderRadius = () => {
 		if (customButtonCorners && customButtonCorners !== "") {
@@ -34,7 +36,6 @@ export default function VideoPlayer({
 	const [currentSrc, setCurrentSrc] = useState(url);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const videoRef = useRef<HTMLVideoElement | null>(null);
-	const [vimeoThumb, setVimeoThumb] = useState<string>("");
 	const getParentHost = () => {
 		try {
 			return window.location.hostname || "localhost";
@@ -117,20 +118,6 @@ export default function VideoPlayer({
 		return u;
 	};
 
-	useEffect(() => {
-		if (type === "vimeo") {
-			const endpoint = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
-			fetch(endpoint)
-				.then((r) => (r.ok ? r.json() : null))
-				.then((d) => {
-					const t = d && d.thumbnail_url ? String(d.thumbnail_url) : "";
-					if (t) {
-						setVimeoThumb(t);
-					}
-				})
-				.catch(() => {});
-		}
-	}, [type, url]);
 
 	const handlePlay = () => {
 		if (onPlayClick) {
@@ -188,12 +175,16 @@ export default function VideoPlayer({
 		);
 	}
 
-	if (type === "youtube") {
-		const ytId = getYouTubeId(url);
-		const thumb = ytId ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg` : "";
-		return (
-			<div className="relative">
-				{isPlaying ? (
+    if (type === "youtube") {
+        const ytId = getYouTubeId(url);
+        const thumb = thumbnailUrl && thumbnailUrl.trim().length > 0
+            ? thumbnailUrl
+            : ytId
+            ? `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`
+            : "";
+        return (
+            <div className="relative">
+                {isPlaying ? (
 					<iframe
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 						allowFullScreen
@@ -233,10 +224,10 @@ export default function VideoPlayer({
 		);
 	}
 
-	if (type === "vimeo") {
-		return (
-			<div className="relative">
-				{isPlaying ? (
+    if (type === "vimeo") {
+        return (
+            <div className="relative">
+                {isPlaying ? (
 					<iframe
 						allow="autoplay; fullscreen; picture-in-picture"
 						allowFullScreen
@@ -245,18 +236,21 @@ export default function VideoPlayer({
 						style={inlineStyle}
 						title={title || "Vídeo do Vimeo"}
 					/>
-				) : (
-					<div
-						className={baseClasses}
-						style={{
-							...inlineStyle,
-							backgroundImage: vimeoThumb ? `url(${vimeoThumb})` : undefined,
-							backgroundSize: "cover",
-							backgroundPosition: "center",
-							backgroundColor: "black",
-						}}
-					/>
-				)}
+                ) : (
+                    <div
+                        className={baseClasses}
+                        style={{
+                            ...inlineStyle,
+                            backgroundImage:
+                                thumbnailUrl && thumbnailUrl.trim().length > 0
+                                    ? `url(${thumbnailUrl})`
+                                    : undefined,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            backgroundColor: "black",
+                        }}
+                    />
+                )}
 				{!isPlaying && (
 					<>
 						<div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
