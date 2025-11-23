@@ -81,12 +81,7 @@ const PersonalizarClient = () => {
 		}
 	};
 
-	const {
-		profile,
-		userData,
-		isProfileLoading,
-		fetchProfile,
-	} = useProfileData(
+	const { profile, userData, isProfileLoading, fetchProfile } = useProfileData(
 		session?.user?.id || undefined,
 		session?.user?.image || undefined
 	);
@@ -104,7 +99,6 @@ const PersonalizarClient = () => {
 		session?.user?.image ||
 			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 	);
-
 
 	const { userCustomizations, handleTemplateChange } = useCustomizations();
 
@@ -216,16 +210,16 @@ const PersonalizarClient = () => {
 				aria-label={
 					mobileView === "design" ? "Ver preview" : "Voltar ao design"
 				}
-				className="fixed right-6 bottom-30 z-50 rounded-full bg-avocado-400 p-3 text-white shadow-lg transition-colors hover:bg-avocado-500 active:scale-95 md:hidden"
+				className="fixed right-6 bottom-30 z-50 rounded-full bg-black p-3 text-white shadow-lg transition-colors hover:bg-black/90 active:scale-95 md:hidden dark:bg-white"
 				onClick={() =>
 					handleMobileViewChange(mobileView === "design" ? "preview" : "design")
 				}
 				type="button"
 			>
 				{mobileView === "design" ? (
-					<Eye className="h-6 w-6 text-black" strokeWidth={1.5} />
+					<Eye className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
 				) : (
-					<EyeOff className="h-6 w-6 text-black" strokeWidth={1.5} />
+					<EyeOff className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
 				)}
 			</button>
 
