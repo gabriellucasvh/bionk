@@ -9,6 +9,7 @@ import {
 	Edit,
 	Grip,
 	Image,
+	Link as LinkIcon,
 	Lock,
 	MoreVertical,
 	MousePointerClick,
@@ -16,6 +17,7 @@ import {
 	Trash2,
 	Zap,
 } from "lucide-react";
+import NextImage from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import ArchivingLoader from "@/components/animations/ArchivingLoader";
@@ -55,7 +57,7 @@ import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import { useSubscription } from "@/providers/subscriptionProvider";
 import type { LinkItem } from "../../types/links.types";
-import { isValidUrl } from "../../utils/links.helpers";
+import { getLinkPlatform, isValidUrl } from "../../utils/links.helpers";
 import { useCountdown } from "../../utils/useCountdown";
 
 // Tipos e Interfaces
@@ -837,6 +839,7 @@ const DisplayView = (props: LinkCardProps) => {
 	const { toggleAnimation } = useLinkAnimation();
 	const { isLinkAnimated, isArchiving, isLaunching, isExpiring, isLinkLocked } =
 		useLinkStates(link, archivingLinkId);
+	const platform = getLinkPlatform(link.url || "");
 
 	// Força re-render e estado correto ao expirar usando o countdown
 	const { hasEnded: expirationEnded } = useCountdown(
@@ -867,17 +870,49 @@ const DisplayView = (props: LinkCardProps) => {
 					<Grip className="h-5 w-5 text-muted-foreground" />
 				</div>
 				<div className="flex-1 space-y-2">
-					<header className="flex flex-wrap items-center gap-2">
-						<h3 className="font-medium">
-							{link.title.length > 64
-								? `${link.title.slice(0, 64)}...`
-								: link.title}
-						</h3>
-						{link.badge && <Badge variant="secondary">{link.badge}</Badge>}
-						{link.password && (
-							<Lock className="h-3 w-3 text-muted-foreground" />
+					<header className="flex items-center gap-3">
+						{platform.iconPath ? (
+							<div
+								className={cn(
+									"flex items-center justify-center rounded-md p-1.5",
+									platform.bgColor
+								)}
+							>
+								<NextImage
+									alt={platform.name}
+									className="h-4 w-4 brightness-0 invert"
+									height={16}
+									src={platform.iconPath}
+									width={16}
+								/>
+							</div>
+						) : (
+							<div
+								className={cn(
+									"flex items-center justify-center rounded-md p-1.5",
+									platform.bgColor
+								)}
+							>
+								<LinkIcon className="h-4 w-4 text-white dark:text-bunker-950" />
+							</div>
 						)}
+						<span className="font-medium text-sm">{platform.name}</span>
 					</header>
+					{(link.title || link.badge || link.password) && (
+						<div className="flex flex-wrap items-center gap-2">
+							{link.title && (
+								<h3 className="font-medium">
+									{link.title.length > 64
+										? `${link.title.slice(0, 64)}...`
+										: link.title}
+								</h3>
+							)}
+							{link.badge && <Badge variant="secondary">{link.badge}</Badge>}
+							{link.password && (
+								<Lock className="h-3 w-3 text-muted-foreground" />
+							)}
+						</div>
+					)}
 
 					<LinkContent
 						isLinkLocked={isLinkLocked}
