@@ -58,24 +58,25 @@ export type TextItem = {
 };
 
 export type VideoItem = {
-	id: number;
-	title: string | null;
-	description: string | null;
-	url: string;
-	type: "direct" | "youtube" | "vimeo" | "tiktok" | "twitch";
-	active: boolean;
-	order: number;
-	userId: number;
-	isEditing?: boolean;
-	isDraft?: boolean;
-	archived?: boolean;
-	sectionId?: number | null;
-	// Propriedades para unificação
-	isVideo?: boolean;
-	isSection?: boolean;
-	isText?: boolean;
-	children?: never;
-	dbId?: number;
+    id: number;
+    title: string | null;
+    description: string | null;
+    url: string;
+    type: "direct" | "youtube" | "vimeo" | "tiktok" | "twitch";
+    active: boolean;
+    order: number;
+    userId: number;
+    clicks?: number;
+    isEditing?: boolean;
+    isDraft?: boolean;
+    archived?: boolean;
+    sectionId?: number | null;
+    // Propriedades para unificação
+    isVideo?: boolean;
+    isSection?: boolean;
+    isText?: boolean;
+    children?: never;
+    dbId?: number;
 };
 
 export type ImageItem = {

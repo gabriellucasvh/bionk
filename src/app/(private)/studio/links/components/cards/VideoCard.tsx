@@ -1,9 +1,18 @@
 "use client";
 
-import { Archive, Edit, Grip, MoreVertical, Trash2, Video } from "lucide-react";
+import {
+	Archive,
+	Edit,
+	Grip,
+	MoreVertical,
+	MousePointerClick,
+	Trash2,
+	Video,
+} from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -176,6 +185,23 @@ const DisplayView = ({
 }: VideoCardProps) => {
 	const platform = getVideoPlatform(video.url);
 
+	const clicks = useMemo(() => {
+		if (video.type === "tiktok") {
+			return null;
+		}
+		if (
+			!(
+				video.type === "youtube" ||
+				video.type === "vimeo" ||
+				video.type === "twitch"
+			)
+		) {
+			return null;
+		}
+		const v = (video as any).clicks;
+		return typeof v === "number" ? v || 0 : 0;
+	}, [video.type, (video as any).clicks]);
+
 	const handleStartEditing = () => {
 		onStartEditingVideo?.(video.id);
 	};
@@ -253,7 +279,22 @@ const DisplayView = ({
 					)}
 				</div>
 			</div>
-			<div className="flex items-center justify-end border-t pt-3">
+			<div className="flex items-center justify-between border-t pt-3">
+				<div className="flex items-center gap-2">
+					{clicks !== null && (
+						<Badge
+							className="flex items-center gap-1"
+							title="Total de cliques"
+							variant="outline"
+						>
+							<MousePointerClick className="h-3 w-3" />
+							<span className="hidden sm:inline">
+								{(clicks || 0).toLocaleString()}
+							</span>
+							<span className="sm:hidden">{clicks || 0}</span>
+						</Badge>
+					)}
+				</div>
 				<div className="flex items-center gap-2 sm:gap-4">
 					<div className="flex items-center space-x-2">
 						<Switch

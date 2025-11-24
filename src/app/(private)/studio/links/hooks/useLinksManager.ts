@@ -258,7 +258,7 @@ export const useLinksManager = (
 			);
 			return {
 				...video,
-				clicks: 0,
+				clicks: (video as any).clicks ?? 0,
 				sensitive: false,
 				isVideo: true,
 				isEditing: existingItem?.isEditing,
