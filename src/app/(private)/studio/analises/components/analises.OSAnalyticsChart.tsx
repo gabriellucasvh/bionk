@@ -1,5 +1,6 @@
 "use client";
 
+import { HelpCircle } from "lucide-react";
 import Image from "next/image";
 import {
 	Bar,
@@ -86,7 +87,7 @@ export default function OSAnalyticsChart({
 		);
 	}
 
-	const getOSIconSrc = (os: string) => {
+	const getOSIconSrc = (os: string): string | null => {
 		const lower = os.toLowerCase();
 		if (lower === "ios") {
 			return "/icons/apple.svg";
@@ -103,7 +104,7 @@ export default function OSAnalyticsChart({
 		if (lower === "linux") {
 			return "/icons/linux.svg";
 		}
-		return "/images/bionk-icon-black.svg";
+		return null;
 	};
 
 	const dataMap = new Map(data.map((item) => [item.os.toLowerCase(), item]));
@@ -232,18 +233,23 @@ export default function OSAnalyticsChart({
 													100
 												).toFixed(0)
 											: "0";
+									const osIconSrc = getOSIconSrc(item.os);
 									return (
 										<TableRow key={item.os}>
 											<TableCell className="font-medium">
 												<div className="flex items-center gap-3">
 													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-														<Image
-															alt={item.name}
-															className="h-4 w-4 dark:invert"
-															height={16}
-															src={getOSIconSrc(item.os)}
-															width={16}
-														/>
+														{osIconSrc ? (
+															<Image
+																alt={item.name}
+																className="h-4 w-4 dark:invert"
+																height={16}
+																src={osIconSrc}
+																width={16}
+															/>
+														) : (
+															<HelpCircle className="h-4 w-4" />
+														)}
 													</div>
 													<span>{item.name}</span>
 												</div>
