@@ -55,30 +55,34 @@ export const getVideoPlatform = (url: string): VideoPlatform => {
 };
 
 export const VIDEO_URL_ERROR_MESSAGE =
-	"URL de vídeo inválida. Aceitos: YouTube, Vimeo, TikTok, Twitch (apenas clipes) ou arquivos .mp4, .webm, .ogg";
+    "URL de vídeo inválida. Aceitos: YouTube, Vimeo, TikTok, Twitch (apenas clipes) ou arquivos .mp4, .webm, .ogg";
 
 const DIRECT_VIDEO_EXT_REGEX = /\.(mp4|webm|ogg)$/i;
 const YOUTUBE_REGEX = /(?:youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]+/;
+const YOUTUBE_EMBED_REGEX = /(?:youtube\.com\/embed\/|youtube-nocookie\.com\/embed\/)[a-zA-Z0-9_-]+/;
 const VIMEO_REGEX = /vimeo\.com\/\d+/;
+const VIMEO_EMBED_REGEX = /player\.vimeo\.com\/video\/\d+/;
 const TIKTOK_REGEX = /tiktok\.com\/@[^/]+\/video\/\d+/;
+const TIKTOK_EMBED_REGEX = /tiktok\.com\/embed\/v2\/\d+/;
 const TWITCH_CLIP_REGEX =
-	/(?:clips\.twitch\.tv\/[A-Za-z0-9-]+|twitch\.tv\/[^/]+\/clip\/[A-Za-z0-9-]+)/i;
+    /(?:clips\.twitch\.tv\/[A-Za-z0-9-]+|twitch\.tv\/[^/]+\/clip\/[A-Za-z0-9-]+)/i;
+const TWITCH_EMBED_REGEX = /clips\.twitch\.tv\/embed\?clip=[A-Za-z0-9-]+/i;
 
 export function isValidVideoUrl(url: string): {
-	valid: boolean;
-	error?: string;
+    valid: boolean;
+    error?: string;
 } {
-	const trimmed = (url || "").trim();
-	if (trimmed.length === 0) {
-		return { valid: false, error: "URL é obrigatória" };
-	}
-	const direct = DIRECT_VIDEO_EXT_REGEX.test(trimmed);
-	const youtube = YOUTUBE_REGEX.test(trimmed);
-	const vimeo = VIMEO_REGEX.test(trimmed);
-	const tiktok = TIKTOK_REGEX.test(trimmed);
-	const twitchClip = TWITCH_CLIP_REGEX.test(trimmed);
-	const ok = direct || youtube || vimeo || tiktok || twitchClip;
-	return ok
-		? { valid: true }
-		: { valid: false, error: VIDEO_URL_ERROR_MESSAGE };
+    const trimmed = (url || "").trim();
+    if (trimmed.length === 0) {
+        return { valid: false, error: "URL é obrigatória" };
+    }
+    const direct = DIRECT_VIDEO_EXT_REGEX.test(trimmed);
+    const youtube = YOUTUBE_REGEX.test(trimmed) || YOUTUBE_EMBED_REGEX.test(trimmed);
+    const vimeo = VIMEO_REGEX.test(trimmed) || VIMEO_EMBED_REGEX.test(trimmed);
+    const tiktok = TIKTOK_REGEX.test(trimmed) || TIKTOK_EMBED_REGEX.test(trimmed);
+    const twitchClip = TWITCH_CLIP_REGEX.test(trimmed) || TWITCH_EMBED_REGEX.test(trimmed);
+    const ok = direct || youtube || vimeo || tiktok || twitchClip;
+    return ok
+        ? { valid: true }
+        : { valid: false, error: VIDEO_URL_ERROR_MESSAGE };
 }

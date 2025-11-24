@@ -5,56 +5,95 @@ import prisma from "@/lib/prisma";
 
 const DIRECT_REGEX = /\.(mp4|webm|ogg)$/i;
 const YOUTUBE_REGEX = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/;
+const YOUTUBE_EMBED_REGEX = /(?:youtube\.com\/embed\/|youtube-nocookie\.com\/embed\/)([a-zA-Z0-9_-]+)/;
 const VIMEO_REGEX = /vimeo\.com\/(\d+)/;
+const VIMEO_EMBED_REGEX = /player\.vimeo\.com\/video\/(\d+)/;
 const TIKTOK_REGEX = /tiktok\.com\/@[^/]+\/video\/(\d+)/;
+const TIKTOK_EMBED_REGEX = /tiktok\.com\/embed\/v2\/(\d+)/;
 const TWITCH_CLIP_REGEX =
-	/(?:clips\.twitch\.tv\/([A-Za-z0-9-]+)|twitch\.tv\/[^/]+\/clip\/([A-Za-z0-9-]+))/i;
+    /(?:clips\.twitch\.tv\/([A-Za-z0-9-]+)|twitch\.tv\/[^/]+\/clip\/([A-Za-z0-9-]+))/i;
+const TWITCH_EMBED_PARAM_REGEX = /(?:clips\.twitch\.tv\/embed\?clip=|player\.twitch\.tv\/?\?clip=)([A-Za-z0-9-]+)/i;
 
 function validateVideoUrl(
-	url: string
+    url: string
 ): { type: string; normalizedUrl: string } | null {
-	const trimmedUrl = url.trim();
+    const trimmedUrl = url.trim();
 
-	if (DIRECT_REGEX.test(trimmedUrl)) {
-		return { type: "direct", normalizedUrl: trimmedUrl };
-	}
+    if (DIRECT_REGEX.test(trimmedUrl)) {
+        return { type: "direct", normalizedUrl: trimmedUrl };
+    }
 
-	const youtubeMatch = trimmedUrl.match(YOUTUBE_REGEX);
-	if (youtubeMatch) {
-		return {
-			type: "youtube",
-			normalizedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}`,
-		};
-	}
+    const youtubeMatch = trimmedUrl.match(YOUTUBE_REGEX);
+    if (youtubeMatch) {
+        return {
+            type: "youtube",
+            normalizedUrl: `https://www.youtube.com/embed/${youtubeMatch[1]}`,
+        };
+    }
 
-	const vimeoMatch = trimmedUrl.match(VIMEO_REGEX);
-	if (vimeoMatch) {
-		return {
-			type: "vimeo",
-			normalizedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}`,
-		};
-	}
+    const youtubeEmbedMatch = trimmedUrl.match(YOUTUBE_EMBED_REGEX);
+    if (youtubeEmbedMatch) {
+        return {
+            type: "youtube",
+            normalizedUrl: `https://www.youtube.com/embed/${youtubeEmbedMatch[1]}`,
+        };
+    }
 
-	const tiktokMatch = trimmedUrl.match(TIKTOK_REGEX);
-	if (tiktokMatch) {
-		return {
-			type: "tiktok",
-			normalizedUrl: `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`,
-		};
-	}
+    const vimeoMatch = trimmedUrl.match(VIMEO_REGEX);
+    if (vimeoMatch) {
+        return {
+            type: "vimeo",
+            normalizedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}`,
+        };
+    }
 
-	const twitchClipMatch = trimmedUrl.match(TWITCH_CLIP_REGEX);
-	if (twitchClipMatch) {
-		const slug = twitchClipMatch[1] || twitchClipMatch[2];
-		if (slug) {
-			return {
-				type: "twitch",
-				normalizedUrl: `https://clips.twitch.tv/embed?clip=${slug}`,
-			};
-		}
-	}
+    const vimeoEmbedMatch = trimmedUrl.match(VIMEO_EMBED_REGEX);
+    if (vimeoEmbedMatch) {
+        return {
+            type: "vimeo",
+            normalizedUrl: `https://player.vimeo.com/video/${vimeoEmbedMatch[1]}`,
+        };
+    }
 
-	return null;
+    const tiktokMatch = trimmedUrl.match(TIKTOK_REGEX);
+    if (tiktokMatch) {
+        return {
+            type: "tiktok",
+            normalizedUrl: `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`,
+        };
+    }
+
+    const tiktokEmbedMatch = trimmedUrl.match(TIKTOK_EMBED_REGEX);
+    if (tiktokEmbedMatch) {
+        return {
+            type: "tiktok",
+            normalizedUrl: `https://www.tiktok.com/embed/v2/${tiktokEmbedMatch[1]}`,
+        };
+    }
+
+    const twitchClipMatch = trimmedUrl.match(TWITCH_CLIP_REGEX);
+    if (twitchClipMatch) {
+        const slug = twitchClipMatch[1] || twitchClipMatch[2];
+        if (slug) {
+            return {
+                type: "twitch",
+                normalizedUrl: `https://clips.twitch.tv/embed?clip=${slug}`,
+            };
+        }
+    }
+
+    const twitchEmbedParamMatch = trimmedUrl.match(TWITCH_EMBED_PARAM_REGEX);
+    if (twitchEmbedParamMatch) {
+        const slug = twitchEmbedParamMatch[1];
+        if (slug) {
+            return {
+                type: "twitch",
+                normalizedUrl: `https://clips.twitch.tv/embed?clip=${slug}`,
+            };
+        }
+    }
+
+    return null;
 }
 
 export async function POST(request: Request) {
@@ -99,12 +138,19 @@ export async function POST(request: Request) {
     let thumbnailUrl: string | null = null;
     try {
         if (validation.type === "youtube") {
-            const m = url.match(YOUTUBE_REGEX);
-            if (m && m[1]) {
-                thumbnailUrl = `https://i.ytimg.com/vi/${m[1]}/hqdefault.jpg`;
+            const mWatch = url.match(YOUTUBE_REGEX);
+            const mEmbed = url.match(YOUTUBE_EMBED_REGEX);
+            const ytId = (mWatch && mWatch[1]) || (mEmbed && mEmbed[1]);
+            if (ytId) {
+                thumbnailUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
             }
         } else if (validation.type === "vimeo") {
-            const endpoint = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
+            const mPage = url.match(VIMEO_REGEX);
+            const mEmbed = url.match(VIMEO_EMBED_REGEX);
+            const vimeoId = (mPage && mPage[1]) || (mEmbed && mEmbed[1]);
+            const endpoint = vimeoId
+                ? `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(`https://vimeo.com/${vimeoId}`)}`
+                : `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
             const r = await fetch(endpoint);
             if (r && r.ok) {
                 const d = await r.json();
