@@ -30,7 +30,7 @@ export function HeaderStylePreview({
 }: HeaderStylePreviewProps) {
 	const renderDefaultStyle = () => (
 		<div
-			className="flex h-full w-full flex-col items-center justify-center rounded-lg bg-zinc-800 p-4 dark:bg-zinc-900"
+			className="flex h-full w-full flex-col items-center justify-center rounded-3xl bg-zinc-800 p-4 dark:bg-zinc-900"
 			style={{
 				backgroundImage: backgroundImage || undefined,
 				backgroundSize: "cover",
@@ -62,7 +62,7 @@ export function HeaderStylePreview({
 
 	const renderHorizontalStyle = () => (
 		<div
-			className="flex h-full w-full items-center rounded-lg bg-zinc-800 p-4 dark:bg-zinc-900"
+			className="flex h-full w-full items-center rounded-3xl bg-zinc-800 p-4 dark:bg-zinc-900"
 			style={{
 				backgroundImage: backgroundImage || undefined,
 				backgroundSize: "cover",
@@ -96,7 +96,7 @@ export function HeaderStylePreview({
 
 	const renderHeroStyle = () => (
 		<div
-			className="relative flex h-full w-full flex-col items-center justify-end overflow-hidden rounded-lg p-4"
+			className="relative flex h-full w-full flex-col items-center justify-end overflow-hidden rounded-3xl p-4"
 			style={{
 				backgroundImage: image
 					? `url(${image})`
@@ -170,36 +170,40 @@ export function HeaderStyleButtons({
 		<div className="max-w-full overflow-x-auto overscroll-x-contain px-1">
 			<div className="flex snap-x snap-mandatory gap-3">
 				{HEADER_STYLES.map((style) => (
-					<button
-						className={`relative w-32 flex-shrink-0 snap-start rounded-lg border-2 p-2 transition-all duration-200 md:w-36 lg:w-40 ${
-							selectedStyle === style.value
-								? "border-green-500 bg-green-50 dark:bg-green-950"
-								: "border-zinc-200 hover:border-zinc-300 dark:border-zinc-700 dark:hover:border-zinc-600"
-						}`}
+					<div
+						className="w-32 flex-shrink-0 snap-start md:w-36 lg:w-40"
 						key={style.value}
-						onClick={() => onStyleChange(style.value)}
-						type="button"
 					>
-						<div className="h-48 w-full md:h-52 lg:h-56">
-							<HeaderStylePreview
-								backgroundColor={backgroundColor}
-								backgroundImage={backgroundImage}
-								bio={bio}
-								buttonColor={buttonColor}
-								buttonStyle={buttonStyle}
-								buttonTextColor={buttonTextColor}
-								fontFamily={fontFamily}
-								image={image}
-								name={name}
-								style={style.value}
-								textColor={textColor}
-								username={username}
-							/>
-						</div>
-						<p className="mt-2 text-center font-medium text-xs text-zinc-700 dark:text-zinc-300">
+						<button
+							className={`relative mt-2 w-full rounded-3xl border-2 transition-all duration-200 ${
+								selectedStyle === style.value
+									? " ring-2 ring-black dark:ring-white"
+									: "border-zinc-200 hover:border-zinc-300 dark:border-zinc-700 dark:hover:border-zinc-600"
+							}`}
+							onClick={() => onStyleChange(style.value)}
+							type="button"
+						>
+							<div className="h-48 w-full md:h-52 lg:h-56">
+								<HeaderStylePreview
+									backgroundColor={backgroundColor}
+									backgroundImage={backgroundImage}
+									bio={bio}
+									buttonColor={buttonColor}
+									buttonStyle={buttonStyle}
+									buttonTextColor={buttonTextColor}
+									fontFamily={fontFamily}
+									image={image}
+									name={name}
+									style={style.value}
+									textColor={textColor}
+									username={username}
+								/>
+							</div>
+						</button>
+						<p className="mt-2 text-center text-sm text-zinc-700 dark:text-zinc-300">
 							{style.label}
 						</p>
-					</button>
+					</div>
 				))}
 			</div>
 		</div>

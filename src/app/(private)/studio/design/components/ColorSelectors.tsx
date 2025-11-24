@@ -37,7 +37,7 @@ export function ColorOption({
 	return (
 		<button
 			className={`h-10 w-10 rounded-full border-2 ${
-				isSelected ? "border-lime-700" : "border-zinc-300 dark:border-zinc-600"
+				isSelected ? "ring-2 ring-black dark:ring-white" : "border-zinc-300 dark:border-zinc-600"
 			}`}
 			key={color}
 			onClick={() => handleChange(field, color)}

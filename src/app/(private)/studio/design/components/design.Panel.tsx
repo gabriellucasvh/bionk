@@ -2,9 +2,7 @@
 
 import {
 	Image as ImageIcon,
-	Paintbrush,
-	SwatchBook,
-	Video,
+	Play,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -218,7 +216,7 @@ export function DesignPanel() {
 										case "color":
 											return {
 												backgroundColor:
-													customizations.customBackgroundColor || "#e3e8e5",
+													customizations.customBackgroundColor || "#f2f2f2",
 											};
 										case "gradient":
 											return customizations.customBackgroundGradient
@@ -228,7 +226,7 @@ export function DesignPanel() {
 													}
 												: {
 														backgroundImage:
-															"linear-gradient(135deg, #e3e8e5 0%, #e3e8e5 100%)",
+															"linear-gradient(135deg, #f2f2f2 0%, #f2f2f2 100%)",
 													};
 										case "image":
 											return customizations.customBackgroundImageUrl
@@ -238,22 +236,16 @@ export function DesignPanel() {
 														backgroundPosition: "top",
 														backgroundRepeat: "no-repeat",
 													}
-												: { backgroundColor: "#e3e8e5" };
+												: { backgroundColor: "#f2f2f2" };
 										case "video":
-											return { backgroundColor: "#e3e8e5" };
+											return { backgroundColor: "#f2f2f2" };
 										default:
-											return { backgroundColor: "#e3e8e5" };
+											return { backgroundColor: "#f2f2f2" };
 									}
 								})();
 
-								const Icon =
-									opt.key === "color"
-										? Paintbrush
-										: opt.key === "gradient"
-											? SwatchBook
-											: opt.key === "image"
-												? ImageIcon
-												: Video;
+								const showIcon = opt.key === "image" || opt.key === "video";
+								const Icon = opt.key === "image" ? ImageIcon : Play;
 
 								return (
 									<div
@@ -262,9 +254,7 @@ export function DesignPanel() {
 									>
 										<button
 											className={`relative w-full overflow-hidden rounded-xl border transition-all ${
-												isSelected
-													? "border-lime-700 ring-2 ring-lime-700 dark:border-lime-600 dark:ring-lime-600"
-													: "border-zinc-300 hover:border-green-500 dark:border-zinc-600 dark:hover:border-green-400"
+												isSelected ? " ring-1 ring-offset-2 dark:ring-1" : ""
 											}`}
 											onClick={() => handleBackgroundTypeChange(opt.key)}
 											style={{ aspectRatio: "6 / 7", ...previewStyle }}
@@ -282,19 +272,21 @@ export function DesignPanel() {
 												/>
 											) : null}
 											<div className="absolute inset-0 flex items-center justify-center">
-												<Icon
-													className={`h-6 w-6 ${
-														isSelected
-															? "text-lime-700 dark:text-lime-400"
-															: "text-white drop-shadow-sm"
-													}`}
-												/>
+												{showIcon ? (
+													<Icon
+														className={`h-6 w-6 ${
+															isSelected
+																? "text-black dark:text-black"
+																: "text-black"
+														}`}
+													/>
+												) : null}
 											</div>
 										</button>
 										<span
-											className={`mt-1 text-center text-xs ${
+											className={`mt-2 text-center text-sm ${
 												isSelected
-													? "text-lime-700 dark:text-lime-400"
+													? "text-black dark:text-white"
 													: "text-zinc-700 dark:text-zinc-300"
 											}`}
 										>
@@ -336,8 +328,8 @@ export function DesignPanel() {
 									<button
 										className={`h-10 w-10 rounded-full border-2 transition-all duration-300 ${
 											customizations.customBackgroundGradient === gradient
-												? "border-2 border-lime-700"
-												: "border-2 border-zinc-200 hover:border-green-500 dark:border-zinc-600 dark:hover:border-green-400"
+												? "ring-2 ring-black dark:ring-white"
+												: ""
 										}`}
 										key={gradient}
 										onClick={() => {

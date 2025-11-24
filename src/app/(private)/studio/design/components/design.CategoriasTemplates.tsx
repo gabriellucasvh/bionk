@@ -153,9 +153,9 @@ export default function TemplateSettings({
 			<div className="mb-10 hidden grid-cols-2 gap-2 sm:grid sm:grid-cols-3 md:grid-cols-4">
 				{Object.keys(CATEGORIES).map((category) => (
 					<Button
-						className={`flex h-12 w-full items-center justify-center rounded-lg border-2 px-2 py-1 text-center font-medium text-xs capitalize transition-colors hover:border-lime-500 hover:bg-green-950 hover:text-white ${
+						className={`flex h-12 w-full items-center justify-center rounded-2xl border px-2 py-1 text-center font-medium capitalize transition-colors hover:bg-bunker-100 dark:hover:bg-bunker-950 dark:hover:text-white ${
 							selectedCategory === category
-								? "border-lime-500 bg-green-950 text-white"
+								? " bg-black text-white hover:bg-black hover:text-white dark:bg-white dark:text-black dark:hover:bg-white dark:hover:text-black"
 								: " bg-white dark:bg-zinc-900 dark:text-white"
 						}`}
 						key={category}
@@ -173,7 +173,7 @@ export default function TemplateSettings({
 				<div className="mt-4">
 					<div className="relative">
 						<div
-							className=" flex gap-3 overflow-x-auto pb-2"
+							className=" flex gap-3 overflow-x-auto p-2"
 							ref={scrollContainerRef}
 						>
 							{CATEGORIES[selectedCategory as keyof typeof CATEGORIES]?.map(
@@ -181,8 +181,8 @@ export default function TemplateSettings({
 									<div
 										className={`min-w-[150px] cursor-pointer rounded-lg border transition-all ${
 											selectedTemplate === template.id
-												? "border-green-600 bg-green-50"
-												: "border-zinc-300 hover:border-green-400 hover:bg-zinc-50 dark:border-zinc-600 dark:hover:border-green-400 dark:hover:bg-zinc-600"
+												? ""
+												: "ring-offset-2 transition-all duration-200 hover:ring-2 hover:ring-black"
 										}`}
 										key={template.id}
 									>
