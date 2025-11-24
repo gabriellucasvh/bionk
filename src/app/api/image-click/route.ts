@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCookiePreferencesFromHeaders } from "@/lib/cookie-server";
 import prisma from "@/lib/prisma";
+import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
+import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
 
 export async function POST(req: NextRequest) {
 	try {
@@ -28,7 +30,7 @@ export async function POST(req: NextRequest) {
 		// Always increment per-item clicks (essential functionality), regardless of analytics preference
 		const image = await prisma.image.findUnique({
 			where: { id: Number(imageId) },
-			select: { id: true, items: true },
+			select: { id: true, items: true, userId: true },
 		});
 
 		if (!image) {
@@ -64,8 +66,78 @@ export async function POST(req: NextRequest) {
 
 		const updatedClicks = (updated.items as any[])[itemIndex]?.clicks ?? 0;
 
-		// If analytics are allowed, we could extend tracking here (no ImageClick table exists yet)
-		// For now, just return updated counters.
+		const targetItem = itemsArray[itemIndex] || {};
+		const rawUrl =
+			typeof targetItem.linkUrl === "string" ? targetItem.linkUrl.trim() : "";
+		const hasUrl = rawUrl.length > 0;
+
+		if (hasUrl && image.userId) {
+			const ensureHttps = (u: string) => {
+				if (!u) {
+					return "";
+				}
+				if (u.startsWith("http://")) {
+					return `https://${u.slice(7)}`;
+				}
+				if (!u.startsWith("http")) {
+					return `https://${u}`;
+				}
+				return u;
+			};
+
+			const normalizedUrl = ensureHttps(rawUrl);
+
+			let linkRecord = await prisma.link.findFirst({
+				where: {
+					userId: image.userId,
+					url: normalizedUrl,
+					type: "countdown_link",
+				},
+				select: { id: true },
+			});
+
+			if (!linkRecord) {
+				linkRecord = await prisma.link.create({
+					data: {
+						userId: image.userId,
+						title: targetItem.title || "Imagem",
+						url: normalizedUrl,
+						active: false,
+						archived: true,
+						type: "countdown_link",
+					},
+					select: { id: true },
+				});
+			}
+
+			if (analytics) {
+				const userAgent = getUserAgent(req);
+				const deviceType = detectDeviceType(userAgent);
+				const clientIP = getClientIP(req);
+				const country = await getCountryFromIP(clientIP || "127.0.0.1");
+
+				await prisma.linkClick.create({
+					data: {
+						linkId: Number(linkRecord.id),
+						device: deviceType,
+						userAgent,
+						country,
+						referrer: normalizedReferrer,
+					},
+				});
+			} else {
+				await prisma.linkClick.create({
+					data: {
+						linkId: Number(linkRecord.id),
+						device: "unknown",
+						userAgent: null,
+						country: null,
+						referrer: normalizedReferrer,
+					},
+				});
+			}
+		}
+
 		return NextResponse.json({
 			id: updated.id,
 			itemIndex,

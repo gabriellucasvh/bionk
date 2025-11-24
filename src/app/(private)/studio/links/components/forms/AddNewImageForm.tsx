@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { ImageFormData } from "../../hooks/useLinksManager";
 import type { SectionItem } from "../../types/links.types";
 
+const HTTP_SCHEME_RE = /^https?:\/\//i;
 interface AddNewImageFormProps {
 	formData?: ImageFormData;
 	setFormData?: (data: ImageFormData) => void;
@@ -109,6 +110,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 	const [activeSection, setActiveSection] = useState<string>("");
 	const [uploadError, setUploadError] = useState<string>("");
 	const [isUploading, setIsUploading] = useState(false);
+	const [linkErrors, setLinkErrors] = useState<Record<number, string>>({});
 
 	const ACCEPTED_IMAGE_TYPES = [
 		"image/jpeg",
@@ -227,6 +229,32 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 
 	// Removidos handlers de URL de imagem não utilizados
 
+	const validateLink = (raw: string) => {
+		const v = typeof raw === "string" ? raw.trim() : "";
+		if (!v) {
+			return "";
+		}
+		const hasScheme = HTTP_SCHEME_RE.test(v) || v.startsWith("//");
+		const normalized = hasScheme ? v : `https://${v}`;
+		try {
+			const parsed = new URL(normalized);
+			if (!(parsed.protocol === "http:" || parsed.protocol === "https:")) {
+				return "Insira um URL válido";
+			}
+			const host = parsed.hostname;
+			if (!(host && host.includes("."))) {
+				return "Insira um URL válido";
+			}
+			const tld = host.split(".").pop() || "";
+			if (tld.length < 2) {
+				return "Insira um URL válido";
+			}
+			return "";
+		} catch {
+			return "Insira um URL válido";
+		}
+	};
+
 	const updateLinkUrl = (index: number, linkUrl: string) => {
 		const next = [...(formData.images || [])];
 		if (!next[index]) {
@@ -234,6 +262,8 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 		}
 		next[index] = { ...next[index], linkUrl };
 		setFormData({ ...formData, images: next });
+		const errorMsg = validateLink(linkUrl);
+		setLinkErrors((prev) => ({ ...prev, [index]: errorMsg }));
 	};
 
 	const removeImage = (index: number) => {
@@ -279,6 +309,17 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 			});
 		}
 	};
+
+	const hasInvalidLinks = useMemo(() => {
+		const imgs = formData.images || [];
+		for (let i = 0; i < imgs.length; i++) {
+			const msg = linkErrors[i];
+			if (typeof msg === "string" && msg.trim().length > 0) {
+				return true;
+			}
+		}
+		return false;
+	}, [formData.images, linkErrors]);
 
 	return (
 		<div className="flex h-full flex-col space-y-4">
@@ -542,11 +583,23 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 												src={img.url}
 											/>
 										</div>
-										<Input
-											onChange={(e) => updateLinkUrl(idx, e.target.value)}
-											placeholder="URL do link (opcional)"
-											value={img.linkUrl || ""}
-										/>
+										<div className="flex-1">
+											<Input
+												className={
+													linkErrors[idx] && linkErrors[idx].trim().length > 0
+														? "border-red-500 focus-visible:border-red-500"
+														: undefined
+												}
+												onChange={(e) => updateLinkUrl(idx, e.target.value)}
+												placeholder="URL do link (opcional)"
+												value={img.linkUrl || ""}
+											/>
+											{linkErrors[idx] && linkErrors[idx].trim().length > 0 && (
+												<p className="mt-1 text-red-600 text-xs">
+													{linkErrors[idx]}
+												</p>
+											)}
+										</div>
 										{!(propMode === "edit" && formData.layout === "single") && (
 											<BaseButton
 												className="h-10"
@@ -687,7 +740,11 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 					</BaseButton>
 					<BaseButton
 						className="px-4"
-						disabled={isSaveDisabled || (propMode === "edit" && didSubmit)}
+						disabled={
+							isSaveDisabled ||
+							hasInvalidLinks ||
+							(propMode === "edit" && didSubmit)
+						}
 						loading={isLoading}
 						onClick={handleSave}
 						type="button"

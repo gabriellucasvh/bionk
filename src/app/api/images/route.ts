@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-
+const HTTP_SCHEME_RE = /^https?:\/\//i;
 export async function POST(request: Request) {
 	const session = await getServerSession(authOptions);
 
@@ -54,6 +54,45 @@ export async function POST(request: Request) {
 				{ error: "Descrição deve ter no máximo 200 caracteres" },
 				{ status: 400 }
 			);
+		}
+
+		if (Array.isArray(items)) {
+			for (let i = 0; i < items.length; i++) {
+				const raw = items[i]?.linkUrl as string | undefined;
+				if (raw && raw.trim().length > 0) {
+					const v = raw.trim();
+					const hasScheme = HTTP_SCHEME_RE.test(v) || v.startsWith("//");
+					const normalized = hasScheme ? v : `https://${v}`;
+					try {
+						const u = new URL(normalized);
+						if (!(u.protocol === "http:" || u.protocol === "https:")) {
+							return NextResponse.json(
+								{ error: `URL inválida na imagem ${i + 1}` },
+								{ status: 400 }
+							);
+						}
+						const host = u.hostname;
+						if (!(host && host.includes("."))) {
+							return NextResponse.json(
+								{ error: `URL inválida na imagem ${i + 1}` },
+								{ status: 400 }
+							);
+						}
+						const tld = host.split(".").pop() || "";
+						if (tld.length < 2) {
+							return NextResponse.json(
+								{ error: `URL inválida na imagem ${i + 1}` },
+								{ status: 400 }
+							);
+						}
+					} catch {
+						return NextResponse.json(
+							{ error: `URL inválida na imagem ${i + 1}` },
+							{ status: 400 }
+						);
+					}
+				}
+			}
 		}
 
 		// Ao criar um novo item, empurra os outros para baixo mantendo o order
