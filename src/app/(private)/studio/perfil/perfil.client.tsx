@@ -575,6 +575,7 @@ const PerfilClient = () => {
 										setIsEditingUsername(false);
 										setIsEditModalOpen(true);
 									}}
+									variant="studio"
 								>
 									Editar Perfil
 								</BaseButton>
@@ -710,6 +711,7 @@ const PerfilClient = () => {
 												}
 												fullWidth
 												onClick={() => setIsEditingUsername(false)}
+												variant="studio"
 											>
 												Confirmar
 											</BaseButton>
@@ -803,6 +805,7 @@ const PerfilClient = () => {
 												fullWidth
 												loading={loading || isUploadingImage}
 												onClick={handleSaveProfile}
+												variant="studio"
 											>
 												Salvar
 											</BaseButton>
@@ -1027,6 +1030,7 @@ const PerfilClient = () => {
 												fullWidth
 												loading={loading || isUploadingImage}
 												onClick={handleSaveProfile}
+												variant="studio"
 											>
 												Salvar
 											</BaseButton>

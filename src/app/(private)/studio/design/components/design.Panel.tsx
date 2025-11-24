@@ -39,26 +39,26 @@ const convertCustomizationsToRecord = (
 });
 
 export function DesignPanel() {
-    const {
-        userData,
-        customizations,
-        updateCustomization,
-        hasUnsavedChanges,
-        saveChanges,
-        discardChanges,
-        // UI store
-        isBackgroundModalOpen,
-        backgroundModalType,
-        isFontModalOpen,
-        setIsBackgroundModalOpen,
-        setBackgroundModalType,
-        setIsFontModalOpen,
-    } = useDesignStore();
+	const {
+		userData,
+		customizations,
+		updateCustomization,
+		hasUnsavedChanges,
+		saveChanges,
+		discardChanges,
+		// UI store
+		isBackgroundModalOpen,
+		backgroundModalType,
+		isFontModalOpen,
+		setIsBackgroundModalOpen,
+		setBackgroundModalType,
+		setIsFontModalOpen,
+	} = useDesignStore();
 
 	const [activeColorPicker, setActiveColorPicker] = useState<string | null>(
 		null
 	);
-    // Estado de UI agora vem do store para persistência
+	// Estado de UI agora vem do store para persistência
 	const [isSavingPending, setIsSavingPending] = useState(false);
 
 	// Tipo de fundo selecionado (apenas um por vez)
@@ -88,11 +88,11 @@ export function DesignPanel() {
 		setBackgroundType(type);
 
 		// Para imagem/vídeo, abrir modal de seleção sem alterar o preview atual.
-        if (type === "image" || type === "video") {
-            setBackgroundModalType(type);
-            setIsBackgroundModalOpen(true);
-        }
-    };
+		if (type === "image" || type === "video") {
+			setBackgroundModalType(type);
+			setIsBackgroundModalOpen(true);
+		}
+	};
 
 	const handleSavePending = async () => {
 		try {
@@ -568,6 +568,7 @@ export function DesignPanel() {
 						disabled={isSavingPending}
 						onClick={handleSavePending}
 						size="sm"
+						variant="studio"
 					>
 						{isSavingPending ? (
 							<span className="flex items-center gap-2">

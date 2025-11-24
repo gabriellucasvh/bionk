@@ -619,6 +619,7 @@ const SocialLinksTabContent = ({
 							disabled={isSaveButtonDisabled()}
 							loading={isSaving}
 							onClick={handleAddOrUpdateSocialLink}
+							variant="studio"
 						>
 							<span className="flex items-center justify-center">Salvar</span>
 						</BaseButton>
