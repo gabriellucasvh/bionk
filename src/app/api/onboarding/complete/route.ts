@@ -5,6 +5,7 @@ import { authOptions, clearUserTokenCache } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { getDefaultCustomPresets } from "@/utils/templatePresets";
+export const runtime = "nodejs";
 
 const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
 const BASE64_IMAGE_REGEX = /^data:image\/\w+;base64,/;
@@ -71,10 +72,9 @@ async function uploadProfileImage(profileImage: string, defaultImage: string) {
 		});
 
 		return (uploadResponse as any).secure_url;
-	} catch (error) {
-		console.error("Erro no upload da imagem:", error);
-		return defaultImage;
-	}
+    } catch {
+        return defaultImage;
+    }
 }
 
 export async function POST(request: Request) {

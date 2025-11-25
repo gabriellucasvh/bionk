@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+export const runtime = "nodejs";
 
 // A API espera um array de objetos com id e order
 const reorderSchema = z.object({

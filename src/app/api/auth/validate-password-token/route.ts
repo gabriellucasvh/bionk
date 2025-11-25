@@ -1,15 +1,26 @@
-import { cookies } from "next/headers";
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
-    try {
-        const cookieStore = await cookies();
-        const regCsrfCookie = cookieStore.get("reg_csrf");
-        if (!(regCsrfCookie && regCsrfCookie.value)) {
-            return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
-        }
-        const { token } = await req.json();
+	try {
+		const cookieHeader = req.headers.get("cookie") || "";
+		let regCsrfCookieValue: string | null = null;
+		for (const part of cookieHeader.split(";")) {
+			const [k, v] = part.trim().split("=");
+			if (k === "reg_csrf") {
+				regCsrfCookieValue = v ? decodeURIComponent(v) : null;
+				break;
+			}
+		}
+		const regCsrfCookie = regCsrfCookieValue
+			? { value: regCsrfCookieValue }
+			: null;
+		if (!(regCsrfCookie && regCsrfCookie.value)) {
+			return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
+		}
+		const { token } = await req.json();
 
 		if (!token) {
 			return NextResponse.json(
@@ -27,12 +38,12 @@ export async function POST(req: Request) {
 			return NextResponse.json({ error: "Token inválido." }, { status: 400 });
 		}
 
-        if (
-            !user.registrationCsrfState ||
-            user.registrationCsrfState !== regCsrfCookie.value
-        ) {
-            return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
-        }
+		if (
+			!user.registrationCsrfState ||
+			user.registrationCsrfState !== regCsrfCookie.value
+		) {
+			return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
+		}
 		if (
 			!user.registrationCsrfExpiry ||
 			user.registrationCsrfExpiry < new Date()

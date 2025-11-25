@@ -1,8 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCookiePreferencesFromHeaders } from "@/lib/cookie-server";
+import { getCookiePreferencesFromRequest } from "@/lib/cookie-server";
 import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
 	try {
@@ -59,7 +60,7 @@ export async function POST(req: NextRequest) {
 		}
 
 		// Verificar preferências de cookies
-		const cookiePreferences = await getCookiePreferencesFromHeaders();
+        const cookiePreferences = getCookiePreferencesFromRequest(req as unknown as Request);
 
 		// Se analytics não estão permitidos, registramos o clique com dados mínimos
 		if (!cookiePreferences.analytics) {

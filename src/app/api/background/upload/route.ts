@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
+export const runtime = "nodejs";
 
 // Accepted formats per requirements
 const ACCEPTED_IMAGE_TYPES = [

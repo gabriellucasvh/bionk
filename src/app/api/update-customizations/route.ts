@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 // Regex de extensão definido no escopo de módulo para performance
 const EXTENSION_REGEX = /\.[^/.]+$/;

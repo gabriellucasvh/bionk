@@ -9,6 +9,7 @@ import {
 	parseMusicUrl,
 	resolveDeezerShortUrl,
 } from "@/utils/music";
+export const runtime = "nodejs";
 
 export async function PUT(
 	request: NextRequest,
@@ -121,7 +122,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-	request: NextRequest,
+	_request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const session = await getServerSession(authOptions);

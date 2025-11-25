@@ -1,8 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getCookiePreferencesFromHeaders } from "@/lib/cookie-server";
+import { getCookiePreferencesFromRequest } from "@/lib/cookie-server";
 import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
 	try {
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const { analytics } = await getCookiePreferencesFromHeaders();
+        const { analytics } = getCookiePreferencesFromRequest(req as unknown as Request);
 		const normalizedReferrer = trafficSource || "direct";
 
 		// Always increment per-item clicks (essential functionality), regardless of analytics preference

@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
+const REGEX_FILE_EXTENSION = /\.[^/.]+$/;
 export async function POST(
 	req: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
@@ -90,7 +92,7 @@ export async function POST(
 					.split("/")
 					.slice(-2)
 					.join("/")
-					.replace(/\.[^/.]+$/, "");
+					.replace(REGEX_FILE_EXTENSION, "");
 
 				await cloudinary.uploader.destroy(oldPublicId);
 			} catch (cloudinaryError) {
@@ -128,7 +130,7 @@ export async function POST(
 
 // DELETE endpoint para remover imagem personalizada
 export async function DELETE(
-	req: NextRequest,
+	_req: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const { id: idString } = await params;
@@ -162,7 +164,7 @@ export async function DELETE(
 					.split("/")
 					.slice(-2)
 					.join("/")
-					.replace(/\.[^/.]+$/, "");
+					.replace(REGEX_FILE_EXTENSION, "");
 
 				await cloudinary.uploader.destroy(publicId);
 			} catch (cloudinaryError) {

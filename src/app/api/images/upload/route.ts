@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -60,8 +61,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, url: result.secure_url });
-  } catch (error) {
-    console.error("Erro no upload de imagem:", error);
+  } catch {
     return NextResponse.json(
       { success: false, error: "Erro ao fazer upload da imagem" },
       { status: 500 }

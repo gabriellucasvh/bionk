@@ -1,10 +1,11 @@
 import crypto from "node:crypto";
-import { headers } from "next/headers";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 import { type NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import { z } from "zod";
+export const runtime = "nodejs";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
 
 // Regex patterns moved to top level for performance
 const USERNAME_REGEX = /^[a-zA-Z0-9._]{3,30}$/;
@@ -52,21 +53,15 @@ let _contactRateLimiter: any = null;
 
 function getContactRateLimiter() {
 	if (!_contactRateLimiter) {
-		const { Ratelimit } = require("@upstash/ratelimit");
-		const { Redis } = require("@upstash/redis");
-
 		const url = process.env.UPSTASH_REDIS_REST_URL;
 		const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-
 		if (!(url && token)) {
 			throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
 		}
-
 		const redis = new Redis({ url, token });
-
 		_contactRateLimiter = new Ratelimit({
 			redis,
-			limiter: Ratelimit.slidingWindow(3, "60 s"), // 3 requests por minuto
+			limiter: Ratelimit.slidingWindow(3, "60 s"),
 			analytics: true,
 			prefix: "ratelimit_contact",
 		});
@@ -118,8 +113,8 @@ function getClientIP(headersList: Headers): string {
 export async function POST(req: NextRequest): Promise<NextResponse> {
 	try {
 		// Rate limiting
-		const headersList = await headers();
-		const ip = getClientIP(headersList);
+		const headersList = req.headers;
+		const ip = getClientIP(headersList as Headers);
 
 		const { success } = await getContactRateLimiter().limit(ip);
 		if (!success) {
@@ -224,6 +219,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 		// Enviar email
 		try {
+			if (!resendApiKey) {
+				return NextResponse.json({
+					message: "Solicitação enviada. Entraremos em contato em breve.",
+					success: true,
+				});
+			}
+			const { Resend } = await import("resend");
+			const resend = new Resend(resendApiKey);
 			await resend.emails.send({
 				from: process.env.RESEND_FROM_EMAIL || "contato@bionk.me",
 				to: ["contato@bionk.me"], // Email da empresa
@@ -238,12 +241,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 				to: [sanitizedData.email],
 				subject: "Recebemos sua solicitação - Bionk",
 				html: `
-          <h2>Obrigado pelo seu interesse!</h2>
-          <p>Olá ${sanitizedData.fullName},</p>
-          <p>Recebemos sua solicitação de plano personalizado para <strong>${sanitizedData.companyName}</strong>.</p>
-          <p>Nossa equipe analisará suas necessidades e entrará em contato em até 2 dias úteis.</p>
-          <p>Atenciosamente,<br>Equipe Bionk</p>
-        `,
+					<h2>Obrigado pelo seu interesse!</h2>
+					<p>Olá ${sanitizedData.fullName},</p>
+					<p>Recebemos sua solicitação de plano personalizado para <strong>${sanitizedData.companyName}</strong>.</p>
+					<p>Nossa equipe analisará suas necessidades e entrará em contato em até 2 dias úteis.</p>
+					<p>Atenciosamente,<br>Equipe Bionk</p>
+				`,
 			});
 
 			return NextResponse.json(

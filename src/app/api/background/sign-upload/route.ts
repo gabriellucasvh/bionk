@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
+export const runtime = "nodejs";
 
 // Area (crop) enviado pelo cliente
 type CropArea = { x: number; y: number; width: number; height: number };

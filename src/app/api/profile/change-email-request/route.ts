@@ -1,14 +1,14 @@
+import crypto from "node:crypto";
+import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import ChangeEmailVerificationEmail from "@/emails/change-email-verification-email";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
-import bcrypt from "bcryptjs";
-import crypto from "node:crypto";
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
-import { Resend } from "resend";
+export const runtime = "nodejs";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
 
 export async function POST(req: Request): Promise<NextResponse> {
 	try {
@@ -19,9 +19,9 @@ export async function POST(req: Request): Promise<NextResponse> {
 
 		if (session.user.banido) {
 			return NextResponse.json(
-				{ 
-					error: "Conta suspensa", 
-					message: "Sua conta foi suspensa e não pode realizar esta ação." 
+				{
+					error: "Conta suspensa",
+					message: "Sua conta foi suspensa e não pode realizar esta ação.",
 				},
 				{ status: 403 }
 			);
@@ -106,6 +106,14 @@ export async function POST(req: Request): Promise<NextResponse> {
 		const verificationUrl = `${process.env.NEXTAUTH_URL}/profile/verify-new-email?token=${emailVerificationToken}`;
 
 		try {
+			if (!resendApiKey) {
+				return NextResponse.json({
+					message:
+						"Solicitação enviada. Verifique seu e-mail em alguns minutos.",
+				});
+			}
+			const { Resend } = await import("resend");
+			const resend = new Resend(resendApiKey);
 			await resend.emails.send({
 				from: process.env.RESEND_FROM_EMAIL || "suporte@bionk.me",
 				to: newEmail,
@@ -129,7 +137,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 			{ message: "E-mail de verificação enviado para o novo endereço." },
 			{ status: 200 }
 		);
-	} catch  {
+	} catch {
 		return NextResponse.json(
 			{ error: "Ocorreu um erro interno." },
 			{ status: 500 }

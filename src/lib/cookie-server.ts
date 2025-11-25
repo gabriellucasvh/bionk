@@ -7,8 +7,8 @@ interface CookiePreferences {
 	marketing: boolean;
 }
 
-export async function getCookiePreferencesFromHeaders(): Promise<CookiePreferences> {
-	const cookieStore = await cookies();
+export function getCookiePreferencesFromHeaders(): CookiePreferences {
+	const cookieStore = cookies() as any;
 	const getBool = (name: string, defaultValue = false): boolean => {
 		const val = cookieStore.get(name)?.value;
 		return val ? val === "true" : defaultValue;

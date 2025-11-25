@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
+export const runtime = "nodejs";
 
 const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
 // Função para limpar usernames reservados expirados

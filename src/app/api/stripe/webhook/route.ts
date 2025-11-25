@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 	apiVersion: "2025-09-30.clover",
@@ -28,10 +29,9 @@ export async function POST(req: Request) {
 	const sig = req.headers.get("stripe-signature");
 	const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
-	if (!(sig && webhookSecret)) {
-		console.error("Webhook inválido: faltando assinatura ou secret");
-		return NextResponse.json({ error: "Webhook inválido" }, { status: 400 });
-	}
+    if (!(sig && webhookSecret)) {
+        return NextResponse.json({ error: "Webhook inválido" }, { status: 400 });
+    }
 
 	let event: Stripe.Event;
 	try {

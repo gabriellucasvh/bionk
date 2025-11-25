@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 export async function GET() {
 	try {
@@ -42,35 +43,22 @@ export async function GET() {
 
 		if (isPaidPlan) {
 			// Verificar se o status é ativo
-			if (user.subscriptionStatus !== "active") {
-				console.log(
-					"User with paid plan but inactive status, showing as free",
-					{
-						userId: session.user.id,
-						plan: user.subscriptionPlan,
-						status: user.subscriptionStatus,
-					}
-				);
-				return NextResponse.json({
-					isSubscribed: true,
-					plan: "free",
-					status: "active",
-				});
-			}
+            if (user.subscriptionStatus !== "active") {
+                return NextResponse.json({
+                    isSubscribed: true,
+                    plan: "free",
+                    status: "active",
+                });
+            }
 
 			// Verificar se a assinatura não expirou
-			if (user.subscriptionEndDate && user.subscriptionEndDate < new Date()) {
-				console.log("User with expired subscription, showing as free", {
-					userId: session.user.id,
-					plan: user.subscriptionPlan,
-					endDate: user.subscriptionEndDate,
-				});
-				return NextResponse.json({
-					isSubscribed: true,
-					plan: "free",
-					status: "active",
-				});
-			}
+            if (user.subscriptionEndDate && user.subscriptionEndDate < new Date()) {
+                return NextResponse.json({
+                    isSubscribed: true,
+                    plan: "free",
+                    status: "active",
+                });
+            }
 		}
 
 		const response = {
@@ -85,11 +73,10 @@ export async function GET() {
 		};
 
 		return NextResponse.json(response);
-	} catch (error) {
-		console.error("Error in subscription-details API:", error);
-		return NextResponse.json(
-			{ error: "Erro ao buscar detalhes da assinatura." },
-			{ status: 500 }
-		);
-	}
+    } catch {
+        return NextResponse.json(
+            { error: "Erro ao buscar detalhes da assinatura." },
+            { status: 500 }
+        );
+    }
 }

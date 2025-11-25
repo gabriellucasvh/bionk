@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 const MAX_ATTEMPTS = 2; // tentativa principal + 1 retentativa
 const BACKOFF_MINUTES = [5]; // 02:05 como janela de retry
@@ -198,9 +198,13 @@ export async function GET(request: Request) {
 
 	try {
 		// Agregar cliques por userId/linkId para o dia alvo
-        const clicksByLink: Array<{ userId: string; linkId: number; clicks: number }> = await prisma.$queryRaw<
-            Array<{ userId: string; linkId: number; clicks: number }>
-        >`
+		const clicksByLink: Array<{
+			userId: string;
+			linkId: number;
+			clicks: number;
+		}> = await prisma.$queryRaw<
+			Array<{ userId: string; linkId: number; clicks: number }>
+		>`
             SELECT l."userId" as "userId", lc."linkId" as "linkId", COUNT(lc.id)::int as clicks
             FROM "public"."LinkClick" lc
             JOIN "public"."Link" l ON l.id = lc."linkId"
@@ -209,9 +213,8 @@ export async function GET(request: Request) {
         `;
 
 		// Agregar views por userId para o dia alvo
-        const viewsByUser: Array<{ userId: string; views: number }> = await prisma.$queryRaw<
-            Array<{ userId: string; views: number }>
-        >`
+		const viewsByUser: Array<{ userId: string; views: number }> =
+			await prisma.$queryRaw<Array<{ userId: string; views: number }>>`
     SELECT pv."userId" as "userId", COUNT(pv.id)::int as views
     FROM "public"."ProfileView" pv
     WHERE pv."createdAt" BETWEEN ${startOfTarget} AND ${endOfTarget}
@@ -219,9 +222,8 @@ export async function GET(request: Request) {
   `;
 
 		// Agregar cliques por userId para o dia alvo
-        const clicksByUser: Array<{ userId: string; clicks: number }> = await prisma.$queryRaw<
-            Array<{ userId: string; clicks: number }>
-        >`
+		const clicksByUser: Array<{ userId: string; clicks: number }> =
+			await prisma.$queryRaw<Array<{ userId: string; clicks: number }>>`
     SELECT l."userId" as "userId", COUNT(lc.id)::int as clicks
     FROM "public"."LinkClick" lc
     JOIN "public"."Link" l ON l.id = lc."linkId"
@@ -254,40 +256,42 @@ export async function GET(request: Request) {
 
 		// Upserts em paralelo para views por usuário
 		let updatedUserRollups = 0;
-        const userViewUpserts = viewsByUser.map((row: { userId: string; views: number }) =>
-            prisma.monthlyUserAnalytics.upsert({
-				where: {
-					userId_monthStart: {
+		const userViewUpserts = viewsByUser.map(
+			(row: { userId: string; views: number }) =>
+				prisma.monthlyUserAnalytics.upsert({
+					where: {
+						userId_monthStart: {
+							userId: row.userId,
+							monthStart,
+						},
+					},
+					update: { views: { increment: row.views } },
+					create: {
 						userId: row.userId,
 						monthStart,
+						views: row.views,
+						clicks: 0,
 					},
-				},
-				update: { views: { increment: row.views } },
-				create: {
-					userId: row.userId,
-					monthStart,
-					views: row.views,
-					clicks: 0,
-				},
-			})
+				})
 		);
 		// Upserts em paralelo para cliques por usuário
-        const userClickUpserts = clicksByUser.map((row: { userId: string; clicks: number }) =>
-            prisma.monthlyUserAnalytics.upsert({
-				where: {
-					userId_monthStart: {
+		const userClickUpserts = clicksByUser.map(
+			(row: { userId: string; clicks: number }) =>
+				prisma.monthlyUserAnalytics.upsert({
+					where: {
+						userId_monthStart: {
+							userId: row.userId,
+							monthStart,
+						},
+					},
+					update: { clicks: { increment: row.clicks } },
+					create: {
 						userId: row.userId,
 						monthStart,
+						clicks: row.clicks,
+						views: 0,
 					},
-				},
-				update: { clicks: { increment: row.clicks } },
-				create: {
-					userId: row.userId,
-					monthStart,
-					clicks: row.clicks,
-					views: 0,
-				},
-			})
+				})
 		);
 		await Promise.all([...userViewUpserts, ...userClickUpserts]);
 		updatedUserRollups = viewsByUser.length + clicksByUser.length;
@@ -336,6 +340,7 @@ export async function GET(request: Request) {
 			try {
 				const resendApiKey = process.env.RESEND_API_KEY;
 				if (resendApiKey) {
+					const { Resend } = await import("resend");
 					const resend = new Resend(resendApiKey);
 					await resend.emails.send({
 						from: process.env.RESEND_FROM_EMAIL || "contato@bionk.me",

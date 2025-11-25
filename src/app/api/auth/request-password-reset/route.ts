@@ -1,22 +1,16 @@
 // src/app/api/auth/request-password-reset/route.ts
 
+import crypto from "node:crypto";
+import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
-import { headers } from "next/headers";
-import { type NextRequest, NextResponse } from "next/server";
-import crypto from "node:crypto";
-import { Resend } from "resend";
+export const runtime = "nodejs";
 
 const resendApiKey = process.env.RESEND_API_KEY;
-if (!resendApiKey) {
-	throw new Error("RESEND_API_KEY não está definido no ambiente.");
-}
-const resend = new Resend(resendApiKey);
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
 	// --- RATE LIMITER ---
-	const headersList = await headers();
-	const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
+	const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
 	const { success } = await getAuthRateLimiter().limit(ip);
 
 	if (!success) {
@@ -67,6 +61,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 		const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
 
 		try {
+			if (!(resendApiKey && resendApiKey.trim().length > 0)) {
+				return NextResponse.json(
+					{
+						message:
+							"Se o e-mail estiver cadastrado, um link de redefinição será enviado.",
+					},
+					{ status: 200 }
+				);
+			}
+			const { Resend } = await import("resend");
+			const resend = new Resend(resendApiKey);
 			const emailResponse = await resend.emails.send({
 				from: "Bionk <contato@bionk.me>",
 				to: [email],

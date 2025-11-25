@@ -1,9 +1,9 @@
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
-import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
+export const runtime = "nodejs";
 
 const REJEX_UPPERCASE = /[A-Z]/;
 const REJEX_LOWERCASE = /[a-z]/;
@@ -12,8 +12,7 @@ const REJEX_REPEAT = /([A-Za-z0-9])\1{3,}/;
 
 export async function POST(req: NextRequest) {
 	// --- RATE LIMITER ---
-	const headersList = await headers();
-	const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
+	const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
 	const { success } = await getAuthRateLimiter().limit(ip);
 	if (!success) {
 		return NextResponse.json(

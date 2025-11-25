@@ -1,33 +1,28 @@
-import { cookies, headers } from "next/headers";
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { getAuthRateLimiter } from "@/lib/rate-limiter";
 
 export async function GET(req: Request) {
 	try {
-		const headersList = await headers();
-		const ip =
-			headersList.get("cf-connecting-ip") ||
-			headersList.get("x-real-ip") ||
-			headersList.get("x-forwarded-for") ||
-			"127.0.0.1";
-		const { success } = await getAuthRateLimiter().limit(ip);
-		if (!success) {
-			return NextResponse.json(
-				{ error: "Muitas requisições. Tente novamente mais tarde." },
-				{ status: 429 }
-			);
+		const cookieHeader = req.headers.get("cookie") || "";
+		let regCsrfCookieValue: string | null = null;
+		for (const part of cookieHeader.split(";")) {
+			const [k, v] = part.trim().split("=");
+			if (k === "reg_csrf") {
+				regCsrfCookieValue = v ? decodeURIComponent(v) : null;
+				break;
+			}
 		}
-
-		const { searchParams } = new URL(req.url);
-		const email = searchParams.get("email");
-
-		const cookieStore = await cookies();
-		const regCsrfCookie = cookieStore.get("reg_csrf");
+		const regCsrfCookie = regCsrfCookieValue
+			? { value: regCsrfCookieValue }
+			: null;
 		if (!(regCsrfCookie && regCsrfCookie.value)) {
 			return NextResponse.json({ error: "CSRF inválido." }, { status: 400 });
 		}
 
+		const prisma = (await import("@/lib/prisma")).default;
 		const user = await prisma.user.findFirst({
 			where: { registrationCsrfState: regCsrfCookie.value },
 			select: {

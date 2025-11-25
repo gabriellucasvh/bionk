@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 export async function POST(
 	req: NextRequest,

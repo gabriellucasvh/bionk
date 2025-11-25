@@ -1,11 +1,12 @@
 import crypto from "node:crypto";
-import { headers } from "next/headers";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 import { type NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import { z } from "zod";
 import { discordWebhook } from "@/lib/discord-webhook";
+export const runtime = "nodejs";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
 
 // Regex patterns moved to top level for performance
 const SUSPICIOUS_PATTERNS = [
@@ -49,17 +50,15 @@ let _contactRateLimiter: any = null;
 
 function getContactRateLimiter() {
 	if (!_contactRateLimiter) {
-		const { Ratelimit } = require("@upstash/ratelimit");
-		const { Redis } = require("@upstash/redis");
-
-		const redis = new Redis({
-			url: process.env.UPSTASH_REDIS_REST_URL,
-			token: process.env.UPSTASH_REDIS_REST_TOKEN,
-		});
-
+		const url = process.env.UPSTASH_REDIS_REST_URL;
+		const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+		if (!(url && token)) {
+			throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
+		}
+		const redis = new Redis({ url, token });
 		_contactRateLimiter = new Ratelimit({
 			redis,
-			limiter: Ratelimit.slidingWindow(3, "10 m"), // 3 tentativas por 10 minutos
+			limiter: Ratelimit.slidingWindow(3, "10 m"),
 			analytics: true,
 			prefix: "contact_form",
 		});
@@ -99,8 +98,8 @@ function generateCSRFToken(): string {
 export async function POST(req: NextRequest): Promise<NextResponse> {
 	try {
 		// Rate limiting
-		const headersList = await headers();
-		const ip = getClientIP(headersList);
+		const headersList = req.headers;
+		const ip = getClientIP(headersList as Headers);
 
 		const { success } = await getContactRateLimiter().limit(ip);
 		if (!success) {
@@ -206,6 +205,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 		// Enviar email
 		try {
+			if (!resendApiKey) {
+				return NextResponse.json(
+					{
+						message: "Mensagem recebida. Vamos responder em breve.",
+						success: true,
+					},
+					{ status: 200 }
+				);
+			}
+			const { Resend } = await import("resend");
+			const resend = new Resend(resendApiKey);
 			await resend.emails.send({
 				from: process.env.RESEND_FROM_EMAIL || "contato@bionk.me",
 				to: ["contato@bionk.me"], // Email da empresa
@@ -220,12 +230,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 				to: [sanitizedData.email],
 				subject: "Recebemos sua mensagem - Bionk",
 				html: `
-					<h2>Obrigado por entrar em contato!</h2>
-					<p>Olá ${sanitizedData.fullName},</p>
-					<p>Recebemos sua mensagem sobre <strong>${subjectLabels[sanitizedData.subject]}</strong>.</p>
-					<p>Nossa equipe analisará sua solicitação e responderá em até 2 dias úteis.</p>
-					<p>Atenciosamente,<br>Equipe Bionk</p>
-				`,
+						<h2>Obrigado por entrar em contato!</h2>
+						<p>Olá ${sanitizedData.fullName},</p>
+						<p>Recebemos sua mensagem sobre <strong>${subjectLabels[sanitizedData.subject]}</strong>.</p>
+						<p>Nossa equipe analisará sua solicitação e responderá em até 2 dias úteis.</p>
+						<p>Atenciosamente,<br>Equipe Bionk</p>
+					`,
 			});
 
 			// Enviar notificação para o Discord
@@ -244,7 +254,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 					},
 				});
 			} catch {
-
 				// Não falha a requisição se o Discord falhar
 			}
 

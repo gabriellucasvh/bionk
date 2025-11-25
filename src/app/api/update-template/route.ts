@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { getTemplatePreset } from "@/utils/templatePresets";
+export const runtime = "nodejs";
 
 const VALID_TEMPLATES = [
 	"default",

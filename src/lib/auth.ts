@@ -1,14 +1,20 @@
 import crypto from "node:crypto";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcryptjs";
+
 import type { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { discordWebhook } from "@/lib/discord-webhook";
+import {
+	clearFailures,
+	getBlockInfo,
+	registerFailure,
+} from "@/lib/login-throttle";
 import prisma from "@/lib/prisma";
-import { headers } from "next/headers";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
-import { clearFailures, getBlockInfo, registerFailure } from "@/lib/login-throttle";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Funções auxiliares para JWT
 function setupInitialToken(token: any, user: ExtendedUser, account: any) {
@@ -94,9 +100,7 @@ async function updateTokenFromDatabase(token: any) {
 			// Salvar no cache
 			tokenCache.set(userId, { data: userData, timestamp: now });
 		}
-	} catch (error) {
-		console.error("Erro ao buscar dados do usuário:", error);
-	}
+	} catch {}
 }
 
 // Função para limpar cache quando necessário
@@ -113,8 +117,6 @@ function updateTokenFromSession(token: any, sessionUser: any) {
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-
-
 
 if (!(clientId && clientSecret)) {
 	throw new Error("Missing Google OAuth environment variables");
@@ -143,7 +145,8 @@ export const authOptions: NextAuthOptions = {
 			picture?: string;
 			provider?: string;
 		}) => {
-			const imageUrl = "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
+			const imageUrl =
+				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 
 			// Determinar status e username baseado no provider
 			const isGoogleProvider = data.provider === "google" || (data as any).sub;
@@ -152,21 +155,21 @@ export const authOptions: NextAuthOptions = {
 				? `temp_${crypto.randomUUID().slice(0, 8)}`
 				: `user_${crypto.randomUUID().slice(0, 8)}`;
 
-            const newUser = await prisma.user.create({
-              data: {
-                email: data.email,
-                name: data.name || "Usuário",
-                username,
-                status,
-                image: imageUrl,
-                googleId: (data as any).sub ?? null,
-                provider: isGoogleProvider ? "google" : "credentials",
-                emailVerified: new Date(),
-                onboardingCompleted: false,
-                subscriptionPlan: "free",
-                subscriptionStatus: "active"
-              },
-            });
+			const newUser = await prisma.user.create({
+				data: {
+					email: data.email,
+					name: data.name || "Usuário",
+					username,
+					status,
+					image: imageUrl,
+					googleId: (data as any).sub ?? null,
+					provider: isGoogleProvider ? "google" : "credentials",
+					emailVerified: new Date(),
+					onboardingCompleted: false,
+					subscriptionPlan: "free",
+					subscriptionStatus: "active",
+				},
+			});
 
 			// Notificar Discord sobre novo registro via Google OAuth
 			try {
@@ -228,24 +231,31 @@ export const authOptions: NextAuthOptions = {
 				password: { label: "Password", type: "password" },
 			},
 			async authorize(credentials) {
-				const rawLogin = (credentials as any).login ?? (credentials as any).email;
+				const rawLogin =
+					(credentials as any).login ?? (credentials as any).email;
 				if (!(rawLogin && credentials?.password)) {
 					return null;
 				}
 
-				const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 				if (rawLogin.includes("@") && !EMAIL_REGEX.test(rawLogin)) {
 					return null;
 				}
 
-				const hdrs = await headers();
-				const ip =
-					hdrs.get("cf-connecting-ip") ||
-					hdrs.get("x-real-ip") ||
-					hdrs.get("x-forwarded-for") ||
-					"unknown";
+				let ip: string | null = null;
+				try {
+					const mod: any = await import("next/headers");
+					const hAny = mod.headers() as any;
+					const forwarded =
+						hAny.get("x-forwarded-for") ||
+						hAny.get("x-real-ip") ||
+						hAny.get("cf-connecting-ip") ||
+						null;
+					ip = forwarded ? forwarded.split(",")[0].trim() : null;
+				} catch {
+					ip = null;
+				}
 
-				const { success } = await getAuthRateLimiter().limit(ip);
+				const { success } = await getAuthRateLimiter().limit(rawLogin);
 				if (!success) {
 					try {
 						const maskEmail = (e: string) => {
@@ -254,20 +264,23 @@ export const authOptions: NextAuthOptions = {
 								return "masked";
 							}
 							const u = parts[0];
-							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							const m =
+								u.length <= 2
+									? "*".repeat(u.length)
+									: u[0] + "*".repeat(u.length - 2) + u.at(-1);
 							return `${m}@${parts[1]}`;
 						};
 						await discordWebhook.notifyException({
 							error: "login-block",
 							message: "rate-limit",
 							context: "login_security",
-						metadata: { email: maskEmail(rawLogin), ip },
-					});
-				} catch {}
-				return null;
-			}
+							metadata: { email: maskEmail(rawLogin), ip },
+						});
+					} catch {}
+					return null;
+				}
 
-				const blockInfo = await getBlockInfo(rawLogin, ip)
+				const blockInfo = await getBlockInfo(rawLogin, ip);
 				if (blockInfo.blocked) {
 					try {
 						const maskEmail = (e: string) => {
@@ -276,7 +289,10 @@ export const authOptions: NextAuthOptions = {
 								return "masked";
 							}
 							const u = parts[0];
-							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							const m =
+								u.length <= 2
+									? "*".repeat(u.length)
+									: u[0] + "*".repeat(u.length - 2) + u.at(-1);
 							return `${m}@${parts[1]}`;
 						};
 						await discordWebhook.notifyException({
@@ -290,16 +306,21 @@ export const authOptions: NextAuthOptions = {
 				}
 
 				const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
-				const captchaToken = (credentials as any).captchaToken as string | undefined;
+				const captchaToken = (credentials as any).captchaToken as
+					| string
+					| undefined;
 				const requireCaptcha = !!turnstileSecret && blockInfo.count >= 2;
 				if (requireCaptcha) {
 					if (!captchaToken) {
 						return null;
 					}
 					const params = new URLSearchParams();
-					params.append("secret", turnstileSecret!);
+					if (!turnstileSecret) {
+						return null;
+					}
+					params.append("secret", turnstileSecret);
 					params.append("response", captchaToken);
-					params.append("remoteip", ip);
+					params.append("remoteip", ip ?? "127.0.0.1");
 					const resp = await fetch(
 						"https://challenges.cloudflare.com/turnstile/v0/siteverify",
 						{
@@ -330,19 +351,22 @@ export const authOptions: NextAuthOptions = {
 								return "masked";
 							}
 							const u = parts[0];
-							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							const m =
+								u.length <= 2
+									? "*".repeat(u.length)
+									: u[0] + "*".repeat(u.length - 2) + u.at(-1);
 							return `${m}@${parts[1]}`;
 						};
 						await discordWebhook.notifyException({
 							error: "login-failure",
 							message: "user-not-found",
 							context: "login_security",
-						metadata: { email: maskEmail(rawLogin), ip },
-					});
-				} catch {}
-				await registerFailure(rawLogin, ip)
-				return null;
-			}
+							metadata: { email: maskEmail(rawLogin), ip },
+						});
+					} catch {}
+					await registerFailure(rawLogin, ip);
+					return null;
+				}
 
 				if (user.isBanned) {
 					try {
@@ -352,19 +376,22 @@ export const authOptions: NextAuthOptions = {
 								return "masked";
 							}
 							const u = parts[0];
-							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							const m =
+								u.length <= 2
+									? "*".repeat(u.length)
+									: u[0] + "*".repeat(u.length - 2) + u.at(-1);
 							return `${m}@${parts[1]}`;
 						};
 						await discordWebhook.notifyException({
 							error: "login-failure",
 							message: "account-banned",
 							context: "login_security",
-						metadata: { email: maskEmail(rawLogin), ip },
-					});
-				} catch {}
-				await registerFailure(rawLogin, ip)
-				return null;
-			}
+							metadata: { email: maskEmail(rawLogin), ip },
+						});
+					} catch {}
+					await registerFailure(rawLogin, ip);
+					return null;
+				}
 
 				if (user.provider === "credentials" && user.status !== "active") {
 					try {
@@ -374,19 +401,22 @@ export const authOptions: NextAuthOptions = {
 								return "masked";
 							}
 							const u = parts[0];
-							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							const m =
+								u.length <= 2
+									? "*".repeat(u.length)
+									: u[0] + "*".repeat(u.length - 2) + u.at(-1);
 							return `${m}@${parts[1]}`;
 						};
 						await discordWebhook.notifyException({
 							error: "login-failure",
 							message: "inactive-status",
 							context: "login_security",
-						metadata: { email: maskEmail(rawLogin), ip },
-					});
-				} catch {}
-				await registerFailure(rawLogin, ip)
-				return null;
-			}
+							metadata: { email: maskEmail(rawLogin), ip },
+						});
+					} catch {}
+					await registerFailure(rawLogin, ip);
+					return null;
+				}
 
 				const isValid = await bcrypt.compare(
 					credentials.password,
@@ -401,21 +431,24 @@ export const authOptions: NextAuthOptions = {
 								return "masked";
 							}
 							const u = parts[0];
-							const m = u.length <= 2 ? "*".repeat(u.length) : u[0] + "*".repeat(u.length - 2) + u[u.length - 1];
+							const m =
+								u.length <= 2
+									? "*".repeat(u.length)
+									: u[0] + "*".repeat(u.length - 2) + u.at(-1);
 							return `${m}@${parts[1]}`;
 						};
 						await discordWebhook.notifyException({
 							error: "login-failure",
 							message: "invalid-password",
 							context: "login_security",
-						metadata: { email: maskEmail(rawLogin), ip },
-					});
-				} catch {}
-				await registerFailure(rawLogin, ip)
-				return null;
-			}
+							metadata: { email: maskEmail(rawLogin), ip },
+						});
+					} catch {}
+					await registerFailure(rawLogin, ip);
+					return null;
+				}
 
-				await clearFailures(rawLogin, ip)
+				await clearFailures(rawLogin, ip);
 
 				return {
 					id: user.id,

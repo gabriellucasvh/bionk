@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import Stripe from "stripe";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 	apiVersion: "2025-09-30.clover",
@@ -66,10 +67,9 @@ export async function POST() {
 		const portal = await stripe.billingPortal.sessions.create(params);
 
 		return NextResponse.json({ url: portal.url });
-	} catch (error: any) {
-		console.error("Erro ao criar sessão do Customer Portal:", error);
-		const message =
-			typeof error?.message === "string" ? error.message : "Erro interno";
-		return NextResponse.json({ error: message }, { status: 500 });
-	}
+    } catch (error: any) {
+        const message =
+            typeof error?.message === "string" ? error.message : "Erro interno";
+        return NextResponse.json({ error: message }, { status: 500 });
+    }
 }

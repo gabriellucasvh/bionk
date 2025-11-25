@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 // Regex para remover extensão de arquivo
 const FILE_EXTENSION_REGEX = /\.[^/.]+$/;

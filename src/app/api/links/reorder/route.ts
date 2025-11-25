@@ -6,6 +6,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 const reorderSchema = z.object({
 	items: z.array(

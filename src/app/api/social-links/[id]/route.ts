@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
+export const runtime = "nodejs";
 
 export async function PUT(
 	request: NextRequest,

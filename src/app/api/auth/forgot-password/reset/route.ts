@@ -1,19 +1,42 @@
 import crypto from "node:crypto";
-import { Redis } from "@upstash/redis";
+
 import bcrypt from "bcryptjs";
-import { cookies, headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import { clearUserTokenCache } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
 
-function getRedis() {
-	const url = process.env.UPSTASH_REDIS_REST_URL;
-	const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-	if (!(url && token)) {
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+function ensureRedisEnv() {
+	if (!(REDIS_URL && REDIS_TOKEN)) {
 		throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
 	}
-	return new Redis({ url, token });
+}
+async function redisCmd(cmd: (string | number)[]) {
+	ensureRedisEnv();
+	const res = await fetch(REDIS_URL as string, {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${REDIS_TOKEN}`,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(cmd),
+	});
+	const data = await res.json();
+	return data?.result ?? null;
+}
+function getRedis() {
+	return {
+		get: async (key: string) => (await redisCmd(["GET", key])) as any,
+		del: async (key: string) => {
+			await redisCmd(["DEL", key]);
+		},
+	} as const;
 }
 
 const REJEX_UPPERCASE = /[A-Z]/;
@@ -22,8 +45,7 @@ const REJEX_DIGIT = /\d/;
 const REJEX_REPEAT = /([A-Za-z0-9])\1{3,}/;
 
 export async function POST(req: NextRequest) {
-	const headersList = await headers();
-	const ip = headersList.get("x-forwarded-for") ?? "127.0.0.1";
+	const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1";
 	const { success } = await getAuthRateLimiter().limit(ip);
 	if (!success) {
 		return NextResponse.json(
@@ -87,8 +109,15 @@ export async function POST(req: NextRequest) {
 		if (token && typeof token === "string") {
 			hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 		} else {
-			const cookieStore = await cookies();
-			const fpTh = cookieStore.get("fp_th")?.value || null;
+			const cookieHeader = req.headers.get("cookie") || "";
+			let fpTh: string | null = null;
+			for (const part of cookieHeader.split(";")) {
+				const [k, v] = part.trim().split("=");
+				if (k === "fp_th") {
+					fpTh = v ? decodeURIComponent(v) : null;
+					break;
+				}
+			}
 			if (fpTh) {
 				hashedToken = fpTh;
 			}
@@ -100,9 +129,9 @@ export async function POST(req: NextRequest) {
 			);
 		}
 		const redis = getRedis();
-		const userIdFromLookup = await redis.get<string>(
-			`fp:lookup:${hashedToken}`
-		);
+		const userIdFromLookup = (await redis.get(`fp:lookup:${hashedToken}`)) as
+			| string
+			| null;
 
 		let userId = userIdFromLookup || null;
 		if (!userId) {

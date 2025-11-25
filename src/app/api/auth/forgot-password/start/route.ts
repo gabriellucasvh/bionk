@@ -1,31 +1,62 @@
 import crypto from "node:crypto";
-import { Redis } from "@upstash/redis";
-import { headers } from "next/headers";
+
 import { type NextRequest, NextResponse } from "next/server";
-import React from "react";
-import { Resend } from "resend";
-import OtpPasswordRecover from "@/emails/OtpPasswordRecover";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
 
-function getRedis() {
-	const url = process.env.UPSTASH_REDIS_REST_URL;
-	const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-	if (!(url && token)) {
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+function ensureRedisEnv() {
+	if (!(REDIS_URL && REDIS_TOKEN)) {
 		throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
 	}
-	return new Redis({ url, token });
+}
+async function redisCmd(cmd: (string | number)[]) {
+	ensureRedisEnv();
+	const res = await fetch(REDIS_URL as string, {
+		method: "POST",
+		headers: {
+			Authorization: `Bearer ${REDIS_TOKEN}`,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(cmd),
+	});
+	const data = await res.json();
+	return data?.result ?? null;
+}
+function getRedis() {
+	return {
+		incr: async (key: string) => Number(await redisCmd(["INCR", key])),
+		expire: async (key: string, seconds: number) => {
+			await redisCmd(["EXPIRE", key, seconds]);
+		},
+		set: async (
+			key: string,
+			value: string | number,
+			opts?: { ex?: number }
+		) => {
+			const v = String(value);
+			if (opts?.ex && opts.ex > 0) {
+				await redisCmd(["SET", key, v, "EX", opts.ex]);
+				return;
+			}
+			await redisCmd(["SET", key, v]);
+		},
+	} as const;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const USERNAME_REGEX = /^[a-zA-Z0-9._]{3,30}$/;
 
 export async function POST(req: NextRequest) {
-	const headersList = await headers();
 	const ip =
-		headersList.get("cf-connecting-ip") ||
-		headersList.get("x-real-ip") ||
-		headersList.get("x-forwarded-for") ||
+		req.headers.get("cf-connecting-ip") ||
+		req.headers.get("x-real-ip") ||
+		req.headers.get("x-forwarded-for") ||
 		"127.0.0.1";
 	const limiter = getAuthRateLimiter();
 	const { success } = await limiter.limit(ip);
@@ -106,15 +137,14 @@ export async function POST(req: NextRequest) {
 
 			const resendApiKey = process.env.RESEND_API_KEY;
 			if (resendApiKey) {
+				const { Resend } = await import("resend");
 				const resend = new Resend(resendApiKey);
+				const html = `<!doctype html><html lang="pt-BR"><head><meta charSet="utf-8" /><title>Bionk</title></head><body style="background:#f6f9fc;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Ubuntu,sans-serif;padding:20px 0"><div style="background:#ffffff;margin:0 auto;padding:20px;border:1px solid #dfe1e6;border-radius:8px;max-width:465px"><h1 style="color:#1a1a1a;font-size:28px;font-weight:bold;text-align:center;margin-bottom:20px">Código para Redefinir Senha</h1><p style="color:#525f7f;font-size:16px;line-height:24px;margin-bottom:15px">Recebemos uma solicitação para redefinir sua senha no Bionk. Use o código abaixo para continuar o processo:</p><div style="background:#f0f0f0;border-radius:4px;margin:20px 0;padding:10px;text-align:center"><div style="color:#0a0a0a;font-size:32px;font-weight:bold;letter-spacing:2px">${otp}</div></div><p style="color:#525f7f;font-size:16px;line-height:24px;margin-bottom:15px">Este código é válido por 10 minutos. Se você não solicitou a redefinição, ignore este e-mail.</p><hr style="border-color:#dfe1e6;margin:20px 0" /><p style="color:#8898aa;font-size:12px;line-height:16px;text-align:center">Bionk - Conectando suas ideias.</p><p style="text-align:center;margin-top:10px"><a href="${process.env.NEXTAUTH_URL || "https://bionk.me"}" style="color:#007bff;text-decoration:none;font-size:12px">Acessar Bionk</a></p></div></body></html>`;
 				await resend.emails.send({
 					from: "Bionk <contato@bionk.me>",
 					to: [user.email],
 					subject: `Recuperação de senha – seu código é ${otp}`,
-					react: React.createElement(OtpPasswordRecover, {
-						otp,
-						expiryMinutes: 10,
-					}),
+					html,
 				});
 			}
 		}

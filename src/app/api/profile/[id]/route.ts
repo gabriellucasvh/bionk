@@ -8,6 +8,7 @@ import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import { authOptions } from "@/lib/auth";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 const regex = /^[a-z0-9._]{3,30}$/;
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {

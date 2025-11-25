@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   const session = await getServerSession(authOptions);
@@ -28,8 +29,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     await prisma.$transaction(updateTransactions);
 
     return NextResponse.json({ message: "Reordenação de imagens concluída" });
-  } catch (error) {
-    console.error("Erro ao reordenar imagens:", error);
+  } catch {
     return NextResponse.json(
       { error: "Erro interno do servidor" },
       { status: 500 }

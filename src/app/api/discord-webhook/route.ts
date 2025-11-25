@@ -1,6 +1,7 @@
 // src/app/api/discord-webhook/route.ts
 
 import { type NextRequest, NextResponse } from "next/server";
+export const runtime = "nodejs";
 
 // Configuração do webhook do Discord bot
 const DISCORD_BOT_URL = process.env.DISCORD_BOT_WEBHOOK_URL;

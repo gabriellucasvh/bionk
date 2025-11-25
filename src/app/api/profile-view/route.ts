@@ -1,9 +1,10 @@
 // app/api/profile-view/route.ts
 import { type NextRequest, NextResponse } from "next/server";
-import { getCookiePreferencesFromHeaders } from "@/lib/cookie-server";
+import { getCookiePreferencesFromRequest } from "@/lib/cookie-server";
 import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
+export const runtime = "nodejs";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
 	try {
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 			);
 		}
 
-		const cookiePreferences = await getCookiePreferencesFromHeaders();
+        const cookiePreferences = getCookiePreferencesFromRequest(request as unknown as Request);
 		if (!cookiePreferences.analytics) {
 			return NextResponse.json({ message: "Analytics disabled" });
 		}
@@ -24,12 +25,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 		const deviceType = detectDeviceType(userAgent);
 
 		let country = "Unknown";
-		try {
-			const clientIP = getClientIP(request);
-			country = await getCountryFromIP(clientIP || "127.0.0.1");
-		} catch (error) {
-			console.error("Error getting country:", error);
-		}
+        try {
+            const clientIP = getClientIP(request);
+            country = await getCountryFromIP(clientIP || "127.0.0.1");
+        } catch {
+        }
 
 		const referrer = trafficSource || "direct";
 
@@ -44,8 +44,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 		});
 
 		return NextResponse.json({ message: "Profile view recorded" });
-	} catch (error) {
-		console.error("Profile view error:", error);
-		return NextResponse.json({ error: "Internal error" }, { status: 500 });
-	}
+    } catch {
+        return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    }
 }

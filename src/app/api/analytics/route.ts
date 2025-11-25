@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+export const runtime = "nodejs";
 
 type LinkBasic = { id: number; title: string | null; url: string | null };
 type MonthlyRollupBasic = { monthStart: Date; clicks: number | null; views: number | null };

@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
@@ -50,8 +49,16 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		const cookieStore = await cookies();
-		const csrfCookie = cookieStore.get("reg_csrf");
+		const cookieHeader = request.headers.get("cookie") || "";
+		let csrfCookieValue: string | null = null;
+		for (const part of cookieHeader.split(";")) {
+			const [k, v] = part.trim().split("=");
+			if (k === "reg_csrf") {
+				csrfCookieValue = v ? decodeURIComponent(v) : null;
+				break;
+			}
+		}
+		const csrfCookie = csrfCookieValue ? { value: csrfCookieValue } : null;
 		if (!(csrfCookie && csrfCookie.value)) {
 			return NextResponse.json(
 				{ error: "Sessão inválida para limpeza." },
