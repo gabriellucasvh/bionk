@@ -1,16 +1,16 @@
 // src/types/user-profile.d.ts
 import type {
-	CustomPresets as PrismaCustomPresets,
-	Event as PrismaEvent,
-	Image as PrismaImage,
-	Link as PrismaLink,
-	Music as PrismaMusic,
-	Section as PrismaSection,
-	SocialLink as PrismaSocialLink,
-	Text as PrismaText,
-	User as PrismaUser,
-	Video as PrismaVideo,
-} from "@prisma/client";
+    CustomPresets as PrismaCustomPresets,
+    Event as PrismaEvent,
+    Image as PrismaImage,
+    Link as PrismaLink,
+    Music as PrismaMusic,
+    Section as PrismaSection,
+    SocialLink as PrismaSocialLink,
+    Text as PrismaText,
+    User as PrismaUser,
+    Video as PrismaVideo,
+} from "@/generated/prisma/models";
 
 // --- Links e Seções ---
 export type UserLink = PrismaLink & {
