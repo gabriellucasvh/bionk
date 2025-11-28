@@ -135,9 +135,11 @@ interface ExtendedUser extends User {
 	bannedAt?: Date;
 }
 
+const baseAdapter = PrismaAdapter(prisma as any) as any;
+
 export const authOptions: NextAuthOptions = {
 	adapter: {
-		...PrismaAdapter(prisma),
+		...baseAdapter,
 		createUser: async (data: {
 			name?: string;
 			email: string;
