@@ -4,7 +4,11 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { profileBaseTag, profileCustomizationsTag } from "@/lib/cache-tags";
+import {
+	evictProfilePageCache,
+	profileBaseTag,
+	profileCustomizationsTag,
+} from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 import { getTemplatePreset } from "@/utils/templatePresets";
 export const runtime = "nodejs";
@@ -93,6 +97,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 			revalidatePath(`/${user.username}`);
 			revalidateTag(profileBaseTag(user.username));
 			revalidateTag(profileCustomizationsTag(user.username));
+			await evictProfilePageCache(user.username);
 		}
 
 		return NextResponse.json({

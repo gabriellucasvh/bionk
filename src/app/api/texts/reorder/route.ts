@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
-import { profileTextsTag } from "@/lib/cache-tags";
+import { profileTextsTag, evictProfilePageCache } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -60,6 +60,7 @@ export async function PUT(req: Request) {
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
 			revalidateTag(profileTextsTag(user.username));
+			await evictProfilePageCache(user.username);
 		}
 
 		return NextResponse.json({

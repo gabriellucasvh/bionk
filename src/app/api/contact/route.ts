@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import { getRedis } from "@/lib/redis";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { discordWebhook } from "@/lib/discord-webhook";
@@ -50,12 +50,7 @@ let _contactRateLimiter: any = null;
 
 function getContactRateLimiter() {
 	if (!_contactRateLimiter) {
-		const url = process.env.UPSTASH_REDIS_REST_URL;
-		const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-		if (!(url && token)) {
-			throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
-		}
-		const redis = new Redis({ url, token });
+    const redis = getRedis();
 		_contactRateLimiter = new Ratelimit({
 			redis,
 			limiter: Ratelimit.slidingWindow(3, "10 m"),

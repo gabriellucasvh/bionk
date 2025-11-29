@@ -4,8 +4,9 @@ import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 import type { ComponentType } from "react";
-import { allProfileTags } from "@/lib/cache-tags";
+import { allProfileTags, profilePageCacheKey } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 import type { UserProfile as UserProfileData } from "@/types/user-profile";
 import { UserProfileWrapper } from "./UserProfileWrapper";
 
@@ -28,6 +29,8 @@ export const dynamic = "force-static";
 export default async function UserPage({ params }: PageProps) {
 	const { username } = await params;
 	const now = new Date();
+
+	// uso de getRedis centralizado
 
 	const getUserCached = unstable_cache(
 		async () => {
@@ -257,7 +260,25 @@ export default async function UserPage({ params }: PageProps) {
 		{ revalidate: 1800, tags: allProfileTags(username) }
 	);
 
-	const user = await getUserCached();
+	let user: UserProfileData | null = null;
+
+	try {
+		const r = getRedis();
+		const key = profilePageCacheKey(username);
+		const cached = await r.get<string | null>(key);
+		if (cached) {
+			user = JSON.parse(cached) as UserProfileData | null;
+		}
+	} catch {}
+
+	if (!user) {
+		user = await getUserCached();
+		try {
+			const r = getRedis();
+			const key = profilePageCacheKey(username);
+			await r.set(key, JSON.stringify(user), { ex: 60 });
+		} catch {}
+	}
 
 	if (!user) {
 		notFound();

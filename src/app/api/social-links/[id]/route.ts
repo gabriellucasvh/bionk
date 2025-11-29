@@ -2,7 +2,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { profileSocialLinksTag } from "@/lib/cache-tags";
+import { evictProfilePageCache, profileSocialLinksTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -46,6 +46,7 @@ export async function PUT(
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
 			revalidateTag(profileSocialLinksTag(user.username));
+			await evictProfilePageCache(user.username);
 		}
 
 		return NextResponse.json(updatedLink);
@@ -90,6 +91,7 @@ export async function DELETE(
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
 			revalidateTag(profileSocialLinksTag(user.username));
+			await evictProfilePageCache(user.username);
 		}
 
 		return NextResponse.json({ message: "Link social excluído com sucesso" });

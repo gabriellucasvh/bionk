@@ -4,7 +4,10 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { profileCustomizationsTag } from "@/lib/cache-tags";
+import {
+	evictProfilePageCache,
+	profileCustomizationsTag,
+} from "@/lib/cache-tags";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
@@ -100,6 +103,7 @@ export async function POST(request: Request) {
 				if (user?.username) {
 					revalidatePath(`/${user.username}`);
 					revalidateTag(profileCustomizationsTag(user.username));
+					await evictProfilePageCache(user.username);
 				}
 				return NextResponse.json(existingPresets);
 			}
@@ -194,6 +198,7 @@ export async function POST(request: Request) {
 			if (user?.username) {
 				revalidatePath(`/${user.username}`);
 				revalidateTag(profileCustomizationsTag(user.username));
+				await evictProfilePageCache(user.username);
 			}
 
 			return NextResponse.json(updated);
@@ -216,6 +221,7 @@ export async function POST(request: Request) {
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
 			revalidateTag(profileCustomizationsTag(user.username));
+			await evictProfilePageCache(user.username);
 		}
 
 		return NextResponse.json(created);

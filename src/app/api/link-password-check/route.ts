@@ -1,40 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getClientIP } from "@/utils/geolocation";
+import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 
 const MAX_ATTEMPTS = 5; // 5 tentativas
 const WINDOW_SECONDS = 3 * 60 * 60; // janela de 3 horas
 
-const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
-function ensureRedisEnv() {
-	if (!(REDIS_URL && REDIS_TOKEN)) {
-		throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
-	}
-}
-async function redisCmd(cmd: (string | number)[]) {
-	ensureRedisEnv();
-	const res = await fetch(REDIS_URL as string, {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${REDIS_TOKEN}`,
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(cmd),
-	});
-	const data = await res.json();
-	return data?.result ?? null;
-}
-function getRedisClient() {
-	return {
-		get: async (key: string) => (await redisCmd(["GET", key])) as any,
-		incr: async (key: string) => Number(await redisCmd(["INCR", key])),
-		expire: async (key: string, seconds: number) => {
-			await redisCmd(["EXPIRE", key, seconds]);
-		},
-	} as const;
-}
+// Redis via SDK padronizado
 
 export async function POST(req: NextRequest) {
 	try {
@@ -58,13 +31,13 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const redis = getRedisClient();
+        const redis = getRedis();
 
 		const ip = getClientIP(req) || "127.0.0.1";
 		const key = `link_password_attempts:${normalizedLinkId}:${ip}`;
 
 		// Checar se o IP está bloqueado (5 ou mais tentativas na janela)
-		const currentCountRaw = (await redis.get(key)) as number | null;
+        const currentCountRaw = (await redis.get<number | null>(key)) as number | null;
 		const currentCount = Number(currentCountRaw ?? 0);
 
 		if (currentCount >= MAX_ATTEMPTS) {
@@ -98,10 +71,10 @@ export async function POST(req: NextRequest) {
 		}
 
 		// Senha incorreta: incrementar contador e definir TTL de 3h
-		const newCount = await redis.incr(key);
-		if (newCount === 1) {
-			await redis.expire(key, WINDOW_SECONDS);
-		}
+        const newCount = await redis.incr(key);
+        if (newCount === 1) {
+            await redis.expire(key, WINDOW_SECONDS);
+        }
 
 		const remaining = Math.max(0, MAX_ATTEMPTS - newCount);
 

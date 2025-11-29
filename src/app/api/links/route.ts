@@ -4,7 +4,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { profileLinksTag } from "@/lib/cache-tags";
+import { evictProfilePageCache, profileLinksTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -207,6 +207,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 		if (userExists.username) {
 			revalidatePath(`/${userExists.username}`);
 			revalidateTag(profileLinksTag(userExists.username));
+			await evictProfilePageCache(userExists.username);
 		}
 
 		return NextResponse.json(newLink, { status: 201 });

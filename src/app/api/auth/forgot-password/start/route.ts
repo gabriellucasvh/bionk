@@ -3,51 +3,13 @@ import crypto from "node:crypto";
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
+import { getRedis } from "@/lib/redis";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
-const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
-function ensureRedisEnv() {
-	if (!(REDIS_URL && REDIS_TOKEN)) {
-		throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
-	}
-}
-async function redisCmd(cmd: (string | number)[]) {
-	ensureRedisEnv();
-	const res = await fetch(REDIS_URL as string, {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${REDIS_TOKEN}`,
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(cmd),
-	});
-	const data = await res.json();
-	return data?.result ?? null;
-}
-function getRedis() {
-	return {
-		incr: async (key: string) => Number(await redisCmd(["INCR", key])),
-		expire: async (key: string, seconds: number) => {
-			await redisCmd(["EXPIRE", key, seconds]);
-		},
-		set: async (
-			key: string,
-			value: string | number,
-			opts?: { ex?: number }
-		) => {
-			const v = String(value);
-			if (opts?.ex && opts.ex > 0) {
-				await redisCmd(["SET", key, v, "EX", opts.ex]);
-				return;
-			}
-			await redisCmd(["SET", key, v]);
-		},
-	} as const;
-}
+// Redis via SDK padronizado
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const USERNAME_REGEX = /^[a-zA-Z0-9._]{3,30}$/;

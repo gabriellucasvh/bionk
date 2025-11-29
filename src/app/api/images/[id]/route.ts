@@ -2,7 +2,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { profileImagesTag } from "@/lib/cache-tags";
+import { profileImagesTag, evictProfilePageCache } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -140,6 +140,7 @@ export async function PUT(
 			if (user?.username) {
 				revalidatePath(`/${user.username}`);
 				revalidateTag(profileImagesTag(user.username));
+				await evictProfilePageCache(user.username);
 			}
 		} catch {}
 
@@ -196,6 +197,7 @@ export async function DELETE(
 			if (user?.username) {
 				revalidatePath(`/${user.username}`);
 				revalidateTag(profileImagesTag(user.username));
+				await evictProfilePageCache(user.username);
 			}
 		} catch {}
 

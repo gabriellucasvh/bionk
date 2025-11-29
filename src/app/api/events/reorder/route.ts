@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
-import { profileEventsTag } from "@/lib/cache-tags";
+import { evictProfilePageCache, profileEventsTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -51,6 +51,7 @@ export async function PUT(req: Request) {
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
 			revalidateTag(profileEventsTag(user.username));
+			await evictProfilePageCache(user.username);
 		}
 
 		return NextResponse.json({ message: "Ordem dos eventos atualizada" });

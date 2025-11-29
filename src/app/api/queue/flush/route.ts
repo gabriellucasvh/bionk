@@ -1,4 +1,4 @@
-import { Redis } from "@upstash/redis";
+import { getRedis } from "@/lib/redis";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
@@ -23,14 +23,7 @@ function authorized(req: Request) {
 	return false;
 }
 
-function getRedis() {
-	const url = process.env.UPSTASH_REDIS_REST_URL;
-	const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-	if (!(url && token)) {
-		throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
-	}
-	return new Redis({ url, token });
-}
+// uso de getRedis centralizado
 
 export async function POST(req: Request) {
 	if (!authorized(req)) {

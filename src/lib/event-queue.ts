@@ -1,18 +1,4 @@
-import { Redis } from "@upstash/redis";
-
-let _redis: Redis | null = null;
-
-function getRedis() {
-	if (!_redis) {
-		const url = process.env.UPSTASH_REDIS_REST_URL;
-		const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-		if (!(url && token)) {
-			throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
-		}
-		_redis = new Redis({ url, token });
-	}
-	return _redis;
-}
+import { getRedis } from "@/lib/redis";
 
 export async function enqueueClickEvent(payload: {
 	linkId: number;
@@ -24,6 +10,17 @@ export async function enqueueClickEvent(payload: {
 }) {
 	const r = getRedis();
 	await r.lpush("events:clicks", JSON.stringify(payload));
+	try {
+		const fields: Record<string, string> = {
+			type: "click",
+			linkId: String(payload.linkId),
+			userId: "",
+			device: payload.device ?? "unknown",
+			referrer: payload.referrer ?? "unknown",
+			at: payload.createdAt,
+		};
+		await r.xadd("logs:events", "*", fields);
+	} catch {}
 }
 
 export async function enqueueProfileViewEvent(payload: {
@@ -36,6 +33,17 @@ export async function enqueueProfileViewEvent(payload: {
 }) {
 	const r = getRedis();
 	await r.lpush("events:views", JSON.stringify(payload));
+	try {
+		const fields: Record<string, string> = {
+			type: "view",
+			linkId: "",
+			userId: String(payload.userId),
+			device: payload.device ?? "unknown",
+			referrer: payload.referrer ?? "unknown",
+			at: payload.createdAt,
+		};
+		await r.xadd("logs:events", "*", fields);
+	} catch {}
 }
 
 export async function incrementLinkClickCounter(
