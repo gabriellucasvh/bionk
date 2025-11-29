@@ -1,69 +1,74 @@
 // src/app/api/links/route.ts
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { profileLinksTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
 type LinkItem = {
-    id: number;
-    sectionId: number | null;
-    section: { id: number; title: string; active: boolean; order: number } | null;
+	id: number;
+	sectionId: number | null;
+	section: { id: number; title: string; active: boolean; order: number } | null;
 } & { [key: string]: any };
 
 export async function GET(request: Request): Promise<NextResponse> {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-        return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-    }
-    if (session.user.banido) {
-        return NextResponse.json(
-            {
-                error: "Conta suspensa",
-                message: "Sua conta foi suspensa e não pode realizar esta ação.",
-            },
-            { status: 403 }
-        );
-    }
+	const session = await getServerSession(authOptions);
+	if (!session?.user?.id) {
+		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+	}
+	if (session.user.banido) {
+		return NextResponse.json(
+			{
+				error: "Conta suspensa",
+				message: "Sua conta foi suspensa e não pode realizar esta ação.",
+			},
+			{ status: 403 }
+		);
+	}
 
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
+	const { searchParams } = new URL(request.url);
+	const status = searchParams.get("status");
 
-    try {
-        // Inativar automaticamente links expirados antes de listar
-        await prisma.link.updateMany({
-            where: { userId: session.user.id, expiresAt: { lte: new Date() }, active: true },
-            data: { active: false },
-        });
+	try {
+		// Inativar automaticamente links expirados antes de listar
+		await prisma.link.updateMany({
+			where: {
+				userId: session.user.id,
+				expiresAt: { lte: new Date() },
+				active: true,
+			},
+			data: { active: false },
+		});
 
-        const links: LinkItem[] = await prisma.link.findMany({
-            where: { userId: session.user.id, archived: status === "archived" },
-            orderBy: { order: "asc" },
-            include: {
-                section: {
-                    select: {
-                        id: true,
-                        title: true,
-                        active: true,
-                        order: true,
-                    },
-                },
-            },
-        });
+		const links: LinkItem[] = await prisma.link.findMany({
+			where: { userId: session.user.id, archived: status === "archived" },
+			orderBy: { order: "asc" },
+			include: {
+				section: {
+					select: {
+						id: true,
+						title: true,
+						active: true,
+						order: true,
+					},
+				},
+			},
+		});
 
 		// Transform the data to include section information directly in the link
-        const transformedLinks = links.map((link: LinkItem) => ({
-            ...link,
-            sectionId: link.section?.id || link.sectionId,
-            section: link.section
-                ? {
-                        id: link.section.id,
-                        title: link.section.title,
-                    }
-                : null,
-        }));
+		const transformedLinks = links.map((link: LinkItem) => ({
+			...link,
+			sectionId: link.section?.id || link.sectionId,
+			section: link.section
+				? {
+						id: link.section.id,
+						title: link.section.title,
+					}
+				: null,
+		}));
 
 		return NextResponse.json({ links: transformedLinks });
 	} catch {
@@ -152,34 +157,34 @@ export async function POST(request: Request): Promise<NextResponse> {
 			}
 		}
 
-        // Incrementar order de todos os itens existentes do usuário
-        // Inclui: links, textos, seções, vídeos, imagens e músicas
-        await prisma.$transaction([
-            prisma.link.updateMany({
-                where: { userId: session.user.id },
-                data: { order: { increment: 1 } },
-            }),
-            prisma.text.updateMany({
-                where: { userId: session.user.id },
-                data: { order: { increment: 1 } },
-            }),
-            prisma.section.updateMany({
-                where: { userId: session.user.id },
-                data: { order: { increment: 1 } },
-            }),
-            prisma.video.updateMany({
-                where: { userId: session.user.id },
-                data: { order: { increment: 1 } },
-            }),
-            prisma.image.updateMany({
-                where: { userId: session.user.id },
-                data: { order: { increment: 1 } },
-            }),
-            prisma.music.updateMany({
-                where: { userId: session.user.id },
-                data: { order: { increment: 1 } },
-            }),
-        ]);
+		// Incrementar order de todos os itens existentes do usuário
+		// Inclui: links, textos, seções, vídeos, imagens e músicas
+		await prisma.$transaction([
+			prisma.link.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+			prisma.text.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+			prisma.section.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+			prisma.video.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+			prisma.image.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+			prisma.music.updateMany({
+				where: { userId: session.user.id },
+				data: { order: { increment: 1 } },
+			}),
+		]);
 
 		const newLink = await prisma.link.create({
 			data: {
@@ -201,6 +206,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
 		if (userExists.username) {
 			revalidatePath(`/${userExists.username}`);
+			revalidateTag(profileLinksTag(userExists.username));
 		}
 
 		return NextResponse.json(newLink, { status: 201 });

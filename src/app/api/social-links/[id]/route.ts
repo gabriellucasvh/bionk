@@ -1,8 +1,9 @@
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { profileSocialLinksTag } from "@/lib/cache-tags";
+import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
 export async function PUT(
@@ -40,10 +41,11 @@ export async function PUT(
 		// Busca o username do usuário para revalidar sua página
 		const user = await prisma.user.findUnique({
 			where: { id: session.user.id },
-			select: { username: true }
+			select: { username: true },
 		});
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
+			revalidateTag(profileSocialLinksTag(user.username));
 		}
 
 		return NextResponse.json(updatedLink);
@@ -83,14 +85,15 @@ export async function DELETE(
 		// Busca o username do usuário para revalidar sua página
 		const user = await prisma.user.findUnique({
 			where: { id: session.user.id },
-			select: { username: true }
+			select: { username: true },
 		});
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
+			revalidateTag(profileSocialLinksTag(user.username));
 		}
 
 		return NextResponse.json({ message: "Link social excluído com sucesso" });
-	} catch  {
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }

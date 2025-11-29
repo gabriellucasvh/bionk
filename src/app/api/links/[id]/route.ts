@@ -1,7 +1,8 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { profileLinksTag } from "@/lib/cache-tags";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
@@ -125,6 +126,7 @@ export async function PUT(
 		});
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
+			revalidateTag(profileLinksTag(user.username));
 		}
 
 		return NextResponse.json(updatedLink);
@@ -211,6 +213,7 @@ export async function DELETE(
 		});
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
+			revalidateTag(profileLinksTag(user.username));
 		}
 
 		return NextResponse.json({ message: "Link excluído com sucesso" });

@@ -1,6 +1,8 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { profileEventsTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -84,6 +86,17 @@ export async function POST(req: NextRequest) {
 			},
 			select: { id: true },
 		});
+
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true },
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+				revalidateTag(profileEventsTag(user.username));
+			}
+		} catch {}
 
 		return NextResponse.json({ id: created.id }, { status: 201 });
 	} catch {

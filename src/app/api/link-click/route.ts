@@ -1,12 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCookiePreferencesFromRequest } from "@/lib/cookie-server";
+import {
+	enqueueClickEvent,
+	ensureLinkClickCounter,
+	incrementLinkClickCounter,
+} from "@/lib/event-queue";
 import prisma from "@/lib/prisma";
+import { ensureMonthlyPartitions } from "@/lib/partition-manager";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
 	try {
+		await ensureMonthlyPartitions();
 		// Lida tanto com JSON quanto com texto plano do sendBeacon
 		const body = await req.text();
 		const parsed = JSON.parse(body);
@@ -59,45 +66,54 @@ export async function POST(req: NextRequest) {
 			}
 		}
 
-		// Verificar preferências de cookies
-        const cookiePreferences = getCookiePreferencesFromRequest(req as unknown as Request);
+		const cookiePreferences = getCookiePreferencesFromRequest(
+			req as unknown as Request
+		);
 
-		// Se analytics não estão permitidos, registramos o clique com dados mínimos
+		const base = await prisma.link.findUnique({
+			where: { id: Number(linkId) },
+			select: {
+				id: true,
+				clicks: true,
+				deleteOnClicks: true,
+				active: true,
+				title: true,
+			},
+		});
+		if (!base) {
+			return NextResponse.json(
+				{ error: "Link não encontrado" },
+				{ status: 404 }
+			);
+		}
+
+		await ensureLinkClickCounter(Number(linkId), Number(base.clicks || 0));
+		const currentCount = await incrementLinkClickCounter(Number(linkId));
+
+		if (
+			base.deleteOnClicks &&
+			base.active &&
+			currentCount >= Number(base.deleteOnClicks)
+		) {
+			await prisma.link.update({
+				where: { id: Number(linkId) },
+				data: { active: false },
+			});
+		}
+
 		if (!cookiePreferences.analytics) {
-			const [, updatedLinkAnon] = await prisma.$transaction([
-				prisma.linkClick.create({
-					data: {
-						linkId: Number(linkId),
-						device: "unknown",
-						userAgent: null,
-						country: null,
-						referrer: null,
-					},
-				}),
-				prisma.link.update({
-					where: { id: Number(linkId) },
-					data: { clicks: { increment: 1 } },
-					select: {
-						id: true,
-						clicks: true,
-						deleteOnClicks: true,
-						active: true,
-						title: true,
-					},
-				}),
-			]);
-
-			if (
-				updatedLinkAnon.deleteOnClicks &&
-				updatedLinkAnon.clicks >= updatedLinkAnon.deleteOnClicks
-			) {
-				await prisma.link.update({
-					where: { id: Number(linkId) },
-					data: { active: false },
-				});
-			}
-
-			return NextResponse.json(updatedLinkAnon);
+			await enqueueClickEvent({
+				linkId: Number(linkId),
+				device: "unknown",
+				userAgent: null,
+				country: null,
+				referrer: null,
+				createdAt: new Date().toISOString(),
+			});
+			return NextResponse.json({
+				id: Number(linkId),
+				clicksCounter: currentCount,
+			});
 		}
 
 		// Detectar tipo de dispositivo de forma anônima (LGPD compliant)
@@ -113,40 +129,19 @@ export async function POST(req: NextRequest) {
 		// Usar trafficSource do cliente ou fallback para direct
 		const normalizedReferrer = trafficSource || "direct";
 
-		const [, updatedLinkDetailed] = await prisma.$transaction([
-			prisma.linkClick.create({
-				data: {
-					linkId: Number(linkId),
-					device: deviceType,
-					userAgent,
-					country,
-					referrer: normalizedReferrer,
-				},
-			}),
-			prisma.link.update({
-				where: { id: Number(linkId) },
-				data: { clicks: { increment: 1 } },
-				select: {
-					id: true,
-					clicks: true,
-					deleteOnClicks: true,
-					active: true,
-					title: true,
-				},
-			}),
-		]);
+		await enqueueClickEvent({
+			linkId: Number(linkId),
+			device: deviceType,
+			userAgent,
+			country,
+			referrer: normalizedReferrer,
+			createdAt: new Date().toISOString(),
+		});
 
-		if (
-			updatedLinkDetailed.deleteOnClicks &&
-			updatedLinkDetailed.clicks >= updatedLinkDetailed.deleteOnClicks
-		) {
-			await prisma.link.update({
-				where: { id: Number(linkId) },
-				data: { active: false },
-			});
-		}
-
-		return NextResponse.json(updatedLinkDetailed);
+		return NextResponse.json({
+			id: Number(linkId),
+			clicksCounter: currentCount,
+		});
 	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },

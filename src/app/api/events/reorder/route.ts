@@ -1,61 +1,63 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import { profileEventsTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
 const reorderSchema = z.object({
-    items: z.array(
-        z.object({
-            id: z.number(),
-            order: z.number(),
-        })
-    ),
+	items: z.array(
+		z.object({
+			id: z.number(),
+			order: z.number(),
+		})
+	),
 });
 
 export async function PUT(req: Request) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-        return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-    }
+	const session = await getServerSession(authOptions);
+	if (!session?.user?.id) {
+		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+	}
 
-    try {
-        const body = await req.json();
-        const validation = reorderSchema.safeParse(body);
-        if (!validation.success) {
-            return NextResponse.json(
-                { error: "Dados inválidos", details: validation.error.flatten() },
-                { status: 400 }
-            );
-        }
+	try {
+		const body = await req.json();
+		const validation = reorderSchema.safeParse(body);
+		if (!validation.success) {
+			return NextResponse.json(
+				{ error: "Dados inválidos", details: validation.error.flatten() },
+				{ status: 400 }
+			);
+		}
 
-        const { items } = validation.data;
+		const { items } = validation.data;
 
-        const transactions = items.map((item) =>
-            prisma.event.update({
-                where: { id: item.id, userId: session.user.id },
-                data: { order: item.order },
-            })
-        );
+		const transactions = items.map((item) =>
+			prisma.event.update({
+				where: { id: item.id, userId: session.user.id },
+				data: { order: item.order },
+			})
+		);
 
-        await prisma.$transaction(transactions);
+		await prisma.$transaction(transactions);
 
-        revalidatePath("/studio/links");
-        const user = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { username: true },
-        });
-        if (user?.username) {
-            revalidatePath(`/${user.username}`);
-        }
+		revalidatePath("/studio/links");
+		const user = await prisma.user.findUnique({
+			where: { id: session.user.id },
+			select: { username: true },
+		});
+		if (user?.username) {
+			revalidatePath(`/${user.username}`);
+			revalidateTag(profileEventsTag(user.username));
+		}
 
-        return NextResponse.json({ message: "Ordem dos eventos atualizada" });
-    } catch {
-        return NextResponse.json(
-            { error: "Ocorreu um erro ao reordenar os eventos." },
-            { status: 500 }
-        );
-    }
+		return NextResponse.json({ message: "Ordem dos eventos atualizada" });
+	} catch {
+		return NextResponse.json(
+			{ error: "Ocorreu um erro ao reordenar os eventos." },
+			{ status: 500 }
+		);
+	}
 }

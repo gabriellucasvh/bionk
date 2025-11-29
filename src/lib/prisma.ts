@@ -5,6 +5,18 @@ const globalForPrisma = globalThis as unknown as { prismaProxy?: PrismaClient };
 
 let prismaInstance: PrismaClient | null = null;
 
+function normalizeDatabaseUrl(cs: string): string {
+  try {
+    const u = new URL(cs);
+    if (!u.searchParams.get("sslmode")) {
+      u.searchParams.set("sslmode", "require");
+    }
+    return u.toString();
+  } catch {
+    return cs;
+  }
+}
+
 const prismaProxy = new Proxy({} as PrismaClient, {
 	get(_target, prop, _receiver) {
 		if (!prismaInstance) {
@@ -12,7 +24,7 @@ const prismaProxy = new Proxy({} as PrismaClient, {
 			if (!(typeof cs === "string" && cs.length > 0)) {
 				throw new Error("DATABASE_URL não configurada");
 			}
-			const adapter = new PrismaPg({ connectionString: cs });
+			const adapter = new PrismaPg({ connectionString: normalizeDatabaseUrl(cs) });
 			prismaInstance = new PrismaClient({ adapter } as any);
 		}
 		const value = (prismaInstance as any)[prop];

@@ -1,6 +1,8 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { profileImagesTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -130,9 +132,19 @@ export async function PUT(
 			data: updateData,
 		});
 
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true },
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+				revalidateTag(profileImagesTag(user.username));
+			}
+		} catch {}
+
 		return NextResponse.json(updatedImage);
-	} catch (error) {
-		console.error("Erro ao atualizar imagem:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }
@@ -176,9 +188,19 @@ export async function DELETE(
 			where: { id: imageId },
 		});
 
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true },
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+				revalidateTag(profileImagesTag(user.username));
+			}
+		} catch {}
+
 		return NextResponse.json({ message: "Imagem excluída com sucesso" });
-	} catch (error) {
-		console.error("Erro ao excluir imagem:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }

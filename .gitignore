@@ -33,6 +33,7 @@ logs.txt
 tasks.md
 assigntrafficsources.js
 .cursorrules
+todo-escalabilidade.txt
 
 # env files (can opt-in for committing if needed)
 .env*
