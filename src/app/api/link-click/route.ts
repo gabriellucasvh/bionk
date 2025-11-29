@@ -115,6 +115,18 @@ export async function POST(req: NextRequest) {
 					createdAt: new Date().toISOString(),
 				});
 			} catch {}
+			try {
+				await prisma.linkClick.create({
+					data: {
+						linkId: Number(linkId),
+						device: "unknown",
+						userAgent: null,
+						country: null,
+						referrer: null,
+						createdAt: new Date(),
+					},
+				});
+			} catch {}
 			return NextResponse.json({
 				id: Number(linkId),
 				clicksCounter: currentCount,
@@ -144,6 +156,18 @@ export async function POST(req: NextRequest) {
 				country,
 				referrer: normalizedReferrer,
 				createdAt: new Date().toISOString(),
+			});
+		} catch {}
+		try {
+			await prisma.linkClick.create({
+				data: {
+					linkId: Number(linkId),
+					device: deviceType || null,
+					userAgent: userAgent || null,
+					country: country || null,
+					referrer: normalizedReferrer || null,
+					createdAt: new Date(),
+				},
 			});
 		} catch {}
 

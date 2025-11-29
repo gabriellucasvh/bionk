@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getCookiePreferencesFromRequest } from "@/lib/cookie-server";
 import { enqueueProfileViewEvent } from "@/lib/event-queue";
 import { ensureMonthlyPartitions } from "@/lib/partition-manager";
+import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
 export const runtime = "nodejs";
@@ -50,6 +51,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 				country,
 				referrer,
 				createdAt: new Date().toISOString(),
+			});
+		} catch {}
+		try {
+			await prisma.profileView.create({
+				data: {
+					userId: String(userId),
+					device: deviceType || null,
+					userAgent: userAgent || null,
+					country: country || null,
+					referrer: referrer || null,
+					createdAt: new Date(),
+				},
 			});
 		} catch {}
 
