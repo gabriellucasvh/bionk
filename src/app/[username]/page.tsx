@@ -35,7 +35,7 @@ export default async function UserPage({ params }: PageProps) {
 	const getUserCached = unstable_cache(
 		async () => {
 			try {
-				return (await prisma.user.findUnique({
+				const baseUser = (await prisma.user.findUnique({
 					where: { username },
 					select: {
 						id: true,
@@ -227,10 +227,54 @@ export default async function UserPage({ params }: PageProps) {
 						CustomPresets: {
 							select: {
 								id: true,
+								customBackgroundColor: true,
+								customBackgroundGradient: true,
+								customBackgroundMediaType: true,
+								customBackgroundImageUrl: true,
+								customBackgroundVideoUrl: true,
+								customTextColor: true,
+								customFont: true,
+								customButtonColor: true,
+								customButtonTextColor: true,
+								customButtonStyle: true,
+								customButtonFill: true,
+								customButtonCorners: true,
+								headerStyle: true,
+								customBlurredBackground: true,
 							},
 						},
 					},
 				})) as UserProfileData | null;
+
+				if (!baseUser) {
+					return null;
+				}
+
+				if (!baseUser.CustomPresets) {
+					const presets = await prisma.customPresets.findUnique({
+						where: { userId: baseUser.id },
+						select: {
+							id: true,
+							customBackgroundColor: true,
+							customBackgroundGradient: true,
+							customBackgroundMediaType: true,
+							customBackgroundImageUrl: true,
+							customBackgroundVideoUrl: true,
+							customTextColor: true,
+							customFont: true,
+							customButtonColor: true,
+							customButtonTextColor: true,
+							customButtonStyle: true,
+							customButtonFill: true,
+							customButtonCorners: true,
+							headerStyle: true,
+							customBlurredBackground: true,
+						},
+					});
+					return { ...baseUser, CustomPresets: presets } as UserProfileData;
+				}
+
+				return baseUser;
 			} catch {
 				const base = await prisma.user.findUnique({
 					where: { username },
@@ -427,7 +471,30 @@ export default async function UserPage({ params }: PageProps) {
 					u.Section = [];
 				}
 
-				u.CustomPresets = null;
+				try {
+					u.CustomPresets = await prisma.customPresets.findUnique({
+						where: { userId: base.id },
+						select: {
+							id: true,
+							customBackgroundColor: true,
+							customBackgroundGradient: true,
+							customBackgroundMediaType: true,
+							customBackgroundImageUrl: true,
+							customBackgroundVideoUrl: true,
+							customTextColor: true,
+							customFont: true,
+							customButtonColor: true,
+							customButtonTextColor: true,
+							customButtonStyle: true,
+							customButtonFill: true,
+							customButtonCorners: true,
+							headerStyle: true,
+							customBlurredBackground: true,
+						},
+					});
+				} catch {
+					u.CustomPresets = null;
+				}
 
 				return u as UserProfileData;
 			}
