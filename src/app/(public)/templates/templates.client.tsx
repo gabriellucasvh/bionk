@@ -44,17 +44,17 @@ const TemplatesClient = () => {
 							onClick={() => handleTemplateClick(template)}
 							role="none"
 						>
-							<div className="aspect-[9/16] overflow-hidden rounded-xl border-2 border-gray-200 transition-all duration-300 group-hover:border-purple-500">
+							<div className="aspect-[3/4] overflow-hidden ">
 								<Image
 									alt={template.name}
-									className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-									height={533}
+									className="h-full w-full object-cover"
+									height={400}
 									quality={90}
 									src={template.image}
 									width={300}
 								/>
 							</div>
-							<p className="mt-2 text-center font-medium text-gray-700 text-sm transition-colors duration-300 group-hover:text-purple-600">
+							<p className="mt-2 text-center font-medium text-gray-700 text-sm transition-colors duration-300 group-hover:text-black">
 								{template.name}
 							</p>
 						</div>

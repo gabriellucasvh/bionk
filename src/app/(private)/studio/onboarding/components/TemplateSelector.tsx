@@ -26,15 +26,15 @@ export default function TemplateSelector({
 							onClick={() => onSelect(tpl.id)}
 							type="button"
 						>
-							<div className="aspect-[9/16] w-full bg-gray-100 dark:bg-gray-800">
-								<Image
-									alt={tpl.name}
-									className="h-full w-full object-cover"
-									height={320}
-									src={tpl.image}
-									width={180}
-								/>
-							</div>
+					<div className="aspect-[3/4] w-full bg-gray-100 dark:bg-gray-800">
+						<Image
+							alt={tpl.name}
+							className="h-full w-full object-cover"
+							height={240}
+							src={tpl.image}
+							width={180}
+						/>
+					</div>
 						</button>
 					);
 				})}

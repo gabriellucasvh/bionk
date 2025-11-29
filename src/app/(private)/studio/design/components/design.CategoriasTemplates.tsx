@@ -179,10 +179,10 @@ export default function TemplateSettings({
 							{CATEGORIES[selectedCategory as keyof typeof CATEGORIES]?.map(
 								(template) => (
 									<div
-										className={`min-w-[150px] cursor-pointer rounded-lg border transition-all ${
+										className={`min-w-[150px] cursor-pointer rounded-2xl transition-all ${
 											selectedTemplate === template.id
 												? ""
-												: "ring-offset-2 transition-all duration-200 hover:ring-2 hover:ring-black"
+												: "ring-offset-2 transition-all duration-200 hover:ring-2 hover:ring-black dark:hover:ring-white dark:hover:ring-offset-0"
 										}`}
 										key={template.id}
 									>
@@ -191,7 +191,7 @@ export default function TemplateSettings({
 											onClick={() => handleTemplateSelect(template.id)}
 											variant="ghost"
 										>
-											<div className="relative h-[266px] w-[150px] overflow-hidden rounded-lg bg-zinc-200 dark:bg-zinc-700">
+											<div className="relative h-[200px] w-[150px] overflow-hidden rounded-xl">
 												<Image
 													alt={template.name}
 													className="object-cover"

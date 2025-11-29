@@ -2,98 +2,82 @@ export const ALL_TEMPLATES = [
 	{
 		id: "default",
 		name: "Padrão",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/default.png",
+		image: "/templates/default.png",
 	},
 	{
 		id: "simple",
 		name: "Simples",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/simple.png",
+		image: "/templates/simple.png",
 	},
 	{
 		id: "abacate",
 		name: "Abacate",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/clean.png",
+		image: "/templates/abacate.png",
 	},
 	{
 		id: "menta",
 		name: "Menta",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/elegant.png",
+		image: "/templates/menta.png",
 	},
 	{
 		id: "vinho",
 		name: "Vinho",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747031556/bionk/templates/business.png",
+		image: "/templates/vinho.png",
 	},
 	{
 		id: "ember",
 		name: "Ember",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/corporate.png",
+		image: "/templates/ember.png",
 	},
 	{
 		id: "lux",
 		name: "Luxuoso",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/lux.png",
+		image: "/templates/lux.png",
 	},
 	{
 		id: "pulse",
 		name: "Pulse",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/dark.png",
+		image: "/templates/pulse.png",
 	},
 	{
 		id: "mistico",
 		name: "Místico",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/mistico.png",
+		image: "/templates/mistico.png",
 	},
 	{
 		id: "artistic",
 		name: "Artístico",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/artistic.png",
+		image: "/templates/artistic.png",
 	},
 	{
 		id: "unique",
 		name: "Único",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/unique.png",
+		image: "/templates/unique.png",
 	},
 	{
 		id: "neon",
 		name: "Neon",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/neon.png",
+		image: "/templates/neon.png",
 	},
 	{
 		id: "retro",
 		name: "Retrô",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/retro.png",
+		image: "/templates/retro.png",
 	},
 	{
 		id: "modern",
 		name: "Moderno",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/modern.png",
+		image: "/templates/modern.png",
 	},
 	{
 		id: "vibrant",
 		name: "Vibrante",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/vibrant.png",
+		image: "/templates/vibrant.png",
 	},
 
 	{
 		id: "cyber",
 		name: "Cyberpunk",
-		image:
-			"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1747030264/bionk/templates/cyber.png",
+		image: "/templates/cyber.png",
 	},
 ];
