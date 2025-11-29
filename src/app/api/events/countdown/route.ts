@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 
 const REJECT_URL = /^https:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
@@ -73,59 +73,24 @@ export async function POST(req: NextRequest) {
 			typeof targetMonth === "number" ? targetMonth : eventDate.getMonth() + 1;
 		const day = typeof targetDay === "number" ? targetDay : eventDate.getDate();
 
-		await prisma.$transaction([
-			prisma.link.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.text.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.section.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.video.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.image.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.music.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.event.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-		]);
-
-		const created = await prisma.event.create({
-			data: {
-				userId: session.user.id,
-				title: String(title).trim().slice(0, 40),
-				location: "",
-				eventDate,
-				eventTime,
-				descriptionShort: null,
-				externalLink: "",
-				coverImageUrl: null,
-				order: 0,
-				active: true,
-				type: "countdown",
-				targetMonth: month,
-				targetDay: day,
-				countdownLinkUrl: linkUrl,
-				countdownLinkVisibility: visibility ? (visibility as any) : null,
-			},
-			select: { id: true },
-		});
-
-		return NextResponse.json({ id: created.id }, { status: 201 });
+		const r = getRedis();
+		const payload = {
+			userId: session.user.id,
+			title: String(title).trim().slice(0, 40),
+			location: "",
+			eventDate: eventDate.toISOString(),
+			eventTime,
+			descriptionShort: null,
+			externalLink: "",
+			coverImageUrl: null,
+			type: "countdown",
+			targetMonth: month,
+			targetDay: day,
+			countdownLinkUrl: linkUrl,
+			countdownLinkVisibility: visibility,
+		};
+		await r.lpush("ingest:events", JSON.stringify(payload));
+		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(
 			{ error: "Falha ao criar contagem" },

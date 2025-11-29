@@ -1,11 +1,10 @@
 // src/app/api/links/route.ts
 
-import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { evictProfilePageCache, profileLinksTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 
 type LinkItem = {
@@ -157,60 +156,24 @@ export async function POST(request: Request): Promise<NextResponse> {
 			}
 		}
 
-		// Incrementar order de todos os itens existentes do usuário
-		// Inclui: links, textos, seções, vídeos, imagens e músicas
-		await prisma.$transaction([
-			prisma.link.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.text.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.section.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.video.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.image.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.music.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-		]);
-
-		const newLink = await prisma.link.create({
-			data: {
-				userId: session.user.id,
-				title,
-				url,
-				order: 0,
-				active: true,
-				sectionId: sectionId || null,
-				badge: badge || null,
-				password: password && password.trim() !== "" ? password.trim() : null,
-				expiresAt: expiresAt ? new Date(expiresAt) : null,
-				deleteOnClicks:
-					deleteOnClicks && deleteOnClicks > 0 ? deleteOnClicks : null,
-				launchesAt: launchesAt ? new Date(launchesAt) : null,
-				shareAllowed: Boolean(shareAllowed),
-			},
-		});
-
-		if (userExists.username) {
-			revalidatePath(`/${userExists.username}`);
-			revalidateTag(profileLinksTag(userExists.username));
-			await evictProfilePageCache(userExists.username);
-		}
-
-		return NextResponse.json(newLink, { status: 201 });
+		const r = getRedis();
+		const payload = {
+			userId: session.user.id,
+			title,
+			url,
+			sectionId: sectionId || null,
+			badge: badge || null,
+			password: password && password.trim() !== "" ? password.trim() : null,
+			expiresAt: expiresAt ? String(new Date(expiresAt).toISOString()) : null,
+			deleteOnClicks:
+				deleteOnClicks && deleteOnClicks > 0 ? deleteOnClicks : null,
+			launchesAt: launchesAt
+				? String(new Date(launchesAt).toISOString())
+				: null,
+			shareAllowed: Boolean(shareAllowed),
+		};
+		await r.lpush("ingest:links", JSON.stringify(payload));
+		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(
 			{ error: "Falha ao criar link." },

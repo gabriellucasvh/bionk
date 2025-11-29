@@ -1,9 +1,8 @@
-import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { evictProfilePageCache, profileVideosTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 
 const DIRECT_REGEX = /\.(mp4|webm|ogg)$/i;
@@ -140,89 +139,30 @@ export async function POST(request: Request) {
 			);
 		}
 
-		let thumbnailUrl: string | null = null;
-		try {
-			if (validation.type === "youtube") {
-				const mWatch = url.match(YOUTUBE_REGEX);
-				const mEmbed = url.match(YOUTUBE_EMBED_REGEX);
-				const ytId = (mWatch && mWatch[1]) || (mEmbed && mEmbed[1]);
-				if (ytId) {
-					thumbnailUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
-				}
-			} else if (validation.type === "vimeo") {
-				const mPage = url.match(VIMEO_REGEX);
-				const mEmbed = url.match(VIMEO_EMBED_REGEX);
-				const vimeoId = (mPage && mPage[1]) || (mEmbed && mEmbed[1]);
-				const endpoint = vimeoId
-					? `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(`https://vimeo.com/${vimeoId}`)}`
-					: `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
-				const r = await fetch(endpoint);
-				if (r && r.ok) {
-					const d = await r.json();
-					const t = d && d.thumbnail_url ? String(d.thumbnail_url) : "";
-					if (t) {
-						thumbnailUrl = t;
-					}
-				}
-			}
-		} catch {}
+        let thumbnailUrl: string | null = null;
+        try {
+            if (validation.type === "youtube") {
+                const mWatch = url.match(YOUTUBE_REGEX);
+                const mEmbed = url.match(YOUTUBE_EMBED_REGEX);
+                const ytId = (mWatch && mWatch[1]) || (mEmbed && mEmbed[1]);
+                if (ytId) {
+                    thumbnailUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+                }
+            }
+        } catch {}
 
-		await prisma.$transaction([
-			prisma.link.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.text.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.section.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.video.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.image.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.music.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-		]);
-
-		const data = {
-			title: title?.trim() || null,
-			description: description?.trim() || null,
-			type: validation.type,
-			url: validation.normalizedUrl,
-			thumbnailUrl: thumbnailUrl ?? null,
-			active: true,
-			order: 0,
-			userId: session.user.id,
-			sectionId: sectionId || null,
-		};
-
-		const video = await prisma.video.create({
-			data: data as any,
-		});
-
-		try {
-			const user = await prisma.user.findUnique({
-				where: { id: session.user.id },
-				select: { username: true },
-			});
-			if (user?.username) {
-				revalidatePath(`/${user.username}`);
-				revalidateTag(profileVideosTag(user.username));
-				await evictProfilePageCache(user.username);
-			}
-		} catch {}
-
-		return NextResponse.json(video, { status: 201 });
+        const r = getRedis();
+        const payload = {
+            userId: session.user.id,
+            title: title?.trim() || null,
+            description: description?.trim() || null,
+            type: validation.type,
+            url: validation.normalizedUrl,
+            thumbnailUrl: thumbnailUrl ?? null,
+            sectionId: sectionId || null,
+        };
+        await r.lpush("ingest:videos", JSON.stringify(payload));
+        return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },

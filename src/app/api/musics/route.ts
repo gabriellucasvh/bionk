@@ -1,11 +1,9 @@
-import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { profileMusicsTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 import {
-	fetchMetadataFromProvider,
 	getCanonicalUrl,
 	getEmbedUrl,
 	parseMusicUrl,
@@ -59,78 +57,17 @@ export async function POST(request: Request) {
 			? getEmbedUrl(maybeResolvedUrl)
 			: getCanonicalUrl(maybeResolvedUrl);
 
-		// Ao criar um novo item, empurra os outros para baixo mantendo o order
-		await prisma.$transaction([
-			prisma.link.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.text.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.section.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.video.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.image.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.music.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-		]);
-
-		// Buscar metadados (Spotify via oEmbed, Deezer via API)
-		let authorName: string | undefined;
-		let thumbnailUrl: string | undefined;
-		let finalTitle: string = title?.trim() || "";
-		try {
-			const meta = await fetchMetadataFromProvider(parsed);
-			if (!finalTitle && (meta.title || "").trim().length > 0) {
-				finalTitle = meta.title as string;
-			}
-			authorName = (meta.authorName || "").trim() || undefined;
-			thumbnailUrl = (meta.thumbnailUrl || "").trim() || undefined;
-		} catch {
-			// silent
-		}
-
-		const music = await prisma.music.create({
-			data: {
-				title: finalTitle,
-				url: normalizedUrl,
-				// platform: parsed.platform,
-				usePreview: !!usePreview,
-				active: true,
-				order: 0,
-				userId: session.user.id,
-				sectionId: sectionId || null,
-				authorName,
-				thumbnailUrl,
-			},
-		});
-
-		try {
-			const user = await prisma.user.findUnique({
-				where: { id: session.user.id },
-				select: { username: true },
-			});
-			if (user?.username) {
-				revalidatePath(`/${user.username}`);
-				revalidateTag(profileMusicsTag(user.username));
-			}
-		} catch {}
-
-		return NextResponse.json(music, { status: 201 });
-	} catch (error) {
-		console.error("Erro ao criar música:", error);
+		const r = getRedis();
+		const payload = {
+			userId: session.user.id,
+			title: title ? title.trim() : "",
+			url: normalizedUrl,
+			usePreview: !!usePreview,
+			sectionId: sectionId || null,
+		};
+		await r.lpush("ingest:musics", JSON.stringify(payload));
+		return NextResponse.json({ accepted: true }, { status: 202 });
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }

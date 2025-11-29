@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 const HTTP_SCHEME_RE = /^https?:\/\//i;
 export async function POST(request: Request) {
@@ -96,48 +97,20 @@ export async function POST(request: Request) {
 			}
 		}
 
-		// Ao criar um novo item, empurra os outros para baixo mantendo o order
-		await prisma.$transaction([
-			prisma.link.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.text.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.section.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.video.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.image.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-		]);
-
-		const image = await prisma.image.create({
-			data: {
-				title: title?.trim() || null,
-				description: description?.trim() || null,
-				layout,
-				ratio,
-				sizePercent,
-				items, // Json: [{ url, previewUrl?, provider?, authorName?, authorLink?, sourceLink?, linkUrl? }]
-				active: true,
-				order: 0,
-				userId: session.user.id,
-				sectionId: sectionId || null,
-			},
-		});
-
-		return NextResponse.json(image, { status: 201 });
-	} catch (error) {
-		console.error("Erro ao criar imagem:", error);
+		const r = getRedis();
+		const payload = {
+			userId: session.user.id,
+			title: title ? title.trim() : null,
+			description: description ? description.trim() : null,
+			layout,
+			ratio,
+			sizePercent,
+			items,
+			sectionId: sectionId || null,
+		};
+		await r.lpush("ingest:images", JSON.stringify(payload));
+		return NextResponse.json({ accepted: true }, { status: 202 });
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }
@@ -164,8 +137,7 @@ export async function GET(request: NextRequest) {
 		});
 
 		return NextResponse.json({ images });
-	} catch (error) {
-		console.error("Erro ao listar imagens:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }

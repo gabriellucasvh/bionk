@@ -1,9 +1,8 @@
-import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { profileEventsTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
@@ -40,65 +39,20 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		await prisma.$transaction([
-			prisma.link.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.text.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.section.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.video.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.image.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.music.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.event.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-		]);
-
-		const created = await prisma.event.create({
-			data: {
-				userId: session.user.id,
-				title: String(title).trim().slice(0, 40),
-				location: String(location),
-				eventDate: new Date(eventDate),
-				eventTime: String(eventTime),
-				descriptionShort: descriptionShort ? String(descriptionShort) : null,
-				externalLink: String(externalLink).trim(),
-				coverImageUrl: coverImageUrl ? String(coverImageUrl) : null,
-				order: 0,
-				active: true,
-			},
-			select: { id: true },
-		});
-
-		try {
-			const user = await prisma.user.findUnique({
-				where: { id: session.user.id },
-				select: { username: true },
-			});
-			if (user?.username) {
-				revalidatePath(`/${user.username}`);
-				revalidateTag(profileEventsTag(user.username));
-			}
-		} catch {}
-
-		return NextResponse.json({ id: created.id }, { status: 201 });
+		const r = getRedis();
+		const payload = {
+			userId: session.user.id,
+			title: String(title).trim().slice(0, 40),
+			location: String(location),
+			eventDate: new Date(eventDate).toISOString(),
+			eventTime: String(eventTime),
+			descriptionShort: descriptionShort ? String(descriptionShort) : null,
+			externalLink: String(externalLink).trim(),
+			coverImageUrl: coverImageUrl ? String(coverImageUrl) : null,
+			type: null,
+		};
+		await r.lpush("ingest:events", JSON.stringify(payload));
+		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(
 			{ error: "Falha ao criar evento" },

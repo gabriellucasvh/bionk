@@ -1,9 +1,8 @@
-import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { evictProfilePageCache, profileTextsTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
@@ -37,61 +36,18 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// Incrementar order de todos os itens existentes do usuário
-		await prisma.$transaction([
-			prisma.link.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.text.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.section.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.video.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.image.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.music.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-		]);
-
-		const text = await prisma.text.create({
-			data: {
-				title: title.trim(),
-				description: (description || "").trim(),
-				position,
-				hasBackground,
-				isCompact,
-				active: true,
-				order: 0,
-				userId: session.user.id,
-				sectionId: sectionId || null,
-			},
-		});
-
-		try {
-			const user = await prisma.user.findUnique({
-				where: { id: session.user.id },
-				select: { username: true },
-			});
-			if (user?.username) {
-				revalidatePath(`/${user.username}`);
-				revalidateTag(profileTextsTag(user.username));
-				await evictProfilePageCache(user.username);
-			}
-		} catch {}
-
-		return NextResponse.json(text, { status: 201 });
+        const r = getRedis();
+        const payload = {
+            userId: session.user.id,
+            title: title.trim(),
+            description: (description || "").trim(),
+            position,
+            hasBackground,
+            isCompact,
+            sectionId: sectionId || null,
+        };
+        await r.lpush("ingest:texts", JSON.stringify(payload));
+        return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },

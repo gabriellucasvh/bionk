@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 export const runtime = "nodejs";
@@ -55,41 +56,8 @@ export async function POST(req: Request): Promise<NextResponse> {
 	}
 
 	const { title } = await req.json();
-	
-    await Promise.all([
-        prisma.link.updateMany({
-            where: { userId: session.user.id },
-            data: { order: { increment: 1 } },
-        }),
-        prisma.section.updateMany({
-            where: { userId: session.user.id },
-            data: { order: { increment: 1 } },
-        }),
-        prisma.text.updateMany({
-            where: { userId: session.user.id },
-            data: { order: { increment: 1 } },
-        }),
-        prisma.video.updateMany({
-            where: { userId: session.user.id },
-            data: { order: { increment: 1 } },
-        }),
-        prisma.image.updateMany({
-            where: { userId: session.user.id },
-            data: { order: { increment: 1 } },
-        }),
-        prisma.music.updateMany({
-            where: { userId: session.user.id },
-            data: { order: { increment: 1 } },
-        }),
-    ]);
-	
-	const newSection = await prisma.section.create({
-		data: {
-			title: title.trim(),
-			order: 0,
-			userId: session.user.id,
-		},
-	});
-
-	return NextResponse.json(newSection);
+	const r = getRedis();
+	const payload = { userId: session.user.id, title: String(title).trim() };
+	await r.lpush("ingest:sections", JSON.stringify(payload));
+	return NextResponse.json({ accepted: true }, { status: 202 });
 }
