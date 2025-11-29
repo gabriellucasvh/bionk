@@ -1,11 +1,12 @@
 // src/app/api/profile/[id]/route.ts
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import Stripe from "stripe";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import { authOptions } from "@/lib/auth";
+import { profileBaseTag } from "@/lib/cache-tags";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
@@ -94,6 +95,7 @@ export async function PATCH(
 		// Revalida a página do perfil do usuário
 		if (updatedUser.username) {
 			revalidatePath(`/${updatedUser.username}`);
+			revalidateTag(profileBaseTag(updatedUser.username));
 		}
 
 		return NextResponse.json({
@@ -285,6 +287,7 @@ export async function PUT(
 		// Revalida a página do perfil do usuário
 		if (updatedUser.username) {
 			revalidatePath(`/${updatedUser.username}`);
+			revalidateTag(profileBaseTag(updatedUser.username));
 		}
 
 		return NextResponse.json(updatedUser);

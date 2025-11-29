@@ -5,39 +5,13 @@ import { type NextRequest, NextResponse } from "next/server";
 import { clearUserTokenCache } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
+import { getRedis } from "@/lib/redis";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
-const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
-function ensureRedisEnv() {
-	if (!(REDIS_URL && REDIS_TOKEN)) {
-		throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
-	}
-}
-async function redisCmd(cmd: (string | number)[]) {
-	ensureRedisEnv();
-	const res = await fetch(REDIS_URL as string, {
-		method: "POST",
-		headers: {
-			Authorization: `Bearer ${REDIS_TOKEN}`,
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(cmd),
-	});
-	const data = await res.json();
-	return data?.result ?? null;
-}
-function getRedis() {
-	return {
-		get: async (key: string) => (await redisCmd(["GET", key])) as any,
-		del: async (key: string) => {
-			await redisCmd(["DEL", key]);
-		},
-	} as const;
-}
+// Redis via SDK padronizado
 
 const REJEX_UPPERCASE = /[A-Z]/;
 const REJEX_LOWERCASE = /[a-z]/;
@@ -128,10 +102,10 @@ export async function POST(req: NextRequest) {
 				{ status: 400 }
 			);
 		}
-		const redis = getRedis();
-		const userIdFromLookup = (await redis.get(`fp:lookup:${hashedToken}`)) as
-			| string
-			| null;
+        const redis = getRedis();
+        const userIdFromLookup = (await redis.get<string | null>(`fp:lookup:${hashedToken}`)) as
+            | string
+            | null;
 
 		let userId = userIdFromLookup || null;
 		if (!userId) {
@@ -172,11 +146,11 @@ export async function POST(req: NextRequest) {
 			}),
 		]);
 
-		try {
-			await redis.del(`fp:token_hash:${userId}`);
-			await redis.del(`fp:token_plain:${userId}`);
-			await redis.del(`fp:lookup:${hashedToken}`);
-		} catch {}
+        try {
+            await redis.del(`fp:token_hash:${userId}`);
+            await redis.del(`fp:token_plain:${userId}`);
+            await redis.del(`fp:lookup:${hashedToken}`);
+        } catch {}
 
 		try {
 			clearUserTokenCache(userId);

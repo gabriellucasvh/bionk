@@ -1,10 +1,11 @@
 // src/app/api/sections/[id]/ungroup/route.ts
 
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { profileLinksTag, profileSectionsTag } from "@/lib/cache-tags";
+import prisma from "@/lib/prisma";
 
 export async function POST(
 	_request: NextRequest,
@@ -34,6 +35,18 @@ export async function POST(
 		});
 
 		revalidatePath("/studio/links");
+
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true },
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+				revalidateTag(profileSectionsTag(user.username));
+				revalidateTag(profileLinksTag(user.username));
+			}
+		} catch {}
 
 		return NextResponse.json({
 			message: "Links desagrupados e seção excluída com sucesso",

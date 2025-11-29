@@ -1,10 +1,15 @@
 // src/app/api/update-template/route.ts
 
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import {
+	evictProfilePageCache,
+	profileBaseTag,
+	profileCustomizationsTag,
+} from "@/lib/cache-tags";
+import prisma from "@/lib/prisma";
 import { getTemplatePreset } from "@/utils/templatePresets";
 export const runtime = "nodejs";
 
@@ -59,7 +64,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 
 		const templatePreset = getTemplatePreset(template);
 
-        await prisma.$transaction(async (tx: any) => {
+		await prisma.$transaction(async (tx: any) => {
 			await tx.user.update({
 				where: { email: userEmail },
 				data: {
@@ -90,6 +95,9 @@ export async function POST(req: Request): Promise<NextResponse> {
 		// Otimização: Revalide a página do usuário após a atualização
 		if (user.username) {
 			revalidatePath(`/${user.username}`);
+			revalidateTag(profileBaseTag(user.username));
+			revalidateTag(profileCustomizationsTag(user.username));
+			await evictProfilePageCache(user.username);
 		}
 
 		return NextResponse.json({

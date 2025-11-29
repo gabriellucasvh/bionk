@@ -1,10 +1,15 @@
 // src/app/api/links/reorder/route.ts
 
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
+import {
+	evictProfilePageCache,
+	profileLinksTag,
+	profileSectionsTag,
+} from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -48,23 +53,28 @@ export async function PUT(req: Request): Promise<NextResponse> {
 
 		// Validar se todas as seções referenciadas existem
 		const referencedSectionIds = linkItems
-			.map(item => item.sectionId)
-			.filter(id => id !== null && id !== undefined);
+			.map((item) => item.sectionId)
+			.filter((id) => id !== null && id !== undefined);
 
 		if (referencedSectionIds.length > 0) {
-            const existingSections: Array<{ id: number }> = await prisma.section.findMany({
-                where: {
-                    id: { in: referencedSectionIds },
-                    userId,
-                },
-                select: { id: true },
-            });
-            const existingSectionIds = new Set(existingSections.map((s: { id: number }) => s.id));
-			const invalidSectionIds = referencedSectionIds.filter(id => !existingSectionIds.has(id));
+			const existingSections: Array<{ id: number }> =
+				await prisma.section.findMany({
+					where: {
+						id: { in: referencedSectionIds },
+						userId,
+					},
+					select: { id: true },
+				});
+			const existingSectionIds = new Set(
+				existingSections.map((s: { id: number }) => s.id)
+			);
+			const invalidSectionIds = referencedSectionIds.filter(
+				(id) => !existingSectionIds.has(id)
+			);
 
 			if (invalidSectionIds.length > 0) {
 				return NextResponse.json(
-					{ error: `Seções não encontradas: ${invalidSectionIds.join(', ')}` },
+					{ error: `Seções não encontradas: ${invalidSectionIds.join(", ")}` },
 					{ status: 404 }
 				);
 			}
@@ -89,15 +99,17 @@ export async function PUT(req: Request): Promise<NextResponse> {
 		}
 
 		// Buscar todas as seções existentes como links primeiro
-        const existingLinks: Array<{ id: number }> = await prisma.link.findMany({
-            where: {
-                id: { in: sectionItems.map(item => item.id) },
-                userId,
-                type: "section",
-            },
-            select: { id: true },
-        });
-        const existingLinkIds = new Set(existingLinks.map((link: { id: number }) => link.id));
+		const existingLinks: Array<{ id: number }> = await prisma.link.findMany({
+			where: {
+				id: { in: sectionItems.map((item) => item.id) },
+				userId,
+				type: "section",
+			},
+			select: { id: true },
+		});
+		const existingLinkIds = new Set(
+			existingLinks.map((link: { id: number }) => link.id)
+		);
 
 		// Atualizar seções (tratadas como links especiais)
 		for (const item of sectionItems) {
@@ -142,6 +154,9 @@ export async function PUT(req: Request): Promise<NextResponse> {
 		});
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
+			revalidateTag(profileLinksTag(user.username));
+			revalidateTag(profileSectionsTag(user.username));
+			await evictProfilePageCache(user.username);
 		}
 
 		return NextResponse.json({ message: "Ordem atualizada com sucesso!" });

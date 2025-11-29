@@ -1,9 +1,10 @@
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth";
 import { z } from "zod";
+import { authOptions } from "@/lib/auth";
+import { evictProfilePageCache, profileSectionsTag } from "@/lib/cache-tags";
+import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
 // A API espera um array de objetos com id e order
@@ -60,10 +61,12 @@ export async function PUT(req: Request) {
 		});
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
+			revalidateTag(profileSectionsTag(user.username));
+			await evictProfilePageCache(user.username);
 		}
 
 		return NextResponse.json({ message: "Seções reordenadas com sucesso!" });
-	} catch  {
+	} catch {
 		return NextResponse.json(
 			{ error: "Ocorreu um erro ao reordenar as seções." },
 			{ status: 500 }

@@ -1,6 +1,8 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { profileMusicsTag, evictProfilePageCache } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -34,6 +36,17 @@ export async function PUT(request: Request) {
 		);
 
 		await Promise.all(updatePromises);
+
+		revalidatePath("/studio/links");
+		const user = await prisma.user.findUnique({
+			where: { id: session.user.id },
+			select: { username: true },
+		});
+		if (user?.username) {
+			revalidatePath(`/${user.username}`);
+			revalidateTag(profileMusicsTag(user.username));
+			await evictProfilePageCache(user.username);
+		}
 
 		return NextResponse.json({
 			message: "Ordem das músicas atualizada com sucesso",

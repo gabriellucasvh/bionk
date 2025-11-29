@@ -1,19 +1,7 @@
-import { Redis } from "@upstash/redis"
+import { getRedis } from "@/lib/redis"
 import crypto from "node:crypto"
 
-let _redis: Redis | null = null
-
-function getRedis() {
-  if (!_redis) {
-    const url = process.env.UPSTASH_REDIS_REST_URL
-    const token = process.env.UPSTASH_REDIS_REST_TOKEN
-    if (!(url && token)) {
-      throw new Error("Variáveis de ambiente do Upstash Redis não definidas")
-    }
-    _redis = new Redis({ url, token })
-  }
-  return _redis
-}
+// getRedis centralizado
 
 function getKey(email: string, ip: string | null) {
   const normalizedEmail = email.trim().toLowerCase()

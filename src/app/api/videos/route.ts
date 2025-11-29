@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 
 const DIRECT_REGEX = /\.(mp4|webm|ogg)$/i;
@@ -147,68 +148,86 @@ export async function POST(request: Request) {
 				if (ytId) {
 					thumbnailUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
 				}
-			} else if (validation.type === "vimeo") {
-				const mPage = url.match(VIMEO_REGEX);
-				const mEmbed = url.match(VIMEO_EMBED_REGEX);
-				const vimeoId = (mPage && mPage[1]) || (mEmbed && mEmbed[1]);
-				const endpoint = vimeoId
-					? `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(`https://vimeo.com/${vimeoId}`)}`
-					: `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
-				const r = await fetch(endpoint);
-				if (r && r.ok) {
-					const d = await r.json();
-					const t = d && d.thumbnail_url ? String(d.thumbnail_url) : "";
-					if (t) {
-						thumbnailUrl = t;
-					}
-				}
 			}
 		} catch {}
 
-		await prisma.$transaction([
-			prisma.link.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.text.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.section.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.video.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.image.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.music.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-		]);
-
-		const data = {
+		const uid = session.user.id;
+		const ingestMode = (process.env.INGEST_MODE || "").toLowerCase();
+		const useQueue = ingestMode
+			? ingestMode !== "sync"
+			: process.env.NODE_ENV === "production";
+		if (!useQueue) {
+			const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+				prisma.link.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.text.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.video.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.image.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.music.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.section.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.event.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+			]);
+			const candidates = [
+				minL._min.order,
+				minT._min.order,
+				minV._min.order,
+				minI._min.order,
+				minM._min.order,
+				minS._min.order,
+				minE._min.order,
+			].filter((n) => typeof n === "number") as number[];
+			const base = candidates.length > 0 ? Math.min(...candidates) : 0;
+			const created = await prisma.video.create({
+				data: {
+					userId: uid,
+					title: title?.trim() || null,
+					description: description?.trim() || null,
+					type: validation.type,
+					url: validation.normalizedUrl,
+					thumbnailUrl: thumbnailUrl ?? null,
+					active: true,
+					order: base - 1,
+					sectionId: sectionId || null,
+				},
+			});
+			return NextResponse.json(created, { status: 201 });
+		}
+		const r = getRedis();
+		const shardCount = Math.max(1, Number(process.env.INGEST_SHARDS || 8));
+		const shard =
+			Math.abs(Array.from(uid).reduce((a, c) => a + c.charCodeAt(0), 0)) %
+			shardCount;
+		const payload = {
+			userId: uid,
 			title: title?.trim() || null,
 			description: description?.trim() || null,
 			type: validation.type,
 			url: validation.normalizedUrl,
 			thumbnailUrl: thumbnailUrl ?? null,
-			active: true,
-			order: 0,
-			userId: session.user.id,
 			sectionId: sectionId || null,
 		};
-
-		const video = await prisma.video.create({
-			data: data as any,
-		});
-
-		return NextResponse.json(video, { status: 201 });
+		await r.lpush(`ingest:videos:${uid}:${shard}`, JSON.stringify(payload));
+		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },

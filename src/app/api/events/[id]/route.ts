@@ -1,6 +1,8 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { profileEventsTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -73,9 +75,7 @@ export async function PUT(
 			...(targetMonth !== undefined && { targetMonth: Number(targetMonth) }),
 			...(targetDay !== undefined && { targetDay: Number(targetDay) }),
 			...(countdownLinkUrl !== undefined && {
-				countdownLinkUrl: REJECT_URL.test(
-					String(countdownLinkUrl)
-				)
+				countdownLinkUrl: REJECT_URL.test(String(countdownLinkUrl))
 					? String(countdownLinkUrl)
 					: null,
 			}),
@@ -126,6 +126,17 @@ export async function PUT(
 			select: { id: true },
 		});
 
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true },
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+				revalidateTag(profileEventsTag(user.username));
+			}
+		} catch {}
+
 		return NextResponse.json({ id: updated.id });
 	} catch {
 		return NextResponse.json(
@@ -167,6 +178,18 @@ export async function DELETE(
 		}
 
 		await prisma.event.delete({ where: { id: eventId } });
+
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true },
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+				revalidateTag(profileEventsTag(user.username));
+			}
+		} catch {}
+
 		return NextResponse.json({ ok: true });
 	} catch {
 		return NextResponse.json(

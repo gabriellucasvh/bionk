@@ -1,5 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCookiePreferencesFromRequest } from "@/lib/cookie-server";
+import {
+	enqueueClickEvent,
+	ensureLinkClickCounter,
+	incrementLinkClickCounter,
+} from "@/lib/event-queue";
 import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
@@ -25,7 +30,9 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-        const { analytics } = getCookiePreferencesFromRequest(req as unknown as Request);
+		const { analytics } = getCookiePreferencesFromRequest(
+			req as unknown as Request
+		);
 		const normalizedReferrer = trafficSource || "direct";
 
 		// Always increment per-item clicks (essential functionality), regardless of analytics preference
@@ -111,30 +118,46 @@ export async function POST(req: NextRequest) {
 				});
 			}
 
+			const base = await prisma.link.findUnique({
+				where: { id: Number(linkRecord.id) },
+				select: { id: true, clicks: true, deleteOnClicks: true, active: true },
+			});
+			if (base) {
+				await ensureLinkClickCounter(Number(base.id), Number(base.clicks || 0));
+				const currentCount = await incrementLinkClickCounter(Number(base.id));
+				if (
+					base.deleteOnClicks &&
+					base.active &&
+					currentCount >= Number(base.deleteOnClicks)
+				) {
+					await prisma.link.update({
+						where: { id: Number(base.id) },
+						data: { active: false },
+					});
+				}
+			}
+
 			if (analytics) {
 				const userAgent = getUserAgent(req);
 				const deviceType = detectDeviceType(userAgent);
 				const clientIP = getClientIP(req);
 				const country = await getCountryFromIP(clientIP || "127.0.0.1");
-
-				await prisma.linkClick.create({
-					data: {
-						linkId: Number(linkRecord.id),
-						device: deviceType,
-						userAgent,
-						country,
-						referrer: normalizedReferrer,
-					},
+				await enqueueClickEvent({
+					linkId: Number(linkRecord.id),
+					device: deviceType,
+					userAgent,
+					country,
+					referrer: normalizedReferrer,
+					createdAt: new Date().toISOString(),
 				});
 			} else {
-				await prisma.linkClick.create({
-					data: {
-						linkId: Number(linkRecord.id),
-						device: "unknown",
-						userAgent: null,
-						country: null,
-						referrer: normalizedReferrer,
-					},
+				await enqueueClickEvent({
+					linkId: Number(linkRecord.id),
+					device: "unknown",
+					userAgent: null,
+					country: null,
+					referrer: normalizedReferrer,
+					createdAt: new Date().toISOString(),
 				});
 			}
 		}

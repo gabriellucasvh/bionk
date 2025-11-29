@@ -1,9 +1,13 @@
 // src/app/api/update-customizations/route.ts
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import {
+	evictProfilePageCache,
+	profileCustomizationsTag,
+} from "@/lib/cache-tags";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
@@ -18,7 +22,7 @@ function extractBackgroundPublicId(url: string | null | undefined) {
 	try {
 		const u = new URL(url);
 		const parts = u.pathname.split("/").filter(Boolean);
-		const bgIdx = parts.findIndex((seg) => seg === "backgrounds");
+		const bgIdx = parts.indexOf("backgrounds");
 		if (bgIdx === -1) {
 			return null;
 		}
@@ -98,6 +102,8 @@ export async function POST(request: Request) {
 				});
 				if (user?.username) {
 					revalidatePath(`/${user.username}`);
+					revalidateTag(profileCustomizationsTag(user.username));
+					await evictProfilePageCache(user.username);
 				}
 				return NextResponse.json(existingPresets);
 			}
@@ -191,6 +197,8 @@ export async function POST(request: Request) {
 			});
 			if (user?.username) {
 				revalidatePath(`/${user.username}`);
+				revalidateTag(profileCustomizationsTag(user.username));
+				await evictProfilePageCache(user.username);
 			}
 
 			return NextResponse.json(updated);
@@ -212,6 +220,8 @@ export async function POST(request: Request) {
 		});
 		if (user?.username) {
 			revalidatePath(`/${user.username}`);
+			revalidateTag(profileCustomizationsTag(user.username));
+			await evictProfilePageCache(user.username);
 		}
 
 		return NextResponse.json(created);

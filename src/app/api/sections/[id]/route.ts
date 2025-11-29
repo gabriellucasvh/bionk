@@ -1,10 +1,11 @@
 // src/app/api/sections/[id]/route.ts
 
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { profileLinksTag, profileSectionsTag } from "@/lib/cache-tags";
+import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
 export async function PUT(
@@ -31,7 +32,7 @@ export async function PUT(
 		const { title, links, active } = body;
 
 		// Inicia uma transação para garantir a consistência dos dados
-        const result = await prisma.$transaction(async (tx: any) => {
+		const result = await prisma.$transaction(async (tx: any) => {
 			// Se o status 'active' está sendo atualizado, atualiza também todos os links associados
 			if (typeof active === "boolean") {
 				await tx.link.updateMany({
@@ -63,6 +64,8 @@ export async function PUT(
 		revalidatePath("/studio/links");
 		if (session.user.username) {
 			revalidatePath(`/${session.user.username}`);
+			revalidateTag(profileSectionsTag(session.user.username));
+			revalidateTag(profileLinksTag(session.user.username));
 		}
 
 		return NextResponse.json(result);
@@ -103,6 +106,9 @@ export async function DELETE(
 		});
 
 		revalidatePath("/studio/links");
+		if (session.user.username) {
+			revalidatePath(`/${session.user.username}`);
+		}
 
 		return NextResponse.json({ message: "Seção excluída com sucesso" });
 	} catch {

@@ -1,6 +1,8 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { evictProfilePageCache, profileTextsTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -67,6 +69,18 @@ export async function PUT(
 			},
 		});
 
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true },
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+				revalidateTag(profileTextsTag(user.username));
+				await evictProfilePageCache(user.username);
+			}
+		} catch {}
+
 		return NextResponse.json(updatedText);
 	} catch {
 		return NextResponse.json(
@@ -111,6 +125,18 @@ export async function DELETE(
 		await prisma.text.delete({
 			where: { id: textId },
 		});
+
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true },
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+				revalidateTag(profileTextsTag(user.username));
+				await evictProfilePageCache(user.username);
+			}
+		} catch {}
 
 		return NextResponse.json({ message: "Texto excluído com sucesso" });
 	} catch {

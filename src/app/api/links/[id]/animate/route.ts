@@ -1,4 +1,5 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { profileLinksTag } from "@/lib/cache-tags";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -55,9 +56,10 @@ export async function POST(
 			where: { id: session.user.id },
 			select: { username: true },
 		});
-		if (user?.username) {
-			revalidatePath(`/${user.username}`);
-		}
+    if (user?.username) {
+        revalidatePath(`/${user.username}`);
+        revalidateTag(profileLinksTag(user.username));
+    }
 
 		return NextResponse.json({
 			message: "Estado de animação atualizado com sucesso",

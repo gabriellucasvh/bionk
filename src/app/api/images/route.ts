@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 const HTTP_SCHEME_RE = /^https?:\/\//i;
 export async function POST(request: Request) {
@@ -96,48 +97,86 @@ export async function POST(request: Request) {
 			}
 		}
 
-		// Ao criar um novo item, empurra os outros para baixo mantendo o order
-		await prisma.$transaction([
-			prisma.link.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.text.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.section.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.video.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-			prisma.image.updateMany({
-				where: { userId: session.user.id },
-				data: { order: { increment: 1 } },
-			}),
-		]);
-
-		const image = await prisma.image.create({
-			data: {
-				title: title?.trim() || null,
-				description: description?.trim() || null,
-				layout,
-				ratio,
-				sizePercent,
-				items, // Json: [{ url, previewUrl?, provider?, authorName?, authorLink?, sourceLink?, linkUrl? }]
-				active: true,
-				order: 0,
-				userId: session.user.id,
-				sectionId: sectionId || null,
-			},
-		});
-
-		return NextResponse.json(image, { status: 201 });
-	} catch (error) {
-		console.error("Erro ao criar imagem:", error);
+		const uid = session.user.id;
+		const ingestMode = (process.env.INGEST_MODE || "").toLowerCase();
+		const useQueue = ingestMode
+			? ingestMode !== "sync"
+			: process.env.NODE_ENV === "production";
+		if (!useQueue) {
+			const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+				prisma.link.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.text.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.video.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.image.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.music.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.section.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+				prisma.event.aggregate({
+					where: { userId: uid },
+					_min: { order: true },
+				}),
+			]);
+			const candidates = [
+				minL._min.order,
+				minT._min.order,
+				minV._min.order,
+				minI._min.order,
+				minM._min.order,
+				minS._min.order,
+				minE._min.order,
+			].filter((n) => typeof n === "number") as number[];
+			const base = candidates.length > 0 ? Math.min(...candidates) : 0;
+			const created = await prisma.image.create({
+				data: {
+					userId: uid,
+					title: title ? title.trim() : null,
+					description: description ? description.trim() : null,
+					layout,
+					ratio,
+					sizePercent,
+					items,
+					active: true,
+					order: base - 1,
+					sectionId: sectionId || null,
+				},
+			});
+			return NextResponse.json(created, { status: 201 });
+		}
+		const r = getRedis();
+		const shardCount = Math.max(1, Number(process.env.INGEST_SHARDS || 8));
+		const shard =
+			Math.abs(Array.from(uid).reduce((a, c) => a + c.charCodeAt(0), 0)) %
+			shardCount;
+		const payload = {
+			userId: uid,
+			title: title ? title.trim() : null,
+			description: description ? description.trim() : null,
+			layout,
+			ratio,
+			sizePercent,
+			items,
+			sectionId: sectionId || null,
+		};
+		await r.lpush(`ingest:images:${uid}:${shard}`, JSON.stringify(payload));
+		return NextResponse.json({ accepted: true }, { status: 202 });
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }
@@ -164,8 +203,7 @@ export async function GET(request: NextRequest) {
 		});
 
 		return NextResponse.json({ images });
-	} catch (error) {
-		console.error("Erro ao listar imagens:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }

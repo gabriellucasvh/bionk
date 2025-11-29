@@ -1,6 +1,8 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { profileMusicsTag, evictProfilePageCache } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 import {
 	fetchMetadataFromProvider,
@@ -111,9 +113,20 @@ export async function PUT(
 			data: updateData,
 		});
 
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true },
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+				revalidateTag(profileMusicsTag(user.username));
+				await evictProfilePageCache(user.username);
+			}
+		} catch {}
+
 		return NextResponse.json(updatedMusic);
-	} catch (error) {
-		console.error("Erro ao atualizar música:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }
@@ -157,9 +170,20 @@ export async function DELETE(
 			where: { id: musicId },
 		});
 
+		try {
+			const user = await prisma.user.findUnique({
+				where: { id: session.user.id },
+				select: { username: true },
+			});
+			if (user?.username) {
+				revalidatePath(`/${user.username}`);
+				revalidateTag(profileMusicsTag(user.username));
+				await evictProfilePageCache(user.username);
+			}
+		} catch {}
+
 		return NextResponse.json({ message: "Música excluída com sucesso" });
-	} catch (error) {
-		console.error("Erro ao excluir música:", error);
+	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },
 			{ status: 500 }
