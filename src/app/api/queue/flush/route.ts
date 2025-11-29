@@ -222,17 +222,30 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				linkTxs.push(
 					(async () => {
-						const maxRes = await prisma.link.aggregate({
-							where: { userId: uid },
-							_max: { order: true },
-						});
-						const base =
-							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.image.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+						]);
+						const candidates = [
+							minL._min.order,
+							minT._min.order,
+							minV._min.order,
+							minI._min.order,
+							minM._min.order,
+							minS._min.order,
+							minE._min.order,
+						].filter((n) => typeof n === "number") as number[];
+						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
 							userId: uid,
 							title: String(item.title),
 							url: String(item.url),
-							order: base + 1 + idx,
+							order: base - 1 - idx,
 							active: true,
 							sectionId: item.sectionId ? Number(item.sectionId) : null,
 							badge: item.badge ? String(item.badge) : null,
@@ -266,12 +279,25 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				textTxs.push(
 					(async () => {
-						const maxRes = await prisma.text.aggregate({
-							where: { userId: uid },
-							_max: { order: true },
-						});
-						const base =
-							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.image.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+						]);
+						const candidates = [
+							minL._min.order,
+							minT._min.order,
+							minV._min.order,
+							minI._min.order,
+							minM._min.order,
+							minS._min.order,
+							minE._min.order,
+						].filter((n) => typeof n === "number") as number[];
+						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
 							userId: uid,
 							title: String(item.title),
@@ -280,7 +306,7 @@ export async function POST(req: Request) {
 							hasBackground: !!item.hasBackground,
 							isCompact: !!item.isCompact,
 							active: true,
-							order: base + 1 + idx,
+							order: base - 1 - idx,
 							sectionId: item.sectionId ? Number(item.sectionId) : null,
 						}));
 						return prisma.text.createMany({ data });
@@ -305,12 +331,25 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				videoTxs.push(
 					(async () => {
-						const maxRes = await prisma.video.aggregate({
-							where: { userId: uid },
-							_max: { order: true },
-						});
-						const base =
-							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.image.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+						]);
+						const candidates = [
+							minL._min.order,
+							minT._min.order,
+							minV._min.order,
+							minI._min.order,
+							minM._min.order,
+							minS._min.order,
+							minE._min.order,
+						].filter((n) => typeof n === "number") as number[];
+						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
 							userId: uid,
 							title: item.title ? String(item.title) : null,
@@ -321,7 +360,7 @@ export async function POST(req: Request) {
 								? String(item.thumbnailUrl)
 								: null,
 							active: true,
-							order: base + 1 + idx,
+							order: base - 1 - idx,
 							sectionId: item.sectionId ? Number(item.sectionId) : null,
 						}));
 						return prisma.video.createMany({ data });
@@ -346,12 +385,25 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				imageTxs.push(
 					(async () => {
-						const maxRes = await prisma.image.aggregate({
-							where: { userId: uid },
-							_max: { order: true },
-						});
-						const base =
-							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.image.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+						]);
+						const candidates = [
+							minL._min.order,
+							minT._min.order,
+							minV._min.order,
+							minI._min.order,
+							minM._min.order,
+							minS._min.order,
+							minE._min.order,
+						].filter((n) => typeof n === "number") as number[];
+						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
 							userId: uid,
 							title: item.title ? String(item.title) : null,
@@ -361,7 +413,7 @@ export async function POST(req: Request) {
 							sizePercent: Number(item.sizePercent),
 							items: Array.isArray(item.items) ? item.items : [],
 							active: true,
-							order: base + 1 + idx,
+							order: base - 1 - idx,
 							sectionId: item.sectionId ? Number(item.sectionId) : null,
 						}));
 						return prisma.image.createMany({ data });
@@ -386,19 +438,32 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				musicTxs.push(
 					(async () => {
-						const maxRes = await prisma.music.aggregate({
-							where: { userId: uid },
-							_max: { order: true },
-						});
-						const base =
-							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.image.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+						]);
+						const candidates = [
+							minL._min.order,
+							minT._min.order,
+							minV._min.order,
+							minI._min.order,
+							minM._min.order,
+							minS._min.order,
+							minE._min.order,
+						].filter((n) => typeof n === "number") as number[];
+						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
 							userId: uid,
 							title: item.title ? String(item.title) : "",
 							url: String(item.url),
 							usePreview: !!item.usePreview,
 							active: true,
-							order: base + 1 + idx,
+							order: base - 1 - idx,
 							sectionId: item.sectionId ? Number(item.sectionId) : null,
 							authorName: item.authorName ? String(item.authorName) : null,
 							thumbnailUrl: item.thumbnailUrl
@@ -427,16 +492,29 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				sectionTxs.push(
 					(async () => {
-						const maxRes = await prisma.section.aggregate({
-							where: { userId: uid },
-							_max: { order: true },
-						});
-						const base =
-							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.image.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+						]);
+						const candidates = [
+							minL._min.order,
+							minT._min.order,
+							minV._min.order,
+							minI._min.order,
+							minM._min.order,
+							minS._min.order,
+							minE._min.order,
+						].filter((n) => typeof n === "number") as number[];
+						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
 							userId: uid,
 							title: String(item.title),
-							order: base + 1 + idx,
+							order: base - 1 - idx,
 						}));
 						return prisma.section.createMany({ data });
 					})()
@@ -460,12 +538,25 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				eventTxs.push(
 					(async () => {
-						const maxRes = await prisma.event.aggregate({
-							where: { userId: uid },
-							_max: { order: true },
-						});
-						const base =
-							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.image.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+						]);
+						const candidates = [
+							minL._min.order,
+							minT._min.order,
+							minV._min.order,
+							minI._min.order,
+							minM._min.order,
+							minS._min.order,
+							minE._min.order,
+						].filter((n) => typeof n === "number") as number[];
+						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => {
 							const vis =
 								item.countdownLinkVisibility === "after" ||
@@ -490,7 +581,7 @@ export async function POST(req: Request) {
 									? String(item.coverImageUrl)
 									: null,
 								active: true,
-								order: base + 1 + idx,
+								order: base - 1 - idx,
 								type: item.type ? String(item.type) : undefined,
 								targetMonth:
 									typeof item.targetMonth === "number"
