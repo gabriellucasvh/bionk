@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 			coverImageUrl: coverImageUrl ? String(coverImageUrl) : null,
 			type: null,
 		};
-		await r.lpush("ingest:events", JSON.stringify(payload));
+		await r.lpush(`ingest:events:${session.user.id}`, JSON.stringify(payload));
 		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(

@@ -172,7 +172,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 				: null,
 			shareAllowed: Boolean(shareAllowed),
 		};
-		await r.lpush("ingest:links", JSON.stringify(payload));
+		await r.lpush(`ingest:links:${session.user.id}`, JSON.stringify(payload));
 		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(

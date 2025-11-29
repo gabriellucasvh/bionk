@@ -46,7 +46,7 @@ export async function POST(request: Request) {
             isCompact,
             sectionId: sectionId || null,
         };
-        await r.lpush("ingest:texts", JSON.stringify(payload));
+		await r.lpush(`ingest:texts:${session.user.id}`, JSON.stringify(payload));
         return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(

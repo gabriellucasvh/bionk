@@ -1,8 +1,8 @@
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getRedis } from "@/lib/redis";
-import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 type SectionItem = { id: number } & { [key: string]: any };
@@ -15,26 +15,26 @@ export async function GET(): Promise<NextResponse> {
 
 	if (session.user.banido) {
 		return NextResponse.json(
-			{ 
-				error: "Conta suspensa", 
-				message: "Sua conta foi suspensa e não pode realizar esta ação." 
+			{
+				error: "Conta suspensa",
+				message: "Sua conta foi suspensa e não pode realizar esta ação.",
 			},
 			{ status: 403 }
 		);
 	}
 
-    const sections: SectionItem[] = await prisma.section.findMany({
-        where: { userId: session.user.id },
-        orderBy: { order: "asc" },
-        include: { links: true },
-    });
+	const sections: SectionItem[] = await prisma.section.findMany({
+		where: { userId: session.user.id },
+		orderBy: { order: "asc" },
+		include: { links: true },
+	});
 
 	// Transformar para incluir dbId
-    const transformedSections = sections.map((section: SectionItem) => ({
-        ...section,
-        id: `section-${section.id}`,
-        dbId: section.id,
-    }));
+	const transformedSections = sections.map((section: SectionItem) => ({
+		...section,
+		id: `section-${section.id}`,
+		dbId: section.id,
+	}));
 
 	return NextResponse.json(transformedSections);
 }
@@ -47,9 +47,9 @@ export async function POST(req: Request): Promise<NextResponse> {
 
 	if (session.user.banido) {
 		return NextResponse.json(
-			{ 
-				error: "Conta suspensa", 
-				message: "Sua conta foi suspensa e não pode realizar esta ação." 
+			{
+				error: "Conta suspensa",
+				message: "Sua conta foi suspensa e não pode realizar esta ação.",
 			},
 			{ status: 403 }
 		);
@@ -58,6 +58,6 @@ export async function POST(req: Request): Promise<NextResponse> {
 	const { title } = await req.json();
 	const r = getRedis();
 	const payload = { userId: session.user.id, title: String(title).trim() };
-	await r.lpush("ingest:sections", JSON.stringify(payload));
+	await r.lpush(`ingest:sections:${session.user.id}`, JSON.stringify(payload));
 	return NextResponse.json({ accepted: true }, { status: 202 });
 }

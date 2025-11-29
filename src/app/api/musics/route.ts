@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 			usePreview: !!usePreview,
 			sectionId: sectionId || null,
 		};
-		await r.lpush("ingest:musics", JSON.stringify(payload));
+		await r.lpush(`ingest:musics:${session.user.id}`, JSON.stringify(payload));
 		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(

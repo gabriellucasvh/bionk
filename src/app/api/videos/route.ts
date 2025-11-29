@@ -139,30 +139,30 @@ export async function POST(request: Request) {
 			);
 		}
 
-        let thumbnailUrl: string | null = null;
-        try {
-            if (validation.type === "youtube") {
-                const mWatch = url.match(YOUTUBE_REGEX);
-                const mEmbed = url.match(YOUTUBE_EMBED_REGEX);
-                const ytId = (mWatch && mWatch[1]) || (mEmbed && mEmbed[1]);
-                if (ytId) {
-                    thumbnailUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
-                }
-            }
-        } catch {}
+		let thumbnailUrl: string | null = null;
+		try {
+			if (validation.type === "youtube") {
+				const mWatch = url.match(YOUTUBE_REGEX);
+				const mEmbed = url.match(YOUTUBE_EMBED_REGEX);
+				const ytId = (mWatch && mWatch[1]) || (mEmbed && mEmbed[1]);
+				if (ytId) {
+					thumbnailUrl = `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+				}
+			}
+		} catch {}
 
-        const r = getRedis();
-        const payload = {
-            userId: session.user.id,
-            title: title?.trim() || null,
-            description: description?.trim() || null,
-            type: validation.type,
-            url: validation.normalizedUrl,
-            thumbnailUrl: thumbnailUrl ?? null,
-            sectionId: sectionId || null,
-        };
-        await r.lpush("ingest:videos", JSON.stringify(payload));
-        return NextResponse.json({ accepted: true }, { status: 202 });
+		const r = getRedis();
+		const payload = {
+			userId: session.user.id,
+			title: title?.trim() || null,
+			description: description?.trim() || null,
+			type: validation.type,
+			url: validation.normalizedUrl,
+			thumbnailUrl: thumbnailUrl ?? null,
+			sectionId: sectionId || null,
+		};
+		await r.lpush(`ingest:videos:${session.user.id}`, JSON.stringify(payload));
+		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },

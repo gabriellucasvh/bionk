@@ -3,6 +3,44 @@ import prisma from "@/lib/prisma";
 import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 
+async function popBatchList(r: any, key: string, max: number) {
+	const arr = await r.lrange(key, -max, -1);
+	const items = Array.isArray(arr)
+		? arr.filter((x) => typeof x === "string")
+		: [];
+	if (items.length > 0) {
+		await r.ltrim(key, 0, -items.length - 1);
+	}
+	return items;
+}
+
+async function popBatchListPrefix(r: any, prefix: string, maxTotal: number) {
+	const keys = await r.keys(`${prefix}:*`);
+	const ks = Array.isArray(keys) ? keys : [];
+	if (ks.length === 0) {
+		return [] as string[];
+	}
+	const per = Math.max(1, Math.floor(maxTotal / ks.length));
+	const ranges = ks.map((k) => r.lrange(k, -per, -1));
+	const lists = await Promise.all(ranges);
+	const trims = ks.map((k, i) => {
+		const cnt = Array.isArray(lists[i]) ? lists[i].length : 0;
+		return cnt > 0 ? r.ltrim(k, 0, -cnt - 1) : Promise.resolve(null);
+	});
+	await Promise.all(trims);
+	const out: string[] = [];
+	for (const lst of lists) {
+		if (Array.isArray(lst)) {
+			for (const s of lst) {
+				if (typeof s === "string") {
+					out.push(s);
+				}
+			}
+		}
+	}
+	return out;
+}
+
 function authorized(req: Request) {
 	const isProd = process.env.NODE_ENV === "production";
 	const vercelHeader = (req.headers.get("x-vercel-cron") || "").trim();
@@ -33,69 +71,27 @@ export async function POST(req: Request) {
 	try {
 		const r = getRedis();
 		const maxBatch = 1000;
-		const clicksLenRaw = await r.llen("events:clicks");
-		const viewsLenRaw = await r.llen("events:views");
-		const linksLenRaw = await r.llen("ingest:links");
-		const textsLenRaw = await r.llen("ingest:texts");
-		const videosLenRaw = await r.llen("ingest:videos");
-		const imagesLenRaw = await r.llen("ingest:images");
-		const musicsLenRaw = await r.llen("ingest:musics");
-		const sectionsLenRaw = await r.llen("ingest:sections");
-		const eventsLenRaw = await r.llen("ingest:events");
-		const clicksLen = Number(clicksLenRaw || 0);
-		const viewsLen = Number(viewsLenRaw || 0);
-		const linksLen = Number(linksLenRaw || 0);
-		const textsLen = Number(textsLenRaw || 0);
-		const videosLen = Number(videosLenRaw || 0);
-		const imagesLen = Number(imagesLenRaw || 0);
-		const musicsLen = Number(musicsLenRaw || 0);
-		const sectionsLen = Number(sectionsLenRaw || 0);
-		const eventsLen = Number(eventsLenRaw || 0);
-		const batchClicks = Math.min(maxBatch, Math.max(0, clicksLen));
-		const batchViews = Math.min(maxBatch, Math.max(0, viewsLen));
-		const batchLinks = Math.min(maxBatch, Math.max(0, linksLen));
-		const batchTexts = Math.min(maxBatch, Math.max(0, textsLen));
-		const batchVideos = Math.min(maxBatch, Math.max(0, videosLen));
-		const batchImages = Math.min(maxBatch, Math.max(0, imagesLen));
-		const batchMusics = Math.min(maxBatch, Math.max(0, musicsLen));
-		const batchSections = Math.min(maxBatch, Math.max(0, sectionsLen));
-		const batchEvents = Math.min(maxBatch, Math.max(0, eventsLen));
-		const clicksPops = Array.from({ length: batchClicks }, () =>
-			r.rpop<string | null>("events:clicks")
-		);
-		const viewsPops = Array.from({ length: batchViews }, () =>
-			r.rpop<string | null>("events:views")
-		);
-		const linksPops = Array.from({ length: batchLinks }, () =>
-			r.rpop<string | null>("ingest:links")
-		);
-		const textsPops = Array.from({ length: batchTexts }, () =>
-			r.rpop<string | null>("ingest:texts")
-		);
-		const videosPops = Array.from({ length: batchVideos }, () =>
-			r.rpop<string | null>("ingest:videos")
-		);
-		const imagesPops = Array.from({ length: batchImages }, () =>
-			r.rpop<string | null>("ingest:images")
-		);
-		const musicsPops = Array.from({ length: batchMusics }, () =>
-			r.rpop<string | null>("ingest:musics")
-		);
-		const sectionsPops = Array.from({ length: batchSections }, () =>
-			r.rpop<string | null>("ingest:sections")
-		);
-		const eventsPops = Array.from({ length: batchEvents }, () =>
-			r.rpop<string | null>("ingest:events")
-		);
-		const rawClicks = await Promise.all(clicksPops);
-		const rawViews = await Promise.all(viewsPops);
-		const rawLinks = await Promise.all(linksPops);
-		const rawTexts = await Promise.all(textsPops);
-		const rawVideos = await Promise.all(videosPops);
-		const rawImages = await Promise.all(imagesPops);
-		const rawMusics = await Promise.all(musicsPops);
-		const rawSections = await Promise.all(sectionsPops);
-		const rawEvents = await Promise.all(eventsPops);
+		const [
+			rawClicks,
+			rawViews,
+			rawLinks,
+			rawTexts,
+			rawVideos,
+			rawImages,
+			rawMusics,
+			rawSections,
+			rawEvents,
+		] = await Promise.all([
+			popBatchList(r, "events:clicks", maxBatch),
+			popBatchList(r, "events:views", maxBatch),
+			popBatchListPrefix(r, "ingest:links", maxBatch),
+			popBatchListPrefix(r, "ingest:texts", maxBatch),
+			popBatchListPrefix(r, "ingest:videos", maxBatch),
+			popBatchListPrefix(r, "ingest:images", maxBatch),
+			popBatchListPrefix(r, "ingest:musics", maxBatch),
+			popBatchListPrefix(r, "ingest:sections", maxBatch),
+			popBatchListPrefix(r, "ingest:events", maxBatch),
+		]);
 		const clicks: any[] = [];
 		const views: any[] = [];
 		const links: any[] = [];
