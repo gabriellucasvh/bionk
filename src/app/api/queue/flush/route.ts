@@ -70,7 +70,7 @@ export async function POST(req: Request) {
 
 	try {
 		const r = getRedis();
-		const maxBatch = 1000;
+		const maxBatch = Math.max(1, Number(process.env.INGEST_MAX_BATCH || 1000));
 		const [
 			rawClicks,
 			rawViews,
@@ -218,63 +218,39 @@ export async function POST(req: Request) {
 				arr.push(item);
 				byUser.set(uid, arr);
 			}
-			const linkTxs: Promise<any[]>[] = [];
+			const linkTxs: Promise<any>[] = [];
 			for (const [uid, arr] of byUser.entries()) {
-				const n = arr.length;
-				const data = arr.map((item, idx) => ({
-					userId: uid,
-					title: String(item.title),
-					url: String(item.url),
-					order: idx,
-					active: true,
-					sectionId: item.sectionId ? Number(item.sectionId) : null,
-					badge: item.badge ? String(item.badge) : null,
-					password: item.password ? String(item.password) : null,
-					expiresAt: item.expiresAt ? new Date(item.expiresAt) : null,
-					deleteOnClicks: item.deleteOnClicks
-						? Number(item.deleteOnClicks)
-						: null,
-					launchesAt: item.launchesAt ? new Date(item.launchesAt) : null,
-					shareAllowed: !!item.shareAllowed,
-				}));
 				linkTxs.push(
-					prisma.$transaction([
-						prisma.link.updateMany({
+					(async () => {
+						const maxRes = await prisma.link.aggregate({
 							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.text.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.section.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.video.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.image.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.music.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.event.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.link.createMany({ data }),
-					])
+							_max: { order: true },
+						});
+						const base =
+							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const data = arr.map((item, idx) => ({
+							userId: uid,
+							title: String(item.title),
+							url: String(item.url),
+							order: base + 1 + idx,
+							active: true,
+							sectionId: item.sectionId ? Number(item.sectionId) : null,
+							badge: item.badge ? String(item.badge) : null,
+							password: item.password ? String(item.password) : null,
+							expiresAt: item.expiresAt ? new Date(item.expiresAt) : null,
+							deleteOnClicks: item.deleteOnClicks
+								? Number(item.deleteOnClicks)
+								: null,
+							launchesAt: item.launchesAt ? new Date(item.launchesAt) : null,
+							shareAllowed: !!item.shareAllowed,
+						}));
+						return prisma.link.createMany({ data });
+					})()
 				);
 			}
 			const linkResults = await Promise.all(linkTxs);
-			for (const trx of linkResults) {
-				const last = trx.at(-1) as any;
-				insertedLinks += last?.count || 0;
+			for (const res of linkResults) {
+				insertedLinks += (res as any)?.count || 0;
 			}
 		}
 
@@ -286,58 +262,34 @@ export async function POST(req: Request) {
 				arr.push(item);
 				byUser.set(uid, arr);
 			}
-			const textTxs: Promise<any[]>[] = [];
+			const textTxs: Promise<any>[] = [];
 			for (const [uid, arr] of byUser.entries()) {
-				const n = arr.length;
-				const data = arr.map((item, idx) => ({
-					userId: uid,
-					title: String(item.title),
-					description: String(item.description || ""),
-					position: String(item.position),
-					hasBackground: !!item.hasBackground,
-					isCompact: !!item.isCompact,
-					active: true,
-					order: idx,
-					sectionId: item.sectionId ? Number(item.sectionId) : null,
-				}));
 				textTxs.push(
-					prisma.$transaction([
-						prisma.link.updateMany({
+					(async () => {
+						const maxRes = await prisma.text.aggregate({
 							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.text.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.section.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.video.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.image.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.music.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.event.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.text.createMany({ data }),
-					])
+							_max: { order: true },
+						});
+						const base =
+							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const data = arr.map((item, idx) => ({
+							userId: uid,
+							title: String(item.title),
+							description: String(item.description || ""),
+							position: String(item.position),
+							hasBackground: !!item.hasBackground,
+							isCompact: !!item.isCompact,
+							active: true,
+							order: base + 1 + idx,
+							sectionId: item.sectionId ? Number(item.sectionId) : null,
+						}));
+						return prisma.text.createMany({ data });
+					})()
 				);
 			}
 			const textResults = await Promise.all(textTxs);
-			for (const trx of textResults) {
-				const last = trx.at(-1) as any;
-				insertedTexts += last?.count || 0;
+			for (const res of textResults) {
+				insertedTexts += (res as any)?.count || 0;
 			}
 		}
 
@@ -349,58 +301,36 @@ export async function POST(req: Request) {
 				arr.push(item);
 				byUser.set(uid, arr);
 			}
-			const videoTxs: Promise<any[]>[] = [];
+			const videoTxs: Promise<any>[] = [];
 			for (const [uid, arr] of byUser.entries()) {
-				const n = arr.length;
-				const data = arr.map((item, idx) => ({
-					userId: uid,
-					title: item.title ? String(item.title) : null,
-					description: item.description ? String(item.description) : null,
-					type: String(item.type),
-					url: String(item.url),
-					thumbnailUrl: item.thumbnailUrl ? String(item.thumbnailUrl) : null,
-					active: true,
-					order: idx,
-					sectionId: item.sectionId ? Number(item.sectionId) : null,
-				}));
 				videoTxs.push(
-					prisma.$transaction([
-						prisma.link.updateMany({
+					(async () => {
+						const maxRes = await prisma.video.aggregate({
 							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.text.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.section.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.video.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.image.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.music.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.event.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.video.createMany({ data }),
-					])
+							_max: { order: true },
+						});
+						const base =
+							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const data = arr.map((item, idx) => ({
+							userId: uid,
+							title: item.title ? String(item.title) : null,
+							description: item.description ? String(item.description) : null,
+							type: String(item.type),
+							url: String(item.url),
+							thumbnailUrl: item.thumbnailUrl
+								? String(item.thumbnailUrl)
+								: null,
+							active: true,
+							order: base + 1 + idx,
+							sectionId: item.sectionId ? Number(item.sectionId) : null,
+						}));
+						return prisma.video.createMany({ data });
+					})()
 				);
 			}
 			const videoResults = await Promise.all(videoTxs);
-			for (const trx of videoResults) {
-				const last = trx.at(-1) as any;
-				insertedVideos += last?.count || 0;
+			for (const res of videoResults) {
+				insertedVideos += (res as any)?.count || 0;
 			}
 		}
 
@@ -412,59 +342,35 @@ export async function POST(req: Request) {
 				arr.push(item);
 				byUser.set(uid, arr);
 			}
-			const imageTxs: Promise<any[]>[] = [];
+			const imageTxs: Promise<any>[] = [];
 			for (const [uid, arr] of byUser.entries()) {
-				const n = arr.length;
-				const data = arr.map((item, idx) => ({
-					userId: uid,
-					title: item.title ? String(item.title) : null,
-					description: item.description ? String(item.description) : null,
-					layout: String(item.layout),
-					ratio: String(item.ratio),
-					sizePercent: Number(item.sizePercent),
-					items: Array.isArray(item.items) ? item.items : [],
-					active: true,
-					order: idx,
-					sectionId: item.sectionId ? Number(item.sectionId) : null,
-				}));
 				imageTxs.push(
-					prisma.$transaction([
-						prisma.link.updateMany({
+					(async () => {
+						const maxRes = await prisma.image.aggregate({
 							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.text.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.section.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.video.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.image.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.music.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.event.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.image.createMany({ data }),
-					])
+							_max: { order: true },
+						});
+						const base =
+							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const data = arr.map((item, idx) => ({
+							userId: uid,
+							title: item.title ? String(item.title) : null,
+							description: item.description ? String(item.description) : null,
+							layout: String(item.layout),
+							ratio: String(item.ratio),
+							sizePercent: Number(item.sizePercent),
+							items: Array.isArray(item.items) ? item.items : [],
+							active: true,
+							order: base + 1 + idx,
+							sectionId: item.sectionId ? Number(item.sectionId) : null,
+						}));
+						return prisma.image.createMany({ data });
+					})()
 				);
 			}
 			const imageResults = await Promise.all(imageTxs);
-			for (const trx of imageResults) {
-				const last = trx.at(-1) as any;
-				insertedImages += last?.count || 0;
+			for (const res of imageResults) {
+				insertedImages += (res as any)?.count || 0;
 			}
 		}
 
@@ -476,58 +382,36 @@ export async function POST(req: Request) {
 				arr.push(item);
 				byUser.set(uid, arr);
 			}
-			const musicTxs: Promise<any[]>[] = [];
+			const musicTxs: Promise<any>[] = [];
 			for (const [uid, arr] of byUser.entries()) {
-				const n = arr.length;
-				const data = arr.map((item, idx) => ({
-					userId: uid,
-					title: item.title ? String(item.title) : "",
-					url: String(item.url),
-					usePreview: !!item.usePreview,
-					active: true,
-					order: idx,
-					sectionId: item.sectionId ? Number(item.sectionId) : null,
-					authorName: item.authorName ? String(item.authorName) : null,
-					thumbnailUrl: item.thumbnailUrl ? String(item.thumbnailUrl) : null,
-				}));
 				musicTxs.push(
-					prisma.$transaction([
-						prisma.link.updateMany({
+					(async () => {
+						const maxRes = await prisma.music.aggregate({
 							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.text.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.section.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.video.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.image.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.music.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.event.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.music.createMany({ data }),
-					])
+							_max: { order: true },
+						});
+						const base =
+							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const data = arr.map((item, idx) => ({
+							userId: uid,
+							title: item.title ? String(item.title) : "",
+							url: String(item.url),
+							usePreview: !!item.usePreview,
+							active: true,
+							order: base + 1 + idx,
+							sectionId: item.sectionId ? Number(item.sectionId) : null,
+							authorName: item.authorName ? String(item.authorName) : null,
+							thumbnailUrl: item.thumbnailUrl
+								? String(item.thumbnailUrl)
+								: null,
+						}));
+						return prisma.music.createMany({ data });
+					})()
 				);
 			}
 			const musicResults = await Promise.all(musicTxs);
-			for (const trx of musicResults) {
-				const last = trx.at(-1) as any;
-				insertedMusics += last?.count || 0;
+			for (const res of musicResults) {
+				insertedMusics += (res as any)?.count || 0;
 			}
 		}
 
@@ -539,52 +423,28 @@ export async function POST(req: Request) {
 				arr.push(item);
 				byUser.set(uid, arr);
 			}
-			const sectionTxs: Promise<any[]>[] = [];
+			const sectionTxs: Promise<any>[] = [];
 			for (const [uid, arr] of byUser.entries()) {
-				const n = arr.length;
-				const data = arr.map((item, idx) => ({
-					userId: uid,
-					title: String(item.title),
-					order: idx,
-				}));
 				sectionTxs.push(
-					prisma.$transaction([
-						prisma.link.updateMany({
+					(async () => {
+						const maxRes = await prisma.section.aggregate({
 							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.text.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.section.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.video.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.image.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.music.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.event.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.section.createMany({ data }),
-					])
+							_max: { order: true },
+						});
+						const base =
+							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const data = arr.map((item, idx) => ({
+							userId: uid,
+							title: String(item.title),
+							order: base + 1 + idx,
+						}));
+						return prisma.section.createMany({ data });
+					})()
 				);
 			}
 			const sectionResults = await Promise.all(sectionTxs);
-			for (const trx of sectionResults) {
-				const last = trx.at(-1) as any;
-				insertedSections += last?.count || 0;
+			for (const res of sectionResults) {
+				insertedSections += (res as any)?.count || 0;
 			}
 		}
 
@@ -596,73 +456,61 @@ export async function POST(req: Request) {
 				arr.push(item);
 				byUser.set(uid, arr);
 			}
-			const eventTxs: Promise<any[]>[] = [];
+			const eventTxs: Promise<any>[] = [];
 			for (const [uid, arr] of byUser.entries()) {
-				const n = arr.length;
-				const data = arr.map((item, idx) => ({
-					userId: uid,
-					title: String(item.title),
-					location: item.location ? String(item.location) : "",
-					eventDate: item.eventDate ? new Date(item.eventDate) : new Date(),
-					eventTime: String(item.eventTime),
-					descriptionShort: item.descriptionShort
-						? String(item.descriptionShort)
-						: null,
-					externalLink: item.externalLink ? String(item.externalLink) : "",
-					coverImageUrl: item.coverImageUrl ? String(item.coverImageUrl) : null,
-					active: true,
-					order: idx,
-					type: item.type ? String(item.type) : undefined,
-					targetMonth:
-						typeof item.targetMonth === "number" ? item.targetMonth : null,
-					targetDay: typeof item.targetDay === "number" ? item.targetDay : null,
-					countdownLinkUrl: item.countdownLinkUrl
-						? String(item.countdownLinkUrl)
-						: null,
-					countdownLinkVisibility:
-						item.countdownLinkVisibility === "after" ||
-						item.countdownLinkVisibility === "during"
-							? item.countdownLinkVisibility
-							: null,
-				}));
 				eventTxs.push(
-					prisma.$transaction([
-						prisma.link.updateMany({
+					(async () => {
+						const maxRes = await prisma.event.aggregate({
 							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.text.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.section.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.video.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.image.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.music.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.event.updateMany({
-							where: { userId: uid },
-							data: { order: { increment: n } },
-						}),
-						prisma.event.createMany({ data }),
-					])
+							_max: { order: true },
+						});
+						const base =
+							typeof maxRes._max.order === "number" ? maxRes._max.order : -1;
+						const data = arr.map((item, idx) => {
+							const vis =
+								item.countdownLinkVisibility === "after" ||
+								item.countdownLinkVisibility === "during"
+									? item.countdownLinkVisibility
+									: null;
+							return {
+								userId: uid,
+								title: String(item.title),
+								location: item.location ? String(item.location) : "",
+								eventDate: item.eventDate
+									? new Date(item.eventDate)
+									: new Date(),
+								eventTime: String(item.eventTime),
+								descriptionShort: item.descriptionShort
+									? String(item.descriptionShort)
+									: null,
+								externalLink: item.externalLink
+									? String(item.externalLink)
+									: "",
+								coverImageUrl: item.coverImageUrl
+									? String(item.coverImageUrl)
+									: null,
+								active: true,
+								order: base + 1 + idx,
+								type: item.type ? String(item.type) : undefined,
+								targetMonth:
+									typeof item.targetMonth === "number"
+										? item.targetMonth
+										: null,
+								targetDay:
+									typeof item.targetDay === "number" ? item.targetDay : null,
+								countdownLinkUrl: item.countdownLinkUrl
+									? String(item.countdownLinkUrl)
+									: null,
+								countdownLinkVisibility: vis as any,
+							};
+						});
+						return prisma.event.createMany({ data });
+					})()
 				);
 			}
 			const eventResults = await Promise.all(eventTxs);
-			for (const trx of eventResults) {
-				const last = trx.at(-1) as any;
-				insertedEvents += last?.count || 0;
+			for (const res of eventResults) {
+				insertedEvents += (res as any)?.count || 0;
 			}
 		}
 

@@ -36,18 +36,23 @@ export async function POST(request: Request) {
 			);
 		}
 
-        const r = getRedis();
-        const payload = {
-            userId: session.user.id,
-            title: title.trim(),
-            description: (description || "").trim(),
-            position,
-            hasBackground,
-            isCompact,
-            sectionId: sectionId || null,
-        };
-		await r.lpush(`ingest:texts:${session.user.id}`, JSON.stringify(payload));
-        return NextResponse.json({ accepted: true }, { status: 202 });
+		const r = getRedis();
+		const uid = session.user.id;
+		const shardCount = Math.max(1, Number(process.env.INGEST_SHARDS || 8));
+		const shard =
+			Math.abs(Array.from(uid).reduce((a, c) => a + c.charCodeAt(0), 0)) %
+			shardCount;
+		const payload = {
+			userId: uid,
+			title: title.trim(),
+			description: (description || "").trim(),
+			position,
+			hasBackground,
+			isCompact,
+			sectionId: sectionId || null,
+		};
+		await r.lpush(`ingest:texts:${uid}:${shard}`, JSON.stringify(payload));
+		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(
 			{ error: "Erro interno do servidor" },

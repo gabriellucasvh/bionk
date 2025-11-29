@@ -58,14 +58,19 @@ export async function POST(request: Request) {
 			: getCanonicalUrl(maybeResolvedUrl);
 
 		const r = getRedis();
+		const uid = session.user.id;
+		const shardCount = Math.max(1, Number(process.env.INGEST_SHARDS || 8));
+		const shard =
+			Math.abs(Array.from(uid).reduce((a, c) => a + c.charCodeAt(0), 0)) %
+			shardCount;
 		const payload = {
-			userId: session.user.id,
+			userId: uid,
 			title: title ? title.trim() : "",
 			url: normalizedUrl,
 			usePreview: !!usePreview,
 			sectionId: sectionId || null,
 		};
-		await r.lpush(`ingest:musics:${session.user.id}`, JSON.stringify(payload));
+		await r.lpush(`ingest:musics:${uid}:${shard}`, JSON.stringify(payload));
 		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(

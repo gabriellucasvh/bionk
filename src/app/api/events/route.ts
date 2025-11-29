@@ -40,8 +40,13 @@ export async function POST(req: NextRequest) {
 		}
 
 		const r = getRedis();
+		const uid = session.user.id;
+		const shardCount = Math.max(1, Number(process.env.INGEST_SHARDS || 8));
+		const shard =
+			Math.abs(Array.from(uid).reduce((a, c) => a + c.charCodeAt(0), 0)) %
+			shardCount;
 		const payload = {
-			userId: session.user.id,
+			userId: uid,
 			title: String(title).trim().slice(0, 40),
 			location: String(location),
 			eventDate: new Date(eventDate).toISOString(),
@@ -51,7 +56,7 @@ export async function POST(req: NextRequest) {
 			coverImageUrl: coverImageUrl ? String(coverImageUrl) : null,
 			type: null,
 		};
-		await r.lpush(`ingest:events:${session.user.id}`, JSON.stringify(payload));
+		await r.lpush(`ingest:events:${uid}:${shard}`, JSON.stringify(payload));
 		return NextResponse.json({ accepted: true }, { status: 202 });
 	} catch {
 		return NextResponse.json(
