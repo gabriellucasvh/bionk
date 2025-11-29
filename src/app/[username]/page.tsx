@@ -34,22 +34,227 @@ export default async function UserPage({ params }: PageProps) {
 
 	const getUserCached = unstable_cache(
 		async () => {
-			return (await prisma.user.findUnique({
-				where: { username },
-				select: {
-					id: true,
-					username: true,
-					name: true,
-					bio: true,
-					image: true,
-					template: true,
-					templateCategory: true,
-					sensitiveProfile: true,
-					isBanned: true,
-					banReason: true,
-					bannedAt: true,
-					Link: {
+			try {
+				return (await prisma.user.findUnique({
+					where: { username },
+					select: {
+						id: true,
+						username: true,
+						name: true,
+						bio: true,
+						image: true,
+						template: true,
+						templateCategory: true,
+						sensitiveProfile: true,
+						isBanned: true,
+						banReason: true,
+						bannedAt: true,
+						Link: {
+							where: {
+								active: true,
+								archived: false,
+								OR: [{ launchesAt: null }, { launchesAt: { lte: now } }],
+								AND: [
+									{ OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] },
+								],
+							},
+							orderBy: { order: "asc" },
+							select: {
+								id: true,
+								title: true,
+								url: true,
+								order: true,
+								type: true,
+								sectionId: true,
+								clicks: true,
+								customImageUrl: true,
+								badge: true,
+								password: true,
+								animated: true,
+								expiresAt: true,
+								deleteOnClicks: true,
+								shareAllowed: true,
+								section: {
+									select: {
+										id: true,
+										title: true,
+									},
+								},
+							},
+						},
+						SocialLink: {
+							where: { active: true },
+							orderBy: { order: "asc" },
+							select: {
+								id: true,
+								platform: true,
+								url: true,
+								order: true,
+								active: true,
+							},
+						},
+						Text: {
+							where: { active: true, archived: false },
+							orderBy: { order: "asc" },
+							select: {
+								id: true,
+								title: true,
+								description: true,
+								position: true,
+								hasBackground: true,
+								active: true,
+								order: true,
+								userId: true,
+								isCompact: true,
+								sectionId: true,
+								section: {
+									select: {
+										id: true,
+										title: true,
+									},
+								},
+							},
+						},
+						Video: {
+							where: { active: true, archived: false },
+							orderBy: { order: "asc" },
+							select: {
+								id: true,
+								title: true,
+								description: true,
+								type: true,
+								url: true,
+								thumbnailUrl: true,
+								order: true,
+								active: true,
+								userId: true,
+								sectionId: true,
+								section: {
+									select: {
+										id: true,
+										title: true,
+									},
+								},
+							} as any,
+						},
+						Image: {
+							where: { active: true, archived: false },
+							orderBy: { order: "asc" },
+							select: {
+								id: true,
+								title: true,
+								description: true,
+								layout: true,
+								ratio: true,
+								sizePercent: true,
+								items: true,
+								order: true,
+								active: true,
+								userId: true,
+								sectionId: true,
+								section: {
+									select: {
+										id: true,
+										title: true,
+									},
+								},
+							},
+						},
+						Music: {
+							where: { active: true, archived: false },
+							orderBy: { order: "asc" },
+							select: {
+								id: true,
+								title: true,
+								url: true,
+								order: true,
+								active: true,
+								userId: true,
+								sectionId: true,
+								section: {
+									select: {
+										id: true,
+										title: true,
+									},
+								},
+							} as any,
+						},
+						Event: {
+							where: { active: true },
+							orderBy: { order: "asc" },
+							select: {
+								id: true,
+								title: true,
+								location: true,
+								eventDate: true,
+								eventTime: true,
+								externalLink: true,
+								type: true,
+								order: true,
+								userId: true,
+							},
+						},
+						Section: {
+							where: { active: true },
+							orderBy: { order: "asc" },
+							select: {
+								id: true,
+								title: true,
+								order: true,
+								active: true,
+								links: {
+									where: {
+										active: true,
+										archived: false,
+										OR: [{ launchesAt: null }, { launchesAt: { lte: now } }],
+										AND: [
+											{
+												OR: [{ expiresAt: null }, { expiresAt: { gte: now } }],
+											},
+										],
+									},
+									orderBy: { order: "asc" },
+									select: {
+										id: true,
+										title: true,
+										url: true,
+										order: true,
+										type: true,
+									},
+								},
+							},
+						},
+						CustomPresets: {
+							select: {
+								id: true,
+							},
+						},
+					},
+				})) as UserProfileData | null;
+			} catch {
+				const base = await prisma.user.findUnique({
+					where: { username },
+					select: {
+						id: true,
+						username: true,
+						name: true,
+						bio: true,
+						image: true,
+						template: true,
+						templateCategory: true,
+					},
+				});
+
+				if (!base) {
+					return null;
+				}
+
+				const u: any = { ...base };
+
+				try {
+					u.Link = await prisma.link.findMany({
 						where: {
+							userId: base.id,
 							active: true,
 							archived: false,
 							OR: [{ launchesAt: null }, { launchesAt: { lte: now } }],
@@ -63,24 +268,16 @@ export default async function UserPage({ params }: PageProps) {
 							order: true,
 							type: true,
 							sectionId: true,
-							clicks: true,
-							customImageUrl: true,
-							badge: true,
-							password: true,
-							animated: true,
-							expiresAt: true,
-							deleteOnClicks: true,
-							shareAllowed: true,
-							section: {
-								select: {
-									id: true,
-									title: true,
-								},
-							},
+							section: { select: { id: true, title: true } },
 						},
-					},
-					SocialLink: {
-						where: { active: true },
+					});
+				} catch {
+					u.Link = [];
+				}
+
+				try {
+					u.SocialLink = await prisma.socialLink.findMany({
+						where: { userId: base.id, active: true },
 						orderBy: { order: "asc" },
 						select: {
 							id: true,
@@ -89,31 +286,34 @@ export default async function UserPage({ params }: PageProps) {
 							order: true,
 							active: true,
 						},
-					},
-					Text: {
-						where: { active: true, archived: false },
+					});
+				} catch {
+					u.SocialLink = [];
+				}
+
+				try {
+					u.Text = await prisma.text.findMany({
+						where: { userId: base.id, active: true, archived: false },
 						orderBy: { order: "asc" },
 						select: {
 							id: true,
 							title: true,
 							description: true,
 							position: true,
-							hasBackground: true,
 							active: true,
 							order: true,
 							userId: true,
-							isCompact: true,
 							sectionId: true,
-							section: {
-								select: {
-									id: true,
-									title: true,
-								},
-							},
+							section: { select: { id: true, title: true } },
 						},
-					},
-					Video: {
-						where: { active: true, archived: false },
+					});
+				} catch {
+					u.Text = [];
+				}
+
+				try {
+					u.Video = await prisma.video.findMany({
+						where: { userId: base.id, active: true, archived: false },
 						orderBy: { order: "asc" },
 						select: {
 							id: true,
@@ -121,21 +321,20 @@ export default async function UserPage({ params }: PageProps) {
 							description: true,
 							type: true,
 							url: true,
-							thumbnailUrl: true,
 							order: true,
 							active: true,
 							userId: true,
 							sectionId: true,
-							section: {
-								select: {
-									id: true,
-									title: true,
-								},
-							},
-						} as any,
-					},
-					Image: {
-						where: { active: true, archived: false },
+							section: { select: { id: true, title: true } },
+						},
+					});
+				} catch {
+					u.Video = [];
+				}
+
+				try {
+					u.Image = await prisma.image.findMany({
+						where: { userId: base.id, active: true, archived: false },
 						orderBy: { order: "asc" },
 						select: {
 							id: true,
@@ -149,38 +348,35 @@ export default async function UserPage({ params }: PageProps) {
 							active: true,
 							userId: true,
 							sectionId: true,
-							section: {
-								select: {
-									id: true,
-									title: true,
-								},
-							},
+							section: { select: { id: true, title: true } },
 						},
-					},
-					Music: {
-						where: { active: true, archived: false },
+					});
+				} catch {
+					u.Image = [];
+				}
+
+				try {
+					u.Music = await prisma.music.findMany({
+						where: { userId: base.id, active: true, archived: false },
 						orderBy: { order: "asc" },
 						select: {
 							id: true,
 							title: true,
 							url: true,
-							usePreview: true,
-							authorName: true,
-							thumbnailUrl: true,
 							order: true,
 							active: true,
 							userId: true,
 							sectionId: true,
-							section: {
-								select: {
-									id: true,
-									title: true,
-								},
-							},
-						} as any,
-					},
-					Event: {
-						where: { active: true },
+							section: { select: { id: true, title: true } },
+						},
+					});
+				} catch {
+					u.Music = [];
+				}
+
+				try {
+					u.Event = await prisma.event.findMany({
+						where: { userId: base.id, active: true },
 						orderBy: { order: "asc" },
 						select: {
 							id: true,
@@ -192,14 +388,15 @@ export default async function UserPage({ params }: PageProps) {
 							type: true,
 							order: true,
 							userId: true,
-							targetMonth: true,
-							targetDay: true,
-							countdownLinkUrl: true,
-							countdownLinkVisibility: true,
 						},
-					},
-					Section: {
-						where: { active: true },
+					});
+				} catch {
+					u.Event = [];
+				}
+
+				try {
+					u.Section = await prisma.section.findMany({
+						where: { userId: base.id, active: true },
 						orderBy: { order: "asc" },
 						select: {
 							id: true,
@@ -222,39 +419,18 @@ export default async function UserPage({ params }: PageProps) {
 									url: true,
 									order: true,
 									type: true,
-									clicks: true,
-									customImageUrl: true,
-									badge: true,
-									password: true,
-									animated: true,
-									expiresAt: true,
-									deleteOnClicks: true,
-									shareAllowed: true,
 								},
 							},
 						},
-					},
-					CustomPresets: {
-						select: {
-							id: true,
-							customBackgroundColor: true,
-							customBackgroundGradient: true,
-							customBackgroundMediaType: true,
-							customBackgroundImageUrl: true,
-							customBackgroundVideoUrl: true,
-							customTextColor: true,
-							customButtonTextColor: true,
-							customButtonStyle: true,
-							customButtonFill: true,
-							customButtonCorners: true,
-							customFont: true,
-							headerStyle: true,
-							customButtonColor: true,
-							customBlurredBackground: true,
-						},
-					},
-				},
-			})) as UserProfileData | null;
+					});
+				} catch {
+					u.Section = [];
+				}
+
+				u.CustomPresets = null;
+
+				return u as UserProfileData;
+			}
 		},
 		["user-profile", username],
 		{ revalidate: 1800, tags: allProfileTags(username) }
