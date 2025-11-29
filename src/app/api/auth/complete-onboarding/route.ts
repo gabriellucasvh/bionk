@@ -211,6 +211,7 @@ export async function POST(request: NextRequest) {
                 userType: selectedType,
                 pendingSubscriptionPlan: selectedPlan === "pro" ? "pro" : null,
                 subscriptionPlan: selectedPlan === "free" ? "free" : "free",
+                lastUsernameChange: null,
                 CustomPresets: {
                     upsert: {
                         create: getDefaultCustomPresets(),
