@@ -796,7 +796,7 @@ const LinkActionButtons = ({
 						Cancelar
 					</AlertDialogCancel>
 					<AlertDialogAction
-						className="rounded-full bg-avocado-400 text-black hover:bg-avocado-500"
+						className="rounded-full bg-sky-400 text-black hover:bg-sky-500"
 						onClick={async () => {
 							if (isExpired) {
 								return;

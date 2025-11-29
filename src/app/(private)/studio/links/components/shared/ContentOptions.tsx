@@ -16,7 +16,7 @@ const ContentOptions = ({ onOptionSelect }: ContentOptionsProps) => {
 					type="button"
 				>
 					<div
-						className="relative w-20 overflow-hidden rounded-2xl border bg-avocado-400 ring-offset-2 transition-all duration-300 hover:ring-2 hover:ring-black"
+						className="relative w-20 overflow-hidden rounded-2xl border bg-sky-400 ring-offset-2 transition-all duration-300 hover:ring-2 hover:ring-black"
 						style={{ aspectRatio: "7 / 7" }}
 					>
 						<Plus className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-black" />
@@ -33,7 +33,7 @@ const ContentOptions = ({ onOptionSelect }: ContentOptionsProps) => {
 						className="relative w-20 overflow-hidden rounded-2xl border bg-green-950 ring-offset-2 transition-all duration-300 hover:ring-2 hover:ring-black"
 						style={{ aspectRatio: "7 / 7" }}
 					>
-						<Layers2 className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-avocado-100" />
+						<Layers2 className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 h-6 w-6 text-sky-100" />
 					</div>
 					<span className="font-medium text-sm">Seção</span>
 				</button>

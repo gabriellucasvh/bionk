@@ -26,10 +26,10 @@ interface CookiePreferences {
 }
 
 const defaultPreferences: CookiePreferences = {
-    essential: true,
-    analytics: false,
-    functional: false,
-    marketing: false,
+	essential: true,
+	analytics: false,
+	functional: false,
+	marketing: false,
 };
 
 interface BionkActionsModalProps {
@@ -494,7 +494,7 @@ export default function BionkActionsModal({
 											href="/registro"
 											prefetch={false}
 										>
-											<BaseButton className="w-full rounded-full bg-avocado-400 text-black hover:bg-avocado-500">
+											<BaseButton className="w-full rounded-full bg-sky-400 text-black hover:bg-sky-500">
 												<span className="flex items-center justify-center gap-2">
 													Começar gratuitamente{" "}
 													<ArrowRight className="h-4 w-4" />
@@ -749,7 +749,7 @@ export default function BionkActionsModal({
 											href="/registro"
 											prefetch={false}
 										>
-											<BaseButton className="w-full rounded-full bg-avocado-400 text-black hover:bg-avocado-500">
+											<BaseButton className="w-full rounded-full bg-sky-400 text-black hover:bg-sky-500">
 												<span className="flex items-center justify-center gap-2">
 													Começar gratuitamente{" "}
 													<ArrowRight className="h-4 w-4" />
