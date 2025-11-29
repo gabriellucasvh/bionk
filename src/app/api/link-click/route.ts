@@ -5,18 +5,21 @@ import {
 	ensureLinkClickCounter,
 	incrementLinkClickCounter,
 } from "@/lib/event-queue";
-import prisma from "@/lib/prisma";
 import { ensureMonthlyPartitions } from "@/lib/partition-manager";
+import prisma from "@/lib/prisma";
 import { detectDeviceType, getUserAgent } from "@/utils/deviceDetection";
 import { getClientIP, getCountryFromIP } from "@/utils/geolocation";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
 	try {
-		await ensureMonthlyPartitions();
-		// Lida tanto com JSON quanto com texto plano do sendBeacon
-		const body = await req.text();
-		const parsed = JSON.parse(body);
+		const raw = await req.text();
+		let parsed: any = {};
+		try {
+			parsed = JSON.parse(raw || "{}");
+		} catch {
+			return NextResponse.json({ error: "Corpo inválido" }, { status: 400 });
+		}
 		let { linkId, trafficSource, url, userId, title, type } = parsed as {
 			linkId?: number | string;
 			trafficSource?: string;
@@ -102,41 +105,47 @@ export async function POST(req: NextRequest) {
 		}
 
 		if (!cookiePreferences.analytics) {
-			await enqueueClickEvent({
-				linkId: Number(linkId),
-				device: "unknown",
-				userAgent: null,
-				country: null,
-				referrer: null,
-				createdAt: new Date().toISOString(),
-			});
+			try {
+				await enqueueClickEvent({
+					linkId: Number(linkId),
+					device: "unknown",
+					userAgent: null,
+					country: null,
+					referrer: null,
+					createdAt: new Date().toISOString(),
+				});
+			} catch {}
 			return NextResponse.json({
 				id: Number(linkId),
 				clicksCounter: currentCount,
 			});
 		}
 
-		// Detectar tipo de dispositivo de forma anônima (LGPD compliant)
+		try {
+			await ensureMonthlyPartitions();
+		} catch {}
+
 		const userAgent = getUserAgent(req);
 		const deviceType = detectDeviceType(userAgent);
 
-		// Obter país baseado no IP (sem rastrear usuário individualmente)
-		const clientIP = getClientIP(req);
-		const country = await getCountryFromIP(clientIP || "127.0.0.1");
+		let country: string | null = null;
+		try {
+			const clientIP = getClientIP(req);
+			country = await getCountryFromIP(clientIP || "127.0.0.1");
+		} catch {}
 
-		// Log para debug em produção
-
-		// Usar trafficSource do cliente ou fallback para direct
 		const normalizedReferrer = trafficSource || "direct";
 
-		await enqueueClickEvent({
-			linkId: Number(linkId),
-			device: deviceType,
-			userAgent,
-			country,
-			referrer: normalizedReferrer,
-			createdAt: new Date().toISOString(),
-		});
+		try {
+			await enqueueClickEvent({
+				linkId: Number(linkId),
+				device: deviceType,
+				userAgent,
+				country,
+				referrer: normalizedReferrer,
+				createdAt: new Date().toISOString(),
+			});
+		} catch {}
 
 		return NextResponse.json({
 			id: Number(linkId),

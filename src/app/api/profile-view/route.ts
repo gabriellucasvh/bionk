@@ -9,8 +9,10 @@ export const runtime = "nodejs";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
 	try {
-		await ensureMonthlyPartitions();
-		const { userId, trafficSource } = await request.json();
+		const raw = await request.text();
+		const parsed = JSON.parse(raw || "{}");
+		const userId = parsed?.userId;
+		const trafficSource = parsed?.trafficSource;
 		if (!userId) {
 			return NextResponse.json(
 				{ error: "UserId is required" },
@@ -25,6 +27,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 			return NextResponse.json({ message: "Analytics disabled" });
 		}
 
+		try {
+			await ensureMonthlyPartitions();
+		} catch {}
+
 		const userAgent = getUserAgent(request);
 		const deviceType = detectDeviceType(userAgent);
 
@@ -36,17 +42,19 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
 		const referrer = trafficSource || "direct";
 
-		await enqueueProfileViewEvent({
-			userId: String(userId),
-			device: deviceType,
-			userAgent,
-			country,
-			referrer,
-			createdAt: new Date().toISOString(),
-		});
+		try {
+			await enqueueProfileViewEvent({
+				userId: String(userId),
+				device: deviceType,
+				userAgent,
+				country,
+				referrer,
+				createdAt: new Date().toISOString(),
+			});
+		} catch {}
 
 		return NextResponse.json({ message: "Profile view recorded" });
 	} catch {
-		return NextResponse.json({ error: "Internal error" }, { status: 500 });
+		return NextResponse.json({ error: "Bad request" }, { status: 400 });
 	}
 }
