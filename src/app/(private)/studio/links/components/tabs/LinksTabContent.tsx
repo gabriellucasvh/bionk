@@ -177,6 +177,7 @@ const LinksTabContent = ({
 					event={handlers.originalEvent as any}
 					onClose={() => {
 						setIsAddingEvent(false);
+						handlers.setCreatingInSectionId(null);
 					}}
 					onCreated={async () => {
 						await mutateLinks();
@@ -187,6 +188,7 @@ const LinksTabContent = ({
 						await mutateMusics();
 						await mutateEvents();
 						setIsAddingEvent(false);
+						handlers.setCreatingInSectionId(null);
 					}}
 					onSaved={async () => {
 						await mutateLinks();
@@ -197,7 +199,9 @@ const LinksTabContent = ({
 						await mutateMusics();
 						await mutateEvents();
 						setIsAddingEvent(false);
+						handlers.setCreatingInSectionId(null);
 					}}
+					sectionId={handlers.creatingInSectionId as any}
 				/>
 			)}
 
@@ -259,6 +263,7 @@ const LinksTabContent = ({
 					setFormData,
 					existingSections,
 					handleAddNewLink: handlers.handleAddNewLink,
+					openAddContentModalForSection: handlers.openAddContentModalForSection,
 				}}
 				onAddLinkToSection={handlers.handleAddLinkToSection}
 				onArchiveImage={handlers.handleArchiveImage}

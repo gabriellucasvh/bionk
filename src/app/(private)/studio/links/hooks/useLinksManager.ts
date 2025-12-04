@@ -154,6 +154,9 @@ export const useLinksManager = (
 	const [isAddingEvent, setIsAddingEvent] = useState(false);
 	const [isAddingEventCountdown, setIsAddingEventCountdown] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [creatingInSectionId, setCreatingInSectionId] = useState<number | null>(
+		null
+	);
 	const [togglingEventId, setTogglingEventId] = useState<number | null>(null);
 	const [formData, setFormData] = useState<LinkFormData>(initialFormData);
 	const [sectionFormData, setSectionFormData] = useState<SectionFormData>(
@@ -198,6 +201,7 @@ export const useLinksManager = (
 		setIsAddingEvent(false);
 		setIsAddingEventCountdown(false);
 		setIsModalOpen(false);
+		setCreatingInSectionId(null);
 		setFormData(initialFormData);
 		setSectionFormData(initialSectionFormData);
 		setTextFormData(initialTextFormData);
@@ -1309,7 +1313,7 @@ export const useLinksManager = (
 			active: true,
 			archived: false,
 			order,
-			sectionId: null,
+			sectionId: musicFormData.sectionId ?? null,
 			userId: 0,
 			isDraft: true,
 			isMusic: true,
@@ -1332,6 +1336,16 @@ export const useLinksManager = (
 		setOriginalMusic(null);
 		setIsAddingMusic(false);
 		setIsModalOpen(false);
+	};
+
+	const openAddContentModalForSection = (sectionId: number) => {
+		setCreatingInSectionId(sectionId);
+		setFormData({ ...formData, sectionId });
+		setTextFormData({ ...textFormData, sectionId });
+		setVideoFormData({ ...videoFormData, sectionId });
+		setImageFormData({ ...imageFormData, sectionId });
+		setMusicFormData({ ...musicFormData, sectionId });
+		setIsModalOpen(true);
 	};
 
 	const handleMusicUpdate = async (id: number, payload: Partial<MusicItem>) => {
@@ -2186,6 +2200,7 @@ export const useLinksManager = (
 		isAddingImage,
 		isAddingMusic,
 		isModalOpen,
+		creatingInSectionId,
 		formData,
 		sectionFormData,
 		textFormData,
@@ -2205,6 +2220,7 @@ export const useLinksManager = (
 		setIsAddingImage,
 		setIsAddingMusic,
 		setIsModalOpen,
+		setCreatingInSectionId,
 		setFormData,
 		setSectionFormData,
 		setTextFormData,
@@ -2225,6 +2241,7 @@ export const useLinksManager = (
 		handleAddNewVideo,
 		handleAddNewImage,
 		handleAddNewMusic,
+		openAddContentModalForSection,
 		handleAddLinkToSection,
 		saveEditing,
 		handleDeleteLink,

@@ -15,17 +15,19 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 interface AddNewEventFormProps {
-	onCreated?: (id: number) => void;
-	onSaved?: (id: number) => void;
-	onClose?: () => void;
-	event?: import("../../types/links.types").EventItem;
+    onCreated?: (id: number) => void;
+    onSaved?: (id: number) => void;
+    onClose?: () => void;
+    event?: import("../../types/links.types").EventItem;
+    sectionId?: number | null;
 }
 
 const AddNewEventForm = ({
-	onCreated,
-	onSaved,
-	onClose,
-	event,
+    onCreated,
+    onSaved,
+    onClose,
+    event,
+    sectionId,
 }: AddNewEventFormProps) => {
 	const toLocalInputDate = (s?: string) => {
 		if (!s) {
@@ -77,27 +79,28 @@ const AddNewEventForm = ({
 		return t;
 	};
 
-	const handleSubmit = async () => {
-		if (!canSubmit()) {
-			setError("Preencha os campos obrigatórios");
-			return;
-		}
-		setLoading(true);
-		setError("");
-		const payload = {
-			title: title.trim(),
-			location: location.trim(),
-			eventDate,
-			eventTime,
-			descriptionShort: descriptionShort.trim() || undefined,
-			externalLink: externalLink.trim(),
-			coverImageUrl: coverImageUrl.trim() || undefined,
-		};
-		const res = await fetch(event ? `/api/events/${event.id}` : "/api/events", {
-			method: event ? "PUT" : "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(payload),
-		});
+    const handleSubmit = async () => {
+        if (!canSubmit()) {
+            setError("Preencha os campos obrigatórios");
+            return;
+        }
+        setLoading(true);
+        setError("");
+        const payload = {
+            title: title.trim(),
+            location: location.trim(),
+            eventDate,
+            eventTime,
+            descriptionShort: descriptionShort.trim() || undefined,
+            externalLink: externalLink.trim(),
+            coverImageUrl: coverImageUrl.trim() || undefined,
+            sectionId: sectionId ?? event?.sectionId ?? null,
+        };
+        const res = await fetch(event ? `/api/events/${event.id}` : "/api/events", {
+            method: event ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
 		setLoading(false);
 		if (!res.ok) {
 			setError(event ? "Falha ao salvar evento" : "Falha ao criar evento");

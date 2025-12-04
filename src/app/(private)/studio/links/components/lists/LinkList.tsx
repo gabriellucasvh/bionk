@@ -202,6 +202,10 @@ const LinkList = (props: LinkListProps) => {
 		useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
 	);
 
+	const topLevelItems = items.filter(
+		(item) => item.isSection || !(item as any).sectionId
+	);
+
 	// Resolve o item ativo para o DragOverlay, cobrindo itens dentro de seções
 	const activePreviewItem = (() => {
 		if (!activeId) {
@@ -295,7 +299,7 @@ const LinkList = (props: LinkListProps) => {
 				sensors={sensors}
 			>
 				<SortableContext
-					items={items.map((item) => {
+					items={topLevelItems.map((item) => {
 						if (item.isSection) {
 							return `section-${item.id}`;
 						}
@@ -319,7 +323,7 @@ const LinkList = (props: LinkListProps) => {
 					strategy={verticalListSortingStrategy}
 				>
 					<div className="space-y-3">
-						{items.map((item) => {
+						{topLevelItems.map((item) => {
 							let key = "";
 							let sortableId = "";
 
@@ -361,8 +365,10 @@ const LinkList = (props: LinkListProps) => {
 											};
 											return (
 												<SectionCard
+													existingSections={existingSections as any}
 													isDragging={isDragging}
 													isTogglingActive={togglingSectionId === item.id}
+													items={items as any}
 													linksManager={linksManager}
 													listeners={listeners}
 													onAddLinkToSection={onAddLinkToSection}

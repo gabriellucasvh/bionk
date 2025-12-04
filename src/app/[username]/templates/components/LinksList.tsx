@@ -178,8 +178,18 @@ export default function LinksList({
 		return contentArray.sort((a, b) => a.order - b.order);
 	};
 
-	const renderSectionHeader = (link: any, sectionId: number, index: number) => {
-		if (!link.section) {
+	const renderSectionHeader = (item: any, sectionId: number, index: number) => {
+		const sectionTitle = (() => {
+			const byList = (user.Section || []).find(
+				(s: any) => s.id === sectionId
+			)?.title;
+			if (byList) {
+				return byList;
+			}
+			return item.section?.title || null;
+		})();
+
+		if (!sectionTitle) {
 			return null;
 		}
 
@@ -189,7 +199,7 @@ export default function LinksList({
 				key={`section-${sectionId}-${index}`}
 			>
 				<h2 className="text-center font-bold text-xl" style={textStyle}>
-					{link.section.title}
+					{sectionTitle}
 				</h2>
 			</div>
 		);
@@ -211,7 +221,7 @@ export default function LinksList({
 			}
 		}
 
-		result.push(renderLink(link));
+		result.push(renderLink(link, index === firstLinkIndex));
 		return result;
 	};
 
@@ -508,9 +518,7 @@ export default function LinksList({
 
 				return (
 					<div className={needsSpacing ? "mb-8" : ""} key={`content-${index}`}>
-						{content.type === "link"
-							? renderLink(content.item as UserLink, index === firstLinkIndex)
-							: renderedContent}
+						{renderedContent}
 					</div>
 				);
 			})}

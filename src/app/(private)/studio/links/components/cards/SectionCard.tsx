@@ -7,6 +7,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Grip, MoreHorizontal, Plus, Trash2, Ungroup } from "lucide-react";
 import { useState } from "react";
+import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -16,12 +17,27 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import type { SectionItem } from "../../types/links.types";
+import type { UnifiedItem } from "../../hooks/useLinksManager";
+import type {
+	EventItem,
+	ImageItem,
+	LinkItem,
+	MusicItem,
+	SectionItem,
+	TextItem,
+	VideoItem,
+} from "../../types/links.types";
 import LinkCard from "../cards/LinkCard";
 import SortableItem from "../sortable/SortableItem";
+import EventCard from "./EventCard";
+import ImageCard from "./ImageCard";
+import MusicCard from "./MusicCard";
+import TextCard from "./TextCard";
+import VideoCard from "./VideoCard";
 
 interface SectionCardProps {
 	section: SectionItem;
+	items?: UnifiedItem[];
 	onSectionUpdate: (id: number, payload: Partial<SectionItem>) => void;
 	onSectionDelete: (id: number) => void;
 	onSectionUngroup: (id: number) => void;
@@ -44,10 +60,85 @@ interface SectionCardProps {
 	onUpdateCustomImage?: (id: number, imageUrl: string) => void;
 	onRemoveCustomImage?: (id: number) => void;
 	isTogglingActive?: boolean;
+	existingSections?: SectionItem[];
+	togglingLinkId?: number | null;
+	originalLink?: LinkItem | null;
+	onDeleteText?: (id: number) => void;
+	onArchiveText?: (id: number) => void;
+	onStartEditingText?: (id: number) => void;
+	onTextChange?: (
+		id: number,
+		field: "title" | "description" | "position" | "hasBackground" | "isCompact",
+		value: string | boolean
+	) => void;
+	onSaveEditingText?: (
+		id: number,
+		title: string,
+		description: string,
+		position: "left" | "center" | "right",
+		hasBackground: boolean,
+		isCompact: boolean
+	) => void;
+	onCancelEditingText?: (id: number) => void;
+	togglingTextId?: number | null;
+	originalText?: TextItem | null;
+	onDeleteVideo?: (id: number) => void;
+	onArchiveVideo?: (id: number) => void;
+	onStartEditingVideo?: (id: number) => void;
+	onVideoChange?: (
+		id: number,
+		field: "title" | "description" | "url",
+		value: string
+	) => void;
+	onSaveEditingVideo?: (
+		id: number,
+		title: string,
+		description: string,
+		url: string
+	) => void;
+	onCancelEditingVideo?: (id: number) => void;
+	togglingVideoId?: number | null;
+	originalVideo?: VideoItem | null;
+	onDeleteImage?: (id: number) => void;
+	onArchiveImage?: (id: number) => void;
+	onStartEditingImage?: (id: number) => void;
+	onImageChange?: (
+		id: number,
+		field: "title" | "description",
+		value: string
+	) => void;
+	onSaveEditingImage?: (id: number, payload: Partial<ImageItem>) => void;
+	onCancelEditingImage?: (id: number) => void;
+	togglingImageId?: number | null;
+	originalImage?: ImageItem | null;
+	onDeleteMusic?: (id: number) => void;
+	onArchiveMusic?: (id: number) => void;
+	onStartEditingMusic?: (id: number) => void;
+	onMusicChange?: (
+		id: number,
+		field: "title" | "url" | "usePreview",
+		value: string | boolean
+	) => void;
+	onSaveEditingMusic?: (
+		id: number,
+		title: string,
+		url: string,
+		usePreview: boolean
+	) => void;
+	onCancelEditingMusic?: (id: number) => void;
+	togglingMusicId?: number | null;
+	originalMusic?: MusicItem | null;
+	onDeleteEvent?: (id: number) => void;
+	onStartEditingEvent?: (id: number) => void;
+	handleSaveEditingEvent?: (id: number, payload: Partial<EventItem>) => void;
+	handleCancelEditingEvent?: (id: number) => void;
+	togglingEventId?: number | null;
+	originalEvent?: EventItem | null;
 }
 
 const SectionCard = ({
 	section,
+	items,
 	onSectionUpdate,
 	onSectionDelete,
 	onSectionUngroup,
@@ -59,10 +150,65 @@ const SectionCard = ({
 	onCancelNewSection,
 	linksManager,
 	isTogglingActive,
+	existingSections,
 	...linkCardProps
 }: SectionCardProps) => {
 	const [title, setTitle] = useState(section.title || "");
 	const isDraftSection = !section.dbId;
+	const sectionNumericId =
+		typeof section.dbId === "number" && Number.isFinite(section.dbId)
+			? section.dbId
+			: Number(section.id);
+	const sectionStringId = (section.id ?? "").toString();
+	const childrenFromItems: UnifiedItem[] = (items || []).filter((i) => {
+		const raw = (i as any).sectionId;
+		if (raw === null || typeof raw === "undefined") {
+			return false;
+		}
+		if (typeof raw === "number") {
+			if (Number.isFinite(raw) && raw === sectionNumericId) {
+				return true;
+			}
+			if (String(raw) === sectionStringId) {
+				return true;
+			}
+			return false;
+		}
+		if (typeof raw === "string") {
+			if (raw === sectionStringId) {
+				return true;
+			}
+			const asNum = Number(raw);
+			if (Number.isFinite(asNum) && asNum === sectionNumericId) {
+				return true;
+			}
+			return false;
+		}
+		return false;
+	});
+	const otherChildren: UnifiedItem[] = childrenFromItems.filter((c: any) => {
+		if (c.isSection) {
+			return false;
+		}
+		if (
+			c.isText ||
+			c.isVideo ||
+			(c as any).isImage ||
+			(c as any).isMusic ||
+			(c as any).isEvent
+		) {
+			return true;
+		}
+		return false;
+	});
+	const children: UnifiedItem[] = [
+		...(section.links || []),
+		...otherChildren,
+	].sort((a: any, b: any) => {
+		const ao = typeof a.order === "number" ? a.order : 0;
+		const bo = typeof b.order === "number" ? b.order : 0;
+		return ao - bo;
+	});
 	return (
 		<section className="space-y-4 rounded-3xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
 			{/* Header reorganizado para dispositivos móveis */}
@@ -114,23 +260,24 @@ const SectionCard = ({
 					)}
 				</div>
 
-				{/* Segunda linha: Botão adicionar link e Toggle ativo/inativo */}
+				{/* Segunda linha: Botão adicionar conteúdo e Toggle ativo/inativo */}
 				<div className="flex flex-wrap items-center justify-between gap-3">
-					<Button
+					<BaseButton
 						className="h-8 flex-shrink-0 rounded-full"
 						disabled={isDraftSection}
 						onClick={async () => {
-							if (onAddLinkToSection) {
+							if (linksManager?.openAddContentModalForSection) {
+								linksManager.openAddContentModalForSection(section.dbId);
+							} else if (onAddLinkToSection) {
 								await onAddLinkToSection(section.dbId);
 							}
 						}}
-						size="sm"
-						variant="outline"
+						variant="studio"
 					>
 						<Plus className="mr-1 h-3 w-3" />
-						<span className="hidden sm:inline">Adicionar link</span>
+						<span className="hidden sm:inline">Adicionar Conteúdo</span>
 						<span className="sm:hidden">Adicionar</span>
-					</Button>
+					</BaseButton>
 					<div className="flex flex-shrink-0 items-center space-x-2">
 						{isDraftSection ? null : (
 							<>
@@ -183,28 +330,211 @@ const SectionCard = ({
 			)}
 
 			{!isDragging && (
-					<SortableContext
-						items={section.links.map((l) => `link-${l.id}`)}
-						strategy={verticalListSortingStrategy}
-					>
-						<div className="space-y-3">
-							{section.links.map((linkItem) => (
-								<SortableItem id={`link-${linkItem.id}`} key={linkItem.id}>
+				<SortableContext
+					items={children.map((child) => {
+						if ((child as any).isSection) {
+							return `section-${child.id}`;
+						}
+						if ((child as any).isText) {
+							return `text-${child.id}`;
+						}
+						if ((child as any).isVideo) {
+							return `video-${child.id}`;
+						}
+						if ((child as any).isImage) {
+							return `image-${child.id}`;
+						}
+						if ((child as any).isMusic) {
+							return `music-${child.id}`;
+						}
+						if ((child as any).isEvent) {
+							return `event-${child.id}`;
+						}
+						return `link-${child.id}`;
+					})}
+					strategy={verticalListSortingStrategy}
+				>
+					<div className="space-y-3">
+						{children.map((child) => {
+							const childIdStr = (() => {
+								if ((child as any).isText) {
+									return `text-${child.id}`;
+								}
+								if ((child as any).isVideo) {
+									return `video-${child.id}`;
+								}
+								if ((child as any).isImage) {
+									return `image-${child.id}`;
+								}
+								if ((child as any).isMusic) {
+									return `music-${child.id}`;
+								}
+								if ((child as any).isEvent) {
+									return `event-${child.id}`;
+								}
+								return `link-${child.id}`;
+							})();
+							return (
+								<SortableItem id={childIdStr} key={childIdStr}>
 									{({
-										listeners: linkListeners,
-										setActivatorNodeRef: linkSetActivatorNodeRef,
-									}) => (
-										<LinkCard
-											link={linkItem}
-											listeners={linkListeners}
-											setActivatorNodeRef={linkSetActivatorNodeRef}
-											{...linkCardProps}
-										/>
-									)}
+										listeners: childListeners,
+										setActivatorNodeRef: childSetRef,
+									}) => {
+										if ((child as any).isText) {
+											return (
+												<TextCard
+													isDragging={false}
+													listeners={childListeners}
+													onArchiveText={linkCardProps.onArchiveText as any}
+													onCancelEditingText={
+														linkCardProps.onCancelEditingText as any
+													}
+													onDeleteText={linkCardProps.onDeleteText as any}
+													onSaveEditingText={
+														linkCardProps.onSaveEditingText as any
+													}
+													onStartEditingText={
+														linkCardProps.onStartEditingText as any
+													}
+													onTextChange={linkCardProps.onTextChange as any}
+													onToggleActive={linkCardProps.onToggleActive as any}
+													setActivatorNodeRef={childSetRef}
+													text={child as any}
+												/>
+											);
+										}
+										if ((child as any).isVideo) {
+											return (
+												<VideoCard
+													isDragging={false}
+													isTogglingActive={
+														linkCardProps.togglingVideoId === child.id
+													}
+													listeners={childListeners}
+													onArchiveVideo={linkCardProps.onArchiveVideo as any}
+													onCancelEditingVideo={
+														linkCardProps.onCancelEditingVideo as any
+													}
+													onDeleteVideo={linkCardProps.onDeleteVideo as any}
+													onSaveEditingVideo={
+														linkCardProps.onSaveEditingVideo as any
+													}
+													onStartEditingVideo={
+														linkCardProps.onStartEditingVideo as any
+													}
+													onToggleActive={linkCardProps.onToggleActive as any}
+													onVideoChange={linkCardProps.onVideoChange as any}
+													originalVideo={linkCardProps.originalVideo as any}
+													setActivatorNodeRef={childSetRef}
+													video={child as any}
+												/>
+											);
+										}
+										if ((child as any).isImage) {
+											return (
+												<ImageCard
+													existingSections={existingSections as any}
+													image={child as any}
+													isDragging={false}
+													isTogglingActive={
+														linkCardProps.togglingImageId === child.id
+													}
+													listeners={childListeners}
+													onArchiveImage={linkCardProps.onArchiveImage as any}
+													onCancelEditingImage={
+														linkCardProps.onCancelEditingImage as any
+													}
+													onDeleteImage={linkCardProps.onDeleteImage as any}
+													onImageChange={linkCardProps.onImageChange as any}
+													onSaveEditingImage={
+														linkCardProps.onSaveEditingImage as any
+													}
+													onStartEditingImage={
+														linkCardProps.onStartEditingImage as any
+													}
+													onToggleActive={linkCardProps.onToggleActive as any}
+													originalImage={linkCardProps.originalImage as any}
+													setActivatorNodeRef={childSetRef}
+												/>
+											);
+										}
+										if ((child as any).isMusic) {
+											return (
+												<MusicCard
+													isDragging={false}
+													isTogglingActive={
+														linkCardProps.togglingMusicId === child.id
+													}
+													listeners={childListeners}
+													music={child as any}
+													onArchiveMusic={linkCardProps.onArchiveMusic as any}
+													onCancelEditingMusic={
+														linkCardProps.onCancelEditingMusic as any
+													}
+													onDeleteMusic={linkCardProps.onDeleteMusic as any}
+													onMusicChange={linkCardProps.onMusicChange as any}
+													onSaveEditingMusic={
+														linkCardProps.onSaveEditingMusic as any
+													}
+													onStartEditingMusic={
+														linkCardProps.onStartEditingMusic as any
+													}
+													onToggleActive={linkCardProps.onToggleActive as any}
+													originalMusic={linkCardProps.originalMusic as any}
+													setActivatorNodeRef={childSetRef}
+												/>
+											);
+										}
+										if ((child as any).isEvent) {
+											return (
+												<EventCard
+													event={child as any}
+													isDragging={false}
+													isTogglingActive={
+														linkCardProps.togglingEventId === child.id
+													}
+													listeners={childListeners}
+													onCancelEditingEvent={
+														linkCardProps.handleCancelEditingEvent as any
+													}
+													onDeleteEvent={linkCardProps.onDeleteEvent as any}
+													onSaveEditingEvent={
+														linkCardProps.handleSaveEditingEvent as any
+													}
+													onStartEditingEvent={
+														linkCardProps.onStartEditingEvent as any
+													}
+													onToggleActive={linkCardProps.onToggleActive as any}
+													originalEvent={linkCardProps.originalEvent as any}
+													setActivatorNodeRef={childSetRef}
+												/>
+											);
+										}
+										return (
+											<LinkCard
+												archivingLinkId={linkCardProps.archivingLinkId as any}
+												isTogglingActive={
+													linkCardProps.togglingLinkId === child.id
+												}
+												link={child as any}
+												listeners={childListeners}
+												onRemoveCustomImage={
+													linkCardProps.onRemoveCustomImage as any
+												}
+												onUpdateCustomImage={
+													linkCardProps.onUpdateCustomImage as any
+												}
+												originalLink={linkCardProps.originalLink as any}
+												setActivatorNodeRef={childSetRef}
+												{...linkCardProps}
+											/>
+										);
+									}}
 								</SortableItem>
-							))}
-						</div>
-					</SortableContext>
+							);
+						})}
+					</div>
+				</SortableContext>
 			)}
 		</section>
 	);
