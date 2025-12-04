@@ -56,7 +56,7 @@ const VerPerfilMobile = () => {
 		<Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
 			<DialogTrigger asChild>
 				<BaseButton
-					className="lg:hidden"
+					className="md:hidden"
 					disabled={!username}
 					size="sm"
 					variant="green"
