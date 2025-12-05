@@ -1,10 +1,17 @@
 "use client";
 
 import { format } from "date-fns";
-import { useState } from "react";
+import { Upload } from "lucide-react";
+import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,6 +20,8 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
+import MobileBottomSheet from "../../components/shared/MobileBottomSheet";
+import { useDragGesture } from "../../hooks/useDragGesture";
 
 const REJECT_URL = /^https:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
 const ACCEPTED_IMAGE_TYPES = [
@@ -84,6 +93,61 @@ const AddNewEventForm = ({
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string>("");
 	const [isUploadingCover, setIsUploadingCover] = useState(false);
+	const [isUploadOpen, setIsUploadOpen] = useState(false);
+	const [isAnimating, setIsAnimating] = useState(false);
+	const [isMobile, setIsMobile] = useState(false);
+	const [dragActive, setDragActive] = useState(false);
+
+	const {
+		isDragging,
+		dragY,
+		isClosing,
+		handleMouseDown,
+		handleTouchStart,
+		handleMouseMove,
+		handleTouchMove,
+		handleMouseUp,
+		handleTouchEnd,
+	} = useDragGesture(() => setIsUploadOpen(false));
+
+	const checkMobile = () => {
+		setIsMobile(
+			typeof window !== "undefined" ? window.innerWidth < 640 : false
+		);
+	};
+
+	useEffect(() => {
+		checkMobile();
+		const onResize = () => checkMobile();
+		window.addEventListener("resize", onResize);
+		return () => window.removeEventListener("resize", onResize);
+	}, []);
+
+	useEffect(() => {
+		if (isUploadOpen && isMobile) {
+			setIsAnimating(true);
+			document.addEventListener("mousemove", handleMouseMove as any);
+			document.addEventListener("mouseup", handleMouseUp as any);
+			document.addEventListener("touchmove", handleTouchMove as any);
+			document.addEventListener("touchend", handleTouchEnd as any);
+		} else {
+			setIsAnimating(false);
+		}
+
+		return () => {
+			document.removeEventListener("mousemove", handleMouseMove as any);
+			document.removeEventListener("mouseup", handleMouseUp as any);
+			document.removeEventListener("touchmove", handleTouchMove as any);
+			document.removeEventListener("touchend", handleTouchEnd as any);
+		};
+	}, [
+		isUploadOpen,
+		isMobile,
+		handleMouseMove,
+		handleMouseUp,
+		handleTouchMove,
+		handleTouchEnd,
+	]);
 
 	const canSubmit = () => {
 		if (!(title.trim() && location.trim() && eventDate && eventTime)) {
@@ -163,6 +227,69 @@ const AddNewEventForm = ({
 		}
 		if (onClose) {
 			onClose();
+		}
+	};
+
+	const handleOpenUpload = () => {
+		setIsUploadOpen(true);
+	};
+
+	const handleDrop = async (e: React.DragEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setDragActive(false);
+		const files = e.dataTransfer.files;
+		if (!files || files.length === 0) {
+			return;
+		}
+		await uploadCover(files[0]);
+	};
+
+	const handleDrag = (e: React.DragEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (e.type === "dragenter" || e.type === "dragover") {
+			setDragActive(true);
+		} else if (e.type === "dragleave") {
+			setDragActive(false);
+		}
+	};
+
+	const uploadCover = async (file: File) => {
+		if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+			setError("Formato não suportado para imagem de capa.");
+			return;
+		}
+		if (file.size > MAX_IMAGE_SIZE_BYTES) {
+			setError("Imagem de capa muito grande (máx. 10MB).");
+			return;
+		}
+		setError("");
+		setIsUploadingCover(true);
+		try {
+			const form = new FormData();
+			form.append("file", file);
+			let resp: Response;
+			if (event?.id) {
+				resp = await fetch(`/api/events/${event.id}/upload`, {
+					method: "POST",
+					body: form,
+				});
+			} else {
+				resp = await fetch("/api/images/upload", {
+					method: "POST",
+					body: form,
+				});
+			}
+			const json = await resp.json();
+			if (resp.ok && json?.url) {
+				setCoverImageUrl(json.url);
+				setIsUploadOpen(false);
+			} else {
+				setError(json?.error || "Falha no upload da imagem de capa");
+			}
+		} finally {
+			setIsUploadingCover(false);
 		}
 	};
 
@@ -276,86 +403,132 @@ const AddNewEventForm = ({
 							<div className="grid gap-2">
 								<Label>Imagem de capa</Label>
 								<div className="space-y-2">
-									<Input
-										onChange={(e) => setCoverImageUrl(e.target.value)}
-										placeholder="Ex: https://cdn.exemplo.com/capa.jpg"
-										value={coverImageUrl}
-									/>
-									<div className="flex items-center gap-2">
-										<input
-											accept={ACCEPTED_IMAGE_TYPES.join(",")}
-											className="hidden"
-											onChange={async (e) => {
-												const files = e.target.files;
-												if (!files || files.length === 0) {
-													return;
-												}
-												const file = files[0];
-												if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-													setError(
-														"Formato não suportado para imagem de capa."
-													);
-													return;
-												}
-												if (file.size > MAX_IMAGE_SIZE_BYTES) {
-													setError("Imagem de capa muito grande (máx. 10MB).");
-													return;
-												}
-												setError("");
-												setIsUploadingCover(true);
-												try {
-													const form = new FormData();
-													form.append("file", file);
-													let uploadUrl = "";
-													let resp: Response;
-													if (event?.id) {
-														resp = await fetch(
-															`/api/events/${event.id}/upload`,
-															{
-																method: "POST",
-																body: form,
-															}
-														);
-													} else {
-														resp = await fetch("/api/images/upload", {
-															method: "POST",
-															body: form,
-														});
-													}
-													const json = await resp.json();
-													if (resp.ok && json?.url) {
-														uploadUrl = json.url;
-														setCoverImageUrl(uploadUrl);
-													} else {
-														setError(
-															json?.error || "Falha no upload da imagem de capa"
-														);
-													}
-												} finally {
-													setIsUploadingCover(false);
-												}
-											}}
-											type="file"
-										/>
-										<BaseButton
-											className="px-3"
-											disabled={isUploadingCover}
-											onClick={(e) => {
-												const input = e.currentTarget
-													.previousSibling as HTMLInputElement;
-												if (input && input.type === "file") {
-													input.click();
-												}
-											}}
-											type="button"
-										>
-											{isUploadingCover ? "Enviando..." : "Enviar imagem"}
-										</BaseButton>
-									</div>
+									<BaseButton
+										className="px-3"
+										disabled={isUploadingCover}
+										onClick={handleOpenUpload}
+										type="button"
+									>
+										{isUploadingCover ? "Enviando..." : "Adicionar imagem"}
+									</BaseButton>
 								</div>
 							</div>
 						</div>
 					</div>
+
+					{error && <div className="text-red-600 text-sm">{error}</div>}
+
+					{!isMobile && (
+						<Dialog
+							onOpenChange={(v) => setIsUploadOpen(v)}
+							open={isUploadOpen}
+						>
+							<DialogContent className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 shadow-xl sm:max-w-lg">
+								<DialogHeader>
+									<DialogTitle className="text-center font-bold text-gray-900 text-xl dark:text-white">
+										Enviar imagem de capa
+									</DialogTitle>
+								</DialogHeader>
+								<div className="space-y-4">
+									<div
+										className={`relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-10 text-center transition-colors ${
+											dragActive
+												? "border-blue-500 bg-blue-50"
+												: "border-gray-300 hover:border-gray-400"
+										}`}
+										onClick={() =>
+											document
+												.getElementById("event-cover-upload-input")
+												?.click()
+										}
+										onDragEnter={handleDrag}
+										onDragLeave={handleDrag}
+										onDragOver={handleDrag}
+										onDrop={handleDrop}
+										role="none"
+									>
+										<Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+										<p className="mb-2 font-medium text-gray-700 dark:text-white">
+											Arraste uma imagem ou clique para selecionar
+										</p>
+										<p className="text-gray-500 text-sm dark:text-white/80">
+											Formatos: JPG, PNG, GIF, SVG, WebP, AVIF
+										</p>
+										<input
+											accept={ACCEPTED_IMAGE_TYPES.join(",")}
+											className="hidden"
+											id="event-cover-upload-input"
+											onChange={(e) => {
+												const f = e.target.files?.[0];
+												if (!f) {
+													return;
+												}
+												uploadCover(f);
+											}}
+											type="file"
+										/>
+									</div>
+								</div>
+							</DialogContent>
+						</Dialog>
+					)}
+
+					{isMobile && (
+						<MobileBottomSheet
+							dragY={dragY}
+							isAnimating={isAnimating}
+							isClosing={isClosing}
+							isDragging={isDragging}
+							isOpen={isUploadOpen}
+							onClose={() => setIsUploadOpen(false)}
+							onMouseDown={handleMouseDown}
+							onTouchStart={handleTouchStart}
+						>
+							<div className="py-2">
+								<div className="text-center font-semibold text-base">
+									Enviar imagem de capa
+								</div>
+								<div
+									className={`relative mt-4 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-10 text-center transition-colors ${
+										dragActive
+											? "border-blue-500 bg-blue-50"
+											: "border-gray-300 hover:border-gray-400"
+									}`}
+									onClick={() =>
+										document
+											.getElementById("event-cover-upload-input-mobile")
+											?.click()
+									}
+									onDragEnter={handleDrag}
+									onDragLeave={handleDrag}
+									onDragOver={handleDrag}
+									onDrop={handleDrop}
+									role="none"
+								>
+									<Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+									<p className="mb-2 font-medium text-gray-700 dark:text-white">
+										Arraste uma imagem ou toque para selecionar
+									</p>
+									<p className="text-gray-500 text-sm dark:text-white/80">
+										Formatos: JPG, PNG, GIF, SVG, WebP, AVIF
+									</p>
+									<input
+										accept={ACCEPTED_IMAGE_TYPES.join(",")}
+										className="hidden"
+										id="event-cover-upload-input-mobile"
+										onChange={(e) => {
+											const f = e.target.files?.[0];
+											if (!f) {
+												return;
+											}
+											uploadCover(f);
+										}}
+										type="file"
+									/>
+								</div>
+							</div>
+						</MobileBottomSheet>
+					)}
 					{error && <div className="text-red-600 text-sm">{error}</div>}
 				</section>
 			</div>
