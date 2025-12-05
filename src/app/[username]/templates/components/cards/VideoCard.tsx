@@ -4,31 +4,31 @@ import type { CustomPresets } from "./utils/style";
 import { buildCompactButtonStyle, toForeground } from "./utils/style";
 
 interface VideoCardProps {
-    id: number;
-    title?: string;
-    description?: string;
-    type: string;
-    url: string;
-    thumbnailUrl?: string | null;
-    className?: string;
-    classNames?: {
-        name?: string;
-        bio?: string;
-    };
-    customPresets?: CustomPresets;
-    onPlayClick?: () => void;
+	id: number;
+	title?: string;
+	description?: string;
+	type: string;
+	url: string;
+	thumbnailUrl?: string | null;
+	className?: string;
+	classNames?: {
+		name?: string;
+		bio?: string;
+	};
+	customPresets?: CustomPresets;
+	onPlayClick?: () => void;
 }
 
 export default function VideoCard({
-    title,
-    description,
-    type,
-    url,
-    thumbnailUrl,
-    className = "",
-    classNames,
-    customPresets,
-    onPlayClick,
+	title,
+	description,
+	type,
+	url,
+	thumbnailUrl,
+	className = "",
+	classNames,
+	customPresets,
+	onPlayClick,
 }: VideoCardProps) {
 	const isTikTok = type === "tiktok";
 	const videoContainerClass = isTikTok ? "flex justify-center" : "";
@@ -62,45 +62,66 @@ export default function VideoCard({
 		borderBottomRightRadius: `${cornerValue}px`,
 	} as React.CSSProperties;
 
+	const baseStyle = customPresets
+		? (buildCompactButtonStyle(customPresets) as any)
+		: ({ backgroundColor: buttonColor } as any);
+	const baseBorder = (baseStyle as any).border;
+	const baseBg = (baseStyle as any).backgroundColor;
+
+	const topStyle: React.CSSProperties = {
+		...(hasInfoArea ? topRadiusStyle : fullRadiusStyle),
+		backgroundColor: baseBg,
+	};
+	if (baseBorder) {
+		if (hasInfoArea) {
+			(topStyle as any).borderTop = baseBorder;
+			(topStyle as any).borderLeft = baseBorder;
+			(topStyle as any).borderRight = baseBorder;
+		} else {
+			(topStyle as any).border = baseBorder;
+		}
+	}
+
 	return (
 		<div className={`w-full pb-4 ${className}`}>
 			<div
-				className={`${videoContainerClass} overflow-hidden bg-black`}
-				style={hasInfoArea ? topRadiusStyle : fullRadiusStyle}
+				className={`${videoContainerClass} overflow-hidden`}
+				style={topStyle}
 			>
-                <VideoPlayer
-                    className={
-                        hasInfoArea ? `rounded-none ${videoPlayerClass}` : videoPlayerClass
-                    }
-                    customButtonCorners={
-                        hasInfoArea ? undefined : customPresets?.customButtonCorners
-                    }
-                    title={title}
-                    type={type}
-                    url={url}
-                    thumbnailUrl={thumbnailUrl || undefined}
-                    onPlayClick={onPlayClick}
-                />
+				<VideoPlayer
+					className={
+						hasInfoArea ? `rounded-none ${videoPlayerClass}` : videoPlayerClass
+					}
+					customButtonCorners={
+						hasInfoArea ? undefined : customPresets?.customButtonCorners
+					}
+					onPlayClick={onPlayClick}
+					thumbnailUrl={thumbnailUrl || undefined}
+					title={title}
+					type={type}
+					url={url}
+				/>
 			</div>
 			{hasInfoArea && (
 				<div
 					className="px-4 py-3 text-center"
 					style={{
 						...(() => {
-							const baseStyle = customPresets
+							const infoAreaBaseStyle = customPresets
 								? buildCompactButtonStyle(customPresets)
 								: { backgroundColor: buttonColor };
-							const { border: baseBorder, ...restBase } = baseStyle as any;
+							const { border: infoAreaBorder, ...infoAreaRest } =
+								infoAreaBaseStyle as any;
 							const style: React.CSSProperties = {
-								...restBase,
+								...infoAreaRest,
 								borderRadius: 0,
 								...bottomRadiusStyle,
 								borderTop: "none",
 							};
-							if (baseBorder) {
-								(style as any).borderLeft = baseBorder;
-								(style as any).borderRight = baseBorder;
-								(style as any).borderBottom = baseBorder;
+							if (infoAreaBorder) {
+								(style as any).borderLeft = infoAreaBorder;
+								(style as any).borderRight = infoAreaBorder;
+								(style as any).borderBottom = infoAreaBorder;
 							}
 							const btnStyle = customPresets?.customButtonStyle || "";
 							if (btnStyle === "neon") {
