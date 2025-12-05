@@ -33,7 +33,7 @@ logs.txt
 tasks.md
 assigntrafficsources.js
 .cursorrules
-
+services.txt
 # env files (can opt-in for committing if needed)
 .env*
 

@@ -1566,6 +1566,13 @@ export const useLinksManager = (
 		await mutateEvents();
 	};
 
+	const handleArchiveEvent = async (id: number) => {
+		setUnifiedItems((prev) =>
+			prev.filter((i) => !(i as any).isEvent || i.id !== id)
+		);
+		await handleEventUpdate(id, { active: false });
+	};
+
 	const handleStartEditingEvent = (id: number) => {
 		const ev = unifiedItems.find((i) => (i as any).isEvent && i.id === id) as
 			| EventItem
@@ -2269,6 +2276,7 @@ export const useLinksManager = (
 		handleSaveEditingVideo,
 		handleCancelEditingVideo,
 		handleDeleteEvent,
+		handleArchiveEvent,
 		handleStartEditingEvent,
 		handleSaveEditingEvent,
 		handleCancelEditingEvent,

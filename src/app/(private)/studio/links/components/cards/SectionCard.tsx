@@ -130,10 +130,11 @@ interface SectionCardProps {
 	originalMusic?: MusicItem | null;
 	onDeleteEvent?: (id: number) => void;
 	onStartEditingEvent?: (id: number) => void;
-	handleSaveEditingEvent?: (id: number, payload: Partial<EventItem>) => void;
-	handleCancelEditingEvent?: (id: number) => void;
-	togglingEventId?: number | null;
-	originalEvent?: EventItem | null;
+    handleSaveEditingEvent?: (id: number, payload: Partial<EventItem>) => void;
+    handleCancelEditingEvent?: (id: number) => void;
+    togglingEventId?: number | null;
+    originalEvent?: EventItem | null;
+    onArchiveEvent?: (id: number) => void;
 }
 
 const SectionCard = ({
@@ -485,31 +486,32 @@ const SectionCard = ({
 												/>
 											);
 										}
-										if ((child as any).isEvent) {
-											return (
-												<EventCard
-													event={child as any}
-													isDragging={false}
-													isTogglingActive={
-														linkCardProps.togglingEventId === child.id
-													}
-													listeners={childListeners}
-													onCancelEditingEvent={
-														linkCardProps.handleCancelEditingEvent as any
-													}
-													onDeleteEvent={linkCardProps.onDeleteEvent as any}
-													onSaveEditingEvent={
-														linkCardProps.handleSaveEditingEvent as any
-													}
-													onStartEditingEvent={
-														linkCardProps.onStartEditingEvent as any
-													}
-													onToggleActive={linkCardProps.onToggleActive as any}
-													originalEvent={linkCardProps.originalEvent as any}
-													setActivatorNodeRef={childSetRef}
-												/>
-											);
-										}
+                                        if ((child as any).isEvent) {
+                                            return (
+                                                <EventCard
+                                                    event={child as any}
+                                                    isDragging={false}
+                                                    isTogglingActive={
+                                                        linkCardProps.togglingEventId === child.id
+                                                    }
+                                                    listeners={childListeners}
+                                                    onCancelEditingEvent={
+                                                        linkCardProps.handleCancelEditingEvent as any
+                                                    }
+                                                    onDeleteEvent={linkCardProps.onDeleteEvent as any}
+                                                    onSaveEditingEvent={
+                                                        linkCardProps.handleSaveEditingEvent as any
+                                                    }
+                                                    onStartEditingEvent={
+                                                        linkCardProps.onStartEditingEvent as any
+                                                    }
+                                                    onArchiveEvent={linkCardProps.onArchiveEvent as any}
+                                                    onToggleActive={linkCardProps.onToggleActive as any}
+                                                    originalEvent={linkCardProps.originalEvent as any}
+                                                    setActivatorNodeRef={childSetRef}
+                                                />
+                                            );
+                                        }
 										return (
 											<LinkCard
 												archivingLinkId={linkCardProps.archivingLinkId as any}

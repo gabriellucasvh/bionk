@@ -116,9 +116,9 @@ const DisplayView = ({
 		onStartEditingImage?.(image.id);
 	};
 
-	const handleArchive = () => {
-		onArchiveImage?.(image.id);
-	};
+    const handleArchive = () => {
+        return;
+    };
 
 	const handleDelete = () => {
 		onDeleteImage?.(image.id);
@@ -269,21 +269,21 @@ const DisplayView = ({
 								<MoreVertical className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem onClick={handleStartEditing}>
-								<Edit className="mr-2 h-4 w-4" /> Editar
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-							<DropdownMenuItem onClick={handleArchive}>
-								<Archive className="mr-2 h-4 w-4" /> Arquivar
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								className="text-destructive"
-								onClick={handleDelete}
-							>
-								<Trash2 className="mr-2 h-4 w-4" /> Excluir
-							</DropdownMenuItem>
-						</DropdownMenuContent>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={handleStartEditing}>
+                                <Edit className="mr-2 h-4 w-4" /> Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem disabled>
+                                <Archive className="mr-2 h-4 w-4" /> Arquivar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={handleDelete}
+                            >
+                                <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
 					</DropdownMenu>
 				</div>
 			</div>

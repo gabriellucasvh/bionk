@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	asChild?: boolean;
 	loading?: boolean;
-	variant?: "default" | "white" | "green" | "outline" | "link" | "sky" | "studio";
+	variant?: "default" | "white" | "green" | "outline" | "link" | "sky" | "studio" | "destructive";
 	children: ReactNode;
 	fullWidth?: boolean;
 	size?: "default" | "sm" | "lg" | "icon";
@@ -32,6 +32,8 @@ export function BaseButton({
 		studio: "bg-sky-500 hover:bg-sky-400 text-white",
 		white: "bg-white hover:bg-zinc-200 text-black border border-gray-200",
 		green: "bg-green-500 hover:bg-green-600 text-white border border-green-500",
+		destructive:
+					"bg-red-500 text-white shadow-xs hover:bg-red-500/80 focus-visible:ring-red-500/20 ",
 		outline:
 			"bg-transparent hover:bg-gray-100 border border-black text-black dark:border-white dark:text-white",
 		link: "bg-transparent hover:underline text-black dark:text-white",

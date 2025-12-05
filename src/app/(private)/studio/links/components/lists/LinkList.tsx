@@ -138,10 +138,11 @@ interface LinkListProps {
 	originalMusic?: MusicItem | null;
 	existingSections?: SectionItem[];
 	onDeleteEvent?: (id: number) => void;
-	onStartEditingEvent?: (id: number) => void;
-	handleSaveEditingEvent?: (id: number, payload: Partial<EventItem>) => void;
-	handleCancelEditingEvent?: (id: number) => void;
-	originalEvent?: EventItem | null;
+    onStartEditingEvent?: (id: number) => void;
+    handleSaveEditingEvent?: (id: number, payload: Partial<EventItem>) => void;
+    handleCancelEditingEvent?: (id: number) => void;
+    originalEvent?: EventItem | null;
+    onArchiveEvent?: (id: number) => void;
 }
 
 const LinkList = (props: LinkListProps) => {
@@ -180,6 +181,7 @@ const LinkList = (props: LinkListProps) => {
 		handleSaveEditingEvent,
 		handleCancelEditingEvent,
 		existingSections,
+        // Handlers e estados de Música (antes ausentes)
 		// Handlers e estados de Música (antes ausentes)
 		onArchiveMusic,
 		onCancelEditingMusic,
@@ -190,6 +192,7 @@ const LinkList = (props: LinkListProps) => {
 		originalMusic,
 		togglingMusicId,
 		togglingEventId,
+		onArchiveEvent,
 		...cardProps
 	} = props;
 
@@ -466,21 +469,22 @@ const LinkList = (props: LinkListProps) => {
 
 										if ((item as any).isEvent) {
 											return (
-												<EventCard
-													event={item as any}
-													isDragging={isDragging}
-													isTogglingActive={togglingEventId === item.id}
-													listeners={listeners}
-													onCancelEditingEvent={handleCancelEditingEvent as any}
-													onDeleteEvent={cardProps.onDeleteEvent as any}
-													onSaveEditingEvent={handleSaveEditingEvent as any}
-													onStartEditingEvent={
-														cardProps.onStartEditingEvent as any
-													}
-													onToggleActive={cardProps.onToggleActive}
-													originalEvent={originalEvent}
-													setActivatorNodeRef={setActivatorNodeRef}
-												/>
+                                            <EventCard
+                                                event={item as any}
+                                                isDragging={isDragging}
+                                                isTogglingActive={togglingEventId === item.id}
+                                                listeners={listeners}
+                                                onCancelEditingEvent={handleCancelEditingEvent as any}
+                                                onDeleteEvent={cardProps.onDeleteEvent as any}
+                                                onSaveEditingEvent={handleSaveEditingEvent as any}
+                                                onStartEditingEvent={
+                                                    cardProps.onStartEditingEvent as any
+                                                }
+                                                onArchiveEvent={onArchiveEvent as any}
+                                                onToggleActive={cardProps.onToggleActive}
+                                                originalEvent={originalEvent}
+                                                setActivatorNodeRef={setActivatorNodeRef}
+                                            />
 											);
 										}
 
