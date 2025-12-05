@@ -140,7 +140,7 @@ export async function GET(req: NextRequest) {
 		const events = await prisma.event.findMany({
 			where: {
 				userId: session.user.id,
-				active: status === "archived" ? false : true,
+				active: status !== "archived",
 			},
 			orderBy: { order: "asc" },
 			select: {
