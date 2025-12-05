@@ -108,17 +108,12 @@ const DisplayView = ({
 	setActivatorNodeRef,
 	onToggleActive,
 	onStartEditingImage,
-	onArchiveImage,
 	onDeleteImage,
 	isTogglingActive,
 }: ImageCardProps) => {
 	const handleStartEditing = () => {
 		onStartEditingImage?.(image.id);
 	};
-
-    const handleArchive = () => {
-        return;
-    };
 
 	const handleDelete = () => {
 		onDeleteImage?.(image.id);

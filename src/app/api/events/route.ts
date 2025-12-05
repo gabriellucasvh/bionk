@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
+const REJECT_URL = /^https:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
 
 export async function POST(req: NextRequest) {
 	try {
@@ -35,6 +36,13 @@ export async function POST(req: NextRequest) {
 		) {
 			return NextResponse.json(
 				{ error: "Campos obrigatórios ausentes" },
+				{ status: 400 }
+			);
+		}
+
+		if (!REJECT_URL.test(String(externalLink).trim())) {
+			return NextResponse.json(
+				{ error: "Link externo inválido" },
 				{ status: 400 }
 			);
 		}

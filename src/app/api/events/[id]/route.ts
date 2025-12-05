@@ -8,8 +8,8 @@ export const runtime = "nodejs";
 
 const REJECT_URL = /^https:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
 export async function PUT(
-    request: Request,
-    { params }: { params: Promise<{ id: string }> }
+	request: Request,
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const session = await getServerSession(authOptions);
 	if (!session?.user?.id) {
@@ -29,20 +29,20 @@ export async function PUT(
 	try {
 		const body = await request.json();
 		const {
-				title,
-				location,
-				eventDate,
-				eventTime,
-				descriptionShort,
-				externalLink,
-				coverImageUrl,
-				active,
-				order,
-				type,
-				targetMonth,
-				targetDay,
-				countdownLinkUrl,
-				countdownLinkVisibility,
+			title,
+			location,
+			eventDate,
+			eventTime,
+			descriptionShort,
+			externalLink,
+			coverImageUrl,
+			active,
+			order,
+			type,
+			targetMonth,
+			targetDay,
+			countdownLinkUrl,
+			countdownLinkVisibility,
 		} = body || {};
 
 		const event = await prisma.event.findFirst({
@@ -56,37 +56,47 @@ export async function PUT(
 			);
 		}
 
+		if (externalLink !== undefined) {
+			const v = String(externalLink).trim();
+			if (!REJECT_URL.test(v)) {
+				return NextResponse.json(
+					{ error: "Link externo inválido" },
+					{ status: 400 }
+				);
+			}
+		}
+
 		const updateData: any = {
-				...(title !== undefined && { title: String(title).trim().slice(0, 40) }),
-				...(location !== undefined && { location: String(location) }),
-				...(eventTime !== undefined && { eventTime: String(eventTime) }),
-				...(descriptionShort !== undefined && {
-					descriptionShort: descriptionShort ? String(descriptionShort) : null,
-				}),
-				...(externalLink !== undefined && {
-					externalLink: String(externalLink),
-				}),
-				...(coverImageUrl !== undefined && {
-					coverImageUrl: coverImageUrl ? String(coverImageUrl) : null,
-				}),
-				...(active !== undefined && { active }),
-				...(order !== undefined && { order }),
-				...(type !== undefined && { type: String(type) }),
-				...(targetMonth !== undefined && { targetMonth: Number(targetMonth) }),
-				...(targetDay !== undefined && { targetDay: Number(targetDay) }),
-				...(countdownLinkUrl !== undefined && {
-					countdownLinkUrl: REJECT_URL.test(String(countdownLinkUrl))
-						? String(countdownLinkUrl)
-						: null,
-				}),
-				...(countdownLinkVisibility !== undefined && {
-					countdownLinkVisibility: ["after", "during"].includes(
-						String(countdownLinkVisibility)
-					)
-						? String(countdownLinkVisibility)
-						: null,
-				}),
-			};
+			...(title !== undefined && { title: String(title).trim().slice(0, 40) }),
+			...(location !== undefined && { location: String(location) }),
+			...(eventTime !== undefined && { eventTime: String(eventTime) }),
+			...(descriptionShort !== undefined && {
+				descriptionShort: descriptionShort ? String(descriptionShort) : null,
+			}),
+			...(externalLink !== undefined && {
+				externalLink: String(externalLink).trim(),
+			}),
+			...(coverImageUrl !== undefined && {
+				coverImageUrl: coverImageUrl ? String(coverImageUrl) : null,
+			}),
+			...(active !== undefined && { active }),
+			...(order !== undefined && { order }),
+			...(type !== undefined && { type: String(type) }),
+			...(targetMonth !== undefined && { targetMonth: Number(targetMonth) }),
+			...(targetDay !== undefined && { targetDay: Number(targetDay) }),
+			...(countdownLinkUrl !== undefined && {
+				countdownLinkUrl: REJECT_URL.test(String(countdownLinkUrl))
+					? String(countdownLinkUrl)
+					: null,
+			}),
+			...(countdownLinkVisibility !== undefined && {
+				countdownLinkVisibility: ["after", "during"].includes(
+					String(countdownLinkVisibility)
+				)
+					? String(countdownLinkVisibility)
+					: null,
+			}),
+		};
 
 		if (String(type || event.type) === "countdown" && eventDate !== undefined) {
 			const parseLocalDate = (s: string) => {

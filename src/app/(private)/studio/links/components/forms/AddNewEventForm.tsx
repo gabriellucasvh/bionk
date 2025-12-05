@@ -14,20 +14,22 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 
+const REJECT_URL = /^https:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
+
 interface AddNewEventFormProps {
-    onCreated?: (id: number) => void;
-    onSaved?: (id: number) => void;
-    onClose?: () => void;
-    event?: import("../../types/links.types").EventItem;
-    sectionId?: number | null;
+	onCreated?: (id: number) => void;
+	onSaved?: (id: number) => void;
+	onClose?: () => void;
+	event?: import("../../types/links.types").EventItem;
+	sectionId?: number | null;
 }
 
 const AddNewEventForm = ({
-    onCreated,
-    onSaved,
-    onClose,
-    event,
-    sectionId,
+	onCreated,
+	onSaved,
+	onClose,
+	event,
+	sectionId,
 }: AddNewEventFormProps) => {
 	const toLocalInputDate = (s?: string) => {
 		if (!s) {
@@ -62,7 +64,11 @@ const AddNewEventForm = ({
 		if (!(title.trim() && location.trim() && eventDate && eventTime)) {
 			return false;
 		}
-		if (!externalLink.trim()) {
+		const link = externalLink.trim();
+		if (!link) {
+			return false;
+		}
+		if (!REJECT_URL.test(link)) {
 			return false;
 		}
 		return true;
@@ -79,28 +85,32 @@ const AddNewEventForm = ({
 		return t;
 	};
 
-    const handleSubmit = async () => {
-        if (!canSubmit()) {
-            setError("Preencha os campos obrigatórios");
-            return;
-        }
-        setLoading(true);
-        setError("");
-        const payload = {
-            title: title.trim(),
-            location: location.trim(),
-            eventDate,
-            eventTime,
-            descriptionShort: descriptionShort.trim() || undefined,
-            externalLink: externalLink.trim(),
-            coverImageUrl: coverImageUrl.trim() || undefined,
-            sectionId: sectionId ?? event?.sectionId ?? null,
-        };
-        const res = await fetch(event ? `/api/events/${event.id}` : "/api/events", {
-            method: event ? "PUT" : "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
+	const handleSubmit = async () => {
+		if (!canSubmit()) {
+			if (externalLink.trim() && !REJECT_URL.test(externalLink.trim())) {
+				setError("Link externo inválido. Use uma URL https.");
+				return;
+			}
+			setError("Preencha os campos obrigatórios");
+			return;
+		}
+		setLoading(true);
+		setError("");
+		const payload = {
+			title: title.trim(),
+			location: location.trim(),
+			eventDate,
+			eventTime,
+			descriptionShort: descriptionShort.trim() || undefined,
+			externalLink: externalLink.trim(),
+			coverImageUrl: coverImageUrl.trim() || undefined,
+			sectionId: sectionId ?? event?.sectionId ?? null,
+		};
+		const res = await fetch(event ? `/api/events/${event.id}` : "/api/events", {
+			method: event ? "PUT" : "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
 		setLoading(false);
 		if (!res.ok) {
 			setError(event ? "Falha ao salvar evento" : "Falha ao criar evento");
@@ -126,12 +136,12 @@ const AddNewEventForm = ({
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 						<div className="grid gap-2">
 							<Label>Título*</Label>
-						<Input
-							maxLength={40}
-							onChange={(e) => setTitle(e.target.value)}
-							placeholder="Ex: Nome do evento"
-							value={title}
-						/>
+							<Input
+								maxLength={40}
+								onChange={(e) => setTitle(e.target.value)}
+								placeholder="Ex: Nome do evento"
+								value={title}
+							/>
 						</div>
 						<div>
 							<div className="grid gap-2">
@@ -217,8 +227,10 @@ const AddNewEventForm = ({
 								<Label>Link externo*</Label>
 								<Input
 									onChange={(e) => setExternalLink(e.target.value)}
+									pattern="^https:\/\/[\\w.-]+(?::\d+)?(?:\/.*)?$"
 									placeholder="Ex: https://meusite.com/ingressos/0123"
 									required
+									title="Informe uma URL https válida"
 									value={externalLink}
 								/>
 							</div>
