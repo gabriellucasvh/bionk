@@ -1,7 +1,15 @@
 "use client";
 
 import { format } from "date-fns";
-import { Archive, ClockFading, Edit, Grip, MoreVertical, Ticket, Trash2 } from "lucide-react";
+import {
+	Archive,
+	ClockFading,
+	Edit,
+	Grip,
+	MoreVertical,
+	Ticket,
+	Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -15,20 +23,21 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import type { EventItem } from "../../types/links.types";
 import AddNewCountdownForm from "../forms/AddNewCountdownForm";
+import AddNewEventForm from "../forms/AddNewEventForm";
 
 interface EventCardProps {
-    event: EventItem;
-    isDragging: boolean;
-    listeners: any;
-    setActivatorNodeRef: (el: HTMLElement | null) => void;
-    onToggleActive?: (id: number, active: boolean) => void;
-    onDeleteEvent?: (id: number) => void;
-    isTogglingActive?: boolean;
-    onStartEditingEvent?: (id: number) => void;
-    onSaveEditingEvent?: (id: number, payload: Partial<EventItem>) => void;
-    onCancelEditingEvent?: (id: number) => void;
-    originalEvent?: EventItem | null;
-    onArchiveEvent?: (id: number) => void;
+	event: EventItem;
+	isDragging: boolean;
+	listeners: any;
+	setActivatorNodeRef: (el: HTMLElement | null) => void;
+	onToggleActive?: (id: number, active: boolean) => void;
+	onDeleteEvent?: (id: number) => void;
+	isTogglingActive?: boolean;
+	onStartEditingEvent?: (id: number) => void;
+	onSaveEditingEvent?: (id: number, payload: Partial<EventItem>) => void;
+	onCancelEditingEvent?: (id: number) => void;
+	originalEvent?: EventItem | null;
+	onArchiveEvent?: (id: number) => void;
 }
 
 const EventCard = ({
@@ -62,12 +71,12 @@ const EventCard = ({
 		}
 	})();
 
-    const handleDelete = () => {
-        onDeleteEvent?.(event.id);
-    };
-    const handleArchive = () => {
-        onArchiveEvent?.(event.id);
-    };
+	const handleDelete = () => {
+		onDeleteEvent?.(event.id);
+	};
+	const handleArchive = () => {
+		onArchiveEvent?.(event.id);
+	};
 
 	if (event.isEditing && isCountdown) {
 		const handleSaveManaged = async (payload: {
@@ -94,11 +103,50 @@ const EventCard = ({
 		return (
 			<article
 				className={cn(
-					"relative flex flex-col gap-3 rounded-3xl border bg-white p-3 transition-all sm:p-4 dark:bg-zinc-900",
+					"relative rounded-3xl border-0 bg-transparent p-0 transition-all",
 					isDragging && "opacity-50"
 				)}
 			>
 				<AddNewCountdownForm
+					event={event as any}
+					onClose={() => onCancelEditingEvent?.(event.id)}
+					onSaved={() => {}}
+					onSaveManaged={handleSaveManaged}
+				/>
+			</article>
+		);
+	}
+
+	if (event.isEditing && !isCountdown) {
+		const handleSaveManaged = async (payload: {
+			title: string;
+			location: string;
+			eventDate: string;
+			eventTime: string;
+			descriptionShort?: string | null;
+			externalLink: string;
+			coverImageUrl?: string | null;
+			sectionId?: number | null;
+		}) => {
+			onSaveEditingEvent?.(event.id, {
+				title: payload.title,
+				location: payload.location,
+				eventDate: payload.eventDate as any,
+				eventTime: payload.eventTime,
+				descriptionShort: payload.descriptionShort ?? null,
+				externalLink: payload.externalLink,
+				coverImageUrl: payload.coverImageUrl ?? null,
+				sectionId: payload.sectionId ?? event.sectionId ?? null,
+			});
+		};
+		return (
+			<article
+				className={cn(
+					"relative rounded-3xl border-0 bg-transparent p-0 transition-all",
+					isDragging && "opacity-50"
+				)}
+			>
+				<AddNewEventForm
 					event={event as any}
 					onClose={() => onCancelEditingEvent?.(event.id)}
 					onSaved={() => {}}
@@ -186,18 +234,21 @@ const EventCard = ({
 								<MoreVertical className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onStartEditingEvent?.(event.id)}>
-                            <Edit className="mr-2 h-4 w-4" /> Editar
-                        </DropdownMenuItem>
-						<DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleArchive}>
-                            <Archive className="mr-2 h-4 w-4" /> Arquivar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive" onClick={handleDelete}>
-                            <Trash2 className="mr-2 h-4 w-4" /> Deletar
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
+						<DropdownMenuContent align="end">
+							<DropdownMenuItem onClick={() => onStartEditingEvent?.(event.id)}>
+								<Edit className="mr-2 h-4 w-4" /> Editar
+							</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem onClick={handleArchive}>
+								<Archive className="mr-2 h-4 w-4" /> Arquivar
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								className="text-destructive"
+								onClick={handleDelete}
+							>
+								<Trash2 className="mr-2 h-4 w-4" /> Deletar
+							</DropdownMenuItem>
+						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
 			</div>

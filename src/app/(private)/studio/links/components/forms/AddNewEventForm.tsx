@@ -35,6 +35,16 @@ interface AddNewEventFormProps {
 	onClose?: () => void;
 	event?: import("../../types/links.types").EventItem;
 	sectionId?: number | null;
+	onSaveManaged?: (payload: {
+		title: string;
+		location: string;
+		eventDate: string;
+		eventTime: string;
+		descriptionShort?: string | null;
+		externalLink: string;
+		coverImageUrl?: string | null;
+		sectionId?: number | null;
+	}) => void | Promise<void>;
 }
 
 const AddNewEventForm = ({
@@ -43,6 +53,7 @@ const AddNewEventForm = ({
 	onClose,
 	event,
 	sectionId,
+	onSaveManaged,
 }: AddNewEventFormProps) => {
 	const toLocalInputDate = (s?: string) => {
 		if (!s) {
@@ -120,6 +131,18 @@ const AddNewEventForm = ({
 			coverImageUrl: coverImageUrl.trim() || undefined,
 			sectionId: sectionId ?? event?.sectionId ?? null,
 		};
+		if (event?.id && onSaveManaged) {
+			try {
+				await onSaveManaged(payload);
+				onSaved?.(event.id);
+			} finally {
+				setLoading(false);
+			}
+			if (onClose) {
+				onClose();
+			}
+			return;
+		}
 		const res = await fetch(event ? `/api/events/${event.id}` : "/api/events", {
 			method: event ? "PUT" : "POST",
 			headers: { "Content-Type": "application/json" },

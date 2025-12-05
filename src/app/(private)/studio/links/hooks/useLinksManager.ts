@@ -1581,25 +1581,17 @@ export const useLinksManager = (
 			return;
 		}
 		setOriginalEvent(ev);
-		const isCountdown =
-			(ev as any).type === "countdown" ||
-			(!((ev as any).externalLink || (ev as any).location) &&
-				(ev as any).eventTime === "00:00");
-		if (isCountdown) {
-			setUnifiedItems((prevItems) =>
-				prevItems.map((item) => {
-					if (item.isEditing && item.id !== id) {
-						return { ...(item as any), isEditing: false } as any;
-					}
-					if ((item as any).isEvent && item.id === id) {
-						return { ...(item as any), isEditing: true } as any;
-					}
-					return item;
-				})
-			);
-			return;
-		}
-		setIsAddingEvent(true);
+		setUnifiedItems((prevItems) =>
+			prevItems.map((item) => {
+				if (item.isEditing && item.id !== id) {
+					return { ...(item as any), isEditing: false } as any;
+				}
+				if ((item as any).isEvent && item.id === id) {
+					return { ...(item as any), isEditing: true } as any;
+				}
+				return item;
+			})
+		);
 	};
 
 	const handleSaveEditingEvent = async (
