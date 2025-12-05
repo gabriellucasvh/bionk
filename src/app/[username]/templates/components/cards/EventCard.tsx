@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { MotionSpan } from "@/components/ui/motion";
 import { detectTrafficSource } from "@/utils/traffic-source";
+import { CardImage } from "./utils/media";
 import { parseRgb, toForeground } from "./utils/style";
 
 interface EventCardProps {
@@ -73,6 +74,7 @@ export default function EventCard({
 
 	const href = normalizeExternalUrl(event?.externalLink);
 	const mutedTextColor = toForeground(textColor, 0.7);
+	const [coverError, setCoverError] = useState(false);
 
 	const isCountdown = useMemo(() => {
 		if (event?.type === "countdown") {
@@ -191,6 +193,21 @@ export default function EventCard({
 					padding: 0,
 				}}
 			>
+				{event?.coverImageUrl && !coverError && (
+					<div
+						style={{
+							borderTopLeftRadius: `${cornerValue}px`,
+							borderTopRightRadius: `${cornerValue}px`,
+						}}
+					>
+						<CardImage
+							alt={String(event?.title || "Imagem de capa")}
+							onError={() => setCoverError(true)}
+							ratio="16:9"
+							src={String(event?.coverImageUrl)}
+						/>
+					</div>
+				)}
 				<div
 					className="text-center"
 					style={{
@@ -319,18 +336,35 @@ export default function EventCard({
 	if (href) {
 		return (
 			<a
-				className="block border p-4 shadow"
+				className="block overflow-hidden border shadow"
 				href={href}
 				rel="noopener noreferrer"
 				style={{ borderRadius: `${cornerValue}px`, ...(buttonStyle || {}) }}
 				target="_blank"
 			>
-				<h3 className="font-bold text-lg">{event?.title}</h3>
-				<div className="text-sm" style={{ color: mutedTextColor }}>
-					{event?.location}
-				</div>
-				<div className="text-sm" style={{ color: mutedTextColor }}>
-					{dateLabel} • {event?.eventTime}
+				{event?.coverImageUrl && !coverError && (
+					<div
+						style={{
+							borderTopLeftRadius: `${cornerValue}px`,
+							borderTopRightRadius: `${cornerValue}px`,
+						}}
+					>
+						<CardImage
+							alt={String(event?.title || "Imagem de capa")}
+							onError={() => setCoverError(true)}
+							ratio="16:9"
+							src={String(event?.coverImageUrl)}
+						/>
+					</div>
+				)}
+				<div className="px-4 py-4">
+					<h3 className="font-bold text-lg">{event?.title}</h3>
+					<div className="text-sm" style={{ color: mutedTextColor }}>
+						{event?.location}
+					</div>
+					<div className="text-sm" style={{ color: mutedTextColor }}>
+						{dateLabel} • {event?.eventTime}
+					</div>
 				</div>
 			</a>
 		);
@@ -338,15 +372,32 @@ export default function EventCard({
 
 	return (
 		<div
-			className="border p-4 shadow"
+			className="overflow-hidden border shadow"
 			style={{ borderRadius: `${cornerValue}px`, ...(buttonStyle || {}) }}
 		>
-			<h3 className="font-bold text-lg">{event?.title}</h3>
-			<div className="text-sm" style={{ color: mutedTextColor }}>
-				{event?.location}
-			</div>
-			<div className="text-sm" style={{ color: mutedTextColor }}>
-				{dateLabel} • {event?.eventTime}
+			{event?.coverImageUrl && !coverError && (
+				<div
+					style={{
+						borderTopLeftRadius: `${cornerValue}px`,
+						borderTopRightRadius: `${cornerValue}px`,
+					}}
+				>
+					<CardImage
+						alt={String(event?.title || "Imagem de capa")}
+						onError={() => setCoverError(true)}
+						ratio="16:9"
+						src={String(event?.coverImageUrl)}
+					/>
+				</div>
+			)}
+			<div className="px-4 py-4">
+				<h3 className="font-bold text-lg">{event?.title}</h3>
+				<div className="text-sm" style={{ color: mutedTextColor }}>
+					{event?.location}
+				</div>
+				<div className="text-sm" style={{ color: mutedTextColor }}>
+					{dateLabel} • {event?.eventTime}
+				</div>
 			</div>
 		</div>
 	);

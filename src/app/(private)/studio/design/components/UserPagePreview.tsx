@@ -11,11 +11,10 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useMemo, useReducer, useState } from "react";
+import EventCard from "@/app/[username]/templates/components/cards/EventCard";
 import MusicCard from "@/app/[username]/templates/components/cards/MusicCard";
 import { CardImage } from "@/app/[username]/templates/components/cards/utils/media";
-import { toForeground } from "@/app/[username]/templates/components/cards/utils/style";
 import VideoCard from "@/app/[username]/templates/components/cards/VideoCard";
-import EventCard from "@/app/[username]/templates/components/cards/EventCard";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
 import { cn } from "@/lib/utils";
 import type { UserLink, UserProfile } from "@/types/user-profile";
@@ -227,7 +226,6 @@ function getButtonStyle(
 
 	const borderRadius = `${buttonCorners}px`;
 	const baseStyle = {
-		padding: "8px",
 		borderRadius,
 		transition: "all 0.2s",
 	};
@@ -693,7 +691,11 @@ function ContentList({
 
 		result.push(
 			<div className="w-full" key={`event-${event.id}`}>
-				<EventCard event={event} customPresets={customizations} buttonStyle={getButtonStyle(customizations)} />
+				<EventCard
+					buttonStyle={getButtonStyle(customizations)}
+					customPresets={customizations}
+					event={event}
+				/>
 			</div>
 		);
 

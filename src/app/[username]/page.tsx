@@ -191,25 +191,26 @@ export default async function UserPage({ params }: PageProps) {
 				u.Music = [];
 			}
 
-			try {
-				u.Event = await prisma.event.findMany({
-					where: { userId: base.id, active: true },
-					orderBy: { order: "asc" },
-					select: {
-						id: true,
-						title: true,
-						location: true,
-						eventDate: true,
-						eventTime: true,
-						externalLink: true,
-						type: true,
-						order: true,
-						userId: true,
-					},
-				});
-			} catch {
-				u.Event = [];
-			}
+            try {
+                u.Event = await prisma.event.findMany({
+                    where: { userId: base.id, active: true },
+                    orderBy: { order: "asc" },
+                    select: {
+                        id: true,
+                        title: true,
+                        location: true,
+                        eventDate: true,
+                        eventTime: true,
+                        externalLink: true,
+                        type: true,
+                        coverImageUrl: true,
+                        order: true,
+                        userId: true,
+                    },
+                });
+            } catch {
+                u.Event = [];
+            }
 
 			try {
 				u.Section = await prisma.section.findMany({

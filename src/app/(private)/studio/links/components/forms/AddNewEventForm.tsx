@@ -15,6 +15,19 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 const REJECT_URL = /^https:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
+const ACCEPTED_IMAGE_TYPES = [
+	"image/jpeg",
+	"image/jpg",
+	"image/png",
+	"image/gif",
+	"image/webp",
+	"image/avif",
+	"image/svg+xml",
+	"image/bmp",
+	"image/heic",
+	"image/heif",
+];
+const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
 
 interface AddNewEventFormProps {
 	onCreated?: (id: number) => void;
@@ -59,6 +72,7 @@ const AddNewEventForm = ({
 	);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string>("");
+	const [isUploadingCover, setIsUploadingCover] = useState(false);
 
 	const canSubmit = () => {
 		if (!(title.trim() && location.trim() && eventDate && eventTime)) {
@@ -238,11 +252,84 @@ const AddNewEventForm = ({
 						<div>
 							<div className="grid gap-2">
 								<Label>Imagem de capa</Label>
-								<Input
-									onChange={(e) => setCoverImageUrl(e.target.value)}
-									placeholder="Ex: https://cdn.exemplo.com/capa.jpg"
-									value={coverImageUrl}
-								/>
+								<div className="space-y-2">
+									<Input
+										onChange={(e) => setCoverImageUrl(e.target.value)}
+										placeholder="Ex: https://cdn.exemplo.com/capa.jpg"
+										value={coverImageUrl}
+									/>
+									<div className="flex items-center gap-2">
+										<input
+											accept={ACCEPTED_IMAGE_TYPES.join(",")}
+											className="hidden"
+											onChange={async (e) => {
+												const files = e.target.files;
+												if (!files || files.length === 0) {
+													return;
+												}
+												const file = files[0];
+												if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+													setError(
+														"Formato não suportado para imagem de capa."
+													);
+													return;
+												}
+												if (file.size > MAX_IMAGE_SIZE_BYTES) {
+													setError("Imagem de capa muito grande (máx. 10MB).");
+													return;
+												}
+												setError("");
+												setIsUploadingCover(true);
+												try {
+													const form = new FormData();
+													form.append("file", file);
+													let uploadUrl = "";
+													let resp: Response;
+													if (event?.id) {
+														resp = await fetch(
+															`/api/events/${event.id}/upload`,
+															{
+																method: "POST",
+																body: form,
+															}
+														);
+													} else {
+														resp = await fetch("/api/images/upload", {
+															method: "POST",
+															body: form,
+														});
+													}
+													const json = await resp.json();
+													if (resp.ok && json?.url) {
+														uploadUrl = json.url;
+														setCoverImageUrl(uploadUrl);
+													} else {
+														setError(
+															json?.error || "Falha no upload da imagem de capa"
+														);
+													}
+												} finally {
+													setIsUploadingCover(false);
+												}
+											}}
+											type="file"
+										/>
+										<BaseButton
+											className="px-3"
+											disabled={isUploadingCover}
+											onClick={(e) => {
+												const input = e.currentTarget
+													.previousSibling as HTMLInputElement;
+												if (input && input.type === "file") {
+													input.click();
+												}
+											}}
+											type="button"
+										>
+											{isUploadingCover ? "Enviando..." : "Enviar imagem"}
+										</BaseButton>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>

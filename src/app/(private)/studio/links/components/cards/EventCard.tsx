@@ -42,7 +42,6 @@ const EventCard = ({
 	onStartEditingEvent,
 	onSaveEditingEvent,
 	onCancelEditingEvent,
-    onArchiveEvent,
 }: EventCardProps) => {
 	const isCountdown =
 		event.type === "countdown" ||
