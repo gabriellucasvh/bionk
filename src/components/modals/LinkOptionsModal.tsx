@@ -9,14 +9,51 @@ import { usePathname } from "next/navigation";
 import type { FC } from "react";
 import {
 	Dialog,
-	DialogContent,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { DialogBottomSheetContent } from "@/components/ui/dialog-bottom-sheet";
 import type { UserLink } from "@/types/user-profile";
 import { BaseButton } from "../buttons/BaseButton";
 import ShareSheet from "../ShareSheet";
+
+const formatUrlForDisplay = (raw?: string) => {
+	const src = (raw || "").trim();
+	if (!src) {
+		return "URL não disponível";
+	}
+	let normalized = src;
+	const lower = src.toLowerCase();
+	if (!(lower.startsWith("http://") || lower.startsWith("https://"))) {
+		normalized = `https://${src}`;
+	}
+	try {
+		const u = new URL(normalized);
+		const host = u.hostname;
+		let clean = u.pathname || "";
+		while (clean.startsWith("/")) {
+			clean = clean.slice(1);
+		}
+		if (!clean) {
+			return host;
+		}
+		const snippet = clean.slice(0, 4);
+		return `${host}/${snippet}${clean.length > 4 ? "..." : ""}`;
+	} catch {
+		const schemeIndex = src.indexOf("://");
+		const withoutScheme = schemeIndex >= 0 ? src.slice(schemeIndex + 3) : src;
+		const firstSlash = withoutScheme.indexOf("/");
+		const host =
+			firstSlash >= 0 ? withoutScheme.slice(0, firstSlash) : withoutScheme;
+		const rest = firstSlash >= 0 ? withoutScheme.slice(firstSlash + 1) : "";
+		if (!rest) {
+			return host || "URL não disponível";
+		}
+		const snippet = rest.slice(0, 4);
+		return `${host}/${snippet}${rest.length > 4 ? "..." : ""}`;
+	}
+};
 
 interface LinkOptionsModalProps {
 	link: UserLink | null;
@@ -39,6 +76,8 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 		return null;
 	}
 
+	const displayUrl = formatUrlForDisplay(link.url);
+
 	const handleOpenLink = () => {
 		if (link.url) {
 			window.open(link.url, "_blank", "noopener,noreferrer");
@@ -47,7 +86,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 
 	return (
 		<Dialog onOpenChange={onOpenChange} open={!!link}>
-			<DialogContent className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 text-center shadow-xl sm:max-w-lg">
+			<DialogBottomSheetContent className="text-center">
 				<div className="flex justify-center pb-2">
 					<Image
 						alt="Bionk Logo"
@@ -63,7 +102,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						{link.title}
 					</DialogTitle>
 					<DialogDescription className="mb-4 line-clamp-2 max-w-md truncate text-gray-600 text-sm">
-						{link.url || "URL não disponível"}
+						{displayUrl}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -91,7 +130,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						Denunciar Link
 					</Link>
 				</div>
-			</DialogContent>
+			</DialogBottomSheetContent>
 		</Dialog>
 	);
 };
