@@ -180,6 +180,9 @@ export default async function UserPage({ params }: PageProps) {
 						id: true,
 						title: true,
 						url: true,
+						authorName: true,
+						thumbnailUrl: true,
+						usePreview: true,
 						order: true,
 						active: true,
 						userId: true,
@@ -191,26 +194,26 @@ export default async function UserPage({ params }: PageProps) {
 				u.Music = [];
 			}
 
-            try {
-                u.Event = await prisma.event.findMany({
-                    where: { userId: base.id, active: true },
-                    orderBy: { order: "asc" },
-                    select: {
-                        id: true,
-                        title: true,
-                        location: true,
-                        eventDate: true,
-                        eventTime: true,
-                        externalLink: true,
-                        type: true,
-                        coverImageUrl: true,
-                        order: true,
-                        userId: true,
-                    },
-                });
-            } catch {
-                u.Event = [];
-            }
+			try {
+				u.Event = await prisma.event.findMany({
+					where: { userId: base.id, active: true },
+					orderBy: { order: "asc" },
+					select: {
+						id: true,
+						title: true,
+						location: true,
+						eventDate: true,
+						eventTime: true,
+						externalLink: true,
+						type: true,
+						coverImageUrl: true,
+						order: true,
+						userId: true,
+					},
+				});
+			} catch {
+				u.Event = [];
+			}
 
 			try {
 				u.Section = await prisma.section.findMany({
