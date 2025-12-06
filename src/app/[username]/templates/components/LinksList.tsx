@@ -55,8 +55,8 @@ export default function LinksList({
 		setShowTooltip(null);
 	};
 
-	const renderLink = (item: UserLink, isFirstLink?: boolean) => {
-		const isAnimated = animatedLinks.has(item.id.toString());
+    const renderLink = (item: UserLink, isFirstLink?: boolean) => {
+        const isAnimated = !!item.animated || animatedLinks.has(item.id.toString());
 
 		const linkContent = (
 			<>

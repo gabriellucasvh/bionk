@@ -58,8 +58,8 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [customImageError, setCustomImageError] = useState(false);
 	const [showTooltip, setShowTooltip] = useState(false);
-	const { animatedLinks } = useLinkAnimation();
-	const isAnimated = animatedLinks.has(link.id.toString());
+    const { animatedLinks } = useLinkAnimation();
+    const isAnimated = !!link.animated || animatedLinks.has(link.id.toString());
 
 	// Calcular o borderRadius baseado no customButtonCorners ou usar padrão
 	const imageBorderRadius = customPresets?.customButtonCorners

@@ -17,6 +17,7 @@ import { CardImage } from "@/app/[username]/templates/components/cards/utils/med
 import VideoCard from "@/app/[username]/templates/components/cards/VideoCard";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
 import { cn } from "@/lib/utils";
+import { useLinkAnimation } from "@/providers/linkAnimationProvider";
 import type { UserLink, UserProfile } from "@/types/user-profile";
 import { detectTrafficSource } from "@/utils/traffic-source";
 import { FONT_OPTIONS } from "../constants/design.constants";
@@ -334,6 +335,7 @@ function ContentList({
 	customizations: UserPagePreviewProps["customizations"];
 	textStyle?: React.CSSProperties;
 }) {
+	const { animatedLinks } = useLinkAnimation();
 	const buttonStyle = getButtonStyle(customizations);
 
 	const [carouselStates, setCarouselStates] = useState<
@@ -380,6 +382,8 @@ function ContentList({
 	}, [user, customizations]);
 
 	const renderLink = (item: UserLink) => {
+		const isAnimated =
+			!!(item as any).animated || animatedLinks.has(String(item.id));
 		const customImageUrl =
 			item.customImageUrl && typeof item.customImageUrl === "string"
 				? item.customImageUrl
@@ -441,7 +445,10 @@ function ContentList({
 			<div className="w-full" key={item.id}>
 				{item.password ? (
 					<button
-						className="relative flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200"
+						className={cn(
+							"relative flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200",
+							isAnimated && "animate-shake"
+						)}
 						style={buttonStyle}
 						type="button"
 					>
@@ -460,7 +467,10 @@ function ContentList({
 					</button>
 				) : href ? (
 					<a
-						className="group relative flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200"
+						className={cn(
+							"group relative flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200",
+							isAnimated && "animate-shake"
+						)}
 						href={href}
 						rel="noopener noreferrer"
 						style={buttonStyle}
@@ -470,7 +480,10 @@ function ContentList({
 					</a>
 				) : (
 					<div
-						className="group relative flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200"
+						className={cn(
+							"group relative flex w-full items-center rounded-lg border p-4 text-left transition-all duration-200",
+							isAnimated && "animate-shake"
+						)}
 						style={buttonStyle}
 					>
 						{linkContent}
