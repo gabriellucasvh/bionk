@@ -81,7 +81,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 					<ShareSheet title={link.title} url={link.url || ""} />
 
 					<Link
-						className="mx-auto inline-flex justify-center rounded-xl px-4 py-2 text-red-500 hover:text-red-600"
+						className="mx-auto flex items-center justify-center rounded-xl px-4 py-2 text-red-500 hover:text-red-600"
 						href={reportHref}
 						prefetch={false}
 						rel="noopener noreferrer"
