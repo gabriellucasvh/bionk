@@ -15,11 +15,13 @@ import {
 	MousePointerClick,
 	Tags,
 	Trash2,
+	X,
 	Zap,
 } from "lucide-react";
 import NextImage from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import MobileBottomSheet from "@/app/(private)/studio/links/components/shared/MobileBottomSheet";
 import ArchivingLoader from "@/components/animations/ArchivingLoader";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { ProButton } from "@/components/buttons/ProButton";
@@ -756,6 +758,264 @@ const LinkActionButtons = ({
 		>
 			<Image className="h-4 w-4" />
 		</Button>
+		{/* Botão de animação: comportamentos para mobile vs desktop */}
+		<AnimationToggle
+			isExpired={isExpired}
+			isLinkAnimated={isLinkAnimated}
+			link={link}
+			toggleAnimation={toggleAnimation}
+		/>
+		<Badge className="flex flex-shrink-0 items-center gap-1" variant="outline">
+			<MousePointerClick className="h-3 w-3" />
+			<span className="hidden sm:inline">
+				{(link.clicks || 0).toLocaleString()}
+			</span>
+			<span className="sm:hidden">{link.clicks || 0}</span>
+		</Badge>
+	</div>
+);
+
+const AnimationToggle = ({
+	link,
+	isLinkAnimated,
+	toggleAnimation,
+	isExpired,
+}: {
+	link: LinkItem;
+	isLinkAnimated: boolean;
+	toggleAnimation: (id: number) => Promise<void>;
+	isExpired: boolean;
+}) => {
+	const [isMobile, setIsMobile] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
+	const [isAnimating, setIsAnimating] = useState(false);
+	const [isDragging, setIsDragging] = useState(false);
+	const [dragY, setDragY] = useState(0);
+	const [isClosing, setIsClosing] = useState(false);
+	const startYRef = useRef<number | null>(null);
+	const startTimeRef = useRef<number | null>(null);
+	const dragYRef = useRef(0);
+
+	useEffect(() => {
+		const mq =
+			typeof window !== "undefined"
+				? window.matchMedia("(max-width: 639px)")
+				: null;
+		const apply = () => setIsMobile(!!mq?.matches);
+		apply();
+		mq?.addEventListener("change", apply);
+		return () => mq?.removeEventListener("change", apply);
+	}, []);
+
+	const VELOCITY_CLOSE_THRESHOLD = 0.5;
+	const MIN_DELTA_FOR_SWIPE = 10;
+	const getCloseDistanceThreshold = () => {
+		const h = Math.round(window.innerHeight * 0.8);
+		return Math.max(140, Math.round(h * 0.55));
+	};
+
+	const openMobile = () => {
+		if (isExpired) {
+			return;
+		}
+		setIsOpen(true);
+		setIsAnimating(false);
+		setIsClosing(false);
+		requestAnimationFrame(() => {
+			setIsAnimating(true);
+		});
+	};
+
+	const closeMobile = () => {
+		setIsClosing(true);
+		setIsAnimating(true);
+		setIsOpen(false);
+		window.setTimeout(() => {
+			setIsClosing(false);
+			setIsAnimating(false);
+			setDragY(0);
+			dragYRef.current = 0;
+		}, 400);
+	};
+
+	const onMouseDown = (e: React.MouseEvent) => {
+		startYRef.current = e.clientY;
+		startTimeRef.current = performance.now();
+		setIsDragging(true);
+		const onMouseMove = (ev: MouseEvent) => {
+			if (startYRef.current !== null) {
+				const delta = ev.clientY - startYRef.current;
+				const clamped = Math.max(0, delta);
+				setDragY(clamped);
+				dragYRef.current = clamped;
+				const now = performance.now();
+				const duration = startTimeRef.current ? now - startTimeRef.current : 0;
+				const velocity = duration > 0 ? clamped / duration : 0;
+				if (
+					clamped >= MIN_DELTA_FOR_SWIPE &&
+					velocity >= VELOCITY_CLOSE_THRESHOLD
+				) {
+					document.removeEventListener("mousemove", onMouseMove);
+					document.removeEventListener("mouseup", onMouseUp);
+					setIsDragging(false);
+					startYRef.current = null;
+					startTimeRef.current = null;
+					closeMobile();
+				}
+			}
+		};
+		const onMouseUp = () => {
+			document.removeEventListener("mousemove", onMouseMove);
+			document.removeEventListener("mouseup", onMouseUp);
+			setIsDragging(false);
+			const endTime = performance.now();
+			const duration = startTimeRef.current
+				? endTime - startTimeRef.current
+				: 0;
+			const delta = dragYRef.current;
+			const velocity = duration > 0 ? delta / duration : 0;
+			if (
+				delta >= getCloseDistanceThreshold() ||
+				(delta >= MIN_DELTA_FOR_SWIPE && velocity >= VELOCITY_CLOSE_THRESHOLD)
+			) {
+				closeMobile();
+			} else {
+				setDragY(0);
+				dragYRef.current = 0;
+			}
+			startYRef.current = null;
+			startTimeRef.current = null;
+		};
+		document.addEventListener("mousemove", onMouseMove);
+		document.addEventListener("mouseup", onMouseUp);
+	};
+
+	const onTouchStart = (e: React.TouchEvent) => {
+		const touch = e.touches[0];
+		startYRef.current = touch.clientY;
+		startTimeRef.current = performance.now();
+		setIsDragging(true);
+		const onTouchMove = (ev: TouchEvent) => {
+			if (startYRef.current !== null && ev.touches[0]) {
+				const delta = ev.touches[0].clientY - startYRef.current;
+				const clamped = Math.max(0, delta);
+				setDragY(clamped);
+				dragYRef.current = clamped;
+				ev.preventDefault();
+				const now = performance.now();
+				const duration = startTimeRef.current ? now - startTimeRef.current : 0;
+				const velocity = duration > 0 ? clamped / duration : 0;
+				if (
+					clamped >= MIN_DELTA_FOR_SWIPE &&
+					velocity >= VELOCITY_CLOSE_THRESHOLD
+				) {
+					document.removeEventListener("touchmove", onTouchMove, {
+						passive: false,
+					} as any);
+					document.removeEventListener("touchend", onTouchEnd);
+					setIsDragging(false);
+					startYRef.current = null;
+					startTimeRef.current = null;
+					closeMobile();
+				}
+			}
+		};
+		const onTouchEnd = () => {
+			document.removeEventListener("touchmove", onTouchMove, {
+				passive: false,
+			} as any);
+			document.removeEventListener("touchend", onTouchEnd);
+			setIsDragging(false);
+			const endTime = performance.now();
+			const duration = startTimeRef.current
+				? endTime - startTimeRef.current
+				: 0;
+			const delta = dragYRef.current;
+			const velocity = duration > 0 ? delta / duration : 0;
+			if (
+				delta >= getCloseDistanceThreshold() ||
+				(delta >= MIN_DELTA_FOR_SWIPE && velocity >= VELOCITY_CLOSE_THRESHOLD)
+			) {
+				closeMobile();
+			} else {
+				setDragY(0);
+				dragYRef.current = 0;
+			}
+			startYRef.current = null;
+			startTimeRef.current = null;
+		};
+		document.addEventListener("touchmove", onTouchMove, {
+			passive: false,
+		} as any);
+		document.addEventListener("touchend", onTouchEnd);
+	};
+
+	if (isMobile) {
+		return (
+			<>
+				<Button
+					className={cn(
+						"h-8 w-8 flex-shrink-0",
+						isLinkAnimated
+							? "text-green-600 hover:text-green-700"
+							: "text-muted-foreground hover:text-foreground"
+					)}
+					disabled={isExpired}
+					onClick={openMobile}
+					size="icon"
+					title={
+						isExpired
+							? "Expirado — animação indisponível"
+							: isLinkAnimated
+								? "Desativar animação"
+								: "Ativar animação"
+					}
+					variant="ghost"
+				>
+					<Zap className="h-4 w-4" />
+				</Button>
+				<MobileBottomSheet
+					dragY={dragY}
+					isAnimating={isAnimating}
+					isClosing={isClosing}
+					isDragging={isDragging}
+					isOpen={isOpen}
+					onClose={closeMobile}
+					onMouseDown={onMouseDown}
+					onTouchStart={onTouchStart}
+				>
+					<div className="pt-2">
+						<div className="text-center">
+							<h2 className="font-bold text-gray-900 text-xl dark:text-white">
+								{isLinkAnimated ? "Desativar" : "Ativar"} Animação
+							</h2>
+							<p className="text-gray-600 text-sm dark:text-white/80">
+								{isLinkAnimated
+									? "Esta ação desativará a animação do link."
+									: "Esta ação fará o link dar uma tremidinha infinita na sua página para chamar atenção dos visitantes."}
+							</p>
+						</div>
+						<div className="mt-4">
+							<BaseButton
+								fullWidth
+								onClick={async () => {
+									if (isExpired) {
+										return;
+									}
+									await toggleAnimation(link.id);
+									closeMobile();
+								}}
+							>
+								{isLinkAnimated ? "Desativar" : "Ativar"} Animação
+							</BaseButton>
+						</div>
+					</div>
+				</MobileBottomSheet>
+			</>
+		);
+	}
+
+	return (
 		<AlertDialog>
 			<AlertDialogTrigger asChild>
 				<Button
@@ -779,7 +1039,13 @@ const LinkActionButtons = ({
 					<Zap className="h-4 w-4" />
 				</Button>
 			</AlertDialogTrigger>
-			<AlertDialogContent>
+			<AlertDialogContent className="rounded-3xl">
+				<AlertDialogCancel
+					aria-label="Fechar"
+					className="absolute top-4 right-4 inline-flex h-7 w-7 items-center justify-center rounded-full border-none bg-white p-0 opacity-70 ring-offset-background transition-opacity hover:bg-muted-foreground/20 hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none dark:bg-zinc-800 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0"
+				>
+					<X className="h-4 w-4" />
+				</AlertDialogCancel>
 				<AlertDialogHeader>
 					<AlertDialogTitle>
 						{isLinkAnimated ? "Desativar" : "Ativar"} Animação
@@ -787,16 +1053,13 @@ const LinkActionButtons = ({
 					<AlertDialogDescription>
 						{isLinkAnimated
 							? "Esta ação desativará a animação do link."
-							: "Esta ação fará o link dar uma tremidinha infinita na sua página para chamar atenção dos visitantes."}
+							: "Esta ação fará o link dar uma tremidinha infinita na sua página para chamar atenção dos visitantes."} {" "}
 						Deseja continuar?
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel className="rounded-full ">
-						Cancelar
-					</AlertDialogCancel>
 					<AlertDialogAction
-						className="rounded-full bg-sky-400 text-black hover:bg-sky-500"
+						className="h-11 w-full rounded-full"
 						onClick={async () => {
 							if (isExpired) {
 								return;
@@ -809,15 +1072,8 @@ const LinkActionButtons = ({
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
-		<Badge className="flex flex-shrink-0 items-center gap-1" variant="outline">
-			<MousePointerClick className="h-3 w-3" />
-			<span className="hidden sm:inline">
-				{(link.clicks || 0).toLocaleString()}
-			</span>
-			<span className="sm:hidden">{link.clicks || 0}</span>
-		</Badge>
-	</div>
-);
+	);
+};
 
 const DisplayView = (props: LinkCardProps) => {
 	const {
@@ -1011,7 +1267,7 @@ const DisplayView = (props: LinkCardProps) => {
 					onUpdateCustomImage?.(link.id, imageUrl);
 					setIsImageModalOpen(false);
 				}}
-                />
+			/>
 		</article>
 	);
 };

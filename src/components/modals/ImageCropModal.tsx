@@ -143,8 +143,11 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 
 	useEffect(() => {
 		if (isOpen) {
-			setIsAnimating(true);
+			setIsAnimating(false);
 			setIsClosing(false);
+			requestAnimationFrame(() => {
+				setIsAnimating(true);
+			});
 		}
 		return;
 	}, [isOpen]);
