@@ -41,16 +41,17 @@ interface EventCardProps {
 }
 
 const EventCard = ({
-	event,
-	isDragging,
-	listeners,
-	setActivatorNodeRef,
-	onToggleActive,
-	onDeleteEvent,
-	isTogglingActive,
-	onStartEditingEvent,
-	onSaveEditingEvent,
-	onCancelEditingEvent,
+    event,
+    isDragging,
+    listeners,
+    setActivatorNodeRef,
+    onToggleActive,
+    onDeleteEvent,
+    isTogglingActive,
+    onStartEditingEvent,
+    onSaveEditingEvent,
+    onCancelEditingEvent,
+    onArchiveEvent,
 }: EventCardProps) => {
 	const isCountdown =
 		event.type === "countdown" ||
