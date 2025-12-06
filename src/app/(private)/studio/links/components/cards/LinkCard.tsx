@@ -1011,7 +1011,7 @@ const DisplayView = (props: LinkCardProps) => {
 					onUpdateCustomImage?.(link.id, imageUrl);
 					setIsImageModalOpen(false);
 				}}
-			/>
+                />
 		</article>
 	);
 };

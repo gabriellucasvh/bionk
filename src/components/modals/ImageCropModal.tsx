@@ -10,8 +10,9 @@ import {
 } from "lucide-react";
 import NextImage from "next/image";
 import type { FC } from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
+import MobileBottomSheet from "@/app/(private)/studio/links/components/shared/MobileBottomSheet";
 import {
 	Dialog,
 	DialogContent,
@@ -114,6 +115,40 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [dragActive, setDragActive] = useState(false);
 
+	const [isAnimating, setIsAnimating] = useState(false);
+	const [isDragging, setIsDragging] = useState(false);
+	const [dragY, setDragY] = useState(0);
+	const [isClosing, setIsClosing] = useState(false);
+	const startYRef = useRef<number | null>(null);
+	const startTimeRef = useRef<number | null>(null);
+	const dragYRef = useRef(0);
+	const VELOCITY_CLOSE_THRESHOLD = 0.5;
+	const MIN_DELTA_FOR_SWIPE = 10;
+	const getCloseDistanceThreshold = () => {
+		const h = Math.round(window.innerHeight * 0.8);
+		return Math.max(140, Math.round(h * 0.55));
+	};
+
+	const [isMobile, setIsMobile] = useState(false);
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const mq = window.matchMedia("(max-width: 640px)");
+			const apply = () => setIsMobile(mq.matches);
+			apply();
+			mq.addEventListener("change", apply);
+			return () => mq.removeEventListener("change", apply);
+		}
+		return;
+	}, []);
+
+	useEffect(() => {
+		if (isOpen) {
+			setIsAnimating(true);
+			setIsClosing(false);
+		}
+		return;
+	}, [isOpen]);
+
 	const handleFileSelect = (file: File) => {
 		if (!ACCEPTED_FORMATS.includes(file.type)) {
 			alert(
@@ -214,6 +249,18 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 		setSelectedImage(null);
 		setZoom(1);
 		setCrop({ x: 0, y: 0 });
+		if (isMobile) {
+			setIsClosing(true);
+			setIsAnimating(true);
+			onClose();
+			window.setTimeout(() => {
+				setIsClosing(false);
+				setIsAnimating(false);
+				setDragY(0);
+				dragYRef.current = 0;
+			}, 400);
+			return;
+		}
 		onClose();
 	};
 
@@ -226,12 +273,282 @@ const ImageCropModal: FC<ImageCropModalProps> = ({
 		processImage();
 	}
 
+	if (isMobile) {
+		return (
+			<MobileBottomSheet
+				dragY={dragY}
+				isAnimating={isAnimating}
+				isClosing={isClosing}
+				isDragging={isDragging}
+				isOpen={isOpen}
+				onClose={handleClose}
+				onMouseDown={(e) => {
+					startYRef.current = e.clientY;
+					startTimeRef.current = performance.now();
+					setIsDragging(true);
+					const onMouseMove = (ev: MouseEvent) => {
+						if (startYRef.current !== null) {
+							const delta = ev.clientY - startYRef.current;
+							const clamped = Math.max(0, delta);
+							setDragY(clamped);
+							dragYRef.current = clamped;
+							const now = performance.now();
+							const duration = startTimeRef.current
+								? now - startTimeRef.current
+								: 0;
+							const velocity = duration > 0 ? clamped / duration : 0;
+							if (
+								clamped >= MIN_DELTA_FOR_SWIPE &&
+								velocity >= VELOCITY_CLOSE_THRESHOLD
+							) {
+								document.removeEventListener("mousemove", onMouseMove);
+								document.removeEventListener("mouseup", onMouseUp);
+								setIsDragging(false);
+								startYRef.current = null;
+								startTimeRef.current = null;
+								handleClose();
+							}
+						}
+					};
+					const onMouseUp = () => {
+						document.removeEventListener("mousemove", onMouseMove);
+						document.removeEventListener("mouseup", onMouseUp);
+						setIsDragging(false);
+						const endTime = performance.now();
+						const duration = startTimeRef.current
+							? endTime - startTimeRef.current
+							: 0;
+						const delta = dragYRef.current;
+						const velocity = duration > 0 ? delta / duration : 0;
+						if (
+							delta >= getCloseDistanceThreshold() ||
+							(delta >= MIN_DELTA_FOR_SWIPE &&
+								velocity >= VELOCITY_CLOSE_THRESHOLD)
+						) {
+							handleClose();
+						} else {
+							setDragY(0);
+							dragYRef.current = 0;
+						}
+						startYRef.current = null;
+						startTimeRef.current = null;
+					};
+					document.addEventListener("mousemove", onMouseMove);
+					document.addEventListener("mouseup", onMouseUp);
+				}}
+				onTouchStart={(e) => {
+					const touch = e.touches[0];
+					startYRef.current = touch.clientY;
+					startTimeRef.current = performance.now();
+					setIsDragging(true);
+					const onTouchMove = (ev: TouchEvent) => {
+						if (startYRef.current !== null && ev.touches[0]) {
+							const delta = ev.touches[0].clientY - startYRef.current;
+							const clamped = Math.max(0, delta);
+							setDragY(clamped);
+							dragYRef.current = clamped;
+							ev.preventDefault();
+							const now = performance.now();
+							const duration = startTimeRef.current
+								? now - startTimeRef.current
+								: 0;
+							const velocity = duration > 0 ? clamped / duration : 0;
+							if (
+								clamped >= MIN_DELTA_FOR_SWIPE &&
+								velocity >= VELOCITY_CLOSE_THRESHOLD
+							) {
+								document.removeEventListener("touchmove", onTouchMove, {
+									passive: false,
+								} as any);
+								document.removeEventListener("touchend", onTouchEnd);
+								setIsDragging(false);
+								startYRef.current = null;
+								startTimeRef.current = null;
+								handleClose();
+							}
+						}
+					};
+					const onTouchEnd = () => {
+						document.removeEventListener("touchmove", onTouchMove, {
+							passive: false,
+						} as any);
+						document.removeEventListener("touchend", onTouchEnd);
+						setIsDragging(false);
+						const endTime = performance.now();
+						const duration = startTimeRef.current
+							? endTime - startTimeRef.current
+							: 0;
+						const delta = dragYRef.current;
+						const velocity = duration > 0 ? delta / duration : 0;
+						if (
+							delta >= getCloseDistanceThreshold() ||
+							(delta >= MIN_DELTA_FOR_SWIPE &&
+								velocity >= VELOCITY_CLOSE_THRESHOLD)
+						) {
+							handleClose();
+						} else {
+							setDragY(0);
+							dragYRef.current = 0;
+						}
+						startYRef.current = null;
+						startTimeRef.current = null;
+					};
+					document.addEventListener("touchmove", onTouchMove, {
+						passive: false,
+					} as any);
+					document.addEventListener("touchend", onTouchEnd);
+				}}
+			>
+				<div className="pt-2">
+					<div className="text-center">
+						<h2 className="font-bold text-gray-900 text-xl dark:text-white">
+							Personalizar Ícone do Link
+						</h2>
+						<p className="text-gray-600 text-sm dark:text-white/80">
+							Ajuste a imagem para criar o ícone perfeito.
+						</p>
+					</div>
+					<div className="mt-4 space-y-4">
+						{shouldShowCropper ? (
+							<div className="space-y-4">
+								<div className="relative h-80 w-full rounded-lg bg-gray-100">
+									<Cropper
+										aspect={1}
+										crop={crop}
+										cropShape="rect"
+										image={selectedImage.src}
+										onCropChange={setCrop}
+										onCropComplete={onCropComplete}
+										onZoomChange={setZoom}
+										showGrid
+										zoom={zoom}
+									/>
+								</div>
+								<div className="space-y-3">
+									<Label htmlFor="zoom-slider">Zoom</Label>
+									<div className="flex items-center gap-2">
+										<ZoomOut className="h-5 w-5 text-gray-500" />
+										<Slider
+											id="zoom-slider"
+											max={3}
+											min={1}
+											onValueChange={(value) => setZoom(value[0])}
+											step={0.1}
+											value={[zoom]}
+										/>
+										<ZoomIn className="h-5 w-5 text-gray-500" />
+									</div>
+								</div>
+								<div className="flex flex-col gap-2 pt-2 sm:flex-row sm:justify-center">
+									<BaseButton
+										className="flex w-full items-center justify-center gap-2"
+										onClick={() => setSelectedImage(null)}
+										variant="white"
+									>
+										<RotateCcw className="h-4 w-4" />
+										Escolher Outra
+									</BaseButton>
+									<BaseButton
+										className="flex w-full items-center justify-center gap-2"
+										loading={isProcessing}
+										onClick={processImage}
+									>
+										<Check className="h-4 w-4" />
+										Salvar Ícone
+									</BaseButton>
+								</div>
+							</div>
+						) : (
+							<div className="space-y-4">
+								{currentImageUrl && (
+									<div className="text-center">
+										<p className="mb-3 font-medium text-gray-700 text-sm dark:text-white">
+											Imagem atual:
+										</p>
+										<div className="mb-4 flex justify-center">
+											<NextImage
+												alt="Imagem atual"
+												className="h-20 w-20 rounded-lg border object-cover"
+												height={100}
+												src={currentImageUrl}
+												width={100}
+											/>
+										</div>
+										{onImageRemove && (
+											<Button
+												className="mx-auto mb-4 flex w-min items-center justify-center gap-2 hover:text-red-500"
+												onClick={() => {
+													onImageRemove();
+													onClose();
+												}}
+												variant="ghost"
+											>
+												<Trash2 className="h-4 w-4" />
+												Remover Imagem
+											</Button>
+										)}
+										<div className="relative">
+											<div className="relative mb-2 text-center">
+												<div className="absolute inset-0 flex items-center">
+													<div className="w-full border-gray-300 border-t" />
+												</div>
+												<div className="relative flex justify-center text-sm">
+													<span className="bg-white px-2 text-gray-500 dark:bg-zinc-950 dark:text-white/80">
+														ou escolha uma nova
+													</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								)}
+								<div
+									className={`relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-10 text-center transition-colors ${
+										dragActive
+											? "border-blue-500 bg-blue-50"
+											: "border-gray-300 hover:border-gray-400"
+									}`}
+									onClick={() =>
+										document.getElementById("file-upload-input")?.click()
+									}
+									onDragEnter={handleDrag}
+									onDragLeave={handleDrag}
+									onDragOver={handleDrag}
+									onDrop={handleDrop}
+									role="none"
+								>
+									<Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+									<p className="mb-2 font-medium text-gray-700 dark:text-white">
+										{currentImageUrl
+											? "Escolher nova imagem"
+											: "Arraste uma imagem ou clique para selecionar"}
+									</p>
+									<p className="text-gray-500 text-sm dark:text-white/80">
+										Formatos: JPG, PNG, GIF, SVG, WebP, etc.
+									</p>
+									<input
+										accept={ACCEPTED_FORMATS.join(",")}
+										className="hidden"
+										id="file-upload-input"
+										onChange={(e) =>
+											e.target.files?.[0] && handleFileSelect(e.target.files[0])
+										}
+										type="file"
+									/>
+								</div>
+							</div>
+						)}
+					</div>
+				</div>
+			</MobileBottomSheet>
+		);
+	}
+
 	return (
 		<Dialog onOpenChange={isProcessing ? undefined : handleClose} open={isOpen}>
 			<DialogContent
 				className="w-full max-w-[90vw] rounded-3xl border bg-background p-6 shadow-xl sm:max-w-lg"
-				preventCloseOnInteractOutside
 				preventCloseOnEscape
+				preventCloseOnInteractOutside
 			>
 				<DialogHeader>
 					<DialogTitle className="text-center font-bold text-gray-900 text-xl dark:text-white">
