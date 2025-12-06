@@ -4,6 +4,7 @@ import {
 	Archive,
 	Edit,
 	Grip,
+	Loader2,
 	MoreVertical,
 	Music2,
 	Trash2,
@@ -70,6 +71,7 @@ const EditingView = ({
 >) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [urlError, setUrlError] = useState<string | null>(null);
+	const [isSearchingTitle, setIsSearchingTitle] = useState(false);
 
 	const hasChanges = originalMusic
 		? music.title !== originalMusic.title ||
@@ -83,10 +85,12 @@ const EditingView = ({
 		const currentTitle = (music.title || "").trim();
 		const currentUrl = (music.url || "").trim();
 		if (!currentUrl || currentTitle.length > 0) {
+			setIsSearchingTitle(false);
 			return;
 		}
 		const { valid } = isValidMusicUrl(currentUrl);
 		if (!valid) {
+			setIsSearchingTitle(false);
 			return;
 		}
 
@@ -99,6 +103,7 @@ const EditingView = ({
 				}
 
 				// Buscar no servidor para evitar CORS (Deezer/Audiomack)
+				setIsSearchingTitle(true);
 				const resp = await fetch(
 					`/api/music/metadata?url=${encodeURIComponent(currentUrl)}`
 				);
@@ -113,12 +118,17 @@ const EditingView = ({
 				}
 			} catch {
 				// Silencioso: não bloquear edição caso meta falhe
+			} finally {
+				if (!cancelled) {
+					setIsSearchingTitle(false);
+				}
 			}
 		}, 500);
 
 		return () => {
 			cancelled = true;
 			clearTimeout(timer);
+			setIsSearchingTitle(false);
 		};
 	}, [music.title, music.url, onMusicChange, music.id]);
 
@@ -147,13 +157,21 @@ const EditingView = ({
 					<Label className="font-medium text-sm" htmlFor="music-title">
 						Título
 					</Label>
-					<Input
-						id="music-title"
-						maxLength={70}
-						onChange={(e) => onMusicChange?.(music.id, "title", e.target.value)}
-						placeholder="Digite o título da música"
-						value={music.title || ""}
-					/>
+					<div className="relative">
+						<Input
+							className={isSearchingTitle ? "pr-10" : undefined}
+							id="music-title"
+							maxLength={70}
+							onChange={(e) =>
+								onMusicChange?.(music.id, "title", e.target.value)
+							}
+							placeholder="Digite o título da música"
+							value={music.title || ""}
+						/>
+						{isSearchingTitle && (
+							<Loader2 className="-translate-y-1/2 absolute top-1/2 right-2 h-4 w-4 animate-spin text-muted-foreground" />
+						)}
+					</div>
 				</div>
 
 				<div>
