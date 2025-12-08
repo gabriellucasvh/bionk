@@ -614,7 +614,7 @@ export function DesignPanel() {
 								))}
 							</div>
 							<div className="mt-4">
-								<p className="font-semibold">Customizar</p>
+								<p className="font-semibold text-sm">Customizar</p>
 								<div className="mt-2 mb-3 flex flex-wrap gap-1">
 									<button
 										className="flex h-10 w-10 items-center justify-center rounded-full"
@@ -685,7 +685,9 @@ export function DesignPanel() {
 										<button
 											aria-label={label}
 											className={`flex h-18 w-35 items-center justify-center rounded-2xl border ${
-												gradientMode === key ? "bg-zinc-100" : "bg-white"
+												gradientMode === key
+													? "bg-zinc-100 ring-2 ring-black ring-offset-2 dark:bg-zinc-600 dark:ring-white"
+													: "bg-white dark:bg-zinc-700"
 											}`}
 											onClick={() => {
 												setGradientMode(key);
