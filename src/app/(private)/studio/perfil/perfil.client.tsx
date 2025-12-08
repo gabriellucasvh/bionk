@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import {
 	isValidUsernameFormat,
+	normalizeUsernameForLookup,
 	sanitizeUsername,
 	USERNAME_FORMAT_ERROR,
 } from "@/utils/username";
@@ -298,49 +299,49 @@ const PerfilClient = () => {
 		return true;
 	};
 
-	const checkUsernameAvailability = async (username: string) => {
-		if (!username.trim()) {
-			return;
-		}
-		if (username === originalProfile.username) {
-			setIsCheckingUsername(false);
-			setValidationError("");
-			return;
-		}
-		lastUsernameRequestedRef.current = username;
-		setIsCheckingUsername(true);
-		try {
-			if (usernameCheckAbortRef.current) {
-				usernameCheckAbortRef.current.abort();
-			}
-			const controller = new AbortController();
-			usernameCheckAbortRef.current = controller;
-			const res = await fetch(
-				`/api/auth/check-username?username=${encodeURIComponent(username)}`,
-				{ signal: controller.signal }
-			);
-			const json = await res.json();
-			if (username !== lastUsernameRequestedRef.current) {
-				return;
-			}
-			if (username !== currentUsernameRef.current) {
-				return;
-			}
-			if (json && json.available) {
-				setValidationError("");
-			} else {
-				setValidationError("Nome de usuário já está em uso");
-			}
-		} catch (err: any) {
-			if (err?.name === "AbortError") {
-				return;
-			}
-			setValidationError("Erro ao verificar disponibilidade");
-		} finally {
-			setIsCheckingUsername(false);
-			setIsTypingUsername(false);
-		}
-	};
+    const checkUsernameAvailability = async (username: string) => {
+        if (!username.trim()) {
+            return;
+        }
+        if (username === originalProfile.username) {
+            setIsCheckingUsername(false);
+            setValidationError("");
+            return;
+        }
+        lastUsernameRequestedRef.current = username;
+        setIsCheckingUsername(true);
+        try {
+            if (usernameCheckAbortRef.current) {
+                usernameCheckAbortRef.current.abort();
+            }
+            const controller = new AbortController();
+            usernameCheckAbortRef.current = controller;
+            const res = await fetch(
+                `/api/auth/check-username?username=${encodeURIComponent(normalizeUsernameForLookup(username))}`,
+                { signal: controller.signal }
+            );
+            const json = await res.json();
+            if (username !== lastUsernameRequestedRef.current) {
+                return;
+            }
+            if (username !== currentUsernameRef.current) {
+                return;
+            }
+            if (json && json.available) {
+                setValidationError("");
+            } else {
+                setValidationError("Nome de usuário já está em uso");
+            }
+        } catch (err: any) {
+            if (err?.name === "AbortError") {
+                return;
+            }
+            setValidationError("Erro ao verificar disponibilidade");
+        } finally {
+            setIsCheckingUsername(false);
+            setIsTypingUsername(false);
+        }
+    };
 
 	const uploadImage = async (file: File): Promise<string | null> => {
 		if (!session?.user?.id) {

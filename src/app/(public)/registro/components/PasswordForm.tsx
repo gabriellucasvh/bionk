@@ -34,10 +34,10 @@ export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {
 						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
 						placeholder="Digite seu username"
 						type="text"
-                        {...form.register("username", {
-                            setValueAs: (v) =>
-                                typeof v === "string" ? sanitizeUsername(v) : "",
-                        })}
+						{...form.register("username", {
+							setValueAs: (v) =>
+								typeof v === "string" ? sanitizeUsername(v) : "",
+						})}
 						disabled={loading}
 					/>
 				</div>

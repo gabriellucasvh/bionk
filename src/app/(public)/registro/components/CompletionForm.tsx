@@ -8,8 +8,9 @@ import { BaseButton } from "@/components/buttons/BaseButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-	isValidUsernameFormat,
-	sanitizeUsername,
+    isValidUsernameFormat,
+    sanitizeUsername,
+    normalizeUsernameForLookup,
 } from "@/utils/username";
 
 const REJEX_UPPERCASE = /[A-Z]/;
@@ -59,9 +60,9 @@ export function CompletionForm({
 		}
 		setUsernameStatus({ type: "checking" });
 		try {
-			const response = await axios.get(
-				`/api/auth/check-username?username=${encodeURIComponent(username)}`
-			);
+            const response = await axios.get(
+                `/api/auth/check-username?username=${encodeURIComponent(normalizeUsernameForLookup(username))}`
+            );
 			const current = form.getValues().username || "";
 			if (current !== username) {
 				return;

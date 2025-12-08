@@ -2,10 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
-import { USERNAME_FORMAT_ERROR, USERNAME_REGEX } from "@/utils/username";
+import { normalizeUsernameForLookup } from "@/utils/username";
 export const runtime = "nodejs";
 
-const USERNAME_REGEX_LOCAL = USERNAME_REGEX;
 // Função para limpar usernames reservados expirados
 async function cleanupExpiredUsernameReservations() {
 	try {
@@ -53,19 +52,7 @@ export async function GET(request: NextRequest) {
 			);
 		}
 
-		// Normalizar username para lowercase
-		const normalizedUsername = username.toLowerCase().trim();
-
-		// Validar formato do username
-		if (!USERNAME_REGEX_LOCAL.test(normalizedUsername)) {
-			return NextResponse.json(
-				{
-					available: false,
-					error: USERNAME_FORMAT_ERROR,
-				},
-				{ status: 400 }
-			);
-		}
+		const normalizedUsername = normalizeUsernameForLookup(username);
 
 		// Verificar se username está na blacklist
 		if (BLACKLISTED_USERNAMES.includes(normalizedUsername)) {

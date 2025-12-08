@@ -7,3 +7,7 @@ export function sanitizeUsername(input: string): string {
 export function isValidUsernameFormat(u: string): boolean {
   return USERNAME_REGEX.test(String(u || ""));
 }
+export function normalizeUsernameForLookup(input: string): string {
+  const s = sanitizeUsername(input);
+  return s.replace(/^\.+|\.+$/g, "");
+}

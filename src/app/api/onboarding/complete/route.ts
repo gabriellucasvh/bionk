@@ -17,11 +17,16 @@ function validateOnboardingData(name: string, username: string) {
 		return "Nome deve ter pelo menos 2 caracteres";
 	}
 
-	if (!(username && USERNAME_REGEX_LOCAL.test(username))) {
+	const normalized = username.toLowerCase().trim();
+	const cleaned = normalized.replace(/^\.+|\.+$/g, "");
+	if (cleaned !== normalized) {
+		return USERNAME_FORMAT_ERROR;
+	}
+	if (!(normalized && USERNAME_REGEX_LOCAL.test(normalized))) {
 		return USERNAME_FORMAT_ERROR;
 	}
 
-	if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
+	if (BLACKLISTED_USERNAMES.includes(normalized)) {
 		return "Este nome de usuário não está disponível";
 	}
 
@@ -98,6 +103,16 @@ export async function POST(request: Request) {
 
 		const body = await request.json();
 		const { name, username, bio, profileImage, userType, plan } = body;
+		const normalized = String(username || "")
+			.toLowerCase()
+			.trim();
+		const cleaned = normalized.replace(/^\.+|\.+$/g, "");
+		if (cleaned !== normalized) {
+			return NextResponse.json(
+				{ error: USERNAME_FORMAT_ERROR },
+				{ status: 400 }
+			);
+		}
 
 		// Validar dados
 		const validationError = validateOnboardingData(name, username);
@@ -107,7 +122,7 @@ export async function POST(request: Request) {
 
 		// Verificar se username já existe
 		const existingUser = await prisma.user.findUnique({
-			where: { username: username.toLowerCase() },
+			where: { username: normalized },
 		});
 
 		if (existingUser && existingUser.id !== session.user.id) {
@@ -136,7 +151,7 @@ export async function POST(request: Request) {
 			where: { id: session.user.id },
 			data: {
 				name: name.trim(),
-				username: username.toLowerCase().trim(),
+				username: normalized,
 				bio: bio?.trim() || null,
 				image: imageUrl,
 				onboardingCompleted: true,

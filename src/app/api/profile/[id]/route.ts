@@ -233,6 +233,13 @@ export async function PUT(
 
 		if (isUsernameChange) {
 			const normalized = username.toLowerCase().trim();
+			const cleaned = normalized.replace(/^\.+|\.+$/g, "");
+			if (cleaned !== normalized) {
+				return NextResponse.json(
+					{ error: "Username inválido" },
+					{ status: 400 }
+				);
+			}
 			if (!regex.test(normalized)) {
 				return NextResponse.json(
 					{ error: "Username inválido" },

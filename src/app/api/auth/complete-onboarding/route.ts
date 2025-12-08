@@ -165,7 +165,17 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		if (!USERNAME_REGEX_LOCAL.test(username.toLowerCase().trim())) {
+		const normalized = username.toLowerCase().trim();
+		const cleaned = normalized.replace(/^\.+|\.+$/g, "");
+		if (cleaned !== normalized) {
+			return NextResponse.json(
+				{
+					error: USERNAME_FORMAT_ERROR,
+				},
+				{ status: 400 }
+			);
+		}
+		if (!USERNAME_REGEX_LOCAL.test(normalized)) {
 			return NextResponse.json(
 				{
 					error: USERNAME_FORMAT_ERROR,
@@ -185,7 +195,7 @@ export async function POST(request: NextRequest) {
 		// Verificar se username já está em uso
 		const existingUser = await prisma.user.findFirst({
 			where: {
-				username: username.toLowerCase(),
+				username: normalized,
 				NOT: {
 					id: session.user.id,
 				},
@@ -217,7 +227,7 @@ export async function POST(request: NextRequest) {
 			where: { id: session.user.id },
 			data: {
 				name: name.trim(),
-				username: username.toLowerCase().trim(),
+				username: normalized,
 				bio: bio?.trim() || null,
 				image: imageUrl,
 				onboardingCompleted: true,

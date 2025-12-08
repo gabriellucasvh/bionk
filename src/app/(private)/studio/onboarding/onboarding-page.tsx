@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import {
 	isValidUsernameFormat,
+	normalizeUsernameForLookup,
 	sanitizeUsername,
 	USERNAME_FORMAT_ERROR,
 	USERNAME_REGEX,
@@ -234,7 +235,7 @@ export default function OnboardingPageComponent({
 				}
 
 				const response = await fetch(
-					`/api/auth/check-username?username=${encodeURIComponent(username)}`,
+					`/api/auth/check-username?username=${encodeURIComponent(normalizeUsernameForLookup(username))}`,
 					{ signal: controller.signal }
 				);
 				const result = await response.json();

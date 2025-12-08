@@ -477,6 +477,10 @@ async function sendOtpEmail(
 
 async function handleOtpRequest(email: string, username: string) {
 	const normalizedUsername = (username || "").toLowerCase().trim();
+	const cleaned = normalizedUsername.replace(/^\.+|\.+$/g, "");
+	if (normalizedUsername && cleaned !== normalizedUsername) {
+		return NextResponse.json({ error: USERNAME_FORMAT_ERROR }, { status: 400 });
+	}
 
 	if (normalizedUsername) {
 		const formatValidation = validateUsernameFormat(normalizedUsername);
@@ -791,6 +795,10 @@ async function handleUserCreation(
 		);
 	}
 	const normalizedUsername = username.toLowerCase().trim();
+	const cleaned = normalizedUsername.replace(/^\.+|\.+$/g, "");
+	if (cleaned !== normalizedUsername) {
+		return NextResponse.json({ error: USERNAME_FORMAT_ERROR }, { status: 400 });
+	}
 	const formatValidation = validateUsernameFormat(normalizedUsername);
 	if (formatValidation) {
 		return formatValidation;
