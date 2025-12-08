@@ -10,9 +10,11 @@ import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import LoadingPage from "@/components/layout/LoadingPage";
+import { USERNAME_REGEX } from "@/utils/username";
 import { CompletionForm } from "../components/CompletionForm";
 
 const REJEX_REPEAT = /([A-Za-z0-9])\1{3,}/;
+const USERNAME_REGEX_LOCAL = USERNAME_REGEX;
 
 const isObviousSequence = (pwd: string) => {
 	const seqs = [
@@ -42,8 +44,8 @@ const completionSchema = z.object({
 		.min(3, "Username deve ter pelo menos 3 caracteres")
 		.max(30, "Username deve ter no máximo 30 caracteres")
 		.regex(
-			/^[a-z0-9._]+$/,
-			"Username deve conter apenas letras minúsculas, números, pontos(.) e underscores(_)"
+			USERNAME_REGEX_LOCAL,
+			"Username deve conter apenas letras minúsculas, números, pontos(.) e underscores(_) e não pode começar nem terminar com ponto"
 		),
 	password: z
 		.string()

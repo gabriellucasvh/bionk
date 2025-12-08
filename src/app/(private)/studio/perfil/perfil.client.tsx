@@ -19,6 +19,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
+import {
+	isValidUsernameFormat,
+	sanitizeUsername,
+	USERNAME_FORMAT_ERROR,
+} from "@/utils/username";
 import VerPerfilMobile from "../VerPerfilMobile";
 
 interface User {
@@ -56,6 +61,7 @@ const PerfilClient = () => {
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isEditingUsername, setIsEditingUsername] = useState(false);
 	const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+	const [isTypingUsername, setIsTypingUsername] = useState(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const lastUsernameRequestedRef = useRef<string>("");
 	const currentUsernameRef = useRef<string>("");
@@ -280,6 +286,10 @@ const PerfilClient = () => {
 			setValidationError("Nome de usuário deve ter no máximo 30 caracteres.");
 			return false;
 		}
+		if (!isValidUsernameFormat(username)) {
+			setValidationError(USERNAME_FORMAT_ERROR);
+			return false;
+		}
 		if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
 			setValidationError("Este nome de usuário não está disponível.");
 			return false;
@@ -328,6 +338,7 @@ const PerfilClient = () => {
 			setValidationError("Erro ao verificar disponibilidade");
 		} finally {
 			setIsCheckingUsername(false);
+			setIsTypingUsername(false);
 		}
 	};
 
@@ -637,9 +648,9 @@ const PerfilClient = () => {
 															id="edit-username"
 															maxLength={30}
 															onChange={(e) => {
-																const sanitizedUsername = e.target.value
-																	.replace(/[^a-zA-Z0-9_.]/g, "")
-																	.toLowerCase();
+																const sanitizedUsername = sanitizeUsername(
+																	e.target.value
+																);
 																setProfile({
 																	...profile,
 																	username: sanitizedUsername,
@@ -651,6 +662,7 @@ const PerfilClient = () => {
 																	);
 																	usernameDebounceRef.current = null;
 																}
+																setIsTypingUsername(true);
 																setIsCheckingUsername(true);
 																usernameDebounceRef.current = window.setTimeout(
 																	() => {
@@ -662,9 +674,10 @@ const PerfilClient = () => {
 																			);
 																		} else {
 																			setIsCheckingUsername(false);
+																			setIsTypingUsername(false);
 																		}
 																	},
-																	2000
+																	500
 																);
 															}}
 															placeholder="username"
@@ -704,6 +717,7 @@ const PerfilClient = () => {
 													loading ||
 													isUploadingImage ||
 													isCheckingUsername ||
+													isTypingUsername ||
 													!!validationError ||
 													!profile.username ||
 													profile.username.length < 3 ||
@@ -863,9 +877,9 @@ const PerfilClient = () => {
 															id="edit-username"
 															maxLength={30}
 															onChange={(e) => {
-																const sanitizedUsername = e.target.value
-																	.replace(/[^a-zA-Z0-9_.]/g, "")
-																	.toLowerCase();
+																const sanitizedUsername = sanitizeUsername(
+																	e.target.value
+																);
 																setProfile({
 																	...profile,
 																	username: sanitizedUsername,
@@ -877,6 +891,7 @@ const PerfilClient = () => {
 																	);
 																	usernameDebounceRef.current = null;
 																}
+																setIsTypingUsername(true);
 																setIsCheckingUsername(true);
 																usernameDebounceRef.current = window.setTimeout(
 																	() => {
@@ -888,9 +903,10 @@ const PerfilClient = () => {
 																			);
 																		} else {
 																			setIsCheckingUsername(false);
+																			setIsTypingUsername(false);
 																		}
 																	},
-																	2000
+																	500
 																);
 															}}
 															placeholder="username"
@@ -930,6 +946,7 @@ const PerfilClient = () => {
 													loading ||
 													isUploadingImage ||
 													isCheckingUsername ||
+													isTypingUsername ||
 													!!validationError ||
 													!profile.username ||
 													profile.username.length < 3 ||

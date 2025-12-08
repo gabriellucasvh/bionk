@@ -10,13 +10,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
+import {
+	isValidUsernameFormat,
+	sanitizeUsername,
+	USERNAME_FORMAT_ERROR,
+	USERNAME_REGEX,
+} from "@/utils/username";
 
 import CustomLinksForm from "./components/CustomLinksForm";
 import SocialLinksSelector from "./components/SocialLinksSelector";
 import TemplateSelector from "./components/TemplateSelector";
 import UserTypeSelector from "./components/UserTypeSelector";
 
-const REGEX_USERNAME = /^[a-z0-9._]{3,30}$/;
+const REGEX_USERNAME = USERNAME_REGEX;
 
 interface OnboardingPageProps {
 	onComplete: (data: OnboardingData) => void;
@@ -138,6 +144,7 @@ export default function OnboardingPageComponent({
 	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const usernameInputRef = useRef<HTMLInputElement | null>(null);
+	const lastUsernameRequestedRef = useRef<string>("");
 
 	// Cleanup timer and abort controller on unmount
 	useEffect(() => {
@@ -190,13 +197,11 @@ export default function OnboardingPageComponent({
 			return;
 		}
 
-		// Validate allowed characters and length (3-30)
 		const pattern = REGEX_USERNAME;
 		if (!pattern.test(username)) {
 			setUsernameValidation({
 				isValid: false,
-				message:
-					"Nome de usuário deve conter apenas letras minúsculas, números, pontos(.) e underscores(_)",
+				message: USERNAME_FORMAT_ERROR,
 				isChecking: false,
 			});
 			return;
@@ -210,6 +215,7 @@ export default function OnboardingPageComponent({
 			// Create new abort controller for this request
 			const controller = new AbortController();
 			abortControllerRef.current = controller;
+			lastUsernameRequestedRef.current = username;
 
 			try {
 				// Double-check blacklist before making API call (race condition protection)
@@ -238,6 +244,12 @@ export default function OnboardingPageComponent({
 					return;
 				}
 
+				if (
+					lastUsernameRequestedRef.current !== username ||
+					username !== data.username
+				) {
+					return;
+				}
 				if (result.available) {
 					setUsernameValidation({
 						isValid: true,
@@ -266,7 +278,7 @@ export default function OnboardingPageComponent({
 	}, []);
 
 	const handleUsernameChange = (value: string) => {
-		const sanitized = value.replace(/[^a-zA-Z0-9._]/g, "").toLowerCase();
+		const sanitized = sanitizeUsername(value);
 		if (sanitized === data.username) {
 			return;
 		}
@@ -305,6 +317,7 @@ export default function OnboardingPageComponent({
 				}
 				const hasValidUsername =
 					data.username.trim().length > 0 &&
+					isValidUsernameFormat(data.username) &&
 					usernameValidation.isValid &&
 					!usernameValidation.isChecking;
 				return hasName && hasValidUsername;

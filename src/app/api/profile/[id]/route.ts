@@ -9,9 +9,10 @@ import { authOptions } from "@/lib/auth";
 import { profileBaseTag } from "@/lib/cache-tags";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
+import { USERNAME_REGEX } from "@/utils/username";
 export const runtime = "nodejs";
 
-const regex = /^[a-z0-9._]{3,30}$/;
+const regex = USERNAME_REGEX;
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 	apiVersion: "2025-09-30.clover",
 });

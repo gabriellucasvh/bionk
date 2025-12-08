@@ -7,6 +7,10 @@ import type { UseFormReturn } from "react-hook-form";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+	isValidUsernameFormat,
+	sanitizeUsername,
+} from "@/utils/username";
 
 const REJEX_UPPERCASE = /[A-Z]/;
 const REJEX_LOWERCASE = /[a-z]/;
@@ -58,6 +62,10 @@ export function CompletionForm({
 			const response = await axios.get(
 				`/api/auth/check-username?username=${encodeURIComponent(username)}`
 			);
+			const current = form.getValues().username || "";
+			if (current !== username) {
+				return;
+			}
 			if (response.data.available) {
 				setUsernameStatus({
 					type: "available",
@@ -76,7 +84,7 @@ export function CompletionForm({
 	};
 
 	const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, "");
+		const value = sanitizeUsername(e.target.value);
 		form.setValue("username", value, { shouldValidate: true });
 		setIsTyping(true);
 		setUsernameStatus({ type: "idle" });
@@ -106,7 +114,9 @@ export function CompletionForm({
 	const canSubmit = () => {
 		const hasErrors = Object.keys(form.formState.errors).length > 0;
 		const usernamePresent = !!form.watch("username");
-		const usernameOk = usernameStatus.type === "available";
+		const usernameOk =
+			usernameStatus.type === "available" &&
+			isValidUsernameFormat(form.watch("username") || "");
 		const pwd = form.watch("password") || "";
 		const pwdOk =
 			pwd.length >= 9 &&

@@ -5,9 +5,10 @@ import { authOptions, clearUserTokenCache } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { getDefaultCustomPresets } from "@/utils/templatePresets";
+import { USERNAME_FORMAT_ERROR, USERNAME_REGEX } from "@/utils/username";
 export const runtime = "nodejs";
 
-const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
+const USERNAME_REGEX_LOCAL = USERNAME_REGEX;
 const BASE64_IMAGE_REGEX = /^data:image\/\w+;base64,/;
 
 // Função auxiliar para validar dados do onboarding
@@ -16,8 +17,8 @@ function validateOnboardingData(name: string, username: string) {
 		return "Nome deve ter pelo menos 2 caracteres";
 	}
 
-	if (!(username && USERNAME_REGEX.test(username))) {
-		return "Username deve conter apenas letras minúsculas, números, pontos(.) e underscores(_)";
+	if (!(username && USERNAME_REGEX_LOCAL.test(username))) {
+		return USERNAME_FORMAT_ERROR;
 	}
 
 	if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
@@ -72,9 +73,9 @@ async function uploadProfileImage(profileImage: string, defaultImage: string) {
 		});
 
 		return (uploadResponse as any).secure_url;
-    } catch {
-        return defaultImage;
-    }
+	} catch {
+		return defaultImage;
+	}
 }
 
 export async function POST(request: Request) {

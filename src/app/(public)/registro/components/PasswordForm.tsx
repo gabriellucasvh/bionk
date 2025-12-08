@@ -6,6 +6,7 @@ import type { UseFormReturn } from "react-hook-form";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { sanitizeUsername } from "@/utils/username";
 
 interface PasswordFormData {
 	username: string;
@@ -33,12 +34,10 @@ export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {
 						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
 						placeholder="Digite seu username"
 						type="text"
-						{...form.register("username", {
-							setValueAs: (v) =>
-								typeof v === "string"
-									? v.replace(/[^a-zA-Z0-9_-]/g, "").toLowerCase()
-									: "",
-						})}
+                        {...form.register("username", {
+                            setValueAs: (v) =>
+                                typeof v === "string" ? sanitizeUsername(v) : "",
+                        })}
 						disabled={loading}
 					/>
 				</div>

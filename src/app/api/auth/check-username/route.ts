@@ -2,9 +2,10 @@ import { type NextRequest, NextResponse } from "next/server";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
+import { USERNAME_FORMAT_ERROR, USERNAME_REGEX } from "@/utils/username";
 export const runtime = "nodejs";
 
-const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
+const USERNAME_REGEX_LOCAL = USERNAME_REGEX;
 // Função para limpar usernames reservados expirados
 async function cleanupExpiredUsernameReservations() {
 	try {
@@ -56,12 +57,11 @@ export async function GET(request: NextRequest) {
 		const normalizedUsername = username.toLowerCase().trim();
 
 		// Validar formato do username
-		if (!USERNAME_REGEX.test(normalizedUsername)) {
+		if (!USERNAME_REGEX_LOCAL.test(normalizedUsername)) {
 			return NextResponse.json(
 				{
 					available: false,
-					error:
-						"Username deve ter entre 3-30 caracteres e conter apenas letras minúsculas, números, pontos(.) e underscores(_)",
+					error: USERNAME_FORMAT_ERROR,
 				},
 				{ status: 400 }
 			);

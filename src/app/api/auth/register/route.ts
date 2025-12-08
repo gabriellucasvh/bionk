@@ -9,6 +9,7 @@ import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
 import { getDefaultCustomPresets } from "@/utils/templatePresets";
+import { USERNAME_FORMAT_ERROR, USERNAME_REGEX } from "@/utils/username";
 
 const OTP_EXPIRY_MINUTES = 3;
 const MAX_OTP_ATTEMPTS = 5;
@@ -16,7 +17,7 @@ const BASE_BLOCK_DURATION_MINUTES = 10;
 const PASSWORD_SETUP_TOKEN_EXPIRY_MINUTES = 15;
 const OTP_TOKEN_EXPIRY_MINUTES = 10;
 const USERNAME_RESERVATION_EXPIRY_MINUTES = 15;
-const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
+const USERNAME_REGEX_LOCAL = USERNAME_REGEX;
 const REJEX_UPPERCASE = /[A-Z]/;
 const REJEX_LOWERCASE = /[a-z]/;
 const REJEX_DIGIT = /\d/;
@@ -284,11 +285,10 @@ export async function POST(req: Request) {
 function validateUsernameFormat(
 	normalizedUsername: string
 ): NextResponse | null {
-	if (!USERNAME_REGEX.test(normalizedUsername)) {
+	if (!USERNAME_REGEX_LOCAL.test(normalizedUsername)) {
 		return NextResponse.json(
 			{
-				error:
-					"Username deve conter apenas letras minúsculas, números, pontos(.) e underscores(_)",
+				error: USERNAME_FORMAT_ERROR,
 			},
 			{ status: 400 }
 		);
