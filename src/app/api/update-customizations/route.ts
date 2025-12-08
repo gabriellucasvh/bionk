@@ -85,6 +85,54 @@ export async function POST(request: Request) {
 				})
 		);
 
+		const user = await prisma.user.findUnique({
+			where: { id: session.user.id },
+			select: {
+				subscriptionPlan: true,
+				subscriptionStatus: true,
+				subscriptionEndDate: true,
+			},
+		});
+		if (!user) {
+			return NextResponse.json(
+				{ error: "Usuário não encontrado" },
+				{ status: 404 }
+			);
+		}
+		const plan = user.subscriptionPlan || "free";
+		const isActive =
+			user.subscriptionStatus === "active" &&
+			(!user.subscriptionEndDate || user.subscriptionEndDate >= new Date());
+		const canUseBackgroundMedia =
+			isActive && (plan === "pro" || plan === "ultra");
+		const incomingTypeRaw = cleanedCustomizations.customBackgroundMediaType as
+			| string
+			| undefined;
+		const incomingType =
+			incomingTypeRaw === "image" || incomingTypeRaw === "video"
+				? incomingTypeRaw
+				: undefined;
+		const wantsImage =
+			typeof cleanedCustomizations.customBackgroundImageUrl === "string" &&
+			cleanedCustomizations.customBackgroundImageUrl.trim().length > 0;
+		const wantsVideo =
+			typeof cleanedCustomizations.customBackgroundVideoUrl === "string" &&
+			cleanedCustomizations.customBackgroundVideoUrl.trim().length > 0;
+		const wantsBackgroundMedia =
+			incomingType === "image" ||
+			incomingType === "video" ||
+			wantsImage ||
+			wantsVideo;
+		if (wantsBackgroundMedia && !canUseBackgroundMedia) {
+			return NextResponse.json(
+				{
+					error:
+						"Fundo com imagem/vídeo disponível apenas nos planos Pro ou Ultra",
+				},
+				{ status: 403 }
+			);
+		}
+
 		// 3. Busca as personalizações existentes no banco
 		const existingPresets = await prisma.customPresets.findUnique({
 			where: { userId: session.user.id },
@@ -95,35 +143,35 @@ export async function POST(request: Request) {
 		if (existingPresets) {
 			// Se não há nenhum campo para atualizar, retorna o registro existente
 			if (!hasUpdates) {
-				// Revalida a página do perfil do usuário
-				const user = await prisma.user.findUnique({
+				const userForRevalidate = await prisma.user.findUnique({
 					where: { id: session.user.id },
 					select: { username: true },
 				});
-				if (user?.username) {
-					revalidatePath(`/${user.username}`);
-					revalidateTag(profileCustomizationsTag(user.username));
-					await evictProfilePageCache(user.username);
+				if (userForRevalidate?.username) {
+					revalidatePath(`/${userForRevalidate.username}`);
+					revalidateTag(profileCustomizationsTag(userForRevalidate.username));
+					await evictProfilePageCache(userForRevalidate.username);
 				}
 				return NextResponse.json(existingPresets);
 			}
 			// 4. Garantir exclusividade e limpar Cloudinary quando apropriado
-			const incomingType = cleanedCustomizations.customBackgroundMediaType as
-				| "image"
-				| "video"
-				| undefined;
+			const selectedBackgroundType =
+				cleanedCustomizations.customBackgroundMediaType as
+					| "image"
+					| "video"
+					| undefined;
 
 			// Forçar exclusividade nas URLs com base no tipo informado
-			if (incomingType === "image") {
+			if (selectedBackgroundType === "image") {
 				cleanedCustomizations.customBackgroundVideoUrl = "";
-			} else if (incomingType === "video") {
+			} else if (selectedBackgroundType === "video") {
 				cleanedCustomizations.customBackgroundImageUrl = "";
 			}
 
 			// Apagar do Cloudinary a mídia oposta quando o tipo muda
 			try {
 				if (
-					incomingType === "image" &&
+					selectedBackgroundType === "image" &&
 					existingPresets.customBackgroundVideoUrl
 				) {
 					const publicId = extractBackgroundPublicId(
@@ -136,7 +184,7 @@ export async function POST(request: Request) {
 					}
 				}
 				if (
-					incomingType === "video" &&
+					selectedBackgroundType === "video" &&
 					existingPresets.customBackgroundImageUrl
 				) {
 					const publicId = extractBackgroundPublicId(
@@ -190,15 +238,14 @@ export async function POST(request: Request) {
 				data: cleanedCustomizations,
 			});
 
-			// Revalida a página do perfil do usuário
-			const user = await prisma.user.findUnique({
+			const userForRevalidate = await prisma.user.findUnique({
 				where: { id: session.user.id },
 				select: { username: true },
 			});
-			if (user?.username) {
-				revalidatePath(`/${user.username}`);
-				revalidateTag(profileCustomizationsTag(user.username));
-				await evictProfilePageCache(user.username);
+			if (userForRevalidate?.username) {
+				revalidatePath(`/${userForRevalidate.username}`);
+				revalidateTag(profileCustomizationsTag(userForRevalidate.username));
+				await evictProfilePageCache(userForRevalidate.username);
 			}
 
 			return NextResponse.json(updated);
@@ -213,15 +260,14 @@ export async function POST(request: Request) {
 			data: dataToCreate,
 		});
 
-		// Revalida a página do perfil do usuário
-		const user = await prisma.user.findUnique({
+		const userForRevalidate = await prisma.user.findUnique({
 			where: { id: session.user.id },
 			select: { username: true },
 		});
-		if (user?.username) {
-			revalidatePath(`/${user.username}`);
-			revalidateTag(profileCustomizationsTag(user.username));
-			await evictProfilePageCache(user.username);
+		if (userForRevalidate?.username) {
+			revalidatePath(`/${userForRevalidate.username}`);
+			revalidateTag(profileCustomizationsTag(userForRevalidate.username));
+			await evictProfilePageCache(userForRevalidate.username);
 		}
 
 		return NextResponse.json(created);

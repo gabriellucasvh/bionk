@@ -1,16 +1,15 @@
 "use client";
 
-import {
-	Image as ImageIcon,
-	Play,
-} from "lucide-react";
+import { Image as ImageIcon, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingSpinner from "@/components/buttons/LoadingSpinner";
+import { ProButton } from "@/components/buttons/ProButton";
 import BackgroundMediaModal from "@/components/modals/BackgroundMediaModal";
 import FontSelectionModal from "@/components/modals/FontSelectionModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { useSubscription } from "@/providers/subscriptionProvider";
 import { useDesignStore } from "@/stores/designStore";
 import { FONT_OPTIONS, GRADIENTS } from "../constants/design.constants";
 import { ColorPreviews } from "./ColorPreviews";
@@ -58,6 +57,10 @@ export function DesignPanel() {
 	);
 	// Estado de UI agora vem do store para persistência
 	const [isSavingPending, setIsSavingPending] = useState(false);
+
+	const { subscriptionPlan } = useSubscription();
+	const canUseBackgroundMedia =
+		subscriptionPlan === "pro" || subscriptionPlan === "ultra";
 
 	// Tipo de fundo selecionado (apenas um por vez)
 	const [backgroundType, setBackgroundType] = useState<
@@ -249,14 +252,27 @@ export function DesignPanel() {
 
 								return (
 									<div
-										className="flex w-24 flex-col items-center"
+										className="relative flex w-24 flex-col items-center"
 										key={opt.key}
 									>
 										<button
 											className={`relative w-full overflow-hidden rounded-xl border transition-all ${
 												isSelected ? " ring-1 ring-offset-2 dark:ring-1" : ""
+											} ${
+												(opt.key === "image" || opt.key === "video") &&
+												!canUseBackgroundMedia
+													? "opacity-60"
+													: ""
 											}`}
-											onClick={() => handleBackgroundTypeChange(opt.key)}
+											onClick={() => {
+												if (
+													(opt.key === "image" || opt.key === "video") &&
+													!canUseBackgroundMedia
+												) {
+													return;
+												}
+												handleBackgroundTypeChange(opt.key);
+											}}
 											style={{ aspectRatio: "6 / 7", ...previewStyle }}
 											type="button"
 										>
@@ -276,13 +292,25 @@ export function DesignPanel() {
 													<Icon
 														className={`h-6 w-6 ${
 															isSelected
-																? "text-black dark:text-black"
-																: "text-black"
+																? "text-black"
+																: "text-black "
 														}`}
 													/>
 												) : null}
 											</div>
 										</button>
+										{(opt.key === "image" || opt.key === "video") &&
+										!canUseBackgroundMedia ? (
+											<div className="absolute top-1 right-1 z-10">
+												<ProButton
+													href="/planos"
+													label="Pro"
+													showOverlayTooltip={false}
+													size="xs"
+													tooltip="Disponível nos planos Pro e Ultra"
+												/>
+											</div>
+										) : null}
 										<span
 											className={`mt-2 text-center text-sm ${
 												isSelected
@@ -358,7 +386,11 @@ export function DesignPanel() {
 							<div className="flex gap-2">
 								<button
 									className="rounded-md border px-4 py-2 text-sm"
+									disabled={!canUseBackgroundMedia}
 									onClick={() => {
+										if (!canUseBackgroundMedia) {
+											return;
+										}
 										setBackgroundModalType("image");
 										setIsBackgroundModalOpen(true);
 									}}
@@ -380,6 +412,17 @@ export function DesignPanel() {
 									</button>
 								)}
 							</div>
+							{canUseBackgroundMedia ? null : (
+								<div className="flex items-center gap-2">
+									<ProButton
+										href="/planos"
+										label="Pro"
+										showOverlayTooltip={false}
+										size="xs"
+										tooltip="Disponível nos planos Pro e Ultra"
+									/>
+								</div>
+							)}
 						</div>
 					)}
 					{/* Vídeo de Fundo */}
@@ -392,7 +435,11 @@ export function DesignPanel() {
 							<div className="flex gap-2">
 								<button
 									className="rounded-md border px-4 py-2 text-sm"
+									disabled={!canUseBackgroundMedia}
 									onClick={() => {
+										if (!canUseBackgroundMedia) {
+											return;
+										}
 										setBackgroundModalType("video");
 										setIsBackgroundModalOpen(true);
 									}}
@@ -414,6 +461,17 @@ export function DesignPanel() {
 									</button>
 								)}
 							</div>
+							{canUseBackgroundMedia ? null : (
+								<div className="flex items-center gap-2">
+									<ProButton
+										href="/planos"
+										label="Pro"
+										showOverlayTooltip={false}
+										size="xs"
+										tooltip="Disponível nos planos Pro e Ultra"
+									/>
+								</div>
+							)}
 						</div>
 					)}
 

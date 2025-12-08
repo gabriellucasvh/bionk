@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import cloudinary from "@/lib/cloudinary";
 export const runtime = "nodejs";
 
@@ -28,16 +29,37 @@ const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const MAX_VIDEO_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request: Request) {
-	try {
-		const session = await getServerSession(authOptions);
-		if (!session?.user?.id) {
-			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-		}
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+        }
 
-		const formData = await request.formData();
-		const file = formData.get("file") as File | null;
-		const type = String(formData.get("type") || "").toLowerCase(); // 'image' | 'video'
-		const cropJson = formData.get("crop") as string | null; // optional for image
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: {
+                subscriptionPlan: true,
+                subscriptionStatus: true,
+                subscriptionEndDate: true,
+            },
+        });
+        if (!user) {
+            return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
+        }
+        const plan = user.subscriptionPlan || "free";
+        const isActive = user.subscriptionStatus === "active" && (!user.subscriptionEndDate || user.subscriptionEndDate >= new Date());
+        const canUseBackgroundMedia = isActive && (plan === "pro" || plan === "ultra");
+        if (!canUseBackgroundMedia) {
+            return NextResponse.json(
+                { error: "Disponível apenas nos planos Pro ou Ultra" },
+                { status: 403 }
+            );
+        }
+
+        const formData = await request.formData();
+        const file = formData.get("file") as File | null;
+        const type = String(formData.get("type") || "").toLowerCase(); // 'image' | 'video'
+        const cropJson = formData.get("crop") as string | null; // optional for image
 
 		if (!(file && type)) {
 			return NextResponse.json(

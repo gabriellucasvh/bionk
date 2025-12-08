@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 import cloudinary from "@/lib/cloudinary";
 export const runtime = "nodejs";
 
@@ -19,14 +20,35 @@ type Body = {
 };
 
 export async function POST(request: Request) {
-	const session = await getServerSession(authOptions);
-	if (!session?.user?.id) {
-		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-	}
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+        return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
 
-	try {
-		const body = (await request.json()) as Body;
-		const { url, type, crop, credit } = body;
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: {
+                subscriptionPlan: true,
+                subscriptionStatus: true,
+                subscriptionEndDate: true,
+            },
+        });
+        if (!user) {
+            return NextResponse.json({ error: "Usuário não encontrado" }, { status: 404 });
+        }
+        const plan = user.subscriptionPlan || "free";
+        const isActive = user.subscriptionStatus === "active" && (!user.subscriptionEndDate || user.subscriptionEndDate >= new Date());
+        const canUseBackgroundMedia = isActive && (plan === "pro" || plan === "ultra");
+        if (!canUseBackgroundMedia) {
+            return NextResponse.json(
+                { error: "Disponível apenas nos planos Pro ou Ultra" },
+                { status: 403 }
+            );
+        }
+
+        const body = (await request.json()) as Body;
+        const { url, type, crop, credit } = body;
 
 		if (!(url && type)) {
 			return NextResponse.json(
