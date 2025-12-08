@@ -14,7 +14,7 @@ export const RenderLabel = ({ text, hasPending, icon }: RenderLabelProps) => {
 			{icon && icon}
 			{text}
 			{hasPending && (
-				<span className="ml-2 text-red-500 text-xs">(não salvo)</span>
+				<span className="ml-2 text-red-500 text-sm">(não salvo)</span>
 			)}
 		</Label>
 	);

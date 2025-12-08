@@ -1,6 +1,14 @@
 "use client";
 
-import { Image as ImageIcon, Play, Plus } from "lucide-react";
+import {
+	ArrowDown,
+	ArrowUp,
+	CircleDot,
+	Image as ImageIcon,
+	Play,
+	Plus,
+	RefreshCcw,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -160,8 +168,22 @@ function computeOverlayColor(baseHex: string): string {
 	return rgbToHex(overlayR, overlayG, overlayB);
 }
 
-function buildGradient(baseHex: string): string {
+type GradientMode = "linear-top" | "linear-bottom" | "radial" | "conic-180";
+
+function buildGradient(
+	baseHex: string,
+	mode: GradientMode = "linear-top"
+): string {
 	const overlay = computeOverlayColor(baseHex);
+	if (mode === "linear-bottom") {
+		return `linear-gradient(to bottom, ${overlay} 0%, ${baseHex} 100%)`;
+	}
+	if (mode === "radial") {
+		return `radial-gradient(circle, ${overlay} 0%, ${overlay} 20%, ${baseHex} 100%)`;
+	}
+	if (mode === "conic-180") {
+		return `conic-gradient(from 180deg at 50% 50%, ${overlay} 0%, ${baseHex} 100%)`;
+	}
 	return `linear-gradient(to top, ${overlay} 0%, ${baseHex} 100%)`;
 }
 
@@ -220,6 +242,7 @@ export function DesignPanel() {
 	})();
 	const [gradientBaseColor, setGradientBaseColor] =
 		useState<string>(defaultBaseColor);
+	const [gradientMode, setGradientMode] = useState<GradientMode>("linear-top");
 	// Estado de UI agora vem do store para persistência
 	const [isSavingPending, setIsSavingPending] = useState(false);
 
@@ -265,7 +288,7 @@ export function DesignPanel() {
 						)
 					: "";
 			if (base) {
-				const gradient = buildGradient(base);
+				const gradient = buildGradient(base, gradientMode);
 				updateCustomization("customBackgroundGradient", gradient);
 				updateCustomization("customBackgroundColor", "");
 				updateCustomization("customBackgroundMediaType", "");
@@ -295,8 +318,9 @@ export function DesignPanel() {
 		}
 	};
 
-	const applyGradientFromColor = (color: string) => {
-		const gradient = buildGradient(color);
+	const applyGradientFromColor = (color: string, mode?: GradientMode) => {
+		const m = mode ?? gradientMode;
+		const gradient = buildGradient(color, m);
 		handleChange("customBackgroundGradient", gradient);
 		handleChange("customBackgroundColor", "");
 		handleChange("customBackgroundMediaType", "");
@@ -445,7 +469,8 @@ export function DesignPanel() {
 												: customizations.customBackgroundColor
 													? {
 															backgroundImage: buildGradient(
-																customizations.customBackgroundColor
+																customizations.customBackgroundColor,
+																gradientMode
 															),
 														}
 													: {
@@ -543,10 +568,6 @@ export function DesignPanel() {
 								);
 							})}
 						</div>
-						<p className="mt-2 text-muted-foreground text-xs">
-							Apenas uma opção de fundo é usada por vez. Alternar o tipo não
-							altera o fundo atual; a mudança ocorre ao selecionar uma opção.
-						</p>
 					</div>
 
 					{/* Cor de Fundo */}
@@ -593,6 +614,7 @@ export function DesignPanel() {
 								))}
 							</div>
 							<div className="mt-4">
+								<p className="font-semibold">Customizar</p>
 								<div className="mt-2 mb-3 flex flex-wrap gap-1">
 									<button
 										className="flex h-10 w-10 items-center justify-center rounded-full"
@@ -644,6 +666,40 @@ export function DesignPanel() {
 										/>
 									</div>
 								)}
+							</div>
+							<p className="mt-2 font-semibold text-sm">Direções</p>
+							<div className="mt-3 flex flex-wrap gap-3">
+								{(
+									[
+										{ key: "linear-top", label: "Cima", Icon: ArrowUp },
+										{ key: "linear-bottom", label: "Baixo", Icon: ArrowDown },
+										{ key: "radial", label: "Radial", Icon: CircleDot },
+										{
+											key: "conic-180",
+											label: "Cônico",
+											Icon: RefreshCcw,
+										},
+									] as const
+								).map(({ key, label, Icon }) => (
+									<div className="flex flex-col items-center" key={key}>
+										<button
+											aria-label={label}
+											className={`flex h-18 w-35 items-center justify-center rounded-2xl border ${
+												gradientMode === key ? "bg-zinc-100" : "bg-white"
+											}`}
+											onClick={() => {
+												setGradientMode(key);
+												applyGradientFromColor(gradientBaseColor, key);
+											}}
+											type="button"
+										>
+											<Icon className="h-5 w-5" />
+										</button>
+										<span className="mt-2 text-center text-black text-xs dark:text-white">
+											{label}
+										</span>
+									</div>
+								))}
 							</div>
 						</div>
 					)}
