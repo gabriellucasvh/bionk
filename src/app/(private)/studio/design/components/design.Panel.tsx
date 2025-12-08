@@ -165,6 +165,15 @@ function buildGradient(baseHex: string): string {
 	return `linear-gradient(to top, ${overlay} 0%, ${baseHex} 100%)`;
 }
 
+function extractBaseColorFromGradient(gradient: string): string {
+	const matches = gradient.match(GRADIENT_HEX_RE);
+	if (matches && matches.length > 0) {
+		const last = matches.at(-1) as string;
+		return last;
+	}
+	return "#f2f2f2";
+}
+
 const convertCustomizationsToRecord = (
 	customizations: any
 ): Record<string, string> => ({
@@ -241,13 +250,48 @@ export function DesignPanel() {
 	const handleBackgroundTypeChange = (
 		type: "color" | "gradient" | "image" | "video"
 	) => {
-		// Alternar apenas a aba exibida; não limpar valores existentes.
 		setBackgroundType(type);
-
-		// Para imagem/vídeo, abrir modal de seleção sem alterar o preview atual.
 		if (type === "image" || type === "video") {
 			setBackgroundModalType(type);
 			setIsBackgroundModalOpen(true);
+			return;
+		}
+		if (type === "gradient") {
+			const base = customizations.customBackgroundColor
+				? customizations.customBackgroundColor
+				: customizations.customBackgroundGradient
+					? extractBaseColorFromGradient(
+							customizations.customBackgroundGradient
+						)
+					: "";
+			if (base) {
+				const gradient = buildGradient(base);
+				updateCustomization("customBackgroundGradient", gradient);
+				updateCustomization("customBackgroundColor", "");
+				updateCustomization("customBackgroundMediaType", "");
+				updateCustomization("customBackgroundImageUrl", "");
+				updateCustomization("customBackgroundVideoUrl", "");
+				setGradientBaseColor(base);
+			}
+			return;
+		}
+		if (type === "color") {
+			let color = customizations.customBackgroundColor;
+			if (
+				(!color || color.length === 0) &&
+				customizations.customBackgroundGradient
+			) {
+				color = extractBaseColorFromGradient(
+					customizations.customBackgroundGradient
+				);
+			}
+			if (color) {
+				updateCustomization("customBackgroundColor", color);
+				updateCustomization("customBackgroundGradient", "");
+				updateCustomization("customBackgroundMediaType", "");
+				updateCustomization("customBackgroundImageUrl", "");
+				updateCustomization("customBackgroundVideoUrl", "");
+			}
 		}
 	};
 
@@ -384,8 +428,13 @@ export function DesignPanel() {
 									switch (opt.key) {
 										case "color":
 											return {
-												backgroundColor:
-													customizations.customBackgroundColor || "#f2f2f2",
+												backgroundColor: customizations.customBackgroundColor
+													? customizations.customBackgroundColor
+													: customizations.customBackgroundGradient
+														? extractBaseColorFromGradient(
+																customizations.customBackgroundGradient
+															)
+														: "#f2f2f2",
 											};
 										case "gradient":
 											return customizations.customBackgroundGradient
@@ -393,10 +442,16 @@ export function DesignPanel() {
 														backgroundImage:
 															customizations.customBackgroundGradient,
 													}
-												: {
-														backgroundImage:
-															"linear-gradient(135deg, #f2f2f2 0%, #f2f2f2 100%)",
-													};
+												: customizations.customBackgroundColor
+													? {
+															backgroundImage: buildGradient(
+																customizations.customBackgroundColor
+															),
+														}
+													: {
+															backgroundImage:
+																"linear-gradient(135deg, #f2f2f2 0%, #f2f2f2 100%)",
+														};
 										case "image":
 											return customizations.customBackgroundImageUrl
 												? {
