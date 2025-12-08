@@ -1,7 +1,8 @@
 "use client";
 
-import { Image as ImageIcon, Play } from "lucide-react";
+import { Image as ImageIcon, Play, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { HexColorInput, HexColorPicker } from "react-colorful";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import LoadingSpinner from "@/components/buttons/LoadingSpinner";
 import { ProButton } from "@/components/buttons/ProButton";
@@ -11,9 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useSubscription } from "@/providers/subscriptionProvider";
 import { useDesignStore } from "@/stores/designStore";
-import { FONT_OPTIONS, GRADIENTS } from "../constants/design.constants";
+import {
+	FONT_OPTIONS,
+	GRADIENTS,
+	SOLID_COLORS,
+} from "../constants/design.constants";
 import { ColorPreviews } from "./ColorPreviews";
-import { ColorSelector } from "./ColorSelectors";
+import { ColorOption, ColorSelector } from "./ColorSelectors";
 import { RenderLabel } from "./design.RenderLabel";
 import {
 	ButtonCornersSelector,
@@ -21,6 +26,144 @@ import {
 	FontSelector,
 } from "./FontButtonSelectors";
 import { HeaderStyleButtons } from "./HeaderStylePreview";
+
+const GRADIENT_HEX_RE = /#([0-9a-fA-F]{3,8})/g;
+
+function clamp(n: number, min: number, max: number): number {
+	if (n < min) {
+		return min;
+	}
+	if (n > max) {
+		return max;
+	}
+	return n;
+}
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+	let h = hex.replace(/[^0-9a-fA-F]/g, "");
+	if (h.length === 3) {
+		const r = h[0];
+		const g = h[1];
+		const b = h[2];
+		h = `${r}${r}${g}${g}${b}${b}`;
+	}
+	const r = Number.parseInt(h.slice(0, 2), 16);
+	const g = Number.parseInt(h.slice(2, 4), 16);
+	const b = Number.parseInt(h.slice(4, 6), 16);
+	return { r, g, b };
+}
+
+function rgbToHsl(
+	r: number,
+	g: number,
+	b: number
+): { h: number; s: number; l: number } {
+	const rr = r / 255;
+	const gg = g / 255;
+	const bb = b / 255;
+	const max = Math.max(rr, gg, bb);
+	const min = Math.min(rr, gg, bb);
+	let h = 0;
+	let s = 0;
+	const l = (max + min) / 2;
+	if (max === min) {
+		h = 0;
+		s = 0;
+	} else {
+		const d = max - min;
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+		switch (max) {
+			case rr: {
+				h = (gg - bb) / d + (gg < bb ? 6 : 0);
+				break;
+			}
+			case gg: {
+				h = (bb - rr) / d + 2;
+				break;
+			}
+			default: {
+				h = (rr - gg) / d + 4;
+				break;
+			}
+		}
+		h /= 6;
+	}
+	return { h: h * 360, s: s * 100, l: l * 100 };
+}
+
+function hslToRgb(
+	h: number,
+	s: number,
+	l: number
+): { r: number; g: number; b: number } {
+	const hh = h / 360;
+	const ss = s / 100;
+	const ll = l / 100;
+	if (ss === 0) {
+		const v = Math.round(ll * 255);
+		return { r: v, g: v, b: v };
+	}
+	const q = ll < 0.5 ? ll * (1 + ss) : ll + ss - ll * ss;
+	const p = 2 * ll - q;
+	function hue2rgb(t: number): number {
+		let tt = t;
+		if (tt < 0) {
+			tt += 1;
+		} else if (tt > 1) {
+			tt -= 1;
+		}
+		if (tt < 1 / 6) {
+			return p + (q - p) * 6 * tt;
+		}
+		if (tt < 1 / 2) {
+			return q;
+		}
+		if (tt < 2 / 3) {
+			return p + (q - p) * (2 / 3 - tt) * 6;
+		}
+		return p;
+	}
+	const r = Math.round(hue2rgb(hh + 1 / 3) * 255);
+	const g = Math.round(hue2rgb(hh) * 255);
+	const b = Math.round(hue2rgb(hh - 1 / 3) * 255);
+	return { r, g, b };
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+	const toHex = (v: number) => v.toString(16).padStart(2, "0");
+	return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function computeOverlayColor(baseHex: string): string {
+	const { r, g, b } = hexToRgb(baseHex);
+	const { h, s, l } = rgbToHsl(r, g, b);
+	let overlayR = 0;
+	let overlayG = 0;
+	let overlayB = 0;
+	if (l <= 10) {
+		overlayR = 74;
+		overlayG = 74;
+		overlayB = 74;
+	} else if (l >= 90) {
+		overlayR = 229;
+		overlayG = 229;
+		overlayB = 229;
+	} else {
+		const nh = (h + 22) % 360;
+		const ns = clamp(s + 20, 55, 90);
+		const nl = clamp(l + 15, 40, 80);
+		const rgb2 = hslToRgb(nh, ns, nl);
+		overlayR = rgb2.r;
+		overlayG = rgb2.g;
+		overlayB = rgb2.b;
+	}
+	return rgbToHex(overlayR, overlayG, overlayB);
+}
+
+function buildGradient(baseHex: string): string {
+	const overlay = computeOverlayColor(baseHex);
+	return `linear-gradient(to top, ${overlay} 0%, ${baseHex} 100%)`;
+}
 
 const convertCustomizationsToRecord = (
 	customizations: any
@@ -55,6 +198,19 @@ export function DesignPanel() {
 	const [activeColorPicker, setActiveColorPicker] = useState<string | null>(
 		null
 	);
+	const defaultBaseColor = (() => {
+		const s = customizations.customBackgroundGradient || "";
+		const m = s.match(GRADIENT_HEX_RE);
+		if (m && m.length > 0) {
+			return m.at(-1) as string;
+		}
+		if (customizations.customBackgroundColor) {
+			return customizations.customBackgroundColor;
+		}
+		return "#8b36af";
+	})();
+	const [gradientBaseColor, setGradientBaseColor] =
+		useState<string>(defaultBaseColor);
 	// Estado de UI agora vem do store para persistência
 	const [isSavingPending, setIsSavingPending] = useState(false);
 
@@ -93,6 +249,16 @@ export function DesignPanel() {
 			setBackgroundModalType(type);
 			setIsBackgroundModalOpen(true);
 		}
+	};
+
+	const applyGradientFromColor = (color: string) => {
+		const gradient = buildGradient(color);
+		handleChange("customBackgroundGradient", gradient);
+		handleChange("customBackgroundColor", "");
+		handleChange("customBackgroundMediaType", "");
+		handleChange("customBackgroundImageUrl", "");
+		handleChange("customBackgroundVideoUrl", "");
+		setGradientBaseColor(color);
 	};
 
 	const handleSavePending = async () => {
@@ -291,9 +457,7 @@ export function DesignPanel() {
 												{showIcon ? (
 													<Icon
 														className={`h-6 w-6 ${
-															isSelected
-																? "text-black"
-																: "text-black "
+															isSelected ? "text-black" : "text-black "
 														}`}
 													/>
 												) : null}
@@ -372,6 +536,59 @@ export function DesignPanel() {
 										type="button"
 									/>
 								))}
+							</div>
+							<div className="mt-4">
+								<div className="mt-2 mb-3 flex flex-wrap gap-1">
+									<button
+										className="flex h-10 w-10 items-center justify-center rounded-full"
+										data-color-button
+										onClick={() =>
+											setActiveColorPicker(
+												activeColorPicker === "gradient" ? null : "gradient"
+											)
+										}
+										style={{
+											background:
+												"conic-gradient(from 0deg, red, orange, yellow, green, cyan, blue, violet, red)",
+										}}
+										type="button"
+									>
+										<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white">
+											<Plus className="h-4 w-4" />
+										</span>
+									</button>
+									{gradientBaseColor && (
+										<button
+											className="h-10 w-10 rounded-full border-2 border-lime-700"
+											style={{ backgroundColor: gradientBaseColor }}
+											type="button"
+										/>
+									)}
+									{SOLID_COLORS.map((color) => (
+										<ColorOption
+											color={color}
+											field="customBackgroundGradient"
+											handleChange={(_, v) => applyGradientFromColor(v)}
+											isSelected={false}
+											key={color}
+										/>
+									))}
+								</div>
+								{activeColorPicker === "gradient" && (
+									<div className="mt-3 w-min" data-color-picker>
+										<HexColorPicker
+											color={gradientBaseColor}
+											onChange={(c) => applyGradientFromColor(c)}
+										/>
+										<HexColorInput
+											className="mt-2 w-full rounded border border-zinc-300 p-2 text-center dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
+											color={gradientBaseColor}
+											onChange={(c) => applyGradientFromColor(c)}
+											placeholder="#8b36af"
+											prefixed
+										/>
+									</div>
+								)}
 							</div>
 						</div>
 					)}
