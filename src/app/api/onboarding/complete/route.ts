@@ -5,7 +5,7 @@ import { authOptions, clearUserTokenCache } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { getDefaultCustomPresets } from "@/utils/templatePresets";
-import { USERNAME_FORMAT_ERROR, USERNAME_REGEX } from "@/utils/username";
+import { getUsernameFormatError, USERNAME_REGEX } from "@/utils/username";
 export const runtime = "nodejs";
 
 const USERNAME_REGEX_LOCAL = USERNAME_REGEX;
@@ -20,10 +20,10 @@ function validateOnboardingData(name: string, username: string) {
 	const normalized = username.toLowerCase().trim();
 	const cleaned = normalized.replace(/^\.+|\.+$/g, "");
 	if (cleaned !== normalized) {
-		return USERNAME_FORMAT_ERROR;
+		return getUsernameFormatError(normalized) || "Username inválido";
 	}
 	if (!(normalized && USERNAME_REGEX_LOCAL.test(normalized))) {
-		return USERNAME_FORMAT_ERROR;
+		return getUsernameFormatError(normalized) || "Username inválido";
 	}
 
 	if (BLACKLISTED_USERNAMES.includes(normalized)) {
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
 		const cleaned = normalized.replace(/^\.+|\.+$/g, "");
 		if (cleaned !== normalized) {
 			return NextResponse.json(
-				{ error: USERNAME_FORMAT_ERROR },
+				{ error: getUsernameFormatError(normalized) || "Username inválido" },
 				{ status: 400 }
 			);
 		}

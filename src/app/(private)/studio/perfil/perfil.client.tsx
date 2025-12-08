@@ -20,10 +20,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import {
-	isValidUsernameFormat,
+	getUsernameFormatError,
 	normalizeUsernameForLookup,
 	sanitizeUsername,
-	USERNAME_FORMAT_ERROR,
 } from "@/utils/username";
 import VerPerfilMobile from "../VerPerfilMobile";
 
@@ -287,8 +286,9 @@ const PerfilClient = () => {
 			setValidationError("Nome de usuário deve ter no máximo 30 caracteres.");
 			return false;
 		}
-		if (!isValidUsernameFormat(username)) {
-			setValidationError(USERNAME_FORMAT_ERROR);
+		const formatErr = getUsernameFormatError(username);
+		if (formatErr) {
+			setValidationError(formatErr);
 			return false;
 		}
 		if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {
@@ -299,49 +299,49 @@ const PerfilClient = () => {
 		return true;
 	};
 
-    const checkUsernameAvailability = async (username: string) => {
-        if (!username.trim()) {
-            return;
-        }
-        if (username === originalProfile.username) {
-            setIsCheckingUsername(false);
-            setValidationError("");
-            return;
-        }
-        lastUsernameRequestedRef.current = username;
-        setIsCheckingUsername(true);
-        try {
-            if (usernameCheckAbortRef.current) {
-                usernameCheckAbortRef.current.abort();
-            }
-            const controller = new AbortController();
-            usernameCheckAbortRef.current = controller;
-            const res = await fetch(
-                `/api/auth/check-username?username=${encodeURIComponent(normalizeUsernameForLookup(username))}`,
-                { signal: controller.signal }
-            );
-            const json = await res.json();
-            if (username !== lastUsernameRequestedRef.current) {
-                return;
-            }
-            if (username !== currentUsernameRef.current) {
-                return;
-            }
-            if (json && json.available) {
-                setValidationError("");
-            } else {
-                setValidationError("Nome de usuário já está em uso");
-            }
-        } catch (err: any) {
-            if (err?.name === "AbortError") {
-                return;
-            }
-            setValidationError("Erro ao verificar disponibilidade");
-        } finally {
-            setIsCheckingUsername(false);
-            setIsTypingUsername(false);
-        }
-    };
+	const checkUsernameAvailability = async (username: string) => {
+		if (!username.trim()) {
+			return;
+		}
+		if (username === originalProfile.username) {
+			setIsCheckingUsername(false);
+			setValidationError("");
+			return;
+		}
+		lastUsernameRequestedRef.current = username;
+		setIsCheckingUsername(true);
+		try {
+			if (usernameCheckAbortRef.current) {
+				usernameCheckAbortRef.current.abort();
+			}
+			const controller = new AbortController();
+			usernameCheckAbortRef.current = controller;
+			const res = await fetch(
+				`/api/auth/check-username?username=${encodeURIComponent(normalizeUsernameForLookup(username))}`,
+				{ signal: controller.signal }
+			);
+			const json = await res.json();
+			if (username !== lastUsernameRequestedRef.current) {
+				return;
+			}
+			if (username !== currentUsernameRef.current) {
+				return;
+			}
+			if (json && json.available) {
+				setValidationError("");
+			} else {
+				setValidationError("Nome de usuário já está em uso");
+			}
+		} catch (err: any) {
+			if (err?.name === "AbortError") {
+				return;
+			}
+			setValidationError("Erro ao verificar disponibilidade");
+		} finally {
+			setIsCheckingUsername(false);
+			setIsTypingUsername(false);
+		}
+	};
 
 	const uploadImage = async (file: File): Promise<string | null> => {
 		if (!session?.user?.id) {
@@ -652,6 +652,9 @@ const PerfilClient = () => {
 																const sanitizedUsername = sanitizeUsername(
 																	e.target.value
 																);
+																if (sanitizedUsername === profile.username) {
+																	return;
+																}
 																setProfile({
 																	...profile,
 																	username: sanitizedUsername,
@@ -881,6 +884,9 @@ const PerfilClient = () => {
 																const sanitizedUsername = sanitizeUsername(
 																	e.target.value
 																);
+																if (sanitizedUsername === profile.username) {
+																	return;
+																}
 																setProfile({
 																	...profile,
 																	username: sanitizedUsername,

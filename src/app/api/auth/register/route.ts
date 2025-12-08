@@ -9,7 +9,7 @@ import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
 import { getDefaultCustomPresets } from "@/utils/templatePresets";
-import { USERNAME_FORMAT_ERROR, USERNAME_REGEX } from "@/utils/username";
+import { getUsernameFormatError, USERNAME_REGEX } from "@/utils/username";
 
 const OTP_EXPIRY_MINUTES = 3;
 const MAX_OTP_ATTEMPTS = 5;
@@ -286,12 +286,9 @@ function validateUsernameFormat(
 	normalizedUsername: string
 ): NextResponse | null {
 	if (!USERNAME_REGEX_LOCAL.test(normalizedUsername)) {
-		return NextResponse.json(
-			{
-				error: USERNAME_FORMAT_ERROR,
-			},
-			{ status: 400 }
-		);
+		const msg =
+			getUsernameFormatError(normalizedUsername) || "Username inválido";
+		return NextResponse.json({ error: msg }, { status: 400 });
 	}
 	return null;
 }
@@ -479,7 +476,9 @@ async function handleOtpRequest(email: string, username: string) {
 	const normalizedUsername = (username || "").toLowerCase().trim();
 	const cleaned = normalizedUsername.replace(/^\.+|\.+$/g, "");
 	if (normalizedUsername && cleaned !== normalizedUsername) {
-		return NextResponse.json({ error: USERNAME_FORMAT_ERROR }, { status: 400 });
+		const msg =
+			getUsernameFormatError(normalizedUsername) || "Username inválido";
+		return NextResponse.json({ error: msg }, { status: 400 });
 	}
 
 	if (normalizedUsername) {
@@ -797,7 +796,9 @@ async function handleUserCreation(
 	const normalizedUsername = username.toLowerCase().trim();
 	const cleaned = normalizedUsername.replace(/^\.+|\.+$/g, "");
 	if (cleaned !== normalizedUsername) {
-		return NextResponse.json({ error: USERNAME_FORMAT_ERROR }, { status: 400 });
+		const msg =
+			getUsernameFormatError(normalizedUsername) || "Username inválido";
+		return NextResponse.json({ error: msg }, { status: 400 });
 	}
 	const formatValidation = validateUsernameFormat(normalizedUsername);
 	if (formatValidation) {

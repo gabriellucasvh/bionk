@@ -9,7 +9,7 @@ import { authOptions } from "@/lib/auth";
 import { profileBaseTag } from "@/lib/cache-tags";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
-import { USERNAME_REGEX } from "@/utils/username";
+import { USERNAME_REGEX, getUsernameFormatError } from "@/utils/username";
 export const runtime = "nodejs";
 
 const regex = USERNAME_REGEX;
@@ -233,19 +233,15 @@ export async function PUT(
 
 		if (isUsernameChange) {
 			const normalized = username.toLowerCase().trim();
-			const cleaned = normalized.replace(/^\.+|\.+$/g, "");
-			if (cleaned !== normalized) {
-				return NextResponse.json(
-					{ error: "Username inválido" },
-					{ status: 400 }
-				);
-			}
-			if (!regex.test(normalized)) {
-				return NextResponse.json(
-					{ error: "Username inválido" },
-					{ status: 400 }
-				);
-			}
+        const cleaned = normalized.replace(/^\.+|\.+$/g, "");
+        if (cleaned !== normalized) {
+            const msg = getUsernameFormatError(normalized) || "Username inválido";
+            return NextResponse.json({ error: msg }, { status: 400 });
+        }
+        if (!regex.test(normalized)) {
+            const msg = getUsernameFormatError(normalized) || "Username inválido";
+            return NextResponse.json({ error: msg }, { status: 400 });
+        }
 			if (BLACKLISTED_USERNAMES.includes(normalized)) {
 				return NextResponse.json(
 					{ error: "Username não disponível" },

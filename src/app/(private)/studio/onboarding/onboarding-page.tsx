@@ -11,11 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import {
+	getUsernameFormatError,
 	isValidUsernameFormat,
 	normalizeUsernameForLookup,
 	sanitizeUsername,
-	USERNAME_FORMAT_ERROR,
-	USERNAME_REGEX,
 } from "@/utils/username";
 
 import CustomLinksForm from "./components/CustomLinksForm";
@@ -23,7 +22,6 @@ import SocialLinksSelector from "./components/SocialLinksSelector";
 import TemplateSelector from "./components/TemplateSelector";
 import UserTypeSelector from "./components/UserTypeSelector";
 
-const REGEX_USERNAME = USERNAME_REGEX;
 
 interface OnboardingPageProps {
 	onComplete: (data: OnboardingData) => void;
@@ -201,11 +199,11 @@ export default function OnboardingPageComponent({
 			return;
 		}
 
-		const pattern = REGEX_USERNAME;
-		if (!pattern.test(username)) {
+		const formatErr = getUsernameFormatError(username);
+		if (formatErr) {
 			setUsernameValidation({
 				isValid: false,
-				message: USERNAME_FORMAT_ERROR,
+				message: formatErr,
 				isChecking: false,
 			});
 			setIsTypingUsername(false);

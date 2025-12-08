@@ -5,7 +5,7 @@ import { authOptions, clearUserTokenCache } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { getDefaultCustomPresets } from "@/utils/templatePresets";
-import { USERNAME_FORMAT_ERROR, USERNAME_REGEX } from "@/utils/username";
+import { USERNAME_REGEX, getUsernameFormatError } from "@/utils/username";
 export const runtime = "nodejs";
 
 const BASE64_IMAGE_REGEX = /^data:image\/\w+;base64,/;
@@ -166,23 +166,15 @@ export async function POST(request: NextRequest) {
 		}
 
 		const normalized = username.toLowerCase().trim();
-		const cleaned = normalized.replace(/^\.+|\.+$/g, "");
-		if (cleaned !== normalized) {
-			return NextResponse.json(
-				{
-					error: USERNAME_FORMAT_ERROR,
-				},
-				{ status: 400 }
-			);
-		}
-		if (!USERNAME_REGEX_LOCAL.test(normalized)) {
-			return NextResponse.json(
-				{
-					error: USERNAME_FORMAT_ERROR,
-				},
-				{ status: 400 }
-			);
-		}
+        const cleaned = normalized.replace(/^\.+|\.+$/g, "");
+        if (cleaned !== normalized) {
+            const msg = getUsernameFormatError(normalized) || "Username inválido";
+            return NextResponse.json({ error: msg }, { status: 400 });
+        }
+        if (!USERNAME_REGEX_LOCAL.test(normalized)) {
+            const msg = getUsernameFormatError(normalized) || "Username inválido";
+            return NextResponse.json({ error: msg }, { status: 400 });
+        }
 
 		// Verificar se username está na blacklist
 		if (BLACKLISTED_USERNAMES.includes(username.toLowerCase())) {

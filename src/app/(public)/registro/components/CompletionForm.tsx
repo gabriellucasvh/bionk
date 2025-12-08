@@ -8,9 +8,9 @@ import { BaseButton } from "@/components/buttons/BaseButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    isValidUsernameFormat,
-    sanitizeUsername,
-    normalizeUsernameForLookup,
+	getUsernameFormatError,
+	normalizeUsernameForLookup,
+	sanitizeUsername,
 } from "@/utils/username";
 
 const REJEX_UPPERCASE = /[A-Z]/;
@@ -60,9 +60,9 @@ export function CompletionForm({
 		}
 		setUsernameStatus({ type: "checking" });
 		try {
-            const response = await axios.get(
-                `/api/auth/check-username?username=${encodeURIComponent(normalizeUsernameForLookup(username))}`
-            );
+			const response = await axios.get(
+				`/api/auth/check-username?username=${encodeURIComponent(normalizeUsernameForLookup(username))}`
+			);
 			const current = form.getValues().username || "";
 			if (current !== username) {
 				return;
@@ -84,20 +84,24 @@ export function CompletionForm({
 		}
 	};
 
-	const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = sanitizeUsername(e.target.value);
-		form.setValue("username", value, { shouldValidate: true });
-		setIsTyping(true);
-		setUsernameStatus({ type: "idle" });
-		if (usernameCheckTimeout) {
-			clearTimeout(usernameCheckTimeout);
-		}
-		const timeout = setTimeout(() => {
-			setIsTyping(false);
-			checkUsernameAvailability(value);
-		}, 600);
-		setUsernameCheckTimeout(timeout);
-	};
+    const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const prev = form.getValues().username || "";
+        const value = sanitizeUsername(e.target.value);
+        form.setValue("username", value, { shouldValidate: true });
+        if (value === prev) {
+            return;
+        }
+        setIsTyping(true);
+        setUsernameStatus({ type: "idle" });
+        if (usernameCheckTimeout) {
+            clearTimeout(usernameCheckTimeout);
+        }
+        const timeout = setTimeout(() => {
+            setIsTyping(false);
+            checkUsernameAvailability(value);
+        }, 600);
+        setUsernameCheckTimeout(timeout);
+    };
 
 	const handleUsernameBlur = () => {
 		const value = (form.getValues().username || "").toLowerCase().trim();
@@ -115,9 +119,8 @@ export function CompletionForm({
 	const canSubmit = () => {
 		const hasErrors = Object.keys(form.formState.errors).length > 0;
 		const usernamePresent = !!form.watch("username");
-		const usernameOk =
-			usernameStatus.type === "available" &&
-			isValidUsernameFormat(form.watch("username") || "");
+		const fmtErr = getUsernameFormatError(form.watch("username") || "");
+		const usernameOk = usernameStatus.type === "available" && !fmtErr;
 		const pwd = form.watch("password") || "";
 		const pwdOk =
 			pwd.length >= 9 &&
@@ -204,13 +207,22 @@ export function CompletionForm({
 						</p>
 					)}
 					{!(isTyping || form.formState.errors.username) &&
-						usernameStatus.message && (
-							<p
-								className={`text-sm ${usernameStatus.type === "available" ? "text-green-600" : "text-red-600"}`}
-							>
-								{usernameStatus.message}
-							</p>
-						)}
+						(() => {
+							const err = getUsernameFormatError(form.watch("username") || "");
+							if (err) {
+								return <p className="text-red-600 text-sm">{err}</p>;
+							}
+							if (usernameStatus.message) {
+								return (
+									<p
+										className={`text-sm ${usernameStatus.type === "available" ? "text-green-600" : "text-red-600"}`}
+									>
+										{usernameStatus.message}
+									</p>
+								);
+							}
+							return null;
+						})()}
 				</div>
 			</div>
 
