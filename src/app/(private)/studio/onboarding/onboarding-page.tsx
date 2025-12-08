@@ -125,6 +125,7 @@ export default function OnboardingPageComponent({
 		message: "",
 		isChecking: false,
 	});
+	const [isTypingUsername, setIsTypingUsername] = useState(false);
 	const isGoogleUser =
 		user?.provider === "google" ||
 		Boolean(user?.googleId) ||
@@ -184,6 +185,7 @@ export default function OnboardingPageComponent({
 				message: "",
 				isChecking: false,
 			});
+			setIsTypingUsername(false);
 			return;
 		}
 
@@ -194,6 +196,7 @@ export default function OnboardingPageComponent({
 				message: "Este nome de usuário não está disponível",
 				isChecking: false,
 			});
+			setIsTypingUsername(false);
 			return;
 		}
 
@@ -204,6 +207,7 @@ export default function OnboardingPageComponent({
 				message: USERNAME_FORMAT_ERROR,
 				isChecking: false,
 			});
+			setIsTypingUsername(false);
 			return;
 		}
 
@@ -225,6 +229,7 @@ export default function OnboardingPageComponent({
 						message: "Este nome de usuário não está disponível",
 						isChecking: false,
 					});
+					setIsTypingUsername(false);
 					return;
 				}
 
@@ -248,6 +253,7 @@ export default function OnboardingPageComponent({
 					lastUsernameRequestedRef.current !== username ||
 					username !== data.username
 				) {
+					setIsTypingUsername(false);
 					return;
 				}
 				if (result.available) {
@@ -263,9 +269,11 @@ export default function OnboardingPageComponent({
 						isChecking: false,
 					});
 				}
+				setIsTypingUsername(false);
 			} catch (error) {
 				// Don't show error if request was aborted (user typed something else)
 				if (error instanceof Error && error.name === "AbortError") {
+					setIsTypingUsername(false);
 					return;
 				}
 				setUsernameValidation({
@@ -273,6 +281,7 @@ export default function OnboardingPageComponent({
 					message: "Erro ao verificar disponibilidade",
 					isChecking: false,
 				});
+				setIsTypingUsername(false);
 			}
 		}, 500);
 	}, []);
@@ -283,10 +292,12 @@ export default function OnboardingPageComponent({
 			return;
 		}
 		setData({ ...data, username: sanitized });
+		setIsTypingUsername(true);
 		if (sanitized) {
 			validateUsername(sanitized);
 		} else {
 			setUsernameValidation({ isValid: false, message: "", isChecking: false });
+			setIsTypingUsername(false);
 		}
 	};
 
@@ -319,7 +330,8 @@ export default function OnboardingPageComponent({
 					data.username.trim().length > 0 &&
 					isValidUsernameFormat(data.username) &&
 					usernameValidation.isValid &&
-					!usernameValidation.isChecking;
+					!usernameValidation.isChecking &&
+					!isTypingUsername;
 				return hasName && hasValidUsername;
 			}
 			case 6: {
