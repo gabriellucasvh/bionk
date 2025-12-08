@@ -249,6 +249,8 @@ export function DesignPanel() {
 	const { subscriptionPlan } = useSubscription();
 	const canUseBackgroundMedia =
 		subscriptionPlan === "pro" || subscriptionPlan === "ultra";
+	const canUseAdvancedGradient =
+		subscriptionPlan === "pro" || subscriptionPlan === "ultra";
 
 	// Tipo de fundo selecionado (apenas um por vez)
 	const [backgroundType, setBackgroundType] = useState<
@@ -680,28 +682,49 @@ export function DesignPanel() {
 											Icon: RefreshCcw,
 										},
 									] as const
-								).map(({ key, label, Icon }) => (
-									<div className="flex flex-col items-center" key={key}>
-										<button
-											aria-label={label}
-											className={`flex h-18 w-35 items-center justify-center rounded-2xl border ${
-												gradientMode === key
-													? "bg-zinc-100 ring-2 ring-black ring-offset-2 dark:bg-zinc-600 dark:ring-white"
-													: "bg-white dark:bg-zinc-700"
-											}`}
-											onClick={() => {
-												setGradientMode(key);
-												applyGradientFromColor(gradientBaseColor, key);
-											}}
-											type="button"
+								).map(({ key, label, Icon }) => {
+									const isRestricted = key === "radial" || key === "conic-180";
+									const isDisabled = isRestricted && !canUseAdvancedGradient;
+									return (
+										<div
+											className="relative flex flex-col items-center"
+											key={key}
 										>
-											<Icon className="h-5 w-5" />
-										</button>
-										<span className="mt-2 text-center text-black text-xs dark:text-white">
-											{label}
-										</span>
-									</div>
-								))}
+											<button
+												aria-label={label}
+												className={`flex h-18 w-35 items-center justify-center rounded-2xl border ${
+													gradientMode === key
+														? "bg-zinc-200 ring-2 ring-black ring-offset-2 dark:bg-zinc-600 dark:ring-white"
+														: "bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-700 dark:hover:bg-zinc-600"
+												} ${isDisabled ? "cursor-not-allowed opacity-60" : ""}`}
+												onClick={() => {
+													if (isDisabled) {
+														return;
+													}
+													setGradientMode(key);
+													applyGradientFromColor(gradientBaseColor, key);
+												}}
+												type="button"
+											>
+												<Icon className="h-5 w-5" />
+											</button>
+											{isDisabled ? (
+												<div className="absolute top-1 right-1 z-10">
+													<ProButton
+														href="/planos"
+														label="Pro"
+														showOverlayTooltip={false}
+														size="xs"
+														tooltip="Disponível nos planos Pro e Ultra"
+													/>
+												</div>
+											) : null}
+											<span className="mt-2 text-center text-black text-xs dark:text-white">
+												{label}
+											</span>
+										</div>
+									);
+								})}
 							</div>
 						</div>
 					)}
