@@ -81,6 +81,7 @@ export async function POST(req: Request) {
 			rawMusics,
 			rawSections,
 			rawEvents,
+			rawQRCodes,
 		] = await Promise.all([
 			popBatchList(r, "events:clicks", maxBatch),
 			popBatchList(r, "events:views", maxBatch),
@@ -91,6 +92,7 @@ export async function POST(req: Request) {
 			popBatchListPrefix(r, "ingest:musics", maxBatch),
 			popBatchListPrefix(r, "ingest:sections", maxBatch),
 			popBatchListPrefix(r, "ingest:events", maxBatch),
+			popBatchListPrefix(r, "ingest:qrcodes", maxBatch),
 		]);
 		const clicks: any[] = [];
 		const views: any[] = [];
@@ -101,6 +103,7 @@ export async function POST(req: Request) {
 		const musics: any[] = [];
 		const sections: any[] = [];
 		const events: any[] = [];
+		const qrcodes: any[] = [];
 		for (const raw of rawClicks) {
 			if (!raw) {
 				continue;
@@ -174,6 +177,15 @@ export async function POST(req: Request) {
 			} catch {}
 		}
 
+		for (const raw of rawQRCodes) {
+			if (!raw) {
+				continue;
+			}
+			try {
+				qrcodes.push(JSON.parse(raw));
+			} catch {}
+		}
+
 		let insertedClicks = 0;
 		let insertedViews = 0;
 		let insertedLinks = 0;
@@ -183,6 +195,7 @@ export async function POST(req: Request) {
 		let insertedMusics = 0;
 		let insertedSections = 0;
 		let insertedEvents = 0;
+		let generatedQRCodes = 0;
 
 		if (clicks.length > 0) {
 			const data = clicks.map((c) => ({
@@ -605,6 +618,33 @@ export async function POST(req: Request) {
 			}
 		}
 
+		if (qrcodes.length > 0) {
+			const byUser = new Map<string, any[]>();
+			for (const item of qrcodes) {
+				const uid = String(item.userId || "");
+				const arr = byUser.get(uid) || [];
+				arr.push(item);
+				byUser.set(uid, arr);
+			}
+			const jobs: Promise<any>[] = [];
+			for (const [_uid, arr] of byUser.entries()) {
+				jobs.push(
+					(async () => {
+						const mod = await import("@/lib/qrcode");
+						for (const item of arr) {
+							try {
+								const fmt = item.format === "svg" ? "svg" : "png";
+								const size = Math.max(128, Math.min(2048, Number(item.size || 512)));
+								await mod.buildAndCacheQr(String(item.rawUrl), { format: fmt, size, userId: String(item.userId || "") });
+								generatedQRCodes += 1;
+							} catch {}
+						}
+					})()
+				);
+			}
+			await Promise.all(jobs);
+		}
+
 		const response = NextResponse.json({
 			clicks: insertedClicks,
 			views: insertedViews,
@@ -615,6 +655,7 @@ export async function POST(req: Request) {
 			musics: insertedMusics,
 			sections: insertedSections,
 			events: insertedEvents,
+			qrcodes: generatedQRCodes,
 			empty:
 				insertedClicks === 0 &&
 				insertedViews === 0 &&
@@ -624,7 +665,8 @@ export async function POST(req: Request) {
 				insertedImages === 0 &&
 				insertedMusics === 0 &&
 				insertedSections === 0 &&
-				insertedEvents === 0,
+				insertedEvents === 0 &&
+				generatedQRCodes === 0,
 		});
 		if (
 			insertedClicks === 0 &&
@@ -635,7 +677,8 @@ export async function POST(req: Request) {
 			insertedImages === 0 &&
 			insertedMusics === 0 &&
 			insertedSections === 0 &&
-			insertedEvents === 0
+			insertedEvents === 0 &&
+			generatedQRCodes === 0
 		) {
 			response.headers.set("Retry-After", "30");
 		}
