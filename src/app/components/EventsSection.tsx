@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 export default function EventsSection() {
 	return (
 		<section className="bg-bunker-50 py-24">
@@ -29,18 +27,6 @@ export default function EventsSection() {
 							<div className="my-2 text-bunker-700">
 								<p>São Paulo</p>
 								{new Date().toLocaleDateString()} • 19:00
-							</div>
-							<div className="flex text-bunker-700 text-xs">
-								<Image
-									alt="Sympla"
-									height={15}
-									src="/images/sympla-icon.svg"
-									width={15}
-								/>{" "}
-								• Sympla
-							</div>
-							<div className="mt-4 cursor-pointer select-none rounded-full border border-bunker-200 bg-black px-4 py-2 text-center text-sm text-white">
-								Comprar
 							</div>
 						</div>
 						<p className="mt-3 text-bunker-700">
