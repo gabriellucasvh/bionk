@@ -273,7 +273,7 @@ export default function QrcodeStudioPage() {
 								/>
 								<div className="min-w-0 flex-1">
 									<div className="max-w-full truncate text-muted-foreground text-sm">
-										{it.originalUrl || it.url}
+										{it.originalUrl || ""}
 									</div>
 									<div className="text-muted-foreground text-xs">
 										{createdLabel(it.createdAt)}
@@ -281,8 +281,11 @@ export default function QrcodeStudioPage() {
 									<div className="mt-2 flex gap-2">
 										<span className="group relative inline-flex">
 											<Button
+												disabled={
+													!(it.originalUrl && URL_REGEX.test(it.originalUrl))
+												}
 												onClick={() => {
-													const target = it.originalUrl || it.url;
+													const target = it.originalUrl || "";
 													if (!target) {
 														return;
 													}
@@ -299,8 +302,11 @@ export default function QrcodeStudioPage() {
 										</span>
 										<span className="group relative inline-flex">
 											<Button
+												disabled={
+													!(it.originalUrl && URL_REGEX.test(it.originalUrl))
+												}
 												onClick={() => {
-													const target = it.originalUrl || it.url;
+													const target = it.originalUrl || "";
 													if (!(target && URL_REGEX.test(target))) {
 														return;
 													}

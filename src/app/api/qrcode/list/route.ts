@@ -12,26 +12,43 @@ export async function GET() {
 	}
 	try {
 		const r = getRedis();
-		const hashes = (await r.smembers<string[]>(`qrcode:user:${uid}`)) || [];
+		let hashes: string[] = [];
+		try {
+			hashes = (await r.smembers(`qrcode:user:${uid}`)) || [];
+		} catch {
+			hashes = [];
+		}
+		hashes = hashes.filter((h) => typeof h === "string" && h.length > 0);
 		const items = await Promise.all(
 			hashes.map(async (h) => {
-				const [metaStr, url] = await Promise.all([
-					r.get<string | null>(`qrcode:meta:${h}`),
-					r.get<string | null>(`qrcode:map:${h}`),
-				]);
-				if (!url) {
+				try {
+					const [metaStr, url] = await Promise.all([
+						r.get<string | null>(`qrcode:meta:${h}`),
+						r.get<string | null>(`qrcode:map:${h}`),
+					]);
+					if (!url) {
+						return null;
+					}
+					let meta: any = {};
+					if (metaStr) {
+						try {
+							meta = JSON.parse(metaStr);
+						} catch {
+							meta = {};
+						}
+					}
+					return {
+						hash: h,
+						url,
+						createdAt: meta.createdAt || null,
+						format: meta.format || null,
+						size: Number(meta.size || 0),
+						bytes: Number(meta.bytes || 0),
+						originalUrl: meta.originalUrl || null,
+					};
+				} catch {
 					return null;
 				}
-				const meta = metaStr ? JSON.parse(metaStr) : {};
-				return {
-					hash: h,
-					url,
-					createdAt: meta.createdAt || null,
-					format: meta.format || null,
-					size: Number(meta.size || 0),
-					bytes: Number(meta.bytes || 0),
-					originalUrl: meta.originalUrl || null,
-				};
 			})
 		);
 		const out = items.filter((x) => !!x) as any[];
