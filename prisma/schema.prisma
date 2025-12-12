@@ -85,6 +85,7 @@ model User {
   MonthlyUserAnalytics          MonthlyUserAnalytics[]
   MonthlyLinkAnalytics          MonthlyLinkAnalytics[]
   Event                         Event[]
+  QrCode                        QrCode[]
 
   @@index([subscriptionStatus])
   @@index([createdAt])
@@ -415,4 +416,18 @@ model Event {
 
   @@index([userId])
   @@index([userId, order])
+}
+
+model QrCode {
+  hash         String   @id
+  userId       String
+  originalUrl  String
+  storageUrl   String
+  createdAt    DateTime @default(now())
+  requestCount Int      @default(1)
+  status       String   @default("ativo")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }

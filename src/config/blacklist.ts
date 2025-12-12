@@ -39,6 +39,7 @@ const BASE_FORBIDDEN_USERNAMES: string[] = [
 	"mastodon",
 	"wechat",
 	"line",
+	"qrcode"
 ];
 
 // Função para adicionar a variante com _

@@ -5,6 +5,7 @@ import QRCode, {
 	type QRCodeToBufferOptions,
 	type QRCodeToStringOptions,
 } from "qrcode";
+import prisma from "@/lib/prisma";
 import { getRedis } from "@/lib/redis";
 
 const HTTP_SCHEME_RE = /^https?:\/\//i;
@@ -119,8 +120,7 @@ export async function saveQr(
 	} else {
 		await fs.writeFile(filePath, payload.data as string, { encoding: "utf-8" });
 	}
-	const base = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
-	const publicUrl = `${base}/qr/${file}`;
+	const publicUrl = `/qr/${file}`;
 	return { filePath, publicUrl };
 }
 
@@ -133,17 +133,31 @@ export async function getCachedUrl(hash: string): Promise<string | null> {
 export async function setCache(
 	hash: string,
 	url: string,
-	meta: { userId?: string | null; size: number; format: string; bytes: number }
+	meta: {
+		userId?: string | null;
+		size: number;
+		format: string;
+		bytes: number;
+		originalUrl?: string;
+	}
 ): Promise<void> {
 	const r = getRedis();
 	await r.set(`qrcode:map:${hash}`, url);
+	const createdAt = new Date().toISOString();
 	const m = {
 		userId: meta.userId || "",
 		size: String(meta.size),
 		format: meta.format,
 		bytes: String(meta.bytes),
-		createdAt: String(new Date().toISOString()),
+		createdAt,
+		originalUrl: meta.originalUrl || "",
+		url,
+		hash,
 	};
+	await r.set(`qrcode:meta:${hash}`, JSON.stringify(m));
+	if (meta.userId) {
+		await r.sadd(`qrcode:user:${meta.userId}`, hash);
+	}
 	try {
 		await r.xadd("logs:qrcode", "*", m);
 	} catch {}
@@ -166,11 +180,34 @@ export async function buildAndCacheQr(
 	const canon = canonicalizeUrl(rawUrl);
 	const fmt = opts.format === "svg" ? "svg" : "png";
 	const size = Math.max(128, Math.min(2048, Number(opts.size || 512)));
-	const key = shortHash(`${canon}|${fmt}|${size}`);
+	const key = shortHash(`${canon}`);
 	const cached = await getCachedUrl(key);
+	const uid = opts.userId ? String(opts.userId) : null;
 	if (cached) {
+		if (uid) {
+			try {
+				await prisma.qrCode.upsert({
+					where: { hash: key },
+					update: {
+						requestCount: { increment: 1 },
+						storageUrl: cached,
+						status: "ativo",
+					},
+					create: {
+						hash: key,
+						userId: uid,
+						originalUrl: canon,
+						storageUrl: cached,
+						status: "ativo",
+					},
+				});
+			} catch {}
+		}
 		return { hash: key, url: cached, bytes: 0, size, format: fmt };
 	}
+	const existing = uid
+		? await prisma.qrCode.findUnique({ where: { hash: key } }).catch(() => null)
+		: null;
 	const qr = await generateQr(canon, { format: fmt, size });
 	const saved = await saveQr(key, { format: qr.format, data: qr.data });
 	await setCache(key, saved.publicUrl, {
@@ -178,7 +215,32 @@ export async function buildAndCacheQr(
 		size,
 		format: fmt,
 		bytes: qr.bytes,
+		originalUrl: canon,
 	});
+	if (uid) {
+		try {
+			if (existing) {
+				await prisma.qrCode.update({
+					where: { hash: key },
+					data: {
+						requestCount: { increment: 1 },
+						storageUrl: saved.publicUrl,
+						status: "regenerado",
+					},
+				});
+			} else {
+				await prisma.qrCode.create({
+					data: {
+						hash: key,
+						userId: uid,
+						originalUrl: canon,
+						storageUrl: saved.publicUrl,
+						status: "ativo",
+					},
+				});
+			}
+		} catch {}
+	}
 	return {
 		hash: key,
 		url: saved.publicUrl,
