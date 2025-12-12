@@ -1,10 +1,9 @@
 import crypto from "node:crypto";
-import fs from "node:fs/promises";
-import path from "node:path";
 import QRCode, {
 	type QRCodeToBufferOptions,
 	type QRCodeToStringOptions,
 } from "qrcode";
+import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
 import { getRedis } from "@/lib/redis";
 
@@ -12,6 +11,15 @@ const HTTP_SCHEME_RE = /^https?:\/\//i;
 const HOSTNAME_RE = /^[\w.-]+$/;
 const TRAILING_SLASHES_RE = /\/+$/;
 const UTM_PARAM_RE = /^(utm_|gclid|fbclid|msclkid)$/i;
+const SVG_CLOSE_RE = /<\/svg>\s*$/i;
+const SVG_OPEN_RE = /^<svg\b[^>]*>/i;
+const XMLNS_XLINK_RE = /\sxmlns:xlink=/i;
+const SVG_WIDTH_RE = /\bwidth="(\d+)(?:px)?"/i;
+const SVG_VIEWBOX_RE = /\bviewBox="\s*0\s+0\s+(\d+)\s+(\d+)\s*"/i;
+const END_TAG_RE = />$/;
+const BASE64_PLUS_RE = /\+/g;
+const BASE64_SLASH_RE = /\//g;
+const BASE64_EQUALS_END_RE = /=+$/g;
 
 function ensureHttps(u: string): string {
 	const s = String(u || "").trim();
@@ -68,28 +76,26 @@ export function shortHash(input: string): string {
 	const h = crypto.createHash("sha256").update(input).digest();
 	const b64 = h
 		.toString("base64")
-		.replace(/\+/g, "-")
-		.replace(/\//g, "_")
-		.replace(/=+$/g, "");
+		.replace(BASE64_PLUS_RE, "-")
+		.replace(BASE64_SLASH_RE, "_")
+		.replace(BASE64_EQUALS_END_RE, "");
 	return b64.slice(0, 12);
-}
-
-async function ensureDir(dir: string): Promise<void> {
-	try {
-		await fs.mkdir(dir, { recursive: true });
-	} catch {}
 }
 
 export async function generateQr(
 	url: string,
-	opts: { format?: "png" | "svg"; size?: number }
+	opts: {
+		format?: "png" | "svg";
+		size?: number;
+		ecLevel?: "L" | "M" | "Q" | "H";
+	}
 ): Promise<{ format: "png" | "svg"; data: Buffer | string; bytes: number }> {
 	const format = opts.format === "svg" ? "svg" : "png";
 	const size = Math.max(128, Math.min(2048, Number(opts.size || 512)));
 	const scale = Math.max(2, Math.min(16, Math.round(size / 32)));
 	if (format === "png") {
 		const buf: Buffer = await QRCode.toBuffer(url, {
-			errorCorrectionLevel: "M",
+			errorCorrectionLevel: opts.ecLevel || "M",
 			scale,
 			margin: 2,
 			color: { dark: "#000000", light: "#ffffff" },
@@ -97,7 +103,7 @@ export async function generateQr(
 		return { format, data: buf, bytes: buf.byteLength };
 	}
 	const svg: string = await QRCode.toString(url, {
-		errorCorrectionLevel: "M",
+		errorCorrectionLevel: opts.ecLevel || "M",
 		type: "svg",
 		scale,
 		margin: 2,
@@ -109,19 +115,30 @@ export async function generateQr(
 
 export async function saveQr(
 	hash: string,
-	payload: { format: "png" | "svg"; data: Buffer | string }
+	payload: { format: "png" | "svg"; data: Buffer | string; variant?: string },
+	userId?: string | null
 ): Promise<{ filePath: string; publicUrl: string }> {
-	const dir = path.join(process.cwd(), "public", "qr");
-	await ensureDir(dir);
-	const file = `${hash}.${payload.format}`;
-	const filePath = path.join(dir, file);
+	const suffix = payload.variant ? `-${payload.variant}` : "";
+	const publicId = `${hash}${suffix}`;
+	let fileUri = "";
 	if (payload.format === "png") {
-		await fs.writeFile(filePath, payload.data as Buffer);
+		const buf = payload.data as Buffer;
+		const b64 = buf.toString("base64");
+		fileUri = `data:image/png;base64,${b64}`;
 	} else {
-		await fs.writeFile(filePath, payload.data as string, { encoding: "utf-8" });
+		const svgText = String(payload.data);
+		const b64 = Buffer.from(svgText, "utf-8").toString("base64");
+		fileUri = `data:image/svg+xml;base64,${b64}`;
 	}
-	const publicUrl = `/qr/${file}`;
-	return { filePath, publicUrl };
+	const folder = userId ? `qrcodes/${userId}` : "qrcodes";
+	const result = await cloudinary.uploader.upload(fileUri, {
+		folder,
+		public_id: publicId,
+		overwrite: true,
+		resource_type: "image",
+	} as any);
+	const publicUrl = (result as any).secure_url as string;
+	return { filePath: "", publicUrl };
 }
 
 export async function getCachedUrl(hash: string): Promise<string | null> {
@@ -165,7 +182,12 @@ export async function setCache(
 
 export async function buildAndCacheQr(
 	rawUrl: string,
-	opts: { format?: "png" | "svg"; size?: number; userId?: string | null }
+	opts: {
+		format?: "png" | "svg";
+		size?: number;
+		userId?: string | null;
+		logoUrl?: string | null;
+	}
 ): Promise<{
 	hash: string;
 	url: string;
@@ -178,9 +200,9 @@ export async function buildAndCacheQr(
 		throw new Error("URL inválida");
 	}
 	const canon = canonicalizeUrl(rawUrl);
-	const fmt = opts.format === "svg" ? "svg" : "png";
+	const fmt = opts.logoUrl ? "svg" : opts.format === "svg" ? "svg" : "png";
 	const size = Math.max(128, Math.min(2048, Number(opts.size || 512)));
-	const key = shortHash(`${canon}`);
+	const key = shortHash(`${canon}|${fmt}|${size}|${opts.logoUrl || ""}`);
 	const cached = await getCachedUrl(key);
 	const uid = opts.userId ? String(opts.userId) : null;
 	if (cached) {
@@ -208,13 +230,60 @@ export async function buildAndCacheQr(
 	const existing = uid
 		? await prisma.qrCode.findUnique({ where: { hash: key } }).catch(() => null)
 		: null;
-	const qr = await generateQr(canon, { format: fmt, size });
-	const saved = await saveQr(key, { format: qr.format, data: qr.data });
+	const qr = await generateQr(canon, {
+		format: fmt,
+		size,
+		ecLevel: opts.logoUrl ? "H" : "M",
+	});
+	let dataOut = qr.data;
+	if (fmt === "svg" && typeof dataOut === "string" && opts.logoUrl) {
+		const text = String(dataOut);
+		const vb = text.match(SVG_VIEWBOX_RE);
+		const ww = text.match(SVG_WIDTH_RE);
+		const dim = vb
+			? Math.max(Number(vb[1] || 0), Number(vb[2] || 0))
+			: ww
+				? Number(ww[1])
+				: size;
+		const overlaySize = Math.round(dim * 0.3);
+		const xy = Math.round((dim - overlaySize) / 2);
+		let href = String(opts.logoUrl);
+		try {
+			const resp = await fetch(href);
+			const ct = resp.headers.get("content-type") || "image/png";
+			const ab = await resp.arrayBuffer();
+			const b64 = Buffer.from(ab).toString("base64");
+			href = `data:${ct};base64,${b64}`;
+		} catch {}
+		const injection = `\n<rect x="${xy - Math.round(overlaySize * 0.08)}" y="${xy - Math.round(overlaySize * 0.08)}" width="${overlaySize + Math.round(overlaySize * 0.16)}" height="${overlaySize + Math.round(overlaySize * 0.16)}" rx="${Math.round(overlaySize * 0.12)}" fill="#ffffff" />\n<image href="${href}" xlink:href="${href}" x="${xy}" y="${xy}" width="${overlaySize}" height="${overlaySize}" preserveAspectRatio="xMidYMid meet" />\n`;
+		let svgText = text;
+		if (SVG_OPEN_RE.test(svgText) && !XMLNS_XLINK_RE.test(svgText)) {
+			svgText = svgText.replace(SVG_OPEN_RE, (m) =>
+				m.replace(END_TAG_RE, ' xmlns:xlink="http://www.w3.org/1999/xlink">')
+			);
+		}
+		dataOut = svgText.replace(SVG_CLOSE_RE, `${injection}</svg>`);
+	}
+	const bytesOut =
+		fmt === "svg" && typeof dataOut === "string"
+			? Buffer.byteLength(String(dataOut), "utf-8")
+			: fmt === "png"
+				? (dataOut as Buffer).byteLength
+				: 0;
+	const saved = await saveQr(
+		key,
+		{
+			format: fmt,
+			data: dataOut,
+			variant: opts.logoUrl ? "logo" : undefined,
+		},
+		uid
+	);
 	await setCache(key, saved.publicUrl, {
 		userId: opts.userId || null,
 		size,
 		format: fmt,
-		bytes: qr.bytes,
+		bytes: bytesOut,
 		originalUrl: canon,
 	});
 	if (uid) {
@@ -244,7 +313,7 @@ export async function buildAndCacheQr(
 	return {
 		hash: key,
 		url: saved.publicUrl,
-		bytes: qr.bytes,
+		bytes: bytesOut,
 		size,
 		format: fmt,
 	};

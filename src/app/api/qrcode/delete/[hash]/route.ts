@@ -1,8 +1,7 @@
-import fs from "node:fs/promises";
-import path from "node:path";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import cloudinary from "@/lib/cloudinary";
 import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 
@@ -26,18 +25,16 @@ export async function DELETE(
 		if (!meta || String(meta.userId || "") !== String(uid)) {
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
-		const dir = path.join(process.cwd(), "public", "qr");
-		const files = [
-			path.join(dir, `${hash}.png`),
-			path.join(dir, `${hash}.svg`),
-		];
-		await Promise.all(
-			files.map(async (f) => {
-				try {
-					await fs.unlink(f);
-				} catch {}
-			})
-		);
+		try {
+			await cloudinary.uploader.destroy(`qrcodes/${uid}/${hash}`, {
+				resource_type: "image",
+			} as any);
+		} catch {}
+		try {
+			await cloudinary.uploader.destroy(`qrcodes/${uid}/${hash}-logo`, {
+				resource_type: "image",
+			} as any);
+		} catch {}
 		await Promise.all([
 			r.del(`qrcode:map:${hash}`),
 			r.del(`qrcode:meta:${hash}`),

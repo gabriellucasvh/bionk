@@ -1,10 +1,11 @@
 "use client";
 
-import { Copy, Download, ExternalLink, Trash2 } from "lucide-react";
+import { Copy, Download, ExternalLink, Trash2, Upload } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
+import ImageCropModal from "@/components/modals/ImageCropModal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +35,9 @@ export default function QrcodeStudioPage() {
 	const [loading, setLoading] = useState(false);
 	const [submitting, setSubmitting] = useState(false);
 	const [link, setLink] = useState("");
+	const [logoUrl, setLogoUrl] = useState<string | null>(null);
+	const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+	const [isLogoCropModalOpen, setIsLogoCropModalOpen] = useState(false);
 
 	const count = items.length;
 
@@ -51,6 +55,11 @@ export default function QrcodeStudioPage() {
 				} else {
 					setItems([]);
 				}
+				const logoRes = await fetch("/api/qrcode/logo", { cache: "no-store" });
+				if (logoRes.ok) {
+					const js = await logoRes.json();
+					setLogoUrl(js?.url || null);
+				}
 			} catch {
 				setItems([]);
 			} finally {
@@ -60,7 +69,7 @@ export default function QrcodeStudioPage() {
 		run();
 	}, [session]);
 
-	const submit = async () => {
+	const submit = async (withLogo: boolean) => {
 		const raw = link.trim();
 		if (!(raw && URL_REGEX.test(raw))) {
 			return;
@@ -70,7 +79,9 @@ export default function QrcodeStudioPage() {
 			const res = await fetch("/api/qrcode", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ url: raw }),
+				body: JSON.stringify(
+					withLogo && logoUrl ? { url: raw, logoUrl } : { url: raw }
+				),
 			});
 			if (!res.ok) {
 				return;
@@ -89,6 +100,34 @@ export default function QrcodeStudioPage() {
 			setLink("");
 		} catch {}
 		setSubmitting(false);
+	};
+
+	const handleLogoFile = async (file: File) => {
+		setIsUploadingLogo(true);
+		try {
+			const fd = new FormData();
+			fd.append("file", file);
+			const res = await fetch("/api/qrcode/logo", {
+				method: "POST",
+				body: fd,
+			});
+			const json = await res.json();
+			if (!(res.ok && json.url)) {
+				return;
+			}
+			const url = String(json.url);
+			setLogoUrl(url);
+		} catch {}
+		setIsUploadingLogo(false);
+	};
+
+	const handleLogoSaveFromCrop = async (imageUrl: string) => {
+		try {
+			const blob = await fetch(imageUrl).then((r) => r.blob());
+			const fileType = blob.type || "image/png";
+			const file = new File([blob], "logo.png", { type: fileType });
+			await handleLogoFile(file);
+		} catch {}
 	};
 
 	const remove = async (hash: string) => {
@@ -155,18 +194,50 @@ export default function QrcodeStudioPage() {
 							placeholder="https://exemplo.com"
 							value={link}
 						/>
-						<BaseButton
-							className="w-xs"
-							disabled={
-								submitting ||
-								loading ||
-								!(link.trim() && URL_REGEX.test(link.trim()))
-							}
-							onClick={submit}
-                            variant="studio"
-						>
-							Gerar QR
-						</BaseButton>
+						<div className="flex items-center gap-2">
+							<BaseButton
+								className="w-xs"
+								disabled={
+									submitting ||
+									loading ||
+									!(link.trim() && URL_REGEX.test(link.trim()))
+								}
+								onClick={() => submit(!!logoUrl)}
+								variant="studio"
+							>
+								Gerar QR
+							</BaseButton>
+							<Button
+								disabled={isUploadingLogo}
+								onClick={() => {
+									setIsLogoCropModalOpen(true);
+								}}
+								variant="outline"
+							>
+								<Upload className="mr-2 h-4 w-4" /> Selecionar logo
+							</Button>
+							{logoUrl && (
+								<div className="flex items-center gap-2">
+									<Image
+										alt="Logo"
+										className="size-8 rounded"
+										height={32}
+										src={logoUrl}
+										width={32}
+									/>
+									<Button
+										onClick={async () => {
+											setLogoUrl(null);
+											await fetch("/api/qrcode/logo", { method: "DELETE" });
+										}}
+										size="icon"
+										variant="ghost"
+									>
+										X
+									</Button>
+								</div>
+							)}
+						</div>
 					</div>
 				</CardContent>
 			</Card>
@@ -273,6 +344,17 @@ export default function QrcodeStudioPage() {
 					</Card>
 				))}
 			</div>
+
+			<ImageCropModal
+				currentImageUrl={logoUrl || undefined}
+				isOpen={isLogoCropModalOpen}
+				onClose={() => setIsLogoCropModalOpen(false)}
+				onImageRemove={async () => {
+					setLogoUrl(null);
+					await fetch("/api/qrcode/logo", { method: "DELETE" });
+				}}
+				onImageSave={handleLogoSaveFromCrop}
+			/>
 		</div>
 	);
 }

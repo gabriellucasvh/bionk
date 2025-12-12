@@ -1,8 +1,7 @@
-import fs from "node:fs/promises";
-import path from "node:path";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import cloudinary from "@/lib/cloudinary";
 import { getRedis } from "@/lib/redis";
 export const runtime = "nodejs";
 
@@ -15,15 +14,17 @@ export async function POST() {
 	try {
 		const r = getRedis();
 		const hashes = (await r.smembers<string[]>(`qrcode:user:${uid}`)) || [];
-		const dir = path.join(process.cwd(), "public", "qr");
-		const files = hashes.flatMap((h) => [
-			path.join(dir, `${h}.png`),
-			path.join(dir, `${h}.svg`),
-		]);
 		await Promise.all(
-			files.map(async (f) => {
+			hashes.map(async (h) => {
 				try {
-					await fs.unlink(f);
+					await cloudinary.uploader.destroy(`qrcodes/${uid}/${h}`, {
+						resource_type: "image",
+					} as any);
+				} catch {}
+				try {
+					await cloudinary.uploader.destroy(`qrcodes/${uid}/${h}-logo`, {
+						resource_type: "image",
+					} as any);
 				} catch {}
 			})
 		);

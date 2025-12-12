@@ -17,11 +17,15 @@ export async function POST(req: NextRequest) {
 	try {
 		const body = await req.json();
 		const rawUrl = typeof body?.url === "string" ? body.url.trim() : "";
+		const logoUrl = typeof body?.logoUrl === "string" ? body.logoUrl.trim() : "";
 		const format = body?.format === "svg" ? "svg" : "png";
 		const size = Math.max(128, Math.min(2048, Number(body?.size || 512)));
 		const mode = String(body?.mode || "inline");
 		if (!(rawUrl && URL_REGEX.test(rawUrl))) {
 			return NextResponse.json({ error: "URL inválida" }, { status: 400 });
+		}
+		if (logoUrl && !URL_REGEX.test(logoUrl)) {
+			return NextResponse.json({ error: "Logo inválida" }, { status: 400 });
 		}
 		const canon = canonicalizeUrl(rawUrl);
 		const key = shortHash(`${canon}|${format}|${size}`);
@@ -38,7 +42,12 @@ export async function POST(req: NextRequest) {
 			res.headers.set("Cache-Control", "no-store");
 			return res;
 		}
-		const qr = await buildAndCacheQr(canon, { format, size, userId: uid });
+		const qr = await buildAndCacheQr(canon, {
+			format,
+			size,
+			userId: uid,
+			logoUrl: logoUrl || null,
+		});
 		const res = NextResponse.json({
 			url: qr.url,
 			hash: qr.hash,
