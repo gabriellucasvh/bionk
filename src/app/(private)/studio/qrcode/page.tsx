@@ -1,6 +1,6 @@
 "use client";
 
-import { Copy, Download, ExternalLink, Trash2, Upload } from "lucide-react";
+import { Copy, Download, ExternalLink, ImageIcon, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -226,15 +226,14 @@ export default function QrcodeStudioPage() {
 							>
 								Gerar QR
 							</BaseButton>
-							<Button
+							<BaseButton
 								disabled={isUploadingLogo}
 								onClick={() => {
 									setIsLogoCropModalOpen(true);
 								}}
-								variant="outline"
 							>
-								<Upload className="mr-2 h-4 w-4" /> Selecionar logo
-							</Button>
+								<ImageIcon className="h-4 w-6" /> Usar logo
+							</BaseButton>
 							{logoUrl && (
 								<div className="flex items-center gap-2">
 									<Image
