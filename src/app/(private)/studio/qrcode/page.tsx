@@ -74,6 +74,11 @@ export default function QrcodeStudioPage() {
 		if (!(raw && URL_REGEX.test(raw))) {
 			return;
 		}
+		if (
+			items.some((it) => (it.originalUrl ? it.originalUrl.trim() : "") === raw)
+		) {
+			return;
+		}
 		setSubmitting(true);
 		try {
 			const res = await fetch("/api/qrcode", {
@@ -96,7 +101,16 @@ export default function QrcodeStudioPage() {
 				bytes: 0,
 				originalUrl: raw,
 			};
-			setItems((prev) => [newItem, ...prev]);
+			setItems((prev) => {
+				const exists = prev.some(
+					(x) =>
+						x.hash === newItem.hash || x.originalUrl === newItem.originalUrl
+				);
+				if (exists) {
+					return prev;
+				}
+				return [newItem, ...prev];
+			});
 			setLink("");
 		} catch {}
 		setSubmitting(false);
@@ -200,7 +214,12 @@ export default function QrcodeStudioPage() {
 								disabled={
 									submitting ||
 									loading ||
-									!(link.trim() && URL_REGEX.test(link.trim()))
+									!(link.trim() && URL_REGEX.test(link.trim())) ||
+									items.some(
+										(it) =>
+											(it.originalUrl ? it.originalUrl.trim() : "") ===
+											link.trim()
+									)
 								}
 								onClick={() => submit(!!logoUrl)}
 								variant="studio"
