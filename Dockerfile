@@ -18,12 +18,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Gera o Prisma client antes do build
-RUN npx prisma generate
+# Gera o Prisma client antes do build (precisa de um DATABASE_URL falso para nao falhar)
+RUN DATABASE_URL="postgresql://dummy" npx prisma generate
 
 # Build da aplicação Next.js (usa output: 'standalone' do next.config.js)
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+RUN DATABASE_URL="postgresql://dummy" npm run build
 
 # ---- Etapa 3: Imagem de produção (mínima) -------------------
 FROM node:20-alpine AS runner
