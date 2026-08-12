@@ -37,6 +37,8 @@ services.txt
 
 # env files — NUNCA commitar arquivos .env com segredos
 .env*
+# Excecao: .env.example e publico (nao tem segredos)
+!.env.example
 # Garantir que .env.production nunca seja commitado
 .env.production
 .env.production.local
