@@ -8,8 +8,8 @@ FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package*.json ./
-# Instala TODAS as deps incluindo devDependencies (precisamos do prisma generate e do build)
-RUN npm ci
+# Ignora scripts de postinstall (prisma generate roda na etapa builder, após COPY . .)
+RUN npm ci --ignore-scripts
 
 # ---- Etapa 2: Build -----------------------------------------
 FROM node:20-alpine AS builder
