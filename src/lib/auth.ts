@@ -115,8 +115,8 @@ function updateTokenFromSession(token: any, sessionUser: any) {
 	token.onboardingCompleted = sessionUser.onboardingCompleted;
 }
 
-const clientId = process.env.GOOGLE_CLIENT_ID;
-const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const clientId = process.env.GOOGLE_CLIENT_ID || "";
+const clientSecret = process.env.GOOGLE_CLIENT_SECRET || "";
 
 if (!(clientId && clientSecret)) {
 	console.warn("Missing Google OAuth environment variables");
