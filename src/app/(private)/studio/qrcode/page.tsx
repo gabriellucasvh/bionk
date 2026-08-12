@@ -1,9 +1,17 @@
 "use client";
 
-import { Copy, Download, ExternalLink, ImageIcon, Trash2 } from "lucide-react";
+import {
+	Copy,
+	Download,
+	ExternalLink,
+	ImageIcon,
+	Plus,
+	Trash2,
+} from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { HexColorInput, HexColorPicker } from "react-colorful";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import ImageCropModal from "@/components/modals/ImageCropModal";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +46,9 @@ export default function QrcodeStudioPage() {
 	const [logoUrl, setLogoUrl] = useState<string | null>(null);
 	const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 	const [isLogoCropModalOpen, setIsLogoCropModalOpen] = useState(false);
+	const [darkColor, setDarkColor] = useState<string>("#000000");
+	const [lightColor, setLightColor] = useState<string>("#ffffff");
+	const [activeColorPicker, setActiveColorPicker] = useState<"qr" | null>(null);
 
 	const count = items.length;
 
@@ -69,6 +80,25 @@ export default function QrcodeStudioPage() {
 		run();
 	}, [session]);
 
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as Element;
+			const isColorPickerClick =
+				target.closest("[data-color-picker]") ||
+				target.closest(".react-colorful") ||
+				target.closest("[data-color-button]");
+
+			if (!isColorPickerClick && activeColorPicker) {
+				setActiveColorPicker(null);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [activeColorPicker]);
+
 	const submit = async (withLogo: boolean) => {
 		const raw = link.trim();
 		if (!(raw && URL_REGEX.test(raw))) {
@@ -85,7 +115,9 @@ export default function QrcodeStudioPage() {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(
-					withLogo && logoUrl ? { url: raw, logoUrl } : { url: raw }
+					withLogo && logoUrl
+						? { url: raw, logoUrl, darkColor, lightColor }
+						: { url: raw, darkColor, lightColor }
 				),
 			});
 			if (!res.ok) {
@@ -226,6 +258,10 @@ export default function QrcodeStudioPage() {
 							>
 								Gerar QR
 							</BaseButton>
+						</div>
+					</div>
+					<div className="mt-4 flex flex-col items-center gap-2 md:flex-row">
+						<div className="flex items-center gap-2">
 							<BaseButton
 								disabled={isUploadingLogo}
 								onClick={() => {
@@ -253,6 +289,62 @@ export default function QrcodeStudioPage() {
 									>
 										X
 									</Button>
+								</div>
+							)}
+						</div>
+						<div className="flex w-full flex-col gap-3">
+							<div className="flex items-center gap-3">
+								<span className="text-muted-foreground text-sm">Cor</span>
+								<button
+									className="flex h-8 w-8 items-center justify-center rounded-full"
+									data-color-button
+									onClick={() =>
+										setActiveColorPicker(
+											activeColorPicker === "qr" ? null : "qr"
+										)
+									}
+									style={{
+										background:
+											"conic-gradient(from 0deg, red, orange, yellow, green, cyan, blue, violet, red)",
+									}}
+									type="button"
+								>
+									<span className="flex h-5 w-5 items-center justify-center rounded-full bg-white">
+										<Plus className="h-4 w-4" />
+									</span>
+								</button>
+								<button
+									className="h-8 w-8 rounded-full border-2 border-lime-700"
+									onClick={() => setDarkColor(darkColor)}
+									style={{ background: darkColor }}
+									type="button"
+								/>
+								<button
+									className={`h-8 w-8 rounded-full border-2 ${darkColor === "#000000" ? "ring-2 ring-black dark:ring-white" : "border-zinc-300 dark:border-zinc-600"}`}
+									onClick={() => setDarkColor("#000000")}
+									style={{ background: "#000000" }}
+									type="button"
+								/>
+								<button
+									className={`h-8 w-8 rounded-full border-2 ${darkColor === "#FFFFFF" ? "ring-2 ring-black dark:ring-white" : "border-zinc-300 dark:border-zinc-600"}`}
+									onClick={() => setDarkColor("#FFFFFF")}
+									style={{ background: "#FFFFFF" }}
+									type="button"
+								/>
+							</div>
+							{activeColorPicker === "qr" && (
+								<div className="w-min" data-color-picker>
+									<HexColorPicker
+										color={darkColor}
+										onChange={(c) => setDarkColor(c)}
+									/>
+									<HexColorInput
+										className="mt-2 w-full rounded border border-zinc-300 p-2 text-center dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
+										color={darkColor}
+										onChange={(c) => setDarkColor(c)}
+										placeholder="#000000"
+										prefixed
+									/>
 								</div>
 							)}
 						</div>

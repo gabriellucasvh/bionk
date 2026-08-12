@@ -20,6 +20,7 @@ const END_TAG_RE = />$/;
 const BASE64_PLUS_RE = /\+/g;
 const BASE64_SLASH_RE = /\//g;
 const BASE64_EQUALS_END_RE = /=+$/g;
+const HEX_COLOR_RE = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
 function ensureHttps(u: string): string {
 	const s = String(u || "").trim();
@@ -83,34 +84,42 @@ export function shortHash(input: string): string {
 }
 
 export async function generateQr(
-	url: string,
-	opts: {
-		format?: "png" | "svg";
-		size?: number;
-		ecLevel?: "L" | "M" | "Q" | "H";
-	}
+    url: string,
+    opts: {
+        format?: "png" | "svg";
+        size?: number;
+        ecLevel?: "L" | "M" | "Q" | "H";
+        darkColor?: string;
+        lightColor?: string;
+    }
 ): Promise<{ format: "png" | "svg"; data: Buffer | string; bytes: number }> {
-	const format = opts.format === "svg" ? "svg" : "png";
-	const size = Math.max(128, Math.min(2048, Number(opts.size || 512)));
-	const scale = Math.max(2, Math.min(16, Math.round(size / 32)));
-	if (format === "png") {
-		const buf: Buffer = await QRCode.toBuffer(url, {
-			errorCorrectionLevel: opts.ecLevel || "M",
-			scale,
-			margin: 2,
-			color: { dark: "#000000", light: "#ffffff" },
-		} as QRCodeToBufferOptions);
-		return { format, data: buf, bytes: buf.byteLength };
-	}
-	const svg: string = await QRCode.toString(url, {
-		errorCorrectionLevel: opts.ecLevel || "M",
-		type: "svg",
-		scale,
-		margin: 2,
-		color: { dark: "#000000", light: "#ffffff" },
-	} as QRCodeToStringOptions);
-	const bytes = Buffer.byteLength(svg, "utf-8");
-	return { format, data: svg, bytes };
+    const format = opts.format === "svg" ? "svg" : "png";
+    const size = Math.max(128, Math.min(2048, Number(opts.size || 512)));
+    const scale = Math.max(2, Math.min(16, Math.round(size / 32)));
+    const dark = HEX_COLOR_RE.test(String(opts.darkColor || ""))
+        ? String(opts.darkColor)
+        : "#000000";
+    const light = HEX_COLOR_RE.test(String(opts.lightColor || ""))
+        ? String(opts.lightColor)
+        : "#ffffff";
+    if (format === "png") {
+        const buf: Buffer = await QRCode.toBuffer(url, {
+            errorCorrectionLevel: opts.ecLevel || "M",
+            scale,
+            margin: 2,
+            color: { dark, light },
+        } as QRCodeToBufferOptions);
+        return { format, data: buf, bytes: buf.byteLength };
+    }
+    const svg: string = await QRCode.toString(url, {
+        errorCorrectionLevel: opts.ecLevel || "M",
+        type: "svg",
+        scale,
+        margin: 2,
+        color: { dark, light },
+    } as QRCodeToStringOptions);
+    const bytes = Buffer.byteLength(svg, "utf-8");
+    return { format, data: svg, bytes };
 }
 
 export async function saveQr(
@@ -181,13 +190,15 @@ export async function setCache(
 }
 
 export async function buildAndCacheQr(
-	rawUrl: string,
-	opts: {
-		format?: "png" | "svg";
-		size?: number;
-		userId?: string | null;
-		logoUrl?: string | null;
-	}
+    rawUrl: string,
+    opts: {
+        format?: "png" | "svg";
+        size?: number;
+        userId?: string | null;
+        logoUrl?: string | null;
+        darkColor?: string | null;
+        lightColor?: string | null;
+    }
 ): Promise<{
 	hash: string;
 	url: string;
@@ -200,10 +211,18 @@ export async function buildAndCacheQr(
 		throw new Error("URL inválida");
 	}
 	const canon = canonicalizeUrl(rawUrl);
-	const fmt = opts.logoUrl ? "svg" : opts.format === "svg" ? "svg" : "png";
-	const size = Math.max(128, Math.min(2048, Number(opts.size || 512)));
-	const key = shortHash(`${canon}|${fmt}|${size}|${opts.logoUrl || ""}`);
-	const cached = await getCachedUrl(key);
+    const fmt = opts.logoUrl ? "svg" : opts.format === "svg" ? "svg" : "png";
+    const size = Math.max(128, Math.min(2048, Number(opts.size || 512)));
+    const dcol = HEX_COLOR_RE.test(String(opts.darkColor || ""))
+        ? String(opts.darkColor)
+        : "#000000";
+    const lcol = HEX_COLOR_RE.test(String(opts.lightColor || ""))
+        ? String(opts.lightColor)
+        : "#ffffff";
+    const key = shortHash(
+        `${canon}|${fmt}|${size}|${opts.logoUrl || ""}|${dcol}|${lcol}`
+    );
+    const cached = await getCachedUrl(key);
 	const uid = opts.userId ? String(opts.userId) : null;
 	if (cached) {
 		if (uid) {
@@ -230,11 +249,13 @@ export async function buildAndCacheQr(
 	const existing = uid
 		? await prisma.qrCode.findUnique({ where: { hash: key } }).catch(() => null)
 		: null;
-	const qr = await generateQr(canon, {
-		format: fmt,
-		size,
-		ecLevel: opts.logoUrl ? "H" : "M",
-	});
+    const qr = await generateQr(canon, {
+        format: fmt,
+        size,
+        ecLevel: opts.logoUrl ? "H" : "M",
+        darkColor: dcol,
+        lightColor: lcol,
+    });
 	let dataOut = qr.data;
 	if (fmt === "svg" && typeof dataOut === "string" && opts.logoUrl) {
 		const text = String(dataOut);

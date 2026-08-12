@@ -10,6 +10,7 @@ import {
 export const runtime = "nodejs";
 
 const URL_REGEX = /^https?:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
+const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
 export async function POST(req: NextRequest) {
 	const session = (await getServerSession(authOptions as any)) as any;
@@ -21,6 +22,10 @@ export async function POST(req: NextRequest) {
 		const format = body?.format === "svg" ? "svg" : "png";
 		const size = Math.max(128, Math.min(2048, Number(body?.size || 512)));
 		const mode = String(body?.mode || "inline");
+        const darkColorRaw = typeof body?.darkColor === "string" ? body.darkColor.trim() : "";
+        const lightColorRaw = typeof body?.lightColor === "string" ? body.lightColor.trim() : "";
+        const darkColor = HEX_COLOR_REGEX.test(darkColorRaw) ? darkColorRaw : "#000000";
+        const lightColor = HEX_COLOR_REGEX.test(lightColorRaw) ? lightColorRaw : "#ffffff";
 		if (!(rawUrl && URL_REGEX.test(rawUrl))) {
 			return NextResponse.json({ error: "URL inválida" }, { status: 400 });
 		}
@@ -28,7 +33,7 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ error: "Logo inválida" }, { status: 400 });
 		}
 		const canon = canonicalizeUrl(rawUrl);
-		const key = shortHash(`${canon}|${format}|${size}`);
+		const key = shortHash(`${canon}|${format}|${size}|${logoUrl || ""}|${darkColor}|${lightColor}`);
 		if (mode === "queue") {
 			if (uid) {
 				await enqueueQrJob({
@@ -47,6 +52,8 @@ export async function POST(req: NextRequest) {
 			size,
 			userId: uid,
 			logoUrl: logoUrl || null,
+			darkColor,
+			lightColor,
 		});
 		const res = NextResponse.json({
 			url: qr.url,
