@@ -21,7 +21,7 @@ const ShareBottomSheet: FC<ShareBottomSheetProps> = ({
 	isOpen,
 	onOpenChange,
 }) => {
-	const profileUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "https://bionk.me"}/${user.username}`;
+	const profileUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "https://bionk.duckdns.org"}/${user.username}`;
 	const shareText = `Confira meu perfil na Bionk: ${user.username || user.name}`;
 	const logoUrl = "/images/bionk-icon-black.svg";
 

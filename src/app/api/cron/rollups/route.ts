@@ -5,6 +5,8 @@ export const runtime = "nodejs";
 const MAX_ATTEMPTS = 2; // tentativa principal + 1 retentativa
 const BACKOFF_MINUTES = [5]; // 02:05 como janela de retry
 const REJEX_VERCEL_USERAGENT = /vercel-cron/i;
+// Header customizado para crons locais na VPS (alternativa ao header da Vercel)
+const LOCAL_CRON_HEADER = "x-cron-secret";
 
 function computeNextRetryAt(now: Date, nextAttempt: number): Date | null {
 	const delayMinutes = BACKOFF_MINUTES[nextAttempt - 1];
@@ -63,17 +65,20 @@ export async function GET(request: Request) {
 	const secret = process.env.CRON_SECRET || "";
 	const vercelCronHeader = request.headers.get("x-vercel-cron");
 	const userAgent = request.headers.get("user-agent") || "";
+	const localCronHeader = request.headers.get(LOCAL_CRON_HEADER) || "";
 	const isVercelCron = vercelCronHeader === "1" || vercelCronHeader === "true";
 	const isVercelUserAgent = REJEX_VERCEL_USERAGENT.test(userAgent);
+	// Header X-Cron-Secret: usado pelo crontab da VPS
+	const isLocalCron = !!(secret && localCronHeader === secret);
+	const isTokenAuth = !!(secret && token === secret);
 
-	// Autoriza se for chamada de Cron da Vercel (header presente) OU se o token bater com o segredo
-	if (!(isVercelCron || isVercelUserAgent || (secret && token === secret))) {
+	if (!(isVercelCron || isVercelUserAgent || isTokenAuth || isLocalCron)) {
 		console.warn("[cron/rollups] Não autorizado", {
 			hasVercelHeader: !!vercelCronHeader,
-			vercelCronHeader,
+			hasLocalCronHeader: !!localCronHeader,
 			userAgent,
 			hasToken: !!token,
-			tokenMatches: !!secret && token === secret,
+			tokenMatches: isTokenAuth,
 		});
 		return NextResponse.json({ error: "Não autorizado" }, { status: 403 });
 	}
@@ -117,7 +122,7 @@ export async function GET(request: Request) {
 	const monthStart = startOfMonthUTC(targetDate);
 
 	// Proteção de idempotência via ledger (uma execução por dia UTC)
-	const source = isVercelCron ? "vercel" : "manual";
+	const source = isVercelCron ? "vercel" : isLocalCron ? "vps-cron" : "manual";
 	const existingLedger = await prisma.dailyRollup.findUnique({
 		where: { dayStart: startOfTarget },
 	});
@@ -343,7 +348,7 @@ export async function GET(request: Request) {
 					const { Resend } = await import("resend");
 					const resend = new Resend(resendApiKey);
 					await resend.emails.send({
-						from: process.env.RESEND_FROM_EMAIL || "contato@bionk.me",
+						from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
 						to: ["contato@bionk.me"],
 						subject: "Falha inicial na consolidação diária de rollups",
 						html: `

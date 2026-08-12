@@ -19,7 +19,7 @@ interface OtpPasswordRecoverProps {
 
 const baseUrl = process.env.NEXTAUTH_URL
 	? `${process.env.NEXTAUTH_URL}`
-	: "https://bionk.me";
+	: "https://bionk.duckdns.org";
 
 export const OtpPasswordRecover: React.FC<Readonly<OtpPasswordRecoverProps>> = ({
 	otp,

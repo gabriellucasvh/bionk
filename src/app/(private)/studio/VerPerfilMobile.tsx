@@ -31,9 +31,7 @@ const VerPerfilMobile = () => {
 
 	useEffect(() => {
 		const baseUrl =
-			process.env.NODE_ENV === "production"
-				? "https://www.bionk.me"
-				: "http://localhost:3000";
+			process.env.NEXT_PUBLIC_APP_URL || "https://bionk.duckdns.org";
 		if (username) {
 			setProfileUrl(`${baseUrl}/${username}`);
 		}

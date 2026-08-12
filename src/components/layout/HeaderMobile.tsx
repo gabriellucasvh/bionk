@@ -14,7 +14,7 @@ const HeaderProps = [
 	{ label: "Templates", href: "/templates" },
 	{ label: "Planos", href: "/planos" },
 	{ label: "Descubra", href: "/descubra" },
-	{ label: "Ajuda", href: "https://ajuda.bionk.me" },
+	{ label: "Ajuda", href: "https://bionk.duckdns.org" },
 ];
 
 const HeaderMobile = () => {

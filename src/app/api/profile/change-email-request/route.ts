@@ -115,7 +115,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 			const { Resend } = await import("resend");
 			const resend = new Resend(resendApiKey);
 			await resend.emails.send({
-				from: process.env.RESEND_FROM_EMAIL || "suporte@bionk.me",
+				from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
 				to: newEmail,
 				subject: "Confirme seu novo endereço de e-mail - Bionk",
 				react: ChangeEmailVerificationEmail({

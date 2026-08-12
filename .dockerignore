@@ -1,0 +1,18 @@
+﻿# .dockerignore — evita copiar arquivos desnecessarios para o contexto do Docker
+node_modules
+.next
+.git
+.gitignore
+.env
+.env.local
+.env.development
+.env.production
+*.log
+logs.txt
+README.md
+.vscode
+.cursorrules
+tsconfig.tsbuildinfo
+nginx
+scripts/deploy.sh
+scripts/cron.sh

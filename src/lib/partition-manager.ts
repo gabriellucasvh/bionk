@@ -101,8 +101,10 @@ export async function ensureMonthlyPartitions(): Promise<void> {
 		60,
 		Math.floor((next.getTime() - now.getTime()) / 1000)
 	);
-	const gotLock = await redis.set(lockKey, "1", { nx: true, ex: ttlSeconds });
-	if (!gotLock) {
+	await redis.set(lockKey, "1", { nx: true, ex: ttlSeconds });
+	// Verificar se obtivemos o lock (se o valor for "1" significa que fomos nós que criamos)
+	const lockVal = await redis.get<string | null>(lockKey);
+	if (!lockVal) {
 		return;
 	}
 

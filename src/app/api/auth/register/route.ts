@@ -452,7 +452,7 @@ async function sendOtpEmail(
 		const { Resend } = await import("resend");
 		const resend = new Resend(apiKey);
 		await resend.emails.send({
-			from: "Bionk <contato@bionk.me>",
+			from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
 			to: [email],
 			subject: "Código de verificação",
 			react: OtpEmail({

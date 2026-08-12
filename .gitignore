@@ -34,8 +34,12 @@ tasks.md
 assigntrafficsources.js
 .cursorrules
 services.txt
-# env files (can opt-in for committing if needed)
+
+# env files — NUNCA commitar arquivos .env com segredos
 .env*
+# Garantir que .env.production nunca seja commitado
+.env.production
+.env.production.local
 
 # vercel
 .vercel

@@ -1,8 +1,10 @@
 // next.config.js
 module.exports = {
+	output: "standalone",
 	allowedDevOrigins: [
 		process.env.ALLOWED_DEV_ORIGIN || "http://localhost:3000",
 	],
+
 	compress: true,
 	images: {
 		remotePatterns: [

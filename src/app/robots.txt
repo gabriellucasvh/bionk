@@ -3,4 +3,4 @@ Allow: /
 Disallow: /api/
 Disallow: /(private)/
 
-Sitemap: https://www.bionk.me/sitemap.xml
+Sitemap: https://bionk.duckdns.org/sitemap.xml

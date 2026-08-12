@@ -6,152 +6,152 @@
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
 <url>
-  <loc>https://www.bionk.me/</loc>
+  <loc>https://bionk.duckdns.org/</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://www.bionk.me/templates</loc>
+  <loc>https://bionk.duckdns.org/templates</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://www.bionk.me/planos</loc>
+  <loc>https://bionk.duckdns.org/planos</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://www.bionk.me/descubra</loc>
+  <loc>https://bionk.duckdns.org/descubra</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/</loc>
+  <loc>https://bionk.duckdns.org/</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://www.bionk.me/termos</loc>
+  <loc>https://bionk.duckdns.org/termos</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://www.bionk.me/privacidade</loc>
+  <loc>https://bionk.duckdns.org/privacidade</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://www.bionk.me/registro</loc>
+  <loc>https://bionk.duckdns.org/registro</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/como-criar-uma-conta</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/como-criar-uma-conta</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/configurando-seu-perfil</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/configurando-seu-perfil</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/adicionando-seu-primeiro-link</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/adicionando-seu-primeiro-link</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/personalizando-sua-pagina</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/personalizando-sua-pagina</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/compartilhando-seu-bionk</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/compartilhando-seu-bionk</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/alterando-cores-e-temas</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/alterando-cores-e-temas</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/adicionando-imagens-e-icones</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/adicionando-imagens-e-icones</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/organizando-seus-links</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/organizando-seus-links</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/usando-animacoes-e-efeitos</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/usando-animacoes-e-efeitos</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/fontes-e-estilos-de-texto</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/fontes-e-estilos-de-texto</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/analise-de-cliques-e-visitas</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/analise-de-cliques-e-visitas</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/programando-publicacao-de-links</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/programando-publicacao-de-links</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/recursos-para-criadores-de-conteudo</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/recursos-para-criadores-de-conteudo</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/ajuda/guia/monetizacao-e-links-de-afiliados</loc>
+  <loc>https://bionk.duckdns.org/ajuda/guia/monetizacao-e-links-de-afiliados</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/artigo/como-criar-um-link-na-bio-que-converte</loc>
+  <loc>https://bionk.duckdns.org/artigo/como-criar-um-link-na-bio-que-converte</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/artigo/10-dicas-para-aumentar-seus-seguidores</loc>
+  <loc>https://bionk.duckdns.org/artigo/10-dicas-para-aumentar-seus-seguidores</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/artigo/como-usar-analises-para-melhorar-seu-desempenho</loc>
+  <loc>https://bionk.duckdns.org/artigo/como-usar-analises-para-melhorar-seu-desempenho</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/artigo/integrando-seu-link-na-bio-com-o-instagram</loc>
+  <loc>https://bionk.duckdns.org/artigo/integrando-seu-link-na-bio-com-o-instagram</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-  <loc>https://ajuda.bionk.me/artigo/melhores-praticas-para-criadores-de-conteudo</loc>
+  <loc>https://bionk.duckdns.org/artigo/melhores-praticas-para-criadores-de-conteudo</loc>
   <lastmod>2025-05-13T02:22:42+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
-    <loc>https://www.bionk.me/comunidade</loc>
+    <loc>https://bionk.duckdns.org/comunidade</loc>
     <lastmod>2025-10-19T00:00:00+00:00</lastmod>
     <priority>0.80</priority>
 </url>
 <url>
-    <loc>https://www.bionk.me/cookies</loc>
+    <loc>https://bionk.duckdns.org/cookies</loc>
     <lastmod>2025-10-19T00:00:00+00:00</lastmod>
     <priority>0.80</priority>
 </url>
 <url>
-    <loc>https://www.bionk.me/reportar-violacao</loc>
+    <loc>https://bionk.duckdns.org/reportar-violacao</loc>
     <lastmod>2025-10-19T00:00:00+00:00</lastmod>
     <priority>0.80</priority>
 </url>

@@ -161,11 +161,11 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Bionk",
 		description: "Reúna todos os seus links em um só lugar!",
-		url: "https://www.bionk.me",
+		url: "https://bionk.duckdns.org",
 		siteName: "Bionk",
 		images: [
 			{
-				url: "https://www.bionk.me/bionk-opengraph.png",
+				url: "https://bionk.duckdns.org/bionk-opengraph.png",
 				width: 1200,
 				height: 630,
 				alt: "Bionk",

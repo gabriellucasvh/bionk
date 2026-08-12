@@ -211,9 +211,7 @@ const Sidebar = () => {
 
 	useEffect(() => {
 		const baseUrl =
-			process.env.NODE_ENV === "production"
-				? "https://www.bionk.me"
-				: "http://localhost:3000";
+			process.env.NEXT_PUBLIC_APP_URL || "https://bionk.duckdns.org";
 		setProfileUrl(username ? `${baseUrl}/${username}` : "#");
 	}, [username]);
 
@@ -281,9 +279,7 @@ const Sidebar = () => {
 		const handleUsernameUpdate = (event: CustomEvent) => {
 			const newUsername = event.detail.username;
 			const baseUrl =
-				process.env.NODE_ENV === "production"
-					? "https://www.bionk.me"
-					: "http://localhost:3000";
+				process.env.NEXT_PUBLIC_APP_URL || "https://bionk.duckdns.org"
 			setProfileUrl(newUsername ? `${baseUrl}/${newUsername}` : "#");
 		};
 

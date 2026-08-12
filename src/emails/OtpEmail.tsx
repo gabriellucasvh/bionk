@@ -19,7 +19,7 @@ interface OtpEmailProps {
 
 const baseUrl = process.env.NEXTAUTH_URL
 	? `${process.env.NEXTAUTH_URL}`
-	: "https://bionk.me";
+	: "https://bionk.duckdns.org";
 // const logoUrl = `/images/bionk-name-logo.svg`;
 
 export const OtpEmail: React.FC<Readonly<OtpEmailProps>> = ({

@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
-import { Ratelimit } from "@upstash/ratelimit";
 import { getRedis } from "@/lib/redis";
+
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { discordWebhook } from "@/lib/discord-webhook";
@@ -45,18 +45,24 @@ const contactSchema = z.object({
 	website: z.string().optional(),
 });
 
-// Rate limiter específico para formulário de contato
-let _contactRateLimiter: any = null;
+// Rate limiter nativo: 3 req / 10 min por IP (sliding window simplificado)
+let _contactRateLimiter: {
+	limit: (key: string) => Promise<{ success: boolean }>;
+} | null = null;
 
 function getContactRateLimiter() {
 	if (!_contactRateLimiter) {
-    const redis = getRedis();
-		_contactRateLimiter = new Ratelimit({
-			redis,
-			limiter: Ratelimit.slidingWindow(3, "10 m"),
-			analytics: true,
-			prefix: "contact_form",
-		});
+		_contactRateLimiter = {
+			limit: async (ip: string) => {
+				const key = `ratelimit_contact:${ip}`;
+				const r = getRedis();
+				const count = Number(await r.incr(key));
+				if (count === 1) {
+					await r.expire(key, 600); // 10 minutos
+				}
+				return { success: count <= 3 };
+			},
+		};
 	}
 	return _contactRateLimiter;
 }
@@ -109,9 +115,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 		const _referer = headersList.get("referer");
 		const allowedOrigins = [
 			process.env.NEXTAUTH_URL,
-			"https://www.bionk.me",
-			"https://bionk.me",
-			"http://localhost:3000", // Para desenvolvimento
+			process.env.NEXT_PUBLIC_APP_URL,
+			"http://localhost:3000",
 		];
 
 		if (origin && !allowedOrigins.includes(origin)) {
@@ -212,7 +217,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 			const { Resend } = await import("resend");
 			const resend = new Resend(resendApiKey);
 			await resend.emails.send({
-				from: process.env.RESEND_FROM_EMAIL || "contato@bionk.me",
+				from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
 				to: ["contato@bionk.me"], // Email da empresa
 				replyTo: sanitizedData.email,
 				subject: `Contato: ${subjectLabels[sanitizedData.subject]} - ${sanitizedData.fullName}`,
@@ -221,7 +226,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 			// Email de confirmação para o cliente
 			await resend.emails.send({
-				from: process.env.RESEND_FROM_EMAIL || "contato@bionk.me",
+				from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
 				to: [sanitizedData.email],
 				subject: "Recebemos sua mensagem - Bionk",
 				html: `

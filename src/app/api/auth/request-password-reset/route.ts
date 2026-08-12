@@ -57,7 +57,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 			},
 		});
 
-		const baseUrl = process.env.NEXTAUTH_URL ?? "https://www.bionk.me";
+		const baseUrl = process.env.NEXTAUTH_URL ?? "https://bionk.duckdns.org";
 		const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
 
 		try {
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 			const { Resend } = await import("resend");
 			const resend = new Resend(resendApiKey);
 			const emailResponse = await resend.emails.send({
-				from: "Bionk <contato@bionk.me>",
+				from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
 				to: [email],
 				subject: "Redefinição de Senha - Bionk",
 				html: `<p>Você solicitou a redefinição de senha. Clique no link abaixo para criar uma nova senha:</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>Este link expira em 1 hora.</p><p>Se você não solicitou isso, ignore este e-mail.</p>`,

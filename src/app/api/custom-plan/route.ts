@@ -1,9 +1,9 @@
 import crypto from "node:crypto";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import { getRedis } from "@/lib/redis";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 export const runtime = "nodejs";
+
 
 const resendApiKey = process.env.RESEND_API_KEY;
 
@@ -48,25 +48,25 @@ const customPlanSchema = z.object({
 	website: z.string().optional(),
 });
 
-// Rate limiter específico para formulário de contato
-let _contactRateLimiter: any = null;
+// Rate limiter nativo: 3 req / 60s por IP
+let _contactRateLimiter: {
+	limit: (key: string) => Promise<{ success: boolean }>;
+} | null = null;
 
 function getContactRateLimiter() {
 	if (!_contactRateLimiter) {
-		const url = process.env.UPSTASH_REDIS_REST_URL;
-		const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-		if (!(url && token)) {
-			throw new Error("Variáveis de ambiente do Upstash Redis não definidas");
-		}
-		const redis = new Redis({ url, token });
-		_contactRateLimiter = new Ratelimit({
-			redis,
-			limiter: Ratelimit.slidingWindow(3, "60 s"),
-			analytics: true,
-			prefix: "ratelimit_contact",
-		});
+		_contactRateLimiter = {
+			limit: async (ip: string) => {
+				const key = `ratelimit_customplan:${ip}`;
+				const r = getRedis();
+				const count = Number(await r.incr(key));
+				if (count === 1) {
+					await r.expire(key, 60); // 60 segundos
+				}
+				return { success: count <= 3 };
+			},
+		};
 	}
-
 	return _contactRateLimiter;
 }
 
@@ -129,8 +129,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 		const _referer = headersList.get("referer");
 		const allowedOrigins = [
 			process.env.NEXTAUTH_URL,
-			"https://www.bionk.me",
-			"https://bionk.me",
+			"https://bionk.duckdns.org",
 			"http://localhost:3000", // Para desenvolvimento
 		];
 
