@@ -26,13 +26,17 @@ else
     ACTIVE_CONTAINER="bionk_app_green"
 fi
 
+BRANCH=${1:-master}
+
 echo "================================================="
 echo "🟢 Ambiente Ativo: $ACTIVE_COLOR"
-echo "🚀 Iniciando deploy para: $TARGET_COLOR (Porta $TARGET_PORT)"
+echo "🚀 Iniciando deploy para: $TARGET_COLOR (Porta $TARGET_PORT) da branch: $BRANCH"
 echo "================================================="
 
-echo "📦 Puxando últimas alterações do Git..."
-git pull origin master
+echo "📦 Puxando últimas alterações do Git da branch $BRANCH..."
+git fetch origin
+git checkout $BRANCH
+git reset --hard origin/$BRANCH
 
 echo "🔧 Garantindo que Postgres e Redis estão rodando..."
 docker compose --env-file .env.production up -d postgres redis
