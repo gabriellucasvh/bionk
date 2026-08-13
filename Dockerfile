@@ -23,7 +23,11 @@ RUN DATABASE_URL="postgresql://dummy" npx prisma generate
 
 # Build da aplicação Next.js (usa output: 'standalone' do next.config.js)
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN DATABASE_URL="postgresql://dummy" npm run build
+ENV DATABASE_URL="postgresql://dummy"
+ENV STRIPE_SECRET_KEY="dummy_stripe_key"
+ENV RESEND_API_KEY="dummy_resend_key"
+ENV CLOUDINARY_API_SECRET="dummy_cloudinary_key"
+RUN npm run build
 
 # ---- Etapa 3: Imagem de produção (mínima) -------------------
 FROM node:20-alpine AS runner
