@@ -1,6 +1,6 @@
 "use client";
 import { AnimatePresence } from "framer-motion";
-import { CaretLeft, CaretRight, Quote } from "@phosphor-icons/react/dist/ssr";
+import { CaretLeft, CaretRight, Quotes } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useState } from "react";
 import { MotionDiv } from "@/components/ui/motion";
@@ -93,7 +93,7 @@ export default function Testimonials() {
 								key={index}
 								transition={{ duration: 0.25 }}
 							>
-								<Quote weight="regular"
+								<Quotes weight="regular"
 									className="h-8 w-8 fill-current text-purple-400"
 									strokeWidth={0.1}
 								/>

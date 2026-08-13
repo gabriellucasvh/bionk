@@ -3,6 +3,7 @@
 
 import {
 	ArrowSquareOut,
+	Bell,
 	ChartBar,
 	Download,
 	ImagesSquare,
@@ -21,7 +22,6 @@ import { useSession } from "next-auth/react";
 import React, { useCallback, useEffect, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
 import ShareListCompact from "@/components/ShareListCompact";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -137,8 +137,8 @@ interface SidebarLink {
 const mainLinks: SidebarLink[] = [
 	{
 		key: "profile",
-		href: "/studio/perfil",
-		label: "Perfil",
+		href: "/studio",
+		label: "Studio",
 		icon: User,
 	},
 	{
@@ -348,7 +348,9 @@ const Sidebar = () => {
 							width={90}
 						/>
 					</Link>
-					<ThemeToggle />
+					<button className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800">
+						<Bell className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
+					</button>
 				</header>
 
 				<div className="py-2">
@@ -481,7 +483,7 @@ const Sidebar = () => {
 							</li>
 						);
 					})}
-					{/* Perfil mobile */}
+					{/* Studio mobile */}
 					<li className="flex items-center justify-center">
 						<Button
 							className="flex flex-col items-center gap-1 px-1 font-semibold text-xs text-zinc-500 sm:text-xs dark:text-zinc-400"

@@ -174,7 +174,7 @@ function Login() {
 			if (result?.error) {
 				setMessage("Credenciais inválidas. Tente novamente.");
 			} else {
-				router.replace("/studio/perfil");
+				router.replace("/studio");
 			}
 		} catch {
 			setMessage("Ocorreu um erro durante o login");

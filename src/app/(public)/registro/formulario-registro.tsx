@@ -308,7 +308,7 @@ function Register() {
 					type: "success",
 					text: "Conta criada e login efetuado! Redirecionando...",
 				});
-				router.replace("/studio/perfil");
+				router.replace("/studio");
 			} else {
 				setMessage({
 					type: "success",

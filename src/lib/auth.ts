@@ -534,14 +534,14 @@ export const authOptions: NextAuthOptions = {
 				if (callbackUrl) {
 					return Promise.resolve(callbackUrl);
 				}
-				return Promise.resolve(`${baseUrl}/studio/perfil`);
+				return Promise.resolve(`${baseUrl}/studio`);
 			}
 
 			if (new URL(url, baseUrl).searchParams.has("callbackUrl")) {
 				return Promise.resolve(url);
 			}
 
-			return Promise.resolve(`${baseUrl}/studio/perfil`);
+			return Promise.resolve(`${baseUrl}/studio`);
 		},
 	},
 };
