@@ -1,7 +1,7 @@
 // configs.ArchiveLinksModal.tsx
 "use client";
 
-import { RotateCcw, Trash2, X } from "lucide-react";
+import { ArrowCounterClockwise, Trash, X } from "@phosphor-icons/react/dist/ssr";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -147,7 +147,7 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 						size="sm"
 						variant="ghost"
 					>
-						<X className="h-4 w-4" />
+						<X weight="duotone" className="h-4 w-4" />
 					</Button>
 				</header>
 				<main className="max-h-80 space-y-4 overflow-y-auto p-4">
@@ -226,7 +226,7 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 							onClick={restoreAllItems}
 							variant="outline"
 						>
-							<RotateCcw />
+							<ArrowCounterClockwise weight="duotone" />
 							Todos
 						</Button>
 						<Button
@@ -237,7 +237,7 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 							onClick={deleteAllItems}
 							variant="outline"
 						>
-							<Trash2 /> Todos
+							<Trash weight="duotone" /> Todos
 						</Button>
 					</div>
 				</footer>

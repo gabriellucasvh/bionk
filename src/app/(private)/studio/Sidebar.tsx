@@ -1,19 +1,7 @@
 // src/app/(private)/studio/Sidebar.tsx
 "use client";
 
-import {
-	BarChart3,
-	Blocks,
-	Download,
-	ExternalLink,
-	GalleryHorizontalEnd,
-	Link2,
-	Paintbrush,
-	QrCode,
-	Share2,
-	SwatchBook,
-	User,
-} from "lucide-react";
+import { ChartBar, SquaresFour, Download, ArrowSquareOut, ImagesSquare, Link as LinkIcon, PaintBrush, QrCode, ShareNetwork, Palette, User } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -74,14 +62,14 @@ const ProfileActionsDropdown = ({
 					rel="noopener noreferrer"
 					target="_blank"
 				>
-					<ExternalLink className="h-4 w-4" />
+					<ArrowSquareOut weight="duotone" className="h-4 w-4" />
 					<span>Abrir </span>
 				</Link>
 			</DropdownMenuItem>
 
 			<DropdownMenuSub onOpenChange={setIsQrOpen}>
 				<DropdownMenuSubTrigger className="h-10 cursor-pointer">
-					<QrCode className="mr-2 h-4 w-4" />
+					<QrCode weight="duotone" className="mr-2 h-4 w-4" />
 					<span>QR Code</span>
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent className="p-4">
@@ -101,7 +89,7 @@ const ProfileActionsDropdown = ({
 								onClick={handleDownloadQrCode}
 								size="sm"
 							>
-								<Download className="mr-2 h-4 w-4" />
+								<Download weight="duotone" className="mr-2 h-4 w-4" />
 								Baixar PNG
 							</Button>
 						</div>
@@ -115,7 +103,7 @@ const ProfileActionsDropdown = ({
 
 			<DropdownMenuSub>
 				<DropdownMenuSubTrigger className="h-10 cursor-pointer">
-					<Share2 className="mr-2 h-4 w-4" />
+					<ShareNetwork weight="duotone" className="mr-2 h-4 w-4" />
 					<span>Compartilhar por...</span>
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent className="p-2 md:max-w-md lg:max-w-full">
@@ -139,25 +127,25 @@ const mainLinks: SidebarLink[] = [
 		key: "profile",
 		href: "/studio/perfil",
 		label: "Perfil",
-		icon: <User className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: <User weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 	{
 		key: "links",
 		href: "/studio/links",
 		label: "Links",
-		icon: <Link2 className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: <LinkIcon weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 	{
 		key: "personalization",
 		href: "/studio/design",
 		label: "Design",
-		icon: <Paintbrush className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: <PaintBrush weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 	{
 		key: "analytics",
 		href: "/studio/analises",
 		label: "Análises",
-		icon: <BarChart3 className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: <ChartBar weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 ];
 
@@ -166,13 +154,13 @@ const toolsLinks: SidebarLink[] = [
 		key: "creators",
 		href: "/studio/criadores",
 		label: "Para Criadores",
-		icon: <SwatchBook className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: <Palette weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 	{
 		key: "integrations",
 		href: "/studio/integracoes",
 		label: "Integrações",
-		icon: <Blocks className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: <SquaresFour weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
 	},
 ];
 
@@ -365,7 +353,7 @@ const Sidebar = () => {
 											: username}
 									</span>
 								</div>
-								<ExternalLink className="h-5 w-5 flex-shrink-0 text-zinc-400 dark:text-zinc-300" />
+								<ArrowSquareOut weight="duotone" className="h-5 w-5 flex-shrink-0 text-zinc-400 dark:text-zinc-300" />
 							</Button>
 						</DropdownMenuTrigger>
 						<ProfileActionsDropdown
@@ -437,7 +425,7 @@ const Sidebar = () => {
 									</span>
 								)}
 							</div>
-							<GalleryHorizontalEnd className="h-5 w-5 text-zinc-500 dark:text-zinc-300" />
+							<ImagesSquare weight="duotone" className="h-5 w-5 text-zinc-500 dark:text-zinc-300" />
 						</>
 					)}
 				</div>

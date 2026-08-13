@@ -1,6 +1,6 @@
 "use client";
 
-import { HelpCircle, Upload } from "lucide-react";
+import { Question, Upload } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -339,7 +339,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 								size="icon"
 								variant="ghost"
 							>
-								<HelpCircle className="h-4 w-4" />
+								<Question weight="duotone" className="h-4 w-4" />
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent className="w-70 text-sm">
@@ -439,7 +439,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 													<LoadingSpinner />
 												</div>
 											) : (
-												<Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+												<Upload weight="duotone" className="mx-auto h-8 w-8 text-muted-foreground" />
 											)}
 											<p className="mt-2 font-medium">
 												Arraste uma imagem ou clique para selecionar
@@ -532,7 +532,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 												<LoadingSpinner />
 											</div>
 										) : (
-											<Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+											<Upload weight="duotone" className="mx-auto h-8 w-8 text-muted-foreground" />
 										)}
 										<p className="mt-2 font-medium">
 											Arraste imagens ou clique para selecionar

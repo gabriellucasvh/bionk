@@ -2,7 +2,7 @@
 
 "use client";
 
-import { ExternalLink, Flag } from "lucide-react";
+import { ArrowSquareOut, Flag } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -113,7 +113,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						onClick={handleOpenLink}
 						variant="default"
 					>
-						<ExternalLink className="mr-2 size-4" />
+						<ArrowSquareOut weight="duotone" className="mr-2 size-4" />
 						Abrir Link
 					</BaseButton>
 
@@ -126,7 +126,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						rel="noopener noreferrer"
 						target="_blank"
 					>
-						<Flag className="mr-2 size-4" />
+						<Flag weight="duotone" className="mr-2 size-4" />
 						Denunciar Link
 					</Link>
 				</div>

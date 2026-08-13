@@ -1,6 +1,6 @@
 "use client";
 
-import { HelpCircle } from "lucide-react";
+import { Question } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import {
 	Bar,
@@ -248,7 +248,7 @@ export default function OSAnalyticsChart({
 																width={16}
 															/>
 														) : (
-															<HelpCircle className="h-4 w-4" />
+															<Question weight="duotone" className="h-4 w-4" />
 														)}
 													</div>
 													<span>{item.name}</span>

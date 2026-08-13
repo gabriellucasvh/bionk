@@ -1,13 +1,6 @@
 "use client";
 
-import {
-	Copy,
-	Download,
-	ExternalLink,
-	ImageIcon,
-	Plus,
-	Trash2,
-} from "lucide-react";
+import { Copy, Download, ArrowSquareOut, Image as PhosphorImage, Plus, Trash } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -268,7 +261,7 @@ export default function QrcodeStudioPage() {
 									setIsLogoCropModalOpen(true);
 								}}
 							>
-								<ImageIcon className="h-4 w-6" /> Usar logo
+								<PhosphorImage weight="duotone" className="h-4 w-6" /> Usar logo
 							</BaseButton>
 							{logoUrl && (
 								<div className="flex items-center gap-2">
@@ -310,7 +303,7 @@ export default function QrcodeStudioPage() {
 									type="button"
 								>
 									<span className="flex h-5 w-5 items-center justify-center rounded-full bg-white">
-										<Plus className="h-4 w-4" />
+										<Plus weight="duotone" className="h-4 w-4" />
 									</span>
 								</button>
 								<button
@@ -404,7 +397,7 @@ export default function QrcodeStudioPage() {
 												size="sm"
 												variant="outline"
 											>
-												<Copy />
+												<Copy weight="duotone" />
 											</Button>
 											<span className="-translate-x-1/2 -top-8 sm:-top-10 pointer-events-none absolute left-1/2 z-50 whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
 												Copiar
@@ -425,7 +418,7 @@ export default function QrcodeStudioPage() {
 												size="sm"
 												variant="outline"
 											>
-												<ExternalLink />
+												<ArrowSquareOut weight="duotone" />
 											</Button>
 											<span className="-translate-x-1/2 -top-8 sm:-top-10 pointer-events-none absolute left-1/2 z-50 whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
 												Abrir
@@ -434,7 +427,7 @@ export default function QrcodeStudioPage() {
 										<span className="group relative inline-flex">
 											<a className="inline-flex" download href={it.url}>
 												<Button size="sm" variant="outline">
-													<Download />
+													<Download weight="duotone" />
 												</Button>
 											</a>
 											<span className="-translate-x-1/2 -top-8 sm:-top-10 pointer-events-none absolute left-1/2 z-50 whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -447,7 +440,7 @@ export default function QrcodeStudioPage() {
 												size="sm"
 												variant="destructive"
 											>
-												<Trash2 />
+												<Trash weight="duotone" />
 											</Button>
 											<span className="-translate-x-1/2 -top-8 sm:-top-10 pointer-events-none absolute left-1/2 z-50 whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
 												Excluir

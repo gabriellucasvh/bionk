@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react/dist/ssr";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 
@@ -92,7 +92,7 @@ const MobileBottomSheet = ({
 						onClick={onClose}
 						type="button"
 					>
-						<X className="h-4 w-4" />
+						<X weight="duotone" className="h-4 w-4" />
 					</button>
 				</div>
 				<div

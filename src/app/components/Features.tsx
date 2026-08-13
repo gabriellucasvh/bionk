@@ -1,11 +1,4 @@
-import {
-	BarChart3,
-	Compass,
-	Link as LinkIcon,
-	ListChecks,
-	Palette,
-	Rocket,
-} from "lucide-react";
+import { ChartBar, Compass, Link as LinkIcon, ListChecks, Palette, Rocket } from "@phosphor-icons/react/dist/ssr";
 
 export default function Features() {
 	const items = [
@@ -26,7 +19,7 @@ export default function Features() {
 			accent: "text-emerald-500",
 		},
 		{
-			icon: BarChart3,
+			icon: ChartBar,
 			title: "Métricas",
 			description:
 				"Visualizações e cliques por link. Decida com base em dados.",

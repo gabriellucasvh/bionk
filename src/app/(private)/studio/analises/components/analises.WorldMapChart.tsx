@@ -3,11 +3,11 @@
 import { json } from "d3-fetch";
 import { geoMercator, geoPath } from "d3-geo";
 import { select, selectAll } from "d3-selection";
-import { Earth } from "lucide-react";
+import { GlobeHemisphereWest } from "@phosphor-icons/react/dist/ssr";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// URL do arquivo de topologia mundial (Natural Earth)
+// URL do arquivo de topologia mundial (Natural GlobeHemisphereWest)
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const normalizeCountryName = (name: string): string => {
@@ -143,7 +143,7 @@ export default function WorldMapChart(props: WorldMapChartProps) {
 				<Card className="lg:col-span-2">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							<Earth className="h-5 w-5" />
+							<GlobeHemisphereWest weight="duotone" className="h-5 w-5" />
 							Distribuição Geográfica
 						</CardTitle>
 					</CardHeader>
@@ -232,7 +232,7 @@ export default function WorldMapChart(props: WorldMapChartProps) {
 												className="py-8 text-center text-gray-500"
 												colSpan={3}
 											>
-												<Earth className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+												<GlobeHemisphereWest weight="duotone" className="mx-auto mb-2 h-8 w-8 text-gray-400" />
 												Nenhum dado disponível
 											</td>
 										</tr>

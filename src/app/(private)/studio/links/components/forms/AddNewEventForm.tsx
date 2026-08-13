@@ -1,7 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { Upload } from "lucide-react";
+import { Upload } from "@phosphor-icons/react/dist/ssr";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
@@ -447,7 +447,7 @@ const AddNewEventForm = ({
 										onDrop={handleDrop}
 										role="none"
 									>
-										<Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+										<Upload weight="duotone" className="mx-auto mb-4 h-12 w-12 text-gray-400" />
 										<p className="mb-2 font-medium text-gray-700 dark:text-white">
 											Arraste uma imagem ou clique para selecionar
 										</p>
@@ -505,7 +505,7 @@ const AddNewEventForm = ({
 									onDrop={handleDrop}
 									role="none"
 								>
-									<Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+									<Upload weight="duotone" className="mx-auto mb-4 h-12 w-12 text-gray-400" />
 									<p className="mb-2 font-medium text-gray-700 dark:text-white">
 										Arraste uma imagem ou toque para selecionar
 									</p>

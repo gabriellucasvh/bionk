@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarRange, ChevronDown } from "lucide-react";
+import { CalendarBlank, CaretDown } from "@phosphor-icons/react/dist/ssr";
 import { useMemo, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -117,9 +117,9 @@ export default function PeriodSelector({
 						onClick={() => setMobileOpen(true)}
 						type="button"
 					>
-						<CalendarRange className="mr-1 h-3 w-3" />
+						<CalendarBlank weight="duotone" className="mr-1 h-3 w-3" />
 						{RANGE_LABEL[range]}
-						<ChevronDown className="mr-1 ml-2 h-4 w-4" />
+						<CaretDown weight="duotone" className="mr-1 ml-2 h-4 w-4" />
 					</BaseButton>
 					<BottomSheetContent>
 						<DialogTitle className="py-3 font-semibold text-base">
@@ -302,9 +302,9 @@ export default function PeriodSelector({
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<BaseButton className="select-none rounded-xl bg-black text-sm text-white hover:bg-black/80 dark:bg-white dark:text-black">
-							<CalendarRange className="mr-2 h-4 w-4" />
+							<CalendarBlank weight="duotone" className="mr-2 h-4 w-4" />
 							{RANGE_LABEL[range]}
-							<ChevronDown className="mr-1 ml-2 h-4 w-4" />
+							<CaretDown weight="duotone" className="mr-1 ml-2 h-4 w-4" />
 						</BaseButton>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end" className="w-56">

@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive } from "lucide-react";
+import { Archive } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/utils";
 
 interface ArchivingLoaderProps {
@@ -37,7 +37,7 @@ const ArchivingLoader = ({
 					)}
 				>
 					{/* Ícone de arquivo com animação */}
-					<Archive
+					<Archive weight="duotone"
 						className={cn(
 							"animate-pulse text-green-700 dark:text-green-300",
 							{

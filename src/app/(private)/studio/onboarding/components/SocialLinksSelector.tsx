@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Trash2 } from "lucide-react";
+import { PencilSimple, Trash } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Input } from "@/components/ui/input";
@@ -210,7 +210,7 @@ export default function SocialLinksSelector({
 													title="Editar"
 													type="button"
 												>
-													<Edit className="h-4 w-4" />
+													<PencilSimple weight="duotone" className="h-4 w-4" />
 												</button>
 												<button
 													className="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -222,7 +222,7 @@ export default function SocialLinksSelector({
 													title="Remover"
 													type="button"
 												>
-													<Trash2 className="h-4 w-4" />
+													<Trash weight="duotone" className="h-4 w-4" />
 												</button>
 											</>
 										)}

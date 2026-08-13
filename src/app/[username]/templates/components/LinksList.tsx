@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock } from "lucide-react";
+import { Lock } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import type { CSSProperties, MouseEvent } from "react";
 import { useState } from "react";
@@ -114,7 +114,7 @@ export default function LinksList({
 								onMouseLeave={handleMouseLeave}
 								type="button"
 							>
-								<Lock className="size-5" />
+								<Lock weight="duotone" className="size-5" />
 							</button>
 
 							{/* Tooltip responsivo */}

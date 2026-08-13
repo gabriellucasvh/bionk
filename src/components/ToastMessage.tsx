@@ -1,6 +1,6 @@
 "use client"
 import { useEffect } from "react";
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react/dist/ssr";
 import { MotionDiv, MotionButton } from "./ui/motion";
 
 type ToastProps = {
@@ -39,7 +39,7 @@ export default function Toast({ message, variant, onClose }: ToastProps) {
           whileHover={{ scale: 1.2, rotate: 90 }}
           whileTap={{ scale: 0.9 }}
         >
-          <X size={18} />
+          <X weight="duotone" size={18} />
         </MotionButton>
       </div>
       <MotionDiv

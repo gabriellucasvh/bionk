@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle } from "lucide-react";
+import { Warning } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import { BaseButton } from "./buttons/BaseButton";
 
@@ -37,7 +37,7 @@ const SensitiveContentWarning: React.FC<SensitiveContentWarningProps> = ({
 		>
 			<div className="mx-4 w-full max-w-md space-y-6 rounded-lg p-8 text-center shadow-2xl">
 				<div className="flex justify-center">
-					<AlertTriangle className="text-yellow-400" size={64} />
+					<Warning weight="duotone" className="text-yellow-400" size={64} />
 				</div>
 
 				<div className="space-y-4">

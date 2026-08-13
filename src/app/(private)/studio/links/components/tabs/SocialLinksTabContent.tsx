@@ -7,7 +7,7 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Edit, Loader2, Plus, Trash2 } from "lucide-react";
+import { PencilSimple, SpinnerGap, Plus, Trash } from "@phosphor-icons/react/dist/ssr";
 import type { Session } from "next-auth";
 import { useEffect, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -429,7 +429,7 @@ const SocialLinksTabContent = ({
 							onClick={() => setIsMoreModalOpen(true)}
 							variant="outline"
 						>
-							<Plus className="h-7 w-7" />
+							<Plus weight="duotone" className="h-7 w-7" />
 						</Button>
 					</div>
 				</div>
@@ -682,7 +682,7 @@ const SocialLinksTabContent = ({
 														size="icon"
 														variant="ghost"
 													>
-														<Edit className="h-4 w-4" />
+														<PencilSimple weight="duotone" className="h-4 w-4" />
 													</Button>
 													<Button
 														className="h-8 w-8 text-destructive hover:text-destructive/80"
@@ -692,12 +692,12 @@ const SocialLinksTabContent = ({
 														variant="ghost"
 													>
 														{deletingLinkId === link.id ? (
-															<Loader2
+															<SpinnerGap weight="duotone"
 																aria-label="Deletando..."
 																className="h-4 w-4 animate-spin"
 															/>
 														) : (
-															<Trash2 className="h-4 w-4" />
+															<Trash weight="duotone" className="h-4 w-4" />
 														)}
 													</Button>
 												</div>

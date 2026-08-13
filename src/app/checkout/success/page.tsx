@@ -1,6 +1,6 @@
 // src/app/checkout/success/page.tsx
 
-import { CheckCircle } from "lucide-react";
+import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
@@ -41,7 +41,7 @@ export default async function CheckoutSuccessPage({
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center bg-white p-4 text-center">
 			<div className="mx-auto max-w-md space-y-6">
-				<CheckCircle className="mx-auto h-16 w-16 text-green-500" />
+				<CheckCircle weight="duotone" className="mx-auto h-16 w-16 text-green-500" />
 				<h1 className="font-bold text-3xl">Pagamento Confirmado!</h1>
 				<p className="text-gray-600">
 					Seu pagamento foi processado com sucesso. Obrigado por assinar a

@@ -5,7 +5,7 @@ import {
 	SortableContext,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Grip, MoreHorizontal, Plus, Trash2, Ungroup } from "lucide-react";
+import { DotsSix, DotsThree, Plus, Trash, Rectangle } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
@@ -214,7 +214,7 @@ const SectionCard = ({
 		<section className="space-y-4 rounded-3xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
 			{/* Header reorganizado para dispositivos móveis */}
 			<div className="space-y-3">
-				{/* Primeira linha: Grip, Título e Menu de opções */}
+				{/* Primeira linha: DotsSix, Título e Menu de opções */}
 				<div className="flex items-center justify-between">
 					<div className="flex min-w-0 flex-1 items-center gap-2">
 						<div
@@ -222,7 +222,7 @@ const SectionCard = ({
 							{...listeners}
 							className="flex-shrink-0 cursor-grab touch-none p-1"
 						>
-							<Grip className="h-4 w-4 text-muted-foreground" />
+							<DotsSix weight="duotone" className="h-4 w-4 text-muted-foreground" />
 						</div>
 						{isDraftSection ? (
 							<input
@@ -240,20 +240,20 @@ const SectionCard = ({
 					{isDraftSection ? null : (
 						<DropdownMenu>
 							<DropdownMenuTrigger className="p-1">
-								<MoreHorizontal className="h-4 w-4" />
+								<DotsThree weight="duotone" className="h-4 w-4" />
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="space-y-2 py-2">
 								<DropdownMenuItem
 									onClick={() => onSectionUngroup(section.dbId)}
 								>
-									<Ungroup className="mr-2 h-4 w-4" />
+									<Rectangle weight="duotone" className="mr-2 h-4 w-4" />
 									<span>Desagrupar</span>
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									className="text-destructive"
 									onClick={() => onSectionDelete(section.dbId)}
 								>
-									<Trash2 className="mr-2 h-4 w-4" />
+									<Trash weight="duotone" className="mr-2 h-4 w-4" />
 									<span>Deletar</span>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
@@ -275,7 +275,7 @@ const SectionCard = ({
 						}}
 						variant="studio"
 					>
-						<Plus className="mr-1 h-3 w-3" />
+						<Plus weight="duotone" className="mr-1 h-3 w-3" />
 						<span className="hidden sm:inline">Adicionar Conteúdo</span>
 						<span className="sm:hidden">Adicionar</span>
 					</BaseButton>

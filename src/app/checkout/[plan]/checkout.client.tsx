@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, CircleAlert, Loader2 } from "lucide-react";
+import { ArrowLeft, WarningCircle, SpinnerGap } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
@@ -89,7 +89,7 @@ function BillingToggle({
 				<p className="font-semibold">R${totalAnnualPrice}/ano</p>
 			</div>
 			<span className="flex items-center gap-1 text-gray-300 text-sm">
-				<CircleAlert className="h-3 w-3" />
+				<WarningCircle weight="duotone" className="h-3 w-3" />
 				Você pode cancelar sua assinatura a qualquer momento!
 			</span>
 		</div>
@@ -252,7 +252,7 @@ export default function PaymentPage() {
 								size="icon"
 								variant="ghost"
 							>
-								<ArrowLeft size={24} />
+								<ArrowLeft weight="duotone" size={24} />
 							</Button>
 						</Link>
 						<Image
@@ -354,7 +354,7 @@ export default function PaymentPage() {
 								>
 									{loading ? (
 										<>
-											<Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+											<SpinnerGap weight="duotone" className="mr-2 h-4 w-4 animate-spin" />{" "}
 											Iniciando checkout...
 										</>
 									) : (
@@ -364,7 +364,7 @@ export default function PaymentPage() {
 							</div>
 							{loading && (
 								<div className="mt-4 flex items-center justify-center gap-2 text-gray-600">
-									<Loader2 className="h-5 w-5 animate-spin" /> Processando sua
+									<SpinnerGap weight="duotone" className="h-5 w-5 animate-spin" /> Processando sua
 									assinatura...
 								</div>
 							)}

@@ -1,14 +1,6 @@
 "use client";
 
-import {
-	ArrowDown,
-	ArrowUp,
-	CircleDot,
-	Image as ImageIcon,
-	Play,
-	Plus,
-	RefreshCcw,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, Circle, Image as ImageIcon, Play, Plus, ArrowsClockwise } from "@phosphor-icons/react/dist/ssr";
 import { useEffect, useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -633,7 +625,7 @@ export function DesignPanel() {
 										type="button"
 									>
 										<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white">
-											<Plus className="h-4 w-4" />
+											<Plus weight="duotone" className="h-4 w-4" />
 										</span>
 									</button>
 									{gradientBaseColor && (
@@ -675,11 +667,11 @@ export function DesignPanel() {
 									[
 										{ key: "linear-top", label: "Cima", Icon: ArrowUp },
 										{ key: "linear-bottom", label: "Baixo", Icon: ArrowDown },
-										{ key: "radial", label: "Radial", Icon: CircleDot },
+										{ key: "radial", label: "Radial", Icon: Circle },
 										{
 											key: "conic-180",
 											label: "Cônico",
-											Icon: RefreshCcw,
+											Icon: ArrowsClockwise,
 										},
 									] as const
 								).map(({ key, label, Icon }) => {

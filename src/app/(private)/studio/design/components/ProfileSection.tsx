@@ -1,4 +1,4 @@
-import { Edit, Loader2 } from "lucide-react";
+import { PencilSimple, SpinnerGap } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,7 +38,7 @@ const ProfileSection = ({
 								/>
 								{isUploadingImage && (
 									<div className="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50">
-										<Loader2 className="h-6 w-6 animate-spin text-white" />
+										<SpinnerGap weight="duotone" className="h-6 w-6 animate-spin text-white" />
 									</div>
 								)}
 							</div>
@@ -49,7 +49,7 @@ const ProfileSection = ({
 								size="icon"
 								variant="white"
 							>
-								<Edit className="h-4 w-4" />
+								<PencilSimple weight="duotone" className="h-4 w-4" />
 							</BaseButton>
 						</div>
 					</article>

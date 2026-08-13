@@ -2,12 +2,7 @@
 
 "use client";
 
-import {
-	Check,
-	ChevronRight,
-	Link as LinkIcon,
-	MoreHorizontal,
-} from "lucide-react";
+import { Check, CaretRight, Link as LinkIcon, DotsThree } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useState } from "react";
 import { SHARING_PLATFORMS } from "@/config/sharing-platforms";
@@ -86,15 +81,15 @@ const ShareListCompact = ({
 							<div className="flex items-center justify-between">
 								<div className="ml-1 flex items-center gap-3">
 									{copied ? (
-										<Check className="size-5 text-green-600" />
+										<Check weight="duotone" className="size-5 text-green-600" />
 									) : (
-										<LinkIcon className="size-5" />
+										<LinkIcon weight="duotone" className="size-5" />
 									)}
 									<span className="pl-1 text-sm">
 										{copied ? "Copiado!" : "Copiar link"}
 									</span>
 								</div>
-								<ChevronRight className="size-4 text-muted-foreground" />
+								<CaretRight weight="duotone" className="size-4 text-muted-foreground" />
 							</div>
 						</button>
 					</li>
@@ -140,7 +135,7 @@ const ShareListCompact = ({
 										{platform.name}
 									</span>
 								</div>
-								<ChevronRight className="size-4 text-muted-foreground" />
+								<CaretRight weight="duotone" className="size-4 text-muted-foreground" />
 							</div>
 						</button>
 					</li>
@@ -157,10 +152,10 @@ const ShareListCompact = ({
 						>
 							<div className="flex items-center justify-between">
 								<div className="ml-1 flex items-center gap-3">
-									<MoreHorizontal className="size-5" />
+									<DotsThree weight="duotone" className="size-5" />
 									<span className="pl-1 text-sm">Compartilhar via...</span>
 								</div>
-								<ChevronRight className="size-4 text-muted-foreground" />
+								<CaretRight weight="duotone" className="size-4 text-muted-foreground" />
 							</div>
 						</button>
 					</li>

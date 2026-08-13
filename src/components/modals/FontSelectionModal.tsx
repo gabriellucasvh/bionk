@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 
 interface FontOption {
@@ -45,7 +45,7 @@ export default function FontSelectionModal({
 						size="sm"
 						variant="ghost"
 					>
-						<X className="h-4 w-4" />
+						<X weight="duotone" className="h-4 w-4" />
 					</Button>
 				</div>
 

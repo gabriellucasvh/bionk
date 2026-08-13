@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Sparkle, X } from "lucide-react";
+import { Check, Sparkle, X } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -52,7 +52,7 @@ export function ProButton({
 	const content = (
 		<span className="group relative inline-block">
 			<span className={baseClasses}>
-				<Sparkle className="h-3.5 w-3.5 text-white dark:text-black" />
+				<Sparkle weight="duotone" className="h-3.5 w-3.5 text-white dark:text-black" />
 				<span className="text-white dark:text-black">{label}</span>
 			</span>
 			{showOverlayTooltip && tooltip && (
@@ -87,7 +87,7 @@ export function ProButton({
 				showCloseButton={false}
 			>
 				<DialogClose className="absolute top-4 right-4 rounded-full bg-white p-2 dark:bg-zinc-800">
-					<X className="h-4 w-4" />
+					<X weight="duotone" className="h-4 w-4" />
 				</DialogClose>
 				<DialogTitle className="hidden font-bold text-xl">
 					Desbloqueie o Bionk PRO
@@ -117,27 +117,27 @@ export function ProButton({
 						</h3>
 						<ul className="space-y-3">
 							<li className="flex items-center gap-2">
-								<Check className="h-5 w-5 text-green-600" />
+								<Check weight="duotone" className="h-5 w-5 text-green-600" />
 								<span>Templates premium exclusivos</span>
 							</li>
 							<li className="flex items-center gap-2">
-								<Check className="h-5 w-5 text-green-600" />
+								<Check weight="duotone" className="h-5 w-5 text-green-600" />
 								<span>Análises avançadas de cliques e tráfego</span>
 							</li>
 							<li className="flex items-center gap-2">
-								<Check className="h-5 w-5 text-green-600" />
+								<Check weight="duotone" className="h-5 w-5 text-green-600" />
 								<span>Links ilimitados e organização melhorada</span>
 							</li>
 							<li className="flex items-center gap-2">
-								<Check className="h-5 w-5 text-green-600" />
+								<Check weight="duotone" className="h-5 w-5 text-green-600" />
 								<span>Remoção de marca d’água</span>
 							</li>
 							<li className="flex items-center gap-2">
-								<Check className="h-5 w-5 text-green-600" />
+								<Check weight="duotone" className="h-5 w-5 text-green-600" />
 								<span>Automação e agendamento de conteúdo</span>
 							</li>
 							<li className="flex items-center gap-2">
-								<Check className="h-5 w-5 text-green-600" />
+								<Check weight="duotone" className="h-5 w-5 text-green-600" />
 								<span>Suporte prioritário</span>
 							</li>
 						</ul>

@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { DotsSixVertical } from "@phosphor-icons/react/dist/ssr";
 import type React from "react";
 
 interface SortableSocialLinkItemProps {
@@ -32,7 +32,7 @@ export function SortableSocialLinkItem({
 		<div ref={setNodeRef} style={style} {...attributes}>
 			<div className="flex items-center gap-2">
 				<button {...listeners} className="cursor-grab" type="button">
-					<GripVertical className="h-5 w-5 text-muted-foreground" />
+					<DotsSixVertical weight="duotone" className="h-5 w-5 text-muted-foreground" />
 				</button>
 				<div className="flex-grow">{children}</div>
 			</div>

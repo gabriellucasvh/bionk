@@ -3,7 +3,7 @@
 import { json } from "d3-fetch";
 import { geoNaturalEarth1, geoPath } from "d3-geo";
 import { pointer, select } from "d3-selection";
-import { Earth } from "lucide-react";
+import { GlobeHemisphereWest } from "@phosphor-icons/react/dist/ssr";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { feature } from "topojson-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -478,7 +478,7 @@ export default function WorldMapAnalytics({
 													<TableCell>
 														<div className="flex items-center gap-3">
 															<div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-																<Earth className="h-4 w-4 text-muted-foreground" />
+																<GlobeHemisphereWest weight="duotone" className="h-4 w-4 text-muted-foreground" />
 															</div>
 															<div className="font-medium">
 																{country.country}
@@ -517,7 +517,7 @@ export default function WorldMapAnalytics({
 											colSpan={5}
 										>
 											<div className="flex flex-col items-center gap-2">
-												<Earth className="h-8 w-8 text-muted-foreground" />
+												<GlobeHemisphereWest weight="duotone" className="h-8 w-8 text-muted-foreground" />
 												<span>Nenhum dado disponível</span>
 											</div>
 										</TableCell>

@@ -1,5 +1,5 @@
 "use client";
-import { ChevronLeftIcon } from "lucide-react";
+import { CaretLeft } from "@phosphor-icons/react/dist/ssr";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -80,7 +80,7 @@ export default function EsqueciSenhaClient() {
           {loading ? "Enviando..." : "Enviar"}
         </BaseButton>
         <Button className="mx-auto w-min" onClick={goBack} variant="ghost">
-          <ChevronLeftIcon className="h-4 w-4" /> Voltar para o login
+          <CaretLeft weight="duotone" className="h-4 w-4" /> Voltar para o login
         </Button>
       </div>
     </div>

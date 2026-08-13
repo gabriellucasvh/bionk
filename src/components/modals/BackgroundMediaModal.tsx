@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Upload, ZoomIn, ZoomOut } from "lucide-react";
+import { MagnifyingGlass, Upload, MagnifyingGlassPlus, MagnifyingGlassMinus } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Area } from "react-easy-crop";
@@ -381,7 +381,7 @@ export default function BackgroundMediaModal({
 									onDrop={handleDrop}
 									role="none"
 								>
-									<Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+									<Upload weight="duotone" className="mx-auto mb-4 h-12 w-12 text-gray-400" />
 									<p className="mb-2 font-medium text-gray-700 dark:text-white">
 										{type === "image"
 											? "Arraste uma imagem ou clique para selecionar"
@@ -431,7 +431,7 @@ export default function BackgroundMediaModal({
 									<div className="space-y-3">
 										<Label htmlFor="zoom-slider">Zoom</Label>
 										<div className="flex items-center gap-2">
-											<ZoomOut className="h-5 w-5 text-gray-500" />
+											<MagnifyingGlassMinus weight="duotone" className="h-5 w-5 text-gray-500" />
 											<Slider
 												id="zoom-slider"
 												max={3}
@@ -440,7 +440,7 @@ export default function BackgroundMediaModal({
 												step={0.1}
 												value={[zoom]}
 											/>
-											<ZoomIn className="h-5 w-5 text-gray-500" />
+											<MagnifyingGlassPlus weight="duotone" className="h-5 w-5 text-gray-500" />
 										</div>
 									</div>
 									<div className="flex flex-col gap-2 pt-2 sm:flex-row sm:justify-center">
@@ -512,7 +512,7 @@ export default function BackgroundMediaModal({
 										onClick={performSearch}
 									>
 										<span className="flex items-center justify-center gap-2">
-											<Search className="h-4 w-4 " />
+											<MagnifyingGlass weight="duotone" className="h-4 w-4 " />
 											Buscar
 										</span>
 									</BaseButton>
@@ -562,7 +562,7 @@ export default function BackgroundMediaModal({
 															</span>
 														) : (
 															<span className="flex items-center justify-center gap-2">
-																<Upload className="h-4 w-4" />
+																<Upload weight="duotone" className="h-4 w-4" />
 																Importar Fundo
 															</span>
 														)}
@@ -598,7 +598,7 @@ export default function BackgroundMediaModal({
 															</span>
 														) : (
 															<span className="flex items-center justify-center gap-2">
-																<Upload className="h-4 w-4" />
+																<Upload weight="duotone" className="h-4 w-4" />
 																Importar Vídeo
 															</span>
 														)}

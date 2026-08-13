@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, X } from "lucide-react";
+import { Check, X } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -204,7 +204,7 @@ const PricingCard = ({
 			<div className="mt-8 space-y-3 text-left">
 				{plan.features.map((feature) => (
 					<div className="flex items-center gap-3" key={feature}>
-						<Check className="text-green-500" size={18} />
+						<Check weight="duotone" className="text-green-500" size={18} />
 						<span className="text-gray-600">{feature}</span>
 					</div>
 				))}
@@ -221,7 +221,7 @@ const CustomPlan = () => (
 			<div className="mt-4 space-y-2">
 				{customPlan.features.map((feature) => (
 					<div className="flex items-center gap-3" key={feature}>
-						<Check className="text-green-500" size={18} />
+						<Check weight="duotone" className="text-green-500" size={18} />
 						<span className="text-gray-600">{feature}</span>
 					</div>
 				))}
@@ -281,9 +281,9 @@ const ComparisonTable = () => (
 												key={`${plan.name}-${feature}`}
 											>
 												{plan.features.includes(feature) ? (
-													<Check className="mx-auto h-5 w-5 text-green-500" />
+													<Check weight="duotone" className="mx-auto h-5 w-5 text-green-500" />
 												) : (
-													<X className="mx-auto h-5 w-5 text-gray-400" />
+													<X weight="duotone" className="mx-auto h-5 w-5 text-gray-400" />
 												)}
 											</td>
 										))}

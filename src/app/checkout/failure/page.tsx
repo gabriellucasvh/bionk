@@ -1,6 +1,6 @@
 // src/app/checkout/failure/page.tsx
 
-import { XCircle } from "lucide-react";
+import { XCircle } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
@@ -37,7 +37,7 @@ export default async function CheckoutFailurePage({
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center bg-white p-4 text-center">
 			<div className="mx-auto max-w-md space-y-6">
-				<XCircle className="mx-auto h-16 w-16 text-red-500" />
+				<XCircle weight="duotone" className="mx-auto h-16 w-16 text-red-500" />
 				<h1 className="font-bold text-3xl">Pagamento não concluído</h1>
 				<p className="text-gray-600">
 					Houve um problema ao processar seu pagamento. Por favor, tente

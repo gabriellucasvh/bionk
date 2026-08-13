@@ -1,15 +1,6 @@
 "use client";
 
-import {
-	Archive,
-	Edit,
-	Grip,
-	Image as ImageIcon,
-	LinkIcon,
-	MoreVertical,
-	MousePointerClick,
-	Trash2,
-} from "lucide-react";
+import { Archive, PencilSimple, DotsSix, Image as ImageIcon, Link, DotsThreeVertical, CursorClick, Trash } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -157,7 +148,7 @@ const DisplayView = ({
 					{...listeners}
 					className="cursor-grab touch-none pt-1"
 				>
-					<Grip className="h-5 w-5 text-muted-foreground" />
+					<DotsSix weight="duotone" className="h-5 w-5 text-muted-foreground" />
 				</div>
 				<div className="flex-1 space-y-2">
 					<header className="flex items-center gap-3">
@@ -166,7 +157,7 @@ const DisplayView = ({
 								"flex items-center justify-center rounded-md bg-sky-500 p-1.5"
 							)}
 						>
-							<ImageIcon className="h-4 w-4 text-white" />
+							<ImageIcon weight="duotone" className="h-4 w-4 text-white" />
 						</div>
 						<span className="font-medium text-sm">Imagem ({layoutLabel})</span>
 						{/* Removed inline item count next to title */}
@@ -199,7 +190,7 @@ const DisplayView = ({
 						title="Quantidade de imagens"
 						variant="outline"
 					>
-						<ImageIcon className="h-3 w-3" />
+						<ImageIcon weight="duotone" className="h-3 w-3" />
 						<span className="hidden sm:inline">
 							{itemCount.toLocaleString()}
 						</span>
@@ -211,7 +202,7 @@ const DisplayView = ({
 							title="Imagens com link"
 							variant="outline"
 						>
-							<LinkIcon className="h-3 w-3" />
+							<Link weight="duotone" className="h-3 w-3" />
 							<span className="hidden sm:inline">
 								{clickableCount.toLocaleString()}
 							</span>
@@ -224,7 +215,7 @@ const DisplayView = ({
 							title="Total de cliques"
 							variant="outline"
 						>
-							<MousePointerClick className="h-3 w-3" />
+							<CursorClick weight="duotone" className="h-3 w-3" />
 							<span className="hidden sm:inline">
 								{totalClicks.toLocaleString()}
 							</span>
@@ -261,22 +252,22 @@ const DisplayView = ({
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button className="h-8 w-8" size="icon" variant="ghost">
-								<MoreVertical className="h-4 w-4" />
+								<DotsThreeVertical weight="duotone" className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={handleStartEditing}>
-                                <Edit className="mr-2 h-4 w-4" /> Editar
+                                <PencilSimple weight="duotone" className="mr-2 h-4 w-4" /> Editar
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem disabled>
-                                <Archive className="mr-2 h-4 w-4" /> Arquivar
+                                <Archive weight="duotone" className="mr-2 h-4 w-4" /> Arquivar
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 className="text-destructive"
                                 onClick={handleDelete}
                             >
-                                <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                                <Trash weight="duotone" className="mr-2 h-4 w-4" /> Excluir
                             </DropdownMenuItem>
                         </DropdownMenuContent>
 					</DropdownMenu>

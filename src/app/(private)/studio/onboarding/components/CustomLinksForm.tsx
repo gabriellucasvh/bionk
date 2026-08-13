@@ -1,6 +1,6 @@
 "use client";
 
-import { ALargeSmall, Link2, Trash2 } from "lucide-react";
+import { TextAa, Link, Trash } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Input } from "@/components/ui/input";
@@ -106,7 +106,7 @@ export default function CustomLinksForm({
 						>
 							<div className="flex min-w-0 flex-1 flex-col items-center gap-4 sm:flex-row">
 								<div className="flex items-center gap-3">
-									<ALargeSmall className="h-4 w-4" />
+									<TextAa weight="duotone" className="h-4 w-4" />
 									<Input
 										className="w-[220px] overflow-hidden truncate text-ellipsis whitespace-nowrap rounded-full bg-gray-200 px-4 py-2 text-gray-800 text-sm sm:w-[220px] md:w-[300px] dark:bg-gray-800 dark:text-gray-200"
 										id={`title-pill-${idx}`}
@@ -123,7 +123,7 @@ export default function CustomLinksForm({
 									/>
 								</div>
 								<div className="flex items-center gap-3">
-									<Link2 className="h-4 w-4" />
+									<Link weight="duotone" className="h-4 w-4" />
 									<Input
 										className="w-[220px] overflow-hidden truncate text-ellipsis whitespace-nowrap rounded-full bg-gray-200 px-4 py-2 text-gray-800 text-sm sm:w-[220px] md:w-[300px] dark:bg-gray-800 dark:text-gray-200"
 										id={`url-pill-${idx}`}
@@ -156,7 +156,7 @@ export default function CustomLinksForm({
 									title="Remover"
 									type="button"
 								>
-									<Trash2 className="h-4 w-4" />
+									<Trash weight="duotone" className="h-4 w-4" />
 								</button>
 							</div>
 						</li>

@@ -1,6 +1,6 @@
 "use client";
 
-import { ClockFading, Ticket } from "lucide-react";
+import { ClockAfternoon, Ticket } from "@phosphor-icons/react/dist/ssr";
 
 interface EventOptionsProps {
 	onOptionSelect: (option: "event_tickets" | "event_countdown") => void;
@@ -32,9 +32,9 @@ const OptionItem = ({
 					className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${opt.bg}`}
 				>
 					{opt.icon === "ticket" ? (
-						<Ticket className="h-6 w-6 text-white" strokeWidth={1.5} />
+						<Ticket weight="duotone" className="h-6 w-6 text-white" strokeWidth={1.5} />
 					) : (
-						<ClockFading className="h-6 w-6 text-white" strokeWidth={1.5} />
+						<ClockAfternoon weight="duotone" className="h-6 w-6 text-white" strokeWidth={1.5} />
 					)}
 				</div>
 				<div className="flex min-w-0 max-w-md flex-1 flex-col">

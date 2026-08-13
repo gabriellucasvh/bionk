@@ -1,16 +1,6 @@
 "use client";
 
-import {
-    FolderOpen,
-    Grip,
-    Image as ImageIcon,
-    Link as LinkIcon,
-    Music2,
-    Ticket,
-    Type,
-    Video,
-    ClockFading,
-} from "lucide-react";
+import { FolderOpen, DotsSix, Image as ImageIcon, Link as LinkIcon, MusicNotes, Ticket, TextT, VideoCamera, ClockAfternoon } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/utils";
 import type {
     EventItem,
@@ -46,7 +36,7 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
 		}
 		if ("isText" in item && item.isText) {
 			return {
-				icon: Type,
+				icon: TextT,
 				label: "Texto",
 				color: "text-green-600",
 				title: item.title || "Texto sem título",
@@ -54,7 +44,7 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
 		}
 		if ("isVideo" in item && item.isVideo) {
 			return {
-				icon: Video,
+				icon: VideoCamera,
 				label: "Vídeo",
 				color: "text-red-600",
 				title: item.title || "Vídeo sem título",
@@ -70,7 +60,7 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
 		}
 		if ("isMusic" in item && item.isMusic) {
 			return {
-				icon: Music2,
+				icon: MusicNotes,
 				label: "Música",
 				color: "text-green-600",
 				title: item.title || "Música sem título",
@@ -84,7 +74,7 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
                 (!(ev.externalLink || ev.location) && ev.eventTime === "00:00");
             if (isCountdown) {
                 return {
-                    icon: ClockFading,
+                    icon: ClockAfternoon,
                     label: "Contagem",
                     color: "text-blue-600",
                     title: ev.title || "Contagem",
@@ -115,7 +105,7 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
 				className
 			)}
 		>
-			<Grip className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+			<DotsSix weight="duotone" className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
 			<Icon className={cn("h-4 w-4 flex-shrink-0", color)} />
 			<div className="flex min-w-0 flex-1 flex-col">
 				<span className="font-medium text-muted-foreground text-xs">
