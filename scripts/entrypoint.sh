@@ -12,7 +12,7 @@ done
 echo "==> PostgreSQL pronto!"
 
 echo "==> Rodando prisma migrate deploy..."
-npx prisma migrate deploy
+prisma migrate deploy
 
 echo "==> Iniciando servidor Next.js..."
 exec node server.js

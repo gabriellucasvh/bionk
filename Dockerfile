@@ -32,6 +32,7 @@ RUN npm run build
 # ---- Etapa 3: Imagem de produção (mínima) -------------------
 FROM node:20-alpine AS runner
 RUN apk add --no-cache libc6-compat curl postgresql-client
+RUN npm install -g prisma
 WORKDIR /app
 
 ENV NODE_ENV=production
