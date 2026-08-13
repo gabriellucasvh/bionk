@@ -1,3 +1,4 @@
+import { InstagramLogo, TiktokLogo, YoutubeLogo } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -21,13 +22,7 @@ export default function SocialConnect() {
 				<div className="grid grid-cols-1 gap-6 md:grid-cols-3">
 					<div className="rounded-3xl bg-rose-400 p-6">
 						<div className="flex items-center gap-2 text-black">
-							<Image
-								alt="Instagram"
-								className="brightness-0"
-								height={20}
-								src="/images/instagram-icon.svg"
-								width={20}
-							/>
+							<InstagramLogo weight="fill" className="text-black" size={24} />
 							<span className="font-bold text-xs uppercase tracking-[3px]">
 								Instagram
 							</span>
@@ -43,13 +38,7 @@ export default function SocialConnect() {
 
 					<div className="rounded-3xl bg-sky-400 p-6">
 						<div className="flex items-center gap-2 text-black">
-							<Image
-								alt="TikTok"
-								className="brightness-0"
-								height={20}
-								src="/images/tiktok-icon.svg"
-								width={20}
-							/>
+							<TiktokLogo weight="fill" className="text-black" size={24} />
 							<span className="font-bold text-xs uppercase tracking-[3px]">
 								TikTok
 							</span>
@@ -65,13 +54,7 @@ export default function SocialConnect() {
 
 					<div className="rounded-3xl bg-emerald-400 p-6">
 						<div className="flex items-center gap-2 text-black">
-							<Image
-								alt="YouTube"
-								className="brightness-0"
-								height={20}
-								src="/images/youtube-icon.svg"
-								width={20}
-							/>
+							<YoutubeLogo weight="fill" className="text-black" size={24} />
 							<span className="font-bold text-xs uppercase tracking-[3px]">
 								YouTube
 							</span>
@@ -87,7 +70,7 @@ export default function SocialConnect() {
 				</div>
 
 				<div className="mt-10 flex flex-wrap items-center gap-4">
-					<div className="rounded-2xl bg-white p-2">
+					<div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white p-2">
 						<Image
 							alt="WhatsApp"
 							height={32}
@@ -95,7 +78,7 @@ export default function SocialConnect() {
 							width={32}
 						/>
 					</div>
-					<div className="rounded-2xl bg-white p-2">
+					<div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white p-2">
 						<Image
 							alt="X"
 							className="brightness-0"
@@ -104,7 +87,7 @@ export default function SocialConnect() {
 							width={32}
 						/>
 					</div>
-					<div className="rounded-2xl bg-white p-2">
+					<div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white p-2">
 						<Image
 							alt="Facebook"
 							height={32}
@@ -112,7 +95,7 @@ export default function SocialConnect() {
 							width={32}
 						/>
 					</div>
-					<div className="rounded-2xl bg-white p-2">
+					<div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white p-2">
 						<Image
 							alt="Telegram"
 							height={32}
@@ -120,7 +103,7 @@ export default function SocialConnect() {
 							width={32}
 						/>
 					</div>
-					<div className="rounded-2xl bg-white p-2">
+					<div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white p-2">
 						<Image
 							alt="Pinterest"
 							height={32}
@@ -128,7 +111,7 @@ export default function SocialConnect() {
 							width={32}
 						/>
 					</div>
-					<div className="rounded-2xl bg-white p-2">
+					<div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white p-2">
 						<Image
 							alt="Snapchat"
 							height={32}
@@ -136,7 +119,7 @@ export default function SocialConnect() {
 							width={32}
 						/>
 					</div>
-					<div className="rounded-2xl bg-white p-2">
+					<div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white p-2">
 						<Image
 							alt="Discord"
 							height={32}
@@ -144,15 +127,16 @@ export default function SocialConnect() {
 							width={32}
 						/>
 					</div>
-					<div className="rounded-2xl bg-white p-2">
+					<div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white p-2">
 						<Image
 							alt="Threads"
+							className="brightness-0"
 							height={32}
 							src="/images/threads-icon.svg"
 							width={32}
 						/>
 					</div>
-					<div className="rounded-2xl bg-white p-2">
+					<div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white p-2">
 						<Image
 							alt="Twitch"
 							height={32}
