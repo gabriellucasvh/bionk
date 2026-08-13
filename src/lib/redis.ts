@@ -14,7 +14,7 @@ function getClient(): IORedis {
 		}
 		_client = new IORedis(url, {
 			maxRetriesPerRequest: 3,
-			enableOfflineQueue: true,
+			enableOfflineQueue: false, // <-- IMPORTANTE: Falhar rápido em vez de travar infinitamente
 			lazyConnect: false,
 			retryStrategy(times) {
 				if (times > 10) return null;
