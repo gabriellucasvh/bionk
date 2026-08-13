@@ -1,7 +1,7 @@
 "use client";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { XIcon } from "lucide-react";
+import { X } from "@phosphor-icons/react/dist/ssr";
 import type * as React from "react";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +42,7 @@ function DialogBottomSheetContent({
 				{children}
 				{showCloseButton && (
 					<DialogPrimitive.Close className="absolute top-4 right-4 rounded-full p-1 opacity-70 ring-offset-background transition-opacity hover:bg-muted-foreground/20 hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0">
-						<XIcon />
+						<X weight="duotone" />
 						<span className="sr-only">Close</span>
 					</DialogPrimitive.Close>
 				)}

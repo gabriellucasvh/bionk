@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -61,7 +61,7 @@ function SuccessState() {
 			<CardContent className="pt-8">
 				<div className="space-y-6 text-center">
 					<div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-						<CheckCircle className="h-8 w-8 text-green-600" />
+						<CheckCircle weight="duotone" className="h-8 w-8 text-green-600" />
 					</div>
 
 					<div className="space-y-4">

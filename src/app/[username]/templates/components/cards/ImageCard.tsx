@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronLeft, ChevronRight, Images } from "lucide-react";
+import { CaretLeft, CaretRight, Images } from "@phosphor-icons/react/dist/ssr";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { detectTrafficSource } from "@/utils/traffic-source";
@@ -166,7 +166,7 @@ export default function ImageCard({
 									aria-hidden
 									className="-translate-y-1/2 absolute top-1/2 right-3 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
 								>
-									<Images className="size-5" />
+									<Images weight="duotone" className="size-5" />
 								</div>
 							</div>
 						</summary>
@@ -224,7 +224,7 @@ export default function ImageCard({
 								}}
 								type="button"
 							>
-								<ChevronLeft className="h-5 w-5 text-white" />
+								<CaretLeft weight="duotone" className="h-5 w-5 text-white" />
 							</button>
 						)}
 						{isOverflowing && canRight && (
@@ -237,7 +237,7 @@ export default function ImageCard({
 								}}
 								type="button"
 							>
-								<ChevronRight className="h-5 w-5 text-white" />
+								<CaretRight weight="duotone" className="h-5 w-5 text-white" />
 							</button>
 						)}
 					</div>

@@ -1,6 +1,6 @@
 // src/app/checkout/pending/page.tsx
 
-import { Clock } from "lucide-react";
+import { Clock } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
@@ -41,7 +41,7 @@ export default async function CheckoutPendingPage({
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center bg-white p-4 text-center">
 			<div className="mx-auto max-w-md space-y-6">
-				<Clock className="mx-auto h-16 w-16 text-yellow-500" />
+				<Clock weight="duotone" className="mx-auto h-16 w-16 text-yellow-500" />
 				<h1 className="font-bold text-3xl">Pagamento em Processamento</h1>
 				<p className="text-gray-600">
 					Seu pagamento está sendo processado. Assim que for confirmado, você

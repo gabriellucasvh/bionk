@@ -1,5 +1,5 @@
 "use client";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeClosed } from "@phosphor-icons/react/dist/ssr";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -118,7 +118,7 @@ export default function NovaSenhaClient({ token }: { token?: string }) {
             }}
             type="button"
           >
-            {showPwd ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            {showPwd ? <EyeClosed weight="duotone" className="h-5 w-5" /> : <Eye weight="duotone" className="h-5 w-5" />}
           </button>
         </div>
       </div>
@@ -141,7 +141,7 @@ export default function NovaSenhaClient({ token }: { token?: string }) {
             }}
             type="button"
           >
-            {showConfirm ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            {showConfirm ? <EyeClosed weight="duotone" className="h-5 w-5" /> : <Eye weight="duotone" className="h-5 w-5" />}
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { HelpCircle, Settings } from "lucide-react";
+import { Question, Gear } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -200,7 +200,7 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 								type="button"
 							>
 								<span className="flex items-center text-sm hover:underline">
-									<Settings className="mr-2 h-4 w-4" />
+									<Gear weight="duotone" className="mr-2 h-4 w-4" />
 									Gerenciar Preferências
 								</span>
 							</button>
@@ -230,7 +230,7 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 				<DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
 					<DialogHeader>
 						<DialogTitle className="flex items-center gap-2">
-							<Settings className="h-5 w-5" />
+							<Gear weight="duotone" className="h-5 w-5" />
 							Personalizar Cookies
 						</DialogTitle>
 						<DialogDescription>
@@ -251,7 +251,7 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 									</Badge>
 								</div>
 								<div className="relative">
-									<HelpCircle
+									<Question weight="duotone"
 										className="h-4 w-4 cursor-help text-gray-400"
 										onClick={() =>
 											setActiveTooltip(
@@ -281,7 +281,7 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 									<span className="font-medium text-sm">Funcionais</span>
 								</div>
 								<div className="relative">
-									<HelpCircle
+									<Question weight="duotone"
 										className="h-4 w-4 cursor-help text-gray-400"
 										onClick={() =>
 											setActiveTooltip(
@@ -311,7 +311,7 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 									<span className="font-medium text-sm">Analytics</span>
 								</div>
 								<div className="relative">
-									<HelpCircle
+									<Question weight="duotone"
 										className="h-4 w-4 cursor-help text-gray-400"
 										onClick={() =>
 											setActiveTooltip(
@@ -342,7 +342,7 @@ export default function CookieConsent({ userId: _ }: CookieConsentProps) {
 									<span className="font-medium text-sm">Marketing</span>
 								</div>
 								<div className="relative">
-									<HelpCircle
+									<Question weight="duotone"
 										className="h-4 w-4 cursor-help text-gray-400"
 										onClick={() =>
 											setActiveTooltip(

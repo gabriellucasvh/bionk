@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, RotateCcw, Trash2 } from "lucide-react";
+import { CaretLeft, ArrowCounterClockwise, Trash } from "@phosphor-icons/react/dist/ssr";
 import { format } from "date-fns";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -280,7 +280,7 @@ export default function ArchivedItemsPage() {
                         </p>
                     </div>
                     <Link className="flex items-center" href="/studio/configs">
-                        <ChevronLeft className="mr-2 h-4 w-4" />
+                        <CaretLeft weight="duotone" className="mr-2 h-4 w-4" />
                         Voltar
                     </Link>
                 </header>
@@ -312,7 +312,7 @@ export default function ArchivedItemsPage() {
                                             size="icon"
                                             variant="white"
                                         >
-                                            <RotateCcw className="h-4 w-4" />
+                                            <ArrowCounterClockwise weight="duotone" className="h-4 w-4" />
                                         </BaseButton>
                                         <BaseButton
                                             aria-label="Excluir"
@@ -320,7 +320,7 @@ export default function ArchivedItemsPage() {
                                             size="icon"
                                             variant="white"
                                         >
-                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                            <Trash weight="duotone" className="h-4 w-4 text-red-500" />
                                         </BaseButton>
                                     </div>
                                 </li>

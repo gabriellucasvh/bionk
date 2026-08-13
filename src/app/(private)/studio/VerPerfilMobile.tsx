@@ -1,7 +1,7 @@
 // src/app/(private)/studio/VerPerfilMobile.tsx
 "use client";
 
-import { Download, ExternalLink } from "lucide-react";
+import { Download, ArrowSquareOut } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -60,7 +60,7 @@ const VerPerfilMobile = () => {
 					variant="green"
 				>
 					<span className="flex items-center gap-2">
-						<ExternalLink className="h-4 w-4" />
+						<ArrowSquareOut weight="duotone" className="h-4 w-4" />
 						Compartilhar
 					</span>
 				</BaseButton>
@@ -98,7 +98,7 @@ const VerPerfilMobile = () => {
 								size="sm"
 								variant="white"
 							>
-								<Download className="mr-2 size-4" />
+								<Download weight="duotone" className="mr-2 size-4" />
 								Baixar PNG
 							</BaseButton>
 						</div>
@@ -112,7 +112,7 @@ const VerPerfilMobile = () => {
 						variant="default"
 					>
 						<Link href={profileUrl} rel="noopener noreferrer" target="_blank">
-							<ExternalLink className="mr-2 size-4" />
+							<ArrowSquareOut weight="duotone" className="mr-2 size-4" />
 							Abrir
 						</Link>
 					</BaseButton>

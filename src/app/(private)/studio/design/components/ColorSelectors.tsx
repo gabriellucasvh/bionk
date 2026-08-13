@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus } from "@phosphor-icons/react/dist/ssr";
 import { useRef } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { FIELD_TO_PICKER, SOLID_COLORS } from "../constants/design.constants";
@@ -97,7 +97,7 @@ export function ColorSelector({
 					type="button"
 				>
 					<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white">
-						<Plus className="h-4 w-4" />
+						<Plus weight="duotone" className="h-4 w-4" />
 					</span>
 				</button>
 				{!isSolidColor && customColor && (

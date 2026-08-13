@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeClosed } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -246,9 +246,9 @@ export function CompletionForm({
 						type="button"
 					>
 						{showPassword ? (
-							<EyeOff className="h-5 w-5" />
+							<EyeClosed weight="duotone" className="h-5 w-5" />
 						) : (
-							<Eye className="h-5 w-5" />
+							<Eye weight="duotone" className="h-5 w-5" />
 						)}
 					</button>
 				</div>

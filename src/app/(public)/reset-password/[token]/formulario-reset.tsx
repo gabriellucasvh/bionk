@@ -3,7 +3,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeClosed } from "@phosphor-icons/react/dist/ssr";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -100,7 +100,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 							onClick={() => setShowPassword(!showPassword)}
 							type="button"
 						>
-							{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+							{showPassword ? <EyeClosed weight="duotone" size={20} /> : <Eye weight="duotone" size={20} />}
 						</button>
 					</div>
 					{errors.password && (
@@ -128,7 +128,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 							onClick={() => setShowConfirmPassword(!showConfirmPassword)}
 							type="button"
 						>
-							{showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+							{showConfirmPassword ? <EyeClosed weight="duotone" size={20} /> : <Eye weight="duotone" size={20} />}
 						</button>
 					</div>
 					{errors.confirmPassword && (

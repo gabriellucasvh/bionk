@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreVertical } from "lucide-react";
+import { DotsThreeVertical } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import React from "react";
 import LinkOptionsModal from "@/components/modals/LinkOptionsModal";
@@ -161,7 +161,7 @@ export default function MusicCard({
 					}}
 					type="button"
 				>
-					<MoreVertical className="size-5" style={buttonTextColorStyle} />
+					<DotsThreeVertical weight="duotone" className="size-5" style={buttonTextColorStyle} />
 				</button>
 				{/* Modal de opções */}
 				{optionsOpen && (

@@ -1,7 +1,7 @@
 // src/app/(private)/studio/design/design.client.tsx
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeClosed } from "@phosphor-icons/react/dist/ssr";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import ProfileImageCropModal from "@/components/modals/ProfileImageCropModal";
@@ -217,9 +217,9 @@ const PersonalizarClient = () => {
 				type="button"
 			>
 				{mobileView === "design" ? (
-					<Eye className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
+					<Eye weight="duotone" className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
 				) : (
-					<EyeOff className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
+					<EyeClosed weight="duotone" className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
 				)}
 			</button>
 

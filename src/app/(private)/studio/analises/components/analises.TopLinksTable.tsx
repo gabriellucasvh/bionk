@@ -1,11 +1,6 @@
 "use client";
 
-import {
-	ChevronDown,
-	ChevronUp,
-	LinkIcon,
-	MousePointerClick,
-} from "lucide-react";
+import { CaretDown, CaretUp, Link as LinkIcon, CursorClick } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -107,14 +102,14 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 													href={display.href}
 													target="_blank"
 												>
-													<LinkIcon className="h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
+													<LinkIcon weight="duotone" className="h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
 													<span className="truncate">{display.text}</span>
 												</Link>
 											);
 										})()}
 									</div>
 									<div className="flex items-center rounded-full bg-primary/5 px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm">
-										<MousePointerClick
+										<CursorClick weight="duotone"
 											className="mr-1 text-primary sm:mr-1.5"
 											size={12}
 										/>
@@ -137,12 +132,12 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 								>
 									{isExpanded ? (
 										<>
-											<ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
+											<CaretUp weight="duotone" className="h-3 w-3 sm:h-4 sm:w-4" />
 											Mostrar menos
 										</>
 									) : (
 										<>
-											<ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
+											<CaretDown weight="duotone" className="h-3 w-3 sm:h-4 sm:w-4" />
 											<span className="hidden sm:inline">
 												Ver mais ({topLinks.length - 3} restantes)
 											</span>

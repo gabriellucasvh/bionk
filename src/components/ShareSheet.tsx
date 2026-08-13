@@ -2,13 +2,7 @@
 
 "use client";
 
-import {
-	Check,
-	ChevronLeft,
-	ChevronRight,
-	Link,
-	MoreHorizontal,
-} from "lucide-react";
+import { Check, CaretLeft, CaretRight, Link, DotsThree } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { SHARING_PLATFORMS } from "@/config/sharing-platforms";
@@ -108,9 +102,9 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 		key: "copy",
 		name: copied ? "Copiado!" : "Copiar Link",
 		icon: copied ? (
-			<Check className="size-5 text-green-500" />
+			<Check weight="duotone" className="size-5 text-green-500" />
 		) : (
-			<Link className="size-5" />
+			<Link weight="duotone" className="size-5" />
 		),
 		action: handleCopyLink,
 		color: copied ? "bg-green-100" : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600",
@@ -119,7 +113,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 	const moreButton = {
 		key: "more",
 		name: "Compartilhar via...",
-		icon: <MoreHorizontal className="size-5" />,
+		icon: <DotsThree weight="duotone" className="size-5" />,
 		action: handleNativeShare,
 		color: "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600",
 	};
@@ -143,7 +137,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 				onClick={() => handleScroll("left")}
 				type="button"
 			>
-				<ChevronLeft className="size-6 text-black" />
+				<CaretLeft weight="duotone" className="size-6 text-black" />
 			</button>
 
 			<ul
@@ -217,7 +211,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 				onClick={() => handleScroll("right")}
 				type="button"
 			>
-				<ChevronRight className="size-6 text-black" />
+				<CaretRight weight="duotone" className="size-6 text-black" />
 			</button>
 		</div>
 	);

@@ -1,6 +1,6 @@
 "use client";
 
-import { SquareArrowOutUpRight } from "lucide-react";
+import { ArrowSquareOut } from "@phosphor-icons/react/dist/ssr";
 
 export default function ShareButton({ onClick }: { onClick: () => void }) {
 	return (
@@ -11,7 +11,7 @@ export default function ShareButton({ onClick }: { onClick: () => void }) {
 				onClick={onClick}
 				type="button"
 			>
-				<SquareArrowOutUpRight
+				<ArrowSquareOut weight="duotone"
 					className="size-4.5 text-black"
 					strokeWidth={1.5}
 				/>

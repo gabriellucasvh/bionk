@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Globe, LinkIcon, Share2 } from "lucide-react";
+import { ArrowRight, Globe, Link as LinkIcon, ShareNetwork } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -62,19 +62,19 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 					<div className="grid grid-cols-1 gap-4 py-4">
 						{[
 							{
-								icon: <Globe className="h-4 w-4" />,
+								icon: <Globe weight="duotone" className="h-4 w-4" />,
 								title: "Sua presença online",
 								desc: "Crie um perfil único que represente você ou sua marca.",
 								bg: "bg-blue-100 text-blue-600",
 							},
 							{
-								icon: <LinkIcon className="h-4 w-4" />,
+								icon: <LinkIcon weight="duotone" className="h-4 w-4" />,
 								title: "Todos os seus links",
 								desc: "Reúna todos os seus conteúdos em um só lugar.",
 								bg: "bg-purple-100 text-purple-600",
 							},
 							{
-								icon: <Share2 className="h-4 w-4" />,
+								icon: <ShareNetwork weight="duotone" className="h-4 w-4" />,
 								title: "Compartilhe facilmente",
 								desc: "Compartilhe seu perfil em qualquer lugar com um único link.",
 								bg: "bg-green-100 text-green-600",
@@ -111,7 +111,7 @@ const JoinBionkModal = ({ children }: JoinBionkModalProps) => {
 						target="_blank"
 					>
 						Começar agora
-						<ArrowRight className="ml-2 h-4 w-4" />
+						<ArrowRight weight="duotone" className="ml-2 h-4 w-4" />
 					</Link>
 				</DialogFooter>
 			</DialogContent>

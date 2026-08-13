@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowRight, ArrowSquareOut } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -72,7 +72,7 @@ const Hero = () => {
 						variant="white"
 					>
 						<span className="flex items-center">
-							Saiba mais <ExternalLink className="ml-2 h-4 w-4" />
+							Saiba mais <ArrowSquareOut weight="duotone" className="ml-2 h-4 w-4" />
 						</span>
 					</BaseButton>
 					<BaseButton
@@ -82,7 +82,7 @@ const Hero = () => {
 					>
 						<span className="relative z-10 flex items-center">
 							Comece Grátis{" "}
-							<ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+							<ArrowRight weight="duotone" className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
 						</span>
 					</BaseButton>
 				</div>

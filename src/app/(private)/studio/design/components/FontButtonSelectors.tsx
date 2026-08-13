@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Type } from "lucide-react";
+import { Check, TextT } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { BUTTON_STYLES, FONT_OPTIONS } from "../constants/design.constants";
@@ -57,7 +57,7 @@ export function FontSelector({
 						{FONT_OPTIONS.find((f) => f.value === customizations.customFont)
 							?.label || "Satoshi"}
 					</span>
-					<Type className="h-4 w-4" />
+					<TextT weight="duotone" className="h-4 w-4" />
 				</Button>
 			</div>
 			<div className="mt-2 hidden grid-cols-3 gap-2 sm:grid sm:grid-cols-4 lg:grid-cols-5">
@@ -106,7 +106,7 @@ export function ButtonStyleSelector({
 						>
 							{isActive && (
 								<div className="absolute top-1 left-1 rounded-full bg-green-600 p-1 text-white shadow-sm">
-									<Check className="h-3 w-3" />
+									<Check weight="duotone" className="h-3 w-3" />
 								</div>
 							)}
 							<button

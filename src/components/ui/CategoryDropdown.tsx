@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { CaretDown } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -39,7 +39,7 @@ export default function CategoryDropdown({
 							: selectedCategory.replace(/-/g, " ")
 						: "Selecionar Categoria"}
 				</span>
-				<ChevronDown
+				<CaretDown weight="duotone"
 					className={`h-4 w-4 transition-transform ${
 						isOpen ? "rotate-180" : ""
 					}`}

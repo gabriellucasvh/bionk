@@ -1,13 +1,6 @@
 "use client";
 
-import {
-	Blend,
-	ChartNoAxesCombined,
-	Globe,
-	PartyPopper,
-	Plus,
-	Rocket,
-} from "lucide-react";
+import { Drop, ChartLineUp, Globe, Confetti, Plus, Rocket } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -30,17 +23,17 @@ import {
 
 const featureCards = [
 	{
-		icon: <Plus className="h-8 w-8 text-lime-300" />,
+		icon: <Plus weight="duotone" className="h-8 w-8 text-lime-300" />,
 		title: "Crie seu Link in Bio gratuito com o Bionk",
 		desc: "Obtenha um link exclusivo que centraliza todo o seu conteúdo, permitindo que seus seguidores acessem suas publicações de forma simples e intuitiva.",
 	},
 	{
-		icon: <Blend className="text-lime-300" />,
+		icon: <Drop weight="duotone" className="text-lime-300" />,
 		title: "Atualize seu link em todas as redes sociais",
 		desc: "Personalize seu URL e utilize-o em qualquer plataforma, reunindo seu conteúdo de forma prática para facilitar o acesso dos seus seguidores.",
 	},
 	{
-		icon: <PartyPopper className="text-lime-300" />,
+		icon: <Confetti weight="duotone" className="text-lime-300" />,
 		title: "Expanda seu alcance e engajamento",
 		desc: "Conecte seu público a todas as suas postagens e oportunidades, transformando seu perfil em uma central dinâmica de conteúdos e interações.",
 	},
@@ -49,18 +42,18 @@ const featureCards = [
 const analyticsFeatures = [
 	{
 		icon: (
-			<ChartNoAxesCombined className="flex-shrink-0 p-4 text-white" size={50} />
+			<ChartLineUp weight="duotone" className="flex-shrink-0 p-4 text-white" size={50} />
 		),
 		title: "Estatísticas em tempo real",
 		desc: "Acompanhe visitantes, cliques e conversões em tempo real com painéis detalhados.",
 	},
 	{
-		icon: <Rocket className="flex-shrink-0 p-4 text-white" size={50} />,
+		icon: <Rocket weight="duotone" className="flex-shrink-0 p-4 text-white" size={50} />,
 		title: "Análise de Desempenho",
 		desc: "Identifique quais links e conteúdos geram mais engajamento para otimizar sua estratégia.",
 	},
 	{
-		icon: <Globe className="flex-shrink-0 p-4 text-white" size={50} />,
+		icon: <Globe weight="duotone" className="flex-shrink-0 p-4 text-white" size={50} />,
 		title: "Dados Demográficos",
 		desc: "Conheça a localização, dispositivos e comportamento do seu público para decisões mais inteligentes.",
 	},

@@ -9,7 +9,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { CheckCircle, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, SpinnerGap, XCircle } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -79,12 +79,12 @@ export default function VerifyNewEmailClient() {
 			</CardHeader>
 			<CardContent className="flex flex-col items-center justify-center space-y-6">
 				{status === "loading" && (
-					<Loader2 className="h-12 w-12 animate-spin text-primary" />
+					<SpinnerGap weight="duotone" className="h-12 w-12 animate-spin text-primary" />
 				)}
 				{status === "success" && (
-					<CheckCircle className="h-12 w-12 text-green-500" />
+					<CheckCircle weight="duotone" className="h-12 w-12 text-green-500" />
 				)}
-				{status === "error" && <XCircle className="h-12 w-12 text-red-500" />}
+				{status === "error" && <XCircle weight="duotone" className="h-12 w-12 text-red-500" />}
 
 				{(status === "success" || status === "error") && (
 					<Link href="/studio/configs" passHref>

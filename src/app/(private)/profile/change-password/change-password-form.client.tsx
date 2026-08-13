@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { SpinnerGap } from "@phosphor-icons/react/dist/ssr";
 import ToastMessage from "@/components/ToastMessage"; 
 
 const changePasswordSchema = z.object({
@@ -128,7 +128,7 @@ export default function ChangePasswordForm() {
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <SpinnerGap weight="duotone" className="mr-2 h-4 w-4 animate-spin" />
             ) : null}
             {isLoading ? "Alterando..." : "Alterar Senha"}
           </Button>

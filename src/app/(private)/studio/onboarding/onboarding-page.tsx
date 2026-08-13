@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Edit, Loader2 } from "lucide-react";
+import { Check, PencilSimple, SpinnerGap } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -476,7 +476,7 @@ export default function OnboardingPageComponent({
 									size="icon"
 									variant="white"
 								>
-									<Edit className="h-4 w-4" />
+									<PencilSimple weight="duotone" className="h-4 w-4" />
 								</BaseButton>
 							</div>
 						</div>
@@ -513,7 +513,7 @@ export default function OnboardingPageComponent({
 										/>
 										{usernameValidation.isChecking && (
 											<span className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-2">
-												<Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+												<SpinnerGap weight="duotone" className="h-4 w-4 animate-spin text-muted-foreground" />
 											</span>
 										)}
 									</div>
@@ -649,9 +649,9 @@ export default function OnboardingPageComponent({
 								onClick={handleComplete}
 							>
 								{loading ? (
-									<Loader2 className="h-4 w-4 animate-spin" />
+									<SpinnerGap weight="duotone" className="h-4 w-4 animate-spin" />
 								) : (
-									<Check className="h-4 w-4" />
+									<Check weight="duotone" className="h-4 w-4" />
 								)}
 								Concluir e ir para o Studio
 							</BaseButton>

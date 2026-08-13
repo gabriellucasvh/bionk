@@ -1,14 +1,6 @@
 "use client";
 
-import {
-	Archive,
-	Edit,
-	Grip,
-	Loader2,
-	MoreVertical,
-	Music2,
-	Trash2,
-} from "lucide-react";
+import { Archive, PencilSimple, DotsSix, SpinnerGap, DotsThreeVertical, MusicNotes, Trash } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -169,7 +161,7 @@ const EditingView = ({
 							value={music.title || ""}
 						/>
 						{isSearchingTitle && (
-							<Loader2 className="-translate-y-1/2 absolute top-1/2 right-2 h-4 w-4 animate-spin text-muted-foreground" />
+							<SpinnerGap weight="duotone" className="-translate-y-1/2 absolute top-1/2 right-2 h-4 w-4 animate-spin text-muted-foreground" />
 						)}
 					</div>
 				</div>
@@ -299,7 +291,7 @@ const DisplayView = ({
 					{...listeners}
 					className="cursor-grab touch-none pt-1"
 				>
-					<Grip className="h-5 w-5 text-muted-foreground" />
+					<DotsSix weight="duotone" className="h-5 w-5 text-muted-foreground" />
 				</div>
 				<div className="flex-1 space-y-2">
 					<header className="flex items-center gap-3">
@@ -325,7 +317,7 @@ const DisplayView = ({
 									platform.bgColor
 								)}
 							>
-								<Music2 className="h-4 w-4 text-white" />
+								<MusicNotes weight="duotone" className="h-4 w-4 text-white" />
 							</div>
 						)}
 						<span className="font-medium text-sm">{platform.name}</span>
@@ -372,22 +364,22 @@ const DisplayView = ({
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button className="h-8 w-8" size="icon" variant="ghost">
-								<MoreVertical className="h-4 w-4" />
+								<DotsThreeVertical weight="duotone" className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuItem onClick={handleStartEditing}>
-								<Edit className="mr-2 h-4 w-4" /> Editar
+								<PencilSimple weight="duotone" className="mr-2 h-4 w-4" /> Editar
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem onClick={handleArchive}>
-								<Archive className="mr-2 h-4 w-4" /> Arquivar
+								<Archive weight="duotone" className="mr-2 h-4 w-4" /> Arquivar
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								className="text-destructive"
 								onClick={handleDelete}
 							>
-								<Trash2 className="mr-2 h-4 w-4" /> Deletar
+								<Trash weight="duotone" className="mr-2 h-4 w-4" /> Deletar
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

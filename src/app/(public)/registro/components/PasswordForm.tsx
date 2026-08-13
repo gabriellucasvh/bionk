@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeClosed } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -65,7 +65,7 @@ export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {
 						onClick={() => setShowPassword(!showPassword)}
 						type="button"
 					>
-						{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+						{showPassword ? <EyeClosed weight="duotone" size={20} /> : <Eye weight="duotone" size={20} />}
 					</button>
 				</div>
 				{form.formState.errors.password && (

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-	Download,
-	FileSpreadsheet,
-	FileText,
-	LayoutDashboard as LayoutStudio,
-} from "lucide-react";
+import { Download, FileCsv, FileText, SquaresFour as LayoutStudio } from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { BottomSheet, BottomSheetContent } from "@/components/ui/bottom-sheet";
@@ -38,7 +33,7 @@ export default function ExportOptions({
 						onClick={() => setMobileOpen(true)}
 						type="button"
 					>
-						<LayoutStudio className="mr-1 h-3 w-3" />
+						<LayoutStudio weight="duotone" className="mr-1 h-3 w-3" />
 						Exportar
 					</BaseButton>
 					<BottomSheetContent>
@@ -55,7 +50,7 @@ export default function ExportOptions({
 								type="button"
 							>
 								<span>Excel</span>
-								<Download className="h-5 w-5 text-muted-foreground" />
+								<Download weight="duotone" className="h-5 w-5 text-muted-foreground" />
 							</button>
 							<button
 								className="flex w-full items-center justify-between rounded-xl border p-3 py-4 text-left text-sm"
@@ -66,7 +61,7 @@ export default function ExportOptions({
 								type="button"
 							>
 								<span>PDF</span>
-								<Download className="h-5 w-5 text-muted-foreground" />
+								<Download weight="duotone" className="h-5 w-5 text-muted-foreground" />
 							</button>
 							<button
 								className="flex w-full items-center justify-between rounded-xl border p-3 py-4 text-left text-sm"
@@ -77,7 +72,7 @@ export default function ExportOptions({
 								type="button"
 							>
 								<span>CSV</span>
-								<Download className="h-5 w-5 text-muted-foreground" />
+								<Download weight="duotone" className="h-5 w-5 text-muted-foreground" />
 							</button>
 						</div>
 					</BottomSheetContent>
@@ -87,7 +82,7 @@ export default function ExportOptions({
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<BaseButton className="select-none rounded-xl bg-black text-sm text-white hover:bg-black/80 dark:bg-white dark:text-black">
-							<LayoutStudio className="mr-2 h-4 w-4" />
+							<LayoutStudio weight="duotone" className="mr-2 h-4 w-4" />
 							Exportar
 						</BaseButton>
 					</DropdownMenuTrigger>
@@ -96,21 +91,21 @@ export default function ExportOptions({
 							className="cursor-pointer text-sm"
 							onClick={onExportToExcel}
 						>
-							<FileSpreadsheet className="mr-2 h-4 w-4" />
+							<FileCsv weight="duotone" className="mr-2 h-4 w-4" />
 							Exportar para Excel
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							className="cursor-pointer text-sm"
 							onClick={onExportToPDF}
 						>
-							<FileText className="mr-2 h-4 w-4" />
+							<FileText weight="duotone" className="mr-2 h-4 w-4" />
 							Exportar para PDF
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							className="cursor-pointer text-sm"
 							onClick={onExportToCSV}
 						>
-							<FileText className="mr-2 h-4 w-4" />
+							<FileText weight="duotone" className="mr-2 h-4 w-4" />
 							Exportar para CSV
 						</DropdownMenuItem>
 					</DropdownMenuContent>

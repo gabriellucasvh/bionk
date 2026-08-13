@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeClosed } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -247,7 +247,7 @@ function Login() {
 										onClick={() => setShowPassword(!showPassword)}
 										type="button"
 									>
-										{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+										{showPassword ? <EyeClosed weight="duotone" size={20} /> : <Eye weight="duotone" size={20} />}
 									</button>
 								</div>
 								{/* Espaço reservado para mensagem de erro da senha */}

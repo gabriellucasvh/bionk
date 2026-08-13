@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/providers/themeProvider";
 
@@ -28,9 +28,9 @@ export function ThemeToggle({
 			title={theme === "light" ? "Ativar modo escuro" : "Ativar modo claro"}
 		>
 			{theme === "light" ? (
-				<Moon className="h-4 w-4" />
+				<Moon weight="duotone" className="h-4 w-4" />
 			) : (
-				<Sun className="h-4 w-4" />
+				<Sun weight="duotone" className="h-4 w-4" />
 			)}
 			{showLabel && (
 				<span className="ml-2">

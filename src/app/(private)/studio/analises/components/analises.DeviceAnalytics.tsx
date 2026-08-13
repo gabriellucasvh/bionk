@@ -1,11 +1,6 @@
 "use client";
 
-import {
-	HelpCircle,
-	Monitor,
-	Smartphone,
-	Tablet,
-} from "lucide-react";
+import { Question, Monitor, DeviceMobile, DeviceTablet } from "@phosphor-icons/react/dist/ssr";
 import {
 	Bar,
 	BarChart,
@@ -43,13 +38,13 @@ interface DeviceAnalyticsProps {
 const getDeviceIcon = (device: string) => {
 	switch (device.toLowerCase()) {
 		case "mobile":
-			return <Smartphone className="h-4 w-4" />;
+			return <DeviceMobile weight="duotone" className="h-4 w-4" />;
 		case "desktop":
-			return <Monitor className="h-4 w-4" />;
+			return <Monitor weight="duotone" className="h-4 w-4" />;
 		case "tablet":
-			return <Tablet className="h-4 w-4" />;
+			return <DeviceTablet weight="duotone" className="h-4 w-4" />;
 		default:
-			return <HelpCircle className="h-4 w-4" />;
+			return <Question weight="duotone" className="h-4 w-4" />;
 	}
 };
 
@@ -60,7 +55,7 @@ const getDeviceLabel = (device: string) => {
 		case "desktop":
 			return "Desktop";
 		case "tablet":
-			return "Tablet";
+			return "DeviceTablet";
 		case "unknown":
 			return "Outros";
 		default:

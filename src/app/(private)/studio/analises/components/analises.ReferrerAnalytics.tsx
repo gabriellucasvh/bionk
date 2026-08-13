@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink, Globe, HelpCircle, Search } from "lucide-react";
+import { ArrowSquareOut, Globe, Question, MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import {
 	Bar,
@@ -174,13 +174,13 @@ const getReferrerIcon = (referrer: string) => {
 		case "Bing":
 		case "DuckDuckGo":
 		case "Yahoo":
-			return <Search className="h-4 w-4" />;
+			return <MagnifyingGlass weight="duotone" className="h-4 w-4" />;
 		case "direct":
-			return <Globe className="h-4 w-4" />;
+			return <Globe weight="duotone" className="h-4 w-4" />;
 		case "unknown":
-			return <HelpCircle className="h-4 w-4" />;
+			return <Question weight="duotone" className="h-4 w-4" />;
 		default:
-			return <ExternalLink className="h-4 w-4" />;
+			return <ArrowSquareOut weight="duotone" className="h-4 w-4" />;
 	}
 };
 

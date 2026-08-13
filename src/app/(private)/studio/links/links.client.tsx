@@ -1,7 +1,7 @@
 // src/app/(private)/studio/links/links.client.tsx
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeClosed } from "@phosphor-icons/react/dist/ssr";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -151,12 +151,12 @@ const LinksStudioClient = () => {
 				type="button"
 			>
 				{mobileView === "content" ? (
-					<Eye
+					<Eye weight="duotone"
 						className="h-6 w-6 text-white dark:text-black"
 						strokeWidth={1.5}
 					/>
 				) : (
-					<EyeOff
+					<EyeClosed weight="duotone"
 						className="h-6 w-6 text-white dark:text-black"
 						strokeWidth={1.5}
 					/>

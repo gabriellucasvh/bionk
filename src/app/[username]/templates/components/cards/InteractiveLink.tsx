@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Lock, MoreVertical, MousePointerClick } from "lucide-react";
+import { Clock, Lock, DotsThreeVertical, CursorClick } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import type { FC, MouseEvent, ReactNode } from "react";
@@ -75,7 +75,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		const isShare = !!link.shareAllowed;
 		if (link.password) {
 			return {
-				icon: <Lock className="size-5" />,
+				icon: <Lock weight="duotone" className="size-5" />,
 				tooltip: "Link protegido por senha",
 				kind: "lock",
 			};
@@ -83,7 +83,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		// Nova hierarquia: cadeado > compartilhamento > clock > click
 		if (isShare) {
 			return {
-				icon: <MoreVertical className="size-5" />,
+				icon: <DotsThreeVertical weight="duotone" className="size-5" />,
 				tooltip: "Compartilhamento permitido",
 				kind: "more",
 			};
@@ -96,20 +96,20 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 					? dt.toLocaleDateString("pt-BR")
 					: String(raw);
 			return {
-				icon: <Clock className="size-5" />,
+				icon: <Clock weight="duotone" className="size-5" />,
 				tooltip: `Expira em ${formatted}`,
 				kind: "clock",
 			};
 		}
 		if (hasClicks) {
 			return {
-				icon: <MousePointerClick className="size-5" />,
+				icon: <CursorClick weight="duotone" className="size-5" />,
 				tooltip: `Será excluído após ${link.deleteOnClicks} cliques`,
 				kind: "click",
 			};
 		}
 		return {
-			icon: <MoreVertical className="size-5" />,
+			icon: <DotsThreeVertical weight="duotone" className="size-5" />,
 			tooltip: "Mais opções",
 			kind: "more",
 		};

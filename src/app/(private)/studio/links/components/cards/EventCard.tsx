@@ -1,15 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import {
-	Archive,
-	ClockFading,
-	Edit,
-	Grip,
-	MoreVertical,
-	Ticket,
-	Trash2,
-} from "lucide-react";
+import { Archive, ClockAfternoon, PencilSimple, DotsSix, DotsThreeVertical, Ticket, Trash } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -170,7 +162,7 @@ const EventCard = ({
 					{...listeners}
 					className="cursor-grab touch-none pt-1"
 				>
-					<Grip className="h-5 w-5 text-muted-foreground" />
+					<DotsSix weight="duotone" className="h-5 w-5 text-muted-foreground" />
 				</div>
 				<div className="flex-1 space-y-2">
 					<header className="flex items-center gap-2">
@@ -178,9 +170,9 @@ const EventCard = ({
 							className={`flex items-center justify-center rounded-md p-1.5 ${isCountdown ? "bg-blue-500" : "bg-purple-500"}`}
 						>
 							{isCountdown ? (
-								<ClockFading className="h-4 w-4 text-white" />
+								<ClockAfternoon weight="duotone" className="h-4 w-4 text-white" />
 							) : (
-								<Ticket className="h-4 w-4 text-white" />
+								<Ticket weight="duotone" className="h-4 w-4 text-white" />
 							)}
 						</div>
 						<span className="font-medium text-sm">
@@ -232,22 +224,22 @@ const EventCard = ({
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button className="h-8 w-8" size="icon" variant="ghost">
-								<MoreVertical className="h-4 w-4" />
+								<DotsThreeVertical weight="duotone" className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuItem onClick={() => onStartEditingEvent?.(event.id)}>
-								<Edit className="mr-2 h-4 w-4" /> Editar
+								<PencilSimple weight="duotone" className="mr-2 h-4 w-4" /> Editar
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem onClick={handleArchive}>
-								<Archive className="mr-2 h-4 w-4" /> Arquivar
+								<Archive weight="duotone" className="mr-2 h-4 w-4" /> Arquivar
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								className="text-destructive"
 								onClick={handleDelete}
 							>
-								<Trash2 className="mr-2 h-4 w-4" /> Deletar
+								<Trash weight="duotone" className="mr-2 h-4 w-4" /> Deletar
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

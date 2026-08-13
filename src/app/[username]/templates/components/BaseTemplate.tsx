@@ -1,6 +1,6 @@
 "use client";
 
-import { SquareArrowOutUpRight } from "lucide-react";
+import { ArrowSquareOut } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { FONT_OPTIONS } from "@/app/(private)/studio/design/constants/design.constants";
@@ -266,7 +266,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 							onClick={() => setShareModalOpen(true)}
 							type="button"
 						>
-							<SquareArrowOutUpRight
+							<ArrowSquareOut weight="duotone"
 								className="size-4.5 text-black"
 								strokeWidth={1.5}
 							/>
