@@ -248,10 +248,7 @@ export default function OnboardingPageComponent({
 					return;
 				}
 
-				if (
-					lastUsernameRequestedRef.current !== username ||
-					username !== data.username
-				) {
+				if (lastUsernameRequestedRef.current !== username) {
 					setIsTypingUsername(false);
 					return;
 				}
