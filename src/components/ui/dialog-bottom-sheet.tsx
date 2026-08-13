@@ -27,7 +27,7 @@ function DialogBottomSheetContent({
 			/>
 			<DialogPrimitive.Content
 				className={cn(
-					"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 fixed inset-x-0 bottom-0 z-50 grid w-full translate-x-0 translate-y-0 gap-4 rounded-t-3xl border bg-background p-6 shadow-lg duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in sm:inset-x-auto sm:top-[50%] sm:bottom-auto sm:left-[50%] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl",
+					"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 fixed inset-x-0 bottom-0 z-50 grid w-full translate-x-0 translate-y-0 gap-4 rounded-t-3xl  bg-background p-6  duration-200 data-[state=closed]:animate-out data-[state=open]:animate-in sm:inset-x-auto sm:top-[50%] sm:bottom-auto sm:left-[50%] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-3xl",
 					className
 				)}
 				data-slot="dialog-content"

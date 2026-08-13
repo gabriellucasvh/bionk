@@ -131,7 +131,7 @@ function CommandSeparator({
 }: React.ComponentProps<typeof CommandPrimitive.Separator>) {
 	return (
 		<CommandPrimitive.Separator
-			className={cn("-mx-1 h-px bg-border", className)}
+			className={cn("-mx-1 h-px bg-", className)}
 			data-slot="command-separator"
 			{...props}
 		/>

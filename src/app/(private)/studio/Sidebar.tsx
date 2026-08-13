@@ -1,7 +1,19 @@
 // src/app/(private)/studio/Sidebar.tsx
 "use client";
 
-import { ChartBar, SquaresFour, Download, ArrowSquareOut, ImagesSquare, Link as LinkIcon, PaintBrush, QrCode, ShareNetwork, Palette, User } from "@phosphor-icons/react/dist/ssr";
+import {
+	ArrowSquareOut,
+	ChartBar,
+	Download,
+	ImagesSquare,
+	Link as LinkIcon,
+	PaintBrush,
+	Palette,
+	QrCode,
+	ShareNetwork,
+	SquaresFour,
+	User,
+} from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -62,14 +74,14 @@ const ProfileActionsDropdown = ({
 					rel="noopener noreferrer"
 					target="_blank"
 				>
-					<ArrowSquareOut weight="duotone" className="h-4 w-4" />
+					<ArrowSquareOut className="h-4 w-4" weight="regular" />
 					<span>Abrir </span>
 				</Link>
 			</DropdownMenuItem>
 
 			<DropdownMenuSub onOpenChange={setIsQrOpen}>
 				<DropdownMenuSubTrigger className="h-10 cursor-pointer">
-					<QrCode weight="duotone" className="mr-2 h-4 w-4" />
+					<QrCode className="mr-2 h-4 w-4" weight="regular" />
 					<span>QR Code</span>
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent className="p-4">
@@ -89,7 +101,7 @@ const ProfileActionsDropdown = ({
 								onClick={handleDownloadQrCode}
 								size="sm"
 							>
-								<Download weight="duotone" className="mr-2 h-4 w-4" />
+								<Download className="mr-2 h-4 w-4" weight="regular" />
 								Baixar PNG
 							</Button>
 						</div>
@@ -103,7 +115,7 @@ const ProfileActionsDropdown = ({
 
 			<DropdownMenuSub>
 				<DropdownMenuSubTrigger className="h-10 cursor-pointer">
-					<ShareNetwork weight="duotone" className="mr-2 h-4 w-4" />
+					<ShareNetwork className="mr-2 h-4 w-4" weight="regular" />
 					<span>Compartilhar por...</span>
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent className="p-2 md:max-w-md lg:max-w-full">
@@ -119,7 +131,7 @@ interface SidebarLink {
 	href: string;
 	label: string;
 	labelMobile?: string;
-	icon: React.ReactNode;
+	icon: React.ElementType;
 }
 
 const mainLinks: SidebarLink[] = [
@@ -127,25 +139,25 @@ const mainLinks: SidebarLink[] = [
 		key: "profile",
 		href: "/studio/perfil",
 		label: "Perfil",
-		icon: <User weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: User,
 	},
 	{
 		key: "links",
 		href: "/studio/links",
 		label: "Links",
-		icon: <LinkIcon weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: LinkIcon,
 	},
 	{
 		key: "personalization",
 		href: "/studio/design",
 		label: "Design",
-		icon: <PaintBrush weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: PaintBrush,
 	},
 	{
 		key: "analytics",
 		href: "/studio/analises",
 		label: "Análises",
-		icon: <ChartBar weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: ChartBar,
 	},
 ];
 
@@ -154,13 +166,13 @@ const toolsLinks: SidebarLink[] = [
 		key: "creators",
 		href: "/studio/criadores",
 		label: "Para Criadores",
-		icon: <Palette weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: Palette,
 	},
 	{
 		key: "integrations",
 		href: "/studio/integracoes",
 		label: "Integrações",
-		icon: <SquaresFour weight="duotone" className="h-6 w-6 md:h-4 md:w-4" strokeWidth={2.2} />,
+		icon: SquaresFour,
 	},
 ];
 
@@ -267,7 +279,7 @@ const Sidebar = () => {
 		const handleUsernameUpdate = (event: CustomEvent) => {
 			const newUsername = event.detail.username;
 			const baseUrl =
-				process.env.NEXT_PUBLIC_APP_URL || "https://bionk.duckdns.org"
+				process.env.NEXT_PUBLIC_APP_URL || "https://bionk.duckdns.org";
 			setProfileUrl(newUsername ? `${baseUrl}/${newUsername}` : "#");
 		};
 
@@ -295,18 +307,22 @@ const Sidebar = () => {
 		(links: SidebarLink[]) =>
 			links.map((link) => {
 				const isActive = pathname === link.href;
+				const Icon = link.icon;
 				return (
 					<Button
 						className={`h-10 w-full justify-start rounded-lg px-3 font-medium text-sm transition-all ${
 							isActive
-								? "bg-zinc-200 text-black shadow-sm dark:bg-zinc-700 dark:text-white"
+								? "bg-zinc-200 text-black dark:bg-zinc-700 dark:text-white"
 								: "text-zinc-700 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-700"
 						}`}
 						key={link.key}
 						onClick={() => !isActive && handleNavClick(link.href)}
 						variant="ghost"
 					>
-						<span className="mr-3">{link.icon}</span>
+						<Icon
+							className="mr-3 h-5 w-5 md:h-4 md:w-4"
+							weight={isActive ? "duotone" : "regular"}
+						/>
 						{link.label}
 					</Button>
 				);
@@ -353,7 +369,10 @@ const Sidebar = () => {
 											: username}
 									</span>
 								</div>
-								<ArrowSquareOut weight="duotone" className="h-5 w-5 flex-shrink-0 text-zinc-400 dark:text-zinc-300" />
+								<ArrowSquareOut
+									className="h-5 w-5 flex-shrink-0 text-zinc-400 dark:text-zinc-300"
+									weight="duotone"
+								/>
 							</Button>
 						</DropdownMenuTrigger>
 						<ProfileActionsDropdown
@@ -425,7 +444,10 @@ const Sidebar = () => {
 									</span>
 								)}
 							</div>
-							<ImagesSquare weight="duotone" className="h-5 w-5 text-zinc-500 dark:text-zinc-300" />
+							<ImagesSquare
+								className="h-5 w-5 text-zinc-500 dark:text-zinc-300"
+								weight="duotone"
+							/>
 						</>
 					)}
 				</div>
@@ -436,6 +458,7 @@ const Sidebar = () => {
 				<ul className="grid grid-cols-5 py-3">
 					{mainLinks.map((link) => {
 						const isActive = pathname === link.href;
+						const Icon = link.icon;
 						return (
 							<li className="flex items-center justify-center" key={link.key}>
 								<Button
@@ -447,8 +470,13 @@ const Sidebar = () => {
 									onClick={() => !isActive && handleNavClick(link.href)}
 									variant="ghost"
 								>
-									{link.icon}
-									{link.labelMobile ?? link.label}
+									<Icon
+										className="h-6 w-6"
+										weight={isActive ? "duotone" : "regular"}
+									/>
+									<span className="w-full truncate text-center">
+										{link.labelMobile || link.label}
+									</span>
 								</Button>
 							</li>
 						);

@@ -40,7 +40,7 @@ export default function StudioLayout({ children }: StudioLayoutProps) {
 	}
 
 	return (
-		<div className="flex min-h-screen w-full max-w-full overflow-x-hidden bg-gray-50">
+		<div className="flex min-h-screen w-full max-w-full overflow-x-hidden bg-zinc-50 dark:bg-zinc-950">
 			{!isOnboardingPage && <Sidebar />}
 			<main
 				className={`w-full max-w-full flex-1 overflow-x-hidden ${isOnboardingPage ? "" : "md:ml-64"}`}
