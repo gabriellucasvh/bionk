@@ -31,7 +31,7 @@ RUN npm run build
 
 # ---- Etapa 3: Imagem de produção (mínima) -------------------
 FROM node:20-alpine AS runner
-RUN apk add --no-cache libc6-compat curl
+RUN apk add --no-cache libc6-compat curl postgresql-client
 WORKDIR /app
 
 ENV NODE_ENV=production
