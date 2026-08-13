@@ -39,8 +39,7 @@ const Header: React.FC = () => {
 	};
 
 	return (
-		<nav className="fixed inset-x-0 z-50 hidden bg-bunker-50/60 backdrop-blur-xl lg:block">
-			<div className="pointer-events-none absolute inset-0 bg-[length:6px_6px] bg-[radial-gradient(#000_0.5px,transparent_0.5px)] opacity-5" />
+		<nav className="fixed inset-x-0 z-50 hidden bg-white lg:block">
 			<div className="relative mx-auto flex h-auto max-w-7xl items-center gap-y-4 px-4 py-3">
 				<div className="mx-3 min-w-[100px] shrink-0">
 					<Link href="/">
@@ -59,7 +58,7 @@ const Header: React.FC = () => {
 					{HeaderProps.map((menu) => (
 						<li key={menu.label}>
 							<Link
-								className="font- whitespace-nowrap px-4 py-2 text-black transition-colors duration-200 hover:text-bunker-800"
+								className="whitespace-nowrap px-4 py-2 font-bold text-black transition-colors duration-200 hover:text-sky-500"
 								href={menu.href}
 							>
 								{menu.label}
@@ -71,7 +70,7 @@ const Header: React.FC = () => {
 				<div className="flex min-w-0 flex-wrap justify-end gap-2">
 					{session ? (
 						<BaseButton
-							className="h-14 bg-sky-300 text-black hover:bg-sky-400"
+							className="h-12 rounded-full bg-sky-400 font-bold text-black hover:bg-sky-500"
 							loading={isLoading[KEYS.studio]}
 							onClick={() => handleClick("studio", routes.studio)}
 						>
@@ -80,7 +79,7 @@ const Header: React.FC = () => {
 					) : (
 						<>
 							<BaseButton
-								className="h-14 bg-transparent text-black hover:bg-transparent hover:text-bunker-800"
+								className="h-12 rounded-full bg-transparent font-bold text-black hover:bg-black/5"
 								loading={isLoading[KEYS.login]}
 								onClick={() => handleClick("login", routes.login)}
 							>
@@ -88,7 +87,7 @@ const Header: React.FC = () => {
 							</BaseButton>
 
 							<BaseButton
-								className="h-14 bg-sky-300 text-black hover:bg-sky-400"
+								className="h-12 rounded-full bg-sky-400 font-bold text-black hover:bg-sky-500"
 								loading={isLoading[KEYS.registro]}
 								onClick={() => handleClick("registro", routes.registro)}
 							>
