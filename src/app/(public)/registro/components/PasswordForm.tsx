@@ -65,7 +65,7 @@ export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {
 						onClick={() => setShowPassword(!showPassword)}
 						type="button"
 					>
-						{showPassword ? <EyeClosed weight="duotone" size={20} /> : <Eye weight="duotone" size={20} />}
+						{showPassword ? <EyeClosed weight="regular" size={20} /> : <Eye weight="regular" size={20} />}
 					</button>
 				</div>
 				{form.formState.errors.password && (

@@ -247,7 +247,7 @@ function Login() {
 										onClick={() => setShowPassword(!showPassword)}
 										type="button"
 									>
-										{showPassword ? <EyeClosed weight="duotone" size={20} /> : <Eye weight="duotone" size={20} />}
+										{showPassword ? <EyeClosed weight="regular" size={20} /> : <Eye weight="regular" size={20} />}
 									</button>
 								</div>
 								{/* Espaço reservado para mensagem de erro da senha */}

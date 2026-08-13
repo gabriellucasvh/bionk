@@ -25,7 +25,7 @@ const CategorySelector = ({
                 onClick={() => onCategorySelect("content")}
                 type="button"
             >
-                <Plus weight="duotone" className="h-5 w-5" />
+                <Plus weight="regular" className="h-5 w-5" />
                 <span className="font-medium">Conteúdo</span>
             </button>
 
@@ -39,7 +39,7 @@ const CategorySelector = ({
                 onClick={() => onCategorySelect("video")}
                 type="button"
             >
-                <VideoCamera weight="duotone" className="h-5 w-5" />
+                <VideoCamera weight="regular" className="h-5 w-5" />
                 <span className="font-medium">Vídeo</span>
             </button>
 
@@ -53,7 +53,7 @@ const CategorySelector = ({
                 onClick={() => onCategorySelect("music")}
                 type="button"
             >
-                <MusicNote weight="duotone" className="h-5 w-5" />
+                <MusicNote weight="regular" className="h-5 w-5" />
                 <span className="font-medium">Música</span>
             </button>
 
@@ -67,7 +67,7 @@ const CategorySelector = ({
                 onClick={() => onCategorySelect("image")}
                 type="button"
             >
-                <ImageIcon weight="duotone" className="h-5 w-5" />
+                <ImageIcon weight="regular" className="h-5 w-5" />
                 <span className="font-medium">Imagem</span>
             </button>
 
@@ -81,7 +81,7 @@ const CategorySelector = ({
                 onClick={() => onCategorySelect("event")}
                 type="button"
             >
-                <Ticket weight="duotone" className="h-5 w-5" />
+                <Ticket weight="regular" className="h-5 w-5" />
                 <span className="font-medium">Eventos</span>
             </button>
         </div>

@@ -57,7 +57,7 @@ export function FontSelector({
 						{FONT_OPTIONS.find((f) => f.value === customizations.customFont)
 							?.label || "Satoshi"}
 					</span>
-					<TextT weight="duotone" className="h-4 w-4" />
+					<TextT weight="regular" className="h-4 w-4" />
 				</Button>
 			</div>
 			<div className="mt-2 hidden grid-cols-3 gap-2 sm:grid sm:grid-cols-4 lg:grid-cols-5">
@@ -106,7 +106,7 @@ export function ButtonStyleSelector({
 						>
 							{isActive && (
 								<div className="absolute top-1 left-1 rounded-full bg-green-600 p-1 text-white shadow-sm">
-									<Check weight="duotone" className="h-3 w-3" />
+									<Check weight="regular" className="h-3 w-3" />
 								</div>
 							)}
 							<button

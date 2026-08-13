@@ -100,7 +100,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 							onClick={() => setShowPassword(!showPassword)}
 							type="button"
 						>
-							{showPassword ? <EyeClosed weight="duotone" size={20} /> : <Eye weight="duotone" size={20} />}
+							{showPassword ? <EyeClosed weight="regular" size={20} /> : <Eye weight="regular" size={20} />}
 						</button>
 					</div>
 					{errors.password && (
@@ -128,7 +128,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 							onClick={() => setShowConfirmPassword(!showConfirmPassword)}
 							type="button"
 						>
-							{showConfirmPassword ? <EyeClosed weight="duotone" size={20} /> : <Eye weight="duotone" size={20} />}
+							{showConfirmPassword ? <EyeClosed weight="regular" size={20} /> : <Eye weight="regular" size={20} />}
 						</button>
 					</div>
 					{errors.confirmPassword && (

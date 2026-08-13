@@ -32,9 +32,9 @@ const OptionItem = ({
 					className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${opt.bg}`}
 				>
 					{opt.icon === "ticket" ? (
-						<Ticket weight="duotone" className="h-6 w-6 text-white" strokeWidth={1.5} />
+						<Ticket weight="regular" className="h-6 w-6 text-white" strokeWidth={1.5} />
 					) : (
-						<ClockAfternoon weight="duotone" className="h-6 w-6 text-white" strokeWidth={1.5} />
+						<ClockAfternoon weight="regular" className="h-6 w-6 text-white" strokeWidth={1.5} />
 					)}
 				</div>
 				<div className="flex min-w-0 max-w-md flex-1 flex-col">

@@ -371,7 +371,7 @@ const Sidebar = () => {
 								</div>
 								<ArrowSquareOut
 									className="h-5 w-5 flex-shrink-0 text-zinc-400 dark:text-zinc-300"
-									weight="duotone"
+									weight="regular"
 								/>
 							</Button>
 						</DropdownMenuTrigger>
@@ -446,7 +446,7 @@ const Sidebar = () => {
 							</div>
 							<ImagesSquare
 								className="h-5 w-5 text-zinc-500 dark:text-zinc-300"
-								weight="duotone"
+								weight="regular"
 							/>
 						</>
 					)}

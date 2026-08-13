@@ -102,9 +102,9 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 		key: "copy",
 		name: copied ? "Copiado!" : "Copiar Link",
 		icon: copied ? (
-			<Check weight="duotone" className="size-5 text-green-500" />
+			<Check weight="regular" className="size-5 text-green-500" />
 		) : (
-			<Link weight="duotone" className="size-5" />
+			<Link weight="regular" className="size-5" />
 		),
 		action: handleCopyLink,
 		color: copied ? "bg-green-100" : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600",
@@ -113,7 +113,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 	const moreButton = {
 		key: "more",
 		name: "Compartilhar via...",
-		icon: <DotsThree weight="duotone" className="size-5" />,
+		icon: <DotsThree weight="regular" className="size-5" />,
 		action: handleNativeShare,
 		color: "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600",
 	};
@@ -137,7 +137,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 				onClick={() => handleScroll("left")}
 				type="button"
 			>
-				<CaretLeft weight="duotone" className="size-6 text-black" />
+				<CaretLeft weight="regular" className="size-6 text-black" />
 			</button>
 
 			<ul
@@ -211,7 +211,7 @@ const ShareSheet = ({ url, title }: ShareSheetProps) => {
 				onClick={() => handleScroll("right")}
 				type="button"
 			>
-				<CaretRight weight="duotone" className="size-6 text-black" />
+				<CaretRight weight="regular" className="size-6 text-black" />
 			</button>
 		</div>
 	);

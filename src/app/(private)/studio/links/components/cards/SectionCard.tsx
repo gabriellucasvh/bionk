@@ -222,7 +222,7 @@ const SectionCard = ({
 							{...listeners}
 							className="flex-shrink-0 cursor-grab touch-none p-1"
 						>
-							<DotsSix weight="duotone" className="h-4 w-4 text-muted-foreground" />
+							<DotsSix weight="regular" className="h-4 w-4 text-muted-foreground" />
 						</div>
 						{isDraftSection ? (
 							<input
@@ -240,20 +240,20 @@ const SectionCard = ({
 					{isDraftSection ? null : (
 						<DropdownMenu>
 							<DropdownMenuTrigger className="p-1">
-								<DotsThree weight="duotone" className="h-4 w-4" />
+								<DotsThree weight="regular" className="h-4 w-4" />
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="space-y-2 py-2">
 								<DropdownMenuItem
 									onClick={() => onSectionUngroup(section.dbId)}
 								>
-									<Rectangle weight="duotone" className="mr-2 h-4 w-4" />
+									<Rectangle weight="regular" className="mr-2 h-4 w-4" />
 									<span>Desagrupar</span>
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									className="text-destructive"
 									onClick={() => onSectionDelete(section.dbId)}
 								>
-									<Trash weight="duotone" className="mr-2 h-4 w-4" />
+									<Trash weight="regular" className="mr-2 h-4 w-4" />
 									<span>Deletar</span>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
@@ -275,7 +275,7 @@ const SectionCard = ({
 						}}
 						variant="studio"
 					>
-						<Plus weight="duotone" className="mr-1 h-3 w-3" />
+						<Plus weight="regular" className="mr-1 h-3 w-3" />
 						<span className="hidden sm:inline">Adicionar Conteúdo</span>
 						<span className="sm:hidden">Adicionar</span>
 					</BaseButton>

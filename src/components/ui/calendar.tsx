@@ -134,13 +134,13 @@ function Calendar({
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
             return (
-              <CaretLeft weight="duotone" className={cn("size-4", className)} {...props} />
+              <CaretLeft weight="regular" className={cn("size-4", className)} {...props} />
             )
           }
 
           if (orientation === "right") {
             return (
-              <CaretRight weight="duotone"
+              <CaretRight weight="regular"
                 className={cn("size-4", className)}
                 {...props}
               />
@@ -148,7 +148,7 @@ function Calendar({
           }
 
           return (
-            <CaretDown weight="duotone" className={cn("size-4", className)} {...props} />
+            <CaretDown weight="regular" className={cn("size-4", className)} {...props} />
           )
         },
         DayButton: CalendarDayButton,

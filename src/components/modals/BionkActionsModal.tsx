@@ -124,7 +124,7 @@ export default function BionkActionsModal({
 									<span className="font-medium text-sm">Essenciais</span>
 								</div>
 								<div className="relative">
-									<Question weight="duotone"
+									<Question weight="regular"
 										className="h-4 w-4 cursor-help text-gray-400"
 										onClick={() =>
 											setActiveTooltip(
@@ -153,7 +153,7 @@ export default function BionkActionsModal({
 									<span className="font-medium text-sm">Funcionais</span>
 								</div>
 								<div className="relative">
-									<Question weight="duotone"
+									<Question weight="regular"
 										className="h-4 w-4 cursor-help text-gray-400"
 										onClick={() =>
 											setActiveTooltip(
@@ -182,7 +182,7 @@ export default function BionkActionsModal({
 									<span className="font-medium text-sm">Analytics</span>
 								</div>
 								<div className="relative">
-									<Question weight="duotone"
+									<Question weight="regular"
 										className="h-4 w-4 cursor-help text-gray-400"
 										onClick={() =>
 											setActiveTooltip(
@@ -211,7 +211,7 @@ export default function BionkActionsModal({
 									<span className="font-medium text-sm">Marketing</span>
 								</div>
 								<div className="relative">
-									<Question weight="duotone"
+									<Question weight="regular"
 										className="h-4 w-4 cursor-help text-gray-400"
 										onClick={() =>
 											setActiveTooltip(
@@ -270,7 +270,7 @@ export default function BionkActionsModal({
 							<Link className="my-6 block" href="/registro" prefetch={false}>
 								<BaseButton className="w-full rounded-full bg-sky-400 text-black hover:bg-sky-500">
 									<span className="flex items-center justify-center gap-2">
-										Começar gratuitamente <ArrowRight weight="duotone" className="h-4 w-4" />
+										Começar gratuitamente <ArrowRight weight="regular" className="h-4 w-4" />
 									</span>
 								</BaseButton>
 							</Link>
@@ -282,7 +282,7 @@ export default function BionkActionsModal({
 									rel="noopener noreferrer"
 									target="_blank"
 								>
-									<Flag weight="duotone" className="h-4 w-4" />
+									<Flag weight="regular" className="h-4 w-4" />
 									Reportar Usuário
 								</Link>
 								<span className="text-zinc-400">•</span>
@@ -291,7 +291,7 @@ export default function BionkActionsModal({
 									onClick={() => setShowCookieSettings(true)}
 									type="button"
 								>
-									<Cookie weight="duotone" className="h-4 w-4" />
+									<Cookie weight="regular" className="h-4 w-4" />
 									Cookies
 								</button>
 							</div>

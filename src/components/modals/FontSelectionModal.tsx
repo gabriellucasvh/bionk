@@ -45,7 +45,7 @@ export default function FontSelectionModal({
 						size="sm"
 						variant="ghost"
 					>
-						<X weight="duotone" className="h-4 w-4" />
+						<X weight="regular" className="h-4 w-4" />
 					</Button>
 				</div>
 

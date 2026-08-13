@@ -38,7 +38,7 @@ const ProfileSection = ({
 								/>
 								{isUploadingImage && (
 									<div className="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50">
-										<SpinnerGap weight="duotone" className="h-6 w-6 animate-spin text-white" />
+										<SpinnerGap weight="regular" className="h-6 w-6 animate-spin text-white" />
 									</div>
 								)}
 							</div>
@@ -49,7 +49,7 @@ const ProfileSection = ({
 								size="icon"
 								variant="white"
 							>
-								<PencilSimple weight="duotone" className="h-4 w-4" />
+								<PencilSimple weight="regular" className="h-4 w-4" />
 							</BaseButton>
 						</div>
 					</article>

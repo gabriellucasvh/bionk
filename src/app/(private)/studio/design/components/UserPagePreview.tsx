@@ -385,17 +385,17 @@ function ContentList({
 		const href = normalizeExternalUrl(item?.url);
 		const indicatorIcon = (() => {
 			if (item?.password) {
-				return <Lock weight="duotone" className="h-4 w-4" />;
+				return <Lock weight="regular" className="h-4 w-4" />;
 			}
 			// Prioridade: compartilhamento > cliques > expiração
 			if (item?.shareAllowed) {
-				return <DotsThreeVertical weight="duotone" className="h-4 w-4" />;
+				return <DotsThreeVertical weight="regular" className="h-4 w-4" />;
 			}
 			if (item?.deleteOnClicks) {
-				return <CursorClick weight="duotone" className="h-4 w-4" />;
+				return <CursorClick weight="regular" className="h-4 w-4" />;
 			}
 			if (item?.expiresAt) {
-				return <Clock weight="duotone" className="h-4 w-4" />;
+				return <Clock weight="regular" className="h-4 w-4" />;
 			}
 			return null;
 		})();
@@ -453,7 +453,7 @@ function ContentList({
 						</div>
 						<div className="flex w-10 flex-shrink-0 justify-center">
 							<div className="rounded-full p-2 text-current opacity-70">
-								<Lock weight="duotone" className="h-4 w-4" />
+								<Lock weight="regular" className="h-4 w-4" />
 							</div>
 						</div>
 					</button>
@@ -847,7 +847,7 @@ function ContentList({
 										aria-hidden
 										className="-translate-y-1/2 absolute top-1/2 right-3 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
 									>
-										<Images weight="duotone" className="size-5" />
+										<Images weight="regular" className="size-5" />
 									</div>
 								</div>
 							</summary>
@@ -923,7 +923,7 @@ function ContentList({
 										}}
 										type="button"
 									>
-										<CaretLeft weight="duotone" className="h-4 w-4" />
+										<CaretLeft weight="regular" className="h-4 w-4" />
 									</button>
 								)}
 
@@ -942,7 +942,7 @@ function ContentList({
 										}}
 										type="button"
 									>
-										<CaretRight weight="duotone" className="h-4 w-4" />
+										<CaretRight weight="regular" className="h-4 w-4" />
 									</button>
 								)}
 						</div>

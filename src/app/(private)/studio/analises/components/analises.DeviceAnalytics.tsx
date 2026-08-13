@@ -38,13 +38,13 @@ interface DeviceAnalyticsProps {
 const getDeviceIcon = (device: string) => {
 	switch (device.toLowerCase()) {
 		case "mobile":
-			return <DeviceMobile weight="duotone" className="h-4 w-4" />;
+			return <DeviceMobile weight="regular" className="h-4 w-4" />;
 		case "desktop":
-			return <Monitor weight="duotone" className="h-4 w-4" />;
+			return <Monitor weight="regular" className="h-4 w-4" />;
 		case "tablet":
-			return <DeviceTablet weight="duotone" className="h-4 w-4" />;
+			return <DeviceTablet weight="regular" className="h-4 w-4" />;
 		default:
-			return <Question weight="duotone" className="h-4 w-4" />;
+			return <Question weight="regular" className="h-4 w-4" />;
 	}
 };
 

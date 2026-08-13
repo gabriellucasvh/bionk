@@ -273,7 +273,7 @@ const AddContentModal = ({
 		return (
 			<>
 				<BaseButton className="w-full" onClick={onOpen} variant="studio">
-					<Plus weight="duotone" className="mr-2 h-4 w-4" />
+					<Plus weight="regular" className="mr-2 h-4 w-4" />
 					Adicionar Conteúdo
 				</BaseButton>
 
@@ -295,7 +295,7 @@ const AddContentModal = ({
 									onClick={() => handleCategorySelect("content")}
 									type="button"
 								>
-									<CaretLeft weight="duotone" className="h-5 w-5" />
+									<CaretLeft weight="regular" className="h-5 w-5" />
 									<span className="font-medium">Voltar</span>
 								</button>
 								<span className="font-semibold text-lg">
@@ -429,7 +429,7 @@ const AddContentModal = ({
 									>
 										<div className="flex items-center gap-4">
 											<div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-teal-400">
-												<ImageIcon weight="duotone" className="h-6 w-6 text-black" />
+												<ImageIcon weight="regular" className="h-6 w-6 text-black" />
 											</div>
 											<div className="flex min-w-0 max-w-md flex-1 flex-col">
 												<span className="text-left font-medium">
@@ -564,7 +564,7 @@ const AddContentModal = ({
 	return (
 		<>
 			<BaseButton className="w-full" onClick={onOpen} variant="studio">
-				<Plus weight="duotone" className="mr-2 h-4 w-4" />
+				<Plus weight="regular" className="mr-2 h-4 w-4" />
 				Adicionar Conteúdo
 			</BaseButton>
 
@@ -699,7 +699,7 @@ const AddContentModal = ({
 															>
 																<div className="flex items-center gap-4">
 																	<div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-teal-400">
-																		<ImageIcon weight="duotone" className="h-6 w-6 text-black" />
+																		<ImageIcon weight="regular" className="h-6 w-6 text-black" />
 																	</div>
 																	<div className="flex min-w-0 max-w-md flex-1 flex-col">
 																		<span className="text-left font-medium">

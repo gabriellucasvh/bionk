@@ -210,7 +210,7 @@ export default function SocialLinksSelector({
 													title="Editar"
 													type="button"
 												>
-													<PencilSimple weight="duotone" className="h-4 w-4" />
+													<PencilSimple weight="regular" className="h-4 w-4" />
 												</button>
 												<button
 													className="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -222,7 +222,7 @@ export default function SocialLinksSelector({
 													title="Remover"
 													type="button"
 												>
-													<Trash weight="duotone" className="h-4 w-4" />
+													<Trash weight="regular" className="h-4 w-4" />
 												</button>
 											</>
 										)}

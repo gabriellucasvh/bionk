@@ -78,7 +78,7 @@ const ImageOptions = ({ onOptionSelect }: ImageOptionsProps) => {
 			description: "Uma única imagem destacada.",
 			bg: "bg-teal-400",
 			renderIcon: () => (
-				<ImageIcon weight="duotone" className="h-6 w-6 text-black" strokeWidth={1.5} />
+				<ImageIcon weight="regular" className="h-6 w-6 text-black" strokeWidth={1.5} />
 			),
 		},
 		{
@@ -87,7 +87,7 @@ const ImageOptions = ({ onOptionSelect }: ImageOptionsProps) => {
 			description: "Imagens empilhadas em coluna.",
 			bg: "bg-yellow-400",
 			renderIcon: () => (
-				<ImagesSquare weight="duotone" className="h-6 w-6 text-black" strokeWidth={1.5} />
+				<ImagesSquare weight="regular" className="h-6 w-6 text-black" strokeWidth={1.5} />
 			),
 		},
 		{
@@ -96,7 +96,7 @@ const ImageOptions = ({ onOptionSelect }: ImageOptionsProps) => {
 			description: "Várias imagens em carrossel.",
 			bg: "bg-pink-400",
 			renderIcon: () => (
-				<ImagesSquare weight="duotone" className="h-6 w-6 text-black" strokeWidth={1.5} />
+				<ImagesSquare weight="regular" className="h-6 w-6 text-black" strokeWidth={1.5} />
 			),
 		},
 	];

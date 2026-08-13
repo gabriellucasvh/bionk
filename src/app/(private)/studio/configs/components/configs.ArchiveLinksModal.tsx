@@ -147,7 +147,7 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 						size="sm"
 						variant="ghost"
 					>
-						<X weight="duotone" className="h-4 w-4" />
+						<X weight="regular" className="h-4 w-4" />
 					</Button>
 				</header>
 				<main className="max-h-80 space-y-4 overflow-y-auto p-4">
@@ -226,7 +226,7 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 							onClick={restoreAllItems}
 							variant="outline"
 						>
-							<ArrowCounterClockwise weight="duotone" />
+							<ArrowCounterClockwise weight="regular" />
 							Todos
 						</Button>
 						<Button
@@ -237,7 +237,7 @@ const ArchivedLinksModal = ({ isOpen, onClose }: ArchivedLinksModalProps) => {
 							onClick={deleteAllItems}
 							variant="outline"
 						>
-							<Trash weight="duotone" /> Todos
+							<Trash weight="regular" /> Todos
 						</Button>
 					</div>
 				</footer>

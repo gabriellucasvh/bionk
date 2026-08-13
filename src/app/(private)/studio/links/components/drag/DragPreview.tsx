@@ -105,7 +105,7 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
 				className
 			)}
 		>
-			<DotsSix weight="duotone" className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+			<DotsSix weight="regular" className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
 			<Icon className={cn("h-4 w-4 flex-shrink-0", color)} />
 			<div className="flex min-w-0 flex-1 flex-col">
 				<span className="font-medium text-muted-foreground text-xs">

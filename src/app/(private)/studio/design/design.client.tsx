@@ -217,9 +217,9 @@ const PersonalizarClient = () => {
 				type="button"
 			>
 				{mobileView === "design" ? (
-					<Eye weight="duotone" className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
+					<Eye weight="regular" className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
 				) : (
-					<EyeClosed weight="duotone" className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
+					<EyeClosed weight="regular" className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
 				)}
 			</button>
 

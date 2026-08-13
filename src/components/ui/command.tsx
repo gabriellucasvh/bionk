@@ -68,7 +68,7 @@ function CommandInput({
 			className="flex h-9 items-center gap-2 border-b px-3"
 			data-slot="command-input-wrapper"
 		>
-			<MagnifyingGlass weight="duotone" className="size-4 shrink-0 opacity-50" />
+			<MagnifyingGlass weight="regular" className="size-4 shrink-0 opacity-50" />
 			<CommandPrimitive.Input
 				className={cn(
 					"flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",

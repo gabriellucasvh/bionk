@@ -41,7 +41,7 @@ function AccordionTrigger({
         {...props}
       >
         {children}
-        <CaretDown weight="duotone" className="text-lime-300 pointer-events-none size-8 shrink-0 translate-y-0.5 transition-transform duration-200" />
+        <CaretDown weight="regular" className="text-lime-300 pointer-events-none size-8 shrink-0 translate-y-0.5 transition-transform duration-200" />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   )

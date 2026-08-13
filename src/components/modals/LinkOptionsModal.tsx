@@ -113,7 +113,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						onClick={handleOpenLink}
 						variant="default"
 					>
-						<ArrowSquareOut weight="duotone" className="mr-2 size-4" />
+						<ArrowSquareOut weight="regular" className="mr-2 size-4" />
 						Abrir Link
 					</BaseButton>
 
@@ -126,7 +126,7 @@ const LinkOptionsModal: FC<LinkOptionsModalProps> = ({
 						rel="noopener noreferrer"
 						target="_blank"
 					>
-						<Flag weight="duotone" className="mr-2 size-4" />
+						<Flag weight="regular" className="mr-2 size-4" />
 						Denunciar Link
 					</Link>
 				</div>

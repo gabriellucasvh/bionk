@@ -280,7 +280,7 @@ export default function ArchivedItemsPage() {
                         </p>
                     </div>
                     <Link className="flex items-center" href="/studio/configs">
-                        <CaretLeft weight="duotone" className="mr-2 h-4 w-4" />
+                        <CaretLeft weight="regular" className="mr-2 h-4 w-4" />
                         Voltar
                     </Link>
                 </header>
@@ -312,7 +312,7 @@ export default function ArchivedItemsPage() {
                                             size="icon"
                                             variant="white"
                                         >
-                                            <ArrowCounterClockwise weight="duotone" className="h-4 w-4" />
+                                            <ArrowCounterClockwise weight="regular" className="h-4 w-4" />
                                         </BaseButton>
                                         <BaseButton
                                             aria-label="Excluir"
@@ -320,7 +320,7 @@ export default function ArchivedItemsPage() {
                                             size="icon"
                                             variant="white"
                                         >
-                                            <Trash weight="duotone" className="h-4 w-4 text-red-500" />
+                                            <Trash weight="regular" className="h-4 w-4 text-red-500" />
                                         </BaseButton>
                                     </div>
                                 </li>

@@ -75,7 +75,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		const isShare = !!link.shareAllowed;
 		if (link.password) {
 			return {
-				icon: <Lock weight="duotone" className="size-5" />,
+				icon: <Lock weight="regular" className="size-5" />,
 				tooltip: "Link protegido por senha",
 				kind: "lock",
 			};
@@ -83,7 +83,7 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 		// Nova hierarquia: cadeado > compartilhamento > clock > click
 		if (isShare) {
 			return {
-				icon: <DotsThreeVertical weight="duotone" className="size-5" />,
+				icon: <DotsThreeVertical weight="regular" className="size-5" />,
 				tooltip: "Compartilhamento permitido",
 				kind: "more",
 			};
@@ -96,20 +96,20 @@ const InteractiveLink: FC<InteractiveLinkProps> = ({
 					? dt.toLocaleDateString("pt-BR")
 					: String(raw);
 			return {
-				icon: <Clock weight="duotone" className="size-5" />,
+				icon: <Clock weight="regular" className="size-5" />,
 				tooltip: `Expira em ${formatted}`,
 				kind: "clock",
 			};
 		}
 		if (hasClicks) {
 			return {
-				icon: <CursorClick weight="duotone" className="size-5" />,
+				icon: <CursorClick weight="regular" className="size-5" />,
 				tooltip: `Será excluído após ${link.deleteOnClicks} cliques`,
 				kind: "click",
 			};
 		}
 		return {
-			icon: <DotsThreeVertical weight="duotone" className="size-5" />,
+			icon: <DotsThreeVertical weight="regular" className="size-5" />,
 			tooltip: "Mais opções",
 			kind: "more",
 		};

@@ -70,7 +70,7 @@ export default function Testimonials() {
 								onClick={prev}
 								type="button"
 							>
-								<CaretLeft weight="duotone" className="h-6 w-6 text-black" />
+								<CaretLeft weight="regular" className="h-6 w-6 text-black" />
 							</button>
 							<button
 								aria-label="Próximo"
@@ -78,7 +78,7 @@ export default function Testimonials() {
 								onClick={next}
 								type="button"
 							>
-								<CaretRight weight="duotone" className="h-6 w-6 text-black" />
+								<CaretRight weight="regular" className="h-6 w-6 text-black" />
 							</button>
 						</div>
 					</div>
@@ -93,7 +93,7 @@ export default function Testimonials() {
 								key={index}
 								transition={{ duration: 0.25 }}
 							>
-								<Quote weight="duotone"
+								<Quote weight="regular"
 									className="h-8 w-8 fill-current text-purple-400"
 									strokeWidth={0.1}
 								/>
@@ -118,7 +118,7 @@ export default function Testimonials() {
 								onClick={prev}
 								type="button"
 							>
-								<CaretLeft weight="duotone" className="h-6 w-6 text-black" />
+								<CaretLeft weight="regular" className="h-6 w-6 text-black" />
 							</button>
 							<button
 								aria-label="Próximo"
@@ -126,7 +126,7 @@ export default function Testimonials() {
 								onClick={next}
 								type="button"
 							>
-								<CaretRight weight="duotone" className="h-6 w-6 text-black" />
+								<CaretRight weight="regular" className="h-6 w-6 text-black" />
 							</button>
 						</div>
 					</div>

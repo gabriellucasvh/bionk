@@ -39,7 +39,7 @@ export default function CategoryDropdown({
 							: selectedCategory.replace(/-/g, " ")
 						: "Selecionar Categoria"}
 				</span>
-				<CaretDown weight="duotone"
+				<CaretDown weight="regular"
 					className={`h-4 w-4 transition-transform ${
 						isOpen ? "rotate-180" : ""
 					}`}

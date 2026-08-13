@@ -117,9 +117,9 @@ export default function PeriodSelector({
 						onClick={() => setMobileOpen(true)}
 						type="button"
 					>
-						<CalendarBlank weight="duotone" className="mr-1 h-3 w-3" />
+						<CalendarBlank weight="regular" className="mr-1 h-3 w-3" />
 						{RANGE_LABEL[range]}
-						<CaretDown weight="duotone" className="mr-1 ml-2 h-4 w-4" />
+						<CaretDown weight="regular" className="mr-1 ml-2 h-4 w-4" />
 					</BaseButton>
 					<BottomSheetContent>
 						<DialogTitle className="py-3 font-semibold text-base">
@@ -302,9 +302,9 @@ export default function PeriodSelector({
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<BaseButton className="select-none rounded-xl bg-black text-sm text-white hover:bg-black/80 dark:bg-white dark:text-black">
-							<CalendarBlank weight="duotone" className="mr-2 h-4 w-4" />
+							<CalendarBlank weight="regular" className="mr-2 h-4 w-4" />
 							{RANGE_LABEL[range]}
-							<CaretDown weight="duotone" className="mr-1 ml-2 h-4 w-4" />
+							<CaretDown weight="regular" className="mr-1 ml-2 h-4 w-4" />
 						</BaseButton>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end" className="w-56">

@@ -339,7 +339,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 								size="icon"
 								variant="ghost"
 							>
-								<Question weight="duotone" className="h-4 w-4" />
+								<Question weight="regular" className="h-4 w-4" />
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent className="w-70 text-sm">
@@ -439,7 +439,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 													<LoadingSpinner />
 												</div>
 											) : (
-												<Upload weight="duotone" className="mx-auto h-8 w-8 text-muted-foreground" />
+												<Upload weight="regular" className="mx-auto h-8 w-8 text-muted-foreground" />
 											)}
 											<p className="mt-2 font-medium">
 												Arraste uma imagem ou clique para selecionar
@@ -532,7 +532,7 @@ const AddNewImageForm = (props: AddNewImageFormProps) => {
 												<LoadingSpinner />
 											</div>
 										) : (
-											<Upload weight="duotone" className="mx-auto h-8 w-8 text-muted-foreground" />
+											<Upload weight="regular" className="mx-auto h-8 w-8 text-muted-foreground" />
 										)}
 										<p className="mt-2 font-medium">
 											Arraste imagens ou clique para selecionar

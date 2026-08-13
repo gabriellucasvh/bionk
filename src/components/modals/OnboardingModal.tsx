@@ -249,7 +249,7 @@ const OnboardingModal = ({
 								size="icon"
 								variant="white"
 							>
-								<PencilSimple weight="duotone" className="h-4 w-4" />
+								<PencilSimple weight="regular" className="h-4 w-4" />
 							</BaseButton>
 						</div>
 						<p className="text-center text-muted-foreground text-sm">
@@ -311,7 +311,7 @@ const OnboardingModal = ({
 									value={data.username}
 								/>
 								{usernameValidation.isChecking && (
-									<SpinnerGap weight="duotone" className="h-4 w-4 animate-spin text-muted-foreground" />
+									<SpinnerGap weight="regular" className="h-4 w-4 animate-spin text-muted-foreground" />
 								)}
 							</div>
 							<div className="flex items-center justify-between">
@@ -411,7 +411,7 @@ const OnboardingModal = ({
 								onClick={handlePrevious}
 								variant="outline"
 							>
-								<ArrowLeft weight="duotone" className="mr-2 h-4 w-4" />
+								<ArrowLeft weight="regular" className="mr-2 h-4 w-4" />
 								Voltar
 							</Button>
 
@@ -422,7 +422,7 @@ const OnboardingModal = ({
 							{currentStep < 4 ? (
 								<Button disabled={!canProceedToNext()} onClick={handleNext}>
 									Próximo
-									<ArrowRight weight="duotone" className="ml-2 h-4 w-4" />
+									<ArrowRight weight="regular" className="ml-2 h-4 w-4" />
 								</Button>
 							) : (
 								<BaseButton
@@ -430,7 +430,7 @@ const OnboardingModal = ({
 									loading={loading}
 									onClick={handleComplete}
 								>
-									<Check weight="duotone" className="mr-2 h-4 w-4" />
+									<Check weight="regular" className="mr-2 h-4 w-4" />
 									Concluir
 								</BaseButton>
 							)}

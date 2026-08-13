@@ -28,9 +28,9 @@ export function ThemeToggle({
 			title={theme === "light" ? "Ativar modo escuro" : "Ativar modo claro"}
 		>
 			{theme === "light" ? (
-				<Moon weight="duotone" className="h-4 w-4" />
+				<Moon weight="regular" className="h-4 w-4" />
 			) : (
-				<Sun weight="duotone" className="h-4 w-4" />
+				<Sun weight="regular" className="h-4 w-4" />
 			)}
 			{showLabel && (
 				<span className="ml-2">

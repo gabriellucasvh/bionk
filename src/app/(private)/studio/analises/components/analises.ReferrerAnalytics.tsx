@@ -174,13 +174,13 @@ const getReferrerIcon = (referrer: string) => {
 		case "Bing":
 		case "DuckDuckGo":
 		case "Yahoo":
-			return <MagnifyingGlass weight="duotone" className="h-4 w-4" />;
+			return <MagnifyingGlass weight="regular" className="h-4 w-4" />;
 		case "direct":
-			return <Globe weight="duotone" className="h-4 w-4" />;
+			return <Globe weight="regular" className="h-4 w-4" />;
 		case "unknown":
-			return <Question weight="duotone" className="h-4 w-4" />;
+			return <Question weight="regular" className="h-4 w-4" />;
 		default:
-			return <ArrowSquareOut weight="duotone" className="h-4 w-4" />;
+			return <ArrowSquareOut weight="regular" className="h-4 w-4" />;
 	}
 };
 

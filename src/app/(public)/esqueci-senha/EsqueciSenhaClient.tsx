@@ -80,7 +80,7 @@ export default function EsqueciSenhaClient() {
           {loading ? "Enviando..." : "Enviar"}
         </BaseButton>
         <Button className="mx-auto w-min" onClick={goBack} variant="ghost">
-          <CaretLeft weight="duotone" className="h-4 w-4" /> Voltar para o login
+          <CaretLeft weight="regular" className="h-4 w-4" /> Voltar para o login
         </Button>
       </div>
     </div>
