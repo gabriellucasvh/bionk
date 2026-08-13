@@ -10,7 +10,6 @@ until pg_isready -h postgres -p 5432 -U "$POSTGRES_USER" 2>/dev/null; do
   sleep 2
 done
 echo "==> PostgreSQL pronto!"
-echo "DATABASE_URL=${DATABASE_URL}"
 
 export NODE_PATH=$(npm root -g)
 echo "==> Rodando prisma migrate deploy..."
