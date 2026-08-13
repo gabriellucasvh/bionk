@@ -48,7 +48,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Prisma migrations — copiamos a pasta para rodar migrate deploy na inicialização
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+# Prisma client é gerado em src/generated/prisma, então não existe em node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
 
