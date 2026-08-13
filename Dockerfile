@@ -32,7 +32,7 @@ RUN npm run build
 # ---- Etapa 3: Imagem de produção (mínima) -------------------
 FROM node:20-alpine AS runner
 RUN apk add --no-cache libc6-compat curl postgresql-client
-RUN npm install -g prisma
+RUN npm install -g prisma dotenv
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -49,6 +49,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Prisma migrations — copiamos a pasta para rodar migrate deploy na inicialização
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
 # Prisma client é gerado em src/generated/prisma, então não existe em node_modules/.prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
