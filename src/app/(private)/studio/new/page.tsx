@@ -1,12 +1,10 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import Cookies from "js-cookie";
 import LoadingPage from "@/components/layout/LoadingPage";
-import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
-import { getTemplateInfo } from "@/utils/templatePresets";
 import OnboardingPageComponent, {
 	type OnboardingData,
 } from "../onboarding/onboarding-page";
@@ -38,6 +36,9 @@ export default function NewProfilePage() {
 				username: data.username,
 				bio: data.bio,
 				userType: data.userType,
+				template: data.template,
+				socialLinks: data.socialLinks,
+				customLinks: data.customLinks,
 			};
 			if (data.profileImage) {
 				payload.profileImage = await fileToDataUrl(data.profileImage);
@@ -66,71 +67,6 @@ export default function NewProfilePage() {
 				expires: 30,
 				sameSite: "lax",
 			});
-
-			// Aplicar template escolhido no novo perfil
-			if (data.template) {
-				try {
-					const info = getTemplateInfo(data.template);
-					await fetch("/api/update-template", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							template: data.template,
-							templateCategory: info.category,
-						}),
-					});
-				} catch {
-					// Não bloquear o fluxo
-				}
-			}
-
-			// Salvar redes sociais no novo perfil
-			if (data.socialLinks && data.socialLinks.length > 0) {
-				const platformMap = new Map(SOCIAL_PLATFORMS.map((p) => [p.key, p]));
-				const socialPromises = data.socialLinks
-					.map((item) => {
-						const cfg = platformMap.get(item.platform);
-						if (!cfg) {
-							return null;
-						}
-						const base = cfg.baseUrl || "";
-						const url = `${base}${item.username}`;
-						return fetch("/api/social-links", {
-							method: "POST",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({
-								platform: item.platform,
-								username: item.username,
-								url,
-							}),
-						});
-					})
-					.filter(Boolean) as Promise<Response>[];
-
-				if (socialPromises.length > 0) {
-					await Promise.all(socialPromises);
-				}
-			}
-
-			// Salvar links customizados no novo perfil
-			if (data.customLinks && data.customLinks.length > 0) {
-				const linkPromises = data.customLinks.map((link) =>
-					fetch("/api/links", {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							title: link.title,
-							url: link.url,
-							active: true,
-						}),
-					})
-				);
-				await Promise.all(linkPromises);
-			}
-
-			// Limpar o cookie para não afetar outras telas acidentalmente (ou deixá-lo ativo)
-			// Mas como a tela de sucesso vai referenciar o novo perfil, podemos mantê-lo ou limpá-lo.
-			// Na verdade, a tela de sucesso vai ler o query string.
 
 			// Redirecionar para a tela de sucesso
 			router.push(
