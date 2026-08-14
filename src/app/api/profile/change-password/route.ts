@@ -2,13 +2,13 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getAuthRateLimiter } from "@/lib/rate-limiter";
 import bcrypt from "bcryptjs";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
 	try {
-		const session = await getServerSession(authOptions);
+		const session = await getAppSession();
 		if (!session?.user?.id) {
 			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 		}

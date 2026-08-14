@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getRedis } from "@/lib/redis";
@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 type SectionItem = { id: number } & { [key: string]: any };
 
 export async function GET(): Promise<NextResponse> {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
@@ -40,7 +40,7 @@ export async function GET(): Promise<NextResponse> {
 }
 
 export async function POST(req: Request): Promise<NextResponse> {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}

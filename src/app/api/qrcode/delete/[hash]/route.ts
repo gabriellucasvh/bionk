@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import { getRedis } from "@/lib/redis";
@@ -9,7 +9,7 @@ export async function DELETE(
 	_: Request,
 	ctx: { params: Promise<{ hash: string }> }
 ) {
-	const session = (await getServerSession(authOptions as any)) as any;
+	const session = (await getAppSession()) as any;
 	const uid = session?.user?.id || null;
 	if (!uid) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

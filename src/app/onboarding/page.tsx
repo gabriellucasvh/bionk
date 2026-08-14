@@ -217,6 +217,7 @@ export default function OnboardingPage() {
 						}
 					: undefined
 			}
+			onCancel={() => router.push("/")}
 		/>
 	);
 }

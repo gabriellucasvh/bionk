@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getRedis } from "@/lib/redis";
@@ -101,7 +101,7 @@ function validateVideoUrl(
 }
 
 export async function POST(request: Request) {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 
 	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
@@ -238,7 +238,7 @@ export async function POST(request: Request) {
 
 export async function GET(request: NextRequest) {
 	try {
-		const session = await getServerSession(authOptions);
+		const session = await getAppSession();
 		if (!session?.user?.id) {
 			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 		}

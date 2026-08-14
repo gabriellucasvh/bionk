@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import cloudinary from "@/lib/cloudinary";
@@ -30,7 +30,7 @@ const MAX_VIDEO_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request: Request) {
     try {
-        const session = await getServerSession(authOptions);
+        const session = await getAppSession();
         if (!session?.user?.id) {
             return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
         }

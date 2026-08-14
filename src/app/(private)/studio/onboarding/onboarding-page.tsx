@@ -1,7 +1,11 @@
 "use client";
 
+import {
+	Check,
+	PencilSimple,
+	SpinnerGap,
+} from "@phosphor-icons/react/dist/ssr";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, PencilSimple, SpinnerGap } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -21,7 +25,6 @@ import CustomLinksForm from "./components/CustomLinksForm";
 import SocialLinksSelector from "./components/SocialLinksSelector";
 import TemplateSelector from "./components/TemplateSelector";
 import UserTypeSelector from "./components/UserTypeSelector";
-
 
 interface OnboardingPageProps {
 	onComplete: (data: OnboardingData) => void;
@@ -45,6 +48,9 @@ interface OnboardingPageProps {
 	loading?: boolean;
 	error?: string | null;
 	isLoading?: boolean;
+	requireUsername?: boolean;
+	hideStep6?: boolean;
+	onCancel?: () => void;
 }
 
 export interface OnboardingData {
@@ -98,6 +104,9 @@ export default function OnboardingPageComponent({
 	initialData,
 	user,
 	loading = false,
+	requireUsername = false,
+	hideStep6 = false,
+	onCancel,
 }: OnboardingPageProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [currentStep, setCurrentStep] = useState<Step>(1);
@@ -126,6 +135,7 @@ export default function OnboardingPageComponent({
 	});
 	const [isTypingUsername, setIsTypingUsername] = useState(false);
 	const isGoogleUser =
+		requireUsername ||
 		user?.provider === "google" ||
 		Boolean(user?.googleId) ||
 		user?.status === "pending" ||
@@ -236,6 +246,25 @@ export default function OnboardingPageComponent({
 					`/api/auth/check-username?username=${encodeURIComponent(normalizeUsernameForLookup(username))}`,
 					{ signal: controller.signal }
 				);
+
+				if (!response.ok) {
+					if (response.status === 429) {
+						setUsernameValidation({
+							isValid: false,
+							message: "Muitas tentativas. Aguarde um momento.",
+							isChecking: false,
+						});
+					} else {
+						setUsernameValidation({
+							isValid: false,
+							message: "Erro ao verificar disponibilidade",
+							isChecking: false,
+						});
+					}
+					setIsTypingUsername(false);
+					return;
+				}
+
 				const result = await response.json();
 
 				// Final blacklist check before setting result (ultimate protection)
@@ -266,10 +295,10 @@ export default function OnboardingPageComponent({
 					});
 				}
 				setIsTypingUsername(false);
-			} catch (error) {
+			} catch (error: any) {
 				// Don't show error if request was aborted (user typed something else)
-				if (error instanceof Error && error.name === "AbortError") {
-					setIsTypingUsername(false);
+				if (error?.name === "AbortError" || error?.message?.includes("aborted")) {
+					// We don't set isTypingUsername to false here because a new request might have started
 					return;
 				}
 				setUsernameValidation({
@@ -279,7 +308,7 @@ export default function OnboardingPageComponent({
 				});
 				setIsTypingUsername(false);
 			}
-		}, 500);
+		}, 550);
 	}, []);
 
 	const handleUsernameChange = (value: string) => {
@@ -476,7 +505,7 @@ export default function OnboardingPageComponent({
 									size="icon"
 									variant="white"
 								>
-									<PencilSimple weight="regular" className="h-4 w-4" />
+									<PencilSimple className="h-4 w-4" weight="regular" />
 								</BaseButton>
 							</div>
 						</div>
@@ -513,7 +542,10 @@ export default function OnboardingPageComponent({
 										/>
 										{usernameValidation.isChecking && (
 											<span className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-2">
-												<SpinnerGap weight="regular" className="h-4 w-4 animate-spin text-muted-foreground" />
+												<SpinnerGap
+													className="h-4 w-4 animate-spin text-muted-foreground"
+													weight="regular"
+												/>
 											</span>
 										)}
 									</div>
@@ -605,7 +637,9 @@ export default function OnboardingPageComponent({
 						<div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
 							<div
 								className="h-2 rounded-full bg-black transition-all duration-300"
-								style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
+								style={{
+									width: `${(currentStep / (hideStep6 ? 5 : STEPS.length)) * 100}%`,
+								}}
 							/>
 						</div>
 						<p className="mt-2 text-gray-600 text-sm dark:text-gray-400">
@@ -622,19 +656,28 @@ export default function OnboardingPageComponent({
 				{/* Navigation */}
 				{currentStep !== 2 && (
 					<div className="flex items-center justify-between">
-						{currentStep > 1 ? (
-							<BaseButton
-								className="flex items-center gap-2"
-								onClick={handlePrevious}
-								variant="white"
-							>
-								Voltar
-							</BaseButton>
-						) : (
-							<div />
-						)}
+						<div className="flex items-center gap-4">
+							{currentStep > 1 && (
+								<BaseButton
+									className="flex items-center gap-2"
+									onClick={handlePrevious}
+									variant="white"
+								>
+									Voltar
+								</BaseButton>
+							)}
+							{onCancel && currentStep === 1 && (
+								<button
+									className="font-semibold text-sm text-zinc-900 dark:text-zinc-100"
+									onClick={onCancel}
+									type="button"
+								>
+									Cancelar
+								</button>
+							)}
+						</div>
 
-						{currentStep < STEPS.length ? (
+						{currentStep < (hideStep6 ? 5 : STEPS.length) ? (
 							<BaseButton
 								className="flex items-center gap-2"
 								disabled={!canProceedToNext()}
@@ -648,12 +691,15 @@ export default function OnboardingPageComponent({
 								disabled={loading || isSubmitting || !canProceedToNext()}
 								onClick={handleComplete}
 							>
-								{loading ? (
-									<SpinnerGap weight="regular" className="h-4 w-4 animate-spin" />
+								{loading || isSubmitting ? (
+									<SpinnerGap
+										className="h-4 w-4 animate-spin"
+										weight="regular"
+									/>
 								) : (
-									<Check weight="regular" className="h-4 w-4" />
+									<Check className="h-4 w-4" weight="regular" />
 								)}
-								Concluir e ir para o Studio
+								{hideStep6 ? "Criar Perfil" : "Concluir e ir para o Studio"}
 							</BaseButton>
 						)}
 					</div>

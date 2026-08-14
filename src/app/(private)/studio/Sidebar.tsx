@@ -11,7 +11,7 @@ import {
 	PaintBrush,
 	Palette,
 	QrCode,
-	ShareNetwork,
+	Share,
 	SquaresFour,
 	Stack,
 } from "@phosphor-icons/react/dist/ssr";
@@ -19,8 +19,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import React, { useCallback, useEffect, useState } from "react";
+import type React from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
+import useSWR from "swr";
+import Cookies from "js-cookie";
 import ShareListCompact from "@/components/ShareListCompact";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +40,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSubscription } from "@/providers/subscriptionProvider";
 import { useTheme } from "@/providers/themeProvider";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const ProfileActionsDropdown = ({
 	profileUrl,
@@ -64,7 +69,10 @@ const ProfileActionsDropdown = ({
 	}, [username]);
 
 	return (
-		<DropdownMenuContent align="end" className="ml-3 grid w-60 gap-2 p-2">
+		<DropdownMenuContent
+			align="end"
+			className="ml-3 grid w-60 gap-2 border p-2"
+		>
 			<DropdownMenuLabel className="py-1">Compartilhar</DropdownMenuLabel>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem asChild>
@@ -115,7 +123,7 @@ const ProfileActionsDropdown = ({
 
 			<DropdownMenuSub>
 				<DropdownMenuSubTrigger className="h-10 cursor-pointer">
-					<ShareNetwork className="mr-2 h-4 w-4" weight="regular" />
+					<Share className="mr-2 h-4 w-4" weight="regular" />
 					<span>Compartilhar por...</span>
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent className="p-2 md:max-w-md lg:max-w-full">
@@ -189,6 +197,18 @@ const Sidebar = () => {
 
 	const username = session?.user?.username;
 	const isLoading = !(session?.user && username);
+
+	const { data: profilesData } = useSWR("/api/profile/all", fetcher);
+	const profiles = profilesData?.profiles || [];
+
+	const handleSwitchProfile = (profileId: string) => {
+		Cookies.set("bionk_active_profile_id", profileId, {
+			path: "/",
+			expires: 30,
+			sameSite: "lax",
+		});
+		window.location.href = "/studio/design";
+	};
 
 	// Função para buscar dados atuais do usuário
 	const fetchCurrentUserData = useCallback(async () => {
@@ -348,49 +368,31 @@ const Sidebar = () => {
 							width={90}
 						/>
 					</Link>
-					<button
-						className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
-						type="button"
-					>
-						<Bell className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
-					</button>
+					<div className="flex items-center gap-1">
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<button
+									className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
+									type="button"
+								>
+									<Share className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
+								</button>
+							</DropdownMenuTrigger>
+							<ProfileActionsDropdown
+								profileUrl={profileUrl}
+								username={username}
+							/>
+						</DropdownMenu>
+						<button
+							className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
+							type="button"
+						>
+							<Bell className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
+						</button>
+					</div>
 				</header>
 
-				<div className="py-2">
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button
-								className="flex h-12 w-full items-center justify-between rounded-lg border border-zinc-200 bg-zinc-100 px-4 transition hover:bg-zinc-200 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white dark:hover:bg-zinc-600"
-								variant="outline"
-							>
-								<div className="flex min-w-0 flex-1 flex-col items-start justify-center overflow-hidden text-left">
-									<p className="flex items-center gap-2 font-medium text-sm">
-										Compartilhar
-									</p>
-									<span className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-										bionk.me/
-										{username && username.length > 20
-											? `${username.slice(0, 20)}...`
-											: username}
-									</span>
-								</div>
-								<ArrowSquareOut
-									className="h-5 w-5 flex-shrink-0 text-zinc-400 dark:text-zinc-300"
-									weight="regular"
-								/>
-							</Button>
-						</DropdownMenuTrigger>
-						<ProfileActionsDropdown
-							profileUrl={profileUrl}
-							username={username}
-						/>
-					</DropdownMenu>
-				</div>
-
-				<div>
-					<h3 className="mb-2 px-3 font-semibold text-xs text-zinc-400 tracking-wider dark:text-zinc-300">
-						Studio
-					</h3>
+				<div className="pt-2">
 					<nav className="space-y-0.5">{renderNavLinks(mainLinks)}</nav>
 				</div>
 
@@ -401,60 +403,102 @@ const Sidebar = () => {
 					<nav className="space-y-0.5">{renderNavLinks(toolsLinks)}</nav>
 				</div>
 
-				{/* Perfil */}
-				<div
-					className="mt-auto mb-3 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-600 "
-					onClick={() => router.push("/studio/configs")}
-					role="none"
-				>
-					{isLoading ? (
-						<Skeleton className="h-12 w-12 rounded-full" />
-					) : (
-						<>
-							<Image
-								alt="Avatar"
-								className="rounded-full"
-								height={42}
-								src={
-									userImageUrl || session?.user?.image
-										? imageKey > 0
-											? `${userImageUrl || session?.user?.image}?t=${imageKey}`
-											: `${userImageUrl || session?.user?.image}`
-										: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
-								}
-								width={42}
-							/>
-							<div className="flex flex-1 flex-col truncate">
-								<h2 className="truncate font-semibold text-sm dark:text-white">
-									{userName || session?.user?.name}
-								</h2>
-								{subscriptionPlan && (
-									<span
-										className={`mt-1 inline-block w-fit rounded-md px-2 py-0.5 font-medium text-[10px] capitalize ${(() => {
-											switch (subscriptionPlan) {
-												case "free":
-													return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";
-												case "basic":
-													return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
-												case "pro":
-													return "bg-radial-[at_50%_75%] from-yellow-500 via-purple-500 to-blue-500 text-white";
-												case "ultra":
-													return "bg-gradient-to-r from-blue-600 to-blue-500 text-white";
-												default:
-													return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";
+				{/* Switcher de Perfis */}
+				<div className="mt-auto mb-3">
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<div
+								className="flex cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-600 "
+								role="none"
+							>
+								{isLoading ? (
+									<Skeleton className="h-12 w-12 rounded-full" />
+								) : (
+									<>
+										<Image
+											alt="Avatar"
+											className="rounded-full"
+											height={42}
+											src={
+												userImageUrl || session?.user?.image
+													? imageKey > 0
+														? `${userImageUrl || session?.user?.image}?t=${imageKey}`
+														: `${userImageUrl || session?.user?.image}`
+													: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 											}
-										})()}`}
-									>
-										{subscriptionPlan}
-									</span>
+											width={42}
+										/>
+										<div className="flex flex-1 flex-col truncate">
+											<h2 className="truncate font-semibold text-sm dark:text-white">
+												{userName || session?.user?.name}
+											</h2>
+											{subscriptionPlan && (
+												<span
+													className={`mt-1 inline-block w-fit rounded-md px-2 py-0.5 font-medium text-[10px] capitalize ${(() => {
+														switch (subscriptionPlan) {
+															case "free":
+																return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";
+															case "basic":
+																return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
+															case "pro":
+																return "bg-radial-[at_50%_75%] from-yellow-500 via-purple-500 to-blue-500 text-white";
+															case "ultra":
+																return "bg-gradient-to-r from-blue-600 to-blue-500 text-white";
+															default:
+																return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";
+														}
+													})()}`}
+												>
+													{subscriptionPlan}
+												</span>
+											)}
+										</div>
+										<DotsThreeVerticalIcon
+											className="h-5 w-5 text-zinc-500 dark:text-zinc-300"
+											weight="regular"
+										/>
+									</>
 								)}
 							</div>
-							<DotsThreeVerticalIcon
-								className="h-5 w-5 text-zinc-500 dark:text-zinc-300"
-								weight="regular"
-							/>
-						</>
-					)}
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-56 p-2">
+							<DropdownMenuLabel>Alternar Página</DropdownMenuLabel>
+							<DropdownMenuSeparator />
+							{profiles.map((p: any) => (
+								<DropdownMenuItem
+									className="flex cursor-pointer items-center gap-3 py-2"
+									key={p.id}
+									onClick={() => handleSwitchProfile(p.id)}
+								>
+									<Image
+										alt={p.username}
+										className="rounded-full"
+										height={24}
+										src={
+											p.image ||
+											"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
+										}
+										width={24}
+									/>
+									<div className="flex flex-col truncate">
+										<span className="truncate font-medium text-sm">
+											{p.name}
+										</span>
+										<span className="truncate text-xs text-zinc-500">
+											@{p.username}
+										</span>
+									</div>
+								</DropdownMenuItem>
+							))}
+							<DropdownMenuSeparator />
+							<DropdownMenuItem
+								className="cursor-pointer font-medium"
+								onClick={() => router.push("/studio/configs")}
+							>
+								Configurações da Conta
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</aside>
 
@@ -519,4 +563,4 @@ const Sidebar = () => {
 	);
 };
 
-export default React.memo(Sidebar);
+export default memo(Sidebar);

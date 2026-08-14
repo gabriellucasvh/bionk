@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import { authOptions, clearUserTokenCache } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
@@ -85,7 +85,7 @@ async function uploadProfileImage(profileImage: string, defaultImage: string) {
 
 export async function POST(request: Request) {
 	try {
-		const session = await getServerSession(authOptions);
+		const session = await getAppSession();
 		if (!session?.user?.id) {
 			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 		}

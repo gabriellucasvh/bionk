@@ -1,6 +1,6 @@
 // src/app/api/stripe/checkout/route.ts
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import Stripe from "stripe";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -29,7 +29,7 @@ const PRICE_IDS: Record<string, Record<BillingCycle, string>> = {
 
 export async function POST(request: Request) {
 	try {
-		const session = await getServerSession(authOptions);
+		const session = await getAppSession();
 		if (!session?.user?.id) {
 			return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 		}

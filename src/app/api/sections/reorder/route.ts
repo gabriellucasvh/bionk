@@ -1,6 +1,6 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { evictProfilePageCache, profileSectionsTag } from "@/lib/cache-tags";
@@ -18,7 +18,7 @@ const reorderSchema = z.object({
 });
 
 export async function PUT(req: Request) {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 	}

@@ -1,7 +1,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { profileLinksTag } from "@/lib/cache-tags";
 import { type NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
@@ -10,7 +10,7 @@ export async function POST(
 	_request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 	}

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import {
 	ensureHttps,
@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
 	try {
-		const session = await getServerSession(authOptions);
+		const session = await getAppSession();
 		if (!session?.user?.id) {
 			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 		}

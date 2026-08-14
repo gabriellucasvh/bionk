@@ -1,6 +1,14 @@
 "use client";
 
-import { CaretLeft, CaretRight, Clock, Images, Lock, DotsThreeVertical, CursorClick } from "@phosphor-icons/react/dist/ssr";
+import {
+	CaretLeft,
+	CaretRight,
+	Clock,
+	CursorClick,
+	DotsThreeVertical,
+	Images,
+	Lock,
+} from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useEffect, useMemo, useReducer, useState } from "react";
 import EventCard from "@/app/[username]/templates/components/cards/EventCard";
@@ -385,17 +393,17 @@ function ContentList({
 		const href = normalizeExternalUrl(item?.url);
 		const indicatorIcon = (() => {
 			if (item?.password) {
-				return <Lock weight="regular" className="h-4 w-4" />;
+				return <Lock className="h-4 w-4" weight="regular" />;
 			}
 			// Prioridade: compartilhamento > cliques > expiração
 			if (item?.shareAllowed) {
-				return <DotsThreeVertical weight="regular" className="h-4 w-4" />;
+				return <DotsThreeVertical className="h-4 w-4" weight="regular" />;
 			}
 			if (item?.deleteOnClicks) {
-				return <CursorClick weight="regular" className="h-4 w-4" />;
+				return <CursorClick className="h-4 w-4" weight="regular" />;
 			}
 			if (item?.expiresAt) {
-				return <Clock weight="regular" className="h-4 w-4" />;
+				return <Clock className="h-4 w-4" weight="regular" />;
 			}
 			return null;
 		})();
@@ -453,7 +461,7 @@ function ContentList({
 						</div>
 						<div className="flex w-10 flex-shrink-0 justify-center">
 							<div className="rounded-full p-2 text-current opacity-70">
-								<Lock weight="regular" className="h-4 w-4" />
+								<Lock className="h-4 w-4" weight="regular" />
 							</div>
 						</div>
 					</button>
@@ -847,7 +855,7 @@ function ContentList({
 										aria-hidden
 										className="-translate-y-1/2 absolute top-1/2 right-3 z-20 rounded-full p-2 text-current opacity-70 transition-colors hover:bg-black/10 hover:opacity-100 dark:hover:bg-white/10"
 									>
-										<Images weight="regular" className="size-5" />
+										<Images className="size-5" weight="regular" />
 									</div>
 								</div>
 							</summary>
@@ -923,7 +931,7 @@ function ContentList({
 										}}
 										type="button"
 									>
-										<CaretLeft weight="regular" className="h-4 w-4" />
+										<CaretLeft className="h-4 w-4" weight="regular" />
 									</button>
 								)}
 
@@ -942,7 +950,7 @@ function ContentList({
 										}}
 										type="button"
 									>
-										<CaretRight weight="regular" className="h-4 w-4" />
+										<CaretRight className="h-4 w-4" weight="regular" />
 									</button>
 								)}
 						</div>
@@ -1108,8 +1116,15 @@ function convertUserDataToUserProfile(userData: any): UserProfile {
 	} as UserProfile;
 }
 
-export default function UserPagePreview() {
-	const { userData, customizations } = useInstantPreview();
+export default function UserPagePreview({
+	userData: propUserData,
+	customizations: propCustomizations,
+}: UserPagePreviewProps & { userData?: any } = {}) {
+	const instantPreview = useInstantPreview();
+
+	const userData = propUserData || instantPreview.userData;
+	const customizations = propCustomizations || instantPreview.customizations;
+
 	const user = useMemo(
 		() => convertUserDataToUserProfile(userData),
 		[userData]
