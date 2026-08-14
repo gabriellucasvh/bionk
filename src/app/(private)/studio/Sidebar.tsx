@@ -11,7 +11,7 @@ import {
 	PaintBrush,
 	Palette,
 	QrCode,
-	ShareNetwork,
+	Share,
 	SquaresFour,
 	Stack,
 } from "@phosphor-icons/react/dist/ssr";
@@ -64,7 +64,10 @@ const ProfileActionsDropdown = ({
 	}, [username]);
 
 	return (
-		<DropdownMenuContent align="end" className="ml-3 grid w-60 gap-2 p-2">
+		<DropdownMenuContent
+			align="end"
+			className="ml-3 grid w-60 gap-2 border p-2"
+		>
 			<DropdownMenuLabel className="py-1">Compartilhar</DropdownMenuLabel>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem asChild>
@@ -115,7 +118,7 @@ const ProfileActionsDropdown = ({
 
 			<DropdownMenuSub>
 				<DropdownMenuSubTrigger className="h-10 cursor-pointer">
-					<ShareNetwork className="mr-2 h-4 w-4" weight="regular" />
+					<Share className="mr-2 h-4 w-4" weight="regular" />
 					<span>Compartilhar por...</span>
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent className="p-2 md:max-w-md lg:max-w-full">
@@ -348,49 +351,32 @@ const Sidebar = () => {
 							width={90}
 						/>
 					</Link>
-					<button
-						className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
-						type="button"
-					>
-						<Bell className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
-					</button>
+					<div className="flex items-center gap-1">
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<button
+									className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
+									type="button"
+								>
+									<Share className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
+								</button>
+							</DropdownMenuTrigger>
+							<ProfileActionsDropdown
+								profileUrl={profileUrl}
+								username={username}
+							/>
+						</DropdownMenu>
+						<button
+							className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
+							type="button"
+						>
+							<Bell className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
+						</button>
+					</div>
 				</header>
 
-				<div className="py-2">
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button
-								className="flex h-12 w-full items-center justify-between rounded-lg border border-zinc-200 bg-zinc-100 px-4 transition hover:bg-zinc-200 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white dark:hover:bg-zinc-600"
-								variant="outline"
-							>
-								<div className="flex min-w-0 flex-1 flex-col items-start justify-center overflow-hidden text-left">
-									<p className="flex items-center gap-2 font-medium text-sm">
-										Compartilhar
-									</p>
-									<span className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-										bionk.me/
-										{username && username.length > 20
-											? `${username.slice(0, 20)}...`
-											: username}
-									</span>
-								</div>
-								<ArrowSquareOut
-									className="h-5 w-5 flex-shrink-0 text-zinc-400 dark:text-zinc-300"
-									weight="regular"
-								/>
-							</Button>
-						</DropdownMenuTrigger>
-						<ProfileActionsDropdown
-							profileUrl={profileUrl}
-							username={username}
-						/>
-					</DropdownMenu>
-				</div>
+				<div className="pt-2">
 
-				<div>
-					<h3 className="mb-2 px-3 font-semibold text-xs text-zinc-400 tracking-wider dark:text-zinc-300">
-						Studio
-					</h3>
 					<nav className="space-y-0.5">{renderNavLinks(mainLinks)}</nav>
 				</div>
 
