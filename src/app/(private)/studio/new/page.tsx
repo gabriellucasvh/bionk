@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Cookies from "js-cookie";
 import LoadingPage from "@/components/layout/LoadingPage";
 import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 import { getTemplateInfo } from "@/utils/templatePresets";
@@ -60,7 +61,11 @@ export default function NewProfilePage() {
 			const newProfileId = result.profile.id;
 
 			// Definir o cookie com o ID do novo perfil para que as chamadas seguintes atuem sobre ele
-			document.cookie = `bionk_active_profile_id=${newProfileId}; path=/; max-age=2592000; SameSite=Lax`;
+			Cookies.set("bionk_active_profile_id", newProfileId, {
+				path: "/",
+				expires: 30,
+				sameSite: "lax",
+			});
 
 			// Aplicar template escolhido no novo perfil
 			if (data.template) {
@@ -126,9 +131,11 @@ export default function NewProfilePage() {
 			// Limpar o cookie para não afetar outras telas acidentalmente (ou deixá-lo ativo)
 			// Mas como a tela de sucesso vai referenciar o novo perfil, podemos mantê-lo ou limpá-lo.
 			// Na verdade, a tela de sucesso vai ler o query string.
-			
+
 			// Redirecionar para a tela de sucesso
-			router.push(`/studio/success?username=${encodeURIComponent(result.profile.username)}`);
+			router.push(
+				`/studio/success?username=${encodeURIComponent(result.profile.username)}`
+			);
 		} catch (err: any) {
 			setError(err.message);
 		} finally {
@@ -146,18 +153,18 @@ export default function NewProfilePage() {
 	}
 
 	return (
-		<div className="bg-white dark:bg-zinc-950 min-h-screen">
+		<div className="min-h-screen bg-white dark:bg-zinc-950">
 			<OnboardingPageComponent
 				error={error}
+				hideStep6={true}
 				initialData={{
 					name: "",
 					username: "",
 				}}
 				isLoading={isLoading}
+				onCancel={() => router.push("/studio")}
 				onComplete={handleOnboardingComplete}
 				requireUsername={true}
-				hideStep6={true}
-				onCancel={() => router.push("/studio")}
 			/>
 		</div>
 	);

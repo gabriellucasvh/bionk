@@ -1,7 +1,11 @@
 "use client";
 
+import {
+	Check,
+	PencilSimple,
+	SpinnerGap,
+} from "@phosphor-icons/react/dist/ssr";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, PencilSimple, SpinnerGap } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -21,7 +25,6 @@ import CustomLinksForm from "./components/CustomLinksForm";
 import SocialLinksSelector from "./components/SocialLinksSelector";
 import TemplateSelector from "./components/TemplateSelector";
 import UserTypeSelector from "./components/UserTypeSelector";
-
 
 interface OnboardingPageProps {
 	onComplete: (data: OnboardingData) => void;
@@ -483,7 +486,7 @@ export default function OnboardingPageComponent({
 									size="icon"
 									variant="white"
 								>
-									<PencilSimple weight="regular" className="h-4 w-4" />
+									<PencilSimple className="h-4 w-4" weight="regular" />
 								</BaseButton>
 							</div>
 						</div>
@@ -520,7 +523,10 @@ export default function OnboardingPageComponent({
 										/>
 										{usernameValidation.isChecking && (
 											<span className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-2">
-												<SpinnerGap weight="regular" className="h-4 w-4 animate-spin text-muted-foreground" />
+												<SpinnerGap
+													className="h-4 w-4 animate-spin text-muted-foreground"
+													weight="regular"
+												/>
 											</span>
 										)}
 									</div>
@@ -612,7 +618,9 @@ export default function OnboardingPageComponent({
 						<div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
 							<div
 								className="h-2 rounded-full bg-black transition-all duration-300"
-								style={{ width: `${(currentStep / (hideStep6 ? 5 : STEPS.length)) * 100}%` }}
+								style={{
+									width: `${(currentStep / (hideStep6 ? 5 : STEPS.length)) * 100}%`,
+								}}
 							/>
 						</div>
 						<p className="mt-2 text-gray-600 text-sm dark:text-gray-400">
@@ -641,7 +649,7 @@ export default function OnboardingPageComponent({
 							)}
 							{onCancel && currentStep === 1 && (
 								<button
-									className="text-sm font-semibold text-zinc-900 dark:text-zinc-100"
+									className="font-semibold text-sm text-zinc-900 dark:text-zinc-100"
 									onClick={onCancel}
 									type="button"
 								>
@@ -665,9 +673,12 @@ export default function OnboardingPageComponent({
 								onClick={handleComplete}
 							>
 								{loading || isSubmitting ? (
-									<SpinnerGap weight="regular" className="h-4 w-4 animate-spin" />
+									<SpinnerGap
+										className="h-4 w-4 animate-spin"
+										weight="regular"
+									/>
 								) : (
-									<Check weight="regular" className="h-4 w-4" />
+									<Check className="h-4 w-4" weight="regular" />
 								)}
 								{hideStep6 ? "Criar Perfil" : "Concluir e ir para o Studio"}
 							</BaseButton>

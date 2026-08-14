@@ -19,8 +19,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import React, { useCallback, useEffect, useState } from "react";
+import type React from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
+import useSWR from "swr";
+import Cookies from "js-cookie";
 import ShareListCompact from "@/components/ShareListCompact";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +40,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSubscription } from "@/providers/subscriptionProvider";
 import { useTheme } from "@/providers/themeProvider";
-import useSWR from "swr";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -200,7 +202,11 @@ const Sidebar = () => {
 	const profiles = profilesData?.profiles || [];
 
 	const handleSwitchProfile = (profileId: string) => {
-		document.cookie = `bionk_active_profile_id=${profileId}; path=/; max-age=2592000; SameSite=Lax`;
+		Cookies.set("bionk_active_profile_id", profileId, {
+			path: "/",
+			expires: 30,
+			sameSite: "lax",
+		});
 		window.location.href = "/studio/design";
 	};
 
@@ -387,7 +393,6 @@ const Sidebar = () => {
 				</header>
 
 				<div className="pt-2">
-
 					<nav className="space-y-0.5">{renderNavLinks(mainLinks)}</nav>
 				</div>
 
@@ -461,25 +466,32 @@ const Sidebar = () => {
 							<DropdownMenuSeparator />
 							{profiles.map((p: any) => (
 								<DropdownMenuItem
-									key={p.id}
 									className="flex cursor-pointer items-center gap-3 py-2"
+									key={p.id}
 									onClick={() => handleSwitchProfile(p.id)}
 								>
 									<Image
 										alt={p.username}
-										src={p.image || "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"}
-										width={24}
-										height={24}
 										className="rounded-full"
+										height={24}
+										src={
+											p.image ||
+											"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
+										}
+										width={24}
 									/>
 									<div className="flex flex-col truncate">
-										<span className="font-medium text-sm truncate">{p.name}</span>
-										<span className="text-xs text-zinc-500 truncate">@{p.username}</span>
+										<span className="truncate font-medium text-sm">
+											{p.name}
+										</span>
+										<span className="truncate text-xs text-zinc-500">
+											@{p.username}
+										</span>
 									</div>
 								</DropdownMenuItem>
 							))}
 							<DropdownMenuSeparator />
-							<DropdownMenuItem 
+							<DropdownMenuItem
 								className="cursor-pointer font-medium"
 								onClick={() => router.push("/studio/configs")}
 							>
@@ -551,4 +563,4 @@ const Sidebar = () => {
 	);
 };
 
-export default React.memo(Sidebar);
+export default memo(Sidebar);
