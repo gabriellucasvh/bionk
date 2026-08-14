@@ -39,7 +39,7 @@ export default function CategoryDropdown({
 							: selectedCategory.replace(/-/g, " ")
 						: "Selecionar Categoria"}
 				</span>
-				<CaretDown weight="duotone"
+				<CaretDown weight="regular"
 					className={`h-4 w-4 transition-transform ${
 						isOpen ? "rotate-180" : ""
 					}`}
@@ -48,7 +48,7 @@ export default function CategoryDropdown({
 
 			{/* Dropdown Menu */}
 			{isOpen && (
-				<div className="absolute top-full right-0 left-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-md border bg-white shadow-lg dark:bg-zinc-800">
+				<div className="absolute top-full right-0 left-0 z-50 mt-1 max-h-60 overflow-y-auto rounded-md  bg-white  dark:bg-zinc-800">
 					{categories.map((category) => (
 						<button
 							className={`w-full px-4 py-3 text-left text-sm capitalize transition-colors hover:bg-gray-100 dark:hover:bg-zinc-700 ${

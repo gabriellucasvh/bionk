@@ -143,7 +143,7 @@ export default function WorldMapChart(props: WorldMapChartProps) {
 				<Card className="lg:col-span-2">
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							<GlobeHemisphereWest weight="duotone" className="h-5 w-5" />
+							<GlobeHemisphereWest weight="regular" className="h-5 w-5" />
 							Distribuição Geográfica
 						</CardTitle>
 					</CardHeader>
@@ -232,7 +232,7 @@ export default function WorldMapChart(props: WorldMapChartProps) {
 												className="py-8 text-center text-gray-500"
 												colSpan={3}
 											>
-												<GlobeHemisphereWest weight="duotone" className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+												<GlobeHemisphereWest weight="regular" className="mx-auto mb-2 h-8 w-8 text-gray-400" />
 												Nenhum dado disponível
 											</td>
 										</tr>

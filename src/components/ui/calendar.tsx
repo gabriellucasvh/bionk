@@ -66,7 +66,7 @@ function Calendar({
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
-          "relative has-focus:border-ring border border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] rounded-md",
+          "relative has-focus:border-ring    has-focus:ring-ring/50 has-focus:ring-[3px] rounded-md",
           defaultClassNames.dropdown_root
         ),
         dropdown: cn(
@@ -134,13 +134,13 @@ function Calendar({
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
             return (
-              <CaretLeft weight="duotone" className={cn("size-4", className)} {...props} />
+              <CaretLeft weight="regular" className={cn("size-4", className)} {...props} />
             )
           }
 
           if (orientation === "right") {
             return (
-              <CaretRight weight="duotone"
+              <CaretRight weight="regular"
                 className={cn("size-4", className)}
                 {...props}
               />
@@ -148,7 +148,7 @@ function Calendar({
           }
 
           return (
-            <CaretDown weight="duotone" className={cn("size-4", className)} {...props} />
+            <CaretDown weight="regular" className={cn("size-4", className)} {...props} />
           )
         },
         DayButton: CalendarDayButton,

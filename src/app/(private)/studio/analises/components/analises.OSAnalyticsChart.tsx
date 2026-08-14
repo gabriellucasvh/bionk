@@ -248,7 +248,7 @@ export default function OSAnalyticsChart({
 																width={16}
 															/>
 														) : (
-															<Question weight="duotone" className="h-4 w-4" />
+															<Question weight="regular" className="h-4 w-4" />
 														)}
 													</div>
 													<span>{item.name}</span>

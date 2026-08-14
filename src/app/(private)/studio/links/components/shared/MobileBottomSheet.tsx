@@ -92,7 +92,7 @@ const MobileBottomSheet = ({
 						onClick={onClose}
 						type="button"
 					>
-						<X weight="duotone" className="h-4 w-4" />
+						<X weight="regular" className="h-4 w-4" />
 					</button>
 				</div>
 				<div

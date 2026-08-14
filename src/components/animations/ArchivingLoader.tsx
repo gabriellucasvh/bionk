@@ -37,7 +37,7 @@ const ArchivingLoader = ({
 					)}
 				>
 					{/* Ícone de arquivo com animação */}
-					<Archive weight="duotone"
+					<Archive weight="regular"
 						className={cn(
 							"animate-pulse text-green-700 dark:text-green-300",
 							{

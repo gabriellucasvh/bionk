@@ -102,14 +102,14 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 													href={display.href}
 													target="_blank"
 												>
-													<LinkIcon weight="duotone" className="h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
+													<LinkIcon weight="regular" className="h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
 													<span className="truncate">{display.text}</span>
 												</Link>
 											);
 										})()}
 									</div>
 									<div className="flex items-center rounded-full bg-primary/5 px-2 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm">
-										<CursorClick weight="duotone"
+										<CursorClick weight="regular"
 											className="mr-1 text-primary sm:mr-1.5"
 											size={12}
 										/>
@@ -132,12 +132,12 @@ const TopLinksTable: React.FC<TopLinksTableProps> = React.memo(
 								>
 									{isExpanded ? (
 										<>
-											<CaretUp weight="duotone" className="h-3 w-3 sm:h-4 sm:w-4" />
+											<CaretUp weight="regular" className="h-3 w-3 sm:h-4 sm:w-4" />
 											Mostrar menos
 										</>
 									) : (
 										<>
-											<CaretDown weight="duotone" className="h-3 w-3 sm:h-4 sm:w-4" />
+											<CaretDown weight="regular" className="h-3 w-3 sm:h-4 sm:w-4" />
 											<span className="hidden sm:inline">
 												Ver mais ({topLinks.length - 3} restantes)
 											</span>

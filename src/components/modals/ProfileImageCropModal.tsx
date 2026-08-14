@@ -241,7 +241,7 @@ const ProfileImageCropModal: FC<ProfileImageCropModalProps> = ({
 							<div className="space-y-3">
 								<Label htmlFor="zoom-slider">Zoom</Label>
 								<div className="flex items-center gap-2">
-									<MagnifyingGlassMinus weight="duotone" className="h-5 w-5 text-gray-500" />
+									<MagnifyingGlassMinus weight="regular" className="h-5 w-5 text-gray-500" />
 									<Slider
 										id="zoom-slider"
 										max={3}
@@ -250,7 +250,7 @@ const ProfileImageCropModal: FC<ProfileImageCropModalProps> = ({
 										step={0.1}
 										value={[zoom]}
 									/>
-									<MagnifyingGlassPlus weight="duotone" className="h-5 w-5 text-gray-500" />
+									<MagnifyingGlassPlus weight="regular" className="h-5 w-5 text-gray-500" />
 								</div>
 							</div>
 							<div className="flex flex-col gap-2 pt-2 sm:flex-row sm:justify-center">
@@ -259,7 +259,7 @@ const ProfileImageCropModal: FC<ProfileImageCropModalProps> = ({
 									onClick={() => setSelectedImage(null)}
 									variant="white"
 								>
-									<ArrowCounterClockwise weight="duotone" className="h-4 w-4" />
+									<ArrowCounterClockwise weight="regular" className="h-4 w-4" />
 									Escolher Outra
 								</BaseButton>
 								<BaseButton
@@ -267,7 +267,7 @@ const ProfileImageCropModal: FC<ProfileImageCropModalProps> = ({
 									loading={isProcessing}
 									onClick={processImage}
 								>
-									<Check weight="duotone" className="h-4 w-4" />
+									<Check weight="regular" className="h-4 w-4" />
 									Salvar Foto
 								</BaseButton>
 							</div>
@@ -297,7 +297,7 @@ const ProfileImageCropModal: FC<ProfileImageCropModalProps> = ({
 											}}
 											variant="ghost"
 										>
-											<Trash weight="duotone" className="h-4 w-4" />
+											<Trash weight="regular" className="h-4 w-4" />
 											Remover Foto
 										</Button>
 									)}
@@ -330,7 +330,7 @@ const ProfileImageCropModal: FC<ProfileImageCropModalProps> = ({
 								onDrop={handleDrop}
 								role="none"
 							>
-								<Upload weight="duotone" className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+								<Upload weight="regular" className="mx-auto mb-4 h-12 w-12 text-gray-400" />
 								<p className="mb-2 font-medium text-gray-700 dark:text-white">
 									{currentImageUrl
 										? "Escolher nova foto"

@@ -32,7 +32,7 @@ export function SortableSocialLinkItem({
 		<div ref={setNodeRef} style={style} {...attributes}>
 			<div className="flex items-center gap-2">
 				<button {...listeners} className="cursor-grab" type="button">
-					<DotsSixVertical weight="duotone" className="h-5 w-5 text-muted-foreground" />
+					<DotsSixVertical weight="regular" className="h-5 w-5 text-muted-foreground" />
 				</button>
 				<div className="flex-grow">{children}</div>
 			</div>

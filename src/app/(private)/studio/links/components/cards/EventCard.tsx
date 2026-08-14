@@ -162,7 +162,7 @@ const EventCard = ({
 					{...listeners}
 					className="cursor-grab touch-none pt-1"
 				>
-					<DotsSix weight="duotone" className="h-5 w-5 text-muted-foreground" />
+					<DotsSix weight="regular" className="h-5 w-5 text-muted-foreground" />
 				</div>
 				<div className="flex-1 space-y-2">
 					<header className="flex items-center gap-2">
@@ -170,9 +170,9 @@ const EventCard = ({
 							className={`flex items-center justify-center rounded-md p-1.5 ${isCountdown ? "bg-blue-500" : "bg-purple-500"}`}
 						>
 							{isCountdown ? (
-								<ClockAfternoon weight="duotone" className="h-4 w-4 text-white" />
+								<ClockAfternoon weight="regular" className="h-4 w-4 text-white" />
 							) : (
-								<Ticket weight="duotone" className="h-4 w-4 text-white" />
+								<Ticket weight="regular" className="h-4 w-4 text-white" />
 							)}
 						</div>
 						<span className="font-medium text-sm">
@@ -224,22 +224,22 @@ const EventCard = ({
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button className="h-8 w-8" size="icon" variant="ghost">
-								<DotsThreeVertical weight="duotone" className="h-4 w-4" />
+								<DotsThreeVertical weight="regular" className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuItem onClick={() => onStartEditingEvent?.(event.id)}>
-								<PencilSimple weight="duotone" className="mr-2 h-4 w-4" /> Editar
+								<PencilSimple weight="regular" className="mr-2 h-4 w-4" /> Editar
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem onClick={handleArchive}>
-								<Archive weight="duotone" className="mr-2 h-4 w-4" /> Arquivar
+								<Archive weight="regular" className="mr-2 h-4 w-4" /> Arquivar
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								className="text-destructive"
 								onClick={handleDelete}
 							>
-								<Trash weight="duotone" className="mr-2 h-4 w-4" /> Deletar
+								<Trash weight="regular" className="mr-2 h-4 w-4" /> Deletar
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

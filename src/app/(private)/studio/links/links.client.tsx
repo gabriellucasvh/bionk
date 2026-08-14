@@ -151,12 +151,12 @@ const LinksStudioClient = () => {
 				type="button"
 			>
 				{mobileView === "content" ? (
-					<Eye weight="duotone"
+					<Eye weight="regular"
 						className="h-6 w-6 text-white dark:text-black"
 						strokeWidth={1.5}
 					/>
 				) : (
-					<EyeClosed weight="duotone"
+					<EyeClosed weight="regular"
 						className="h-6 w-6 text-white dark:text-black"
 						strokeWidth={1.5}
 					/>

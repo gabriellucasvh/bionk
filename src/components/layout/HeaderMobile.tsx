@@ -42,20 +42,7 @@ const HeaderMobile = () => {
 	};
 
 	return (
-		<nav
-			className={
-				isOpen
-					? "fixed inset-x-0 z-50 bg-white lg:hidden"
-					: "fixed inset-x-0 z-50 bg-bunker-50/60 backdrop-blur-xl lg:hidden"
-			}
-		>
-			<div
-				className={
-					isOpen
-						? "pointer-events-none absolute inset-0 opacity-0"
-						: "pointer-events-none absolute inset-0 bg-[length:6px_6px] bg-[radial-gradient(#000_0.5px,transparent_0.5px)] opacity-5"
-				}
-			/>
+		<nav className="fixed inset-x-0 z-50 bg-white lg:hidden">
 			<div className="relative m-3 flex items-center justify-between px-4 py-3 font-sans">
 				<div>
 					<Link href="/">
@@ -104,7 +91,7 @@ const HeaderMobile = () => {
 										transition={{ delay: 0.1 }}
 									>
 										<Link
-											className="block w-full rounded-md px-4 py-3 text-gray-700 text-semibold transition-colors duration-200 hover:text-black"
+											className="block w-full rounded-md px-4 py-3 font-bold text-black transition-colors duration-200 hover:text-sky-500"
 											href={menu.href}
 										>
 											{menu.label}
@@ -117,10 +104,11 @@ const HeaderMobile = () => {
 									initial={{ opacity: 0, y: 10 }}
 									transition={{ delay: 0.2 }}
 								>
-									<div className="flex w-full justify-end gap-4 border-white/20 border-t pt-4">
+									<div className="flex w-full justify-end gap-4 border-gray-200 border-t pt-4">
 										{session ? (
 											<div className="flex w-full items-center justify-center gap-3">
 												<BaseButton
+													className="h-12 w-full rounded-full bg-sky-400 font-bold text-black hover:bg-sky-500"
 													loading={isLoading[KEYS.studio]}
 													onClick={() => handleClick("studio", routes.studio)}
 												>
@@ -128,15 +116,16 @@ const HeaderMobile = () => {
 												</BaseButton>
 											</div>
 										) : (
-											<div className="flex w-full items-center justify-center gap-3">
+											<div className="flex w-full flex-col items-center justify-center gap-3">
 												<BaseButton
+													className="h-12 w-full rounded-full bg-transparent font-bold text-black hover:bg-black/5"
 													loading={isLoading[KEYS.login]}
 													onClick={() => handleClick("login", routes.login)}
-													variant="white"
 												>
 													Entrar
 												</BaseButton>
 												<BaseButton
+													className="h-12 w-full rounded-full bg-sky-400 font-bold text-black hover:bg-sky-500"
 													loading={isLoading[KEYS.registro]}
 													onClick={() =>
 														handleClick("registro", routes.registro)

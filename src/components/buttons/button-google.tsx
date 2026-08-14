@@ -12,7 +12,7 @@ export function GoogleBtn() {
 		setIsLoading(true);
 		try {
 			await signIn("google", {
-				callbackUrl: "/studio/perfil",
+				callbackUrl: "/studio",
 			});
 		} catch {
 			setIsLoading(false);

@@ -476,7 +476,7 @@ export default function OnboardingPageComponent({
 									size="icon"
 									variant="white"
 								>
-									<PencilSimple weight="duotone" className="h-4 w-4" />
+									<PencilSimple weight="regular" className="h-4 w-4" />
 								</BaseButton>
 							</div>
 						</div>
@@ -513,7 +513,7 @@ export default function OnboardingPageComponent({
 										/>
 										{usernameValidation.isChecking && (
 											<span className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-2">
-												<SpinnerGap weight="duotone" className="h-4 w-4 animate-spin text-muted-foreground" />
+												<SpinnerGap weight="regular" className="h-4 w-4 animate-spin text-muted-foreground" />
 											</span>
 										)}
 									</div>
@@ -649,9 +649,9 @@ export default function OnboardingPageComponent({
 								onClick={handleComplete}
 							>
 								{loading ? (
-									<SpinnerGap weight="duotone" className="h-4 w-4 animate-spin" />
+									<SpinnerGap weight="regular" className="h-4 w-4 animate-spin" />
 								) : (
-									<Check weight="duotone" className="h-4 w-4" />
+									<Check weight="regular" className="h-4 w-4" />
 								)}
 								Concluir e ir para o Studio
 							</BaseButton>

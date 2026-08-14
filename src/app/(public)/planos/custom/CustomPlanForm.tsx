@@ -61,7 +61,7 @@ function SuccessState() {
 			<CardContent className="pt-8">
 				<div className="space-y-6 text-center">
 					<div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-						<CheckCircle weight="duotone" className="h-8 w-8 text-green-600" />
+						<CheckCircle weight="regular" className="h-8 w-8 text-green-600" />
 					</div>
 
 					<div className="space-y-4">

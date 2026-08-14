@@ -60,7 +60,7 @@ const VerPerfilMobile = () => {
 					variant="green"
 				>
 					<span className="flex items-center gap-2">
-						<ArrowSquareOut weight="duotone" className="h-4 w-4" />
+						<ArrowSquareOut weight="regular" className="h-4 w-4" />
 						Compartilhar
 					</span>
 				</BaseButton>
@@ -98,7 +98,7 @@ const VerPerfilMobile = () => {
 								size="sm"
 								variant="white"
 							>
-								<Download weight="duotone" className="mr-2 size-4" />
+								<Download weight="regular" className="mr-2 size-4" />
 								Baixar PNG
 							</BaseButton>
 						</div>
@@ -112,7 +112,7 @@ const VerPerfilMobile = () => {
 						variant="default"
 					>
 						<Link href={profileUrl} rel="noopener noreferrer" target="_blank">
-							<ArrowSquareOut weight="duotone" className="mr-2 size-4" />
+							<ArrowSquareOut weight="regular" className="mr-2 size-4" />
 							Abrir
 						</Link>
 					</BaseButton>

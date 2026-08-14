@@ -79,12 +79,12 @@ export default function VerifyNewEmailClient() {
 			</CardHeader>
 			<CardContent className="flex flex-col items-center justify-center space-y-6">
 				{status === "loading" && (
-					<SpinnerGap weight="duotone" className="h-12 w-12 animate-spin text-primary" />
+					<SpinnerGap weight="regular" className="h-12 w-12 animate-spin text-primary" />
 				)}
 				{status === "success" && (
-					<CheckCircle weight="duotone" className="h-12 w-12 text-green-500" />
+					<CheckCircle weight="regular" className="h-12 w-12 text-green-500" />
 				)}
-				{status === "error" && <XCircle weight="duotone" className="h-12 w-12 text-red-500" />}
+				{status === "error" && <XCircle weight="regular" className="h-12 w-12 text-red-500" />}
 
 				{(status === "success" || status === "error") && (
 					<Link href="/studio/configs" passHref>

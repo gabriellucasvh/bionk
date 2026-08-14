@@ -51,7 +51,7 @@ function BottomSheetContent({
 			<BottomSheetOverlay />
 			<RadixDialogContent
 				className={cn(
-					"data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:-translate-x-1/2 sm:-translate-y-1/2 fixed right-0 bottom-0 left-0 z-50 w-screen rounded-t-3xl border-t bg-background p-6 shadow-lg duration-300 ease-out data-[state=closed]:animate-out data-[state=open]:animate-in sm:top-1/2 sm:right-auto sm:left-1/2 sm:w-full sm:max-w-lg sm:rounded-3xl sm:border",
+					"data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:-translate-x-1/2 sm:-translate-y-1/2 fixed right-0 bottom-0 left-0 z-50 w-screen rounded-t-3xl border-t bg-background p-6  duration-300 ease-out data-[state=closed]:animate-out data-[state=open]:animate-in sm:top-1/2 sm:right-auto sm:left-1/2 sm:w-full sm:max-w-lg sm:rounded-3xl sm:",
 					className
 				)}
 				data-slot="bottom-sheet-content"
@@ -67,7 +67,7 @@ function BottomSheetContent({
 				{children}
 				{showCloseButton && (
 					<RadixDialogClose className="absolute top-4 right-4 rounded-full p-1 opacity-70 ring-offset-background transition-opacity hover:bg-muted-foreground/20 hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0">
-						<X weight="duotone" />
+						<X weight="regular" />
 						<span className="sr-only">Close</span>
 					</RadixDialogClose>
 				)}

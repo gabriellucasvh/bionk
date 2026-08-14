@@ -166,7 +166,7 @@ export default function VideoPlayer({
 							type="button"
 						>
 							<span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-white/60 shadow-lg backdrop-blur-md transition-all hover:bg-white/90 active:scale-[0.98]">
-								<Play weight="duotone" className="h-7 w-7 fill-current text-black/90" />
+								<Play weight="regular" className="h-7 w-7 fill-current text-black/90" />
 							</span>
 						</button>
 					</>
@@ -215,7 +215,7 @@ export default function VideoPlayer({
 							type="button"
 						>
 							<span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-white/60 shadow-lg backdrop-blur-md transition-all hover:bg-white/90 active:scale-[0.98]">
-								<Play weight="duotone" className="h-7 w-7 fill-current text-black/90" />
+								<Play weight="regular" className="h-7 w-7 fill-current text-black/90" />
 							</span>
 						</button>
 					</>
@@ -261,7 +261,7 @@ export default function VideoPlayer({
 							type="button"
 						>
 							<span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-white/60 shadow-lg backdrop-blur-md transition-all hover:bg-white/90 active:scale-[0.98]">
-								<Play weight="duotone" className="h-7 w-7 fill-current text-black/90" />
+								<Play weight="regular" className="h-7 w-7 fill-current text-black/90" />
 							</span>
 						</button>
 					</>
@@ -326,7 +326,7 @@ export default function VideoPlayer({
 							type="button"
 						>
 							<span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-white/60 shadow-lg backdrop-blur-md transition-all hover:bg-white/90 active:scale-[0.98]">
-								<Play weight="duotone" className="h-7 w-7 fill-current text-black/90" />
+								<Play weight="regular" className="h-7 w-7 fill-current text-black/90" />
 							</span>
 						</button>
 					</>

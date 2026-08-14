@@ -118,7 +118,7 @@ export default function NovaSenhaClient({ token }: { token?: string }) {
             }}
             type="button"
           >
-            {showPwd ? <EyeClosed weight="duotone" className="h-5 w-5" /> : <Eye weight="duotone" className="h-5 w-5" />}
+            {showPwd ? <EyeClosed weight="regular" className="h-5 w-5" /> : <Eye weight="regular" className="h-5 w-5" />}
           </button>
         </div>
       </div>
@@ -141,7 +141,7 @@ export default function NovaSenhaClient({ token }: { token?: string }) {
             }}
             type="button"
           >
-            {showConfirm ? <EyeClosed weight="duotone" className="h-5 w-5" /> : <Eye weight="duotone" className="h-5 w-5" />}
+            {showConfirm ? <EyeClosed weight="regular" className="h-5 w-5" /> : <Eye weight="regular" className="h-5 w-5" />}
           </button>
         </div>
       </div>

@@ -128,7 +128,7 @@ export default function ChangePasswordForm() {
 
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
-              <SpinnerGap weight="duotone" className="mr-2 h-4 w-4 animate-spin" />
+              <SpinnerGap weight="regular" className="mr-2 h-4 w-4 animate-spin" />
             ) : null}
             {isLoading ? "Alterando..." : "Alterar Senha"}
           </Button>

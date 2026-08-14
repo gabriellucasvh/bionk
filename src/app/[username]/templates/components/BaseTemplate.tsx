@@ -266,7 +266,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 							onClick={() => setShareModalOpen(true)}
 							type="button"
 						>
-							<ArrowSquareOut weight="duotone"
+							<ArrowSquareOut weight="regular"
 								className="size-4.5 text-black"
 								strokeWidth={1.5}
 							/>

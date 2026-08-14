@@ -163,7 +163,7 @@ export default function OnboardingPage() {
 			}
 
 			// Redirecionar para o perfil
-			router.push("/studio/perfil");
+			router.push("/studio");
 		} finally {
 			setIsLoading(false);
 		}
@@ -179,7 +179,7 @@ export default function OnboardingPage() {
 			return;
 		}
 		if (session.user.onboardingCompleted) {
-			router.push("/studio/perfil");
+			router.push("/studio");
 			return;
 		}
 	}, [session, status, router]);

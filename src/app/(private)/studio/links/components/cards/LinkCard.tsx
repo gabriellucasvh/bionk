@@ -89,7 +89,7 @@ const CountdownTimer = ({
 	}
 	return (
 		<div className="flex items-center gap-1 text-center font-semibold text-green-700 text-sm">
-			<Clock weight="duotone" className="h-4 w-4" />
+			<Clock weight="regular" className="h-4 w-4" />
 			<span>{prefix}: </span>
 			<span>{`${days}d ${hours}h ${minutes}m ${seconds}s`}</span>
 		</div>
@@ -220,7 +220,7 @@ const EditingView = ({
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300">
-									<Lock weight="duotone" className="h-5 w-5" />
+									<Lock weight="regular" className="h-5 w-5" />
 								</div>
 								<div>
 									<div className="font-medium">Proteger com Senha</div>
@@ -265,7 +265,7 @@ const EditingView = ({
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
-									<CursorClick weight="duotone" className="h-5 w-5" />
+									<CursorClick weight="regular" className="h-5 w-5" />
 								</div>
 								<div>
 									<div className="font-medium">Limite de Cliques</div>
@@ -308,7 +308,7 @@ const EditingView = ({
 								<div className="flex items-center justify-between gap-3 rounded-md border bg-background/50 p-3">
 									<div className="flex items-center gap-3">
 										<div className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
-											<DotsThreeVertical weight="duotone" className="h-5 w-5" />
+											<DotsThreeVertical weight="regular" className="h-5 w-5" />
 										</div>
 										<div>
 											<div className="font-medium">
@@ -332,7 +332,7 @@ const EditingView = ({
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
-									<Tag weight="duotone" className="h-5 w-5" />
+									<Tag weight="regular" className="h-5 w-5" />
 								</div>
 								<div>
 									<div className="font-medium">Adicionar Badge</div>
@@ -379,7 +379,7 @@ const EditingView = ({
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
-									<CalendarPlus weight="duotone" className="h-5 w-5" />
+									<CalendarPlus weight="regular" className="h-5 w-5" />
 								</div>
 								<div>
 									<div className="flex items-center gap-2">
@@ -426,7 +426,7 @@ const EditingView = ({
 													) : (
 														<span>Escolha uma data</span>
 													)}
-													<CalendarPlus weight="duotone" className="ml-2 h-4 w-4" />
+													<CalendarPlus weight="regular" className="ml-2 h-4 w-4" />
 												</Button>
 											</PopoverTrigger>
 											<PopoverContent
@@ -501,7 +501,7 @@ const EditingView = ({
 						<div className="flex items-center justify-between gap-3">
 							<div className="flex items-center gap-3">
 								<div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-									<CalendarMinus weight="duotone" className="h-5 w-5" />
+									<CalendarMinus weight="regular" className="h-5 w-5" />
 								</div>
 								<div>
 									<div className="flex items-center gap-2">
@@ -549,7 +549,7 @@ const EditingView = ({
 														) : (
 															<span>Escolha uma data</span>
 														)}
-														<CalendarMinus weight="duotone" className="ml-2 h-4 w-4" />
+														<CalendarMinus weight="regular" className="ml-2 h-4 w-4" />
 													</Button>
 												</PopoverTrigger>
 												<PopoverContent
@@ -619,7 +619,7 @@ const EditingView = ({
 								<div className="flex items-center justify-between gap-3 rounded-md border bg-background/50 p-3">
 									<div className="flex items-center gap-3">
 										<div className="flex h-9 w-9 items-center justify-center rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
-											<DotsThreeVertical weight="duotone" className="h-5 w-5" />
+											<DotsThreeVertical weight="regular" className="h-5 w-5" />
 										</div>
 										<div>
 											<div className="font-medium">
@@ -740,7 +740,7 @@ const LinkActionButtons = ({
 			}
 			variant="ghost"
 		>
-			<Image weight="duotone" className="h-4 w-4" />
+			<Image weight="regular" className="h-4 w-4" />
 		</Button>
 		{/* Botão de animação: comportamentos para mobile vs desktop */}
 		<AnimationToggle
@@ -750,7 +750,7 @@ const LinkActionButtons = ({
 			toggleAnimation={toggleAnimation}
 		/>
 		<Badge className="flex flex-shrink-0 items-center gap-1" variant="outline">
-			<CursorClick weight="duotone" className="h-3 w-3" />
+			<CursorClick weight="regular" className="h-3 w-3" />
 			<span className="hidden sm:inline">
 				{(link.clicks || 0).toLocaleString()}
 			</span>
@@ -956,7 +956,7 @@ const AnimationToggle = ({
 					}
 					variant="ghost"
 				>
-					<Lightning weight="duotone" className="h-4 w-4" />
+					<Lightning weight="regular" className="h-4 w-4" />
 				</Button>
 				<MobileBottomSheet
 					dragY={dragY}
@@ -1020,7 +1020,7 @@ const AnimationToggle = ({
 					}
 					variant="ghost"
 				>
-					<Lightning weight="duotone" className="h-4 w-4" />
+					<Lightning weight="regular" className="h-4 w-4" />
 				</Button>
 			</AlertDialogTrigger>
 			<AlertDialogContent className="rounded-3xl">
@@ -1028,7 +1028,7 @@ const AnimationToggle = ({
 					aria-label="Fechar"
 					className="absolute top-4 right-4 inline-flex h-7 w-7 items-center justify-center rounded-full border-none bg-white p-0 opacity-70 ring-offset-background transition-opacity hover:bg-muted-foreground/20 hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none dark:bg-zinc-800 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0"
 				>
-					<X weight="duotone" className="h-4 w-4" />
+					<X weight="regular" className="h-4 w-4" />
 				</AlertDialogCancel>
 				<AlertDialogHeader>
 					<AlertDialogTitle>
@@ -1107,7 +1107,7 @@ const DisplayView = (props: LinkCardProps) => {
 					{...listeners}
 					className="cursor-grab touch-none pt-1"
 				>
-					<DotsSix weight="duotone" className="h-5 w-5 text-muted-foreground" />
+					<DotsSix weight="regular" className="h-5 w-5 text-muted-foreground" />
 				</div>
 				<div className="flex-1 space-y-2">
 					<header className="flex items-center gap-3">
@@ -1133,7 +1133,7 @@ const DisplayView = (props: LinkCardProps) => {
 									platform.bgColor
 								)}
 							>
-								<LinkIcon weight="duotone" className="h-4 w-4 text-white dark:text-bunker-950" />
+								<LinkIcon weight="regular" className="h-4 w-4 text-white dark:text-bunker-950" />
 							</div>
 						)}
 						<span className="font-medium text-sm">{platform.name}</span>
@@ -1149,7 +1149,7 @@ const DisplayView = (props: LinkCardProps) => {
 							)}
 							{link.badge && <Badge variant="secondary">{link.badge}</Badge>}
 							{link.password && (
-								<Lock weight="duotone" className="h-3 w-3 text-muted-foreground" />
+								<Lock weight="regular" className="h-3 w-3 text-muted-foreground" />
 							)}
 						</div>
 					)}
@@ -1218,22 +1218,22 @@ const DisplayView = (props: LinkCardProps) => {
 								size="icon"
 								variant="ghost"
 							>
-								<DotsThreeVertical weight="duotone" className="h-4 w-4" />
+								<DotsThreeVertical weight="regular" className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuItem onClick={() => onStartEditing(link.id)}>
-								<PencilSimple weight="duotone" className="mr-2 h-4 w-4" /> Editar
+								<PencilSimple weight="regular" className="mr-2 h-4 w-4" /> Editar
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem onClick={() => onArchiveLink(link.id)}>
-								<ArchiveBox weight="duotone" className="mr-2 h-4 w-4" /> Arquivar
+								<ArchiveBox weight="regular" className="mr-2 h-4 w-4" /> Arquivar
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								className="text-destructive"
 								onClick={() => onDeleteLink(link.id)}
 							>
-								<Trash weight="duotone" className="mr-2 h-4 w-4" /> Deletar
+								<Trash weight="regular" className="mr-2 h-4 w-4" /> Deletar
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

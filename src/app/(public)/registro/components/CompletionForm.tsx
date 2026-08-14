@@ -246,9 +246,9 @@ export function CompletionForm({
 						type="button"
 					>
 						{showPassword ? (
-							<EyeClosed weight="duotone" className="h-5 w-5" />
+							<EyeClosed weight="regular" className="h-5 w-5" />
 						) : (
-							<Eye weight="duotone" className="h-5 w-5" />
+							<Eye weight="regular" className="h-5 w-5" />
 						)}
 					</button>
 				</div>

@@ -29,11 +29,10 @@ const Hero = () => {
 	};
 
 	return (
-		<div className="relative h-[650px] w-full overflow-hidden bg-bunker-50 pt-56 sm:h-[720px] sm:pt-32 md:h-[780px] md:pt-90">
+		<div className="relative h-[650px] w-full overflow-hidden bg-[#d2f34c] pt-56 sm:h-[720px] sm:pt-32 md:h-[780px] md:pt-90">
 			<div className="container relative z-10 mx-auto mt-0 flex h-full max-w-7xl flex-col items-center justify-center px-4 py-10 sm:mt-0 sm:px-6 lg:px-8">
-				{/* ... (título, texto e botões - sem alterações) ... */}
 				<div
-					className={`-translate-x-1 -translate-y-1 mt-1 mb-4 block transform px-4 py-1 text-sky-400 text-sm uppercase tracking-[4px] transition-all duration-700 ${
+					className={`-translate-x-1 -translate-y-1 mt-1 mb-6 block transform rounded-full bg-white px-5 py-2 font-bold text-black text-xs uppercase tracking-[4px] transition-all duration-700 ${
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 				>
@@ -41,7 +40,7 @@ const Hero = () => {
 				</div>
 
 				<h1
-					className={`title mb-6 max-w-4xl text-center font-semibold text-4xl text-bunker-950 transition-all duration-700 sm:text-5xl md:text-5xl ${
+					className={`title mb-6 max-w-4xl text-center font-black text-5xl text-black transition-all duration-700 sm:text-6xl md:text-7xl ${
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 					style={{ transitionDelay: "100ms" }}
@@ -50,7 +49,7 @@ const Hero = () => {
 				</h1>
 
 				<p
-					className={`mb-8 max-w-2xl text-center text-base text-bunker-700 transition-all duration-700 sm:text-lg ${
+					className={`mb-8 max-w-2xl text-center font-medium text-black/80 text-lg transition-all duration-700 sm:text-xl ${
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 					style={{ transitionDelay: "200ms" }}
@@ -61,28 +60,29 @@ const Hero = () => {
 				</p>
 
 				<div
-					className={`flex flex-row items-center gap-2 transition-all duration-700 ${
+					className={`flex flex-row items-center gap-4 transition-all duration-700 ${
 						isLoaded ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
 					}`}
 					style={{ transitionDelay: "300ms" }}
 				>
 					<BaseButton
+						className="rounded-full bg-white font-bold text-black hover:bg-gray-100"
 						disabled={isClicked["/descubra"]}
 						onClick={() => handleClick("/descubra")}
 						variant="white"
 					>
 						<span className="flex items-center">
-							Saiba mais <ArrowSquareOut weight="duotone" className="ml-2 h-4 w-4" />
+							Saiba mais <ArrowSquareOut weight="bold" className="ml-2 h-5 w-5" />
 						</span>
 					</BaseButton>
 					<BaseButton
-						className="bg-sky-300 text-black hover:bg-sky-400"
+						className="rounded-full bg-sky-400 font-bold text-black hover:bg-sky-500"
 						disabled={isClicked["/registro"]}
 						onClick={() => handleClick("/registro")}
 					>
 						<span className="relative z-10 flex items-center">
 							Comece Grátis{" "}
-							<ArrowRight weight="duotone" className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+							<ArrowRight weight="bold" className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
 						</span>
 					</BaseButton>
 				</div>

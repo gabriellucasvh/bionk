@@ -429,7 +429,7 @@ const SocialLinksTabContent = ({
 							onClick={() => setIsMoreModalOpen(true)}
 							variant="outline"
 						>
-							<Plus weight="duotone" className="h-7 w-7" />
+							<Plus weight="regular" className="h-7 w-7" />
 						</Button>
 					</div>
 				</div>
@@ -682,7 +682,7 @@ const SocialLinksTabContent = ({
 														size="icon"
 														variant="ghost"
 													>
-														<PencilSimple weight="duotone" className="h-4 w-4" />
+														<PencilSimple weight="regular" className="h-4 w-4" />
 													</Button>
 													<Button
 														className="h-8 w-8 text-destructive hover:text-destructive/80"
@@ -692,12 +692,12 @@ const SocialLinksTabContent = ({
 														variant="ghost"
 													>
 														{deletingLinkId === link.id ? (
-															<SpinnerGap weight="duotone"
+															<SpinnerGap weight="regular"
 																aria-label="Deletando..."
 																className="h-4 w-4 animate-spin"
 															/>
 														) : (
-															<Trash weight="duotone" className="h-4 w-4" />
+															<Trash weight="regular" className="h-4 w-4" />
 														)}
 													</Button>
 												</div>

@@ -625,7 +625,7 @@ export function DesignPanel() {
 										type="button"
 									>
 										<span className="flex h-6 w-6 items-center justify-center rounded-full bg-white">
-											<Plus weight="duotone" className="h-4 w-4" />
+											<Plus weight="regular" className="h-4 w-4" />
 										</span>
 									</button>
 									{gradientBaseColor && (

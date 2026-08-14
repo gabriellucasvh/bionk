@@ -104,7 +104,7 @@ function Login() {
 	};
 
 	const renderTurnstile = async () => {
-		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		const siteKey = null; // process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 		if (!siteKey) {
 			return null;
 		}
@@ -132,7 +132,7 @@ function Login() {
 	};
 
 	const getCaptchaToken = async (): Promise<string | null> => {
-		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		const siteKey = null; // process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 		if (!siteKey) {
 			return null;
 		}
@@ -174,7 +174,7 @@ function Login() {
 			if (result?.error) {
 				setMessage("Credenciais inválidas. Tente novamente.");
 			} else {
-				router.replace("/studio/perfil");
+				router.replace("/studio");
 			}
 		} catch {
 			setMessage("Ocorreu um erro durante o login");
@@ -247,7 +247,7 @@ function Login() {
 										onClick={() => setShowPassword(!showPassword)}
 										type="button"
 									>
-										{showPassword ? <EyeClosed weight="duotone" size={20} /> : <Eye weight="duotone" size={20} />}
+										{showPassword ? <EyeClosed weight="regular" size={20} /> : <Eye weight="regular" size={20} />}
 									</button>
 								</div>
 								{/* Espaço reservado para mensagem de erro da senha */}

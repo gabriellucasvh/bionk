@@ -261,7 +261,7 @@ export default function QrcodeStudioPage() {
 									setIsLogoCropModalOpen(true);
 								}}
 							>
-								<PhosphorImage weight="duotone" className="h-4 w-6" /> Usar logo
+								<PhosphorImage weight="regular" className="h-4 w-6" /> Usar logo
 							</BaseButton>
 							{logoUrl && (
 								<div className="flex items-center gap-2">
@@ -303,7 +303,7 @@ export default function QrcodeStudioPage() {
 									type="button"
 								>
 									<span className="flex h-5 w-5 items-center justify-center rounded-full bg-white">
-										<Plus weight="duotone" className="h-4 w-4" />
+										<Plus weight="regular" className="h-4 w-4" />
 									</span>
 								</button>
 								<button
@@ -397,7 +397,7 @@ export default function QrcodeStudioPage() {
 												size="sm"
 												variant="outline"
 											>
-												<Copy weight="duotone" />
+												<Copy weight="regular" />
 											</Button>
 											<span className="-translate-x-1/2 -top-8 sm:-top-10 pointer-events-none absolute left-1/2 z-50 whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
 												Copiar
@@ -418,7 +418,7 @@ export default function QrcodeStudioPage() {
 												size="sm"
 												variant="outline"
 											>
-												<ArrowSquareOut weight="duotone" />
+												<ArrowSquareOut weight="regular" />
 											</Button>
 											<span className="-translate-x-1/2 -top-8 sm:-top-10 pointer-events-none absolute left-1/2 z-50 whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
 												Abrir
@@ -427,7 +427,7 @@ export default function QrcodeStudioPage() {
 										<span className="group relative inline-flex">
 											<a className="inline-flex" download href={it.url}>
 												<Button size="sm" variant="outline">
-													<Download weight="duotone" />
+													<Download weight="regular" />
 												</Button>
 											</a>
 											<span className="-translate-x-1/2 -top-8 sm:-top-10 pointer-events-none absolute left-1/2 z-50 whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -440,7 +440,7 @@ export default function QrcodeStudioPage() {
 												size="sm"
 												variant="destructive"
 											>
-												<Trash weight="duotone" />
+												<Trash weight="regular" />
 											</Button>
 											<span className="-translate-x-1/2 -top-8 sm:-top-10 pointer-events-none absolute left-1/2 z-50 whitespace-nowrap rounded-full bg-black/90 px-3 py-2 text-sm text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
 												Excluir

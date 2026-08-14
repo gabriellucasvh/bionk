@@ -11,7 +11,7 @@ export default function ShareButton({ onClick }: { onClick: () => void }) {
 				onClick={onClick}
 				type="button"
 			>
-				<ArrowSquareOut weight="duotone"
+				<ArrowSquareOut weight="regular"
 					className="size-4.5 text-black"
 					strokeWidth={1.5}
 				/>

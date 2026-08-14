@@ -114,7 +114,7 @@ export default function LinksList({
 								onMouseLeave={handleMouseLeave}
 								type="button"
 							>
-								<Lock weight="duotone" className="size-5" />
+								<Lock weight="regular" className="size-5" />
 							</button>
 
 							{/* Tooltip responsivo */}

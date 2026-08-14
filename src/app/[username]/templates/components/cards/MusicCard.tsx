@@ -161,7 +161,7 @@ export default function MusicCard({
 					}}
 					type="button"
 				>
-					<DotsThreeVertical weight="duotone" className="size-5" style={buttonTextColorStyle} />
+					<DotsThreeVertical weight="regular" className="size-5" style={buttonTextColorStyle} />
 				</button>
 				{/* Modal de opções */}
 				{optionsOpen && (

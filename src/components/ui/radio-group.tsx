@@ -26,7 +26,7 @@ function RadioGroupItem({
 		<RadioGroupPrimitive.Item
 			className={cn(
 				// Center the indicator inside the radio circle
-				"peer flex h-4 w-4 items-center justify-center rounded-full border border-input text-foreground outline-hidden focus-visible:border-ring focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
+				"peer flex h-4 w-4 items-center justify-center rounded-full   text-foreground outline-hidden focus-visible:border-ring focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
 				className
 			)}
 			data-slot="radio-group-item"
