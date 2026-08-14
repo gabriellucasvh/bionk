@@ -70,9 +70,6 @@ export default function Studio() {
 						<Plus className="size-6" weight="bold" />
 					</div>
 					<span className="font-semibold">Criar nova página</span>
-					<span className="mt-2 text-xs opacity-60">
-						1 de 10 páginas grátis
-					</span>
 				</div>
 			</div>
 		</div>
