@@ -310,7 +310,7 @@ const Sidebar = () => {
 				const Icon = link.icon;
 				return (
 					<Button
-						className={`h-10 w-full justify-start rounded-lg px-3 font-medium text-sm transition-all ${
+						className={`h-8 w-full justify-start rounded-lg px-3 font-medium text-sm transition-all ${
 							isActive
 								? "bg-zinc-200 text-black dark:bg-zinc-700 dark:text-white"
 								: "text-zinc-700 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-700"
@@ -348,7 +348,7 @@ const Sidebar = () => {
 							width={90}
 						/>
 					</Link>
-					<button className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800">
+					<button className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800" type="button">
 						<Bell className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
 					</button>
 				</header>
@@ -388,14 +388,14 @@ const Sidebar = () => {
 					<h3 className="mb-2 px-3 font-semibold text-xs text-zinc-400 tracking-wider dark:text-zinc-300">
 						Studio
 					</h3>
-					<nav className="space-y-1">{renderNavLinks(mainLinks)}</nav>
+					<nav className="space-y-0.5">{renderNavLinks(mainLinks)}</nav>
 				</div>
 
 				<div className="mt-5">
 					<h3 className="mb-2 px-3 font-semibold text-xs text-zinc-400 tracking-wider dark:text-zinc-300">
 						Ferramentas
 					</h3>
-					<nav className="space-y-1">{renderNavLinks(toolsLinks)}</nav>
+					<nav className="space-y-0.5">{renderNavLinks(toolsLinks)}</nav>
 				</div>
 
 				{/* Perfil */}
