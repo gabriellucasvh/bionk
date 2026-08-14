@@ -5,15 +5,15 @@ import {
 	ArrowSquareOut,
 	Bell,
 	ChartBar,
+	DotsThreeVerticalIcon,
 	Download,
-	ImagesSquare,
 	Link as LinkIcon,
 	PaintBrush,
 	Palette,
 	QrCode,
 	ShareNetwork,
 	SquaresFour,
-	User,
+	Stack,
 } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import Link from "next/link";
@@ -139,7 +139,7 @@ const mainLinks: SidebarLink[] = [
 		key: "profile",
 		href: "/studio",
 		label: "Studio",
-		icon: User,
+		icon: Stack,
 	},
 	{
 		key: "links",
@@ -320,7 +320,7 @@ const Sidebar = () => {
 						variant="ghost"
 					>
 						<Icon
-							className="mr-3 h-5 w-5 md:h-4 md:w-4"
+							className="h-5 w-5 md:h-4 md:w-4"
 							weight={isActive ? "duotone" : "regular"}
 						/>
 						{link.label}
@@ -333,7 +333,7 @@ const Sidebar = () => {
 	return (
 		<>
 			{/* Sidebar desktop */}
-			<aside className="hidden px-3 transition-colors md:fixed md:inset-y-0 md:left-0 md:flex md:w-64 md:flex-col md:border-r md:bg-zinc-50/70 md:backdrop-blur-lg dark:md:border-zinc-700 dark:md:bg-zinc-900">
+			<aside className="hidden px-3 transition-colors md:fixed md:inset-y-0 md:left-0 md:flex md:w-60 md:flex-col md:border-r md:bg-zinc-50/70 md:backdrop-blur-lg dark:md:border-zinc-700 dark:md:bg-zinc-900">
 				<header className="flex h-16 items-center justify-between border-b pr-2 pl-2 dark:border-zinc-700">
 					<Link className="flex items-center gap-2 font-semibold" href="/">
 						<Image
@@ -348,7 +348,10 @@ const Sidebar = () => {
 							width={90}
 						/>
 					</Link>
-					<button className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800" type="button">
+					<button
+						className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
+						type="button"
+					>
 						<Bell className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
 					</button>
 				</header>
@@ -446,7 +449,7 @@ const Sidebar = () => {
 									</span>
 								)}
 							</div>
-							<ImagesSquare
+							<DotsThreeVerticalIcon
 								className="h-5 w-5 text-zinc-500 dark:text-zinc-300"
 								weight="regular"
 							/>
