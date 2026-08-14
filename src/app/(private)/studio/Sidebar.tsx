@@ -37,6 +37,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSubscription } from "@/providers/subscriptionProvider";
 import { useTheme } from "@/providers/themeProvider";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const ProfileActionsDropdown = ({
 	profileUrl,
@@ -192,6 +195,14 @@ const Sidebar = () => {
 
 	const username = session?.user?.username;
 	const isLoading = !(session?.user && username);
+
+	const { data: profilesData } = useSWR("/api/profile/all", fetcher);
+	const profiles = profilesData?.profiles || [];
+
+	const handleSwitchProfile = (profileId: string) => {
+		document.cookie = `bionk_active_profile_id=${profileId}; path=/; max-age=2592000; SameSite=Lax`;
+		window.location.href = "/studio/design";
+	};
 
 	// Função para buscar dados atuais do usuário
 	const fetchCurrentUserData = useCallback(async () => {
@@ -387,60 +398,95 @@ const Sidebar = () => {
 					<nav className="space-y-0.5">{renderNavLinks(toolsLinks)}</nav>
 				</div>
 
-				{/* Perfil */}
-				<div
-					className="mt-auto mb-3 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-600 "
-					onClick={() => router.push("/studio/configs")}
-					role="none"
-				>
-					{isLoading ? (
-						<Skeleton className="h-12 w-12 rounded-full" />
-					) : (
-						<>
-							<Image
-								alt="Avatar"
-								className="rounded-full"
-								height={42}
-								src={
-									userImageUrl || session?.user?.image
-										? imageKey > 0
-											? `${userImageUrl || session?.user?.image}?t=${imageKey}`
-											: `${userImageUrl || session?.user?.image}`
-										: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
-								}
-								width={42}
-							/>
-							<div className="flex flex-1 flex-col truncate">
-								<h2 className="truncate font-semibold text-sm dark:text-white">
-									{userName || session?.user?.name}
-								</h2>
-								{subscriptionPlan && (
-									<span
-										className={`mt-1 inline-block w-fit rounded-md px-2 py-0.5 font-medium text-[10px] capitalize ${(() => {
-											switch (subscriptionPlan) {
-												case "free":
-													return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";
-												case "basic":
-													return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
-												case "pro":
-													return "bg-radial-[at_50%_75%] from-yellow-500 via-purple-500 to-blue-500 text-white";
-												case "ultra":
-													return "bg-gradient-to-r from-blue-600 to-blue-500 text-white";
-												default:
-													return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";
+				{/* Switcher de Perfis */}
+				<div className="mt-auto mb-3">
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<div
+								className="flex cursor-pointer items-center gap-3 rounded-xl p-3 transition-colors duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-600 "
+								role="none"
+							>
+								{isLoading ? (
+									<Skeleton className="h-12 w-12 rounded-full" />
+								) : (
+									<>
+										<Image
+											alt="Avatar"
+											className="rounded-full"
+											height={42}
+											src={
+												userImageUrl || session?.user?.image
+													? imageKey > 0
+														? `${userImageUrl || session?.user?.image}?t=${imageKey}`
+														: `${userImageUrl || session?.user?.image}`
+													: "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
 											}
-										})()}`}
-									>
-										{subscriptionPlan}
-									</span>
+											width={42}
+										/>
+										<div className="flex flex-1 flex-col truncate">
+											<h2 className="truncate font-semibold text-sm dark:text-white">
+												{userName || session?.user?.name}
+											</h2>
+											{subscriptionPlan && (
+												<span
+													className={`mt-1 inline-block w-fit rounded-md px-2 py-0.5 font-medium text-[10px] capitalize ${(() => {
+														switch (subscriptionPlan) {
+															case "free":
+																return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";
+															case "basic":
+																return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
+															case "pro":
+																return "bg-radial-[at_50%_75%] from-yellow-500 via-purple-500 to-blue-500 text-white";
+															case "ultra":
+																return "bg-gradient-to-r from-blue-600 to-blue-500 text-white";
+															default:
+																return "bg-green-100 text-green-600 dark:bg-green-600 dark:text-green-100";
+														}
+													})()}`}
+												>
+													{subscriptionPlan}
+												</span>
+											)}
+										</div>
+										<DotsThreeVerticalIcon
+											className="h-5 w-5 text-zinc-500 dark:text-zinc-300"
+											weight="regular"
+										/>
+									</>
 								)}
 							</div>
-							<DotsThreeVerticalIcon
-								className="h-5 w-5 text-zinc-500 dark:text-zinc-300"
-								weight="regular"
-							/>
-						</>
-					)}
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-56 p-2">
+							<DropdownMenuLabel>Alternar Página</DropdownMenuLabel>
+							<DropdownMenuSeparator />
+							{profiles.map((p: any) => (
+								<DropdownMenuItem
+									key={p.id}
+									className="flex cursor-pointer items-center gap-3 py-2"
+									onClick={() => handleSwitchProfile(p.id)}
+								>
+									<Image
+										alt={p.username}
+										src={p.image || "https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"}
+										width={24}
+										height={24}
+										className="rounded-full"
+									/>
+									<div className="flex flex-col truncate">
+										<span className="font-medium text-sm truncate">{p.name}</span>
+										<span className="text-xs text-zinc-500 truncate">@{p.username}</span>
+									</div>
+								</DropdownMenuItem>
+							))}
+							<DropdownMenuSeparator />
+							<DropdownMenuItem 
+								className="cursor-pointer font-medium"
+								onClick={() => router.push("/studio/configs")}
+							>
+								Configurações da Conta
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</aside>
 

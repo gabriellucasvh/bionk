@@ -4,12 +4,12 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { profileSocialLinksTag, evictProfilePageCache } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 export async function POST(req: Request): Promise<NextResponse | Response> {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 	if (!session?.user?.id) {
 		return new Response("Unauthorized", { status: 401 });
 	}

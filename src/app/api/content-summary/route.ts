@@ -1,12 +1,12 @@
 // src/app/api/content-summary/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 export const runtime = "nodejs";
 
 export async function GET(_request: Request): Promise<NextResponse> {
-    const session = await getServerSession(authOptions);
+    const session = await getAppSession();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }

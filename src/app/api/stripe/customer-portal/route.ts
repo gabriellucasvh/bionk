@@ -1,6 +1,6 @@
 // src/app/api/stripe/customer-portal/route.ts
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import Stripe from "stripe";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -12,7 +12,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 
 export async function POST() {
 	try {
-		const session = await getServerSession(authOptions);
+		const session = await getAppSession();
 		if (!session?.user?.id) {
 			return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 		}

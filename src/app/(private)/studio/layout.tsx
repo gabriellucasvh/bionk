@@ -16,7 +16,7 @@ export default function StudioLayout({ children }: StudioLayoutProps) {
 	const { data: session, status } = useSession();
 	const router = useRouter();
 	const pathname = usePathname();
-	const isOnboardingPage = pathname.includes("/onboarding");
+	const isOnboardingPage = pathname.includes("/onboarding") || pathname.includes("/studio/new");
 
 	useEffect(() => {
 		if (status === "unauthenticated") {

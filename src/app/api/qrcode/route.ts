@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import {
 	buildAndCacheQr,
@@ -13,7 +13,7 @@ const URL_REGEX = /^https?:\/\/[\w.-]+(?::\d+)?(?:\/.*)?$/i;
 const HEX_COLOR_REGEX = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
 export async function POST(req: NextRequest) {
-	const session = (await getServerSession(authOptions as any)) as any;
+	const session = (await getAppSession()) as any;
 	const uid = session?.user?.id || null;
 	try {
 		const body = await req.json();

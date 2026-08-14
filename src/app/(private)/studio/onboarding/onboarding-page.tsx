@@ -45,6 +45,9 @@ interface OnboardingPageProps {
 	loading?: boolean;
 	error?: string | null;
 	isLoading?: boolean;
+	requireUsername?: boolean;
+	hideStep6?: boolean;
+	onCancel?: () => void;
 }
 
 export interface OnboardingData {
@@ -98,6 +101,9 @@ export default function OnboardingPageComponent({
 	initialData,
 	user,
 	loading = false,
+	requireUsername = false,
+	hideStep6 = false,
+	onCancel,
 }: OnboardingPageProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [currentStep, setCurrentStep] = useState<Step>(1);
@@ -126,6 +132,7 @@ export default function OnboardingPageComponent({
 	});
 	const [isTypingUsername, setIsTypingUsername] = useState(false);
 	const isGoogleUser =
+		requireUsername ||
 		user?.provider === "google" ||
 		Boolean(user?.googleId) ||
 		user?.status === "pending" ||
@@ -605,7 +612,7 @@ export default function OnboardingPageComponent({
 						<div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
 							<div
 								className="h-2 rounded-full bg-black transition-all duration-300"
-								style={{ width: `${(currentStep / STEPS.length) * 100}%` }}
+								style={{ width: `${(currentStep / (hideStep6 ? 5 : STEPS.length)) * 100}%` }}
 							/>
 						</div>
 						<p className="mt-2 text-gray-600 text-sm dark:text-gray-400">
@@ -622,19 +629,28 @@ export default function OnboardingPageComponent({
 				{/* Navigation */}
 				{currentStep !== 2 && (
 					<div className="flex items-center justify-between">
-						{currentStep > 1 ? (
-							<BaseButton
-								className="flex items-center gap-2"
-								onClick={handlePrevious}
-								variant="white"
-							>
-								Voltar
-							</BaseButton>
-						) : (
-							<div />
-						)}
+						<div className="flex items-center gap-4">
+							{currentStep > 1 && (
+								<BaseButton
+									className="flex items-center gap-2"
+									onClick={handlePrevious}
+									variant="white"
+								>
+									Voltar
+								</BaseButton>
+							)}
+							{onCancel && currentStep === 1 && (
+								<button
+									className="text-sm font-semibold text-zinc-900 dark:text-zinc-100"
+									onClick={onCancel}
+									type="button"
+								>
+									Cancelar
+								</button>
+							)}
+						</div>
 
-						{currentStep < STEPS.length ? (
+						{currentStep < (hideStep6 ? 5 : STEPS.length) ? (
 							<BaseButton
 								className="flex items-center gap-2"
 								disabled={!canProceedToNext()}
@@ -648,12 +664,12 @@ export default function OnboardingPageComponent({
 								disabled={loading || isSubmitting || !canProceedToNext()}
 								onClick={handleComplete}
 							>
-								{loading ? (
+								{loading || isSubmitting ? (
 									<SpinnerGap weight="regular" className="h-4 w-4 animate-spin" />
 								) : (
 									<Check weight="regular" className="h-4 w-4" />
 								)}
-								Concluir e ir para o Studio
+								{hideStep6 ? "Criar Perfil" : "Concluir e ir para o Studio"}
 							</BaseButton>
 						)}
 					</div>

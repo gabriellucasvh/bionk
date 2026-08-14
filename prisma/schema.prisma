@@ -72,6 +72,9 @@ model User {
   paymentMethodBrand            String?
   paymentMethodLastFour         String?
   bannedAt                      DateTime?
+  ownerId                       String?
+  owner                         User?                  @relation("UserOwner", fields: [ownerId], references: [id])
+  subUsers                      User[]                 @relation("UserOwner")
   accounts                      Account[]
   CustomPresets                 CustomPresets?
   Link                          Link[]

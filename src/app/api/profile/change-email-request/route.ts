@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import ChangeEmailVerificationEmail from "@/emails/change-email-verification-email";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -12,7 +12,7 @@ const resendApiKey = process.env.RESEND_API_KEY;
 
 export async function POST(req: Request): Promise<NextResponse> {
 	try {
-		const session = await getServerSession(authOptions);
+		const session = await getAppSession();
 		if (!session?.user?.id) {
 			return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 		}

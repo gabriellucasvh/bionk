@@ -8,10 +8,10 @@ import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 import { getTemplateInfo } from "@/utils/templatePresets";
 import OnboardingPageComponent, {
 	type OnboardingData,
-} from "../(private)/studio/onboarding/onboarding-page";
+} from "../onboarding/onboarding-page";
 
-export default function OnboardingPage() {
-	const { data: session, status, update } = useSession();
+export default function NewProfilePage() {
+	const { data: session, status } = useSession();
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -31,16 +31,6 @@ export default function OnboardingPage() {
 		setError(null);
 
 		try {
-			// Verificar se o username já existe
-			const checkResponse = await fetch(
-				`/api/auth/check-username?username=${encodeURIComponent(data.username)}`
-			);
-
-			if (!checkResponse.ok) {
-				const errorData = await checkResponse.json();
-				throw new Error(errorData.error || "Erro ao verificar username");
-			}
-
 			// Prepara payload JSON e converte imagem para base64, se existir
 			const payload: any = {
 				name: data.name,
@@ -52,13 +42,8 @@ export default function OnboardingPage() {
 				payload.profileImage = await fileToDataUrl(data.profileImage);
 			}
 
-			const isGoogle = Boolean(
-				session?.user?.provider === "google" || session?.user?.googleId
-			);
-			const completionEndpoint = isGoogle
-				? "/api/onboarding/complete"
-				: "/api/auth/complete-onboarding";
-			const response = await fetch(completionEndpoint, {
+			// Chamada para a nova rota de criação de perfil vinculado
+			const response = await fetch("/api/profile/create-linked", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -68,24 +53,16 @@ export default function OnboardingPage() {
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				throw new Error(errorData.error || "Erro ao completar onboarding");
+				throw new Error(errorData.error || "Erro ao criar nova página");
 			}
 
 			const result = await response.json();
+			const newProfileId = result.profile.id;
 
-			// Atualizar a sessão com os novos dados
-			await update({
-				user: {
-					...session?.user,
-					username: result.user.username ?? session?.user?.username,
-					name: result.user.name ?? session?.user?.name,
-					image: result.user.image ?? session?.user?.image,
-					onboardingCompleted: result.user.onboardingCompleted ?? true,
-					status: result.user.status ?? session?.user?.status,
-				},
-			});
+			// Definir o cookie com o ID do novo perfil para que as chamadas seguintes atuem sobre ele
+			document.cookie = `bionk_active_profile_id=${newProfileId}; path=/; max-age=2592000; SameSite=Lax`;
 
-			// Aplicar template escolhido
+			// Aplicar template escolhido no novo perfil
 			if (data.template) {
 				try {
 					const info = getTemplateInfo(data.template);
@@ -98,10 +75,11 @@ export default function OnboardingPage() {
 						}),
 					});
 				} catch {
-					// Não bloquear o fluxo caso falhe a aplicação do template
+					// Não bloquear o fluxo
 				}
 			}
 
+			// Salvar redes sociais no novo perfil
 			if (data.socialLinks && data.socialLinks.length > 0) {
 				const platformMap = new Map(SOCIAL_PLATFORMS.map((p) => [p.key, p]));
 				const socialPromises = data.socialLinks
@@ -125,19 +103,11 @@ export default function OnboardingPage() {
 					.filter(Boolean) as Promise<Response>[];
 
 				if (socialPromises.length > 0) {
-					const results = await Promise.all(socialPromises);
-					const failed = results.filter((r) => !r.ok);
-					if (failed.length > 0) {
-						const errors = await Promise.all(
-							failed.map((r) => r.json().catch(() => ({})))
-						);
-						const msg =
-							(errors[0] as any)?.error || "Erro ao salvar rede social";
-						throw new Error(msg);
-					}
+					await Promise.all(socialPromises);
 				}
 			}
 
+			// Salvar links customizados no novo perfil
 			if (data.customLinks && data.customLinks.length > 0) {
 				const linkPromises = data.customLinks.map((link) =>
 					fetch("/api/links", {
@@ -150,74 +120,45 @@ export default function OnboardingPage() {
 						}),
 					})
 				);
-				const results = await Promise.all(linkPromises);
-				const failed = results.filter((r) => !r.ok);
-				if (failed.length > 0) {
-					const errors = await Promise.all(
-						failed.map((r) => r.json().catch(() => ({})))
-					);
-					const msg =
-						(errors[0] as any)?.error || "Erro ao salvar link personalizado";
-					throw new Error(msg);
-				}
+				await Promise.all(linkPromises);
 			}
 
-			// Redirecionar para o perfil
-			router.push("/studio");
+			// Limpar o cookie para não afetar outras telas acidentalmente (ou deixá-lo ativo)
+			// Mas como a tela de sucesso vai referenciar o novo perfil, podemos mantê-lo ou limpá-lo.
+			// Na verdade, a tela de sucesso vai ler o query string.
+			
+			// Redirecionar para a tela de sucesso
+			router.push(`/studio/success?username=${encodeURIComponent(result.profile.username)}`);
+		} catch (err: any) {
+			setError(err.message);
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
-	// Redirecionar se não estiver autenticado
-	useEffect(() => {
-		if (status === "loading") {
-			return;
-		}
-		if (!session) {
-			router.push("/registro");
-			return;
-		}
-		if (session.user.onboardingCompleted) {
-			router.push("/studio");
-			return;
-		}
-	}, [session, status, router]);
-
 	if (status === "loading") {
 		return <LoadingPage />;
 	}
 
-	const canShowOnboarding =
-		Boolean(session) && !session?.user?.onboardingCompleted;
-
-	if (!canShowOnboarding) {
-		return <LoadingPage />;
+	if (!session) {
+		router.push("/login");
+		return null;
 	}
 
-	const user = session?.user || null;
-
 	return (
-		<OnboardingPageComponent
-			error={error}
-			initialData={{
-				name: user?.name ?? user?.username ?? "",
-				username: user?.username ?? "",
-			}}
-			isLoading={isLoading}
-			onComplete={handleOnboardingComplete}
-			user={
-				user
-					? {
-							id: user.id,
-							name: user.name || "",
-							email: user.email || "",
-							image: user.image,
-							onboardingCompleted: user.onboardingCompleted,
-						}
-					: undefined
-			}
-			onCancel={() => router.push("/")}
-		/>
+		<div className="bg-white dark:bg-zinc-950 min-h-screen">
+			<OnboardingPageComponent
+				error={error}
+				initialData={{
+					name: "",
+					username: "",
+				}}
+				isLoading={isLoading}
+				onComplete={handleOnboardingComplete}
+				requireUsername={true}
+				hideStep6={true}
+				onCancel={() => router.push("/studio")}
+			/>
+		</div>
 	);
 }

@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import Stripe from "stripe";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
 import { authOptions } from "@/lib/auth";
@@ -22,7 +22,7 @@ export async function GET(
 	_request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 	const { id } = await params;
 
 	if (session?.user?.id !== id) {
@@ -62,7 +62,7 @@ export async function PATCH(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 	const { id } = await params;
 
 	if (session?.user?.id !== id) {
@@ -115,7 +115,7 @@ export async function DELETE(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 	const { id } = await params;
 
 	if (session?.user?.id !== id) {
@@ -204,7 +204,7 @@ export async function PUT(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 	const { id } = await params;
 	if (session?.user?.id !== id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });

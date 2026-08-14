@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import {
 	evictProfilePageCache,
@@ -34,7 +34,7 @@ const VALID_TEMPLATES = [
 
 export async function POST(req: Request): Promise<NextResponse> {
 	try {
-		const session = await getServerSession(authOptions);
+		const session = await getAppSession();
 		if (!session?.user?.email) {
 			return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 		}

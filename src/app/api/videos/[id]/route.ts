@@ -1,6 +1,6 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import { evictProfilePageCache, profileVideosTag } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
@@ -105,7 +105,7 @@ export async function PUT(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 
 	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
@@ -232,7 +232,7 @@ export async function DELETE(
 	_request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 
 	if (!session?.user?.id) {
 		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
