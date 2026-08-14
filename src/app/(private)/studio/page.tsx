@@ -34,13 +34,27 @@ export default function Studio() {
 			<div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 				{/* Card da página principal */}
 				<div className="group relative flex flex-col overflow-hidden rounded-3xl border bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
-					{/* Área da miniatura com CSS Scale Trick */}
-					<div className="relative h-56 w-full overflow-hidden border-b bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950">
-						<div className="pointer-events-none absolute top-0 left-0 h-[200%] w-[200%] origin-top-left scale-50 select-none">
-							<UserPagePreview
-								customizations={userCustomizations}
-								userData={userData}
-							/>
+					{/* Área da miniatura simulando um celular */}
+					<div
+						className="relative flex h-64 w-full justify-center overflow-hidden border-zinc-100 border-b pt-8 dark:border-zinc-800"
+						style={{
+							background:
+								userCustomizations?.customBackgroundGradient ||
+								userCustomizations?.customBackgroundColor ||
+								"#f4f4f5",
+						}}
+					>
+						{/* Phone mockup scaled down */}
+						<div
+							className="relative z-10 origin-top rounded-[40px] shadow-2xl ring-1 ring-black/10 dark:ring-white/10"
+							style={{ transform: "scale(0.6)" }}
+						>
+							<div className="pointer-events-none h-[812px] w-[375px] select-none overflow-hidden rounded-[40px] bg-white dark:bg-zinc-950">
+								<UserPagePreview
+									customizations={userCustomizations}
+									userData={userData}
+								/>
+							</div>
 						</div>
 					</div>
 
@@ -54,13 +68,15 @@ export default function Studio() {
 								bionk.me/{userData.username}
 							</p>
 						</div>
-						<Link
-							className="flex items-center justify-center rounded-xl bg-zinc-100 p-3 text-black transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
-							href="/studio/design"
-							title="Editar Página"
-						>
-							<PencilSimple className="size-5" weight="bold" />
-						</Link>
+						<div className="flex items-center gap-2">
+							<Link
+								className="flex items-center justify-center rounded-full bg-zinc-100 px-5 py-2.5 font-semibold text-black transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
+								href="/studio/design"
+								title="Editar Página"
+							>
+								Editar
+							</Link>
+						</div>
 					</div>
 				</div>
 
