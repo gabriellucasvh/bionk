@@ -246,6 +246,25 @@ export default function OnboardingPageComponent({
 					`/api/auth/check-username?username=${encodeURIComponent(normalizeUsernameForLookup(username))}`,
 					{ signal: controller.signal }
 				);
+
+				if (!response.ok) {
+					if (response.status === 429) {
+						setUsernameValidation({
+							isValid: false,
+							message: "Muitas tentativas. Aguarde um momento.",
+							isChecking: false,
+						});
+					} else {
+						setUsernameValidation({
+							isValid: false,
+							message: "Erro ao verificar disponibilidade",
+							isChecking: false,
+						});
+					}
+					setIsTypingUsername(false);
+					return;
+				}
+
 				const result = await response.json();
 
 				// Final blacklist check before setting result (ultimate protection)
@@ -276,10 +295,10 @@ export default function OnboardingPageComponent({
 					});
 				}
 				setIsTypingUsername(false);
-			} catch (error) {
+			} catch (error: any) {
 				// Don't show error if request was aborted (user typed something else)
-				if (error instanceof Error && error.name === "AbortError") {
-					setIsTypingUsername(false);
+				if (error?.name === "AbortError" || error?.message?.includes("aborted")) {
+					// We don't set isTypingUsername to false here because a new request might have started
 					return;
 				}
 				setUsernameValidation({
@@ -289,7 +308,7 @@ export default function OnboardingPageComponent({
 				});
 				setIsTypingUsername(false);
 			}
-		}, 500);
+		}, 550);
 	}, []);
 
 	const handleUsernameChange = (value: string) => {
