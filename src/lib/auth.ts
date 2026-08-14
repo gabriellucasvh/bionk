@@ -246,7 +246,7 @@ export const authOptions: NextAuthOptions = {
 				let ip: string | null = null;
 				try {
 					const mod: any = await import("next/headers");
-					const hAny = mod.headers() as any;
+					const hAny = await mod.headers() as any;
 					const forwarded =
 						hAny.get("x-forwarded-for") ||
 						hAny.get("x-real-ip") ||
@@ -257,8 +257,16 @@ export const authOptions: NextAuthOptions = {
 					ip = null;
 				}
 
-				const { success } = await getAuthRateLimiter().limit(rawLogin);
-				if (!success) {
+				let rateLimiterSuccess = true;
+				try {
+					const { success } = await getAuthRateLimiter().limit(rawLogin);
+					rateLimiterSuccess = success;
+				} catch (err) {
+					console.error("Rate limiter falhou (Redis offline?):", err);
+					rateLimiterSuccess = true; // Se o Redis cair, permite login
+				}
+
+				if (!rateLimiterSuccess) {
 					try {
 						const maskEmail = (e: string) => {
 							const parts = e.split("@");
@@ -307,7 +315,7 @@ export const authOptions: NextAuthOptions = {
 					return null;
 				}
 
-				const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+				const turnstileSecret = null; // process.env.TURNSTILE_SECRET_KEY;
 				const captchaToken = (credentials as any).captchaToken as
 					| string
 					| undefined;

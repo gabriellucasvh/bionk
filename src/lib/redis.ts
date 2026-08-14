@@ -14,10 +14,12 @@ function getClient(): IORedis {
 		}
 		_client = new IORedis(url, {
 			maxRetriesPerRequest: 3,
-			enableOfflineQueue: false, // <-- IMPORTANTE: Falhar rápido em vez de travar infinitamente
+			enableOfflineQueue: true, // Habilita fila offline para o primeiro request não falhar enquanto conecta
 			lazyConnect: false,
 			retryStrategy(times) {
-				if (times > 10) return null;
+				if (times > 10) {
+					return null;
+				}
 				return Math.min(times * 100, 3000);
 			},
 		});
@@ -38,7 +40,9 @@ function getClient(): IORedis {
 class BionkRedis {
 	async get<T = string>(key: string): Promise<T | null> {
 		const raw = await getClient().get(key);
-		if (raw === null) return null;
+		if (raw === null) {
+			return null;
+		}
 		try {
 			return JSON.parse(raw) as T;
 		} catch {
@@ -49,7 +53,7 @@ class BionkRedis {
 	async set(
 		key: string,
 		value: unknown,
-		opts?: { ex?: number; nx?: boolean },
+		opts?: { ex?: number; nx?: boolean }
 	): Promise<void> {
 		const serialized =
 			typeof value === "string" ? value : JSON.stringify(value);
@@ -116,7 +120,7 @@ class BionkRedis {
 	async xadd(
 		key: string,
 		id: string,
-		fields: Record<string, string>,
+		fields: Record<string, string>
 	): Promise<string | null> {
 		const flat: string[] = [];
 		for (const [k, v] of Object.entries(fields)) {
@@ -134,7 +138,7 @@ class BionkRedis {
 		key: string,
 		start: string,
 		end: string,
-		count?: number,
+		count?: number
 	): Promise<[string, Record<string, string>][]> {
 		const client = getClient();
 		let raw: string[][];

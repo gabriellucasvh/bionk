@@ -1,0 +1,44 @@
+---
+services:
+  postgres:
+    image: postgres:16
+    container_name: bionk_postgres_dev
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: bionk_redis_dev
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "6379:6379"
+    command: >
+      sh -c 'redis-server
+      --requirepass "$$REDIS_PASSWORD"
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --save 60 1
+      --appendonly yes'
+    volumes:
+      - redisdata_dev:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata_dev:
+  redisdata_dev:

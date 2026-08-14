@@ -52,7 +52,7 @@ export default function PageRegistro() {
 	useEffect(() => {}, [widgetId]);
 
 	const renderTurnstile = (): string | null => {
-		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		const siteKey = null; // process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 		const w = window as unknown as { turnstile?: any };
 
 		if (!siteKey) {
@@ -84,7 +84,7 @@ export default function PageRegistro() {
 	};
 
 	const getCaptchaToken = async (): Promise<string | null> => {
-		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		const siteKey = null; // process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 		if (!siteKey) {
 			return captchaToken;
 		}

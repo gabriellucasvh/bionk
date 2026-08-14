@@ -104,7 +104,7 @@ function Login() {
 	};
 
 	const renderTurnstile = async () => {
-		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		const siteKey = null; // process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 		if (!siteKey) {
 			return null;
 		}
@@ -132,7 +132,7 @@ function Login() {
 	};
 
 	const getCaptchaToken = async (): Promise<string | null> => {
-		const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+		const siteKey = null; // process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 		if (!siteKey) {
 			return null;
 		}
