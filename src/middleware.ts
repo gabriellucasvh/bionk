@@ -8,7 +8,15 @@ export async function middleware(req: NextRequest) {
 	const protectedPaths = ["/studio", "/checkout", "/profile"];
 
 	if (protectedPaths.some((path) => pathname.startsWith(path))) {
-		const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+		const cookieName = process.env.NODE_ENV === "production" 
+			? "__Secure-next-auth.session-token"
+			: "next-auth.session-token";
+
+		const token = await getToken({ 
+			req, 
+			secret: process.env.NEXTAUTH_SECRET,
+			cookieName
+		});
 
 		if (!token) {
 			const registroUrl = new URL("/registro", req.url);

@@ -9,8 +9,10 @@ export const metadata: Metadata = {
 		"Acesse sua conta Bionk para gerenciar seus links, personalizar sua página e acompanhar seus resultados. Rápido, seguro e intuitivo!",
 };
 
+import { authOptions } from "@/lib/auth";
+
 export default async function login() {
-	const session = await getServerSession();
+	const session = await getServerSession(authOptions);
 
 	if (session) {
 		return redirect("/studio");

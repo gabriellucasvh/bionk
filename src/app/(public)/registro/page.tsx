@@ -9,8 +9,10 @@ export const metadata: Metadata = {
 		"Cadastre-se gratuitamente na Bionk e crie sua página de links poderosa. Personalização total, analytics e fácil integração - comece agora!",
 };
 
+import { authOptions } from "@/lib/auth";
+
 export default async function registro() {
-	const session = await getServerSession();
+	const session = await getServerSession(authOptions);
 
 	if (session) {
 		return redirect("/studio");
