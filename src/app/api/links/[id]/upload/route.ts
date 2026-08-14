@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { profileLinksTag, evictProfilePageCache } from "@/lib/cache-tags";
 export const runtime = "nodejs";
 
 const REGEX_FILE_EXTENSION = /\.[^/.]+$/;
@@ -68,7 +70,7 @@ export async function POST(
 	try {
 		const link = await prisma.link.findUnique({
 			where: { id },
-			select: { id: true, userId: true, customImageUrl: true },
+			select: { id: true, userId: true, customImageUrl: true, user: { select: { username: true } } },
 		});
 
 		if (!link) {
@@ -118,6 +120,13 @@ export async function POST(
 			data: { customImageUrl: result.secure_url },
 		});
 
+		if (link.user?.username) {
+			revalidatePath("/studio/links");
+			revalidatePath(`/${link.user.username}`);
+			revalidateTag(profileLinksTag(link.user.username));
+			await evictProfilePageCache(link.user.username);
+		}
+
 		return NextResponse.json({ success: true, url: result.secure_url });
 	} catch (error) {
 		console.error("Erro no upload da imagem do link:", error);
@@ -146,7 +155,7 @@ export async function DELETE(
 	try {
 		const link = await prisma.link.findUnique({
 			where: { id },
-			select: { id: true, customImageUrl: true },
+			select: { id: true, customImageUrl: true, user: { select: { username: true } } },
 		});
 
 		if (!link) {
@@ -173,11 +182,17 @@ export async function DELETE(
 			}
 		}
 
-		// Remover URL do banco de dados
 		await prisma.link.update({
 			where: { id },
 			data: { customImageUrl: null },
 		});
+
+		if (link.user?.username) {
+			revalidatePath("/studio/links");
+			revalidatePath(`/${link.user.username}`);
+			revalidateTag(profileLinksTag(link.user.username));
+			await evictProfilePageCache(link.user.username);
+		}
 
 		return NextResponse.json({ success: true });
 	} catch (error) {

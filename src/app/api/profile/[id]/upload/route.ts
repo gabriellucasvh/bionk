@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { profileBaseTag, evictProfilePageCache } from "@/lib/cache-tags";
 export const runtime = "nodejs";
 
 export async function POST(
@@ -28,6 +30,8 @@ export async function POST(
 		// Detecta se é um GIF para preservar a animação
 		const isGif = mimeType === "image/gif";
 		
+
+
 		const result = await cloudinary.uploader.upload(fileUri, {
 			folder: "profile-pictures",
 			public_id: id,
@@ -41,10 +45,18 @@ export async function POST(
 			})
 		});
 
-		await prisma.user.update({
+		const updatedUser = await prisma.user.update({
 			where: { id },
 			data: { image: result.secure_url },
+			select: { username: true }
 		});
+
+		if (updatedUser.username) {
+			revalidatePath("/studio");
+			revalidatePath(`/${updatedUser.username}`);
+			revalidateTag(profileBaseTag(updatedUser.username));
+			await evictProfilePageCache(updatedUser.username);
+		}
 
 		return NextResponse.json({ success: true, url: result.secure_url });
 	} catch {

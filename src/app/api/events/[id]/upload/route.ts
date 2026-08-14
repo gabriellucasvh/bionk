@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { profileEventsTag, evictProfilePageCache } from "@/lib/cache-tags";
 export const runtime = "nodejs";
 
 const REGEX_FILE_EXTENSION = /\.[^/.]+$/;
@@ -59,7 +61,7 @@ export async function POST(
   try {
     const event = await prisma.event.findUnique({
       where: { id },
-      select: { id: true, coverImageUrl: true },
+      select: { id: true, coverImageUrl: true, user: { select: { username: true } } },
     });
 
     if (!event) {
@@ -98,6 +100,13 @@ export async function POST(
       data: { coverImageUrl: result.secure_url },
     });
 
+    if (event.user?.username) {
+      revalidatePath("/studio");
+      revalidatePath(`/${event.user.username}`);
+      revalidateTag(profileEventsTag(event.user.username));
+      await evictProfilePageCache(event.user.username);
+    }
+
     return NextResponse.json({ success: true, url: result.secure_url });
   } catch {
     return NextResponse.json(
@@ -124,7 +133,7 @@ export async function DELETE(
   try {
     const event = await prisma.event.findUnique({
       where: { id },
-      select: { coverImageUrl: true },
+      select: { coverImageUrl: true, user: { select: { username: true } } },
     });
 
     if (!event) {
@@ -149,6 +158,13 @@ export async function DELETE(
       where: { id },
       data: { coverImageUrl: null },
     });
+
+    if (event.user?.username) {
+      revalidatePath("/studio");
+      revalidatePath(`/${event.user.username}`);
+      revalidateTag(profileEventsTag(event.user.username));
+      await evictProfilePageCache(event.user.username);
+    }
 
     return NextResponse.json({ success: true });
   } catch {
