@@ -193,9 +193,10 @@ const Sidebar = () => {
 	const [profileUrl, setProfileUrl] = useState("#");
 	const [imageKey, setImageKey] = useState(0);
 	const [userName, setUserName] = useState<string>("");
+	const [userUsername, setUserUsername] = useState<string>("");
 	const [userImageUrl, setUserImageUrl] = useState<string>("");
 
-	const username = session?.user?.username;
+	const username = userUsername || session?.user?.username;
 	const isLoading = !(session?.user && username);
 
 	const { data: profilesData } = useSWR("/api/profile/all", fetcher);
@@ -221,6 +222,7 @@ const Sidebar = () => {
 			if (response.ok) {
 				const userData = await response.json();
 				setUserName(userData.name || "");
+				setUserUsername(userData.username || "");
 				setUserImageUrl(userData.image || "");
 				setImageKey(Date.now());
 			}
@@ -301,6 +303,7 @@ const Sidebar = () => {
 			const baseUrl =
 				process.env.NEXT_PUBLIC_APP_URL || "https://bionk.duckdns.org";
 			setProfileUrl(newUsername ? `${baseUrl}/${newUsername}` : "#");
+			setUserUsername(newUsername);
 		};
 
 		window.addEventListener(

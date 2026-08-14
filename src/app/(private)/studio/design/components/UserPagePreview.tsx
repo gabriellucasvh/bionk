@@ -10,7 +10,7 @@ import {
 	Lock,
 } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import EventCard from "@/app/[username]/templates/components/cards/EventCard";
 import MusicCard from "@/app/[username]/templates/components/cards/MusicCard";
 import { CardImage } from "@/app/[username]/templates/components/cards/utils/media";
@@ -345,7 +345,7 @@ function ContentList({
 		>
 	>({});
 
-	const updateCarouselStateFor = (el: HTMLElement | null) => {
+	const updateCarouselStateFor = useCallback((el: HTMLElement | null) => {
 		if (!el) {
 			return;
 		}
@@ -366,7 +366,7 @@ function ContentList({
 			}
 			return { ...prev, [id]: { canLeft, canRight, isOverflowing } };
 		});
-	};
+	}, []);
 
 	useEffect(() => {
 		const updateAll = () => {
@@ -376,10 +376,15 @@ function ContentList({
 				updateCarouselStateFor(el);
 			}
 		};
-		updateAll();
+		// timeout to allow the DOM to render the new carousels first
+		const timerId = setTimeout(updateAll, 100);
 		window.addEventListener("resize", updateAll);
-		return () => window.removeEventListener("resize", updateAll);
-	}, [user, customizations]);
+		return () => {
+			clearTimeout(timerId);
+			window.removeEventListener("resize", updateAll);
+		};
+		// biome-ignore lint/correctness/useExhaustiveDependencies: re-measure when content changes
+	}, [user, customizations, updateCarouselStateFor]);
 
 	const renderLink = (item: UserLink) => {
 		const isAnimated =
@@ -1079,7 +1084,11 @@ function convertUserDataToUserProfile(userData: any): UserProfile {
 	}
 
 	// Separar links regulares dos social links
-	const allLinks = Array.isArray(userData.links) ? userData.links : [];
+	const allLinks = Array.isArray(userData.Link)
+		? userData.Link
+		: Array.isArray(userData.links)
+			? userData.links
+			: [];
 	const now = new Date();
 	const withinSchedule = (l: any) => {
 		const launchesOk = !l?.launchesAt || new Date(l.launchesAt) <= now;
@@ -1095,23 +1104,28 @@ function convertUserDataToUserProfile(userData: any): UserProfile {
 		.filter((link: any) => link?.active !== false && link?.archived !== true)
 		.filter(withinSchedule);
 
-	const socialLinks = allLinks
-		.filter((link: any) => link.platform)
-		// Social links seguem apenas flag de ativo
-		.filter((link: any) => link?.active !== false);
+	const rawSocialLinks = Array.isArray(userData.SocialLink)
+		? userData.SocialLink
+		: Array.isArray(userData.socialLinks)
+			? userData.socialLinks
+			: allLinks.filter((link: any) => link.platform);
+
+	const socialLinks = rawSocialLinks.filter(
+		(link: any) => link?.active !== false
+	);
 
 	return {
 		...userData,
 		Link: regularLinks,
-		Text: userData.texts || [],
-		Video: (userData.videos || []).filter(
+		Text: userData.Text || userData.texts || [],
+		Video: (userData.Video || userData.videos || []).filter(
 			(video: any) => video?.active !== false && video?.archived !== true
 		),
-		Image: userData.images || [],
-		Music: (userData.musics || []).filter(
+		Image: userData.Image || userData.images || [],
+		Music: (userData.Music || userData.musics || []).filter(
 			(music: any) => music?.active !== false && music?.archived !== true
 		),
-		Event: userData.events || [],
+		Event: userData.Event || userData.events || [],
 		SocialLink: socialLinks,
 	} as UserProfile;
 }

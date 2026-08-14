@@ -1,4 +1,6 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
+import { profileSectionsTag } from "@/lib/cache-tags";
 import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -91,6 +93,10 @@ export async function POST(req: Request): Promise<NextResponse> {
 				order: base - 1,
 			},
 		});
+		if (session.user?.username) {
+			revalidatePath(`/${session.user.username}`);
+			revalidateTag(profileSectionsTag(session.user.username));
+		}
 		return NextResponse.json(created, { status: 201 });
 	}
 	const r = getRedis();

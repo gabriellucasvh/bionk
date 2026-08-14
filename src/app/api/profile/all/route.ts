@@ -29,6 +29,13 @@ export async function GET() {
 				bio: true,
 				ownerId: true,
 				CustomPresets: true,
+				Link: true,
+				Text: true,
+				Video: true,
+				Image: true,
+				Music: true,
+				Event: true,
+				SocialLink: true,
 			},
 			orderBy: {
 				createdAt: "asc",

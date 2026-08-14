@@ -1,6 +1,8 @@
 // src/app/api/links/route.ts
 
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
+import { profileLinksTag } from "@/lib/cache-tags";
 import { getAppSession } from "@/lib/auth-session";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -222,6 +224,12 @@ export async function POST(request: Request): Promise<NextResponse> {
 					shareAllowed: Boolean(shareAllowed),
 				},
 			});
+
+			if (session.user.username) {
+				revalidatePath(`/${session.user.username}`);
+				revalidateTag(profileLinksTag(session.user.username));
+			}
+
 			return NextResponse.json(created, { status: 201 });
 		}
 
