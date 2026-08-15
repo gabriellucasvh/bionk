@@ -17,9 +17,9 @@ export default function TemplateSelector({
 					const isActive = tpl.id === selectedTemplateId;
 					return (
 						<button
-							className={`group relative overflow-hidden rounded-lg border text-left transition ${
+							className={`group relative overflow-hidden rounded-4xl border text-left transition ${
 								isActive
-									? "ring-3 ring-black"
+									? "ring ring-black"
 									: "border-gray-200 hover:border-gray-300 dark:border-gray-700"
 							}`}
 							key={tpl.id}
