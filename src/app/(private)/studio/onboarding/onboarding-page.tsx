@@ -70,27 +70,32 @@ const STEPS = [
 	{
 		id: 1,
 		title: "Qual o seu objetivo?",
-		description: "Nos conte como vai usar o Bionk para personalizarmos sua jornada.",
+		description:
+			"Nos conte como vai usar o Bionk para personalizarmos sua jornada.",
 	},
 	{
 		id: 2,
 		title: "Escolha seu estilo",
-		description: "Qual visual tem mais a sua cara? Não se preocupe, você pode mudar depois.",
+		description:
+			"Qual visual tem mais a sua cara? Não se preocupe, você pode mudar depois.",
 	},
 	{
 		id: 3,
 		title: "Sua presença digital",
-		description: "Selecione as redes sociais onde o seu público pode te encontrar.",
+		description:
+			"Selecione as redes sociais onde o seu público pode te encontrar.",
 	},
 	{
 		id: 4,
 		title: "Conecte seus links",
-		description: "Adicione os links mais importantes e centralize tudo em um só lugar.",
+		description:
+			"Adicione os links mais importantes e centralize tudo em um só lugar.",
 	},
 	{
 		id: 5,
 		title: "Quase lá! Seu perfil",
-		description: "Mostre ao mundo quem você é com uma foto legal e uma bio que marque.",
+		description:
+			"Mostre ao mundo quem você é com uma foto legal e uma bio que marque.",
 	},
 	{
 		id: 6,
@@ -98,6 +103,8 @@ const STEPS = [
 		description: "Estamos preparando o seu espaço exclusivo.",
 	},
 ];
+
+const HTTP_REGEX = /^https?:\/\//i;
 
 export default function OnboardingPageComponent({
 	onComplete,
@@ -396,7 +403,7 @@ export default function OnboardingPageComponent({
 			.filter((link) => link.title.trim() && link.url.trim())
 			.map((link) => {
 				let u = link.url.trim();
-				if (!/^https?:\/\//i.test(u)) {
+				if (!HTTP_REGEX.test(u)) {
 					u = `https://${u}`;
 				}
 				return { title: link.title.trim(), url: u };
@@ -415,66 +422,37 @@ export default function OnboardingPageComponent({
 		switch (currentStep) {
 			case 1:
 				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="space-y-4"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step1"
-						transition={{ duration: 0.3 }}
-					>
+					<div className="space-y-4">
 						<UserTypeSelector
 							onSelect={(v) => setData({ ...data, userType: v })}
 							selected={data.userType}
 						/>
-					</motion.div>
+					</div>
 				);
 
 			case 2:
 				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="space-y-4"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step2"
-						transition={{ duration: 0.3 }}
-					>
-
+					<div className="space-y-4">
 						<TemplateSelector
 							onSelect={(id) => setData({ ...data, template: id })}
 							selectedTemplateId={data.template}
 						/>
-					</motion.div>
+					</div>
 				);
 
 			case 3:
 				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="space-y-4"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step3"
-						transition={{ duration: 0.3 }}
-					>
+					<div className="space-y-4">
 						<SocialLinksSelector
 							onChange={(v) => setData({ ...data, socialLinks: v })}
 							value={data.socialLinks}
 						/>
-					</motion.div>
+					</div>
 				);
 
 			case 4:
 				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="space-y-6"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step4"
-						transition={{ duration: 0.3 }}
-					>
+					<div className="space-y-6">
 						{data.socialLinks.length > 0 && (
 							<div className="space-y-4">
 								<Label>Seus usuários nas redes sociais</Label>
@@ -522,19 +500,12 @@ export default function OnboardingPageComponent({
 								value={data.customLinks}
 							/>
 						</div>
-					</motion.div>
+					</div>
 				);
 
 			case 5:
 				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="space-y-6"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step5"
-						transition={{ duration: 0.3 }}
-					>
+					<div className="space-y-6">
 						<div className="flex flex-col items-center space-y-2">
 							<div className="relative">
 								<div className="h-24 w-24 overflow-hidden rounded-full bg-muted shadow-lg">
@@ -627,40 +598,55 @@ export default function OnboardingPageComponent({
 								{data.bio.length}/150 caracteres
 							</p>
 						</div>
-					</motion.div>
+					</div>
 				);
 
 			case 6:
 				return (
-					<motion.div
-						animate={{ opacity: 1, x: 0 }}
-						className="space-y-4"
-						exit={{ opacity: 0, x: -20 }}
-						initial={{ opacity: 0, x: 20 }}
-						key="step6"
-						transition={{ duration: 0.3 }}
-					>
-						<div className="text-center">
-							<Image
-								alt="Bionk Logo"
-								className="mx-auto mb-5 h-14 w-auto"
-								height={28}
-								priority
-								src="/images/bionk-icon-black.svg"
-								width={110}
-							/>
-							<h2 className="mb-2 font-bold text-2xl">Tudo pronto!</h2>
-							<p className="mx-auto max-w-md text-muted-foreground">
-								Cadastro concluído com sucesso! Que bom ter você aqui. Estamos
-								animados para acompanhar o que você vai criar a partir de agora.
-							</p>
-						</div>
-					</motion.div>
+					<div className="space-y-4 text-center">
+						<Image
+							alt="Bionk Logo"
+							className="mx-auto mb-5 h-14 w-auto"
+							height={28}
+							priority
+							src="/images/bionk-icon-black.svg"
+							width={110}
+						/>
+						<h2 className="mb-2 font-bold text-2xl">Tudo pronto!</h2>
+						<p className="mx-auto max-w-md text-muted-foreground">
+							Cadastro concluído com sucesso! Que bom ter você aqui. Estamos
+							animados para acompanhar o que você vai criar a partir de agora.
+						</p>
+					</div>
 				);
 
 			default:
 				return null;
 		}
+	};
+
+	const containerVariants = {
+		hidden: { opacity: 0 },
+		show: {
+			opacity: 1,
+			transition: {
+				staggerChildren: 0.1,
+			},
+		},
+		exit: {
+			opacity: 0,
+			y: -15,
+			transition: { duration: 0.2, ease: "easeIn" as const },
+		},
+	};
+
+	const itemVariants = {
+		hidden: { opacity: 0, y: 15 },
+		show: {
+			opacity: 1,
+			y: 0,
+			transition: { duration: 0.4, ease: "easeOut" as const },
+		},
 	};
 
 	return (
@@ -676,73 +662,90 @@ export default function OnboardingPageComponent({
 				</div>
 			)}
 			<div className="mx-auto w-full max-w-lg">
-				{currentStep !== 6 && (
-					<div className="mb-8 text-center">
-						<h1 className="mb-2 font-bold text-3xl text-gray-900 dark:text-white">
-							{STEPS[currentStep - 1].title}
-						</h1>
-						<p className="text-gray-600 dark:text-gray-300">
-							{STEPS[currentStep - 1].description}
-						</p>
-					</div>
-				)}
-				{/* Content */}
-				<div className="mb-6 bg-white py-4 pb-32 dark:bg-gray-800">
-					<AnimatePresence mode="wait">{renderStepContent()}</AnimatePresence>
-				</div>
-
-				{/* Navigation */}
-				<div className="pointer-events-none fixed right-0 bottom-0 left-0 z-20 pt-12 pb-6">
-					<div className="absolute inset-0 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-gray-900 dark:via-gray-900/90 dark:to-transparent" />
-					<div className="pointer-events-auto relative mx-auto flex w-full max-w-lg flex-col items-center gap-3 px-6">
-						{currentStep < (hideStep6 ? 5 : STEPS.length) ? (
-							<BaseButton
-								className="!bg-sky-500 !text-white hover:!bg-sky-600 w-full justify-center border-transparent"
-								disabled={!canProceedToNext()}
-								onClick={handleNext}
-							>
-								Continuar
-							</BaseButton>
-						) : (
-							<BaseButton
-								className="!bg-sky-500 !text-white hover:!bg-sky-600 w-full justify-center border-transparent"
-								disabled={loading || isSubmitting || !canProceedToNext()}
-								onClick={handleComplete}
-							>
-								{loading || isSubmitting ? (
-									<SpinnerGap
-										className="h-4 w-4 animate-spin"
-										weight="regular"
-									/>
-								) : (
-									<Check className="h-4 w-4" weight="regular" />
-								)}
-								<span className="ml-2">
-									{hideStep6 ? "Criar Perfil" : "Concluir e ir para o Studio"}
-								</span>
-							</BaseButton>
+				<AnimatePresence mode="wait">
+					<motion.div
+						animate="show"
+						className="w-full"
+						exit="exit"
+						initial="hidden"
+						key={currentStep}
+						variants={containerVariants}
+					>
+						{currentStep !== 6 && (
+							<div className="mb-8 text-center">
+								<motion.h1
+									className="mb-2 font-bold text-3xl text-gray-900 dark:text-white"
+									variants={itemVariants}
+								>
+									{STEPS[currentStep - 1].title}
+								</motion.h1>
+								<motion.p
+									className="text-gray-600 dark:text-gray-300"
+									variants={itemVariants}
+								>
+									{STEPS[currentStep - 1].description}
+								</motion.p>
+							</div>
 						)}
+						{/* Content */}
+						<motion.div
+							className="mb-6 bg-white py-4 pb-32 dark:bg-gray-800"
+							variants={itemVariants}
+						>
+							{renderStepContent()}
+						</motion.div>
+					</motion.div>
+				</AnimatePresence>
+			</div>
 
-						<div className="flex h-6 items-center gap-4">
-							{currentStep > 1 && (
-								<button
-									className="font-medium text-gray-500 text-sm transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-									onClick={handlePrevious}
-									type="button"
-								>
-									Voltar
-								</button>
+			{/* Navigation */}
+			<div className="pointer-events-none fixed right-0 bottom-0 left-0 z-20 pt-12 pb-6">
+				<div className="absolute inset-0 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-gray-900 dark:via-gray-900/90 dark:to-transparent" />
+				<div className="pointer-events-auto relative mx-auto flex w-full max-w-lg flex-col items-center gap-3 px-6">
+					{currentStep < (hideStep6 ? 5 : STEPS.length) ? (
+						<BaseButton
+							className="!bg-sky-500 !text-white hover:!bg-sky-600 w-full justify-center border-transparent"
+							disabled={!canProceedToNext()}
+							onClick={handleNext}
+						>
+							Continuar
+						</BaseButton>
+					) : (
+						<BaseButton
+							className="!bg-sky-500 !text-white hover:!bg-sky-600 w-full justify-center border-transparent"
+							disabled={loading || isSubmitting || !canProceedToNext()}
+							onClick={handleComplete}
+						>
+							{loading || isSubmitting ? (
+								<SpinnerGap className="h-4 w-4 animate-spin" weight="regular" />
+							) : (
+								<Check className="h-4 w-4" weight="regular" />
 							)}
-							{onCancel && currentStep === 1 && (
-								<button
-									className="font-medium text-gray-500 text-sm transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-									onClick={onCancel}
-									type="button"
-								>
-									Cancelar
-								</button>
-							)}
-						</div>
+							<span className="ml-2">
+								{hideStep6 ? "Criar Perfil" : "Concluir e ir para o Studio"}
+							</span>
+						</BaseButton>
+					)}
+
+					<div className="flex h-6 items-center gap-4">
+						{currentStep > 1 && (
+							<button
+								className="font-medium text-gray-500 text-sm transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+								onClick={handlePrevious}
+								type="button"
+							>
+								Voltar
+							</button>
+						)}
+						{onCancel && currentStep === 1 && (
+							<button
+								className="font-medium text-gray-500 text-sm transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+								onClick={onCancel}
+								type="button"
+							>
+								Cancelar
+							</button>
+						)}
 					</div>
 				</div>
 			</div>
