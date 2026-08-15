@@ -25,6 +25,7 @@ import CustomLinksForm from "./components/CustomLinksForm";
 import SocialLinksSelector from "./components/SocialLinksSelector";
 import TemplateSelector from "./components/TemplateSelector";
 import UserTypeSelector from "./components/UserTypeSelector";
+import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 
 interface OnboardingPageProps {
 	onComplete: (data: OnboardingData) => void;
@@ -80,12 +81,12 @@ const STEPS = [
 	{
 		id: 3,
 		title: "Redes Sociais",
-		description: "Adicione suas redes com usuário",
+		description: "Selecione as redes sociais que você usa",
 	},
 	{
 		id: 4,
-		title: "Links Personalizados",
-		description: "Adicione links com título e URL",
+		title: "Links",
+		description: "Preencha suas redes e adicione outros links",
 	},
 	{
 		id: 5,
@@ -347,7 +348,10 @@ export default function OnboardingPageComponent({
 				return true;
 			}
 			case 4: {
-				return true;
+				const hasAllSocialUsernames = data.socialLinks.every(
+					(link) => link.username.trim().length > 0
+				);
+				return hasAllSocialUsernames;
 			}
 			case 5: {
 				const hasName = data.name.trim().length > 0;
@@ -455,16 +459,59 @@ export default function OnboardingPageComponent({
 				return (
 					<motion.div
 						animate={{ opacity: 1, x: 0 }}
-						className="space-y-4"
+						className="space-y-6"
 						exit={{ opacity: 0, x: -20 }}
 						initial={{ opacity: 0, x: 20 }}
 						key="step4"
 						transition={{ duration: 0.3 }}
 					>
-						<CustomLinksForm
-							onChange={(v) => setData({ ...data, customLinks: v })}
-							value={data.customLinks}
-						/>
+						{data.socialLinks.length > 0 && (
+							<div className="space-y-4">
+								<Label>Seus usuários nas redes sociais</Label>
+								<div className="grid gap-3">
+									{data.socialLinks.map((social, index) => {
+										const cfg = SOCIAL_PLATFORMS.find(
+											(p) => p.key === social.platform
+										);
+										return (
+											<div
+												className="flex items-center gap-3 rounded-lg p-3"
+												key={social.platform}
+											>
+												<div
+													className="h-6 w-6 shrink-0"
+													style={{
+														backgroundColor: cfg?.color,
+														maskImage: cfg ? `url(${cfg.icon})` : undefined,
+														maskSize: "contain",
+														maskRepeat: "no-repeat",
+														maskPosition: "center",
+													}}
+												/>
+												<Input
+													className="flex-1"
+													maxLength={50}
+													onChange={(e) => {
+														const newSocials = [...data.socialLinks];
+														newSocials[index].username = e.target.value;
+														setData({ ...data, socialLinks: newSocials });
+													}}
+													placeholder={cfg?.placeholder || "usuario"}
+													value={social.username}
+												/>
+											</div>
+										);
+									})}
+								</div>
+							</div>
+						)}
+
+						<div className="space-y-4">
+							<CustomLinksForm
+								onChange={(v) => setData({ ...data, customLinks: v })}
+								value={data.customLinks}
+							/>
+						</div>
 					</motion.div>
 				);
 
