@@ -3,7 +3,7 @@
 
 import { Eye, EyeClosed } from "@phosphor-icons/react/dist/ssr";
 import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ProfileImageCropModal from "@/components/modals/ProfileImageCropModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDesignStore } from "@/stores/designStore";
@@ -66,7 +66,7 @@ const DesignPanelSkeleton = () => (
 );
 
 const PersonalizarClient = () => {
-	const { data: session, update } = useSession();
+	const { data: session } = useSession();
 	const { loadInitialData, updateUserField } = useDesignStore();
 	const [mobileView, setMobileView] = useState<"design" | "preview">("design");
 	const previewContainerRef = useRef<HTMLDivElement>(null);
@@ -132,7 +132,7 @@ const PersonalizarClient = () => {
 	}, [userData?.image, updateOriginalImageUrl]);
 
 	// Função para converter UserData do hook para o formato do store
-	const convertUserDataForStore = (userDataInput: any) => {
+	const convertUserDataForStore = useCallback((userDataInput: any) => {
 		// Combinar links regulares e social links
 		const allLinks = [
 			...(userDataInput.Link || []),
@@ -170,7 +170,7 @@ const PersonalizarClient = () => {
 			musics: userDataInput.Music || [],
 			events: userDataInput.Event || [],
 		};
-	};
+	}, []);
 
 	// Carregar dados iniciais no store
 	useEffect(() => {
@@ -178,7 +178,7 @@ const PersonalizarClient = () => {
 			const convertedUserData = convertUserDataForStore(userData);
 			loadInitialData(convertedUserData, userCustomizations);
 		}
-	}, [userData, userCustomizations, loadInitialData]);
+	}, [userData, userCustomizations, loadInitialData, convertUserDataForStore]);
 
 	// Sincronizar mudanças do profile com o store apenas na inicialização
 	useEffect(() => {
@@ -188,7 +188,7 @@ const PersonalizarClient = () => {
 			updateUserField("username", profile.username || userData.username || "");
 			updateUserField("image", profilePreview || userData.image || "");
 		}
-	}, [profile, userData]);
+	}, [profile, userData, profilePreview, updateUserField]);
 
 	// Escutar eventos de recarregamento para atualizar preview
 	useEffect(() => {
@@ -217,9 +217,17 @@ const PersonalizarClient = () => {
 				type="button"
 			>
 				{mobileView === "design" ? (
-					<Eye weight="regular" className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
+					<Eye
+						className="h-6 w-6 text-white dark:text-black"
+						strokeWidth={1.5}
+						weight="regular"
+					/>
 				) : (
-					<EyeClosed weight="regular" className="h-6 w-6 text-white dark:text-black" strokeWidth={1.5} />
+					<EyeClosed
+						className="h-6 w-6 text-white dark:text-black"
+						strokeWidth={1.5}
+						weight="regular"
+					/>
 				)}
 			</button>
 
@@ -320,16 +328,12 @@ const PersonalizarClient = () => {
 					if (!session?.user?.id) {
 						return;
 					}
-					setIsImageCropModalOpen(false);
 					const url = await uploadImage(file, session.user.id);
 					if (!url) {
 						return;
 					}
 					updateOriginalImageUrl(url);
 					resetImageState();
-					if (session?.user) {
-						await update({ user: { ...session.user, image: url } });
-					}
 					window.dispatchEvent(
 						new CustomEvent("profileImageUpdated", {
 							detail: { imageUrl: url },

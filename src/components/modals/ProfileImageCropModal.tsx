@@ -21,7 +21,7 @@ import { Button } from "../ui/button";
 interface ProfileImageCropModalProps {
 	isOpen: boolean;
 	onClose: () => void;
-	onImageSave: (imageFile: File) => void;
+	onImageSave: (imageFile: File) => void | Promise<void>;
 	currentImageUrl?: string | null;
 	onImageRemove?: () => void;
 }
@@ -186,7 +186,7 @@ const ProfileImageCropModal: FC<ProfileImageCropModalProps> = ({
 				});
 			}
 
-			onImageSave(imageFile);
+			await onImageSave(imageFile);
 			handleClose();
 		} catch (error) {
 			console.error("Erro ao processar imagem:", error);
