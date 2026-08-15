@@ -35,7 +35,6 @@ export default function UserTypeSelector({
 	];
 	return (
 		<div>
-			<Label className="mb-3 block">Selecione o tipo de usuário</Label>
 			<div className="flex flex-col gap-3">
 				{options.map((opt) => {
 					const active = selected === opt.key;

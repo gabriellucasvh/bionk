@@ -440,7 +440,6 @@ export default function OnboardingPageComponent({
 						key="step2"
 						transition={{ duration: 0.3 }}
 					>
-						<Label>Templates</Label>
 
 						<TemplateSelector
 							onSelect={(id) => setData({ ...data, template: id })}
@@ -665,7 +664,7 @@ export default function OnboardingPageComponent({
 	};
 
 	return (
-		<div className="flex min-h-dvh items-center justify-center bg-white p-6 dark:from-gray-900 dark:to-gray-800">
+		<div className="flex min-h-dvh items-start justify-center bg-white p-6 pt-16 dark:from-gray-900 dark:to-gray-800">
 			{currentStep !== 6 && (
 				<div className="-translate-x-1/2 fixed top-6 left-1/2 z-50 h-1.5 w-1/12 max-w-md overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
 					<div
@@ -677,13 +676,13 @@ export default function OnboardingPageComponent({
 				</div>
 			)}
 			<div className="mx-auto w-full max-w-lg">
-				{currentStep === 1 && (
+				{currentStep !== 6 && (
 					<div className="mb-8 text-center">
 						<h1 className="mb-2 font-bold text-3xl text-gray-900 dark:text-white">
-							Bem-vindo ao Bionk!
+							{STEPS[currentStep - 1].title}
 						</h1>
 						<p className="text-gray-600 dark:text-gray-300">
-							Vamos configurar seu perfil em alguns passos
+							{STEPS[currentStep - 1].description}
 						</p>
 					</div>
 				)}
