@@ -69,33 +69,33 @@ type Step = 1 | 2 | 3 | 4 | 5 | 6;
 const STEPS = [
 	{
 		id: 1,
-		title: "Tipo de Usuário",
-		description: "Selecione como você pretende usar a plataforma",
+		title: "Qual o seu objetivo?",
+		description: "Nos conte como vai usar o Bionk para personalizarmos sua jornada.",
 	},
 	{
 		id: 2,
-		title: "Templates",
-		description: "Selecione um visual para sua página",
+		title: "Escolha seu estilo",
+		description: "Qual visual tem mais a sua cara? Não se preocupe, você pode mudar depois.",
 	},
 	{
 		id: 3,
-		title: "Redes Sociais",
-		description: "Selecione as redes sociais que você usa",
+		title: "Sua presença digital",
+		description: "Selecione as redes sociais onde o seu público pode te encontrar.",
 	},
 	{
 		id: 4,
-		title: "Links",
-		description: "Preencha suas redes e adicione outros links",
+		title: "Conecte seus links",
+		description: "Adicione os links mais importantes e centralize tudo em um só lugar.",
 	},
 	{
 		id: 5,
-		title: "Perfil",
-		description: "Adicione foto, nome e bio",
+		title: "Quase lá! Seu perfil",
+		description: "Mostre ao mundo quem você é com uma foto legal e uma bio que marque.",
 	},
 	{
 		id: 6,
-		title: "Finalização",
-		description: "Tudo pronto. Revise e conclua",
+		title: "Tudo pronto!",
+		description: "Estamos preparando o seu espaço exclusivo.",
 	},
 ];
 

@@ -12,23 +12,23 @@ export default function UserTypeSelector({
 	const options = [
 		{
 			key: "creator",
-			title: "Criador",
+			title: "Criador de Conteúdo",
 			description:
-				"Mostre seu trabalho, compartilhe conteúdo e conecte-se com seu público.",
+				"Inspire, crie e compartilhe o que você faz de melhor com sua comunidade.",
 			image: "/images/criador.png",
 		},
 		{
 			key: "enterprise",
-			title: "Empresa",
+			title: "Marca & Negócios",
 			description:
-				"Divulgue sua marca, apresente produtos e destaque suas campanhas.",
+				"Expanda sua presença, exiba seus produtos e conquiste novos clientes.",
 			image: "/images/empresa.png",
 		},
 		{
 			key: "personal",
-			title: "Pessoal",
+			title: "Uso Pessoal",
 			description:
-				"Crie um espaço só seu para reunir links, projetos e redes sociais.",
+				"Reúna todos os seus links e projetos em um único lugar com a sua cara.",
 			image: "/images/pessoal.png",
 		},
 	];
