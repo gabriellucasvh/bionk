@@ -14,18 +14,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
+import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 import {
 	getUsernameFormatError,
 	isValidUsernameFormat,
 	normalizeUsernameForLookup,
 	sanitizeUsername,
 } from "@/utils/username";
-
 import CustomLinksForm from "./components/CustomLinksForm";
 import SocialLinksSelector from "./components/SocialLinksSelector";
 import TemplateSelector from "./components/TemplateSelector";
 import UserTypeSelector from "./components/UserTypeSelector";
-import { SOCIAL_PLATFORMS } from "@/config/social-platforms";
 
 interface OnboardingPageProps {
 	onComplete: (data: OnboardingData) => void;
@@ -392,8 +391,20 @@ export default function OnboardingPageComponent({
 			return;
 		}
 		setIsSubmitting(true);
+
+		const validCustomLinks = data.customLinks
+			.filter((link) => link.title.trim() && link.url.trim())
+			.map((link) => {
+				let u = link.url.trim();
+				if (!/^https?:\/\//i.test(u)) {
+					u = `https://${u}`;
+				}
+				return { title: link.title.trim(), url: u };
+			});
+
 		onComplete({
 			...data,
+			customLinks: validCustomLinks,
 			profileImage: selectedProfileFile || undefined,
 		});
 		// Fallback: if parent doesn't toggle loading, re-enable after a delay
