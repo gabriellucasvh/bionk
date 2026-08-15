@@ -35,13 +35,13 @@ export default function UserTypeSelector({
 	];
 	return (
 		<div>
-			<Label className="mb-2 block">Selecione o tipo de usuário</Label>
-			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+			<Label className="mb-3 block">Selecione o tipo de usuário</Label>
+			<div className="flex flex-col gap-3">
 				{options.map((opt) => {
 					const active = selected === opt.key;
 					return (
 						<button
-							className={`rounded-3xl border p-0 text-left transition ${
+							className={`flex w-full items-center gap-4 rounded-2xl border p-3 text-left transition ${
 								active
 									? "ring ring-black"
 									: "border-gray-200 hover:border-gray-300 dark:border-gray-700"
@@ -50,18 +50,20 @@ export default function UserTypeSelector({
 							onClick={() => onSelect(opt.key)}
 							type="button"
 						>
-							<div className="aspect-[4/3] w-full overflow-hidden rounded-t-3xl bg-gray-100 dark:bg-gray-800">
+							<div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
 								<Image
 									alt={opt.title}
 									className="h-full w-full object-cover"
-									height={240}
+									height={80}
 									src={opt.image}
-									width={320}
+									width={80}
 								/>
 							</div>
-							<div className="p-4">
-								<p className="font-semibold">{opt.title}</p>
-								<p className="text-muted-foreground text-sm">
+							<div className="flex flex-col justify-center">
+								<h3 className="mb-1 font-semibold text-gray-900 text-lg dark:text-white">
+									{opt.title}
+								</h3>
+								<p className="text-gray-500 text-sm leading-snug dark:text-gray-400">
 									{opt.description}
 								</p>
 							</div>
