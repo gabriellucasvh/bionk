@@ -297,7 +297,10 @@ export default function OnboardingPageComponent({
 				setIsTypingUsername(false);
 			} catch (error: any) {
 				// Don't show error if request was aborted (user typed something else)
-				if (error?.name === "AbortError" || error?.message?.includes("aborted")) {
+				if (
+					error?.name === "AbortError" ||
+					error?.message?.includes("aborted")
+				) {
 					// We don't set isTypingUsername to false here because a new request might have started
 					return;
 				}
@@ -615,6 +618,16 @@ export default function OnboardingPageComponent({
 
 	return (
 		<div className="flex min-h-dvh items-center justify-center bg-white p-6 dark:from-gray-900 dark:to-gray-800">
+			{currentStep !== 6 && (
+				<div className="-translate-x-1/2 fixed top-6 left-1/2 z-50 h-1.5 w-1/12 max-w-md overflow-hidden rounded-full bg-sky-100 dark:bg-gray-800">
+					<div
+						className="h-full rounded-full bg-sky-500 transition-all duration-300 ease-out"
+						style={{
+							width: `${(currentStep / (hideStep6 ? 5 : STEPS.length)) * 100}%`,
+						}}
+					/>
+				</div>
+			)}
 			<div className="w-full md:max-w-3xl">
 				{currentStep === 1 && (
 					<div className="mb-8 text-center">
@@ -626,28 +639,6 @@ export default function OnboardingPageComponent({
 						</p>
 					</div>
 				)}
-
-				{currentStep !== 6 && (
-					<div className="mb-8">
-						<div className="mb-2 flex items-center justify-between">
-							<span className="font-medium text-gray-700 text-sm dark:text-gray-300">
-								{STEPS[currentStep - 1].title}
-							</span>
-						</div>
-						<div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-							<div
-								className="h-2 rounded-full bg-black transition-all duration-300"
-								style={{
-									width: `${(currentStep / (hideStep6 ? 5 : STEPS.length)) * 100}%`,
-								}}
-							/>
-						</div>
-						<p className="mt-2 text-gray-600 text-sm dark:text-gray-400">
-							{STEPS[currentStep - 1].description}
-						</p>
-					</div>
-				)}
-
 				{/* Content */}
 				<div className="mb-6 bg-white py-4 dark:bg-gray-800">
 					<AnimatePresence mode="wait">{renderStepContent()}</AnimatePresence>
