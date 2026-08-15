@@ -5,8 +5,10 @@ import {
 	ArrowSquareOut,
 	Bell,
 	ChartBar,
+	Check,
 	DotsThreeVerticalIcon,
 	Download,
+	Gear,
 	Link as LinkIcon,
 	PaintBrush,
 	Palette,
@@ -14,7 +16,9 @@ import {
 	Share,
 	SquaresFour,
 	Stack,
+	Users,
 } from "@phosphor-icons/react/dist/ssr";
+import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -23,7 +27,6 @@ import type React from "react";
 import { memo, useCallback, useEffect, useState } from "react";
 import { QRCode } from "react-qrcode-logo";
 import useSWR from "swr";
-import Cookies from "js-cookie";
 import ShareListCompact from "@/components/ShareListCompact";
 import { Button } from "@/components/ui/button";
 import {
@@ -464,41 +467,65 @@ const Sidebar = () => {
 								)}
 							</div>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="w-56 p-2">
-							<DropdownMenuLabel>Alternar Página</DropdownMenuLabel>
-							<DropdownMenuSeparator />
-							{profiles.map((p: any) => (
-								<DropdownMenuItem
-									className="flex cursor-pointer items-center gap-3 py-2"
-									key={p.id}
-									onClick={() => handleSwitchProfile(p.id)}
-								>
-									<Image
-										alt={p.username}
-										className="rounded-full"
-										height={24}
-										src={
-											p.image ||
-											"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
-										}
-										width={24}
-									/>
-									<div className="flex flex-col truncate">
-										<span className="truncate font-medium text-sm">
-											{p.name}
-										</span>
-										<span className="truncate text-xs text-zinc-500">
-											@{p.username}
-										</span>
-									</div>
-								</DropdownMenuItem>
-							))}
+						<DropdownMenuContent
+							align="center"
+							className="w-56 border border-zinc-200 p-2 dark:border-zinc-800"
+							side="top"
+							sideOffset={12}
+						>
+							<DropdownMenuSub>
+								<DropdownMenuSubTrigger className="h-10 cursor-pointer gap-2 font-medium">
+									<Users className="h-4 w-4 text-zinc-500" weight="regular" />
+									<span>Alternar Página</span>
+								</DropdownMenuSubTrigger>
+								<DropdownMenuSubContent className="max-h-[60vh] w-64 overflow-y-auto border border-zinc-200 p-2 dark:border-zinc-800">
+									{profiles.map((p: any) => {
+										const isActive =
+											p.username === (userUsername || session?.user?.username);
+										return (
+											<DropdownMenuItem
+												className="flex cursor-pointer items-center justify-between py-2"
+												key={p.id}
+												onClick={() => handleSwitchProfile(p.id)}
+											>
+												<div className="flex items-center gap-3 truncate">
+													<Image
+														alt={p.username}
+														className="shrink-0 rounded-full"
+														height={24}
+														src={
+															p.image ||
+															"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png"
+														}
+														width={24}
+													/>
+													<div className="flex flex-col truncate">
+														<span className="truncate font-medium text-sm">
+															{p.name}
+														</span>
+														<span className="truncate text-xs text-zinc-500">
+															@{p.username}
+														</span>
+													</div>
+												</div>
+												{isActive && (
+													<Check
+														className="h-4 w-4 shrink-0 text-zinc-900 dark:text-zinc-100"
+														weight="bold"
+													/>
+												)}
+											</DropdownMenuItem>
+										);
+									})}
+								</DropdownMenuSubContent>
+							</DropdownMenuSub>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
-								className="cursor-pointer font-medium"
+								className="h-10 cursor-pointer px-2 font-medium"
 								onClick={() => router.push("/studio/configs")}
 							>
-								Configurações da Conta
+								<Gear className="h-4 w-4 text-zinc-500" weight="regular" />
+								<span>Configurações</span>
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
