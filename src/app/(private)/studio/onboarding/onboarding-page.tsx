@@ -475,7 +475,7 @@ export default function OnboardingPageComponent({
 										);
 										return (
 											<div
-												className="flex items-center gap-3 rounded-lg p-3"
+												className="flex items-center gap-3"
 												key={social.platform}
 											>
 												<div
@@ -665,7 +665,7 @@ export default function OnboardingPageComponent({
 					/>
 				</div>
 			)}
-			<div className="w-full md:max-w-3xl">
+			<div className="mx-auto w-full max-w-lg">
 				{currentStep === 1 && (
 					<div className="mb-8 text-center">
 						<h1 className="mb-2 font-bold text-3xl text-gray-900 dark:text-white">

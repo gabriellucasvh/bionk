@@ -105,10 +105,10 @@ export default function CustomLinksForm({
 							key={`${v.title}-${idx}`}
 						>
 							<div className="flex min-w-0 flex-1 flex-col items-center gap-4 sm:flex-row">
-								<div className="flex items-center gap-3">
-									<TextAa weight="regular" className="h-4 w-4" />
+								<div className="flex w-full flex-1 items-center gap-3">
+									<TextAa weight="regular" className="h-4 w-4 shrink-0" />
 									<Input
-										className="w-[220px] overflow-hidden truncate text-ellipsis whitespace-nowrap rounded-full bg-gray-200 px-4 py-2 text-gray-800 text-sm sm:w-[220px] md:w-[300px] dark:bg-gray-800 dark:text-gray-200"
+										className="flex-1 min-w-0 overflow-hidden truncate text-ellipsis whitespace-nowrap rounded-full bg-gray-200 px-4 py-2 text-gray-800 text-sm dark:bg-gray-800 dark:text-gray-200"
 										id={`title-pill-${idx}`}
 										maxLength={80}
 										onChange={(e) => {
@@ -122,10 +122,10 @@ export default function CustomLinksForm({
 										value={editedIndex === idx ? editedTitle : v.title}
 									/>
 								</div>
-								<div className="flex items-center gap-3">
-									<Link weight="regular" className="h-4 w-4" />
+								<div className="flex w-full flex-1 items-center gap-3">
+									<Link weight="regular" className="h-4 w-4 shrink-0" />
 									<Input
-										className="w-[220px] overflow-hidden truncate text-ellipsis whitespace-nowrap rounded-full bg-gray-200 px-4 py-2 text-gray-800 text-sm sm:w-[220px] md:w-[300px] dark:bg-gray-800 dark:text-gray-200"
+										className="flex-1 min-w-0 overflow-hidden truncate text-ellipsis whitespace-nowrap rounded-full bg-gray-200 px-4 py-2 text-gray-800 text-sm dark:bg-gray-800 dark:text-gray-200"
 										id={`url-pill-${idx}`}
 										onChange={(e) => {
 											if (editedIndex !== idx) {
