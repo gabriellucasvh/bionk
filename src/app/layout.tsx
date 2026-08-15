@@ -1,30 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import {
-	Alegreya,
-	Atkinson_Hyperlegible,
-	Dancing_Script,
-	DM_Serif_Display,
-	Fira_Sans,
-	Geist,
-	Inter,
-	Karla,
-	Libre_Baskerville,
-	Merriweather,
-	Montserrat,
-	Mulish,
-	Nunito,
-	Orbitron,
-	Outfit,
-	Playfair_Display,
-	Plus_Jakarta_Sans,
-	Poppins,
-	Public_Sans,
-	Space_Grotesk,
-	Spectral,
-	Urbanist,
-} from "next/font/google";
+import { Geist } from "next/font/google";
 import localFont from "next/font/local";
 import { LinkAnimationProvider } from "@/providers/linkAnimationProvider";
 import NextAuthSessionProvider from "@/providers/sessionProvider";
@@ -54,97 +31,6 @@ const geist = Geist({
 	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 	subsets: ["latin"],
 	variable: "--font-geist",
-});
-const inter = Inter({
-	subsets: ["latin"],
-	variable: "--font-inter",
-});
-const montserrat = Montserrat({
-	subsets: ["latin"],
-	variable: "--font-montserrat",
-});
-const poppins = Poppins({
-	weight: ["300", "400", "500", "600", "700"],
-	subsets: ["latin"],
-	variable: "--font-poppins",
-});
-const nunito = Nunito({
-	subsets: ["latin"],
-	variable: "--font-nunito",
-});
-const playfairDisplay = Playfair_Display({
-	subsets: ["latin"],
-	variable: "--font-playfair-display",
-});
-const merriweather = Merriweather({
-	weight: ["300", "400", "700"],
-	subsets: ["latin"],
-	variable: "--font-merriweather",
-});
-const dancingScript = Dancing_Script({
-	subsets: ["latin"],
-	variable: "--font-dancing-script",
-});
-const dmSerifDisplay = DM_Serif_Display({
-	weight: ["400"],
-	subsets: ["latin"],
-	variable: "--font-dm-serif-display",
-});
-const orbitron = Orbitron({
-	subsets: ["latin"],
-	variable: "--font-orbitron",
-});
-const plusJakartaSans = Plus_Jakarta_Sans({
-	subsets: ["latin"],
-	variable: "--font-plus-jakarta-sans",
-});
-const outfit = Outfit({
-	subsets: ["latin"],
-	variable: "--font-outfit",
-});
-const spaceGrotesk = Space_Grotesk({
-	subsets: ["latin"],
-	variable: "--font-space-grotesk",
-});
-const libreBaskerville = Libre_Baskerville({
-	weight: ["400", "700"],
-	subsets: ["latin"],
-	variable: "--font-libre-baskerville",
-});
-const alegreya = Alegreya({
-	subsets: ["latin"],
-	variable: "--font-alegreya",
-});
-const spectral = Spectral({
-	weight: ["300", "400", "500", "600", "700"],
-	subsets: ["latin"],
-	variable: "--font-spectral",
-});
-const urbanist = Urbanist({
-	subsets: ["latin"],
-	variable: "--font-urbanist",
-});
-const karla = Karla({
-	subsets: ["latin"],
-	variable: "--font-karla",
-});
-const publicSans = Public_Sans({
-	subsets: ["latin"],
-	variable: "--font-public-sans",
-});
-const atkinsonHyperlegible = Atkinson_Hyperlegible({
-	weight: ["400", "700"],
-	subsets: ["latin"],
-	variable: "--font-atkinson-hyperlegible",
-});
-const firaSans = Fira_Sans({
-	weight: ["300", "400", "500", "600", "700"],
-	subsets: ["latin"],
-	variable: "--font-fira-sans",
-});
-const mulish = Mulish({
-	subsets: ["latin"],
-	variable: "--font-mulish",
 });
 
 export const viewport: Viewport = {
@@ -183,7 +69,7 @@ export default async function RootLayout({
     const session = await getServerSession(authOptions);
     return (
         <html
-            className={`${geist.variable} ${ClashDisplay.variable} ${cabinetGrotesk.variable} ${Satoshi.variable} ${inter.variable} ${montserrat.variable} ${poppins.variable} ${nunito.variable} ${playfairDisplay.variable} ${merriweather.variable} ${dancingScript.variable} ${dmSerifDisplay.variable} ${orbitron.variable} ${plusJakartaSans.variable} ${outfit.variable} ${spaceGrotesk.variable} ${libreBaskerville.variable} ${alegreya.variable} ${spectral.variable} ${urbanist.variable} ${karla.variable} ${publicSans.variable} ${atkinsonHyperlegible.variable} ${firaSans.variable} ${mulish.variable} antialiased`}
+            className={`${geist.variable} ${ClashDisplay.variable} ${cabinetGrotesk.variable} ${Satoshi.variable} antialiased`}
             data-scroll-behavior="smooth"
             lang="pt-BR"
             suppressHydrationWarning={true}

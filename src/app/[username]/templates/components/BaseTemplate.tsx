@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { FONT_OPTIONS } from "@/app/(private)/studio/design/constants/design.constants";
 import CookieConsent from "@/components/CookieConsent";
+import DynamicFont from "@/components/DynamicFont";
 import BionkActionsModal from "@/components/modals/BionkActionsModal";
 import JoinBionkModal from "@/components/modals/JoinBionkModal";
 import ProfileViewTracker from "@/components/ProfileViewTracker";
@@ -242,6 +243,7 @@ export default function BaseTemplate({ user, children }: BaseTemplateProps) {
 				>
 					<FixedBackground customPresets={customPresets} />
 					<ProfileViewTracker userId={user.id} />
+					<DynamicFont fontValue={customPresets.customFont} />
 
 					{/* Top-left and top-right actions */}
 					<div className="absolute top-4 left-4 z-50 sm:top-6 sm:left-6">

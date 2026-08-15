@@ -22,6 +22,7 @@ import type { UserLink, UserProfile } from "@/types/user-profile";
 import { detectTrafficSource } from "@/utils/traffic-source";
 import { FONT_OPTIONS } from "../constants/design.constants";
 import { useInstantPreview } from "../hooks/useInstantPreview";
+import DynamicFont from "@/components/DynamicFont";
 
 const URL_PREFIX_REGEX = /^(https?:\/\/|mailto:|tel:|\/\/)/i;
 
@@ -1239,6 +1240,7 @@ export default function UserPagePreview({
 
 	return (
 		<div className="relative h-full w-full">
+			<DynamicFont fontValue={customizations.customFont} />
 			{renderFixedBackground()}
 			<div
 				className={`relative z-10 h-full w-full overflow-y-auto overflow-x-hidden ${

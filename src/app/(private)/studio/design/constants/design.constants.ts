@@ -22,91 +22,91 @@ export const GRADIENTS = [
 
 export const FONT_OPTIONS = [
 	{ value: "font-sans", label: "Satoshi", fontFamily: "var(--font-sans)" },
-	{ value: "font-inter", label: "Inter", fontFamily: "var(--font-inter)" },
+	{ value: "font-inter", label: "Inter", fontFamily: "'Inter', sans-serif" },
 	{
 		value: "font-montserrat",
 		label: "Montserrat",
-		fontFamily: "var(--font-montserrat)",
+		fontFamily: "'Montserrat', sans-serif",
 	},
 	{
 		value: "font-poppins",
 		label: "Poppins",
-		fontFamily: "var(--font-poppins)",
+		fontFamily: "'Poppins', sans-serif",
 	},
-	{ value: "font-nunito", label: "Nunito", fontFamily: "var(--font-nunito)" },
+	{ value: "font-nunito", label: "Nunito", fontFamily: "'Nunito', sans-serif" },
 	{
 		value: "font-playfair-display",
 		label: "Playfair Display",
-		fontFamily: "var(--font-playfair-display)",
+		fontFamily: "'Playfair Display', serif",
 	},
 	{
 		value: "font-merriweather",
 		label: "Merriweather",
-		fontFamily: "var(--font-merriweather)",
+		fontFamily: "'Merriweather', serif",
 	},
 	{
 		value: "font-dancing-script",
 		label: "Dancing Script",
-		fontFamily: "var(--font-dancing-script)",
+		fontFamily: "'Dancing Script', cursive",
 	},
 	{
 		value: "font-dm-serif-display",
 		label: "DM Serif Display",
-		fontFamily: "var(--font-dm-serif-display)",
+		fontFamily: "'DM Serif Display', serif",
 	},
 	{
 		value: "font-orbitron",
 		label: "Orbitron",
-		fontFamily: "var(--font-orbitron)",
+		fontFamily: "'Orbitron', sans-serif",
 	},
 	{
 		value: "font-plus-jakarta-sans",
 		label: "Plus Jakarta Sans",
-		fontFamily: "var(--font-plus-jakarta-sans)",
+		fontFamily: "'Plus Jakarta Sans', sans-serif",
 	},
-	{ value: "font-outfit", label: "Outfit", fontFamily: "var(--font-outfit)" },
+	{ value: "font-outfit", label: "Outfit", fontFamily: "'Outfit', sans-serif" },
 	{
 		value: "font-space-grotesk",
 		label: "Space Grotesk",
-		fontFamily: "var(--font-space-grotesk)",
+		fontFamily: "'Space Grotesk', sans-serif",
 	},
 	{
 		value: "font-libre-baskerville",
 		label: "Libre Baskerville",
-		fontFamily: "var(--font-libre-baskerville)",
+		fontFamily: "'Libre Baskerville', serif",
 	},
 	{
 		value: "font-alegreya",
 		label: "Alegreya",
-		fontFamily: "var(--font-alegreya)",
+		fontFamily: "'Alegreya', serif",
 	},
 	{
 		value: "font-spectral",
 		label: "Spectral",
-		fontFamily: "var(--font-spectral)",
+		fontFamily: "'Spectral', serif",
 	},
 	{
 		value: "font-urbanist",
 		label: "Urbanist",
-		fontFamily: "var(--font-urbanist)",
+		fontFamily: "'Urbanist', sans-serif",
 	},
-	{ value: "font-karla", label: "Karla", fontFamily: "var(--font-karla)" },
+	{ value: "font-karla", label: "Karla", fontFamily: "'Karla', sans-serif" },
 	{
 		value: "font-public-sans",
 		label: "Public Sans",
-		fontFamily: "var(--font-public-sans)",
+		fontFamily: "'Public Sans', sans-serif",
 	},
 	{
 		value: "font-atkinson-hyperlegible",
 		label: "Atkinson Hyperlegible",
-		fontFamily: "var(--font-atkinson-hyperlegible)",
+		fontFamily: "'Atkinson Hyperlegible', sans-serif",
 	},
 	{
 		value: "font-fira-sans",
 		label: "Fira Sans",
-		fontFamily: "var(--font-fira-sans)",
+		fontFamily: "'Fira Sans', sans-serif",
 	},
-	{ value: "font-mulish", label: "Mulish", fontFamily: "var(--font-mulish)" },
+	{ value: "font-mulish", label: "Mulish", fontFamily: "'Mulish', sans-serif" },
 ];
 
 export const BUTTON_STYLES = [
