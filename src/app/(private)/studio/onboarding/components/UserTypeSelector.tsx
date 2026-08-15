@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { Label } from "@/components/ui/label";
 
 export default function UserTypeSelector({
 	selected,
