@@ -667,7 +667,7 @@ export default function OnboardingPageComponent({
 	return (
 		<div className="flex min-h-dvh items-center justify-center bg-white p-6 dark:from-gray-900 dark:to-gray-800">
 			{currentStep !== 6 && (
-				<div className="-translate-x-1/2 fixed top-6 left-1/2 z-50 h-1.5 w-1/12 max-w-md overflow-hidden rounded-full bg-sky-100 dark:bg-gray-800">
+				<div className="-translate-x-1/2 fixed top-6 left-1/2 z-50 h-1.5 w-1/12 max-w-md overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
 					<div
 						className="h-full rounded-full bg-sky-500 transition-all duration-300 ease-out"
 						style={{
