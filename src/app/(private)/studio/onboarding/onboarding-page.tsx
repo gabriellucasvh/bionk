@@ -431,16 +431,6 @@ export default function OnboardingPageComponent({
 							onSelect={(id) => setData({ ...data, template: id })}
 							selectedTemplateId={data.template}
 						/>
-						<div className="pointer-events-none fixed right-0 bottom-0 left-0 z-20">
-							<div className="bg-gradient-to-t from-white/90 to-white/0 px-4 py-3 dark:from-gray-900/90 dark:to-gray-900/0">
-								<div className="pointer-events-auto mx-auto flex w-full justify-between lg:max-w-1/2">
-									<BaseButton onClick={handlePrevious} variant="white">
-										Voltar
-									</BaseButton>
-									<BaseButton onClick={handleNext}>Continuar</BaseButton>
-								</div>
-							</div>
-						</div>
 					</motion.div>
 				);
 
@@ -640,37 +630,17 @@ export default function OnboardingPageComponent({
 					</div>
 				)}
 				{/* Content */}
-				<div className="mb-6 bg-white py-4 dark:bg-gray-800">
+				<div className="mb-6 bg-white py-4 pb-32 dark:bg-gray-800">
 					<AnimatePresence mode="wait">{renderStepContent()}</AnimatePresence>
 				</div>
 
 				{/* Navigation */}
-				{currentStep !== 2 && (
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-4">
-							{currentStep > 1 && (
-								<BaseButton
-									className="flex items-center gap-2"
-									onClick={handlePrevious}
-									variant="white"
-								>
-									Voltar
-								</BaseButton>
-							)}
-							{onCancel && currentStep === 1 && (
-								<button
-									className="font-semibold text-sm text-zinc-900 dark:text-zinc-100"
-									onClick={onCancel}
-									type="button"
-								>
-									Cancelar
-								</button>
-							)}
-						</div>
-
+				<div className="pointer-events-none fixed right-0 bottom-0 left-0 z-20 pt-12 pb-6">
+					<div className="absolute inset-0 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-gray-900 dark:via-gray-900/90 dark:to-transparent" />
+					<div className="pointer-events-auto relative mx-auto flex w-full max-w-lg flex-col items-center gap-3 px-6">
 						{currentStep < (hideStep6 ? 5 : STEPS.length) ? (
 							<BaseButton
-								className="flex items-center gap-2"
+								className="!bg-sky-500 !text-white hover:!bg-sky-600 w-full justify-center border-transparent"
 								disabled={!canProceedToNext()}
 								onClick={handleNext}
 							>
@@ -678,7 +648,7 @@ export default function OnboardingPageComponent({
 							</BaseButton>
 						) : (
 							<BaseButton
-								className="flex items-center gap-2"
+								className="!bg-sky-500 !text-white hover:!bg-sky-600 w-full justify-center border-transparent"
 								disabled={loading || isSubmitting || !canProceedToNext()}
 								onClick={handleComplete}
 							>
@@ -690,11 +660,34 @@ export default function OnboardingPageComponent({
 								) : (
 									<Check className="h-4 w-4" weight="regular" />
 								)}
-								{hideStep6 ? "Criar Perfil" : "Concluir e ir para o Studio"}
+								<span className="ml-2">
+									{hideStep6 ? "Criar Perfil" : "Concluir e ir para o Studio"}
+								</span>
 							</BaseButton>
 						)}
+
+						<div className="flex h-6 items-center gap-4">
+							{currentStep > 1 && (
+								<button
+									className="font-medium text-gray-500 text-sm transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+									onClick={handlePrevious}
+									type="button"
+								>
+									Voltar
+								</button>
+							)}
+							{onCancel && currentStep === 1 && (
+								<button
+									className="font-medium text-gray-500 text-sm transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+									onClick={onCancel}
+									type="button"
+								>
+									Cancelar
+								</button>
+							)}
+						</div>
 					</div>
-				)}
+				</div>
 			</div>
 
 			{/* Image Crop Modal */}
