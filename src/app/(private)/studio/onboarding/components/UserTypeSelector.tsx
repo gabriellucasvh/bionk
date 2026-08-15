@@ -43,7 +43,7 @@ export default function UserTypeSelector({
 						<button
 							className={`rounded-3xl border p-0 text-left transition ${
 								active
-									? "ring-3 ring-black"
+									? "ring ring-black"
 									: "border-gray-200 hover:border-gray-300 dark:border-gray-700"
 							}`}
 							key={opt.key}
