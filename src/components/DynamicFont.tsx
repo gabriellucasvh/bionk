@@ -25,5 +25,19 @@ export default function DynamicFont({ fontValue }: DynamicFontProps) {
 	const fontName = fontOption.label.replace(/ /g, "+");
 	const url = `https://fonts.googleapis.com/css2?family=${fontName}:wght@300;400;500;600;700&display=swap`;
 
-	return <link href={url} rel="stylesheet" />;
+	return (
+		<>
+			<link
+				crossOrigin="anonymous"
+				href="https://fonts.googleapis.com"
+				rel="preconnect"
+			/>
+			<link
+				crossOrigin="anonymous"
+				href="https://fonts.gstatic.com"
+				rel="preconnect"
+			/>
+			<link href={url} precedence="default" rel="stylesheet" />
+		</>
+	);
 }
