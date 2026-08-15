@@ -88,7 +88,8 @@ export const useSaveProfile = ({
 			profile.bio !== originalProfile.bio;
 		const hasChanges = textChanged || profileImageChanged;
 
-		if (!(session?.user?.id && hasChanges)) {
+		const activeId = (profile as any).id || session?.user?.id;
+		if (!(activeId && hasChanges)) {
 			return;
 		}
 
@@ -105,15 +106,17 @@ export const useSaveProfile = ({
 		let newImageUrl: string | null = null;
 		let updatedUserData: any = null;
 
+
+
 		if (selectedProfileFile) {
-			newImageUrl = await uploadImage(selectedProfileFile, session.user.id);
+			newImageUrl = await uploadImage(selectedProfileFile, activeId);
 			if (!newImageUrl) {
 				setLoading(false);
 				return;
 			}
 			// Atualiza os campos de texto após upload de imagem
 			updatedUserData = await updateProfileText(
-				session?.user?.id,
+				activeId,
 				profile,
 				originalProfile,
 				profileImageChanged
@@ -123,7 +126,7 @@ export const useSaveProfile = ({
 			const defaultImageUrl =
 				"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 			try {
-				const res = await fetch(`/api/profile/${session.user.id}`, {
+				const res = await fetch(`/api/profile/${activeId}`, {
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ ...profile, image: defaultImageUrl }),
@@ -142,7 +145,7 @@ export const useSaveProfile = ({
 		} else {
 			// Apenas campos de texto
 			updatedUserData = await updateProfileText(
-				session?.user?.id,
+				activeId,
 				profile,
 				originalProfile,
 				profileImageChanged

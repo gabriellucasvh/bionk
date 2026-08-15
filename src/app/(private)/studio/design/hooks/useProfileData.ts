@@ -32,6 +32,7 @@ interface UserData {
 }
 
 interface ProfileState {
+	id?: string;
 	name: string;
 	username: string;
 	bio: string;
@@ -43,11 +44,13 @@ export const useProfileData = (
 	options?: { profileOnly?: boolean }
 ) => {
 	const [profile, setProfile] = useState<ProfileState>({
+		id: "",
 		name: "",
 		username: "",
 		bio: "",
 	});
 	const [originalProfile, setOriginalProfile] = useState<ProfileState>({
+		id: "",
 		name: "",
 		username: "",
 		bio: "",
@@ -77,7 +80,7 @@ export const useProfileData = (
 		setIsProfileLoading(true);
 		try {
 			const res = await fetch("/api/profile");
-			const { name = "", username = "", bio = "", image } = await res.json();
+			const { id = "", name = "", username = "", bio = "", image } = await res.json();
 			const currentImage =
 				image ||
 				sessionImage ||
@@ -122,7 +125,7 @@ export const useProfileData = (
 				userEvents = (eventsData?.events || []).filter((ev: any) => ev.active !== false);
 			}
 
-			const profileData = { name, username, bio: bio || "" };
+			const profileData = { id, name, username, bio: bio || "" };
 			setProfile(profileData);
 			setOriginalProfile(profileData);
 
@@ -171,12 +174,13 @@ export const useProfileData = (
 	}, [userId, sessionImage, options?.profileOnly]);
 
 	const updateProfileText = useCallback(async (): Promise<User | null> => {
-		if (!userId) {
+		const activeId = profile.id || userId;
+		if (!activeId) {
 			return null;
 		}
 
 		try {
-			const res = await fetch(`/api/profile/${userId}`, {
+			const res = await fetch(`/api/profile/${activeId}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(profile),

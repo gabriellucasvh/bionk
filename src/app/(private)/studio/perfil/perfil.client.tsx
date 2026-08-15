@@ -36,8 +36,14 @@ interface User {
 
 const PerfilClient = () => {
 	const { data: session, update } = useSession();
-	const [profile, setProfile] = useState({ name: "", username: "", bio: "" });
+	const [profile, setProfile] = useState({
+		id: "",
+		name: "",
+		username: "",
+		bio: "",
+	});
 	const [originalProfile, setOriginalProfile] = useState({
+		id: "",
 		name: "",
 		username: "",
 		bio: "",
@@ -104,6 +110,7 @@ const PerfilClient = () => {
 			try {
 				const res = await fetch("/api/profile");
 				const {
+					id = "",
 					name = "",
 					username = "",
 					bio = "",
@@ -114,8 +121,8 @@ const PerfilClient = () => {
 					image ||
 					"https://res.cloudinary.com/dlfpjuk2r/image/upload/v1757491297/default_xry2zk.png";
 
-				setProfile({ name, username, bio: bio || "" });
-				setOriginalProfile({ name, username, bio: bio || "" });
+				setProfile({ id, name, username, bio: bio || "" });
+				setOriginalProfile({ id, name, username, bio: bio || "" });
 				setProfilePreview(currentImage);
 				setOriginalProfileImageUrl(currentImage);
 
@@ -213,12 +220,13 @@ const PerfilClient = () => {
 			profile.username !== originalProfile.username ||
 			profile.bio !== originalProfile.bio;
 
-		if (!(session?.user?.id && (textChanged || profileImageChanged))) {
+		const activeId = profile.id || session?.user?.id;
+		if (!(activeId && (textChanged || profileImageChanged))) {
 			return null;
 		}
 
 		try {
-			const res = await fetch(`/api/profile/${session.user.id}`, {
+			const res = await fetch(`/api/profile/${activeId}`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(profile),
@@ -344,7 +352,8 @@ const PerfilClient = () => {
 	};
 
 	const uploadImage = async (file: File): Promise<string | null> => {
-		if (!session?.user?.id) {
+		const activeId = profile.id || session?.user?.id;
+		if (!activeId) {
 			return null;
 		}
 
@@ -354,13 +363,10 @@ const PerfilClient = () => {
 		formData.append("type", "profile");
 
 		try {
-			const res = await fetch(
-				`/api/profile/${session.user.id}/upload?type=profile`,
-				{
-					method: "POST",
-					body: formData,
-				}
-			);
+			const res = await fetch(`/api/profile/${activeId}/upload?type=profile`, {
+				method: "POST",
+				body: formData,
+			});
 			const data = await res.json();
 			if (!res.ok) {
 				throw new Error(data.error || "Falha no upload");
@@ -380,6 +386,7 @@ const PerfilClient = () => {
 	) => {
 		if (updatedUserData) {
 			setOriginalProfile({
+				id: profile.id,
 				name: updatedUserData.name,
 				username: updatedUserData.username,
 				bio: updatedUserData.bio || "",
@@ -449,6 +456,7 @@ const PerfilClient = () => {
 			}
 		} else {
 			setOriginalProfile({
+				id: profile.id,
 				name: profile.name,
 				username: profile.username,
 				bio: profile.bio,
@@ -473,7 +481,8 @@ const PerfilClient = () => {
 	};
 
 	const handleSaveProfile = async () => {
-		if (!(session?.user?.id && hasChanges)) {
+		const activeId = profile.id || session?.user?.id;
+		if (!(activeId && hasChanges)) {
 			return;
 		}
 
@@ -552,7 +561,10 @@ const PerfilClient = () => {
 										/>
 										{isUploadingImage && (
 											<div className="absolute inset-0 flex items-center justify-center rounded-full bg-black bg-opacity-50">
-												<SpinnerGap weight="regular" className="h-6 w-6 animate-spin text-white" />
+												<SpinnerGap
+													className="h-6 w-6 animate-spin text-white"
+													weight="regular"
+												/>
 											</div>
 										)}
 									</div>
@@ -563,7 +575,7 @@ const PerfilClient = () => {
 										size="icon"
 										variant="white"
 									>
-										<PencilSimple weight="regular" className="h-4 w-4" />
+										<PencilSimple className="h-4 w-4" weight="regular" />
 									</BaseButton>
 								</div>
 								<div className="flex-1 space-y-2 text-center md:text-start">
@@ -688,7 +700,10 @@ const PerfilClient = () => {
 															value={profile.username}
 														/>
 														{isCheckingUsername && (
-															<SpinnerGap weight="regular" className="-translate-y-1/2 absolute top-1/2 right-3 h-4 w-4 animate-spin text-muted-foreground" />
+															<SpinnerGap
+																className="-translate-y-1/2 absolute top-1/2 right-3 h-4 w-4 animate-spin text-muted-foreground"
+																weight="regular"
+															/>
 														)}
 													</div>
 												</div>
@@ -920,7 +935,10 @@ const PerfilClient = () => {
 															value={profile.username}
 														/>
 														{isCheckingUsername && (
-															<SpinnerGap weight="regular" className="-translate-y-1/2 absolute top-1/2 right-3 h-4 w-4 animate-spin text-muted-foreground" />
+															<SpinnerGap
+																className="-translate-y-1/2 absolute top-1/2 right-3 h-4 w-4 animate-spin text-muted-foreground"
+																weight="regular"
+															/>
 														)}
 													</div>
 												</div>

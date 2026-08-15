@@ -86,6 +86,8 @@ const PersonalizarClient = () => {
 		session?.user?.image || undefined
 	);
 
+	const activeId = profile.id || session?.user?.id;
+
 	const {
 		profilePreview,
 		isUploadingImage,
@@ -325,10 +327,10 @@ const PersonalizarClient = () => {
 				onClose={() => setIsImageCropModalOpen(false)}
 				onImageRemove={handleProfileImageRemove}
 				onImageSave={async (file) => {
-					if (!session?.user?.id) {
+					if (!activeId) {
 						return;
 					}
-					const url = await uploadImage(file, session.user.id);
+					const url = await uploadImage(file, activeId);
 					if (!url) {
 						return;
 					}

@@ -1,15 +1,14 @@
 // src/app/(private)/studio/UserComponents.tsx
 
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
+import { getAppSession } from "@/lib/auth-session";
 import type { FC } from "react";
-import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 type UserWithLinks = any;
 
 export default async function UserComponent() {
-	const session = await getServerSession(authOptions);
+	const session = await getAppSession();
 	const username = session?.user?.username;
 
 	if (!username) {

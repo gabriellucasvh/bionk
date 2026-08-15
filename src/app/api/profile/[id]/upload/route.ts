@@ -1,8 +1,9 @@
+import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
+import { getAppSession } from "@/lib/auth-session";
+import { evictProfilePageCache, profileBaseTag } from "@/lib/cache-tags";
 import cloudinary from "@/lib/cloudinary";
 import prisma from "@/lib/prisma";
-import { revalidatePath, revalidateTag } from "next/cache";
-import { profileBaseTag, evictProfilePageCache } from "@/lib/cache-tags";
 export const runtime = "nodejs";
 
 export async function POST(
@@ -10,6 +11,15 @@ export async function POST(
 	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const { id } = await params;
+	const session = await getAppSession();
+
+	if (session?.user?.id !== id) {
+		return NextResponse.json(
+			{ success: false, error: "Não autorizado" },
+			{ status: 401 }
+		);
+	}
+
 	const data = await req.formData();
 	const file = data.get("file") as File;
 
@@ -29,8 +39,6 @@ export async function POST(
 
 		// Detecta se é um GIF para preservar a animação
 		const isGif = mimeType === "image/gif";
-		
-
 
 		const result = await cloudinary.uploader.upload(fileUri, {
 			folder: "profile-pictures",
@@ -41,14 +49,14 @@ export async function POST(
 			...(isGif && {
 				format: "gif",
 				flags: "preserve_transparency",
-				resource_type: "image"
-			})
+				resource_type: "image",
+			}),
 		});
 
 		const updatedUser = await prisma.user.update({
 			where: { id },
 			data: { image: result.secure_url },
-			select: { username: true }
+			select: { username: true },
 		});
 
 		if (updatedUser.username) {

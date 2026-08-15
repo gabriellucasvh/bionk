@@ -2,7 +2,6 @@
 
 import { NextResponse } from "next/server";
 import { getAppSession } from "@/lib/auth-session";
-import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
@@ -17,6 +16,7 @@ export async function GET() {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
+        id: true,
         name: true,
         username: true,
         bio: true,
