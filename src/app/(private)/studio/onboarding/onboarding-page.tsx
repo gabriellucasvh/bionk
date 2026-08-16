@@ -645,13 +645,15 @@ export default function OnboardingPageComponent({
 	return (
 		<div className="flex min-h-dvh items-start justify-center bg-white p-6 pt-16 dark:from-gray-900 dark:to-gray-800">
 			{currentStep !== 6 && (
-				<div className="-translate-x-1/2 fixed top-6 left-1/2 z-50 h-1.5 w-1/12 max-w-md overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
-					<div
-						className="h-full rounded-full bg-sky-500 transition-all duration-300 ease-out"
-						style={{
-							width: `${(currentStep / (hideStep6 ? 5 : STEPS.length)) * 100}%`,
-						}}
-					/>
+				<div className="fixed top-0 left-0 z-50 flex w-full justify-center bg-white py-6 dark:bg-gray-900">
+					<div className="h-1.5 w-1/12 max-w-md overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+						<div
+							className="h-full rounded-full bg-sky-500 transition-all duration-300 ease-out"
+							style={{
+								width: `${(currentStep / (hideStep6 ? 5 : STEPS.length)) * 100}%`,
+							}}
+						/>
+					</div>
 				</div>
 			)}
 			<div className="mx-auto w-full max-w-lg">
