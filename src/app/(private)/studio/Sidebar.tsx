@@ -12,6 +12,7 @@ import {
 	Link as LinkIcon,
 	PaintBrush,
 	Palette,
+	Plus,
 	QrCode,
 	Share,
 	SquaresFour,
@@ -204,6 +205,8 @@ const Sidebar = () => {
 
 	const { data: profilesData } = useSWR("/api/profile/all", fetcher);
 	const profiles = profilesData?.profiles || [];
+	const maxProfiles = 10;
+	const canCreateMore = profiles.length < maxProfiles;
 
 	const handleSwitchProfile = (profileId: string) => {
 		Cookies.set("bionk_active_profile_id", profileId, {
@@ -517,6 +520,18 @@ const Sidebar = () => {
 											</DropdownMenuItem>
 										);
 									})}
+									{canCreateMore && (
+										<>
+											<DropdownMenuSeparator className="my-1" />
+											<DropdownMenuItem
+												className="flex cursor-pointer items-center justify-center py-2 font-medium text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+												onClick={() => router.push("/studio/new")}
+											>
+												<Plus className="mr-2 h-4 w-4" weight="bold" />
+												Criar nova página
+											</DropdownMenuItem>
+										</>
+									)}
 								</DropdownMenuSubContent>
 							</DropdownMenuSub>
 							<DropdownMenuSeparator />

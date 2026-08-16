@@ -1,10 +1,10 @@
 "use client";
 
 import { Plus } from "@phosphor-icons/react/dist/ssr";
+import Cookies from "js-cookie";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import Cookies from "js-cookie";
 import LoadingPage from "@/components/layout/LoadingPage";
 import UserPagePreview from "./design/components/UserPagePreview";
 
@@ -40,7 +40,7 @@ export default function Studio() {
 					<h1 className="font-bold text-3xl">Minhas Páginas</h1>
 					<p className="mt-2 text-zinc-500">Gerencie seus perfis e links.</p>
 				</div>
-				{canCreateMore && (
+				{canCreateMore ? (
 					<Link
 						className="flex items-center gap-2 rounded-full bg-black px-5 py-2.5 font-medium text-sm text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
 						href="/studio/new"
@@ -49,6 +49,15 @@ export default function Studio() {
 						<span className="hidden sm:inline">Criar nova página</span>
 						<span className="sm:hidden">Criar</span>
 					</Link>
+				) : (
+					<div
+						className="flex cursor-not-allowed items-center gap-2 rounded-full bg-zinc-200 px-5 py-2.5 font-medium text-sm text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500"
+						title="Limite de páginas atingido"
+					>
+						<Plus className="h-4 w-4" weight="bold" />
+						<span className="hidden sm:inline">Criar nova página</span>
+						<span className="sm:hidden">Criar</span>
+					</div>
 				)}
 			</div>
 
@@ -108,7 +117,6 @@ export default function Studio() {
 						</div>
 					);
 				})}
-
 			</div>
 		</div>
 	);
