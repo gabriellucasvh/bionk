@@ -9,6 +9,17 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import ProfileImageCropModal from "@/components/modals/ProfileImageCropModal";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -728,13 +739,33 @@ export default function OnboardingPageComponent({
 							</button>
 						)}
 						{onCancel && currentStep === 1 && (
-							<button
-								className="font-medium text-gray-500 text-sm transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-								onClick={onCancel}
-								type="button"
-							>
-								Cancelar
-							</button>
+							<AlertDialog>
+								<AlertDialogTrigger asChild>
+									<button
+										className="font-medium text-gray-500 text-sm transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+										type="button"
+									>
+										Cancelar
+									</button>
+								</AlertDialogTrigger>
+								<AlertDialogContent>
+									<AlertDialogHeader>
+										<AlertDialogTitle>Tem certeza que deseja cancelar?</AlertDialogTitle>
+										<AlertDialogDescription>
+											Seu progresso será perdido e você voltará para a tela anterior.
+										</AlertDialogDescription>
+									</AlertDialogHeader>
+									<AlertDialogFooter>
+										<AlertDialogCancel>Continuar cadastro</AlertDialogCancel>
+										<AlertDialogAction
+											className="bg-red-500 text-white hover:bg-red-600"
+											onClick={onCancel}
+										>
+											Sim, cancelar
+										</AlertDialogAction>
+									</AlertDialogFooter>
+								</AlertDialogContent>
+							</AlertDialog>
 						)}
 					</div>
 				</div>
