@@ -656,7 +656,10 @@ export default function OnboardingPageComponent({
 	return (
 		<div className="flex min-h-dvh items-start justify-center bg-white p-6 pt-16 dark:from-gray-900 dark:to-gray-800">
 			{currentStep !== 6 && (
-				<div className="fixed top-0 left-0 z-50 flex w-full justify-center bg-white py-6 dark:bg-gray-900">
+				<div 
+					className="fixed top-0 left-0 z-50 flex w-full justify-center bg-white py-6 dark:bg-gray-900"
+					style={{ paddingRight: "var(--removed-body-scroll-bar-size, 0px)" }}
+				>
 					<div className="h-1.5 w-1/12 max-w-md overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
 						<div
 							className="h-full rounded-full bg-sky-500 transition-all duration-300 ease-out"
@@ -705,7 +708,10 @@ export default function OnboardingPageComponent({
 			</div>
 
 			{/* Navigation */}
-			<div className="pointer-events-none fixed right-0 bottom-0 left-0 z-20 pt-12 pb-6">
+			<div 
+				className="pointer-events-none fixed right-0 bottom-0 left-0 z-20 pt-12 pb-6"
+				style={{ paddingRight: "var(--removed-body-scroll-bar-size, 0px)" }}
+			>
 				<div className="absolute inset-0 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-gray-900 dark:via-gray-900/90 dark:to-transparent" />
 				<div className="pointer-events-auto relative mx-auto flex w-full max-w-lg flex-col items-center gap-3 px-6">
 					{currentStep < (hideStep6 ? 5 : STEPS.length) ? (
