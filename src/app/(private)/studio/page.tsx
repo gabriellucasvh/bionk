@@ -40,6 +40,16 @@ export default function Studio() {
 					<h1 className="font-bold text-3xl">Minhas Páginas</h1>
 					<p className="mt-2 text-zinc-500">Gerencie seus perfis e links.</p>
 				</div>
+				{canCreateMore && (
+					<Link
+						className="flex items-center gap-2 rounded-full bg-black px-5 py-2.5 font-medium text-sm text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+						href="/studio/new"
+					>
+						<Plus className="h-4 w-4" weight="bold" />
+						<span className="hidden sm:inline">Criar nova página</span>
+						<span className="sm:hidden">Criar</span>
+					</Link>
+				)}
 			</div>
 
 			<div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -99,21 +109,6 @@ export default function Studio() {
 					);
 				})}
 
-				{/* Placeholder para futuras páginas */}
-				{canCreateMore && (
-					<Link
-						className="group flex h-full min-h-[300px] cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-zinc-200 border-dashed text-zinc-400 transition-colors hover:border-zinc-300 hover:text-zinc-600 dark:border-zinc-800 dark:hover:border-zinc-700 dark:hover:text-zinc-300"
-						href="/studio/new"
-					>
-						<div className="mb-4 flex size-14 items-center justify-center rounded-full bg-zinc-100 transition-transform group-hover:scale-110 dark:bg-zinc-800">
-							<Plus className="size-6" weight="bold" />
-						</div>
-						<span className="font-semibold">Criar nova página</span>
-						<span className="mt-2 text-xs opacity-60">
-							{profiles.length} de {maxProfiles} páginas grátis
-						</span>
-					</Link>
-				)}
 			</div>
 		</div>
 	);
