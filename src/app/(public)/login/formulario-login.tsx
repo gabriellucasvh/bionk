@@ -216,7 +216,7 @@ function Login() {
 									Email ou username
 								</Label>
 								<Input
-									className="w-full rounded-md px-4 py-4 text-base focus-visible:border-lime-500"
+									className="w-full rounded-md px-4 py-4 text-base focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-black"
 									placeholder="Digite seu e-mail ou username"
 									type="text"
 									{...register("login")}
@@ -237,7 +237,7 @@ function Login() {
 								</Label>
 								<div className="relative">
 									<Input
-										className="w-full rounded-md px-4 py-4 text-base focus-visible:border-lime-500"
+										className="w-full rounded-md px-4 py-4 text-base focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-black"
 										placeholder="Digite sua senha"
 										type={showPassword ? "text" : "password"}
 										{...register("password")}
@@ -247,7 +247,11 @@ function Login() {
 										onClick={() => setShowPassword(!showPassword)}
 										type="button"
 									>
-										{showPassword ? <EyeClosed weight="regular" size={20} /> : <Eye weight="regular" size={20} />}
+										{showPassword ? (
+											<EyeClosed size={20} weight="regular" />
+										) : (
+											<Eye size={20} weight="regular" />
+										)}
 									</button>
 								</div>
 								{/* Espaço reservado para mensagem de erro da senha */}

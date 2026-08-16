@@ -31,7 +31,7 @@ export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {
 				</Label>
 				<div className="mt-1">
 					<Input
-						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
+						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:ring-2 focus-visible:ring-black focus-visible:border-transparent"
 						placeholder="Digite seu username"
 						type="text"
 						{...form.register("username", {
@@ -53,7 +53,7 @@ export function PasswordForm({ form, onSubmit, loading }: PasswordFormProps) {
 				</Label>
 				<div className="relative mt-1">
 					<Input
-						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
+						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:ring-2 focus-visible:ring-black focus-visible:border-transparent"
 						placeholder="Digite sua senha"
 						type={showPassword ? "text" : "password"}
 						{...form.register("password")}

@@ -1,7 +1,7 @@
 "use client";
 
-import axios from "axios";
 import { Eye, EyeClosed } from "@phosphor-icons/react/dist/ssr";
+import axios from "axios";
 import { useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { BaseButton } from "@/components/buttons/BaseButton";
@@ -84,24 +84,24 @@ export function CompletionForm({
 		}
 	};
 
-    const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const prev = form.getValues().username || "";
-        const value = sanitizeUsername(e.target.value);
-        form.setValue("username", value, { shouldValidate: true });
-        if (value === prev) {
-            return;
-        }
-        setIsTyping(true);
-        setUsernameStatus({ type: "idle" });
-        if (usernameCheckTimeout) {
-            clearTimeout(usernameCheckTimeout);
-        }
-        const timeout = setTimeout(() => {
-            setIsTyping(false);
-            checkUsernameAvailability(value);
-        }, 600);
-        setUsernameCheckTimeout(timeout);
-    };
+	const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const prev = form.getValues().username || "";
+		const value = sanitizeUsername(e.target.value);
+		form.setValue("username", value, { shouldValidate: true });
+		if (value === prev) {
+			return;
+		}
+		setIsTyping(true);
+		setUsernameStatus({ type: "idle" });
+		if (usernameCheckTimeout) {
+			clearTimeout(usernameCheckTimeout);
+		}
+		const timeout = setTimeout(() => {
+			setIsTyping(false);
+			checkUsernameAvailability(value);
+		}, 600);
+		setUsernameCheckTimeout(timeout);
+	};
 
 	const handleUsernameBlur = () => {
 		const value = (form.getValues().username || "").toLowerCase().trim();
@@ -179,7 +179,7 @@ export function CompletionForm({
 						bionk.me/
 					</span>
 					<Input
-						className={`w-full border px-4 py-3 pl-[100px] transition-colors duration-400 focus-visible:border-lime-500 ${(() => {
+						className={`w-full border px-4 py-3 pl-[100px] transition-colors duration-400 focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-black ${(() => {
 							if (usernameStatus.type === "available") {
 								return "border-green-500";
 							}
@@ -232,7 +232,7 @@ export function CompletionForm({
 				</Label>
 				<div className="relative mt-1">
 					<Input
-						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-lime-500"
+						className="mb-1 w-full rounded-md border px-4 py-3 transition-colors duration-400 focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-black"
 						maxLength={64}
 						placeholder="Digite sua senha"
 						type={showPassword ? "text" : "password"}
@@ -246,9 +246,9 @@ export function CompletionForm({
 						type="button"
 					>
 						{showPassword ? (
-							<EyeClosed weight="regular" className="h-5 w-5" />
+							<EyeClosed className="h-5 w-5" weight="regular" />
 						) : (
-							<Eye weight="regular" className="h-5 w-5" />
+							<Eye className="h-5 w-5" weight="regular" />
 						)}
 					</button>
 				</div>

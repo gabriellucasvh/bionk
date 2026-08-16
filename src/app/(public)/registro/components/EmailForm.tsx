@@ -31,7 +31,7 @@ export function EmailForm({ form, onSubmit, loading }: EmailFormProps) {
 					Seu email
 				</Label>
 				<Input
-					className="w-full rounded-md border px-4 py-4 text-base transition-colors duration-400 focus-visible:border-lime-500"
+					className="w-full rounded-md border px-4 py-4 text-base transition-colors duration-400 focus-visible:ring-2 focus-visible:ring-black focus-visible:border-transparent"
 					placeholder="Digite seu e-mail"
 					type="email"
 					{...form.register("email")}
