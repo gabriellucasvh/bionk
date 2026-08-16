@@ -671,7 +671,7 @@ export default function OnboardingPageComponent({
 				</div>
 			)}
 			<div className="mx-auto w-full max-w-lg">
-				<AnimatePresence mode="wait">
+				<AnimatePresence mode="wait" onExitComplete={() => window.scrollTo(0, 0)}>
 					<motion.div
 						animate="show"
 						className="w-full"
