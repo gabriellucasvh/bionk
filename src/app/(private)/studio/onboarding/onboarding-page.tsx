@@ -1,7 +1,6 @@
 "use client";
 
 import {
-	Check,
 	PencilSimple,
 	SpinnerGap,
 } from "@phosphor-icons/react/dist/ssr";
@@ -540,9 +539,6 @@ export default function OnboardingPageComponent({
 								placeholder="Seu nome"
 								value={data.name}
 							/>
-							<p className="text-muted-foreground text-xs">
-								{data.name.length}/44 caracteres
-							</p>
 						</div>
 						{isGoogleUser && (
 							<div className="space-y-2">
@@ -576,9 +572,6 @@ export default function OnboardingPageComponent({
 										className={`text-xs ${usernameValidation.isValid ? "text-green-600" : "text-red-500"}`}
 									>
 										{usernameValidation.message}
-									</p>
-									<p className="text-muted-foreground text-xs">
-										{data.username.length}/30 caracteres
 									</p>
 								</div>
 							</div>
@@ -716,11 +709,6 @@ export default function OnboardingPageComponent({
 							disabled={loading || isSubmitting || !canProceedToNext()}
 							onClick={handleComplete}
 						>
-							{loading || isSubmitting ? (
-								<SpinnerGap className="h-4 w-4 animate-spin" weight="regular" />
-							) : (
-								<Check className="h-4 w-4" weight="regular" />
-							)}
 							<span className="ml-2">
 								{hideStep6 ? "Criar Perfil" : "Concluir e ir para o Studio"}
 							</span>
