@@ -32,7 +32,7 @@ yarn-error.log*
 logs.txt
 tasks.md
 assigntrafficsources.js
-.cursorrules
+.agents
 services.txt
 
 # env files — NUNCA commitar arquivos .env com segredos
