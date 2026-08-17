@@ -37,26 +37,24 @@ const ArchivingLoader = ({
 					)}
 				>
 					{/* Ícone de arquivo com animação */}
-					<Archive weight="regular"
-						className={cn(
-							"animate-pulse text-green-700 dark:text-green-300",
-							{
-								"h-4 w-4": size === "sm",
-								"h-6 w-6": size === "md",
-								"h-8 w-8": size === "lg",
-							}
-						)}
+					<Archive
+						className={cn("animate-pulse text-green-700 dark:text-green-300", {
+							"h-4 w-4": size === "sm",
+							"h-6 w-6": size === "md",
+							"h-8 w-8": size === "lg",
+						})}
+						weight="regular"
 					/>
 
 					{/* Documentos voando para dentro da caixa */}
 					<div className="-top-2 -right-2 absolute">
-						<div className="h-4 w-3 animate-[flyIn_1.5s_ease-in-out_infinite] rounded-sm border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-700" />
+						<div className="h-4 w-3 animate-[flyIn_1.5s_ease-in-out_infinite] rounded-sm border border-gray-300 bg-white shadow-xs dark:border-gray-600 dark:bg-gray-700" />
 					</div>
 					<div className="-top-1 -right-3 absolute">
-						<div className="h-4 w-3 animate-[flyIn_1.5s_ease-in-out_infinite_0.3s] rounded-sm border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-700" />
+						<div className="h-4 w-3 animate-[flyIn_1.5s_ease-in-out_infinite_0.3s] rounded-sm border border-gray-300 bg-white shadow-xs dark:border-gray-600 dark:bg-gray-700" />
 					</div>
 					<div className="-top-3 -right-1 absolute">
-						<div className="h-4 w-3 animate-[flyIn_1.5s_ease-in-out_infinite_0.6s] rounded-sm border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-700" />
+						<div className="h-4 w-3 animate-[flyIn_1.5s_ease-in-out_infinite_0.6s] rounded-sm border border-gray-300 bg-white shadow-xs dark:border-gray-600 dark:bg-gray-700" />
 					</div>
 				</div>
 

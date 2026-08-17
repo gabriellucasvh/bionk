@@ -1,6 +1,6 @@
 "use client";
-import { AnimatePresence } from "framer-motion";
 import { CaretLeft, CaretRight, Quotes } from "@phosphor-icons/react/dist/ssr";
+import { AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
 import { MotionDiv } from "@/components/ui/motion";
@@ -70,7 +70,7 @@ export default function Testimonials() {
 								onClick={prev}
 								type="button"
 							>
-								<CaretLeft weight="regular" className="h-6 w-6 text-black" />
+								<CaretLeft className="h-6 w-6 text-black" weight="regular" />
 							</button>
 							<button
 								aria-label="Próximo"
@@ -78,7 +78,7 @@ export default function Testimonials() {
 								onClick={next}
 								type="button"
 							>
-								<CaretRight weight="regular" className="h-6 w-6 text-black" />
+								<CaretRight className="h-6 w-6 text-black" weight="regular" />
 							</button>
 						</div>
 					</div>
@@ -87,15 +87,16 @@ export default function Testimonials() {
 						<AnimatePresence mode="wait">
 							<MotionDiv
 								animate={{ opacity: 1, y: 0 }}
-								className="rounded-3xl border-2 border-violet-500 p-10 shadow-sm"
+								className="rounded-3xl border-2 border-violet-500 p-10 shadow-xs"
 								exit={{ opacity: 0, y: -12 }}
 								initial={{ opacity: 0, y: 12 }}
 								key={index}
 								transition={{ duration: 0.25 }}
 							>
-								<Quotes weight="regular"
+								<Quotes
 									className="h-8 w-8 fill-current text-purple-400"
 									strokeWidth={0.1}
+									weight="regular"
 								/>
 								<p className="mt-4 text-3xl text-black leading-snug">
 									{t.quote}
@@ -118,7 +119,7 @@ export default function Testimonials() {
 								onClick={prev}
 								type="button"
 							>
-								<CaretLeft weight="regular" className="h-6 w-6 text-black" />
+								<CaretLeft className="h-6 w-6 text-black" weight="regular" />
 							</button>
 							<button
 								aria-label="Próximo"
@@ -126,7 +127,7 @@ export default function Testimonials() {
 								onClick={next}
 								type="button"
 							>
-								<CaretRight weight="regular" className="h-6 w-6 text-black" />
+								<CaretRight className="h-6 w-6 text-black" weight="regular" />
 							</button>
 						</div>
 					</div>

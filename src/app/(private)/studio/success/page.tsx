@@ -21,7 +21,7 @@ function SuccessContent() {
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 p-6 dark:bg-zinc-950">
 			<div className="flex w-full max-w-lg flex-col items-center text-center">
-				<div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-600 shadow-sm dark:bg-green-900/30 dark:text-green-400">
+				<div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-600 shadow-xs dark:bg-green-900/30 dark:text-green-400">
 					<CheckCircle className="h-10 w-10" weight="fill" />
 				</div>
 
@@ -35,7 +35,7 @@ function SuccessContent() {
 					{session?.user?.email}).
 				</p>
 
-				<div className="mb-10 w-full overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+				<div className="mb-10 w-full overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xs dark:border-zinc-800 dark:bg-zinc-900">
 					<div className="flex items-center justify-between p-5">
 						<div className="flex flex-col items-start truncate">
 							<span className="mb-1 font-bold text-[11px] text-zinc-400 uppercase tracking-wider">

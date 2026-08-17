@@ -57,7 +57,7 @@ export function FontSelector({
 						{FONT_OPTIONS.find((f) => f.value === customizations.customFont)
 							?.label || "Onest"}
 					</span>
-					<TextT weight="regular" className="h-4 w-4" />
+					<TextT className="h-4 w-4" weight="regular" />
 				</Button>
 			</div>
 			<div className="mt-2 hidden grid-cols-3 gap-2 sm:grid sm:grid-cols-4 lg:grid-cols-5">
@@ -105,8 +105,8 @@ export function ButtonStyleSelector({
 							role="none"
 						>
 							{isActive && (
-								<div className="absolute top-1 left-1 rounded-full bg-green-600 p-1 text-white shadow-sm">
-									<Check weight="regular" className="h-3 w-3" />
+								<div className="absolute top-1 left-1 rounded-full bg-green-600 p-1 text-white shadow-xs">
+									<Check className="h-3 w-3" weight="regular" />
 								</div>
 							)}
 							<button

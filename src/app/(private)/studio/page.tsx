@@ -66,7 +66,7 @@ export default function Studio() {
 					const userCustomizations = profile.CustomPresets || {};
 					return (
 						<div
-							className="group relative flex flex-col overflow-hidden rounded-3xl border bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+							className="group relative flex flex-col overflow-hidden rounded-3xl border bg-white shadow-xs transition-all hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
 							key={profile.id}
 						>
 							{/* Área da miniatura simulando um celular */}

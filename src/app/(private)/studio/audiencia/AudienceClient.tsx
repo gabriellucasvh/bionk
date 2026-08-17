@@ -71,7 +71,7 @@ export default function AudienceClient() {
 	return (
 		<div className="space-y-8">
 			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-				<div className="rounded-xl border bg-white p-4 shadow-sm dark:bg-zinc-900">
+				<div className="rounded-xl border bg-white p-4 shadow-xs dark:bg-zinc-900">
 					<div className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<h3 className="font-medium text-sm text-zinc-500 tracking-tight dark:text-zinc-400">
 							Total de Contatos
@@ -86,7 +86,7 @@ export default function AudienceClient() {
 					</div>
 				</div>
 
-				<div className="rounded-xl border bg-white p-4 shadow-sm dark:bg-zinc-900">
+				<div className="rounded-xl border bg-white p-4 shadow-xs dark:bg-zinc-900">
 					<div className="flex flex-row items-center justify-between space-y-0 pb-2">
 						<h3 className="font-medium text-sm text-zinc-500 tracking-tight dark:text-zinc-400">
 							Crescimento Semanal
@@ -109,7 +109,7 @@ export default function AudienceClient() {
 				</div>
 			</div>
 
-			<div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:bg-zinc-900">
+			<div className="overflow-hidden rounded-xl border bg-white shadow-xs dark:bg-zinc-900">
 				<AudienceDataTable data={submissions} />
 			</div>
 		</div>

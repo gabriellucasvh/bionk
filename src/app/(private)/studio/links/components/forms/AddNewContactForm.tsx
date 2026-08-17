@@ -93,7 +93,7 @@ export default function AddNewContactForm({
 	};
 
 	return (
-		<div className="mb-4 rounded-xl border bg-white p-4 shadow-sm dark:bg-zinc-900">
+		<div className="mb-4 rounded-xl border bg-white p-4 shadow-xs dark:bg-zinc-900">
 			<div className="mb-4 flex items-center justify-between">
 				<h3 className="font-semibold">
 					{initialData ? "Editar" : "Novo"} Formulário de Contato
@@ -102,7 +102,9 @@ export default function AddNewContactForm({
 
 			<div className="space-y-4">
 				<div>
-					<label className="mb-1 block font-medium text-sm" htmlFor="title">Título</label>
+					<label className="mb-1 block font-medium text-sm" htmlFor="title">
+						Título
+					</label>
 					<Input
 						id="title"
 						maxLength={80}
@@ -115,7 +117,10 @@ export default function AddNewContactForm({
 				</div>
 
 				<div>
-					<label className="mb-1 block font-medium text-sm" htmlFor="description">
+					<label
+						className="mb-1 block font-medium text-sm"
+						htmlFor="description"
+					>
 						Descrição (opcional)
 					</label>
 					<Input
@@ -131,7 +136,10 @@ export default function AddNewContactForm({
 
 				<div className="grid grid-cols-2 gap-4">
 					<div>
-						<label className="mb-1 block font-medium text-sm" htmlFor="buttonText">
+						<label
+							className="mb-1 block font-medium text-sm"
+							htmlFor="buttonText"
+						>
 							Texto do Botão
 						</label>
 						<Input
@@ -145,7 +153,10 @@ export default function AddNewContactForm({
 						/>
 					</div>
 					<div>
-						<label className="mb-1 block font-medium text-sm" htmlFor="successMessage">
+						<label
+							className="mb-1 block font-medium text-sm"
+							htmlFor="successMessage"
+						>
 							Mensagem de Sucesso
 						</label>
 						<Input

@@ -41,7 +41,7 @@ export function ProButton({
 	const baseClasses = cn(
 		"inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-semibold text-xs",
 		"bg-black/80 dark:bg-white dark:text-black",
-		"shadow-sm transition-shadow hover:shadow-md",
+		"shadow-xs transition-shadow hover:shadow-md",
 		size === "xs" && "px-2 py-0.5 text-xs",
 		size === "md" && "px-3 py-1.5 text-sm",
 		size === "lg" && "px-3.5 py-2 text-sm",
@@ -52,7 +52,10 @@ export function ProButton({
 	const content = (
 		<span className="group relative inline-block">
 			<span className={baseClasses}>
-				<Sparkle weight="regular" className="h-3.5 w-3.5 text-white dark:text-black" />
+				<Sparkle
+					className="h-3.5 w-3.5 text-white dark:text-black"
+					weight="regular"
+				/>
 				<span className="text-white dark:text-black">{label}</span>
 			</span>
 			{showOverlayTooltip && tooltip && (
@@ -87,7 +90,7 @@ export function ProButton({
 				showCloseButton={false}
 			>
 				<DialogClose className="absolute top-4 right-4 rounded-full bg-white p-2 dark:bg-zinc-800">
-					<X weight="regular" className="h-4 w-4" />
+					<X className="h-4 w-4" weight="regular" />
 				</DialogClose>
 				<DialogTitle className="hidden font-bold text-xl">
 					Desbloqueie o Bionk PRO
@@ -117,27 +120,27 @@ export function ProButton({
 						</h3>
 						<ul className="space-y-3">
 							<li className="flex items-center gap-2">
-								<Check weight="regular" className="h-5 w-5 text-green-600" />
+								<Check className="h-5 w-5 text-green-600" weight="regular" />
 								<span>Templates premium exclusivos</span>
 							</li>
 							<li className="flex items-center gap-2">
-								<Check weight="regular" className="h-5 w-5 text-green-600" />
+								<Check className="h-5 w-5 text-green-600" weight="regular" />
 								<span>Análises avançadas de cliques e tráfego</span>
 							</li>
 							<li className="flex items-center gap-2">
-								<Check weight="regular" className="h-5 w-5 text-green-600" />
+								<Check className="h-5 w-5 text-green-600" weight="regular" />
 								<span>Links ilimitados e organização melhorada</span>
 							</li>
 							<li className="flex items-center gap-2">
-								<Check weight="regular" className="h-5 w-5 text-green-600" />
+								<Check className="h-5 w-5 text-green-600" weight="regular" />
 								<span>Remoção de marca d’água</span>
 							</li>
 							<li className="flex items-center gap-2">
-								<Check weight="regular" className="h-5 w-5 text-green-600" />
+								<Check className="h-5 w-5 text-green-600" weight="regular" />
 								<span>Automação e agendamento de conteúdo</span>
 							</li>
 							<li className="flex items-center gap-2">
-								<Check weight="regular" className="h-5 w-5 text-green-600" />
+								<Check className="h-5 w-5 text-green-600" weight="regular" />
 								<span>Suporte prioritário</span>
 							</li>
 						</ul>
