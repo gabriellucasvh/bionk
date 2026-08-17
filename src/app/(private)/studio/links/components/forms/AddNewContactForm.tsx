@@ -24,8 +24,7 @@ export default function AddNewContactForm({
 		title: initialData?.title || "",
 		description: initialData?.description || "",
 		imageUrl: initialData?.imageUrl || "",
-		successMessage:
-			initialData?.successMessage || "Enviado",
+		successMessage: initialData?.successMessage || "Enviado",
 		buttonText: initialData?.buttonText || "Enviar",
 		collectName: initialData?.collectName ?? true,
 		collectEmail: initialData?.collectEmail ?? true,
@@ -103,67 +102,70 @@ export default function AddNewContactForm({
 
 			<div className="space-y-4">
 				<div>
-					<label className="mb-1 block font-medium text-sm">
-						Título <span className="text-red-500">*</span>
-					</label>
+					<label className="mb-1 block font-medium text-sm" htmlFor="title">Título</label>
 					<Input
+						id="title"
+						maxLength={80}
 						onChange={(e) =>
 							setFormData({ ...formData, title: e.target.value })
 						}
 						placeholder="Ex: Entre em contato"
 						value={formData.title}
-						maxLength={80}
 					/>
 				</div>
 
 				<div>
-					<label className="mb-1 block font-medium text-sm">
+					<label className="mb-1 block font-medium text-sm" htmlFor="description">
 						Descrição (opcional)
 					</label>
 					<Input
+						id="description"
+						maxLength={200}
 						onChange={(e) =>
 							setFormData({ ...formData, description: e.target.value })
 						}
 						placeholder="Ex: Preencha os dados abaixo"
 						value={formData.description}
-						maxLength={200}
 					/>
 				</div>
 
 				<div className="grid grid-cols-2 gap-4">
 					<div>
-						<label className="mb-1 block font-medium text-sm">
+						<label className="mb-1 block font-medium text-sm" htmlFor="buttonText">
 							Texto do Botão
 						</label>
 						<Input
+							id="buttonText"
+							maxLength={20}
 							onChange={(e) =>
 								setFormData({ ...formData, buttonText: e.target.value })
 							}
 							placeholder="Enviar"
 							value={formData.buttonText}
-							maxLength={20}
 						/>
 					</div>
 					<div>
-						<label className="mb-1 block font-medium text-sm">
+						<label className="mb-1 block font-medium text-sm" htmlFor="successMessage">
 							Mensagem de Sucesso
 						</label>
 						<Input
+							id="successMessage"
+							maxLength={20}
 							onChange={(e) =>
 								setFormData({ ...formData, successMessage: e.target.value })
 							}
 							placeholder="Enviado com sucesso!"
 							value={formData.successMessage}
-							maxLength={20}
 						/>
 					</div>
 				</div>
 
 				<div>
-					<label className="mb-1 block font-medium text-sm">
+					<label className="mb-1 block font-medium text-sm" htmlFor="imageUrl">
 						URL da Imagem (opcional)
 					</label>
 					<Input
+						id="imageUrl"
 						onChange={(e) =>
 							setFormData({ ...formData, imageUrl: e.target.value })
 						}
@@ -243,17 +245,25 @@ export default function AddNewContactForm({
 				</div>
 			</div>
 
-			<div className="mt-6 flex gap-2">
-				<BaseButton className="flex-1" onClick={onClose} variant="outline">
-					Cancelar
-				</BaseButton>
-				<BaseButton
-					className="flex-1"
-					disabled={isLoading}
-					onClick={handleSave}
-				>
-					{isLoading ? "Salvando..." : "Salvar"}
-				</BaseButton>
+			<div className="flex-shrink-0 pt-6">
+				<div className="flex items-center justify-end gap-3">
+					<BaseButton
+						className="px-4"
+						onClick={onClose}
+						type="button"
+						variant="outline"
+					>
+						Cancelar
+					</BaseButton>
+					<BaseButton
+						className="px-4"
+						disabled={isLoading}
+						onClick={handleSave}
+						type="button"
+					>
+						{isLoading ? "Salvando..." : "Salvar"}
+					</BaseButton>
+				</div>
 			</div>
 		</div>
 	);
