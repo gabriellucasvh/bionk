@@ -333,15 +333,33 @@ export default async function UserPage({ params }: PageProps) {
 	const category = user.templateCategory ?? "classicos";
 	const name = user.template ?? "default";
 
-	// Otimização: Import mais eficiente com fallback
+	// Otimização: Import mais eficiente com fallback e suporte ao Turbopack
 	let TemplateComponent: ComponentType<{ user: UserProfileData }>;
 
 	try {
-		// Tenta carregar o template específico
-		const templatePath = `${category}/${name}`;
-		TemplateComponent = (
-			await import(`@/app/[username]/templates/${templatePath}.tsx`)
-		).default;
+		// Tenta carregar o template específico usando switch para não quebrar o Turbopack
+		switch (category) {
+			case "criativo":
+				TemplateComponent = (
+					await import(`@/app/[username]/templates/criativo/${name}`)
+				).default;
+				break;
+			case "moderno":
+				TemplateComponent = (
+					await import(`@/app/[username]/templates/moderno/${name}`)
+				).default;
+				break;
+			case "unicos":
+				TemplateComponent = (
+					await import(`@/app/[username]/templates/unicos/${name}`)
+				).default;
+				break;
+			default:
+				TemplateComponent = (
+					await import(`@/app/[username]/templates/classicos/${name}`)
+				).default;
+				break;
+		}
 	} catch {
 		// Fallback para template padrão
 		TemplateComponent = (
