@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { type CSSProperties, useMemo, useState } from "react";
+import { type CSSProperties, useMemo, useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import type { UserContactForm } from "@/types/user-profile";
 import { parseRgb } from "./utils/style";
@@ -34,6 +34,17 @@ export default function ContactFormCard({
 	const [errorMsg, setErrorMsg] = useState("");
 	const [phone, setPhone] = useState("");
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+	const cardRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (cardRef.current) {
+			const previewMockup = cardRef.current.closest("#preview-phone-container");
+			if (previewMockup) {
+				setPortalContainer(previewMockup as HTMLElement);
+			}
+		}
+	}, []);
 
 	const cornerValue = customPresets?.customButtonCorners || "12";
 	const buttonColor = String(customPresets?.customButtonColor || "#ffffff");
@@ -213,7 +224,7 @@ export default function ContactFormCard({
 
 	if (contactForm.isCompact) {
 		return (
-			<div className="mb-3 w-full" key={contactForm.id}>
+			<div ref={cardRef} className="mb-3 w-full" key={contactForm.id}>
 				<div className="w-full">
 					<button
 						className="flex min-h-[3.5rem] w-full items-center rounded-2xl border px-1 py-3 text-left shadow backdrop-blur-md transition-all duration-200 hover:brightness-110"
@@ -235,7 +246,7 @@ export default function ContactFormCard({
 				</div>
 
 				<Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
-					<DialogContent className="max-h-[80vh] w-[calc(100vw-2rem)] max-w-2xl overflow-y-auto">
+					<DialogContent container={portalContainer || undefined} className="max-h-[80vh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto">
 						<DialogHeader className="sr-only">
 							<DialogTitle>{contactForm.title || "Contato"}</DialogTitle>
 						</DialogHeader>

@@ -1305,7 +1305,11 @@ export default function UserPagePreview({
 	};
 
 	return (
-		<div className="relative h-full w-full">
+		<div
+			className="relative h-full w-full"
+			id="preview-phone-container"
+			style={{ transform: "translateZ(0)" }}
+		>
 			<DynamicFont fontValue={customizations.customFont} />
 			{renderFixedBackground()}
 			<div

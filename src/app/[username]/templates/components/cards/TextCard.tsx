@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -9,10 +9,10 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import {
-    buildCompactButtonStyle,
-    buildBorderRadiusStyle,
-    resolveTextClasses,
-    composeCardClasses,
+	buildBorderRadiusStyle,
+	buildCompactButtonStyle,
+	composeCardClasses,
+	resolveTextClasses,
 } from "./utils/style";
 
 interface TextItem {
@@ -59,6 +59,19 @@ export default function TextCard({
 	classNames,
 }: TextCardProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
+		null
+	);
+	const cardRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (cardRef.current) {
+			const previewMockup = cardRef.current.closest("#preview-phone-container");
+			if (previewMockup) {
+				setPortalContainer(previewMockup as HTMLElement);
+			}
+		}
+	}, []);
 
 	if (!text.active) {
 		return null;
@@ -72,23 +85,23 @@ export default function TextCard({
 
 	const displayText = text.description;
 
-const getTextClasses = () => {
-    return resolveTextClasses(customPresets, text.hasBackground, {
-        cardTextClasses: classNames?.cardTextClasses,
-        textClasses: classNames?.textClasses,
-    });
-};
+	const getTextClasses = () => {
+		return resolveTextClasses(customPresets, text.hasBackground, {
+			cardTextClasses: classNames?.cardTextClasses,
+			textClasses: classNames?.textClasses,
+		});
+	};
 
-const getCompactButtonStyle = () => {
-    if (!customPresets) {
-        return buttonStyle;
-    }
-    return buildCompactButtonStyle(customPresets, buttonStyle);
-};
+	const getCompactButtonStyle = () => {
+		if (!customPresets) {
+			return buttonStyle;
+		}
+		return buildCompactButtonStyle(customPresets, buttonStyle);
+	};
 
-const getCompactButtonStyleWithoutBackground = () => {
-    return buildBorderRadiusStyle(customPresets?.customButtonCorners);
-};
+	const getCompactButtonStyleWithoutBackground = () => {
+		return buildBorderRadiusStyle(customPresets?.customButtonCorners);
+	};
 
 	const textContent = text.isCompact ? (
 		<div className="w-full">
@@ -146,22 +159,22 @@ const getCompactButtonStyleWithoutBackground = () => {
 		</div>
 	);
 
-const getCardClasses = () => {
-    return composeCardClasses(customPresets, {
-        cardClasses: classNames?.cardClasses,
-        textCard: classNames?.textCard,
-    });
-};
+	const getCardClasses = () => {
+		return composeCardClasses(customPresets, {
+			cardClasses: classNames?.cardClasses,
+			textCard: classNames?.textCard,
+		});
+	};
 
-const getCardStyle = () => {
-    if (!(text.hasBackground && customPresets)) {
-        return buttonStyle;
-    }
-    return getCompactButtonStyle();
-};
+	const getCardStyle = () => {
+		if (!(text.hasBackground && customPresets)) {
+			return buttonStyle;
+		}
+		return getCompactButtonStyle();
+	};
 
 	return (
-		<div className="mb-3 w-full" key={text.id}>
+		<div className="mb-3 w-full" key={text.id} ref={cardRef}>
 			{text.hasBackground ? (
 				<div className={getCardClasses()} style={getCardStyle()}>
 					{textContent}
@@ -172,7 +185,10 @@ const getCardStyle = () => {
 
 			{text.isCompact && (
 				<Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
-					<DialogContent className="max-h-[80vh] w-[calc(100vw-2rem)] max-w-2xl overflow-y-auto">
+					<DialogContent
+						className="max-h-[80vh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto"
+						container={portalContainer || undefined}
+					>
 						<DialogHeader>
 							<DialogTitle>{text.title}</DialogTitle>
 						</DialogHeader>
