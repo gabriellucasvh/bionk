@@ -6,7 +6,7 @@ export const useModalState = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isAnimating, setIsAnimating] = useState(false);
 	const [selectedCategory, setSelectedCategory] = useState<
-		"content" | "video" | "image" | "music" | "event" | null
+		"content" | "video" | "image" | "music" | "event" | "contact" | null
 	>("content");
 	const [selectedOption, setSelectedOption] = useState<
 		| "link"
@@ -26,6 +26,7 @@ export const useModalState = () => {
 		| "image_column"
 		| "image_carousel"
 		| "event_tickets"
+		| "contact_form"
 		| null
 	>(null);
 	const [isMobile, setIsMobile] = useState(false);
@@ -103,7 +104,7 @@ export const useModalState = () => {
 	};
 
 	const handleCategorySelect = (
-		category: "content" | "video" | "image" | "music" | "event"
+		category: "content" | "video" | "image" | "music" | "event" | "contact"
 	) => {
 		setSelectedCategory(category);
 		setSelectedOption(null);

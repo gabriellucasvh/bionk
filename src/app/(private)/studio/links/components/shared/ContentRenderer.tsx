@@ -7,10 +7,10 @@ import VideoOptions from "./VideoOptions";
 import MusicOptions from "./MusicOptions";
 
 interface ContentRendererProps {
-	selectedCategory: "content" | "video" | "image" | "music" | "event" | null;
+	selectedCategory: "content" | "video" | "image" | "music" | "event" | "contact" | null;
 	selectedOption: string | null;
 	onCategorySelect: (
-		category: "content" | "video" | "image" | "music" | "event"
+		category: "content" | "video" | "image" | "music" | "event" | "contact"
 	) => void;
 	onOptionSelect: (option: string) => void;
 	showCategorySelector?: boolean;

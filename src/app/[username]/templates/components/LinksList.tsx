@@ -15,6 +15,7 @@ import MusicCard from "./cards/MusicCard";
 import PasswordProtectedLink from "./cards/PasswordProtectedLink";
 import TextCard from "./cards/TextCard";
 import VideoCard from "./cards/VideoCard";
+import ContactFormCard from "./cards/ContactFormCard";
 
 const YOUTUBE_ID_REGEX =
 	/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/;
@@ -147,12 +148,12 @@ export default function LinksList({
 
 	const addContentToArray = (
 		contentArray: Array<{
-			type: "link" | "text" | "video" | "image" | "music" | "event";
+			type: "link" | "text" | "video" | "image" | "music" | "event" | "contact_form";
 			item: any;
 			order: number;
 		}>,
 		items: any[] | undefined,
-		type: "link" | "text" | "video" | "image" | "music" | "event"
+		type: "link" | "text" | "video" | "image" | "music" | "event" | "contact_form"
 	) => {
 		if (items && items.length > 0) {
 			for (const item of items) {
@@ -163,7 +164,7 @@ export default function LinksList({
 
 	const createContentArray = () => {
 		const contentArray: Array<{
-			type: "link" | "text" | "video" | "image" | "music" | "event";
+			type: "link" | "text" | "video" | "image" | "music" | "event" | "contact_form";
 			item: any;
 			order: number;
 		}> = [];
@@ -174,6 +175,7 @@ export default function LinksList({
 		addContentToArray(contentArray, (user as any).Image, "image");
 		addContentToArray(contentArray, (user as any).Music, "music");
 		addContentToArray(contentArray, (user as any).Event, "event");
+		addContentToArray(contentArray, (user as any).ContactForm, "contact_form");
 
 		return contentArray.sort((a, b) => a.order - b.order);
 	};
@@ -473,6 +475,34 @@ export default function LinksList({
 		return result;
 	};
 
+	const renderContactFormContent = (
+		contactForm: any,
+		index: number,
+		sectionIdRef: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const contactFormSectionId = contactForm.sectionId || null;
+
+		if (contactFormSectionId !== sectionIdRef.value && contactFormSectionId !== null) {
+			sectionIdRef.value = contactFormSectionId;
+			const sectionHeader = renderSectionHeader(contactForm, contactFormSectionId, index);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		result.push(
+			<ContactFormCard
+				buttonStyle={buttonStyle}
+				customPresets={customPresets}
+				contactForm={contactForm}
+				key={`contactform-${contactForm.id}`}
+				textStyle={textStyle}
+			/>
+		);
+		return result;
+	};
+
 	const allContent = createContentArray();
 	const currentSectionId = { value: null };
 	const firstLinkIndex = allContent.findIndex((c) => c.type === "link");
@@ -509,6 +539,8 @@ export default function LinksList({
 							return renderMusicContent(content.item, index, currentSectionId);
 						case "event":
 							return renderEventContent(content.item, index, currentSectionId);
+						case "contact_form":
+							return renderContactFormContent(content.item, index, currentSectionId);
 						default:
 							return null;
 					}

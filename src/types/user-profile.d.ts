@@ -1,5 +1,6 @@
 // src/types/user-profile.d.ts
 import type {
+    ContactForm as PrismaContactForm,
     CustomPresets as PrismaCustomPresets,
     Event as PrismaEvent,
     Image as PrismaImage,
@@ -108,6 +109,29 @@ export interface UserMusic extends PrismaMusic {
 // --- Ingressos ---
 export interface UserEvent extends PrismaEvent {}
 
+// --- Formulário de Contato ---
+export interface UserContactForm extends PrismaContactForm {
+    id: number;
+    title?: string | null;
+    description?: string | null;
+    imageUrl?: string | null;
+    buttonText: string;
+    successMessage: string;
+    collectName: boolean;
+    collectEmail: boolean;
+    collectPhone: boolean;
+    order: number;
+    active: boolean;
+    userId: string;
+    sectionId?: number | null;
+    isCompact: boolean;
+    archived: boolean;
+    section?: {
+        id: number;
+        title: string;
+    } | null;
+}
+
 // --- Customização ---
 export interface CustomPresets extends PrismaCustomPresets {
 	customBackgroundColor: string;
@@ -138,6 +162,7 @@ export type UserProfile = PrismaUser & {
 	Image: UserImage[];
 	Music: UserMusic[];
 	Event: UserEvent[];
+	ContactForm: UserContactForm[];
 	CustomPresets?: CustomPresets | null;
 
 	template?: string;

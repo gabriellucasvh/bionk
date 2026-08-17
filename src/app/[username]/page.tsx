@@ -216,6 +216,33 @@ export default async function UserPage({ params }: PageProps) {
 			}
 
 			try {
+				u.ContactForm = await prisma.contactForm.findMany({
+					where: { userId: base.id, active: true, archived: false },
+					orderBy: { order: "asc" },
+					select: {
+						id: true,
+						title: true,
+						description: true,
+						imageUrl: true,
+						buttonText: true,
+						successMessage: true,
+						collectName: true,
+						collectEmail: true,
+						collectPhone: true,
+						order: true,
+						active: true,
+						userId: true,
+						sectionId: true,
+						isCompact: true,
+						archived: true,
+						section: { select: { id: true, title: true } },
+					},
+				});
+			} catch {
+				u.ContactForm = [];
+			}
+
+			try {
 				u.Section = await prisma.section.findMany({
 					where: { userId: base.id, active: true },
 					orderBy: { order: "asc" },
@@ -311,8 +338,9 @@ export default async function UserPage({ params }: PageProps) {
 
 	try {
 		// Tenta carregar o template específico
+		const templatePath = `${category}/${name}`;
 		TemplateComponent = (
-			await import(`@/app/[username]/templates/${category}/${name}.tsx`)
+			await import(`@/app/[username]/templates/${templatePath}.tsx`)
 		).default;
 	} catch {
 		// Fallback para template padrão

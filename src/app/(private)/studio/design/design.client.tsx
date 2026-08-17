@@ -171,6 +171,7 @@ const PersonalizarClient = () => {
 				})) || [],
 			musics: userDataInput.Music || [],
 			events: userDataInput.Event || [],
+			contactForms: userDataInput.ContactForm || userDataInput.contactForms || [],
 		};
 	}, []);
 

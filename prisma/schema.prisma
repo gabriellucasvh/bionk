@@ -90,6 +90,8 @@ model User {
   Event                         Event[]
   QrCode                        QrCode[]
 
+  ContactForm ContactForm[]
+
   @@index([subscriptionStatus])
   @@index([createdAt])
 }
@@ -308,19 +310,20 @@ model Text {
 }
 
 model Section {
-  id        Int      @id @default(autoincrement())
-  title     String
-  order     Int
-  userId    String
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  links     Link[]
-  texts     Text[]
-  videos    Video[]
-  images    Image[]
-  musics    Music[]
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           Int           @id @default(autoincrement())
+  title        String
+  order        Int
+  userId       String
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  links        Link[]
+  texts        Text[]
+  videos       Video[]
+  images       Image[]
+  musics       Music[]
+  contactForms ContactForm[]
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -432,5 +435,52 @@ model QrCode {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([createdAt])
+}
+
+model ContactForm {
+  id             Int                 @id @default(autoincrement())
+  title          String?
+  description    String?
+  imageUrl       String?
+  buttonText     String              @default("Enviar")
+  successMessage String              @default("Enviado")
+  collectName    Boolean             @default(true)
+  collectEmail   Boolean             @default(true)
+  collectPhone   Boolean             @default(true)
+  order          Int                 @default(0)
+  userId         String
+  active         Boolean             @default(true)
+  sectionId      Int?
+  isCompact      Boolean             @default(false)
+  archived       Boolean             @default(false)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  section        Section?            @relation(fields: [sectionId], references: [id])
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  submissions    ContactSubmission[]
+
+  @@index([sectionId])
+  @@index([userId])
+  @@index([userId, order])
+}
+
+model ContactSubmission {
+  id            Int         @id @default(autoincrement())
+  contactFormId Int
+  name          String?
+  email         String?
+  phone         String?
+  createdAt     DateTime    @default(now())
+  
+  // Tracking
+  device        String?     @default("unknown")
+  userAgent     String?
+  country       String?
+  referrer      String?
+
+  contactForm   ContactForm @relation(fields: [contactFormId], references: [id], onDelete: Cascade)
+
+  @@index([contactFormId])
   @@index([createdAt])
 }

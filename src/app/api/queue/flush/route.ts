@@ -235,7 +235,7 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				linkTxs.push(
 					(async () => {
-						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+						const [minL, minT, minV, minI, minM, minS, minE, minC] = await Promise.all([
 							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
@@ -243,6 +243,7 @@ export async function POST(req: Request) {
 							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.contactForm.aggregate({ where: { userId: uid }, _min: { order: true } }),
 						]);
 						const candidates = [
 							minL._min.order,
@@ -252,6 +253,7 @@ export async function POST(req: Request) {
 							minM._min.order,
 							minS._min.order,
 							minE._min.order,
+							minC._min.order,
 						].filter((n) => typeof n === "number") as number[];
 						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
@@ -292,7 +294,7 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				textTxs.push(
 					(async () => {
-						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+						const [minL, minT, minV, minI, minM, minS, minE, minC] = await Promise.all([
 							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
@@ -300,6 +302,7 @@ export async function POST(req: Request) {
 							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.contactForm.aggregate({ where: { userId: uid }, _min: { order: true } }),
 						]);
 						const candidates = [
 							minL._min.order,
@@ -309,6 +312,7 @@ export async function POST(req: Request) {
 							minM._min.order,
 							minS._min.order,
 							minE._min.order,
+							minC._min.order,
 						].filter((n) => typeof n === "number") as number[];
 						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
@@ -344,7 +348,7 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				videoTxs.push(
 					(async () => {
-						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+						const [minL, minT, minV, minI, minM, minS, minE, minC] = await Promise.all([
 							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
@@ -352,6 +356,7 @@ export async function POST(req: Request) {
 							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.contactForm.aggregate({ where: { userId: uid }, _min: { order: true } }),
 						]);
 						const candidates = [
 							minL._min.order,
@@ -361,6 +366,7 @@ export async function POST(req: Request) {
 							minM._min.order,
 							minS._min.order,
 							minE._min.order,
+							minC._min.order,
 						].filter((n) => typeof n === "number") as number[];
 						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
@@ -398,7 +404,7 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				imageTxs.push(
 					(async () => {
-						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+						const [minL, minT, minV, minI, minM, minS, minE, minC] = await Promise.all([
 							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
@@ -406,6 +412,7 @@ export async function POST(req: Request) {
 							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.contactForm.aggregate({ where: { userId: uid }, _min: { order: true } }),
 						]);
 						const candidates = [
 							minL._min.order,
@@ -415,6 +422,7 @@ export async function POST(req: Request) {
 							minM._min.order,
 							minS._min.order,
 							minE._min.order,
+							minC._min.order,
 						].filter((n) => typeof n === "number") as number[];
 						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
@@ -451,7 +459,7 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				musicTxs.push(
 					(async () => {
-						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+						const [minL, minT, minV, minI, minM, minS, minE, minC] = await Promise.all([
 							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
@@ -459,6 +467,7 @@ export async function POST(req: Request) {
 							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.contactForm.aggregate({ where: { userId: uid }, _min: { order: true } }),
 						]);
 						const candidates = [
 							minL._min.order,
@@ -468,6 +477,7 @@ export async function POST(req: Request) {
 							minM._min.order,
 							minS._min.order,
 							minE._min.order,
+							minC._min.order,
 						].filter((n) => typeof n === "number") as number[];
 						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
@@ -505,7 +515,7 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				sectionTxs.push(
 					(async () => {
-						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+						const [minL, minT, minV, minI, minM, minS, minE, minC] = await Promise.all([
 							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
@@ -513,6 +523,7 @@ export async function POST(req: Request) {
 							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.contactForm.aggregate({ where: { userId: uid }, _min: { order: true } }),
 						]);
 						const candidates = [
 							minL._min.order,
@@ -522,6 +533,7 @@ export async function POST(req: Request) {
 							minM._min.order,
 							minS._min.order,
 							minE._min.order,
+							minC._min.order,
 						].filter((n) => typeof n === "number") as number[];
 						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => ({
@@ -551,7 +563,7 @@ export async function POST(req: Request) {
 			for (const [uid, arr] of byUser.entries()) {
 				eventTxs.push(
 					(async () => {
-						const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+						const [minL, minT, minV, minI, minM, minS, minE, minC] = await Promise.all([
 							prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
@@ -559,6 +571,7 @@ export async function POST(req: Request) {
 							prisma.music.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.section.aggregate({ where: { userId: uid }, _min: { order: true } }),
 							prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.contactForm.aggregate({ where: { userId: uid }, _min: { order: true } }),
 						]);
 						const candidates = [
 							minL._min.order,
@@ -568,6 +581,7 @@ export async function POST(req: Request) {
 							minM._min.order,
 							minS._min.order,
 							minE._min.order,
+							minC._min.order,
 						].filter((n) => typeof n === "number") as number[];
 						const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 						const data = arr.map((item, idx) => {

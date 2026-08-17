@@ -11,6 +11,7 @@ import ImageOptions from "@/app/(private)/studio/links/components/shared/ImageOp
 import MobileBottomSheet from "@/app/(private)/studio/links/components/shared/MobileBottomSheet";
 import MusicOptions from "@/app/(private)/studio/links/components/shared/MusicOptions";
 import VideoOptions from "@/app/(private)/studio/links/components/shared/VideoOptions";
+import ContactOptions from "@/app/(private)/studio/links/components/shared/ContactOptions";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import {
 	Dialog,
@@ -55,6 +56,7 @@ interface AddContentModalProps {
 	setIsAddingMusic: (value: boolean) => void;
 	setIsAddingEvent: (value: boolean) => void;
 	setIsAddingEventCountdown: (value: boolean) => void;
+	setIsAddingContactForm: (value: boolean) => void;
 	setFormData: (data: LinkFormData) => void;
 	setSectionFormData: (data: SectionFormData) => void;
 	setTextFormData: (data: TextFormData) => void;
@@ -78,6 +80,7 @@ const AddContentModal = ({
 	setIsAddingImage,
 	setIsAddingEvent,
 	setIsAddingEventCountdown,
+	setIsAddingContactForm,
 	setVideoFormData,
 	handleAddNewLink,
 	handleAddNewText,
@@ -157,6 +160,7 @@ const AddContentModal = ({
 			"audiomack",
 			"event_tickets",
 			"event_countdown",
+			"contact_form",
 		] as const;
 
 		if (!validOptions.includes(option as any)) {
@@ -244,6 +248,13 @@ const AddContentModal = ({
 			}, 0);
 			return;
 		}
+		if (validOption === "contact_form") {
+			onClose();
+			setTimeout(() => {
+				setIsAddingContactForm(true);
+			}, 0);
+			return;
+		}
 	};
 
 	const handleImageOptionSelect = (
@@ -305,7 +316,9 @@ const AddContentModal = ({
 											? "Música"
 											: selectedCategory === "image"
 												? "Imagem"
-												: "Eventos"}
+												: selectedCategory === "event"
+													? "Eventos"
+													: "Contato"}
 								</span>
 							</div>
 							{selectedCategory === "video" && (
@@ -321,6 +334,9 @@ const AddContentModal = ({
 								<EventOptions
 									onOptionSelect={handleOptionSelectWithState as any}
 								/>
+							)}
+							{selectedCategory === "contact" && (
+								<ContactOptions onOptionSelect={handleOptionSelectWithState as any} />
 							)}
 						</div>
 					) : (
@@ -850,6 +866,11 @@ const AddContentModal = ({
 									)}
 									{selectedCategory === "event" && (
 										<EventOptions
+											onOptionSelect={handleOptionSelectWithState as any}
+										/>
+									)}
+									{selectedCategory === "contact" && (
+										<ContactOptions
 											onOptionSelect={handleOptionSelectWithState as any}
 										/>
 									)}

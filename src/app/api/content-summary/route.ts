@@ -1,16 +1,15 @@
 // src/app/api/content-summary/route.ts
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { getAppSession } from "@/lib/auth-session";
-import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 export const runtime = "nodejs";
 
 export async function GET(_request: Request): Promise<NextResponse> {
-    const session = await getAppSession();
-    if (!session?.user?.id) {
-        return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-    }
-    const userId = session.user.id;
+	const session = await getAppSession();
+	if (!session?.user?.id) {
+		return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+	}
+	const userId = session.user.id;
 
 	try {
 		const [
@@ -21,15 +20,17 @@ export async function GET(_request: Request): Promise<NextResponse> {
 			musicsCount,
 			socialLinksCount,
 			sectionsCount,
-        ] = await Promise.all([
-            prisma.link.count({ where: { userId, archived: false } }),
-            prisma.text.count({ where: { userId, archived: false } }),
-            prisma.video.count({ where: { userId, archived: false } }),
-            prisma.image.count({ where: { userId, archived: false } }),
-            prisma.music.count({ where: { userId, archived: false } }),
-            prisma.socialLink.count({ where: { userId, active: true } }),
-            prisma.section.count({ where: { userId, active: true } }),
-        ]);
+			contactFormsCount,
+		] = await Promise.all([
+			prisma.link.count({ where: { userId, archived: false } }),
+			prisma.text.count({ where: { userId, archived: false } }),
+			prisma.video.count({ where: { userId, archived: false } }),
+			prisma.image.count({ where: { userId, archived: false } }),
+			prisma.music.count({ where: { userId, archived: false } }),
+			prisma.socialLink.count({ where: { userId, active: true } }),
+			prisma.section.count({ where: { userId, active: true } }),
+			prisma.contactForm.count({ where: { userId, archived: false } }),
+		]);
 
 		return NextResponse.json({
 			linksCount,
@@ -39,6 +40,7 @@ export async function GET(_request: Request): Promise<NextResponse> {
 			musicsCount,
 			socialLinksCount,
 			sectionsCount,
+			contactFormsCount,
 		});
 	} catch {
 		return NextResponse.json(

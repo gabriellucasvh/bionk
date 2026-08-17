@@ -16,6 +16,7 @@ import type {
 import AddNewCountdownForm from "../forms/AddNewCountdownForm";
 import AddNewEventForm from "../forms/AddNewEventForm";
 import AddNewSectionForm from "../forms/AddNewSectionForm";
+import AddNewContactForm from "../forms/AddNewContactForm";
 import LinkList from "../lists/LinkList";
 import AddContentModal from "../modals/AddContentModal";
 
@@ -27,6 +28,7 @@ interface LinksTabContentProps {
 	currentImages: ImageItem[];
 	currentMusics: MusicItem[];
 	currentEvents: EventItem[];
+	currentContactForms: any[];
 	mutateLinks: () => Promise<any>;
 	mutateSections: () => Promise<any>;
 	mutateTexts: () => Promise<any>;
@@ -34,6 +36,7 @@ interface LinksTabContentProps {
 	mutateImages: () => Promise<any>;
 	mutateMusics: () => Promise<any>;
 	mutateEvents: () => Promise<any>;
+	mutateContactForms: () => Promise<any>;
 	session: Session | null;
 }
 
@@ -45,6 +48,7 @@ const LinksTabContent = ({
 	currentImages,
 	currentMusics,
 	currentEvents,
+	currentContactForms,
 	mutateLinks,
 	mutateSections,
 	mutateTexts,
@@ -52,6 +56,7 @@ const LinksTabContent = ({
 	mutateImages,
 	mutateMusics,
 	mutateEvents,
+	mutateContactForms,
 }: LinksTabContentProps) => {
 	const {
 		unifiedItems,
@@ -60,6 +65,7 @@ const LinksTabContent = ({
 		isAddingImage,
 		isAddingEvent,
 		isAddingEventCountdown,
+		isAddingContactForm,
 		isAddingMusic,
 		formData,
 		videoFormData,
@@ -87,6 +93,7 @@ const LinksTabContent = ({
 		setIsAddingImage,
 		setIsAddingEvent,
 		setIsAddingEventCountdown,
+		setIsAddingContactForm,
 		setIsAddingMusic,
 		setFormData,
 		setVideoFormData,
@@ -103,13 +110,15 @@ const LinksTabContent = ({
 		currentImages,
 		currentMusics,
 		currentEvents,
+		currentContactForms,
 		mutateLinks,
 		mutateSections,
 		mutateTexts,
 		mutateVideos,
 		mutateImages,
 		mutateMusics,
-		mutateEvents
+		mutateEvents,
+		mutateContactForms
 	);
 
 	const handleDragStart = (event: DragStartEvent) => {
@@ -153,6 +162,12 @@ const LinksTabContent = ({
 						handlers.closeAllActiveCreations();
 					}
 					setIsAddingEventCountdown(value);
+				}}
+				setIsAddingContactForm={(value: boolean) => {
+					if (value) {
+						handlers.closeAllActiveCreations();
+					}
+					setIsAddingContactForm(value);
 				}}
 				setIsAddingImage={setIsAddingImage}
 				setIsAddingMusic={setIsAddingMusic}
@@ -231,6 +246,29 @@ const LinksTabContent = ({
 						await mutateEvents();
 						setIsAddingEventCountdown(false);
 					}}
+				/>
+			)}
+
+			{isAddingContactForm && (
+				<AddNewContactForm
+					onClose={() => {
+						setIsAddingContactForm(false);
+						handlers.setCreatingInSectionId(null);
+					}}
+					onCreated={async () => {
+						await mutateLinks();
+						await mutateSections();
+						await mutateTexts();
+						await mutateVideos();
+						await mutateImages();
+						await mutateMusics();
+						await mutateEvents();
+						await mutateContactForms();
+						setIsAddingContactForm(false);
+						handlers.setCreatingInSectionId(null);
+						window.dispatchEvent(new CustomEvent('reloadIframePreview'));
+					}}
+					sectionId={handlers.creatingInSectionId as any}
 				/>
 			)}
 

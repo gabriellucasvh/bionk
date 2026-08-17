@@ -90,6 +90,8 @@ const LinksStudioClient = () => {
 					type: video.type || "direct",
 				})) || [],
 			musics: userDataInput.Music || [],
+			events: userDataInput.Event || [],
+			contactForms: userDataInput.ContactForm || userDataInput.contactForms || [],
 		};
 	};
 

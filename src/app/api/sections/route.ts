@@ -64,7 +64,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 		? ingestMode !== "sync"
 		: process.env.NODE_ENV === "production";
 	if (!useQueue) {
-		const [minL, minT, minV, minI, minM, minS, minE] = await Promise.all([
+		const [minL, minT, minV, minI, minM, minS, minE, minC] = await Promise.all([
 			prisma.link.aggregate({ where: { userId: uid }, _min: { order: true } }),
 			prisma.text.aggregate({ where: { userId: uid }, _min: { order: true } }),
 			prisma.video.aggregate({ where: { userId: uid }, _min: { order: true } }),
@@ -75,6 +75,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 				_min: { order: true },
 			}),
 			prisma.event.aggregate({ where: { userId: uid }, _min: { order: true } }),
+							prisma.contactForm.aggregate({ where: { userId: uid }, _min: { order: true } }),
 		]);
 		const candidates = [
 			minL._min.order,
@@ -84,6 +85,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 			minM._min.order,
 			minS._min.order,
 			minE._min.order,
+							minC._min.order,
 		].filter((n) => typeof n === "number") as number[];
 		const base = candidates.length > 0 ? Math.min(...candidates) : 0;
 		const created = await prisma.section.create({

@@ -133,13 +133,15 @@ export const useLinksManager = (
 	currentImages: ImageItem[],
 	currentMusics: MusicItem[],
 	currentEvents: EventItem[],
+	currentContactForms: any[],
 	mutateLinks: () => Promise<any>,
 	mutateSections: () => Promise<any>,
 	mutateTexts: () => Promise<any>,
 	mutateVideos: () => Promise<any>,
 	mutateImages: () => Promise<any>,
 	mutateMusics: () => Promise<any>,
-	mutateEvents: () => Promise<any>
+	mutateEvents: () => Promise<any>,
+	mutateContactForms: () => Promise<any>
 ) => {
 	// ... (useState, useEffect, useMemo, findContainerId, etc. continuam iguais)
 	const [unifiedItems, setUnifiedItems] = useState<UnifiedItem[]>([]);
@@ -153,6 +155,7 @@ export const useLinksManager = (
 	const [isAddingMusic, setIsAddingMusic] = useState(false);
 	const [isAddingEvent, setIsAddingEvent] = useState(false);
 	const [isAddingEventCountdown, setIsAddingEventCountdown] = useState(false);
+	const [isAddingContactForm, setIsAddingContactForm] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [creatingInSectionId, setCreatingInSectionId] = useState<number | null>(
 		null
@@ -308,6 +311,17 @@ export const useLinksManager = (
 			} as any;
 		});
 
+		const contactFormItems: UnifiedItem[] = (currentContactForms ?? []).map((cf) => {
+			const existingItem = unifiedItems.find(
+				(item) => (item as any).isContactForm && item.id === cf.id
+			);
+			return {
+				...cf,
+				isContactForm: true as any,
+				isEditing: existingItem?.isEditing,
+			} as any;
+		});
+
 		// Links gerais (sem seção)
 		const generalLinks: UnifiedItem[] = currentLinks
 			.filter((link) => !link.sectionId)
@@ -322,6 +336,7 @@ export const useLinksManager = (
 			...imageItems,
 			...musicItems,
 			...eventItems,
+			...contactFormItems,
 		];
 
 		// Ordenar todos os itens juntos por order, com fallback estável
@@ -342,7 +357,9 @@ export const useLinksManager = (
 								? 4
 								: (item as any).isEvent
 									? 5
-									: 6;
+									: (item as any).isContactForm
+										? 6
+										: 7;
 		allItems.sort(
 			(a, b) =>
 				getOrder(a) - getOrder(b) || typeRank(a) - typeRank(b) || a.id - b.id
@@ -369,7 +386,9 @@ export const useLinksManager = (
 								? "music"
 								: (item as any).isEvent
 									? "event"
-									: "link";
+									: (item as any).isContactForm
+										? "contactForm"
+										: "link";
 			const k = `${t}-${item.id}`;
 			if (seen.has(k)) {
 				return false;
@@ -386,6 +405,7 @@ export const useLinksManager = (
 		currentImages,
 		currentMusics,
 		currentEvents,
+		currentContactForms,
 	]);
 
 	const existingSections = useMemo(() => {
@@ -420,7 +440,9 @@ export const useLinksManager = (
 								item.isText ||
 								item.isVideo ||
 								(item as any).isImage ||
-								(item as any).isMusic
+								(item as any).isMusic ||
+								(item as any).isEvent ||
+								(item as any).isContactForm
 							)
 					)
 					.filter((item) => !(item as any).isDraft)
@@ -474,6 +496,14 @@ export const useLinksManager = (
 
 				const eventItems = items
 					.filter((item) => (item as any).isEvent)
+					.filter((item) => !(item as any).isDraft)
+					.map((item) => ({
+						id: item.id,
+						order: items.indexOf(item),
+					}));
+
+				const contactFormItems = items
+					.filter((item) => (item as any).isContactForm)
 					.filter((item) => !(item as any).isDraft)
 					.map((item) => ({
 						id: item.id,
@@ -544,6 +574,16 @@ export const useLinksManager = (
 					);
 				}
 
+				if (contactFormItems.length > 0) {
+					promises.push(
+						fetch("/api/contact-forms/reorder", {
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ items: contactFormItems }),
+						})
+					);
+				}
+
 				await Promise.all(promises);
 
 				// Atualizar o estado local imediatamente para refletir as mudanças
@@ -563,6 +603,7 @@ export const useLinksManager = (
 					await mutateImages();
 					await mutateMusics();
 					await mutateEvents();
+					await mutateContactForms();
 					isReorderingRef.current = false;
 				}, 200);
 			} catch {
@@ -612,6 +653,9 @@ export const useLinksManager = (
 			}
 			if ((item as any).isEvent) {
 				return `event-${item.id}`;
+			}
+			if ((item as any).isContactForm) {
+				return `contactForm-${item.id}`;
 			}
 			return `link-${item.id}`;
 		};
@@ -782,6 +826,8 @@ export const useLinksManager = (
 				mutateVideos(),
 				mutateImages(),
 				mutateMusics(),
+				mutateEvents(),
+				mutateContactForms?.(),
 			]);
 			return;
 		}
@@ -821,6 +867,8 @@ export const useLinksManager = (
 			mutateVideos(),
 			mutateImages(),
 			mutateMusics(),
+			mutateEvents(),
+			mutateContactForms?.(),
 		]);
 	};
 
@@ -1077,6 +1125,8 @@ export const useLinksManager = (
 				mutateVideos(),
 				mutateImages(),
 				mutateMusics(),
+				mutateEvents(),
+				mutateContactForms?.(),
 			]);
 			setOriginalVideo(null);
 			return;
@@ -1259,6 +1309,8 @@ export const useLinksManager = (
 					mutateVideos(),
 					mutateImages(),
 					mutateMusics(),
+					mutateEvents(),
+					mutateContactForms?.(),
 				]);
 				setOriginalImage(null);
 				return;
@@ -1452,6 +1504,8 @@ export const useLinksManager = (
 				mutateVideos(),
 				mutateImages(),
 				mutateMusics(),
+				mutateEvents(),
+				mutateContactForms?.(),
 			]);
 			setOriginalMusic(null);
 			return;
@@ -1966,6 +2020,8 @@ export const useLinksManager = (
 				mutateVideos(),
 				mutateImages(),
 				mutateMusics(),
+				mutateEvents(),
+				mutateContactForms?.(),
 			]);
 
 			setUnifiedItems((prev) => prev.filter((item) => item.id !== id));
@@ -2143,6 +2199,8 @@ export const useLinksManager = (
 				mutateVideos(),
 				mutateImages(),
 				mutateMusics(),
+				mutateEvents(),
+				mutateContactForms?.(),
 			]);
 			setOriginalText(null);
 			return;
@@ -2198,6 +2256,7 @@ export const useLinksManager = (
 		isAddingVideo,
 		isAddingImage,
 		isAddingMusic,
+		isAddingContactForm,
 		isModalOpen,
 		creatingInSectionId,
 		formData,
@@ -2218,6 +2277,7 @@ export const useLinksManager = (
 		setIsAddingVideo,
 		setIsAddingImage,
 		setIsAddingMusic,
+		setIsAddingContactForm,
 		setIsModalOpen,
 		setCreatingInSectionId,
 		setFormData,

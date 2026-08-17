@@ -259,7 +259,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 			return NextResponse.json(
 				{
-					message: "Mensagem enviada com sucesso! Responderemos em breve.",
+					message: "Enviado",
 					success: true,
 				},
 				{ status: 200 }

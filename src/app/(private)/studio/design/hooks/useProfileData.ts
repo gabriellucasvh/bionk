@@ -29,6 +29,7 @@ interface UserData {
 	Image: UserImage[];
 	Music: UserMusic[];
 	Event: any[];
+	ContactForm: any[];
 }
 
 interface ProfileState {
@@ -69,6 +70,7 @@ export const useProfileData = (
 		Image: [],
 		Music: [],
 		Event: [],
+		ContactForm: [],
 	});
 	const [isProfileLoading, setIsProfileLoading] = useState(true);
 
@@ -93,6 +95,7 @@ export const useProfileData = (
 			let userImages: UserImage[] = [];
 			let userMusics: UserMusic[] = [];
 			let userEvents: any[] = [];
+			let userContactForms: any[] = [];
 
 			// When not in profile-only mode, fetch additional user content
 			if (!options?.profileOnly) {
@@ -123,6 +126,10 @@ export const useProfileData = (
 				const eventsRes = await fetch("/api/events");
 				const eventsData = await eventsRes.json();
 				userEvents = (eventsData?.events || []).filter((ev: any) => ev.active !== false);
+
+				const contactFormsRes = await fetch("/api/contact-forms");
+				const contactFormsData = await contactFormsRes.json();
+				userContactForms = (contactFormsData?.contactForms || []).filter((form: any) => form.active !== false);
 			}
 
 			const profileData = { id, name, username, bio: bio || "" };
@@ -143,6 +150,7 @@ export const useProfileData = (
 				Image: userImages,
 				Music: userMusics,
 				Event: userEvents,
+				ContactForm: userContactForms,
 			});
 
 			return currentImage;
@@ -165,6 +173,7 @@ export const useProfileData = (
 				Image: [],
 				Music: [],
 				Event: [],
+				ContactForm: [],
 			});
 
 			return fallbackUrl;

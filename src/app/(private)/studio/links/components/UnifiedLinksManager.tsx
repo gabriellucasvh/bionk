@@ -193,6 +193,15 @@ const UnifiedLinksManager = () => {
 		revalidateOnReconnect: false,
 	});
 
+	const { data: contactFormsData, mutate: mutateContactForms } = useSWR<{
+		contactForms: any[];
+	}>(userId ? "/api/contact-forms" : null, fetcher, {
+		revalidateOnMount: false,
+		revalidateOnFocus: false,
+		revalidateIfStale: false,
+		revalidateOnReconnect: false,
+	});
+
 	// Carregar mídias apenas se existir motivo (contagem > 0) ou ação do usuário
 	useEffect(() => {
 		if (
@@ -233,6 +242,19 @@ const UnifiedLinksManager = () => {
 			mutateEvents();
 		}
 	}, [activeTab, userId, mutateEvents]);
+
+	const hasLoadedContactForms = useRef(false);
+	useEffect(() => {
+		if (
+			activeTab === "links" &&
+			userId &&
+			!hasLoadedContactForms.current &&
+			(summaryData as any)?.contactFormsCount > 0
+		) {
+			hasLoadedContactForms.current = true;
+			mutateContactForms();
+		}
+	}, [activeTab, userId, (summaryData as any)?.contactFormsCount, mutateContactForms]);
 
 	// Carregar links/textos/seções apenas se houver itens e estiver na aba
 	useEffect(() => {
@@ -291,6 +313,7 @@ const UnifiedLinksManager = () => {
 			images: (imagesData?.images || []) as any,
 			musics: (musicsData?.musics || []) as any,
 			events: ((eventsData?.events || []).filter((e) => e.active !== false)) as any,
+			contactForms: (contactFormsData?.contactForms || []) as any,
 		});
 	}, [
 		linksData,
@@ -300,6 +323,7 @@ const UnifiedLinksManager = () => {
 		imagesData,
 		musicsData,
 		eventsData,
+		contactFormsData,
 	]);
 
 	const showLinksLoader =
@@ -344,6 +368,7 @@ const UnifiedLinksManager = () => {
 		return (
 			<LinksTabContent
 				currentEvents={eventsData?.events || []}
+				currentContactForms={contactFormsData?.contactForms || []}
 				currentImages={imagesData?.images || []}
 				currentLinks={linksData?.links || []}
 				currentMusics={musicsData?.musics || []}
@@ -357,6 +382,7 @@ const UnifiedLinksManager = () => {
 				mutateSections={mutateSections}
 				mutateTexts={mutateTexts}
 				mutateVideos={mutateVideos}
+				mutateContactForms={mutateContactForms}
 				session={session}
 			/>
 		);

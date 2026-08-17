@@ -26,6 +26,7 @@ import type {
 	TextItem,
 	VideoItem,
 } from "../../types/links.types";
+import ContactFormCard from "../cards/ContactFormCard";
 import EventCard from "../cards/EventCard";
 import ImageCard from "../cards/ImageCard";
 import LinkCard from "../cards/LinkCard";
@@ -261,6 +262,22 @@ const LinkList = (props: LinkListProps) => {
 			);
 		}
 
+		if (type === "event") {
+			return (
+				(items.find(
+					(i) => (i as any).isEvent && i.id === idNum
+				) as EventItem) || null
+			);
+		}
+
+		if (type === "contactForm") {
+			return (
+				(items.find(
+					(i) => (i as any).isContactForm && i.id === idNum
+				) as any) || null
+			);
+		}
+
 		if (type === "link") {
 			const topLevelLink = items.find(
 				(i) => !(i.isSection || i.isText || i.isVideo) && i.id === idNum
@@ -321,6 +338,9 @@ const LinkList = (props: LinkListProps) => {
 						if ((item as any).isEvent) {
 							return `event-${item.id}`;
 						}
+						if ((item as any).isContactForm) {
+							return `contactForm-${item.id}`;
+						}
 						return `link-${item.id}`;
 					})}
 					strategy={verticalListSortingStrategy}
@@ -348,6 +368,9 @@ const LinkList = (props: LinkListProps) => {
 							} else if ((item as any).isEvent) {
 								key = `event-${item.id}`;
 								sortableId = `event-${item.id}`;
+							} else if ((item as any).isContactForm) {
+								key = `contactForm-${item.id}`;
+								sortableId = `contactForm-${item.id}`;
 							} else {
 								key = `link-${item.id}`;
 								sortableId = `link-${item.id}`;
@@ -485,6 +508,21 @@ const LinkList = (props: LinkListProps) => {
                                                 originalEvent={originalEvent}
                                                 setActivatorNodeRef={setActivatorNodeRef}
                                             />
+											);
+										}
+
+										if ((item as any).isContactForm) {
+											return (
+												<ContactFormCard
+													contactForm={item as any}
+													isDragging={isDragging}
+													listeners={listeners}
+													setActivatorNodeRef={setActivatorNodeRef}
+													onToggleActive={(id, isActive) => (cardProps.onToggleActive as any)(id, "contactForm", isActive)}
+													onDeleteContactForm={async () => {
+														// Optional mutate callback. We'll rely on LinksTabContent triggering it.
+													}}
+												/>
 											);
 										}
 

@@ -65,6 +65,18 @@ export interface UserData {
 		active?: boolean;
 		archived?: boolean;
 	}>;
+	contactForms?: Array<{
+		id: number;
+		title: string;
+		description?: string | null;
+		buttonText?: string | null;
+		emailTo?: string | null;
+		successMessage?: string | null;
+		order: number;
+		sectionId?: number | null;
+		active?: boolean;
+		archived?: boolean;
+	}>;
 }
 
 export interface Customizations {

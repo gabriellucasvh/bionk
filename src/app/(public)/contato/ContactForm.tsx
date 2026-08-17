@@ -37,7 +37,7 @@ const AlertDescription = ({ children }: { children: React.ReactNode }) => (
 	<div className="text-sm">{children}</div>
 );
 
-import { WarningCircle, CheckCircle } from "@phosphor-icons/react/dist/ssr";
+import { CheckCircle, WarningCircle } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
 // Schema de validação (mesmo da API)
@@ -79,7 +79,7 @@ function SuccessState({ fullName }: SuccessStateProps) {
 	return (
 		<div className="py-8 text-center">
 			<div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-				<CheckCircle weight="regular" className="h-8 w-8 text-green-600" />
+				<CheckCircle className="h-8 w-8 text-green-600" weight="regular" />
 			</div>
 			<h3 className="mb-4 font-semibold text-2xl text-gray-900">
 				Mensagem Enviada!
@@ -132,7 +132,7 @@ export default function ContactForm() {
 			const result = await response.json();
 
 			if (!response.ok) {
-				throw new Error(result.error || "Erro ao enviar mensagem");
+				throw new Error(result.error || "Erro ao Enviar");
 			}
 
 			setSubmittedName(data.fullName);
@@ -172,7 +172,7 @@ export default function ContactForm() {
 		<form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
 			{error && (
 				<Alert variant="destructive">
-					<WarningCircle weight="regular" className="h-4 w-4" />
+					<WarningCircle className="h-4 w-4" weight="regular" />
 					<AlertDescription>{error}</AlertDescription>
 				</Alert>
 			)}

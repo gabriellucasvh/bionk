@@ -79,11 +79,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 				html: `<p>Você solicitou a redefinição de senha. Clique no link abaixo para criar uma nova senha:</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>Este link expira em 1 hora.</p><p>Se você não solicitou isso, ignore este e-mail.</p>`,
 			});
 
-			if (emailResponse.error) {
+			if ((emailResponse as any).error) {
 				throw new Error(
-					typeof emailResponse.error === "string"
-						? emailResponse.error
-						: String(emailResponse.error)
+					typeof (emailResponse as any).error === "string"
+						? (emailResponse as any).error
+						: String((emailResponse as any).error)
 				);
 			}
 

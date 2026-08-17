@@ -1,11 +1,11 @@
 "use client";
 
-import { Image as ImageIcon, MusicNote, Plus, Ticket, VideoCamera } from "@phosphor-icons/react/dist/ssr";
+import { Image as ImageIcon, MusicNote, Plus, Ticket, VideoCamera, EnvelopeSimple } from "@phosphor-icons/react/dist/ssr";
 
 interface CategorySelectorProps {
-    selectedCategory: "content" | "video" | "image" | "music" | "event" | null;
+    selectedCategory: "content" | "video" | "image" | "music" | "event" | "contact" | null;
     onCategorySelect: (
-        category: "content" | "video" | "image" | "music" | "event"
+        category: "content" | "video" | "image" | "music" | "event" | "contact"
     ) => void;
 }
 
@@ -83,6 +83,20 @@ const CategorySelector = ({
             >
                 <Ticket weight="regular" className="h-5 w-5" />
                 <span className="font-medium">Eventos</span>
+            </button>
+
+            <button
+                aria-pressed={selectedCategory === "contact"}
+                className={`flex w-auto items-center space-x-2 rounded-3xl md:rounded-lg px-3 py-6 border md:border-none text-center transition-colors hover:bg-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-zinc-400 dark:focus-visible:ring-offset-zinc-950 dark:hover:bg-zinc-700 md:w-full md:space-x-3 md:p-3 md:text-left ${
+                    selectedCategory === "contact"
+                        ? "bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-white"
+                        : ""
+                }`}
+                onClick={() => onCategorySelect("contact")}
+                type="button"
+            >
+                <EnvelopeSimple weight="regular" className="h-5 w-5" />
+                <span className="font-medium">Contato</span>
             </button>
         </div>
     );

@@ -171,6 +171,12 @@ const mainLinks: SidebarLink[] = [
 		label: "Análises",
 		icon: ChartBar,
 	},
+	{
+		key: "audience",
+		href: "/studio/audiencia",
+		label: "Audiência",
+		icon: Users,
+	},
 ];
 
 const toolsLinks: SidebarLink[] = [

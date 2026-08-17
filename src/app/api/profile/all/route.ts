@@ -35,6 +35,7 @@ export async function GET() {
 				Image: true,
 				Music: true,
 				Event: true,
+				ContactForm: true,
 				SocialLink: true,
 			},
 			orderBy: {

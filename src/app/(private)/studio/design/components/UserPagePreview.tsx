@@ -11,10 +11,12 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import ContactFormCard from "@/app/[username]/templates/components/cards/ContactFormCard";
 import EventCard from "@/app/[username]/templates/components/cards/EventCard";
 import MusicCard from "@/app/[username]/templates/components/cards/MusicCard";
 import { CardImage } from "@/app/[username]/templates/components/cards/utils/media";
 import VideoCard from "@/app/[username]/templates/components/cards/VideoCard";
+import DynamicFont from "@/components/DynamicFont";
 import UserProfileSocialIcons from "@/components/profile/UserProfileSocialIcons";
 import { cn } from "@/lib/utils";
 import { useLinkAnimation } from "@/providers/linkAnimationProvider";
@@ -22,7 +24,6 @@ import type { UserLink, UserProfile } from "@/types/user-profile";
 import { detectTrafficSource } from "@/utils/traffic-source";
 import { FONT_OPTIONS } from "../constants/design.constants";
 import { useInstantPreview } from "../hooks/useInstantPreview";
-import DynamicFont from "@/components/DynamicFont";
 
 const URL_PREFIX_REGEX = /^(https?:\/\/|mailto:|tel:|\/\/)/i;
 
@@ -501,12 +502,26 @@ function ContentList({
 
 	const addContentToArray = (
 		contentArray: Array<{
-			type: "link" | "text" | "video" | "image" | "music" | "event";
+			type:
+				| "link"
+				| "text"
+				| "video"
+				| "image"
+				| "music"
+				| "event"
+				| "contactForm";
 			item: any;
 			order: number;
 		}>,
 		items: any[] | undefined,
-		type: "link" | "text" | "video" | "image" | "music" | "event"
+		type:
+			| "link"
+			| "text"
+			| "video"
+			| "image"
+			| "music"
+			| "event"
+			| "contactForm"
 	) => {
 		if (items && items.length > 0) {
 			for (const item of items) {
@@ -517,7 +532,14 @@ function ContentList({
 
 	const createContentArray = () => {
 		const contentArray: Array<{
-			type: "link" | "text" | "video" | "image" | "music" | "event";
+			type:
+				| "link"
+				| "text"
+				| "video"
+				| "image"
+				| "music"
+				| "event"
+				| "contactForm";
 			item: any;
 			order: number;
 		}> = [];
@@ -528,6 +550,7 @@ function ContentList({
 		addContentToArray(contentArray, (user as any).Image, "image");
 		addContentToArray(contentArray, user.Music, "music");
 		addContentToArray(contentArray, (user as any).Event, "event");
+		addContentToArray(contentArray, (user as any).ContactForm, "contactForm");
 
 		return contentArray.sort((a, b) => a.order - b.order);
 	};
@@ -714,6 +737,40 @@ function ContentList({
 					buttonStyle={getButtonStyle(customizations)}
 					customPresets={customizations}
 					event={event}
+				/>
+			</div>
+		);
+
+		return result;
+	};
+
+	const renderContactFormContent = (
+		contactForm: any,
+		index: number,
+		sectionIdRef: { value: number | null }
+	) => {
+		const result: JSX.Element[] = [];
+		const formSectionId = contactForm.sectionId || null;
+
+		if (formSectionId !== sectionIdRef.value && formSectionId !== null) {
+			sectionIdRef.value = formSectionId;
+			const sectionHeader = renderSectionHeader(
+				contactForm,
+				formSectionId,
+				index
+			);
+			if (sectionHeader) {
+				result.push(sectionHeader);
+			}
+		}
+
+		result.push(
+			<div className="w-full" key={`contactForm-${contactForm.id}`}>
+				<ContactFormCard
+					buttonStyle={getButtonStyle(customizations)}
+					contactForm={contactForm}
+					customPresets={customizations}
+					textStyle={textStyle}
 				/>
 			</div>
 		);
@@ -1062,6 +1119,12 @@ function ContentList({
 							return renderMusicContent(content.item, index, currentSectionId);
 						case "event":
 							return renderEventContent(content.item, index, currentSectionId);
+						case "contactForm":
+							return renderContactFormContent(
+								content.item,
+								index,
+								currentSectionId
+							);
 						default:
 							return null;
 					}
@@ -1127,6 +1190,9 @@ function convertUserDataToUserProfile(userData: any): UserProfile {
 			(music: any) => music?.active !== false && music?.archived !== true
 		),
 		Event: userData.Event || userData.events || [],
+		ContactForm: (userData.ContactForm || userData.contactForms || []).filter(
+			(form: any) => form?.active !== false && form?.archived !== true
+		),
 		SocialLink: socialLinks,
 	} as UserProfile;
 }

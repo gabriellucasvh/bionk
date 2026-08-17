@@ -2,19 +2,18 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
-import { getAppSession } from "@/lib/auth-session";
 import Stripe from "stripe";
 import { BLACKLISTED_USERNAMES } from "@/config/blacklist";
-import { authOptions } from "@/lib/auth";
+import { getAppSession } from "@/lib/auth-session";
 import { profileBaseTag } from "@/lib/cache-tags";
 import { discordWebhook } from "@/lib/discord-webhook";
 import prisma from "@/lib/prisma";
-import { USERNAME_REGEX, getUsernameFormatError } from "@/utils/username";
+import { getUsernameFormatError, USERNAME_REGEX } from "@/utils/username";
 export const runtime = "nodejs";
 
 const regex = USERNAME_REGEX;
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-	apiVersion: "2025-09-30.clover",
+	apiVersion: "2025-10-29.clover",
 });
 
 // FUNÇÃO GET ADICIONADA
@@ -233,15 +232,15 @@ export async function PUT(
 
 		if (isUsernameChange) {
 			const normalized = username.toLowerCase().trim();
-        const cleaned = normalized.replace(/^\.+|\.+$/g, "");
-        if (cleaned !== normalized) {
-            const msg = getUsernameFormatError(normalized) || "Username inválido";
-            return NextResponse.json({ error: msg }, { status: 400 });
-        }
-        if (!regex.test(normalized)) {
-            const msg = getUsernameFormatError(normalized) || "Username inválido";
-            return NextResponse.json({ error: msg }, { status: 400 });
-        }
+			const cleaned = normalized.replace(/^\.+|\.+$/g, "");
+			if (cleaned !== normalized) {
+				const msg = getUsernameFormatError(normalized) || "Username inválido";
+				return NextResponse.json({ error: msg }, { status: 400 });
+			}
+			if (!regex.test(normalized)) {
+				const msg = getUsernameFormatError(normalized) || "Username inválido";
+				return NextResponse.json({ error: msg }, { status: 400 });
+			}
 			if (BLACKLISTED_USERNAMES.includes(normalized)) {
 				return NextResponse.json(
 					{ error: "Username não disponível" },

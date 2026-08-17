@@ -1,6 +1,6 @@
 "use client";
 
-import { FolderOpen, DotsSix, Image as ImageIcon, Link as LinkIcon, MusicNotes, Ticket, TextT, VideoCamera, ClockAfternoon } from "@phosphor-icons/react/dist/ssr";
+import { FolderOpen, DotsSix, Image as ImageIcon, Link as LinkIcon, MusicNotes, Ticket, TextT, VideoCamera, ClockAfternoon, EnvelopeSimple } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/utils";
 import type {
     EventItem,
@@ -87,6 +87,14 @@ const DragPreview = ({ item, className }: DragPreviewProps) => {
                 title: ev.title || "Evento",
             };
     }
+		if ("isContactForm" in item && (item as any).isContactForm) {
+			return {
+				icon: EnvelopeSimple,
+				label: "Formulário de Contato",
+				color: "text-purple-600",
+				title: item.title || "Formulário de Contato",
+			};
+		}
 		return {
 			icon: LinkIcon,
 			label: "Link",
