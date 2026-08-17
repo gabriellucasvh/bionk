@@ -8,6 +8,7 @@ import {
 	Check,
 	DotsThreeVerticalIcon,
 	Download,
+	Export,
 	Gear,
 	Link as LinkIcon,
 	PaintBrush,
@@ -75,24 +76,24 @@ const ProfileActionsDropdown = ({
 	return (
 		<DropdownMenuContent
 			align="end"
-			className="ml-3 grid w-60 gap-2 border p-2"
+			className="ml-3 w-60 p-2"
 		>
-			<DropdownMenuLabel className="py-1">Compartilhar</DropdownMenuLabel>
+			<DropdownMenuLabel>Compartilhar</DropdownMenuLabel>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem asChild>
 				<Link
-					className="flex h-10 cursor-pointer items-center"
+					className="cursor-pointer"
 					href={profileUrl}
 					rel="noopener noreferrer"
 					target="_blank"
 				>
-					<ArrowSquareOut className="h-4 w-4" weight="regular" />
-					<span>Abrir </span>
+					<ArrowSquareOut className="mr-2 h-4 w-4" weight="regular" />
+					<span>Abrir</span>
 				</Link>
 			</DropdownMenuItem>
 
 			<DropdownMenuSub onOpenChange={setIsQrOpen}>
-				<DropdownMenuSubTrigger className="h-10 cursor-pointer">
+				<DropdownMenuSubTrigger className="cursor-pointer">
 					<QrCode className="mr-2 h-4 w-4" weight="regular" />
 					<span>QR Code</span>
 				</DropdownMenuSubTrigger>
@@ -126,7 +127,7 @@ const ProfileActionsDropdown = ({
 			</DropdownMenuSub>
 
 			<DropdownMenuSub>
-				<DropdownMenuSubTrigger className="h-10 cursor-pointer">
+				<DropdownMenuSubTrigger className="cursor-pointer">
 					<Share className="mr-2 h-4 w-4" weight="regular" />
 					<span>Compartilhar por...</span>
 				</DropdownMenuSubTrigger>
@@ -390,7 +391,7 @@ const Sidebar = () => {
 									className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800"
 									type="button"
 								>
-									<Share className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
+									<Export className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
 								</button>
 							</DropdownMenuTrigger>
 							<ProfileActionsDropdown
@@ -483,7 +484,7 @@ const Sidebar = () => {
 							sideOffset={12}
 						>
 							<DropdownMenuSub>
-								<DropdownMenuSubTrigger className="h-10 cursor-pointer gap-2 font-medium">
+								<DropdownMenuSubTrigger className="cursor-pointer gap-2 font-medium">
 									<Users className="h-4 w-4 text-zinc-500" weight="regular" />
 									<span>Alternar Página</span>
 								</DropdownMenuSubTrigger>
@@ -493,7 +494,7 @@ const Sidebar = () => {
 											p.username === (userUsername || session?.user?.username);
 										return (
 											<DropdownMenuItem
-												className="flex cursor-pointer items-center justify-between py-2"
+												className="flex cursor-pointer items-center justify-between"
 												key={p.id}
 												onClick={() => handleSwitchProfile(p.id)}
 											>
@@ -530,7 +531,7 @@ const Sidebar = () => {
 										<>
 											<DropdownMenuSeparator className="my-1" />
 											<DropdownMenuItem
-												className="flex cursor-pointer items-center justify-center py-2 font-medium text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+												className="flex cursor-pointer items-center justify-center font-medium text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
 												onClick={() => router.push("/studio/new")}
 											>
 												<Plus className="mr-2 h-4 w-4" weight="bold" />
@@ -542,7 +543,7 @@ const Sidebar = () => {
 							</DropdownMenuSub>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
-								className="h-10 cursor-pointer px-2 font-medium"
+								className="cursor-pointer font-medium"
 								onClick={() => router.push("/studio/configs")}
 							>
 								<Gear className="h-4 w-4 text-zinc-500" weight="regular" />
