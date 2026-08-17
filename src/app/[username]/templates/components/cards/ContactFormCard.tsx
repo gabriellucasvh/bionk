@@ -135,11 +135,11 @@ export default function ContactFormCard({
 				<form className="flex w-full flex-col gap-3" onSubmit={handleSubmit}>
 					{contactForm.collectName && (
 						<input
-							className="w-full rounded-lg border border-white/20 bg-black/5 px-4 py-2 transition-all placeholder:text-current placeholder:opacity-50 focus:outline-none focus:ring-2 dark:bg-white/5"
+							className="w-full border border-white/20 bg-black/5 px-4 py-2 transition-all placeholder:text-current placeholder:opacity-50 focus:outline-none focus:ring-2 dark:bg-white/5"
 							name="name"
 							placeholder="Seu nome"
 							required
-							style={combinedTextStyle}
+							style={{ ...combinedTextStyle, borderRadius: `${cornerValue}px` }}
 							type="text"
 							maxLength={44}
 						/>
@@ -147,11 +147,11 @@ export default function ContactFormCard({
 
 					{contactForm.collectEmail && (
 						<input
-							className="w-full rounded-lg border border-white/20 bg-black/5 px-4 py-2 transition-all placeholder:text-current placeholder:opacity-50 focus:outline-none focus:ring-2 dark:bg-white/5"
+							className="w-full border border-white/20 bg-black/5 px-4 py-2 transition-all placeholder:text-current placeholder:opacity-50 focus:outline-none focus:ring-2 dark:bg-white/5"
 							name="email"
 							placeholder="Seu e-mail"
 							required
-							style={combinedTextStyle}
+							style={{ ...combinedTextStyle, borderRadius: `${cornerValue}px` }}
 							type="email"
 							maxLength={254}
 						/>
