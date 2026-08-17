@@ -16,8 +16,8 @@ export default function DynamicFont({ fontValue }: DynamicFontProps) {
 		return null;
 	}
 
-	// Satoshi é a nossa fonte local padrão, já carregada globalmente
-	if (fontOption.label === "Satoshi") {
+	// Onest é a nossa fonte local padrão, já carregada globalmente
+	if (fontOption.label === "Onest") {
 		return null;
 	}
 

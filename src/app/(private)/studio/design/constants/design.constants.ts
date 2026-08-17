@@ -21,7 +21,7 @@ export const GRADIENTS = [
 ];
 
 export const FONT_OPTIONS = [
-	{ value: "font-sans", label: "Satoshi", fontFamily: "var(--font-sans)" },
+	{ value: "font-sans", label: "Onest", fontFamily: "var(--font-sans)" },
 	{ value: "font-inter", label: "Inter", fontFamily: "'Inter', sans-serif" },
 	{
 		value: "font-montserrat",

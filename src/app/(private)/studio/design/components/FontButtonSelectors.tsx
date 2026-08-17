@@ -55,7 +55,7 @@ export function FontSelector({
 				>
 					<span className="truncate">
 						{FONT_OPTIONS.find((f) => f.value === customizations.customFont)
-							?.label || "Satoshi"}
+							?.label || "Onest"}
 					</span>
 					<TextT weight="regular" className="h-4 w-4" />
 				</Button>

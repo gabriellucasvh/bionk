@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { Geist } from "next/font/google";
+import { Geist, Onest } from "next/font/google";
 import localFont from "next/font/local";
 import { LinkAnimationProvider } from "@/providers/linkAnimationProvider";
 import NextAuthSessionProvider from "@/providers/sessionProvider";
@@ -9,10 +9,10 @@ import { SubscriptionProvider } from "@/providers/subscriptionProvider";
 import { ThemeProvider } from "@/providers/themeProvider";
 import "./globals.css";
 
-const Satoshi = localFont({
-	src: "/fonts/Satoshi-Variable.woff2",
+const onest = Onest({
+	subsets: ["latin"],
 	display: "swap",
-	variable: "--font-satoshi",
+	variable: "--font-onest",
 });
 
 const ClashDisplay = localFont({
@@ -69,7 +69,7 @@ export default async function RootLayout({
     const session = await getServerSession(authOptions);
     return (
         <html
-            className={`${geist.variable} ${ClashDisplay.variable} ${cabinetGrotesk.variable} ${Satoshi.variable} antialiased`}
+            className={`${geist.variable} ${ClashDisplay.variable} ${cabinetGrotesk.variable} ${onest.variable} antialiased`}
             data-scroll-behavior="smooth"
             lang="pt-BR"
             suppressHydrationWarning={true}

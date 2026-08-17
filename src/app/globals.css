@@ -7,7 +7,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-	--font-sans: var(--font-satoshi);
+	--font-sans: var(--font-onest);
 	--font-clashd: var(--font-clash-display);
 	--font-cabinet-grotesk: var(--font-cabinet-grotesk);
 	--font-geist: var(--font-geist);
