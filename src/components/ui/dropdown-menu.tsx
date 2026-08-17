@@ -1,7 +1,7 @@
 "use client";
 
+import { CaretRight, Check, Circle } from "@phosphor-icons/react/dist/ssr";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import { Check, CaretRight, Circle } from "@phosphor-icons/react/dist/ssr";
 import type * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -40,7 +40,7 @@ function DropdownMenuContent({
 		<DropdownMenuPrimitive.Portal>
 			<DropdownMenuPrimitive.Content
 				className={cn(
-					"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-y-auto overflow-x-hidden rounded-xl border-2 border-border bg-popover p-1 text-popover-foreground data-[state=closed]:animate-out data-[state=open]:animate-in",
+					"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-y-auto overflow-x-hidden rounded-xl border border-primary/20 bg-popover p-1 text-popover-foreground data-[state=closed]:animate-out data-[state=open]:animate-in",
 					className
 				)}
 				data-slot="dropdown-menu-content"
@@ -100,7 +100,7 @@ function DropdownMenuCheckboxItem({
 		>
 			<span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
 				<DropdownMenuPrimitive.ItemIndicator>
-					<Check weight="regular" className="size-4" />
+					<Check className="size-4" weight="regular" />
 				</DropdownMenuPrimitive.ItemIndicator>
 			</span>
 			{children}
@@ -135,7 +135,7 @@ function DropdownMenuRadioItem({
 		>
 			<span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
 				<DropdownMenuPrimitive.ItemIndicator>
-					<Circle weight="regular" className="size-2 fill-current" />
+					<Circle className="size-2 fill-current" weight="regular" />
 				</DropdownMenuPrimitive.ItemIndicator>
 			</span>
 			{children}
@@ -169,7 +169,7 @@ function DropdownMenuSeparator({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
 	return (
 		<DropdownMenuPrimitive.Separator
-			className={cn("-mx-1 my-1 h-px bg-", className)}
+			className={cn("-mx-1 bg- my-1 h-px", className)}
 			data-slot="dropdown-menu-separator"
 			{...props}
 		/>
@@ -217,7 +217,7 @@ function DropdownMenuSubTrigger({
 			{...props}
 		>
 			{children}
-			<CaretRight weight="regular" className="ml-auto size-4" />
+			<CaretRight className="ml-auto size-4" weight="regular" />
 		</DropdownMenuPrimitive.SubTrigger>
 	);
 }
@@ -229,7 +229,7 @@ function DropdownMenuSubContent({
 	return (
 		<DropdownMenuPrimitive.SubContent
 			className={cn(
-				"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md  bg-popover p-1 text-popover-foreground  data-[state=closed]:animate-out data-[state=open]:animate-in",
+				"data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md bg-popover p-1 text-popover-foreground data-[state=closed]:animate-out data-[state=open]:animate-in",
 				className
 			)}
 			data-slot="dropdown-menu-sub-content"
