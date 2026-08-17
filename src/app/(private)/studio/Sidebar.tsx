@@ -345,7 +345,7 @@ const Sidebar = () => {
 				const Icon = link.icon;
 				return (
 					<Button
-						className={`h-8 w-full justify-start rounded-lg px-3 font-medium text-sm transition-all ${
+						className={`h-8 w-full justify-start rounded-lg border-none px-3 font-medium text-sm transition-all ${
 							isActive
 								? "bg-zinc-200 text-black dark:bg-zinc-700 dark:text-white"
 								: "text-zinc-700 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-700"
