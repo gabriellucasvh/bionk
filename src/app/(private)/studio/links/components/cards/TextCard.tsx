@@ -1,6 +1,15 @@
 "use client";
 
-import { TextAlignCenter, AlignLeft, AlignRight, Archive, PencilSimple, DotsSix, DotsThreeVertical, Trash } from "@phosphor-icons/react/dist/ssr";
+import {
+	AlignLeft,
+	AlignRight,
+	Archive,
+	DotsSix,
+	DotsThreeVertical,
+	PencilSimple,
+	TextAlignCenter,
+	Trash,
+} from "@phosphor-icons/react/dist/ssr";
 import { useState } from "react";
 import { BaseButton } from "@/components/buttons/BaseButton";
 import { Button } from "@/components/ui/button";
@@ -132,11 +141,11 @@ const TextCard = ({
 				}`}
 			>
 				<div className="flex items-start gap-2 sm:gap-4">
-					<div className="flex-1 space-y-4">
+					<div className="min-w-0 flex-1 space-y-4">
 						<div className="space-y-2">
 							<Label htmlFor={`title-${text.id}`}>Título *</Label>
 							<Input
-								className="break-words"
+								className="break-all"
 								id={`title-${text.id}`}
 								maxLength={80}
 								onChange={(e) => handleFieldChange("title", e.target.value)}
@@ -148,20 +157,22 @@ const TextCard = ({
 							</div>
 						</div>
 						<div className="space-y-2">
-					<Label htmlFor={`description-${text.id}`}>Descrição (opcional)</Label>
-					<Textarea
-						className="resize-none whitespace-pre-wrap break-words"
-						id={`description-${text.id}`}
-						maxLength={1500}
-						onChange={(e) => {
-							if (e.target.value.length <= 1500) {
-								handleFieldChange("description", e.target.value);
-							}
-						}}
-						placeholder="Digite a descrição"
-						rows={3}
-						value={text.description}
-					/>
+							<Label htmlFor={`description-${text.id}`}>
+								Descrição (opcional)
+							</Label>
+							<Textarea
+								className="resize-none whitespace-pre-wrap break-all"
+								id={`description-${text.id}`}
+								maxLength={1500}
+								onChange={(e) => {
+									if (e.target.value.length <= 1500) {
+										handleFieldChange("description", e.target.value);
+									}
+								}}
+								placeholder="Digite a descrição"
+								rows={3}
+								value={text.description}
+							/>
 							<div className="text-right text-muted-foreground text-xs">
 								{text.description.length}/1500 caracteres
 							</div>
@@ -176,7 +187,7 @@ const TextCard = ({
 									type="button"
 									variant={text.position === "left" ? "default" : "white"}
 								>
-									<AlignLeft weight="regular" className="h-4 w-4" />
+									<AlignLeft className="h-4 w-4" weight="regular" />
 								</BaseButton>
 								<BaseButton
 									className="rounded-lg"
@@ -185,7 +196,7 @@ const TextCard = ({
 									type="button"
 									variant={text.position === "center" ? "default" : "white"}
 								>
-									<TextAlignCenter weight="regular" className="h-4 w-4" />
+									<TextAlignCenter className="h-4 w-4" weight="regular" />
 								</BaseButton>
 								<BaseButton
 									className="rounded-lg"
@@ -194,7 +205,7 @@ const TextCard = ({
 									type="button"
 									variant={text.position === "right" ? "default" : "white"}
 								>
-									<AlignRight weight="regular" className="h-4 w-4" />
+									<AlignRight className="h-4 w-4" weight="regular" />
 								</BaseButton>
 							</div>
 						</div>
@@ -249,18 +260,18 @@ const TextCard = ({
 					{...listeners}
 					className="cursor-grab touch-none pt-1"
 				>
-					<DotsSix weight="regular" className="h-5 w-5 text-muted-foreground" />
+					<DotsSix className="h-5 w-5 text-muted-foreground" weight="regular" />
 				</div>
-				<div className="flex-1 space-y-2">
+				<div className="min-w-0 flex-1 space-y-2">
 					<header className="flex flex-wrap items-center gap-2">
-						<h3 className="font-medium">
+						<h3 className="w-full break-all font-medium">
 							{text.title.length > 64
 								? `${text.title.slice(0, 64)}...`
 								: text.title}
 						</h3>
 					</header>
 
-					<p className="text-muted-foreground text-sm">
+					<p className="break-all text-muted-foreground text-sm">
 						{text.description.length > 100
 							? `${text.description.slice(0, 100)}...`
 							: text.description}
@@ -287,22 +298,23 @@ const TextCard = ({
 					<DropdownMenu onOpenChange={setIsMenuOpen} open={isMenuOpen}>
 						<DropdownMenuTrigger asChild>
 							<Button className="h-8 w-8" size="icon" variant="ghost">
-								<DotsThreeVertical weight="regular" className="h-4 w-4" />
+								<DotsThreeVertical className="h-4 w-4" weight="regular" />
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end">
 							<DropdownMenuItem onClick={handleEdit}>
-								<PencilSimple weight="regular" className="mr-2 h-4 w-4" /> Editar
+								<PencilSimple className="mr-2 h-4 w-4" weight="regular" />{" "}
+								Editar
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem onClick={handleArchive}>
-								<Archive weight="regular" className="mr-2 h-4 w-4" /> Arquivar
+								<Archive className="mr-2 h-4 w-4" weight="regular" /> Arquivar
 							</DropdownMenuItem>
 							<DropdownMenuItem
 								className="text-destructive"
 								onClick={handleDelete}
 							>
-								<Trash weight="regular" className="mr-2 h-4 w-4" /> Deletar
+								<Trash className="mr-2 h-4 w-4" weight="regular" /> Deletar
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

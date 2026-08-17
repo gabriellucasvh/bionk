@@ -1,6 +1,6 @@
 "use client";
 
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -123,10 +123,10 @@ export default function TextCard({
 				<div className="w-10 flex-shrink-0" />
 
 				{/* Título centralizado com mesmo comportamento dos links */}
-				<div className="flex flex-1 justify-center">
+				<div className="flex min-w-0 flex-1 justify-center">
 					<h3
 						className={cn(
-							"line-clamp-2 px-2 font-medium leading-tight",
+							"line-clamp-2 break-all px-2 font-medium leading-tight",
 							getTextClasses()
 						)}
 						style={textStyle}
@@ -142,14 +142,14 @@ export default function TextCard({
 	) : (
 		<div className={cn("w-full p-4", textAlignClass)}>
 			<h3
-				className={cn("mb-2 font-extrabold text-lg", getTextClasses())}
+				className={cn("mb-2 break-all font-bold text-lg", getTextClasses())}
 				style={textStyle}
 			>
 				{text.title}
 			</h3>
 			<p
 				className={cn(
-					"whitespace-pre-wrap text-md leading-relaxed",
+					"whitespace-pre-wrap break-all text-md leading-relaxed",
 					getTextClasses()
 				)}
 				style={textStyle}
@@ -190,10 +190,10 @@ export default function TextCard({
 						container={portalContainer || undefined}
 					>
 						<DialogHeader>
-							<DialogTitle>{text.title}</DialogTitle>
+							<DialogTitle className="break-all">{text.title}</DialogTitle>
 						</DialogHeader>
 						<div className="mt-4">
-							<p className="whitespace-pre-wrap text-sm leading-relaxed">
+							<p className="whitespace-pre-wrap break-all text-sm leading-relaxed">
 								{text.description}
 							</p>
 						</div>
