@@ -192,7 +192,7 @@
 
 @layer base {
 	* {
-		@apply border-border outline-ring/50;
+		@apply border-border outline-primary;
 	}
 	img {
 		/* Bloqueia a seleção de texto/imagem */
